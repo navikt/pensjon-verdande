@@ -19,6 +19,7 @@ import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import RtvBrevSammenligning from '~/components/behandling/RtvBrevSammenligningOutput'
+import { decodeTeam } from '~/common/decodeTeam'
 
 export interface Props {
   behandling: BehandlingDto
@@ -308,6 +309,7 @@ export default function BehandlingCard(props: Props) {
                     <></>
                   )}
                   <Entry labelText={'Status'}>{props.behandling.status}</Entry>
+                  <Entry labelText={'Ansvarlig team'}>{decodeTeam(props.behandling.ansvarligTeam)}</Entry>
                   <Entry labelText={'Funksjonell identifikator'}>
                     {props.behandling.funksjonellIdentifikator}
                   </Entry>

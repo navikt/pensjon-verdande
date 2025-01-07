@@ -4,6 +4,7 @@ import type { BehandlingDto, BehandlingerPage } from '~/types'
 import { Link, useSearchParams } from '@remix-run/react'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
+import { decodeTeam } from '~/common/decodeTeam'
 
 interface Props {
   visStatusSoek?: boolean | true,
@@ -120,6 +121,9 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.ColumnHeader sortable sortKey="class" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
                 Type
               </Table.ColumnHeader>
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+                Ansvarlig team
+              </Table.ColumnHeader>
               <Table.ColumnHeader sortable sortKey="opprettet" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
                 Opprettet
               </Table.ColumnHeader>
@@ -162,6 +166,9 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                     </Link>
                   </Table.DataCell>
                   <Table.DataCell>{decodeBehandling(it.type)}</Table.DataCell>
+                  <Table.DataCell>
+                    {decodeTeam(it.ansvarligTeam)}
+                  </Table.DataCell>
                   <Table.DataCell>
                     {formatIsoTimestamp(it.opprettet)}
                   </Table.DataCell>

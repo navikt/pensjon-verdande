@@ -24,6 +24,7 @@ export type BehandlingDto = {
   utsattTil: string | null
   stoppet: string | null
   opprettet: string
+  ansvarligTeam: string | null
   status: string
   prioritet: number
   behandlingKjoringer: BehandlingKjoringDTO[]
