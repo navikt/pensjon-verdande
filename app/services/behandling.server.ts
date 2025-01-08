@@ -6,7 +6,7 @@ export async function getDashboardSummary(
   accessToken: string,
 ): Promise<DashboardResponse | null> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/dashboard-summary`,
+    `${env.penUrl}/api/behandling/dashboard-summary`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -50,7 +50,7 @@ export async function getBehandlinger(
   }
 
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling?page=${page}&size=${size}${request}`,
+    `${env.penUrl}/api/behandling?page=${page}&size=${size}${request}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -91,7 +91,7 @@ export async function getAvhengigeBehandlinger(
   }
 
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}/avhengigeBehandlinger?page=${page}&size=${size}${request}`,
+    `${env.penUrl}/api/behandling/${behandlingId}/avhengigeBehandlinger?page=${page}&size=${size}${request}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -130,7 +130,7 @@ export async function search(
   }
 
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling?query=${query}&page=${page}&size=${size}${request}`,
+    `${env.penUrl}/api/behandling?query=${query}&page=${page}&size=${size}${request}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -151,7 +151,7 @@ export async function getBehandling(
   behandlingId: string,
 ): Promise<BehandlingDto | null> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}`,
+    `${env.penUrl}/api/behandling/${behandlingId}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -198,7 +198,7 @@ export async function getDetaljertFremdrift(
   forrigeBehandlingId: number | null,
 ): Promise<DetaljertFremdriftDTO | null> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${forrigeBehandlingId}/detaljertfremdrift`,
+    `${env.penUrl}/api/behandling/${forrigeBehandlingId}/detaljertfremdrift`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -221,7 +221,7 @@ export async function fortsettBehandling(
   behandlingId: string,
 ): Promise<void> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}/fortsett`,
+    `${env.penUrl}/api/behandling/${behandlingId}/fortsett`,
     {
       method: 'PUT',
       headers: {
@@ -241,7 +241,7 @@ export async function fortsettAvhengigeBehandlinger(
   behandlingId: string,
 ): Promise<void> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}/fortsettAvhengigeBehandlinger`,
+    `${env.penUrl}/api/behandling/${behandlingId}/fortsettAvhengigeBehandlinger`,
     {
       method: 'PUT',
       headers: {
@@ -261,7 +261,7 @@ export async function taTilDebug(
   behandlingId: string,
 ): Promise<void> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}/debug`,
+    `${env.penUrl}/api/behandling/${behandlingId}/debug`,
     {
       method: 'PUT',
       headers: {
@@ -281,7 +281,7 @@ export async function fjernFraDebug(
   behandlingId: string,
 ): Promise<void> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}/debug`,
+    `${env.penUrl}/api/behandling/${behandlingId}/debug`,
     {
       method: 'DELETE',
       headers: {
@@ -301,7 +301,7 @@ export async function runBehandling(
   behandlingId: string,
 ): Promise<void> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}/run`,
+    `${env.penUrl}/api/behandling/${behandlingId}/run`,
     {
       method: 'POST',
       headers: {
@@ -321,7 +321,7 @@ export async function stopp(
   behandlingId: string,
 ): Promise<void> {
   const response = await fetch(
-    `${env.penUrl}/springapi/behandling/${behandlingId}/stopp`,
+    `${env.penUrl}/api/behandling/${behandlingId}/stopp`,
     {
       method: 'PUT',
       headers: {

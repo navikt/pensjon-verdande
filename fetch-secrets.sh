@@ -121,7 +121,7 @@ fetch_kubernetes_secret_array "dev-gcp" "pensjon-$env" "azure-pensjon-bpc-$env" 
 
 {
   echo AZURE_CALLBACK_URL=http://localhost:3000/auth/callback
-  echo PEN_URL=http://localhost:8089/pen
+  echo PEN_URL=http://localhost:8089
   echo PEN_SCOPE=api://dev-fss.pensjon-q2.pensjon-pen-q2/.default
   echo ENABLE_OAUTH20_CODE_FLOW=true
   echo ENV=q2
