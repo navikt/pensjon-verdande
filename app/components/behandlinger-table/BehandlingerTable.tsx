@@ -150,6 +150,8 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
+              </Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}>
                 {visStatusSoek ?
                   statusOptions()
                   : <></>}
