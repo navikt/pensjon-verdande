@@ -8,16 +8,7 @@ white="[97;1m"
 red="[31;1m"
 endcolor="[0m"
 
-if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
-    echo "Du har for gammel versjon av bash. Vennligst installer versjon 4 eller høyere"
-
-    if [[ $OSTYPE == 'darwin'* ]]; then
-        echo
-        echo "På Mac kan du kjøre: ${white}brew install bash${endcolor}"
-    fi
-
-    exit 1
-fi
+envfile=".env"
 
 command -v base64 >/dev/null 2>&1 || { echo -e >&2 "${red}Du må installere installere base64 (brew install base64 on macOS)${endcolor}"; exit 1; }
 command -v kubectl >/dev/null 2>&1 || { echo -e >&2 "${red}Du må installere kubectl (https://docs.nais.io/basics/access/)${endcolor}"; exit 1; }
@@ -50,69 +41,54 @@ gcloud auth print-access-token >& /dev/null || (
   fi
 ) || exit 1
 
-declare -A kubernetes_context_namespace_secrets
-declare -A kubernetes_secret_array
+function fetch_kubernetes_secrets {
+    local type=$1
+    local context=$2
+    local namespace=$3
+    local secret=$4
+    local mode=$5
+    local A=("$@")
 
-function fetch_kubernetes_secret {
-    local context=$1
-    local namespace=$2
-    local secret=$3
-    local name=$4
-    local context_namespace_secrets_key
-    local context_namespace_secrets_value
-    local secret_name
-    local secret_response
+    echo -n -e "\t- $type "
 
-    echo -n -e "\t$name "
+    local context_namespace_secrets_value=$(kubectl --context="$context" -n "$namespace" get secrets)
+    local secret_name=$(echo "$context_namespace_secrets_value" | grep "$secret" | awk '{print $1}')
 
-
-    context_namespace_secrets_key="$context:$namespace"
-
-    if [ -v kubernetes_context_namespace_secrets["$context_namespace_secrets_key"] ]; then
-        context_namespace_secrets_value=${kubernetes_context_namespace_secrets["$context_namespace_secrets_key"]}
+    if [[ "mode" == "strict" ]]; then
+        local secret_name=$(echo "$context_namespace_secrets_value" | grep "$secret" | awk '{print $1}')
     else
-        context_namespace_secrets_value=$(kubectl --context="$context" -n "$namespace" get secrets)
-        kubernetes_context_namespace_secrets["$context_namespace_secrets_key"]=$context_namespace_secrets_value
+        local secret_name=$(echo "$context_namespace_secrets_value" | grep "$secret" | tail -1 | awk '{print $1}')
     fi
 
-    secret_name=$(echo "$context_namespace_secrets_value" | grep "$secret" | tail -1 | awk '{print $1}')
-
-    if [ -v kubernetes_secret_array["$secret_name"] ]; then
-        secret_response=${kubernetes_secret_array["$secret_name"]}
-    else
-        secret_response=$(kubectl --context="$context" -n "$namespace" get secret "$secret_name" -o json)
-        kubernetes_secret_array["$secret_name"]=$secret_response
+    if [[ $secret_name == *$'\n'* ]]; then
+       echo
+       echo "Fant følgende hemmeligheter som samsvarte med søkestrengen \"$secret\". Støtter kun en hemmelighet"
+       echo $secret_name
+       exit 1
     fi
 
-    {
-      echo -n "$name="
-      echo "$secret_response" | jq -j ".data[\"$name\"]" | base64 --decode
-      echo
-    } >> .env
+    local secret_response=$(kubectl --context="$context" -n "$namespace" get secret "$secret_name" -o json)
+
+    for name in "${A[@]:5}"
+    do
+        {
+          echo -n "$name='"
+          echo "$secret_response" | jq -j ".data[\"$name\"]" | base64 --decode |  tr -d '\n'
+          echo "'"
+        } >> ${envfile}
+    done
 
     echo -e "${bold}${white}✔${endcolor}${normal}"
 }
 
-function fetch_kubernetes_secret_array {
-    local context=$1
-    local namespace=$2
-    local secret=$3
-    local A=("$@")
-
-    for i in "${A[@]:3}"
-    do
-        fetch_kubernetes_secret "$context" "$namespace" "$secret" "$i"
-    done
-}
-
-rm -f .env
-touch .env
+rm -f ${envfile}
+touch ${envfile}
 
 echo
 
 echo -e "${bold}Henter secrets fra Kubernetes${normal}"
 
-fetch_kubernetes_secret_array "dev-gcp" "pensjon-$env" "azure-pensjon-bpc-$env" \
+fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-bpc-$env" "strict" \
   "AZURE_APP_CLIENT_ID" \
   "AZURE_APP_CLIENT_SECRET" \
   "AZURE_APP_TENANT_ID" \
@@ -126,7 +102,7 @@ fetch_kubernetes_secret_array "dev-gcp" "pensjon-$env" "azure-pensjon-bpc-$env" 
   echo ENABLE_OAUTH20_CODE_FLOW=true
   echo ENV=q2
   echo PEN_APPLICATION=pensjon-pen-q2
-} >> .env
+} >> ${envfile}
 
 echo
 
