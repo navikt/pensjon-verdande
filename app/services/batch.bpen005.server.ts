@@ -7,7 +7,7 @@ export async function opprettBpen005(
   begrensetUtplukk: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
-    `${env.penUrl}/springapi/aldersovergang/utplukk`,
+    `${env.penUrl}/api/aldersovergang/utplukk`,
     {
       method: 'POST',
       headers: {

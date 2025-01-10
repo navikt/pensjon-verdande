@@ -6,7 +6,7 @@ export async function opprettBpen007(
   beregningsAr: number,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
-    `${env.penUrl}/springapi/samboer/vurder-samboere/batch`,
+    `${env.penUrl}/api/samboer/vurder-samboere/batch`,
     {
       method: 'POST',
       headers: {
