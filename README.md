@@ -3,8 +3,15 @@
 - [Remix Docs](https://remix.run/docs)
 
 ## Development
+First, set up your environment:
 
-From your terminal:
+```sh
+brew install npm
+npm install
+./fetch-secrets.sh
+```
+
+Start `PenApplication`. Then, from your terminal:
 
 ```sh
 npm run dev
