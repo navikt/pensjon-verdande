@@ -2,6 +2,8 @@
 
 Verdande er et grafisk brukergrensesnitt for å kunne overvåke, feilsøke og utvikle behandlinger i [behandlingsløsningen](https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html). Verdande er tilgjengelig i alle miljøene som pensjon-pen kjører i. pensjon-pen er Navs fagsystem for administrering av pensjon og uføretrygd. Mer informasjon om Verdande i [systemdokumentasjonen](https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlingsloesningen/Verdande.html) (intern).
 
+Verdande henter sitt navn fra norrøn mytologi og betyr "[det som er i ferd med å bli](https://no.wikipedia.org/wiki/Verdande)".
+
 ## Komme i gang
 
 ```sh
