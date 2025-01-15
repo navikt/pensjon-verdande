@@ -32,7 +32,7 @@ export default function BatchOpprett_index() {
 
   return (
     <div>
-      <h1>Opprett BPEN005 batchkjøring</h1>
+      <h1>Start aldersovergang</h1>
       <Form action="bpen005" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Behandlingsmåned</label>
