@@ -19,7 +19,8 @@ import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import RtvBrevSammenligning from '~/components/behandling/RtvBrevSammenligningOutput'
-import { decodeTeam } from '~/common/decodeTeam'
+import type { Team } from '~/common/decodeTeam';
+import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 
 export interface Props {
   behandling: BehandlingDto
@@ -45,6 +46,16 @@ export default function BehandlingCard(props: Props) {
         return prosent
       }
     }
+  }
+
+  function oppdaterAnsvarligTeam(team: Team) {
+      fetcher.submit(
+        { ansvarligTeam: team },
+        {
+          action: 'oppdaterAnsvarligTeam',
+          method: 'POST',
+        },
+      )
   }
 
   function stopp() {
@@ -309,7 +320,12 @@ export default function BehandlingCard(props: Props) {
                     <></>
                   )}
                   <Entry labelText={'Status'}>{props.behandling.status}</Entry>
-                  <Entry labelText={'Ansvarlig team'}>{decodeTeam(props.behandling.ansvarligTeam)}</Entry>
+                  <Entry labelText={'Ansvarlig team'}>
+                    <AnsvarligTeamSelector
+                      ansvarligTeam={props.behandling.ansvarligTeam}
+                      onAnsvarligTeamChange={oppdaterAnsvarligTeam}
+                    />
+                  </Entry>
                   <Entry labelText={'Funksjonell identifikator'}>
                     {props.behandling.funksjonellIdentifikator}
                   </Entry>

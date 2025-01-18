@@ -296,6 +296,29 @@ export async function fjernFraDebug(
   }
 }
 
+export async function patchBehandling(
+  accessToken: string,
+  behandlingId: string,
+  patch: any,
+): Promise<void> {
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/${behandlingId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+      body: JSON.stringify(patch),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error()
+  }
+}
+
 export async function runBehandling(
   accessToken: string,
   behandlingId: string,

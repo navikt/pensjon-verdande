@@ -14,3 +14,7 @@ export const ensureEnv = <T extends Record<string, string>>(variables: T) => {
     {},
   ) as T
 }
+
+export function getEnumValueByKey(enumObj: any, key: string): string | undefined {
+  return enumObj[key];
+}
