@@ -8,6 +8,7 @@ import OverforAnkerTilKabalBatch from '~/components/overfortilkabal-batch/overfo
 
 
 export const action = async ({ request }: LoaderFunctionArgs) => {
+
   const accessToken = await requireAccessToken(request)
   const formData = await request.json()
 

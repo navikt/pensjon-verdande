@@ -26,11 +26,11 @@ export const links: LinksFunction = () => {
   return [
     ...(cssBundleHref
       ? [
-          { rel: 'stylesheet', href: cssBundleHref },
-          { rel: 'stylesheet', href: navStyles },
-          { rel: 'stylesheet', href: navInternalStyles },
-          { rel: 'stylesheet', href: appStylesHref },
-        ]
+        { rel: 'stylesheet', href: cssBundleHref },
+        { rel: 'stylesheet', href: navStyles },
+        { rel: 'stylesheet', href: navInternalStyles },
+        { rel: 'stylesheet', href: appStylesHref },
+      ]
       : []),
   ]
 }
@@ -103,61 +103,67 @@ export default function App() {
                         ) : (
                           <div />
                         )}
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                    <h1>
-                      <NavLink to={`/behandlinger`} end>
-                        Behandlinger
-                      </NavLink>
-                    </h1>
-                    <ul>
-                      <li>
-                        <NavLink to={`/behandlinger/FEILENDE`}>
-                          Feilende
-                        </NavLink>
-                      </li>
-                      <li>
-                        <NavLink to={`/behandlinger/DEBUG`}>I debug</NavLink>
-                      </li>
-                      <li>
-                        <NavLink to={`/behandlinger/STOPPET`}>Stoppede</NavLink>
-                      </li>
-                      <li>
-                        <NavLink to={`/behandlinger/UNDER_BEHANDLING`}>
-                          Under behandling
-                        </NavLink>
-                      </li>
-                      <li>
-                        <NavLink to={`/behandlinger/OPPRETTET`}>
-                          Opprettet
-                        </NavLink>
-                      </li>
-                      <li>
-                        <NavLink to={`/behandlinger/FULLFORT`}>
-                          Fullførte
-                        </NavLink>
-                      </li>
-                    </ul>
                   </li>
                 </ul>
-              </nav>
-            </div>
+              </li>
+              <li>
+                <h1>
+                  <NavLink to={`/behandlinger`} end>
+                    Behandlinger
+                  </NavLink>
+                </h1>
+                <ul>
+                  <li>
+                    <NavLink to={`/behandlinger/FEILENDE`}>
+                      Feilende
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to={`/behandlinger/DEBUG`}>I debug</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to={`/behandlinger/STOPPET`}>Stoppede</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to={`/behandlinger/UNDER_BEHANDLING`}>
+                      Under behandling
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to={`/behandlinger/OPPRETTET`}>
+                      Opprettet
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to={`/behandlinger/FULLFORT`}>
+                      Fullførte
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <h1>Adminverktøy</h1>
+            <ul>
+              <li>
+                <NavLink to={`/laaste-vedtak`}>Låste vedtak</NavLink>
+              </li>
+            </ul>
+          </nav>
+        </div>
 
-            <div
-              className={navigation.state === 'loading' ? 'loading' : ''}
-              id="detail"
-            >
-              <Outlet />
-            </div>
-          </HStack>
-        </VStack>
+        <div
+          className={navigation.state === 'loading' ? 'loading' : ''}
+          id="detail"
+        >
+          <Outlet />
+        </div>
+      </HStack>
+    </VStack>
 
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
+    <ScrollRestoration />
+    <Scripts />
+    <LiveReload />
+    </body>
     </html>
   )
 }
