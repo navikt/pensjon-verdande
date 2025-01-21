@@ -56,7 +56,7 @@ export default function LaasteVedtakPage() {
 
   // Reload page when uttrekk is finished
   useEffect(() => {
-    if (laasteVedtakSummary.uttrekkStatus?.isFerdig || laasteVedtakSummary.uttrekkStatus?.isFeilet) {
+    if (laasteVedtakSummary.behandlingId === null || laasteVedtakSummary.uttrekkStatus?.isFerdig || laasteVedtakSummary.uttrekkStatus?.isFeilet || laasteVedtakSummary.uttrekkStatus?.isFerdig === false) {
       return
     }
 
@@ -134,7 +134,7 @@ export default function LaasteVedtakPage() {
                       <Table.Row key={index}>
                         <Table.DataCell>{formatIsoDate(vedtak.datoRegistrert)}</Table.DataCell>
                         <Table.DataCell>
-                          <AnsvarligTeam behandlingId={laasteVedtakSummary.behandlingId} vedtak={vedtak} />
+                          <AnsvarligTeam behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
                         </Table.DataCell>
                         <Table.DataCell><CopyButton copyText={vedtak.sakId} text={vedtak.sakId}
                                                     size="small" /></Table.DataCell>
@@ -154,10 +154,10 @@ export default function LaasteVedtakPage() {
                         {avansertVisning &&
                           <Table.DataCell>{vedtak.opprettetAv} {vedtak.endretAv && '/' + vedtak.endretAv}</Table.DataCell>}
                         <Table.DataCell>
-                          <Kommentar behandlingId={laasteVedtakSummary.behandlingId} vedtak={vedtak} />
+                          <Kommentar behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
                         </Table.DataCell>
                         <Table.DataCell>
-                          <KanIverksettes behandlingId={laasteVedtakSummary.behandlingId} vedtak={vedtak} />
+                          <KanIverksettes behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
                         </Table.DataCell>
                       </Table.Row>
                     ))}
@@ -267,7 +267,7 @@ function KanIverksettes({ behandlingId, vedtak }: { behandlingId: string, vedtak
 
 function Kommentar({ behandlingId, vedtak }: { behandlingId: string, vedtak: LaasteVedtakRow }) {
   const fetcher = useFetcher()
-  const [kommentar, setKommentar] = useState(vedtak.kommentar ?? "")
+  const [kommentar, setKommentar] = useState(vedtak.kommentar ?? '')
 
   function oppdaterKommentar() {
 
@@ -279,7 +279,7 @@ function Kommentar({ behandlingId, vedtak }: { behandlingId: string, vedtak: Laa
       {
         behandlingId,
         kravId: vedtak.kravId,
-        kommentar,
+        kommentar: kommentar === '' ? ' ' : kommentar,
       },
       {
         action: 'oppdaterKommentar',
