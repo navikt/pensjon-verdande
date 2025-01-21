@@ -98,7 +98,7 @@ export default function LaasteVedtakPage() {
                 <Alert variant="info" size="small" inline>Kjører
                   aktivitet: {(uttrekkStatusFetcher?.data as LaasteVedtakUttrekkStatus | null)?.aktivitet ?? 'Behandling starter...'}</Alert>}
               <RunUttrekk
-                isFerdig={laasteVedtakSummary.uttrekkStatus?.isFerdig === true || laasteVedtakSummary.uttrekkStatus?.isFeilet === true} />
+                isFerdig={laasteVedtakSummary.uttrekkStatus?.isFerdig === true || laasteVedtakSummary.uttrekkStatus?.isFeilet === true || laasteVedtakSummary.behandlingId === null} />
             </HStack>
           </div>
         </HStack>
