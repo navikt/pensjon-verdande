@@ -11,3 +11,13 @@ export function formatIsoTimestamp(
     }
   }
 }
+
+
+export function formatIsoDate(
+  isoDate: string | undefined | null,
+) {
+  if (isoDate) {
+    let date = new Date(isoDate)
+      return date.toLocaleDateString('no-NO')
+  }
+}
