@@ -1,6 +1,6 @@
 export type LaasteVedtakUttrekkSummary = {
-  behandlingId: string,
-  sistKjoert: string,
+  behandlingId: string | null,
+  sistKjoert: string | null,
   uttrekkStatus: LaasteVedtakUttrekkStatus | null,
   laasteVedtak: LaasteVedtakRow[],
 }
