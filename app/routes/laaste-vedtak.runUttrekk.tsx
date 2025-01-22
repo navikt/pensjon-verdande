@@ -8,7 +8,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   const accessToken = await requireAccessToken(request)
 
-  const nullstill = false
+  const nullstill = true
   await runUttrekk(accessToken, nullstill)
   return null
 }
