@@ -31,6 +31,7 @@ export type LaasteVedtakBehandlingSummary = {
   isFeilet: boolean,
   isFerdig: boolean,
   isUnderBehandling: boolean,
+  isStoppet: boolean,
 }
 
 export type LaasteVedtakUttrekkStatus = {

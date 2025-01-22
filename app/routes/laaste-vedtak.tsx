@@ -23,7 +23,7 @@ import React, { useEffect, useState } from 'react'
 import {
   ArrowCirclepathIcon,
   CheckmarkCircleIcon,
-  CogRotationIcon,
+  CogRotationIcon, ExclamationmarkTriangleIcon,
   PersonSuitIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
@@ -305,9 +305,10 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string, behandlinger: 
       {behandlinger.map((behandling) => (
         <HStack key={kravid + behandling.behandlingId} gap="1" align="center">
           <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">{decodeBehandling(behandling.type)}</Link>
-          {behandling.isFeilet ? <XMarkOctagonIcon color="red" /> : behandling.isFerdig ?
-            <CheckmarkCircleIcon color="green" /> :
-            <ArrowCirclepathIcon />}
+          {behandling.isUnderBehandling && <ArrowCirclepathIcon />}
+          {behandling.isFerdig && <CheckmarkCircleIcon color="green" />}
+          {behandling.isFeilet && <ExclamationmarkTriangleIcon color="orange" />}
+          {behandling.isStoppet && <XMarkOctagonIcon color="red" />}
         </HStack>
       ))}
     </VStack>
