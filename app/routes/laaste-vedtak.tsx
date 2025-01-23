@@ -3,7 +3,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
-import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+import { Link, useFetcher, useLoaderData, useSearchParams } from '@remix-run/react'
 import {
   Alert,
   Button,
@@ -23,7 +23,8 @@ import React, { useEffect, useState } from 'react'
 import {
   ArrowCirclepathIcon,
   CheckmarkCircleIcon,
-  CogRotationIcon, ExclamationmarkTriangleIcon,
+  CogRotationIcon,
+  ExclamationmarkTriangleIcon,
   PersonSuitIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
@@ -36,11 +37,17 @@ import type {
   LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary,
 } from '~/laaste-vedtak.types'
+import { useSort } from '~/hooks/useSort'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
+
+  const { searchParams } = new URL(request.url)
+  const team = searchParams.get('team')
+
   const accessToken = await requireAccessToken(request)
   const laasteVedtakSummary = await getLaasteVedtakSummary(
     accessToken,
+    team,
   )
   if (!laasteVedtakSummary) {
     throw new Response('Not Found', { status: 404 })
@@ -49,38 +56,18 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function LaasteVedtakPage() {
-  const laasteVedtakSummary  = useLoaderData() as LaasteVedtakUttrekkSummary
-  const uttrekkStatusFetcher = useFetcher()
+  const laasteVedtakSummary = useLoaderData() as LaasteVedtakUttrekkSummary
+  const [uttrekkStatus, setUttrekkStatus] = useState<LaasteVedtakUttrekkStatus | null>(laasteVedtakSummary.uttrekkStatus)
   const [avansertVisning, setAvansertVisning] = useState(false)
-
-
-  // Reload page when uttrekk is finished
-  useEffect(() => {
-    if (laasteVedtakSummary.behandlingId === null || laasteVedtakSummary.uttrekkStatus?.isFerdig || laasteVedtakSummary.uttrekkStatus?.isFeilet || laasteVedtakSummary.uttrekkStatus?.isFerdig === false) {
-      return
-    }
-
-    function oppdaterUttrekkStatus() {
-      const uttrekkStatus = uttrekkStatusFetcher.data as LaasteVedtakUttrekkStatus | null
-
-      if (uttrekkStatus?.isFerdig || uttrekkStatus?.isFeilet) {
-        clearInterval(interval)
-        location.reload()
-      } else {
-        if (uttrekkStatusFetcher.state === 'idle') uttrekkStatusFetcher.load(`/laaste-vedtak/uttrekkStatus?behandlingId=${laasteVedtakSummary.behandlingId}`)
-      }
-    }
-
-    const interval = setInterval(() => oppdaterUttrekkStatus(), 1000)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [laasteVedtakSummary.behandlingId, laasteVedtakSummary.uttrekkStatus?.isFeilet, laasteVedtakSummary.uttrekkStatus?.isFerdig, uttrekkStatusFetcher])
+  const { sortKey, onSort, sortFunc, sortDecending } =
+    useSort<LaasteVedtakRow>('endretDato')
+  const sortedLaasteVedtak: LaasteVedtakRow[] = React.useMemo(() => {
+    return laasteVedtakSummary.laasteVedtak.sort(sortFunc)
+  }, [laasteVedtakSummary.laasteVedtak, sortFunc])
 
   return (
     <div id="laaste_vedtak">
-      <VStack>
+      <VStack gap="5">
         <HStack align="center" justify="center" gap="2">
           <Heading size="large">Låste vedtak</Heading>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig &&
@@ -94,9 +81,9 @@ export default function LaasteVedtakPage() {
               {laasteVedtakSummary.uttrekkStatus?.isFeilet &&
                 <Alert variant="error" size="small" inline>Uttrekk feilet. Sist
                   forsøkt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)} </Alert>}
-              {(uttrekkStatusFetcher?.data as LaasteVedtakUttrekkStatus | null)?.isFerdig == false &&
+              {uttrekkStatus?.isFerdig == false &&
                 <Alert variant="info" size="small" inline>Kjører
-                  aktivitet: {(uttrekkStatusFetcher?.data as LaasteVedtakUttrekkStatus | null)?.aktivitet ?? 'Behandling starter...'}</Alert>}
+                  aktivitet: {uttrekkStatus?.aktivitet ?? 'Behandling starter...'}</Alert>}
               <RunUttrekk
                 isFerdig={laasteVedtakSummary.uttrekkStatus?.isFerdig === true || laasteVedtakSummary.uttrekkStatus?.isFeilet === true || laasteVedtakSummary.behandlingId === null} />
             </HStack>
@@ -104,33 +91,48 @@ export default function LaasteVedtakPage() {
         </HStack>
         <HStack>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig === true && (
-            <VStack>
-              <HStack>
+            <VStack gap="5">
+              <HStack gap="4" align="end" justify="start">
+                <VelgTeam />
                 <Switch checked={avansertVisning} onChange={() => setAvansertVisning(!avansertVisning)}>Avansert
                   visning</Switch>
               </HStack>
               <HStack>
-                <Table zebraStripes>
+                <Table
+                  size="small"
+                  onSortChange={onSort}
+                  sort={{
+                    direction: sortDecending ? 'descending' : 'ascending',
+                    orderBy: sortKey as string,
+                  }}
+                  zebraStripes>
                   <Table.Header>
                     <Table.Row>
-                      <Table.HeaderCell>Registrert</Table.HeaderCell>
-                      <Table.HeaderCell>Team</Table.HeaderCell>
-                      <Table.HeaderCell>Sak Id</Table.HeaderCell>
-                      {avansertVisning && <Table.HeaderCell>Vedtak Id</Table.HeaderCell>}
-                      <Table.HeaderCell>SakType</Table.HeaderCell>
-                      <Table.HeaderCell>Behandlinger</Table.HeaderCell>
-                      {avansertVisning && <Table.HeaderCell>Vedtakstype</Table.HeaderCell>}
-                      {avansertVisning && <Table.HeaderCell>Vedtaksstatus</Table.HeaderCell>}
-                      {avansertVisning && <Table.HeaderCell>Virk FOM</Table.HeaderCell>}
-                      {avansertVisning && <Table.HeaderCell>Krav gjelder</Table.HeaderCell>}
-                      {avansertVisning && <Table.HeaderCell>Kravstatus</Table.HeaderCell>}
-                      {avansertVisning && <Table.HeaderCell>Opprettet av/Endret av</Table.HeaderCell>}
-                      <Table.HeaderCell>Kommentar</Table.HeaderCell>
-                      <Table.HeaderCell>Kan iverksettes</Table.HeaderCell>
+                      <Table.ColumnHeader sortKey="datoRegistrert" sortable>Registrert</Table.ColumnHeader>
+                      <Table.ColumnHeader sortKey="team" sortable>Team</Table.ColumnHeader>
+                      <Table.ColumnHeader sortKey="sakId" sortable>Sak Id</Table.ColumnHeader>
+                      {avansertVisning &&
+                        <Table.ColumnHeader sortKey="vedtakId" sortable>Vedtak Id</Table.ColumnHeader>}
+                      <Table.ColumnHeader sortKey="sakType" sortable>SakType</Table.ColumnHeader>
+                      <Table.ColumnHeader>Behandlinger</Table.ColumnHeader>
+                      <Table.ColumnHeader sortKey="vedtakStatus" sortable>Vedtaksstatus</Table.ColumnHeader>
+                      {avansertVisning &&
+                        <Table.ColumnHeader sortKey="vedtaksType" sortable>Vedtakstype</Table.ColumnHeader>}
+                      {avansertVisning && <Table.ColumnHeader sortKey="virkFom" sortable>Virk FOM</Table.ColumnHeader>}
+                      {avansertVisning &&
+                        <Table.ColumnHeader sortKey="kravGjelder" sortable>Krav gjelder</Table.ColumnHeader>}
+                      {avansertVisning &&
+                        <Table.ColumnHeader sortKey="kravStatus" sortable>Kravstatus</Table.ColumnHeader>}
+                      {avansertVisning &&
+                        <Table.ColumnHeader sortKey="endretAv" sortable>Opprettet av/Endret av</Table.ColumnHeader>}
+                      <Table.ColumnHeader sortKey="opprettetDato" sortable>Dato opprettet</Table.ColumnHeader>
+                      <Table.ColumnHeader sortKey="endretDato" sortable>Dato endret</Table.ColumnHeader>
+                      <Table.ColumnHeader>Kommentar</Table.ColumnHeader>
+                      <Table.ColumnHeader sortKey="kanIverksettes" sortable>Kan iverksettes</Table.ColumnHeader>
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
-                    {laasteVedtakSummary.laasteVedtak.map((vedtak, index) => (
+                    {sortedLaasteVedtak.map((vedtak, index) => (
                       <Table.Row key={index}>
                         <Table.DataCell>{formatIsoDate(vedtak.datoRegistrert)}</Table.DataCell>
                         <Table.DataCell>
@@ -146,13 +148,15 @@ export default function LaasteVedtakPage() {
                           <PersonSuitIcon color="DarkSlateGray" />}</HStack></Table.DataCell>
                         <Table.DataCell>{vedtak.behandlinger.length > 0 &&
                           <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />}</Table.DataCell>
+                        <Table.DataCell>{vedtak.vedtakStatus}</Table.DataCell>
                         {avansertVisning && <Table.DataCell>{vedtak.vedtaksType}</Table.DataCell>}
-                        {avansertVisning && <Table.DataCell>{vedtak.vedtakStatus}</Table.DataCell>}
                         {avansertVisning && <Table.DataCell>{formatIsoDate(vedtak.virkFom)}</Table.DataCell>}
                         {avansertVisning && <Table.DataCell>{vedtak.kravGjelder}</Table.DataCell>}
                         {avansertVisning && <Table.DataCell>{vedtak.kravStatus}</Table.DataCell>}
                         {avansertVisning &&
                           <Table.DataCell>{vedtak.opprettetAv} {vedtak.endretAv && '/' + vedtak.endretAv}</Table.DataCell>}
+                        <Table.DataCell>{formatIsoDate(vedtak.opprettetDato)}</Table.DataCell>
+                        <Table.DataCell>{formatIsoDate(vedtak.endretDato)}</Table.DataCell>
                         <Table.DataCell>
                           <Kommentar behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
                         </Table.DataCell>
@@ -171,8 +175,10 @@ export default function LaasteVedtakPage() {
               <Detail>{laasteVedtakSummary.uttrekkStatus?.stackTrace}</Detail>
             </VStack>}
         </HStack>
-
       </VStack>
+      <AutoReloadUttrekkStatus behandlingId={laasteVedtakSummary.behandlingId} uttrekkStatus={uttrekkStatus}
+                               setUttrekkStatus={setUttrekkStatus}
+                               shouldAutoReload={!laasteVedtakSummary?.uttrekkStatus?.isFerdig && !laasteVedtakSummary.uttrekkStatus?.isFeilet} />
     </div>
   )
 }
@@ -213,6 +219,7 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string, vedtak:
   return (
     <HStack>
       <Select
+        size="small"
         label="Velg ansvarlig team"
         hideLabel
         id="team-select"
@@ -257,7 +264,7 @@ function KanIverksettes({ behandlingId, vedtak }: { behandlingId: string, vedtak
 
   return (
     <HStack>
-      <Switch checked={vedtak.kanIverksettes} loading={fetcher.state === 'submitting'}
+      <Switch size="small" checked={vedtak.kanIverksettes} loading={fetcher.state === 'submitting'}
               onChange={() => oppdaterKanIverksettes(!vedtak.kanIverksettes)}>
         {null}
       </Switch>
@@ -315,13 +322,86 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string, behandlinger: 
   )
 }
 
+function VelgTeam() {
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const team = searchParams.get('team') as Team | null
+
+  return (
+    <Select size="small" label="Velg team" defaultValue={team || undefined} onChange={(value) => {
+      const nyttTeam = value.target.value
+      if (nyttTeam === '') {
+        searchParams.delete('team')
+      } else {
+        searchParams.set('team', nyttTeam)
+      }
+
+      setSearchParams(searchParams, {
+        preventScrollReset: true,
+      })
+    }
+    }>
+      <option value="">Alle team</option>
+      {Object.keys(Team).map((teamKey) => (
+        <option key={teamKey} value={teamKey}>
+          {getEnumValueByKey(Team, teamKey)}
+        </option>
+      ))}
+    </Select>
+  )
+}
+
+function AutoReloadUttrekkStatus({ behandlingId, uttrekkStatus, setUttrekkStatus, shouldAutoReload }: {
+  behandlingId: string | null,
+  uttrekkStatus: LaasteVedtakUttrekkStatus | null,
+  setUttrekkStatus: (status: LaasteVedtakUttrekkStatus) => void,
+  shouldAutoReload: boolean
+}) {
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    if (fetcher.data !== null) {
+      setUttrekkStatus(fetcher.data as LaasteVedtakUttrekkStatus)
+    }
+  }, [fetcher.data, setUttrekkStatus])
+
+  useEffect(() => {
+    if (behandlingId === null || !shouldAutoReload) {
+      return
+    }
+
+    function oppdaterUttrekkStatus() {
+      const uttrekkStatus = fetcher.data as LaasteVedtakUttrekkStatus | null
+
+      if (uttrekkStatus?.isFerdig || uttrekkStatus?.isFeilet) {
+        clearInterval(interval)
+        location.reload()
+      } else {
+        if (fetcher.state === 'idle') fetcher.load(`/laaste-vedtak/uttrekkStatus?behandlingId=${behandlingId}`)
+      }
+    }
+
+    const interval = setInterval(() => oppdaterUttrekkStatus(), 1000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [behandlingId, uttrekkStatus?.isFeilet, uttrekkStatus?.isFerdig, fetcher])
+
+  return null
+}
 
 export async function getLaasteVedtakSummary(
   accessToken: string,
+  team: string | null,
 ): Promise<LaasteVedtakUttrekkSummary> {
 
+  const url = new URL(`${env.penUrl}/api/behandling/laaste-vedtak`)
+  if (team !== null) {
+    url.searchParams.append('team', team)
+  }
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak`,
+    url.toString(),
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
