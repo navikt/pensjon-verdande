@@ -79,48 +79,19 @@ export async function startReguleringOrkestrering(
   }
 }
 
-export async function fortsettBehandling(
-  accessToken: string,
-  behandlingIdFamilie: string,
-  fortsettTilAktivitet: string,
-): Promise<StartBatchResponse> {
-
-  const body: any = {
-    behandlingIdFamilie: behandlingIdFamilie,
-    fortsettTilAktivitet: fortsettTilAktivitet,
-  }
-
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/fortsett`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify(body),
-    },
-  )
-
-  if (response.ok) {
-    return (await response.json()) as StartBatchResponse
-  } else {
-    throw new Error()
-  }
-}
-
 export async function fortsettAvhengigeBehandling(
   accessToken: string,
   behandlingIdRegulering: string,
   antallFamiliebehandlinger: string,
   fortsettTilAktivitet: string,
+  behandlingType: string,
 ): Promise<FortsettBatchResponse> {
 
   const body: any = {
     behandlingId: behandlingIdRegulering,
     fortsettTilAktivitet: fortsettTilAktivitet,
     antallBehandlinger: antallFamiliebehandlinger,
+    behandlingType: behandlingType,
   }
 
   const response = await fetch(

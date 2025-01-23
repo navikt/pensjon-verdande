@@ -1,9 +1,8 @@
 import type { ActionFunctionArgs} from '@remix-run/node';
 import { json, redirect } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { fortsettAvhengigeBehandling, fortsettBehandling, startReguleringOrkestrering, startReguleringUttrekk, } from '~/services/batch.bpen068.server'
+import { fortsettAvhengigeBehandling, startReguleringOrkestrering, startReguleringUttrekk, } from '~/services/batch.bpen068.server'
 import ReguleringUttrekk from '~/components/regulering/regulering-uttrekk'
-import FortsettFamilieReguleringBehandling from '~/components/regulering/regulering-fortsettbehandling'
 import FortsettAvhengigeReguleringBehandlinger from '~/components/regulering/regulering-fortsett-avhengige'
 import { useLoaderData } from '@remix-run/react'
 import { getBehandlinger } from '~/services/behandling.server'
@@ -36,20 +35,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     )
     return redirect(`/batch/regulering`)
 
-  }else if (updates.formType === 'fortsettFamilie') {
-    await fortsettBehandling(
-      accessToken,
-      updates.behandlingIdFamilie as string,
-      updates.fortsettTilAktivitet as string,
-    )
-    return redirect(`/batch/regulering`)
-
   } else if (updates.formType === 'fortsettAvhengige') {
     await fortsettAvhengigeBehandling(
       accessToken,
       updates.behandlingIdRegulering as string,
       updates.antallFamiliebehandlinger as string,
       updates.fortsettTilAktivitet as string,
+      updates.behandlingType as string,
     )
     return redirect(`/behandling/${updates.behandlingIdRegulering}`)
 
@@ -105,7 +97,7 @@ export default function OpprettReguleringBatchRoute() {
             <td><ReguleringOrkestrering /></td>
           </tr>
           <tr>
-            <td><FortsettFamilieReguleringBehandling /></td>
+            <td></td>
             <td><FortsettAvhengigeReguleringBehandlinger /></td>
           </tr>
         </table>
