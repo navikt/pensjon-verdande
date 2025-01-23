@@ -19,6 +19,8 @@ export type LaasteVedtakRow = {
   vedtakStatus: string | null,
   kravGjelder: string,
   opprettetAv: string,
+  opprettetDato: string,
+  endretDato: string | null,
   endretAv: string | null,
   vedtaksType: string | null,
   kravStatus: string | null,
