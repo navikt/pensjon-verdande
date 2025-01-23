@@ -15,7 +15,7 @@ import {
   Select,
   Switch,
   Table,
-  Textarea,
+  Textarea, Tooltip,
   VStack,
 } from '@navikt/ds-react'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
@@ -24,7 +24,7 @@ import {
   ArrowCirclepathIcon,
   CheckmarkCircleIcon,
   CogRotationIcon,
-  ExclamationmarkTriangleIcon,
+  ExclamationmarkTriangleIcon, HeadCloudIcon,
   PersonSuitIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
@@ -144,8 +144,8 @@ export default function LaasteVedtakPage() {
                           <CopyButton copyText={vedtak.vedtakId} text={vedtak.vedtakId}
                                       size="small" />}</Table.DataCell>}
                         <Table.DataCell><HStack align="center" gap="1">{vedtak.sakType} {vedtak.isAutomatisk ?
-                          <CogRotationIcon color="DeepSkyBlue" fontSize="16" /> :
-                          <PersonSuitIcon color="DarkSlateGray" />}</HStack></Table.DataCell>
+                          <Tooltip content="Automatisk krav"><HeadCloudIcon color="DeepSkyBlue" fontSize="16" /></Tooltip> :
+                          <Tooltip content="Manuelt k rav"><PersonSuitIcon color="DarkSlateGray" /></Tooltip>}</HStack></Table.DataCell>
                         <Table.DataCell>{vedtak.behandlinger.length > 0 &&
                           <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />}</Table.DataCell>
                         <Table.DataCell>{vedtak.vedtakStatus}</Table.DataCell>
@@ -312,10 +312,10 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string, behandlinger: 
       {behandlinger.map((behandling) => (
         <HStack key={kravid + behandling.behandlingId} gap="1" align="center">
           <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">{decodeBehandling(behandling.type)}</Link>
-          {behandling.isUnderBehandling && <ArrowCirclepathIcon />}
-          {behandling.isFerdig && <CheckmarkCircleIcon color="green" />}
-          {behandling.isFeilet && <ExclamationmarkTriangleIcon color="orange" />}
-          {behandling.isStoppet && <XMarkOctagonIcon color="red" />}
+          {behandling.isUnderBehandling && <Tooltip content="Under behandling"><CogRotationIcon /></Tooltip>}
+          {behandling.isFerdig && <Tooltip content="Ferdig"><CheckmarkCircleIcon color="green" /></Tooltip>}
+          {behandling.isFeilet && <Tooltip content="Feilet"><ExclamationmarkTriangleIcon color="orange" /></Tooltip>}
+          {behandling.isStoppet && <Tooltip content="Stoppet manuelt. Krav må låses opp"><XMarkOctagonIcon color="red" /></Tooltip>}
         </HStack>
       ))}
     </VStack>
