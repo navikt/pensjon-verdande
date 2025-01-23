@@ -145,7 +145,7 @@ export default function LaasteVedtakPage() {
                                       size="small" />}</Table.DataCell>}
                         <Table.DataCell><HStack align="center" gap="1">{vedtak.sakType} {vedtak.isAutomatisk ?
                           <Tooltip content="Automatisk krav"><HeadCloudIcon color="DeepSkyBlue" fontSize="16" /></Tooltip> :
-                          <Tooltip content="Manuelt k rav"><PersonSuitIcon color="DarkSlateGray" /></Tooltip>}</HStack></Table.DataCell>
+                          <Tooltip content="Manuelt krav"><PersonSuitIcon color="DarkSlateGray" /></Tooltip>}</HStack></Table.DataCell>
                         <Table.DataCell>{vedtak.behandlinger.length > 0 &&
                           <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />}</Table.DataCell>
                         <Table.DataCell>{vedtak.vedtakStatus}</Table.DataCell>
