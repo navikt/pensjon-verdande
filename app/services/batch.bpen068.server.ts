@@ -84,14 +84,14 @@ export async function fortsettAvhengigeBehandling(
   behandlingIdRegulering: string,
   antallFamiliebehandlinger: string,
   fortsettTilAktivitet: string,
-  behandlingType: string,
+  behandlingStatusType: string,
 ): Promise<FortsettBatchResponse> {
 
   const body: any = {
     behandlingId: behandlingIdRegulering,
     fortsettTilAktivitet: fortsettTilAktivitet,
     antallBehandlinger: antallFamiliebehandlinger,
-    behandlingType: behandlingType,
+    behandlingStatusType: behandlingStatusType,
   }
 
   const response = await fetch(

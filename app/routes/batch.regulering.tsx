@@ -41,7 +41,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       updates.behandlingIdRegulering as string,
       updates.antallFamiliebehandlinger as string,
       updates.fortsettTilAktivitet as string,
-      updates.behandlingType as string,
+      updates.behandlingStatusType as string,
     )
     return redirect(`/behandling/${updates.behandlingIdRegulering}`)
 

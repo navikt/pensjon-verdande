@@ -9,7 +9,7 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
     submit(e.target.form)
     setIsClicked(true)
   }
-  const options = [
+  const status = [
     "FEILENDE",
     "UTSATTE",
     "ALLE",
@@ -41,10 +41,10 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
           />
         </p>
         <p>
-          <select name="behandlingType">
-            <option value={options[0]}>{options[0]}</option>
-            <option value={options[1]}>{options[1]}</option>
-            <option value={options[2]}>{options[2]}</option>
+          <select name="behandlingStatusType">
+            <option value={status[0]}>{status[0]}</option>
+            <option value={status[1]}>{status[1]}</option>
+            <option value={status[2]}>{status[2]}</option>
           </select>
         </p>
         <p>
