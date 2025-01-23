@@ -133,7 +133,7 @@ export default function LaasteVedtakPage() {
                   </Table.Header>
                   <Table.Body>
                     {sortedLaasteVedtak.map((vedtak, index) => (
-                      <Table.Row key={index}>
+                      <Table.Row key={vedtak.kravId}>
                         <Table.DataCell>{formatIsoDate(vedtak.datoRegistrert)}</Table.DataCell>
                         <Table.DataCell>
                           <AnsvarligTeam behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
