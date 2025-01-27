@@ -82,15 +82,17 @@ export async function startReguleringOrkestrering(
 export async function fortsettAvhengigeBehandling(
   accessToken: string,
   behandlingIdRegulering: string,
-  antallFamiliebehandlinger: string,
+  reguleringBehandlingType: string,
+  antallBehandlinger: string,
   fortsettTilAktivitet: string,
   behandlingStatusType: string,
 ): Promise<FortsettBatchResponse> {
 
-  const body: any = {
+  const requestBody: any = {
     behandlingId: behandlingIdRegulering,
+    reguleringBehandlingType: reguleringBehandlingType,
     fortsettTilAktivitet: fortsettTilAktivitet,
-    antallBehandlinger: antallFamiliebehandlinger,
+    antallBehandlinger: antallBehandlinger,
     behandlingStatusType: behandlingStatusType,
   }
 
@@ -103,7 +105,7 @@ export async function fortsettAvhengigeBehandling(
         'Content-Type': 'application/json',
         'X-Request-ID': crypto.randomUUID(),
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(requestBody),
     },
   )
 

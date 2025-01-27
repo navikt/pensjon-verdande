@@ -12,7 +12,7 @@ export default function ReguleringUttrekk() {
   return <div><h2>Start Uttrekk</h2><Form method="POST">
     <input type="hidden" name="formType" value="startReguleringUttrekk" />
     <p>
-      Satsdato
+      Satsdato &nbsp;
       <input
         defaultValue="2025-05-01"
         aria-label="Satsdato"
@@ -22,7 +22,7 @@ export default function ReguleringUttrekk() {
       />
     </p>
     <p>
-      Reguleringsdato
+      Reguleringsdato &nbsp;
       <input
         defaultValue="2025-05-01"
         aria-label="Reguleringsdato"
@@ -32,7 +32,7 @@ export default function ReguleringUttrekk() {
       />
     </p>
     <p>
-      Kjør til og med aktivitet
+      Kjør til og med aktivitet &nbsp;
       <input
         defaultValue="A100"
         aria-label="SisteAktivitet"

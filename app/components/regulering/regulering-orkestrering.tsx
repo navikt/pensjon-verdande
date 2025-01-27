@@ -11,7 +11,7 @@ export default function ReguleringOrkestrering() {
   return <div><h2>Start Orkestrering</h2><Form method="POST">
     <input type="hidden" name="formType" value="startReguleringOrkestrering" />
     <p>
-      Satsdato
+      Satsdato &nbsp;
       <input
         defaultValue="2025-05-01"
         aria-label="Satsdato"
@@ -21,7 +21,7 @@ export default function ReguleringOrkestrering() {
       />
     </p>
     <p>
-      Reguleringsdato
+      Reguleringsdato &nbsp;
       <input
         defaultValue="2025-05-01"
         aria-label="Reguleringsdato"
@@ -31,7 +31,7 @@ export default function ReguleringOrkestrering() {
       />
     </p>
     <p>
-      Kjør til og med aktivitet
+      Kjør til og med aktivitet &nbsp;
       <input
         defaultValue="A100"
         aria-label="SisteAktivitet"
@@ -41,7 +41,7 @@ export default function ReguleringOrkestrering() {
       />
     </p>
     <p>
-      Opprett maks antall familiebehandlinger
+      Opprett maks antall familiebehandlinger &nbsp;
       <input
         defaultValue="10"
         aria-label="MaxFamiliebehandlinger"
