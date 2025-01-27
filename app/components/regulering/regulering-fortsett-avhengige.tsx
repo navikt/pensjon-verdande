@@ -14,14 +14,18 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
     "UTSATTE",
     "ALLE",
   ];
+  const reguleringTyper = [
+    "FAMILIE",
+    "IVERKSETT_VEDTAK",
+  ];
 
   return (
     <div>
-      <h2>Fortsett familiebehandlinger</h2>
+      <h2>Fortsett Regulering behandling(er)</h2>
       <Form method="POST">
         <input type="hidden" name="formType" value="fortsettAvhengige" />
         <p>
-          BehandlingId for Orkestrering behandling
+          OrkestreringsId &nbsp;
           <input
             defaultValue=""
             aria-label="BehandlingIdRegulering"
@@ -31,16 +35,24 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
           />
         </p>
         <p>
-          Antall avhengige behandlinger
+          Behandlingstype &nbsp;
+          <select name="reguleringBehandlingType">
+            <option value={reguleringTyper[0]}>{reguleringTyper[0]}</option>
+            <option value={reguleringTyper[1]}>{reguleringTyper[1]}</option>
+          </select>
+        </p>
+        <p>
+          Antall &nbsp;
           <input
             defaultValue="10"
-            aria-label="AntallFamiliebehandlinger"
-            name="antallFamiliebehandlinger"
+            aria-label="AntallBehandlinger"
+            name="antallBehandlinger"
             type="text"
-            placeholder="Maks antall familiebehandlinger (-1 for alle)"
+            placeholder="Maks antall behandlinger (-1 for alle)"
           />
         </p>
         <p>
+        Behandlingsstatus &nbsp;
           <select name="behandlingStatusType">
             <option value={status[0]}>{status[0]}</option>
             <option value={status[1]}>{status[1]}</option>
@@ -48,7 +60,7 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
           </select>
         </p>
         <p>
-          Fortsett til prosesserings-aktivitet Axxx
+          Fortsett til aktivitet &nbsp;
           <input
             defaultValue=""
             aria-label="FortsettTilAktivitet"

@@ -33,16 +33,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       updates.sisteAktivitet as string,
       updates.maxFamiliebehandlinger as string,
     )
-    return redirect(`/batch/regulering`)
-
-  } else if (updates.formType === 'fortsettAvhengige') {
     await fortsettAvhengigeBehandling(
       accessToken,
       updates.behandlingIdRegulering as string,
-      updates.antallFamiliebehandlinger as string,
+      updates.reguleringBehandlingType as string,
+      updates.antallBehandlinger as string,
       updates.fortsettTilAktivitet as string,
       updates.behandlingStatusType as string,
     )
+
+    return redirect(`/batch/regulering`)
+  } else if (updates.formType === 'fortsettAvhengige') {
     return redirect(`/behandling/${updates.behandlingIdRegulering}`)
 
   }
