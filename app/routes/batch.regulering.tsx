@@ -1,7 +1,12 @@
 import type { ActionFunctionArgs} from '@remix-run/node';
 import { json, redirect } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { fortsettAvhengigeBehandling, startReguleringOrkestrering, startReguleringUttrekk, } from '~/services/batch.bpen068.server'
+import {
+  endreKjorelopIverksettVedtakBehandlinger,
+  fortsettAvhengigeBehandling,
+  startReguleringOrkestrering,
+  startReguleringUttrekk,
+} from '~/services/batch.bpen068.server'
 import ReguleringUttrekk from '~/components/regulering/regulering-uttrekk'
 import FortsettAvhengigeReguleringBehandlinger from '~/components/regulering/regulering-fortsett-avhengige'
 import { useLoaderData } from '@remix-run/react'
@@ -9,6 +14,7 @@ import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import type { BehandlingerPage } from '~/types'
 import ReguleringOrkestrering from '~/components/regulering/regulering-orkestrering'
+import EndreKjoreLopTilBehandlinger from '~/components/regulering/regulering-endre-kjore-lop'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
@@ -33,6 +39,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       updates.sisteAktivitet as string,
       updates.maxFamiliebehandlinger as string,
     )
+    return redirect(`/batch/regulering`)
+  } else if (updates.formType === 'fortsettAvhengige') {
+
     await fortsettAvhengigeBehandling(
       accessToken,
       updates.behandlingIdRegulering as string,
@@ -42,10 +51,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       updates.behandlingStatusType as string,
     )
 
-    return redirect(`/batch/regulering`)
-  } else if (updates.formType === 'fortsettAvhengige') {
     return redirect(`/behandling/${updates.behandlingIdRegulering}`)
-
+  } else if (updates.formType === 'endreKjorelop') {
+    await endreKjorelopIverksettVedtakBehandlinger(
+      accessToken,
+      updates.behandlingIdRegulering as string,
+      updates.velgKjoreLop as string,
+    )
+    return redirect(`/batch/regulering`)
   }
 
   return redirect('/error');
@@ -98,7 +111,7 @@ export default function OpprettReguleringBatchRoute() {
             <td><ReguleringOrkestrering /></td>
           </tr>
           <tr>
-            <td></td>
+            <td><EndreKjoreLopTilBehandlinger /></td>
             <td><FortsettAvhengigeReguleringBehandlinger /></td>
           </tr>
         </table>
