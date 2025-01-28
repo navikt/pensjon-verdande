@@ -148,3 +148,6 @@ export type StartBatchResponse = {
 export type FortsettBatchResponse = {
   behandlingId: number[]
 }
+export type EndreKjorelopIverksettVedtakResponse = {
+  behandlingId: number[]
+}
