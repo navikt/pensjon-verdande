@@ -14,6 +14,7 @@ export default function BatchOpprett_index() {
   const now = new Date()
   const lastYear = now.getFullYear() - 1
   const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
+  const nesteBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 2
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
@@ -101,6 +102,25 @@ export default function BatchOpprett_index() {
           </button>
         </p>
       </Form>
+
+
+      <h1>Opprett BPEN090 batchkjøring</h1>
+      <Form action="bpen090" method="POST">
+        <p>
+          Behandlingsmåned (yyyyMM)
+          <input
+            defaultValue={nesteBehandlingsmaneden}
+            aria-label="behandlingsmaaned"
+            name="behandlingsmaaned"
+            type="number"
+            placeholder="behandlingsmaaned"
+          />
+        </p>
+        <p>
+          <button type="submit">Opprett</button>
+        </p>
+      </Form>
+
       <h1>Opprett BPEN091 batchkjøring</h1>
       <Form action="bpen091" method="POST">
         <p>
