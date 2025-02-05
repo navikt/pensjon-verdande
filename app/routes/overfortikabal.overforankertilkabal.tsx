@@ -1,6 +1,4 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node'
-
-
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import { StartBatchResponse } from '~/types'
