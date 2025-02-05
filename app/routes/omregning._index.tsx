@@ -78,38 +78,38 @@ export default function BatchOpprett_index() {
             </Box>
             <Box>
               <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
-                <Checkbox value='1'>Omregne AFP</Checkbox>
-                <Checkbox value='2'>Behandle åpne krav</Checkbox>
-                <Checkbox value='3'>Bruk faktoromregning</Checkbox>
-                <Checkbox value='4'>Bruk kjøreplan</Checkbox>
-                <Checkbox value='5'>Opprett alle oppgaver</Checkbox>
-                <Checkbox value='6'>Sjekk ytelser fra avtaleland</Checkbox>
+                <Checkbox name="omregneAFP" value='omregneAFP'>Omregne AFP</Checkbox>
+                <Checkbox name="behandleApneKrav" value='behandleApneKrav'>Behandle åpne krav</Checkbox>
+                <Checkbox name="brukFaktoromregning" value='brukFaktoromregning'>Bruk faktoromregning</Checkbox>
+                <Checkbox name="brukKjoreplan" value='brukKjoreplan'>Bruk kjøreplan</Checkbox>
+                <Checkbox name="opprettAlleOppgaver" value='opprettAlleOppgaver'>Opprett alle oppgaver</Checkbox>
+                <Checkbox name="sjekkYtelseFraAvtaleland" value='sjekkYtelseFraAvtaleland'>Sjekk ytelser fra avtaleland</Checkbox>
               </CheckboxGroup>
             </Box>
 
             <Box>
-              <Select label='Krav gjelder'>
+              <Select label='Krav gjelder' name={'kravGjelder'}>
                 {optionsKravGjelder.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
-              <Select label={'Kravårsak'}>
+              <Select label={'Kravårsak'} name={'kravArsak'}>
                 {optionsKravArsak.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
-              <Select label={'Toleransegrense sett'}>
+              <Select label={'Toleransegrense sett'} name={'toleransegrenseSett'}>
                 {toleransegrenseSett.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
-              <Select label={'Oppgave sett'}>
+              <Select label={'Oppgave sett'} name={'oppgaveSett'}>
                 {oppgaveSett.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
