@@ -81,16 +81,11 @@ export default function App() {
           <nav>
             <Accordion size="small" headingSize="xsmall">
               <Accordion.Item>
-                <Accordion.Header>
-                  <NavLink to={`/dashboard`}>Dashboard</NavLink>
-                </Accordion.Header>
+                <NavLink to={`/dashboard`}>Dashboard</NavLink>
               </Accordion.Item>
 
               <Accordion.Item>
-                <Accordion.Header>
-                  <NavLink to={`/sok`}>Søk</NavLink>
-
-                </Accordion.Header>
+                <NavLink to={`/sok`}>Søk</NavLink>
               </Accordion.Item>
 
 
@@ -121,6 +116,9 @@ export default function App() {
                     </li>
                     <li>
                       <NavLink to={`/omsorgsopptjening`}>Omsorgsopptjening uttrekk</NavLink>
+                    </li>
+                    <li>
+                      <NavLink to={`/omregning`}>Omregning - BPEN093</NavLink>
                     </li>
 
                     <li>
