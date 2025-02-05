@@ -94,6 +94,9 @@ export default function App() {
                 <Accordion.Content>
                   <ul>
                     <li>
+                      <NavLink to={`/batcher`}>Kjøringer</NavLink>
+                    </li>
+                    <li>
                       <NavLink to={`/aldersovergang`}>Aldersovergang</NavLink>
                     </li>
                     <li>
@@ -119,10 +122,6 @@ export default function App() {
                     </li>
                     <li>
                       <NavLink to={`/omregning`}>Omregning - BPEN093</NavLink>
-                    </li>
-
-                    <li>
-                      <NavLink to={`/batcher`}>Kjøringer</NavLink>
                     </li>
                     <li>
                       {env != 'p' ? (
