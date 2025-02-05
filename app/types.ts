@@ -151,3 +151,18 @@ export type FortsettBatchResponse = {
 export type EndreKjorelopIverksettVedtakResponse = {
   behandlingId: number[]
 }
+
+export type OmregningRequest = {
+  behandlingsnokkel: string
+  omregningstidspunkt: string
+  omregneAFP: boolean
+  behandleApneKrav: boolean
+  brukFaktoromregning: boolean
+  brukKjoreplan: boolean
+  opprettAlleOppgaver: boolean
+  sjekkYtelseFraAvtaleland: boolean
+  kravGjelder: string
+  kravArsak: string
+  toleransegrenseSett: string
+  oppgaveSett: string
+}
