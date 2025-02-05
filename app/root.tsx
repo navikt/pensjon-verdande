@@ -109,6 +109,9 @@ export default function App() {
                       <NavLink to={`/bpen096`}>Hent opplysninger fra Skatt</NavLink>
                     </li>
                     <li>
+                      <NavLink to={`/bpen090`}>Løpende inntektsavkorting for uføretrygd</NavLink>
+                    </li>
+                    <li>
                       <NavLink to={`/bpen091`}>Fastsette inntekt for uføretrygd</NavLink>
                     </li>
                     <li>
