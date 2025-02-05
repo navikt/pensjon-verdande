@@ -14,6 +14,7 @@ export default function BatchOpprett_index() {
   const now = new Date()
   const lastYear = now.getFullYear() - 1
   const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
+  const nesteBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 2
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
@@ -108,10 +109,10 @@ export default function BatchOpprett_index() {
         <p>
           Behandlingsmåned (yyyyMM)
           <input
-            defaultValue=""
+            defaultValue={nesteBehandlingsmaneden}
             aria-label="behandlingsmaaned"
             name="behandlingsmaaned"
-            type="string"
+            type="number"
             placeholder="behandlingsmaaned"
           />
         </p>
