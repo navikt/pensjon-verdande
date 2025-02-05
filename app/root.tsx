@@ -115,7 +115,7 @@ export default function App() {
                       <NavLink to={`/bpen091`}>Fastsette inntekt for uføretrygd</NavLink>
                     </li>
                     <li>
-                      <NavLink to={`/rtv-brev-sammenligning`}>Hent opplysninger fra Skatt</NavLink>
+                      <NavLink to={`/rtv-brev-sammenligning`}>RTV Brev Sammenligninger</NavLink>
                     </li>
                     <li>
                       <NavLink to={`/overfortilkabal`}>Klager til kabal</NavLink>
@@ -142,7 +142,7 @@ export default function App() {
                 <Accordion.Content>
                   <ul>
                     <li><NavLink to={`/behandlinger`} end>
-                      Alle Behandlinger
+                      Alle behandlinger
                     </NavLink></li>
                     <li>
                       <NavLink to={`/behandlinger/FEILENDE`}>
