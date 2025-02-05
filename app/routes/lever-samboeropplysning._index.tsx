@@ -1,8 +1,7 @@
-import { Form, NavLink, useSubmit } from '@remix-run/react'
+import { Form } from '@remix-run/react'
 import { json } from '@remix-run/node'
 import { env } from '~/services/env.server'
-import React, { useState, useRef, useEffect } from 'react'
-import { Select } from '@navikt/ds-react'
+import React, { useEffect, useRef } from 'react'
 
 export const loader = async () => {
   return json({
@@ -13,10 +12,6 @@ export const loader = async () => {
 export default function BatchOpprett_index() {
   const now = new Date()
   const lastYear = now.getFullYear() - 1
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
 
   const inputRef = useRef<HTMLInputElement>(null)
 

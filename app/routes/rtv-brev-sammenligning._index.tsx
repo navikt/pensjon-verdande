@@ -1,8 +1,7 @@
-import { Form, NavLink, useSubmit } from '@remix-run/react'
+import { NavLink } from '@remix-run/react'
 import { json } from '@remix-run/node'
 import { env } from '~/services/env.server'
-import React, { useState, useRef, useEffect } from 'react'
-import { Select } from '@navikt/ds-react'
+import React, { useEffect, useRef } from 'react'
 
 export const loader = async () => {
   return json({
