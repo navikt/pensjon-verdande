@@ -18,7 +18,6 @@ import { decodeBehandling } from '~/common/decodeBehandling'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
-import RtvBrevSammenligning from '~/components/behandling/RtvBrevSammenligningOutput'
 import type { Team } from '~/common/decodeTeam';
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 
@@ -434,13 +433,6 @@ export default function BehandlingCard(props: Props) {
           <></>
         )}
       </div>
-
-      {
-      ( props.behandling.debugJson
-      ? <RtvBrevSammenligning debugJson={props.behandling.debugJson}></RtvBrevSammenligning>
-      : <></>
-      )
-      }
 
       <Box
         background={'surface-default'}

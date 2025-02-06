@@ -115,9 +115,6 @@ export default function App() {
                       <NavLink to={`/bpen091`}>Fastsette inntekt for uføretrygd</NavLink>
                     </li>
                     <li>
-                      <NavLink to={`/rtv-brev-sammenligning`}>RTV Brev Sammenligninger</NavLink>
-                    </li>
-                    <li>
                       <NavLink to={`/overfortilkabal`}>Klager til kabal</NavLink>
                     </li>
                     <li>

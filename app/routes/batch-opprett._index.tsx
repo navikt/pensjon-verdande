@@ -145,11 +145,6 @@ export default function BatchOpprett_index() {
         </p>
       </Form>
 
-      <h1>Opprett RTV Brev Sammenligninger</h1>
-
-      <NavLink to={'./rtv-brev-sammenligning'}>
-        Opprett RTV Brev Sammenligninger
-      </NavLink>
       <h1>Opprett Omsorgsopptjening uttrekk</h1>
       <NavLink to={'./omsorgsopptjening-uttrekk'}>
         Opprett Omsorgsopptjening-uttrekk

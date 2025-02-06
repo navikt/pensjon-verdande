@@ -29,7 +29,6 @@
     "chart.js": "^4.4.2",
     "chartjs-plugin-datalabels": "^2.2.0",
     "date-fns-tz": "^2.0.0",
-    "diff": "^5.2.0",
     "express": "^4.21.2",
     "isbot": "^5.1.5",
     "jwt-decode": "^4.0.0",
@@ -45,7 +44,6 @@
   "devDependencies": {
     "@remix-run/dev": "^2",
     "@remix-run/eslint-config": "^2",
-    "@types/diff": "^5.2.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "eslint": "^8.47.0",
