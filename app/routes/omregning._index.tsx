@@ -2,7 +2,7 @@ import { Form, useSubmit } from '@remix-run/react'
 import { json } from '@remix-run/node'
 import { env } from '~/services/env.server'
 import React, { useEffect, useRef, useState } from 'react'
-import { Box, Checkbox, CheckboxGroup, HGrid, HStack, MonthPicker, Select, TextField, VStack } from '@navikt/ds-react'
+import { Box, Checkbox, CheckboxGroup, HGrid, MonthPicker, Select, TextField, VStack } from '@navikt/ds-react'
 
 export const loader = async () => {
   return json({
@@ -12,9 +12,8 @@ export const loader = async () => {
 
 export default function BatchOpprett_index() {
   const now = new Date()
-  const lastYear = now.getFullYear() - 1
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const [isClicked, setIsClicked] = useState(false)
+  const [omregningstidspunkt, setOmregningstidspunkt] = useState('')
   const submit = useSubmit()
   const handleSubmit = (e: any) => {
     submit(e.target.form)
@@ -59,6 +58,16 @@ export default function BatchOpprett_index() {
     { value: 'SOKNAD_AP', label: 'Søknad AP' },
   ]
 
+  function setMonthSelected(date: Date | undefined) {
+    if (!date) {
+      return
+    }
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
+    const behandlingsmaned = year * 100 + month
+    setOmregningstidspunkt(behandlingsmaned.toString())
+  }
+
   return (
     <div>
       <h1>BPEN093 - Omregning av ytelser</h1>
@@ -69,21 +78,23 @@ export default function BatchOpprett_index() {
               <TextField label={'Behandlingsnøkkel'} name={'behandlingsnokkel'} size='small' />
 
               <MonthPicker.Standalone
-                aria-label={'Omregningstidspunkt'}
-                onMonthSelect={console.info}
+                onMonthSelect={setMonthSelected}
                 dropdownCaption
                 fromDate={new Date(`1 Oct ${now.getFullYear() - 1}`)}
                 toDate={new Date(`1 Oct ${now.getFullYear() + 1}`)}
               />
+              <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt' value={omregningstidspunkt}
+                     readOnly />
             </Box>
             <Box>
               <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
-                <Checkbox name="omregneAFP" value='omregneAFP'>Omregne AFP</Checkbox>
-                <Checkbox name="behandleApneKrav" value='behandleApneKrav'>Behandle åpne krav</Checkbox>
-                <Checkbox name="brukFaktoromregning" value='brukFaktoromregning'>Bruk faktoromregning</Checkbox>
-                <Checkbox name="brukKjoreplan" value='brukKjoreplan'>Bruk kjøreplan</Checkbox>
-                <Checkbox name="opprettAlleOppgaver" value='opprettAlleOppgaver'>Opprett alle oppgaver</Checkbox>
-                <Checkbox name="sjekkYtelseFraAvtaleland" value='sjekkYtelseFraAvtaleland'>Sjekk ytelser fra avtaleland</Checkbox>
+                <Checkbox name='omregneAFP' value='omregneAFP'>Omregne AFP</Checkbox>
+                <Checkbox name='behandleApneKrav' value='behandleApneKrav'>Behandle åpne krav</Checkbox>
+                <Checkbox name='brukFaktoromregning' value='brukFaktoromregning'>Bruk faktoromregning</Checkbox>
+                <Checkbox name='brukKjoreplan' value='brukKjoreplan'>Bruk kjøreplan</Checkbox>
+                <Checkbox name='opprettAlleOppgaver' value='opprettAlleOppgaver'>Opprett alle oppgaver</Checkbox>
+                <Checkbox name='sjekkYtelseFraAvtaleland' value='sjekkYtelseFraAvtaleland'>Sjekk ytelser fra
+                  avtaleland</Checkbox>
               </CheckboxGroup>
             </Box>
 
@@ -116,7 +127,7 @@ export default function BatchOpprett_index() {
                   </option>
                 ))}
               </Select>
-              <br/>
+              <br />
               <Box>
                 <button type='submit' disabled={isClicked} onClick={handleSubmit}>
                   Opprett
