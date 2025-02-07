@@ -24,7 +24,18 @@ export type LaasteVedtakRow = {
   endretAv: string | null,
   vedtaksType: string | null,
   kravStatus: string | null,
+  opplaasVedtakInformasjon: OpplaasVedtakInformasjon | null,
   behandlinger: LaasteVedtakBehandlingSummary[]
+}
+
+export type OpplaasVedtakInformasjon = {
+  harBehandling: boolean,
+  erAutomatisk: boolean,
+  sammenstotendeVedtak: SammenstoendeVedtak | null,
+}
+
+export type SammenstoendeVedtak = {
+  sakId: string,
 }
 
 export type LaasteVedtakBehandlingSummary = {

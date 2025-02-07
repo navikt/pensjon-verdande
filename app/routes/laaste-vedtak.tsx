@@ -6,31 +6,37 @@ import { env } from '~/services/env.server'
 import { Link, useFetcher, useLoaderData, useSearchParams } from '@remix-run/react'
 import {
   Alert,
+  BodyLong,
   Button,
   CopyButton,
   Detail,
+  Dropdown,
   Heading,
   HStack,
+  List,
   Loader,
+  Modal,
   Select,
   Switch,
   Table,
-  Textarea, Tooltip,
+  Textarea,
+  Tooltip,
   VStack,
 } from '@navikt/ds-react'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import React, { useEffect, useState } from 'react'
 import {
-  ArrowCirclepathIcon,
   CheckmarkCircleIcon,
   CogRotationIcon,
-  ExclamationmarkTriangleIcon, HeadCloudIcon,
+  ExclamationmarkTriangleIcon,
+  HeadCloudIcon,
+  MenuElipsisVerticalIcon,
   PersonSuitIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { getEnumValueByKey } from '~/common/utils'
-import { Team } from '~/common/decodeTeam'
+import { decodeTeam, Team } from '~/common/decodeTeam'
 import type {
   LaasteVedtakBehandlingSummary,
   LaasteVedtakRow,
@@ -38,6 +44,7 @@ import type {
   LaasteVedtakUttrekkSummary,
 } from '~/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
+import { LaasOppResultat } from '~/routes/laaste-vedtak.laasOpp'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
 
@@ -59,6 +66,8 @@ export default function LaasteVedtakPage() {
   const laasteVedtakSummary = useLoaderData() as LaasteVedtakUttrekkSummary
   const [uttrekkStatus, setUttrekkStatus] = useState<LaasteVedtakUttrekkStatus | null>(laasteVedtakSummary.uttrekkStatus)
   const [avansertVisning, setAvansertVisning] = useState(false)
+  const [laasOppVedtak, setLaasOppVedtak] = useState<LaasteVedtakRow | null>(null)
+
   const { sortKey, onSort, sortFunc, sortDecending } =
     useSort<LaasteVedtakRow>('endretDato')
   const sortedLaasteVedtak: LaasteVedtakRow[] = React.useMemo(() => {
@@ -144,8 +153,10 @@ export default function LaasteVedtakPage() {
                           <CopyButton copyText={vedtak.vedtakId} text={vedtak.vedtakId}
                                       size="small" />}</Table.DataCell>}
                         <Table.DataCell><HStack align="center" gap="1">{vedtak.sakType} {vedtak.isAutomatisk ?
-                          <Tooltip content="Automatisk krav"><HeadCloudIcon color="DeepSkyBlue" fontSize="16" /></Tooltip> :
-                          <Tooltip content="Manuelt k rav"><PersonSuitIcon color="DarkSlateGray" /></Tooltip>}</HStack></Table.DataCell>
+                          <Tooltip content="Automatisk krav"><HeadCloudIcon color="DeepSkyBlue"
+                                                                            fontSize="16" /></Tooltip> :
+                          <Tooltip content="Manuelt krav"><PersonSuitIcon
+                            color="DarkSlateGray" /></Tooltip>}</HStack></Table.DataCell>
                         <Table.DataCell>{vedtak.behandlinger.length > 0 &&
                           <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />}</Table.DataCell>
                         <Table.DataCell>{vedtak.vedtakStatus}</Table.DataCell>
@@ -163,6 +174,10 @@ export default function LaasteVedtakPage() {
                         <Table.DataCell>
                           <KanIverksettes behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
                         </Table.DataCell>
+                        <Table.DataCell>
+                          {vedtak.opplaasVedtakInformasjon !== null &&
+                            <VedtakDropdown vedtak={vedtak} onAapneLaasVedtak={() => setLaasOppVedtak(vedtak)} />}
+                        </Table.DataCell>
                       </Table.Row>
                     ))}
                   </Table.Body>
@@ -176,6 +191,7 @@ export default function LaasteVedtakPage() {
             </VStack>}
         </HStack>
       </VStack>
+      {laasOppVedtak !== null && <LaasOppVedtakModal vedtak={laasOppVedtak} onClose={() => setLaasOppVedtak(null)} />}
       <AutoReloadUttrekkStatus behandlingId={laasteVedtakSummary.behandlingId} uttrekkStatus={uttrekkStatus}
                                setUttrekkStatus={setUttrekkStatus}
                                shouldAutoReload={!laasteVedtakSummary?.uttrekkStatus?.isFerdig && !laasteVedtakSummary.uttrekkStatus?.isFeilet} />
@@ -238,6 +254,105 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string, vedtak:
       </Select>
       {fetcher.state === 'submitting' && <Loader size="xsmall" />}
     </HStack>
+  )
+}
+
+
+function VedtakDropdown({ vedtak, onAapneLaasVedtak }: { vedtak: LaasteVedtakRow, onAapneLaasVedtak: () => void }) {
+  return (
+    <Dropdown>
+      <Button size="small" variant="tertiary" icon={<MenuElipsisVerticalIcon />} as={Dropdown.Toggle} />
+      <Dropdown.Menu>
+        <Dropdown.Menu.GroupedList>
+          {vedtak.opplaasVedtakInformasjon !== null && (
+            <Dropdown.Menu.GroupedList.Item onClick={onAapneLaasVedtak}>
+              Lås opp
+            </Dropdown.Menu.GroupedList.Item>
+          )}
+        </Dropdown.Menu.GroupedList>
+      </Dropdown.Menu>
+    </Dropdown>
+  )
+}
+
+function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow, onClose: () => void }) {
+  const fetcher = useFetcher()
+
+  function laasOppVedtak() {
+    fetcher.submit(
+      {
+        vedtakId: vedtak.vedtakId,
+      },
+      {
+        action: 'laasOpp',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  useEffect(() => {
+    const res = fetcher?.data as LaasOppResultat
+    if (res === undefined) {
+      return
+    }
+    if (res.success) {
+      onClose()
+    } else {
+      alert('Kunne ikke låse opp, teknisk feil.')
+    }
+  }, [fetcher.data, onClose])
+
+  return (
+    <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
+      <Modal.Body>
+        <VStack gap="5">
+          <BodyLong>
+            Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
+            innvolvert og at saksbehandler får nødvendig
+            informasjon.
+          </BodyLong>
+          <BodyLong weight="semibold">
+            Team {decodeTeam(vedtak.team)} må gjøre vurdering på hva som skal til for å unngå
+            dette i fremtiden.
+          </BodyLong>
+          <Heading size="small">Dette vil skje:</Heading>
+          <List as="ul">
+            {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak !== null && (
+              <List.Item title="Sammenstøtende vedtak">
+                Vedtaket har sammenstøtende vedtak i sak {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak.sakId}.
+                Dette vedtaket må også låses opp.
+              </List.Item>
+            )}
+            {vedtak.opplaasVedtakInformasjon?.harBehandling && (
+              <List.Item title="Behandling">
+                Vedtaket har en pågående behandling. Denne vil bli stoppet.
+              </List.Item>
+            )}
+            {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
+              <List.Item title="Automatisk vedtak">
+                Kravet har behandlings type automatisk. Det vil endret til manuell, oppgave blir opprettet.
+              </List.Item>
+            )}
+            <List.Item title="Endring av vedtakstatus">
+              Vedtakstatus vil bli endret til "Til Attestering"
+            </List.Item>
+          </List>
+        </VStack>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={laasOppVedtak}>
+          Lås opp
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onClose}
+        >
+          Avbryt
+        </Button>
+      </Modal.Footer>
+    </Modal>
   )
 }
 
@@ -315,7 +430,8 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string, behandlinger: 
           {behandling.isUnderBehandling && <Tooltip content="Under behandling"><CogRotationIcon /></Tooltip>}
           {behandling.isFerdig && <Tooltip content="Ferdig"><CheckmarkCircleIcon color="green" /></Tooltip>}
           {behandling.isFeilet && <Tooltip content="Feilet"><ExclamationmarkTriangleIcon color="orange" /></Tooltip>}
-          {behandling.isStoppet && <Tooltip content="Stoppet manuelt. Krav må låses opp"><XMarkOctagonIcon color="red" /></Tooltip>}
+          {behandling.isStoppet &&
+            <Tooltip content="Stoppet manuelt. Krav må låses opp"><XMarkOctagonIcon color="red" /></Tooltip>}
         </HStack>
       ))}
     </VStack>
