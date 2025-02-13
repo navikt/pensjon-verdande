@@ -1,14 +1,6 @@
 import { Form, useSubmit } from '@remix-run/react'
-import { json } from '@remix-run/node'
-import { env } from '~/services/env.server'
 import React, { useEffect, useRef, useState } from 'react'
 import { Box, Checkbox, CheckboxGroup, HGrid, MonthPicker, Select, TextField, VStack } from '@navikt/ds-react'
-
-export const loader = async () => {
-  return json({
-    env: env.env,
-  })
-}
 
 export default function BatchOpprett_index() {
   const now = new Date()
@@ -95,6 +87,7 @@ export default function BatchOpprett_index() {
                 <Checkbox name='opprettAlleOppgaver' value='opprettAlleOppgaver'>Opprett alle oppgaver</Checkbox>
                 <Checkbox name='sjekkYtelseFraAvtaleland' value='sjekkYtelseFraAvtaleland'>Sjekk ytelser fra
                   avtaleland</Checkbox>
+                <Checkbox name='brukppen015' value='brukppen015'>Bruk PPEN015</Checkbox>
               </CheckboxGroup>
             </Box>
 
