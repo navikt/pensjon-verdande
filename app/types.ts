@@ -165,4 +165,5 @@ export type OmregningRequest = {
   kravArsak: string
   toleransegrenseSett: string
   oppgaveSett: string
+  brukppen015: boolean
 }

@@ -16,6 +16,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     brukKjoreplan: updates.brukKjoreplan === 'true',
     opprettAlleOppgaver: updates.opprettAlleOppgaver === 'true',
     sjekkYtelseFraAvtaleland: updates.sjekkYtelseFraAvtaleland === 'true',
+    brukppen015: updates.brukppen015 === 'true',
     kravGjelder: updates.kravGjelder,
     kravArsak: updates.kravArsak,
     toleransegrenseSett: updates.toleransegrenseSett,
