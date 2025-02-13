@@ -55,3 +55,14 @@ export type LaasteVedtakUttrekkStatus = {
   feilmelding: string,
   stackTrace: string,
 }
+
+export type VedtakYtelsekomponenter = {
+  ytelsekomponenterOversendtOppdrag: YtelsekomponentOversendtOppdrag[],
+}
+
+export type YtelsekomponentOversendtOppdrag = {
+  ytelsekomponentId: string,
+  ytelseKomponentType: string,
+  belop: number,
+}
+

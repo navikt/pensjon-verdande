@@ -8,6 +8,7 @@ import {
   Alert,
   BodyLong,
   Button,
+  Checkbox,
   CopyButton,
   Detail,
   Dropdown,
@@ -42,6 +43,7 @@ import type {
   LaasteVedtakRow,
   LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary,
+  VedtakYtelsekomponenter,
 } from '~/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
 import { LaasOppResultat } from '~/routes/laaste-vedtak.laasOpp'
@@ -67,6 +69,7 @@ export default function LaasteVedtakPage() {
   const [uttrekkStatus, setUttrekkStatus] = useState<LaasteVedtakUttrekkStatus | null>(laasteVedtakSummary.uttrekkStatus)
   const [avansertVisning, setAvansertVisning] = useState(false)
   const [laasOppVedtak, setLaasOppVedtak] = useState<LaasteVedtakRow | null>(null)
+  const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] = useState<LaasteVedtakRow | null>(null)
 
   const { sortKey, onSort, sortFunc, sortDecending } =
     useSort<LaasteVedtakRow>('endretDato')
@@ -176,7 +179,8 @@ export default function LaasteVedtakPage() {
                         </Table.DataCell>
                         <Table.DataCell>
                           {vedtak.opplaasVedtakInformasjon !== null &&
-                            <VedtakDropdown vedtak={vedtak} onAapneLaasVedtak={() => setLaasOppVedtak(vedtak)} />}
+                            <VedtakDropdown vedtak={vedtak} onAapneLaasVedtak={() => setLaasOppVedtak(vedtak)}
+                                            onAapneVerifiserOppdragsmeldingManuelt={() => setVerifiserOppdragsmeldingManuelt(vedtak)} />}
                         </Table.DataCell>
                       </Table.Row>
                     ))}
@@ -192,6 +196,9 @@ export default function LaasteVedtakPage() {
         </HStack>
       </VStack>
       {laasOppVedtak !== null && <LaasOppVedtakModal vedtak={laasOppVedtak} onClose={() => setLaasOppVedtak(null)} />}
+      {verifiserOppdragsmeldingManuelt !== null &&
+        <VerifiserOppdragsmeldingManueltModal vedtak={verifiserOppdragsmeldingManuelt}
+                                              onClose={() => setVerifiserOppdragsmeldingManuelt(null)} />}
       <AutoReloadUttrekkStatus behandlingId={laasteVedtakSummary.behandlingId} uttrekkStatus={uttrekkStatus}
                                setUttrekkStatus={setUttrekkStatus}
                                shouldAutoReload={!laasteVedtakSummary?.uttrekkStatus?.isFerdig && !laasteVedtakSummary.uttrekkStatus?.isFeilet} />
@@ -258,7 +265,11 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string, vedtak:
 }
 
 
-function VedtakDropdown({ vedtak, onAapneLaasVedtak }: { vedtak: LaasteVedtakRow, onAapneLaasVedtak: () => void }) {
+function VedtakDropdown({ vedtak, onAapneLaasVedtak, onAapneVerifiserOppdragsmeldingManuelt }: {
+  vedtak: LaasteVedtakRow,
+  onAapneLaasVedtak: () => void
+  onAapneVerifiserOppdragsmeldingManuelt: () => void
+}) {
   return (
     <Dropdown>
       <Button size="small" variant="tertiary" icon={<MenuElipsisVerticalIcon />} as={Dropdown.Toggle} />
@@ -269,6 +280,10 @@ function VedtakDropdown({ vedtak, onAapneLaasVedtak }: { vedtak: LaasteVedtakRow
               Lås opp
             </Dropdown.Menu.GroupedList.Item>
           )}
+          {vedtak.vedtakStatus === 'Samordnet' && (
+            <Dropdown.Menu.GroupedList.Item onClick={onAapneVerifiserOppdragsmeldingManuelt}>
+              Verifiser oppdragsmelding manuelt
+            </Dropdown.Menu.GroupedList.Item>)}
         </Dropdown.Menu.GroupedList>
       </Dropdown.Menu>
     </Dropdown>
@@ -354,6 +369,90 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow, onCl
       </Modal.Footer>
     </Modal>
   )
+}
+
+function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow, onClose: () => void }) {
+  const submitFetcher = useFetcher()
+  const [oppdragsmeldingOk, setOppdragsmeldingOk] = useState(false)
+
+  function verifiserOppdragsmeldingManuelt() {
+    submitFetcher.submit(
+      {
+        vedtakId: vedtak.vedtakId,
+      },
+      {
+        action: 'bekreftOppdragsmeldingManuelt',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  const fetcher = useFetcher()
+  useEffect(() => {
+    if (fetcher.state === 'idle' && fetcher.data === undefined) fetcher.load(`/laaste-vedtak/hentVedtakIOppdrag/${vedtak.vedtakId}`)
+  }, [fetcher, vedtak.vedtakId])
+
+  useEffect(() => {
+    if (submitFetcher.state === 'idle' && submitFetcher.data === true) {
+      onClose()
+    }
+  }, [onClose, submitFetcher])
+
+  const vedtakIOppdrag = fetcher.data as VedtakYtelsekomponenter | undefined
+
+  return (
+    <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
+      <Modal.Body>
+        <VStack gap="5">
+          <BodyLong>
+            Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
+          </BodyLong>
+
+          {fetcher.state === 'loading' &&
+            <HStack gap="2"><Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail></HStack>}
+
+          {vedtakIOppdrag !== undefined && (
+            <Table size="small" zebraStripes>
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeader>Ytelse type</Table.ColumnHeader>
+                  <Table.ColumnHeader>Beløp i Pesys</Table.ColumnHeader>
+                  <Table.ColumnHeader>YtelsekomponentId</Table.ColumnHeader>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {vedtakIOppdrag?.ytelsekomponenterOversendtOppdrag.map((ytelse) => (
+                  <Table.Row key={ytelse.ytelsekomponentId}>
+                    <Table.DataCell>{ytelse.ytelseKomponentType}</Table.DataCell>
+                    <Table.DataCell>{ytelse.belop}</Table.DataCell>
+                    <Table.DataCell>{ytelse.ytelsekomponentId}</Table.DataCell>
+                  </Table.Row>))}
+              </Table.Body>
+            </Table>
+          )}
+
+        </VStack>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button" loading={submitFetcher.state === 'submitting'}
+                disabled={fetcher.state === 'loading' || !oppdragsmeldingOk}
+                onClick={verifiserOppdragsmeldingManuelt}>
+          Iverksett vedtak
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onClose}
+        >
+          Avbryt
+        </Button>
+        <Checkbox value={oppdragsmeldingOk} onChange={() => setOppdragsmeldingOk(!oppdragsmeldingOk)}
+                  disabled={fetcher.state === 'loading'}>Oppdragsmelding er verifisert manuelt</Checkbox>
+      </Modal.Footer>
+    </Modal>
+  )
+
 }
 
 function KanIverksettes({ behandlingId, vedtak }: { behandlingId: string, vedtak: LaasteVedtakRow }) {
