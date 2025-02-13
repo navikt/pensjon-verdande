@@ -5,20 +5,21 @@ import { opprettOmregningbehandling } from '~/services/batch.omregning.bpen093'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData()
+  const updates = Object.fromEntries(formData)
 
   const omregningRequest = {
-    behandlingsnokkel: formData.get('behandlingsnokkel') as String,
-    omregningstidspunkt: formData.get('omregningstidspunkt') as String,
-    omregneAFP: formData.get('omregneAFP') != null,
-    behandleApneKrav: formData.get('behandleApneKrav') != null,
-    brukFaktoromregning: formData.get('brukFaktoromregning') != null,
-    brukKjoreplan: formData.get('brukKjoreplan') != null,
-    opprettAlleOppgaver: formData.get('opprettAlleOppgaver') != null,
-    sjekkYtelseFraAvtaleland: formData.get('sjekkYtelseFraAvtaleland') != null,
-    kravGjelder: formData.get('kravGjelder') as String,
-    kravArsak: formData.get('kravArsak') as String,
-    toleransegrenseSett: formData.get('toleransegrenseSett') as String,
-    oppgaveSett: formData.get('oppgaveSett') as String,
+    behandlingsnokkel: updates.behandlingsnokkel,
+    omregningstidspunkt: updates.omregningstidspunkt,
+    omregneAFP: updates.omregneAFP === 'true',
+    behandleApneKrav: updates.behandleApneKrav === 'true',
+    brukFaktoromregning: updates.brukFaktoromregning === 'true',
+    brukKjoreplan: updates.brukKjoreplan === 'true',
+    opprettAlleOppgaver: updates.opprettAlleOppgaver === 'true',
+    sjekkYtelseFraAvtaleland: updates.sjekkYtelseFraAvtaleland === 'true',
+    kravGjelder: updates.kravGjelder,
+    kravArsak: updates.kravArsak,
+    toleransegrenseSett: updates.toleransegrenseSett,
+    oppgaveSett: updates.oppgaveSett,
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
