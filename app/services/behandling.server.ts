@@ -358,3 +358,45 @@ export async function stopp(
     throw new Error()
   }
 }
+
+export async function getOppdragsmelding(
+  accessToken: string,
+  behandlingId: string,
+) {
+  const response = await fetch(
+    `${env.penUrl}/api/vedtak/iverksett/${behandlingId}/oppdragsmelding`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return await response.text()
+  } else {
+    throw new Error()
+  }
+}
+
+export async function getOppdragskvittering(
+  accessToken: string,
+  behandlingId: string,
+) {
+  const response = await fetch(
+    `${env.penUrl}/api/vedtak/iverksett/${behandlingId}/oppdragskvittering`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return await response.text()
+  } else {
+    throw new Error()
+  }
+}

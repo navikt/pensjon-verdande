@@ -479,6 +479,24 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
+            {props.behandling._links && props.behandling._links['oppdragsmelding'] ? (
+              <Tabs.Tab
+                value='oppdragsmelding'
+                label='Oppdragsmelding'
+                icon={<TasklistIcon />}
+              />
+            ) : (
+              <></>
+            )}
+            {props.behandling._links && props.behandling._links['oppdragskvittering'] ? (
+              <Tabs.Tab
+                value='oppdragskvittering'
+                label='Oppdragskvittering'
+                icon={<TasklistIcon />}
+              />
+            ) : (
+              <></>
+            )}
 
           </Tabs.List>
           <Outlet/>

@@ -2,4 +2,7 @@
 module.exports = {
   ignoredRouteFiles: ['**/.*'],
   serverModuleFormat: 'cjs',
+  future: {
+    v2_dev: true,
+  },
 }
