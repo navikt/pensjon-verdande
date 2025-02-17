@@ -130,6 +130,14 @@ export default function App() {
                         <div />
                       )}
                     </li>
+                    <li>
+                      {env != 'p' ? (
+                        <NavLink to={`/batch/reguleringv2`}>Regulering Next</NavLink>
+                      ) : (
+                        <div />
+                      )}
+                    </li>
+
                   </ul>
                 </Accordion.Content>
               </Accordion.Item>
