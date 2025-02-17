@@ -121,7 +121,7 @@ export default function App() {
                       <NavLink to={`/omsorgsopptjening`}>Omsorgsopptjening uttrekk</NavLink>
                     </li>
                     <li>
-                      <NavLink to={`/omregning`}>Omregning - BPEN093</NavLink>
+                      <NavLink to={`/omregning`}>Omregn ytelser</NavLink>
                     </li>
                     <li>
                       {env != 'p' ? (
