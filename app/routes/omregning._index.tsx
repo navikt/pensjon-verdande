@@ -1,17 +1,32 @@
 import { Form, useSubmit } from '@remix-run/react'
 import React, { useEffect, useRef, useState } from 'react'
-import { Box, Checkbox, CheckboxGroup, HGrid, MonthPicker, Select, TextField, VStack } from '@navikt/ds-react'
+import {
+  Box,
+  Checkbox,
+  CheckboxGroup,
+  HGrid,
+  MonthPicker,
+  Select,
+  TextField,
+  useMonthpicker,
+  VStack,
+} from '@navikt/ds-react'
 
 export default function BatchOpprett_index() {
   const now = new Date()
   const [isClicked, setIsClicked] = useState(false)
   const [omregningstidspunkt, setOmregningstidspunkt] = useState('')
+  const [hasError, setHasError] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e: any) => {
-    submit(e.target.form)
-    setIsClicked(true)
-  }
+    if (hasError) {
+      return
+    } else {
+      submit(e.target.form)
+      setIsClicked(true)
+    }
 
+  }
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleInput = () => {
@@ -32,7 +47,6 @@ export default function BatchOpprett_index() {
   ]
 
   const toleransegrenseSett = [
-    { value: '', label: 'Ikke utfør kontroll' },
     { value: 'DEFAULT', label: 'Default' },
     { value: 'GPPROD', label: 'GPPROD' },
     { value: 'ENSLIGE4000', label: 'ENSLIGE4000' },
@@ -50,31 +64,48 @@ export default function BatchOpprett_index() {
     { value: 'SOKNAD_AP', label: 'Søknad AP' },
   ]
 
-  function setMonthSelected(date: Date | undefined) {
+  function setMonthSelected(date: Date | undefined): Date | undefined {
     if (!date) {
-      return
+      return undefined
     }
     const month = date.getMonth() + 1
     const year = date.getFullYear()
     const behandlingsmaned = year * 100 + month
     setOmregningstidspunkt(behandlingsmaned.toString())
+    return date
   }
+
+  const { monthpickerProps, inputProps } = useMonthpicker({
+    onMonthChange: setMonthSelected,
+    fromDate: new Date(`1 Oct ${now.getFullYear() - 1}`),
+    toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
+    onValidate: (val) => {
+      if(!val.isValidMonth && val.isEmpty) {
+        setHasError(true)
+      }
+    },
+    required: true,
+  })
 
   return (
     <div>
-      <h1>BPEN093 - Omregning av ytelser</h1>
+      <h1>Omregn ytelser</h1>
+      <p>Behandling som erstatter BPEN093</p>
       <Form action='omregning' method='POST'>
         <VStack gap='6'>
           <HGrid columns={2} gap='6'>
             <Box>
               <TextField label={'Behandlingsnøkkel'} name={'behandlingsnokkel'} size='small' />
 
-              <MonthPicker.Standalone
-                onMonthSelect={setMonthSelected}
-                dropdownCaption
-                fromDate={new Date(`1 Oct ${now.getFullYear() - 1}`)}
-                toDate={new Date(`1 Oct ${now.getFullYear() + 1}`)}
-              />
+              <MonthPicker
+                {...monthpickerProps}
+              >
+                <MonthPicker.Input
+                  {...inputProps}
+                  label='Velg omregningstidspunkt'
+                  error={hasError && 'Du må velge måned'}
+                />
+              </MonthPicker>
               <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt' value={omregningstidspunkt}
                      readOnly />
             </Box>
