@@ -33,6 +33,7 @@ export default function BatchOpprett_index() {
   return (
     <div>
       <h1>Opprett BPEN090 batchkjøring</h1>
+      <p>BPEN090 - Håndterer løpende inntektsavkortning for uføre</p>
       <Form action="bpen090" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Behandlingsmåned (yyyyMM)</label>
