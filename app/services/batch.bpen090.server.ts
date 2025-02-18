@@ -4,6 +4,8 @@ import { StartBatchResponse } from '~/types'
 export async function opprettBpen090(
   accessToken: string,
   behandlingsmaaned: number,
+  begrensUtplukk: boolean,
+  dryRun: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
     `${env.penUrl}/api/uforetrygd/lopendeinntektsavkorting/batch`,
@@ -16,8 +18,8 @@ export async function opprettBpen090(
       },
       body: JSON.stringify({
         behandlingsmaaned: behandlingsmaaned,
-        begrensUtplukk: false,
-        dryRun: true,
+        begrensUtplukk: begrensUtplukk,
+        dryRun: dryRun,
       }),
     },
   )

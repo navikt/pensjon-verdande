@@ -103,7 +103,6 @@ export default function BatchOpprett_index() {
         </p>
       </Form>
 
-
       <h1>Opprett BPEN090 batchkjøring</h1>
       <Form action="bpen090" method="POST">
         <p>
@@ -115,6 +114,32 @@ export default function BatchOpprett_index() {
             type="number"
             placeholder="behandlingsmaaned"
           />
+        </p>
+        <p>
+          <div style={{ display: 'inline-block' }}>
+            <Select
+              label="begrenset utplukk"
+              size={'small'}
+              name={'begrensUtplukk'}
+              defaultValue={'false'}
+            >
+              <option value="true">Ja</option>
+              <option value="false">Nei</option>
+            </Select>
+          </div>
+        </p>
+        <p>
+          <div style={{ display: 'inline-block' }}>
+            <Select
+              label="dryRun"
+              size={'small'}
+              name={'dryRun'}
+              defaultValue={'true'}
+            >
+              <option value="true">Ja</option>
+              <option value="false">Nei</option>
+            </Select>
+          </div>
         </p>
         <p>
           <button type="submit">Opprett</button>

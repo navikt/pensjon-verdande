@@ -1,7 +1,9 @@
-import { Form } from '@remix-run/react'
+import { Form, useSubmit } from '@remix-run/react'
 import { json } from '@remix-run/node'
 import { env } from '~/services/env.server'
-import React, { useRef, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { Select } from '@navikt/ds-react'
+
 
 export const loader = async () => {
   return json({
@@ -11,8 +13,10 @@ export const loader = async () => {
 
 export default function BatchOpprett_index() {
   const now = new Date()
-  const lastYear = now.getFullYear() - 1
   const nesteBehandlingsmaned = now.getFullYear() * 100 + now.getMonth() + 2
+  const [isClicked, setIsClicked] = useState(false)
+  const submit = useSubmit()
+  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -30,8 +34,9 @@ export default function BatchOpprett_index() {
     <div>
       <h1>Opprett BPEN090 batchkjøring</h1>
       <Form action="bpen090" method="POST">
-        <p>
-          Behandlingsmåned (yyyyMM)
+        <div style={{ display: 'inline-block' }}>
+          <label>Behandlingsmåned (yyyyMM)</label>
+          <br/>
           <input
               defaultValue={nesteBehandlingsmaned}
               aria-label="behandlingsmaaned"
@@ -39,9 +44,35 @@ export default function BatchOpprett_index() {
               type="number"
               placeholder="behandlingsmaaned"
           />
-        </p>
+        </div>
+        <br/>
+        <div style={{ display: 'inline-block' }}>
+          <Select
+            label="begrenset utplukk"
+            size={'small'}
+            name={'begrensUtplukk'}
+            defaultValue={'false'}
+          >
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+        </div>
+        <br />
+        <div style={{ display: 'inline-block' }}>
+          <Select
+            label="dryRun"
+            size={'small'}
+            name={'dryRun'}
+            defaultValue={'true'}
+          >
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+        </div>
         <p>
-          <button type="submit">Opprett</button>
+          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
+            Opprett
+          </button>
         </p>
       </Form>
     </div>
