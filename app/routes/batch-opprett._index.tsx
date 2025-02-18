@@ -140,8 +140,45 @@ export default function BatchOpprett_index() {
 
       <h1>Opprett BPEN096 batchkjøring</h1>
       <Form action="bpen096" method="POST">
+        <div style={{ display: 'inline-block' }}>
+          <label>Max antall sekvensnummer</label>
+          <br />
+          <input
+            defaultValue="100"
+            aria-label="maxSekvensnummer"
+            name="maksAntallSekvensnummer"
+            type="number"
+            placeholder="maxSekvensnummer"
+          />
+        </div>
+        <br />
+        <div style={{ display: 'inline-block' }}>
+          <label>Antall sekvensnummer per aktivitet</label>
+          <br />
+          <input
+            defaultValue="10"
+            aria-label="sekvensnummerPerAktivitet"
+            name="sekvensnummerPerAktivitet"
+            type="number"
+            placeholder="sekvensnummerPerAktivitet"
+          />
+        </div>
+        <br />
+        <div style={{ display: 'inline-block' }}>
+          <Select
+            label="dryRun"
+            size={'small'}
+            name={'dryRun'}
+            defaultValue={'true'}
+          >
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+        </div>
         <p>
-          <button type="submit">Opprett</button>
+          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
+            Opprett
+          </button>
         </p>
       </Form>
 

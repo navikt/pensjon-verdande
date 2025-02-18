@@ -3,6 +3,9 @@ import { StartBatchResponse } from '~/types'
 
 export async function opprettBpen096(
   accessToken: string,
+  maksAntallSekvensnummer: number,
+  sekvensnummerPerAktivitet: number,
+  dryRun: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
     `${env.penUrl}/api/hentSkattehendelser`,
@@ -13,6 +16,11 @@ export async function opprettBpen096(
         'Content-Type': 'application/json',
         'X-Request-ID': crypto.randomUUID(),
       },
+      body: JSON.stringify({
+        maksAntallSekvensnummer: maksAntallSekvensnummer,
+        sekvensnummerPerAktivitet: sekvensnummerPerAktivitet,
+        dryRun: dryRun,
+      }),
     },
   )
 
