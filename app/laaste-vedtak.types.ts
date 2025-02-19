@@ -1,3 +1,5 @@
+import type { OpplaasVedtakInformasjon } from '~/laas-opp.types'
+
 export type LaasteVedtakUttrekkSummary = {
   behandlingId: string | null,
   sistKjoert: string | null,
@@ -26,16 +28,6 @@ export type LaasteVedtakRow = {
   kravStatus: string | null,
   opplaasVedtakInformasjon: OpplaasVedtakInformasjon | null,
   behandlinger: LaasteVedtakBehandlingSummary[]
-}
-
-export type OpplaasVedtakInformasjon = {
-  harBehandling: boolean,
-  erAutomatisk: boolean,
-  sammenstotendeVedtak: SammenstoendeVedtak | null,
-}
-
-export type SammenstoendeVedtak = {
-  sakId: string,
 }
 
 export type LaasteVedtakBehandlingSummary = {
