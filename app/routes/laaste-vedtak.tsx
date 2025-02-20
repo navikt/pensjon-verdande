@@ -46,7 +46,7 @@ import type {
   VedtakYtelsekomponenter,
 } from '~/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
-import { LaasOppResultat } from '~/routes/laaste-vedtak.laasOpp'
+import { LaasOppResultat } from '~/laas-opp.types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
 
