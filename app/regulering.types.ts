@@ -12,8 +12,11 @@ export type ReguleringUttrekk = {
   status: Behandlingstatus,
   feilmelding: string | null,
   steg: string
+  progresjon: number,
   satsDato:string,
   uttrekkDato: string,
+  arbeidstabellSize: number,
+  familierTabellSize: number,
 }
 
 export type ReguleringOrkestrering = {

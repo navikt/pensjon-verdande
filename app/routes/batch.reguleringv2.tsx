@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
+import { useRevalidator } from "@remix-run/react";
 import {
   Alert,
   BodyLong,
@@ -14,17 +15,20 @@ import {
   Stepper,
   VStack,
 } from '@navikt/ds-react'
-import React, { useState } from 'react'
-import { ReguleringOrkestrering, ReguleringStatistikk, ReguleringStatus, ReguleringUttrekk } from '~/regulering.types'
+import React, { useEffect, useState } from 'react'
+import type { ReguleringOrkestrering, ReguleringStatus, ReguleringUttrekk } from '~/regulering.types'
 import { Behandlingstatus } from '~/types'
 import { Bar } from 'react-chartjs-2'
 import 'chart.js/auto'
+import { env } from '~/services/env.server'
+import { format, formatISO } from 'date-fns'
 
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
 
 
   const accessToken = await requireAccessToken(request)
+/*
 
   const regulering: ReguleringStatus = {
     steg: 2,
@@ -46,15 +50,48 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     }
   }
 
+ */
+
+
+  const regulering = await getReguleringStatus(accessToken)
+
+  console.log(regulering)
+
   return { regulering }
 }
+
+export async function getReguleringStatus(
+  accessToken: string,
+): Promise<ReguleringStatus> {
+
+  const url = new URL(`${env.penUrl}/api/vedtak/regulering/uttrekk/detaljer`)
+  const response = await fetch(
+    url.toString(),
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return (await response.json()) as ReguleringStatus
+  } else {
+    let body = await response.json()
+    console.log(`Feil ved kall til pen ${response.status}`, body)
+    throw new Error()
+  }
+}
+
 
 export default function OpprettReguleringBatchRoute() {
   const { regulering } =
     useLoaderData<typeof loader>()
 
-  const [reguleringSteg, setReguleringSteg] = useState(regulering.steg)
 
+
+  const [reguleringSteg, setReguleringSteg] = useState(regulering.steg)
 
   return (
     <VStack gap="5">
@@ -81,32 +118,6 @@ export default function OpprettReguleringBatchRoute() {
 
 export function AdministrerTilknyttetdeBehandlinger({orkestrering}: {orkestrering: ReguleringOrkestrering | null}) {
 
-  const statistikk: ReguleringStatistikk = {
-    orkestrering: {
-      opprettet: 100000,
-      under_behandling: 99999,
-      feilende: 0,
-      feilendeDrilldown: [],
-      stoppet: 0,
-      fullfort: 1,
-    },
-    familie: {
-      opprettet: 100000,
-      under_behandling: 99999,
-      feilende: 0,
-      feilendeDrilldown: [],
-      stoppet: 0,
-      fullfort: 1,
-    },
-    iverksettVedtak: {
-      opprettet: 100000,
-      under_behandling: 99999,
-      feilende: 0,
-      feilendeDrilldown: [],
-      stoppet: 0,
-      fullfort: 1,
-    }
-  };
 
   return (
     <HStack>
@@ -208,7 +219,7 @@ export function Uttrekk ({uttrekk}: { uttrekk: ReguleringUttrekk | null}) {
                     <Loader /></HStack>
                   <ProgressBar
                     title={uttrekk.steg}
-                    value={2}
+                    value={uttrekk.progresjon}
                     valueMax={8}
                     size="small"
                     aria-labelledby="progress-bar-label-small"
@@ -247,8 +258,20 @@ export function StartUttrekkModal({isOpen, onClose}: { isOpen: boolean, onClose:
   const year = new Date().getFullYear();
   const defaultSatsdato = new Date(`1 May ${year}`)
   const [satsDato, setSatsDato] = useState<Date | undefined>(defaultSatsdato)
+  const fetcher = useFetcher()
 
   function startUttrekk() {
+    console.log(formatISO(satsDato ?? defaultSatsdato))
+    fetcher.submit(
+      {
+        satsDato: format(satsDato?? defaultSatsdato,'YYYY-MM-DD'),
+      },
+      {
+        action: 'oppdaterTeam',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
 
   }
 
