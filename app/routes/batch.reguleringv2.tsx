@@ -1,7 +1,6 @@
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { useFetcher, useLoaderData } from '@remix-run/react'
-import { useRevalidator } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData, useRevalidator } from '@remix-run/react'
 import {
   Alert,
   BodyLong,
@@ -13,83 +12,41 @@ import {
   Modal,
   ProgressBar,
   Stepper,
+  TextField,
   VStack,
 } from '@navikt/ds-react'
 import React, { useEffect, useState } from 'react'
-import type { ReguleringOrkestrering, ReguleringStatus, ReguleringUttrekk } from '~/regulering.types'
+import type {
+  OrkestreringStatistikk,
+  ReguleringDetaljer,
+  ReguleringOrkestrering,
+  ReguleringUttrekk,
+} from '~/regulering.types'
 import { Behandlingstatus } from '~/types'
 import { Bar } from 'react-chartjs-2'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import { format, formatISO } from 'date-fns'
+import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
+import { Entry } from '~/components/entry/Entry'
 
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-
-
   const accessToken = await requireAccessToken(request)
-/*
-
-  const regulering: ReguleringStatus = {
-    steg: 2,
-    uttrekk: {
-      behandlingId: '123',
-      status: Behandlingstatus.FULLFORT,
-      feilmelding: null,
-      steg: 'A190PopoulerFamileTabell',
-      satsDato: '01.05.2025',
-      uttrekkDato: '10.05.2025',
-    },
-    orkestrering: {
-      behandlingId: "1234",
-      status: Behandlingstatus.UNDER_BEHANDLING,
-      antall:1100000,
-      antallOpprettet: 500000,
-      isFerdig: true,
-      feilmelding: null,
-    }
-  }
-
- */
-
-
-  const regulering = await getReguleringStatus(accessToken)
-
-  console.log(regulering)
-
+  const regulering = await getReguleringDetaljer(accessToken)
   return { regulering }
 }
-
-export async function getReguleringStatus(
-  accessToken: string,
-): Promise<ReguleringStatus> {
-
-  const url = new URL(`${env.penUrl}/api/vedtak/regulering/uttrekk/detaljer`)
-  const response = await fetch(
-    url.toString(),
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return (await response.json()) as ReguleringStatus
-  } else {
-    let body = await response.json()
-    console.log(`Feil ved kall til pen ${response.status}`, body)
-    throw new Error()
-  }
-}
-
 
 export default function OpprettReguleringBatchRoute() {
   const { regulering } =
     useLoaderData<typeof loader>()
 
+  useRevalidateOnInterval({
+    enabled: true,
+    interval: regulering.uttrekk?.status === Behandlingstatus.UNDER_BEHANDLING ? 500 : 1000,
+  })
 
+  console.log(regulering)
 
   const [reguleringSteg, setReguleringSteg] = useState(regulering.steg)
 
@@ -109,22 +66,22 @@ export default function OpprettReguleringBatchRoute() {
         </Stepper>
       </HStack>
       {reguleringSteg === 1 && <Uttrekk uttrekk={regulering.uttrekk}></Uttrekk>}
-      {reguleringSteg === 2 && <Orkestrering orkestrering={regulering.orkestrering} />}
-      {reguleringSteg === 3 && <AdministrerTilknyttetdeBehandlinger orkestrering={regulering.orkestrering} />}
+      {reguleringSteg === 2 && <Orkestrering orkestreringer={regulering.orkestreringer} uttrekk={regulering.uttrekk} />}
+      {reguleringSteg === 3 && <AdministrerTilknyttetdeBehandlinger />}
     </VStack>
   )
 }
 
 
-export function AdministrerTilknyttetdeBehandlinger({orkestrering}: {orkestrering: ReguleringOrkestrering | null}) {
+export function AdministrerTilknyttetdeBehandlinger() {
 
 
   return (
     <HStack>
       <Bar
-        id={"123"}
+        id={'123'}
         data={{
-          labels: ['Orkestrering', "Familie", "Iverksett vedtak"],
+          labels: ['Orkestrering', 'Familie', 'Iverksett vedtak'],
           datasets: [
             {
               label: 'Opprettet',
@@ -162,49 +119,146 @@ export function AdministrerTilknyttetdeBehandlinger({orkestrering}: {orkestrerin
   )
 }
 
-export function Orkestrering({orkestrering}: {orkestrering: ReguleringOrkestrering | null}) {
-  return(
-     <>
-      <HStack>
-        {orkestrering !== null && (
-          <>
-          {!orkestrering.isFerdig &&  (
-              <Alert variant="info" inline>
-                <VStack gap="5">
-                  <HStack gap="2">
-                    <div>Oppretter FamilieRegulering ({orkestrering.antallOpprettet}/{orkestrering.antall})</div>
-                    <Loader /></HStack>
-                  <ProgressBar
-                    value={orkestrering.antallOpprettet}
-                    valueMax={orkestrering.antall}
-                    size="small"
-                    aria-labelledby="progress-bar-label-small"
-                  />
-                  <div><Button variant="secondary">Administrer tiknyttede behandlinger</Button></div>
-                </VStack>
-              </Alert>
-            )}
-            {orkestrering.isFerdig && (
-              <Alert variant="success" inline>
-                <VStack gap="5">
-                  <div>Orkestrering er fullført</div>
-                  <div><Button variant="secondary">Administrer tiknyttede behandlinger</Button></div>
-                </VStack>
-              </Alert>
-            )}
-          </>
-        )}
+export function Orkestrering({ orkestreringer, uttrekk }: {
+  orkestreringer: ReguleringOrkestrering[],
+  uttrekk: ReguleringUttrekk | null
+}) {
+  const [antallFamilier, setAntallFamilier] = useState('100000')
+  const [error, setError] = useState<string | undefined>(undefined)
+  const fetcher = useFetcher()
+
+  function startOrkestrering() {
+    setError(undefined)
+    //Check if antallFamilier is a number
+    if (isNaN(Number(antallFamilier)) || Number(antallFamilier) < 0 || antallFamilier.trim() === '') {
+      setError('Oppgi antall familier')
+      return
+    }
+
+    fetcher.submit(
+      antallFamilier === '' ? {} : { antallFamilier }
+      ,
+      {
+        action: 'startOrkestrering',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+
+    console.log(antallFamilier)
+  }
+
+  if (uttrekk === null) {
+    return <>
+      <Alert variant="info" inline>Uttrekk ikke kjørt enda.</Alert>
+    </>
+  }
+
+  return (
+    <>
+      <HStack style={{ borderBottom: '1px solid #c6c2bf', paddingBottom: '1rem' }} gap="5">
+        <VStack gap="5">
+          <Heading level="2" size="medium">Start orkestrering</Heading>
+          <Entry labelText="Antall ubehandlende familier">
+            {uttrekk.antallUbehandlende}
+          </Entry>
+          <TextField label="Antall familier" error={error} onChange={(e) => setAntallFamilier(e.target.value)}
+                     value={antallFamilier} />
+          <Button loading={fetcher.state === 'submitting'} onClick={startOrkestrering}>Start orkestrering</Button>
+        </VStack>
       </HStack>
-       <HStack>
-         {(orkestrering === null || orkestrering.isFerdig) &&
-           <Button>Start orkestrering</Button>
-         }
-       </HStack>
-     </>
+      {orkestreringer.map((orkestrering, idx) => (
+        <OrkestreringDetaljer key={orkestrering.behandlingId} visStatistikk={idx === 0} orkestrering={orkestrering} />
+      ))}
+    </>
   )
 }
 
-export function Uttrekk ({uttrekk}: { uttrekk: ReguleringUttrekk | null}) {
+export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
+  orkestrering: ReguleringOrkestrering,
+  visStatistikk: boolean
+}) {
+  return (
+    <>
+      <HStack gap="5">
+        <Entry labelText="Status">
+          {orkestrering.status === Behandlingstatus.OPPRETTET &&
+            <Alert variant="info" size="small" inline>Opprettet</Alert>}
+          {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING &&
+            <Alert variant="info" size="small" inline><HStack gap="2">Under behandling <Loader size="small" /></HStack></Alert>}
+          {orkestrering.status === Behandlingstatus.FULLFORT &&
+            <Alert variant="success" size="small" inline>Fullført</Alert>}
+          {orkestrering.status === Behandlingstatus.STOPPET &&
+            <Alert variant="error" size="small" inline>Stoppet</Alert>}
+          {orkestrering.status === Behandlingstatus.DEBUG &&
+            <Alert variant="error" size="small" inline>Debug</Alert>}
+        </Entry>
+        <Entry labelText="Kjøringstidspunkt">
+          {formatIsoTimestamp(orkestrering.kjoringsdato)}
+        </Entry>
+        <Entry labelText="Antall familier">
+          {orkestrering.opprettAntallFamilier === -1 ? 'Alle' : orkestrering.opprettAntallFamilier}
+        </Entry>
+        <Entry labelText="Behandling">
+          <Link to={`/behandling/${orkestrering.behandlingId}`} target="_blank">Gå til behandling</Link>
+        </Entry>
+      </HStack>
+      <HStack>
+        {visStatistikk &&
+          <OrkestreringStatistikk behandlingId={orkestrering.behandlingId} behandlingStatus={orkestrering.status} />}
+      </HStack>
+    </>
+  )
+}
+
+export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
+  behandlingId: string,
+  behandlingStatus: Behandlingstatus
+}) {
+
+  const fetcher = useFetcher()
+  const orkestreringStatistikk = fetcher.data as OrkestreringStatistikk | undefined
+
+  useEffect(() => {
+    if (fetcher.state !== 'idle') return
+    fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`)
+  }, [behandlingId, behandlingStatus, fetcher])
+
+
+  if (orkestreringStatistikk === undefined) {
+    return null
+  }
+
+  const { familierStatistikk, iverksettVedtakStatistikk } = orkestreringStatistikk
+
+  return (
+    <HStack>
+      <Bar
+        id={'123'}
+        data={{
+          labels: ['Opprettet', 'Under behandling', 'Feilende', 'Fullført'],
+          datasets: [
+            {
+              label: 'Familier',
+              data: [familierStatistikk.opprettet, familierStatistikk.underBehandling, familierStatistikk.feilende, familierStatistikk.fullfort],
+              borderWidth: 1,
+            },
+            {
+              label: 'Iverksett vedtak',
+              data: [iverksettVedtakStatistikk.opprettet, iverksettVedtakStatistikk.underBehandling, iverksettVedtakStatistikk.feilende, iverksettVedtakStatistikk.fullfort],
+              borderWidth: 1,
+            },
+          ],
+        }}
+        options={{
+          responsive: true,
+        }}
+      />
+    </HStack>
+  )
+}
+
+export function Uttrekk({ uttrekk }: { uttrekk: ReguleringUttrekk | null }) {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <>
@@ -234,10 +288,16 @@ export function Uttrekk ({uttrekk}: { uttrekk: ReguleringUttrekk | null}) {
               <Alert variant="warning" inline>{uttrekk.feilmelding}</Alert>
             )}
             {uttrekk.status === Behandlingstatus.FULLFORT && (
-              <Alert variant="success" inline><VStack gap="2">Uttrekk er fullført {uttrekk.uttrekkDato}</VStack></Alert>
+              <Alert variant="success" inline><VStack gap="2">Uttrekk er
+                fullført {formatIsoTimestamp(uttrekk.uttrekkDato)}</VStack></Alert>
             )}
           </>
         }
+      </HStack>
+      <HStack gap="5">
+        <Entry labelText={'Satsdato'}>{formatIsoDate(uttrekk?.satsDato)}</Entry>
+        <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>
+        <Entry labelText={'Antall familier'}>{uttrekk?.familierTabellSize}</Entry>
       </HStack>
       <HStack gap="3">
         {(uttrekk === null || (uttrekk.status === Behandlingstatus.FULLFORT || uttrekk.status === Behandlingstatus.STOPPET))
@@ -247,15 +307,15 @@ export function Uttrekk ({uttrekk}: { uttrekk: ReguleringUttrekk | null}) {
           <Button>Gå til Orkestrering</Button>
         }
       </HStack>
-      <StartUttrekkModal isOpen={isOpen} onClose={() => setIsOpen(false)}/>
+      <StartUttrekkModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   )
 
 }
 
-export function StartUttrekkModal({isOpen, onClose}: { isOpen: boolean, onClose: () => void }  ) {
+export function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
 
-  const year = new Date().getFullYear();
+  const year = new Date().getFullYear()
   const defaultSatsdato = new Date(`1 May ${year}`)
   const [satsDato, setSatsDato] = useState<Date | undefined>(defaultSatsdato)
   const fetcher = useFetcher()
@@ -264,45 +324,78 @@ export function StartUttrekkModal({isOpen, onClose}: { isOpen: boolean, onClose:
     console.log(formatISO(satsDato ?? defaultSatsdato))
     fetcher.submit(
       {
-        satsDato: format(satsDato?? defaultSatsdato,'YYYY-MM-DD'),
+        satsDato: format(satsDato ?? defaultSatsdato, 'yyyy-MM-dd'),
       },
       {
-        action: 'oppdaterTeam',
+        action: 'startUttrekk',
         method: 'POST',
         encType: 'application/json',
       },
     )
-
+    onClose()
   }
 
   return (
-  <Modal header={{ heading: 'Start uttrekk' }} open={isOpen} onClose={() => onClose()}>
-    <Modal.Body>
-      <VStack gap="5">
-        <BodyLong>
-          Velg satsdato
-        </BodyLong>
-        <DatePicker.Standalone
-          selected={satsDato}
-          today={defaultSatsdato}
-          onSelect={setSatsDato}
-          fromDate={new Date(`1 May ${year - 2}`)}
-          toDate={new Date(`1 May ${year + 2}`)}
-          dropdownCaption
-        />
-      </VStack>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button onClick={startUttrekk} >
-        Start uttrekk
-      </Button>
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={() => onClose()}
-      >
-        Avbryt
-      </Button>
-    </Modal.Footer>
-  </Modal>   )
+    <Modal header={{ heading: 'Start uttrekk' }} open={isOpen} onClose={() => onClose()}>
+      <Modal.Body>
+        <VStack gap="5">
+          <BodyLong>
+            Velg satsdato
+          </BodyLong>
+          <DatePicker.Standalone
+            selected={satsDato}
+            today={defaultSatsdato}
+            onSelect={setSatsDato}
+            fromDate={new Date(`1 May ${year - 2}`)}
+            toDate={new Date(`1 May ${year + 2}`)}
+            dropdownCaption
+          />
+        </VStack>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={startUttrekk} loading={fetcher.state === 'submitting'}>
+          Start uttrekk
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => onClose()}
+        >
+          Avbryt
+        </Button>
+      </Modal.Footer>
+    </Modal>)
+}
+
+function useRevalidateOnInterval({ enabled = false, interval = 1000 }: { enabled?: boolean; interval?: number }) {
+  let revalidate = useRevalidator()
+  useEffect(function revalidateOnInterval() {
+    if (!enabled) return
+    let intervalId = setInterval(revalidate.revalidate, interval)
+    return () => clearInterval(intervalId)
+  }, [enabled, interval, revalidate])
+}
+
+export async function getReguleringDetaljer(
+  accessToken: string,
+): Promise<ReguleringDetaljer> {
+
+  const url = new URL(`${env.penUrl}/api/vedtak/regulering/detaljer`)
+  const response = await fetch(
+    url.toString(),
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return (await response.json()) as ReguleringDetaljer
+  } else {
+    let body = await response.json()
+    console.log(`Feil ved kall til pen ${response.status}`, body)
+    throw new Error()
+  }
 }

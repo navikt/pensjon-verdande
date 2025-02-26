@@ -8,22 +8,21 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const data = await request.json()
-  return await startUttrekk(accessToken, data.satsDato)
+  return await startOrkestrering(accessToken, data.antallFamilier)
 }
 
-async function startUttrekk(
+async function startOrkestrering(
   accessToken: string,
-  satsDato: string,
+  antallFamilier: string | undefined,
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/uttrekk/start`,
+    `${env.penUrl}/api/vedtak/regulering/orkestrering/startv2`,
     {
       method: 'POST',
       body: JSON.stringify(
           {
-            satsDato,
-            reguleringsDato: satsDato,
+            antallFamilier,
           }
         )
       ,

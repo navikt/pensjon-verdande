@@ -1,10 +1,10 @@
 import type { Behandlingstatus } from '~/types'
 
 
-export type ReguleringStatus =  {
+export type ReguleringDetaljer =  {
   steg: number
   uttrekk: ReguleringUttrekk | null;
-  orkestrering: ReguleringOrkestrering | null;
+  orkestreringer: ReguleringOrkestrering[];
 }
 
 export type ReguleringUttrekk = {
@@ -17,22 +17,35 @@ export type ReguleringUttrekk = {
   uttrekkDato: string,
   arbeidstabellSize: number,
   familierTabellSize: number,
+  antallUbehandlende: number,
 }
 
 export type ReguleringOrkestrering = {
   behandlingId: string;
   status: Behandlingstatus;
-  antall: number;
-  antallOpprettet: number
-  isFerdig: boolean;
-  feilmelding: string | null;
+  kjoringsdato: string;
+  opprettAntallFamilier: number | null;
 }
 
-export type ReguleringStatistikk = {
-  orkestrering: StatistikkNode[];
-  familie: StatistikkNode[];
-  iverksettVedtak: StatistikkNode[];
+export type OrkestreringStatistikk = {
+  familierStatistikk: ReguleringFamilieStatus;
+  iverksettVedtakStatistikk: IverksettVedtakStats;
 }
+
+export type ReguleringFamilieStatus = {
+  opprettet: number;
+  fullfort: number;
+  underBehandling: number;
+  feilende: number;
+}
+
+export type IverksettVedtakStats = {
+  opprettet: number;
+  fullfort: number;
+  underBehandling: number;
+  feilende: number;
+}
+
 
 export type StatistikkNode = {
   navn: string;
