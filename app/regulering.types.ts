@@ -46,6 +46,12 @@ export type IverksettVedtakStats = {
   feilende: number;
 }
 
+export type ArbeidstabellStatistikk = {
+  antallOversendesOppdrag: number;
+  antallFaktoromregnet: number;
+  antallFaktoromregnetDirekte: number;
+  antallReguleringsfeil: number;
+}
 
 export type StatistikkNode = {
   navn: string;

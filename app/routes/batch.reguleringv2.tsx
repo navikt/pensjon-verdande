@@ -21,6 +21,7 @@ import type {
   ReguleringDetaljer,
   ReguleringOrkestrering,
   ReguleringUttrekk,
+  ArbeidstabellStatistikk,
 } from '~/regulering.types'
 import { Behandlingstatus } from '~/types'
 import { Bar } from 'react-chartjs-2'
@@ -60,12 +61,14 @@ export default function OpprettReguleringBatchRoute() {
           onStepChange={setReguleringSteg}
           orientation="horizontal"
         >
-          <Stepper.Step href="#" completed>Uttrekk</Stepper.Step>
-          <Stepper.Step href="#">Orkestrering</Stepper.Step>
+          <Stepper.Step href="#"
+                        completed={regulering.uttrekk?.status === Behandlingstatus.FULLFORT}>Uttrekk</Stepper.Step>
+          <Stepper.Step href="#" completed={regulering.uttrekk?.antallUbehandlende === 0}>Orkestrering</Stepper.Step>
           <Stepper.Step href="#">Administrer tilknyttede behandlinger</Stepper.Step>
         </Stepper>
       </HStack>
-      {reguleringSteg === 1 && <Uttrekk uttrekk={regulering.uttrekk}></Uttrekk>}
+      {reguleringSteg === 1 &&
+        <Uttrekk uttrekk={regulering.uttrekk} goToOrkestrering={() => setReguleringSteg(2)}></Uttrekk>}
       {reguleringSteg === 2 && <Orkestrering orkestreringer={regulering.orkestreringer} uttrekk={regulering.uttrekk} />}
       {reguleringSteg === 3 && <AdministrerTilknyttetdeBehandlinger />}
     </VStack>
@@ -79,6 +82,8 @@ export function AdministrerTilknyttetdeBehandlinger() {
   return (
     <HStack>
       <Bar
+        width={1000}
+        height={500}
         id={'123'}
         data={{
           labels: ['Orkestrering', 'Familie', 'Iverksett vedtak'],
@@ -156,7 +161,7 @@ export function Orkestrering({ orkestreringer, uttrekk }: {
 
   return (
     <>
-      <HStack style={{ borderBottom: '1px solid #c6c2bf', paddingBottom: '1rem' }} gap="5">
+      <HStack gap="5">
         <VStack gap="5">
           <Heading level="2" size="medium">Start orkestrering</Heading>
           <Entry labelText="Antall ubehandlende familier">
@@ -167,9 +172,25 @@ export function Orkestrering({ orkestreringer, uttrekk }: {
           <Button loading={fetcher.state === 'submitting'} onClick={startOrkestrering}>Start orkestrering</Button>
         </VStack>
       </HStack>
-      {orkestreringer.map((orkestrering, idx) => (
-        <OrkestreringDetaljer key={orkestrering.behandlingId} visStatistikk={idx === 0} orkestrering={orkestrering} />
-      ))}
+      <VStack gap="5">
+        <HStack gap="10">
+          <VStack gap="4" style={{ paddingRight: '5rem' }}>
+            <Heading level="2" size="medium">Kjøringer</Heading>
+            {orkestreringer.length === 0 &&
+              <Alert variant="info" inline>Ingen kjøringer enda</Alert>
+            }
+            {orkestreringer.map((orkestrering, idx) => (
+              <OrkestreringDetaljer key={orkestrering.behandlingId} visStatistikk={idx === 0}
+                                    orkestrering={orkestrering} />
+            ))}
+          </VStack>
+          <VStack gap="4">
+            <Heading level="2" size="medium">Statistikk arbeidstabell</Heading>
+            <ArbeidstabellStatistikk />
+          </VStack>
+        </HStack>
+      </VStack>
+
     </>
   )
 }
@@ -179,7 +200,7 @@ export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
   visStatistikk: boolean
 }) {
   return (
-    <>
+    <VStack gap="5">
       <HStack gap="5">
         <Entry labelText="Status">
           {orkestrering.status === Behandlingstatus.OPPRETTET &&
@@ -207,7 +228,7 @@ export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
         {visStatistikk &&
           <OrkestreringStatistikk behandlingId={orkestrering.behandlingId} behandlingStatus={orkestrering.status} />}
       </HStack>
-    </>
+    </VStack>
   )
 }
 
@@ -234,6 +255,7 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
   return (
     <HStack>
       <Bar
+        width={"500"}
         id={'123'}
         data={{
           labels: ['Opprettet', 'Under behandling', 'Feilende', 'Fullført'],
@@ -258,7 +280,58 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
   )
 }
 
-export function Uttrekk({ uttrekk }: { uttrekk: ReguleringUttrekk | null }) {
+
+export function ArbeidstabellStatistikk() {
+
+  const fetcher = useFetcher()
+  const arbeidstabellStatistikk = fetcher.data as ArbeidstabellStatistikk | undefined
+
+  useEffect(() => {
+    if (fetcher.state !== 'idle') return
+    fetcher.load(`hentArbeidstabellStatistikk`)
+  }, [fetcher])
+
+
+  if (arbeidstabellStatistikk === undefined) {
+    return null
+  }
+
+  const {
+    antallOversendesOppdrag,
+    antallFaktoromregnet,
+    antallFaktoromregnetDirekte,
+    antallReguleringsfeil,
+  } = arbeidstabellStatistikk
+
+  return (
+    <HStack>
+      <Bar
+        id={'123'}
+        height={500}
+        width={1000}
+        data={{
+          labels: ['Antall oversendes', 'Antall faktoromregnet', 'Antall fakoromregnet direkte', 'Antall reguleringsfeil'],
+          datasets: [
+            {
+              label: 'Arbeidstabell',
+              data: [antallOversendesOppdrag, antallFaktoromregnet, antallFaktoromregnetDirekte, antallReguleringsfeil],
+              borderWidth: 1,
+            },
+          ],
+        }}
+        options={{
+          responsive: true,
+        }}
+      />
+    </HStack>
+  )
+}
+
+
+export function Uttrekk({ uttrekk, goToOrkestrering }: {
+  uttrekk: ReguleringUttrekk | null,
+  goToOrkestrering: () => void
+}) {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <>
@@ -304,7 +377,7 @@ export function Uttrekk({ uttrekk }: { uttrekk: ReguleringUttrekk | null }) {
           && <Button variant="secondary" onClick={() => setIsOpen(true)}>Kjør uttrekk</Button>
         }
         {uttrekk?.status === Behandlingstatus.FULLFORT &&
-          <Button>Gå til Orkestrering</Button>
+          <Button onClick={goToOrkestrering}>Gå til Orkestrering</Button>
         }
       </HStack>
       <StartUttrekkModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
