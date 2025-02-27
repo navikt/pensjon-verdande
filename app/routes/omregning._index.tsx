@@ -16,8 +16,18 @@ export default function BatchOpprett_index() {
   const now = new Date()
   const [isClicked, setIsClicked] = useState(false)
   const [omregningstidspunkt, setOmregningstidspunkt] = useState('')
+
+  const [omregneAFP, setOmregneAFP] = useState(false)
+  const [behandleApneKrav, setBehandleApneKrav] = useState(false)
+  const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
+  const [brukKjoreplan, setBrukKjoreplan] = useState(false)
+  const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
+  const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
+  const [brukppen015, setBrukppen015] = useState(false)
+
   const [hasError, setHasError] = useState(false)
   const submit = useSubmit()
+
   const handleSubmit = (e: any) => {
     if (hasError) {
       return
@@ -80,7 +90,7 @@ export default function BatchOpprett_index() {
     fromDate: new Date(`1 Oct ${now.getFullYear() - 1}`),
     toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
     onValidate: (val) => {
-      if(!val.isValidMonth && val.isEmpty) {
+      if (!val.isValidMonth && val.isEmpty) {
         setHasError(true)
       }
     },
@@ -106,19 +116,69 @@ export default function BatchOpprett_index() {
                   error={hasError && 'Du må velge måned'}
                 />
               </MonthPicker>
-              <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt' value={omregningstidspunkt}
+              <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt'
+                     value={omregningstidspunkt}
                      readOnly />
             </Box>
             <Box>
-              <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
-                <Checkbox name='omregneAFP' value='omregneAFP'>Omregne AFP</Checkbox>
-                <Checkbox name='behandleApneKrav' value='behandleApneKrav'>Behandle åpne krav</Checkbox>
-                <Checkbox name='brukFaktoromregning' value='brukFaktoromregning'>Bruk faktoromregning</Checkbox>
-                <Checkbox name='brukKjoreplan' value='brukKjoreplan'>Bruk kjøreplan</Checkbox>
-                <Checkbox name='opprettAlleOppgaver' value='opprettAlleOppgaver'>Opprett alle oppgaver</Checkbox>
-                <Checkbox name='sjekkYtelseFraAvtaleland' value='sjekkYtelseFraAvtaleland'>Sjekk ytelser fra
-                  avtaleland</Checkbox>
-                <Checkbox name='brukppen015' value='brukppen015'>Bruk PPEN015</Checkbox>
+              <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {console.log('change')}}>
+                <Checkbox
+                  name='omregneAFP'
+                  value={omregneAFP}
+                  onChange={(event) => {
+                    setOmregneAFP(event.target.checked)
+                  }}
+                >
+                  Omregne AFP
+                </Checkbox>
+
+                <Checkbox
+                  name='behandleApneKrav'
+                  value={behandleApneKrav}
+                  onChange={(event) => setBehandleApneKrav(event.target.checked)}
+                >
+                  Behandle åpne krav
+                </Checkbox>
+
+                <Checkbox
+                  name='brukFaktoromregning'
+                  value={brukFaktoromregning}
+                  onChange={(event) => setBrukFaktoromregning(event.target.checked)}
+                >
+                  Bruk faktoromregning
+                </Checkbox>
+
+                <Checkbox
+                  name='brukKjoreplan'
+                  value={brukKjoreplan}
+                  onChange={(event) => setBrukKjoreplan(event.target.checked)}
+                >
+                  Bruk kjøreplan
+                </Checkbox>
+
+                <Checkbox
+                  name='opprettAlleOppgaver'
+                  value={opprettAlleOppgaver}
+                  onChange={(event) => setOpprettAlleOppgaver(event.target.checked)}
+                >
+                  Opprett alle oppgaver
+                </Checkbox>
+
+                <Checkbox
+                  name='sjekkYtelseFraAvtaleland'
+                  value={sjekkYtelseFraAvtaleland}
+                  onChange={(event) => setSjekkYtelseFraAvtaleland(event.target.checked)}
+                >
+                  Sjekk ytelser fra avtaleland
+                </Checkbox>
+
+                <Checkbox
+                  name='brukppen015'
+                  value={brukppen015}
+                  onChange={(event) => setBrukppen015(event.target.checked)}
+                >
+                  Bruk PPEN015
+                </Checkbox>
               </CheckboxGroup>
             </Box>
 
