@@ -54,6 +54,7 @@ export default function BatchOpprett_index() {
   ]
   const optionsKravArsak = [
     { value: 'OMREGNING', label: 'Omregning' },
+    { value: 'ANNEN_ARSAK', label: 'Annen årsak' },
   ]
 
   const toleransegrenseSett = [
