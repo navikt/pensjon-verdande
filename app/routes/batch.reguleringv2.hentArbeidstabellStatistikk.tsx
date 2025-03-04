@@ -2,7 +2,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
-import type { ArbeidstabellStatistikk } from '~/regulering.types'
+import type { AggregertStatistikk } from '~/regulering.types'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -12,7 +12,7 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
 
 async function hentArbeidstabellStatistikk(
   accessToken: string,
-): Promise<ArbeidstabellStatistikk> {
+): Promise<AggregertStatistikk> {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/arbeidstabell/statistikk`,
@@ -25,7 +25,7 @@ async function hentArbeidstabellStatistikk(
   )
 
   if (response.ok) {
-    return (await response.json()) as ArbeidstabellStatistikk
+    return (await response.json()) as AggregertStatistikk
   } else {
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )

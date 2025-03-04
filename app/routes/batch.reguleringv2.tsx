@@ -6,30 +6,37 @@ import {
   BodyLong,
   Button,
   DatePicker,
+  Dropdown,
   Heading,
   HStack,
   Loader,
   Modal,
   ProgressBar,
+  ReadMore,
   Stepper,
+  Tabs,
   TextField,
   VStack,
 } from '@navikt/ds-react'
 import React, { useEffect, useState } from 'react'
 import type {
+  AggregertStatistikk,
+  ArbeidstabellStatistikk,
   OrkestreringStatistikk,
   ReguleringDetaljer,
   ReguleringOrkestrering,
   ReguleringUttrekk,
-  ArbeidstabellStatistikk,
 } from '~/regulering.types'
-import { Behandlingstatus } from '~/types'
+import { Behandlingstatus, DetaljertFremdriftDTO } from '~/types'
 import { Bar } from 'react-chartjs-2'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import { format, formatISO } from 'date-fns'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { Entry } from '~/components/entry/Entry'
+import {
+  BehandlingBatchDetaljertFremdriftBarChart,
+} from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -175,7 +182,7 @@ export function Orkestrering({ orkestreringer, uttrekk }: {
       <VStack gap="5">
         <HStack gap="10">
           <VStack gap="4" style={{ paddingRight: '5rem' }}>
-            <Heading level="2" size="medium">Kjøringer</Heading>
+            <Heading level="2" size="medium">Orkestreringer</Heading>
             {orkestreringer.length === 0 &&
               <Alert variant="info" inline>Ingen kjøringer enda</Alert>
             }
@@ -185,8 +192,11 @@ export function Orkestrering({ orkestreringer, uttrekk }: {
             ))}
           </VStack>
           <VStack gap="4">
-            <Heading level="2" size="medium">Statistikk arbeidstabell</Heading>
-            <ArbeidstabellStatistikk />
+            <Heading level="2" size="medium">Kjøring resultat</Heading>
+            {orkestreringer.length === 0 ?
+              <Alert variant="info" inline>Ingen kjøringer enda</Alert>
+              : <ArbeidstabellStatistikk />}
+
           </VStack>
         </HStack>
       </VStack>
@@ -238,7 +248,7 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
 }) {
 
   const fetcher = useFetcher()
-  const orkestreringStatistikk = fetcher.data as OrkestreringStatistikk | undefined
+  const orkestreringStatistikk = fetcher.data as DetaljertFremdriftDTO | undefined
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return
@@ -249,34 +259,8 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
   if (orkestreringStatistikk === undefined) {
     return null
   }
-
-  const { familierStatistikk, iverksettVedtakStatistikk } = orkestreringStatistikk
-
   return (
-    <HStack>
-      <Bar
-        width={"500"}
-        id={'123'}
-        data={{
-          labels: ['Opprettet', 'Under behandling', 'Feilende', 'Fullført'],
-          datasets: [
-            {
-              label: 'Familier',
-              data: [familierStatistikk.opprettet, familierStatistikk.underBehandling, familierStatistikk.feilende, familierStatistikk.fullfort],
-              borderWidth: 1,
-            },
-            {
-              label: 'Iverksett vedtak',
-              data: [iverksettVedtakStatistikk.opprettet, iverksettVedtakStatistikk.underBehandling, iverksettVedtakStatistikk.feilende, iverksettVedtakStatistikk.fullfort],
-              borderWidth: 1,
-            },
-          ],
-        }}
-        options={{
-          responsive: true,
-        }}
-      />
-    </HStack>
+    <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
   )
 }
 
@@ -284,17 +268,24 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
 export function ArbeidstabellStatistikk() {
 
   const fetcher = useFetcher()
-  const arbeidstabellStatistikk = fetcher.data as ArbeidstabellStatistikk | undefined
+  const aggregertStatistikk = fetcher.data as AggregertStatistikk | undefined
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return
     fetcher.load(`hentArbeidstabellStatistikk`)
   }, [fetcher])
 
+  if (aggregertStatistikk === undefined && fetcher.state === 'loading') {
+    return <Loader size="small" />
+  }
 
-  if (arbeidstabellStatistikk === undefined) {
+  if (aggregertStatistikk === undefined) {
     return null
   }
+
+  const {
+    arbeidstabellStatistikk,
+  } = aggregertStatistikk
 
   const {
     antallOversendesOppdrag,
@@ -303,27 +294,118 @@ export function ArbeidstabellStatistikk() {
     antallReguleringsfeil,
   } = arbeidstabellStatistikk
 
+
+  const {
+    aggregerteFeilmeldinger,
+  } = aggregertStatistikk
+
+  const {
+    faktoromregningerMedAarsak,
+  } = aggregertStatistikk
+
+
   return (
-    <HStack>
-      <Bar
-        id={'123'}
-        height={500}
-        width={1000}
-        data={{
-          labels: ['Antall oversendes', 'Antall faktoromregnet', 'Antall fakoromregnet direkte', 'Antall reguleringsfeil'],
-          datasets: [
-            {
-              label: 'Arbeidstabell',
-              data: [antallOversendesOppdrag, antallFaktoromregnet, antallFaktoromregnetDirekte, antallReguleringsfeil],
-              borderWidth: 1,
-            },
-          ],
-        }}
-        options={{
-          responsive: true,
-        }}
-      />
-    </HStack>
+    <VStack>
+      <HStack style={{ marginLeft: 'auto' }} gap="3">
+        <Button variant="secondary" size="small">Fortsett feilende familie reguleringer
+          ({aggregertStatistikk.antallFeilendeFamiliebehandlinger})</Button>
+        <Button variant="secondary" size="small">Fortsett feilende iverksett vedtak
+          ({aggregertStatistikk.antallIFeilendeverksettVedtak})</Button>
+        <Dropdown>
+          <Button as={Dropdown.Toggle} size="small">Rune sin knapp</Button>
+          <Dropdown.Menu>
+            <Dropdown.Menu.List>
+              <Dropdown.Menu.List.Item as={Button}>
+                Prøv på nytt med nye avviksgrenser ({aggregertStatistikk.antallVenterPaaRune})
+              </Dropdown.Menu.List.Item>
+              <Dropdown.Menu.List.Item as={Button}>
+                Kjør i faktoromregningsmodus ({aggregertStatistikk.antallVenterPaaRune})
+              </Dropdown.Menu.List.Item>
+              <Dropdown.Menu.List.Item as={Button}>
+                Kjør i feilhåndteringsmodus
+                ({aggregertStatistikk.antallFeilendeBeregnytelser})
+              </Dropdown.Menu.List.Item>
+            </Dropdown.Menu.List>
+          </Dropdown.Menu>
+        </Dropdown>
+
+      </HStack>
+      <Tabs defaultValue="arbeidstabell">
+        <Tabs.List>
+          <Tabs.Tab
+            value="arbeidstabell"
+            label="Arbeidstabell statistikk"
+          />
+          <Tabs.Tab
+            value="feilmeldinger"
+            label="Feilmeldinger"
+          />
+          <Tabs.Tab
+            value="faktomregningArsak"
+            label="Faktoromregninger Årsak"
+          />
+        </Tabs.List>
+        <Tabs.Panel value="arbeidstabell">
+          <Bar
+            id={'123'}
+            height={500}
+            width={1000}
+            data={{
+              labels: ['Antall oversendes', 'Antall faktoromregnet', 'Antall fakoromregnet direkte', 'Antall reguleringsfeil'],
+              datasets: [
+                {
+                  label: 'Arbeidstabell',
+                  data: [antallOversendesOppdrag, antallFaktoromregnet, antallFaktoromregnetDirekte, antallReguleringsfeil],
+                  borderWidth: 1,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+            }}
+          />
+        </Tabs.Panel>
+        <Tabs.Panel value="feilmeldinger">
+          <Bar
+            id={'123'}
+            height={500}
+            width={1000}
+            data={{
+              labels: aggregerteFeilmeldinger.map((f) => f.aktivitet),
+              datasets: aggregerteFeilmeldinger.map((f) => ({
+                labels: f.feilmeldinger.map(value => value.feilmelding), data: f.feilmeldinger.map(value => value.antall), borderWidth: 1,
+              })),
+            }}
+            options={{
+              responsive: true,
+            }}
+          />
+        </Tabs.Panel>
+        <Tabs.Panel value="faktomregningArsak">
+          <Bar
+            id={'123'}
+            height={500}
+            width={1000}
+            data={{
+              labels: faktoromregningerMedAarsak.map((f) => f.aarsak),
+              datasets: [
+                {
+                  label: 'Årsak faktoromregning',
+                  data: faktoromregningerMedAarsak.map((f) => f.antall),
+                  borderWidth: 1,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+            }}
+          />
+        </Tabs.Panel>
+      </Tabs>
+      <HStack>
+
+      </HStack>
+    </VStack>
   )
 }
 
@@ -367,6 +449,19 @@ export function Uttrekk({ uttrekk, goToOrkestrering }: {
           </>
         }
       </HStack>
+      <VStack>
+        <ReadMore header="Vis kjøretid for aktiviteter">
+          <VStack>
+            {uttrekk?.kjoretidAktiviteter.map((aktivitet) => (
+              <Alert variant="success" inline size="small"
+                     key={aktivitet.aktivitet}>{aktivitet.minutter}min {aktivitet.sekunder}s
+                - {aktivitet.aktivitet}</Alert>
+            ))}
+          </VStack>
+        </ReadMore>
+
+
+      </VStack>
       <HStack gap="5">
         <Entry labelText={'Satsdato'}>{formatIsoDate(uttrekk?.satsDato)}</Entry>
         <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>

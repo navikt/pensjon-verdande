@@ -18,6 +18,7 @@ export type ReguleringUttrekk = {
   arbeidstabellSize: number,
   familierTabellSize: number,
   antallUbehandlende: number,
+  kjoretidAktiviteter: KjoretidForAktivitet[],
 }
 
 export type ReguleringOrkestrering = {
@@ -46,6 +47,27 @@ export type IverksettVedtakStats = {
   feilende: number;
 }
 
+
+/*
+    data class AggregertStatistikk(
+        val arbeidstabellStatistikk: ReguleringUttrekkArbTabRepository.ArbeidstabellStatistikk,
+        val aggregerteFeilmeldinger: List<ReguleringAvhengigeBehandlingerService.AntallFeilForKjoring>,
+        val faktoromregningerMedAarsak: List<ReguleringUttrekkArbTabRepository.FaktoromregningMedAarsak>,
+        val antallVenterPaaRune: Int
+    )
+ */
+
+export type AggregertStatistikk = {
+  arbeidstabellStatistikk: ArbeidstabellStatistikk;
+  aggregerteFeilmeldinger: FeiletAktivitet[];
+  faktoromregningerMedAarsak: FaktoromregningMedAarsak[];
+  antallVenterPaaRune: number;
+  antallFeilendeBeregnytelser: number;
+  antallFeilendeFamiliebehandlinger: number;
+  antallIFeilendeverksettVedtak: number;
+}
+
+
 export type ArbeidstabellStatistikk = {
   antallOversendesOppdrag: number;
   antallFaktoromregnet: number;
@@ -53,8 +75,47 @@ export type ArbeidstabellStatistikk = {
   antallReguleringsfeil: number;
 }
 
+export type AntallFeilForKjoring = {
+  feilmelding: string;
+  aktivitet: string;
+  antall: number;
+}
+
+export type FeiletAktivitet = {
+  aktivitet: string;
+  feilmeldinger: Feilmelding[];
+}
+
+export type  Feilmelding = {
+  feilmelding: string;
+  antall: number;
+}
+
+/*
+    data class FeiletAktivitet(
+        val aktivitet: String,
+        val feilmeldinger: List<Feilmelding>
+    )
+
+    data class Feilmelding(
+        val feilmelding: String,
+        val antall: Int
+    )
+ */
+
+export type FaktoromregningMedAarsak = {
+  aarsak: string;
+  antall: number;
+}
+
+
 export type StatistikkNode = {
   navn: string;
   antall: number;
 }
 
+export type KjoretidForAktivitet = {
+  aktivitet: string;
+  sekunder: number;
+  minutter: number;
+}

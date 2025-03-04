@@ -3,7 +3,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import invariant from 'tiny-invariant'
-import type { OrkestreringStatistikk } from '~/regulering.types'
+import { DetaljertFremdriftDTO } from '~/types'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -16,7 +16,7 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
 async function hentOrkestreringsStatistikk(
   accessToken: string,
   behandlingId: string,
-): Promise<OrkestreringStatistikk> {
+): Promise<DetaljertFremdriftDTO> {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/detaljer`,
@@ -29,7 +29,7 @@ async function hentOrkestreringsStatistikk(
   )
 
   if (response.ok) {
-    return (await response.json()) as OrkestreringStatistikk
+    return (await response.json()) as DetaljertFremdriftDTO
   } else {
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
