@@ -75,6 +75,11 @@ export default function BatchOpprett_index() {
     { value: 'SOKNAD_AP', label: 'Søknad AP' },
   ]
 
+  const oppgavePrefiks = [
+    { value: 'REGELENDRING_PREFIKS', label: 'Regelendring prefiks' },
+    { value: 'DEFAULT_PREFIKS', label: 'Default prefiks' },
+  ]
+
   function setMonthSelected(date: Date | undefined): Date | undefined {
     if (!date) {
       return undefined
@@ -207,6 +212,13 @@ export default function BatchOpprett_index() {
               </Select>
               <Select label={'Oppgave sett'} name={'oppgaveSett'}>
                 {oppgaveSett.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+              <Select label={'Oppgave prefiks'} name={'oppgavePrefiks'}>
+                {oppgavePrefiks.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>

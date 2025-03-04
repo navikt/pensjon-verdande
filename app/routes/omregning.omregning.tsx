@@ -21,6 +21,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     kravArsak: updates.kravArsak,
     toleransegrenseSett: updates.toleransegrenseSett,
     oppgaveSett: updates.oppgaveSett,
+    oppgavePrefiks: updates.oppgavePrefiks,
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
