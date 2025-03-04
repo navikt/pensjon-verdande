@@ -252,7 +252,7 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return
-    fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`)
+    fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`, {ms: 20000})
   }, [behandlingId, behandlingStatus, fetcher])
 
 
