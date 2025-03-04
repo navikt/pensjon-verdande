@@ -7,10 +7,9 @@ import {
   Button,
   DatePicker,
   Heading,
-  HStack,
-  Loader,
+  HStack, Loader,
   Modal,
-  ProgressBar,
+  ProgressBar, ReadMore,
   Stepper,
   TextField,
   VStack,
@@ -23,13 +22,16 @@ import type {
   ReguleringUttrekk,
   ArbeidstabellStatistikk,
 } from '~/regulering.types'
-import { Behandlingstatus } from '~/types'
+import { Behandlingstatus, DetaljertFremdriftDTO } from '~/types'
 import { Bar } from 'react-chartjs-2'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import { format, formatISO } from 'date-fns'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { Entry } from '~/components/entry/Entry'
+import {
+  BehandlingBatchDetaljertFremdriftBarChart
+} from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -238,7 +240,7 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
 }) {
 
   const fetcher = useFetcher()
-  const orkestreringStatistikk = fetcher.data as OrkestreringStatistikk | undefined
+  const orkestreringStatistikk = fetcher.data as DetaljertFremdriftDTO | undefined
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return
@@ -249,34 +251,8 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
   if (orkestreringStatistikk === undefined) {
     return null
   }
-
-  const { familierStatistikk, iverksettVedtakStatistikk } = orkestreringStatistikk
-
   return (
-    <HStack>
-      <Bar
-        width={"500"}
-        id={'123'}
-        data={{
-          labels: ['Opprettet', 'Under behandling', 'Feilende', 'Fullført'],
-          datasets: [
-            {
-              label: 'Familier',
-              data: [familierStatistikk.opprettet, familierStatistikk.underBehandling, familierStatistikk.feilende, familierStatistikk.fullfort],
-              borderWidth: 1,
-            },
-            {
-              label: 'Iverksett vedtak',
-              data: [iverksettVedtakStatistikk.opprettet, iverksettVedtakStatistikk.underBehandling, iverksettVedtakStatistikk.feilende, iverksettVedtakStatistikk.fullfort],
-              borderWidth: 1,
-            },
-          ],
-        }}
-        options={{
-          responsive: true,
-        }}
-      />
-    </HStack>
+    <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
   )
 }
 
@@ -367,6 +343,17 @@ export function Uttrekk({ uttrekk, goToOrkestrering }: {
           </>
         }
       </HStack>
+      <VStack>
+        <ReadMore header="Vis kjøretid for aktiviteter">
+          <VStack>
+            {uttrekk?.kjoretidAktiviteter.map((aktivitet) => (
+              <Alert variant="success" inline size="small" key={aktivitet.aktivitet}>{aktivitet.minutter}min {aktivitet.sekunder}s - {aktivitet.aktivitet}</Alert>
+            ))}
+          </VStack>
+        </ReadMore>
+
+
+      </VStack>
       <HStack gap="5">
         <Entry labelText={'Satsdato'}>{formatIsoDate(uttrekk?.satsDato)}</Entry>
         <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>

@@ -18,6 +18,7 @@ export type ReguleringUttrekk = {
   arbeidstabellSize: number,
   familierTabellSize: number,
   antallUbehandlende: number,
+  kjoretidAktiviteter: KjoretidForAktivitet[],
 }
 
 export type ReguleringOrkestrering = {
@@ -58,3 +59,8 @@ export type StatistikkNode = {
   antall: number;
 }
 
+export type KjoretidForAktivitet = {
+  aktivitet: string;
+  sekunder: number;
+  minutter: number;
+}
