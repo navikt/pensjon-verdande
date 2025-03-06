@@ -57,14 +57,17 @@ export type IverksettVedtakStats = {
     )
  */
 
-export type AggregertStatistikk = {
+export type ReguleringStatistikk = {
   arbeidstabellStatistikk: ArbeidstabellStatistikk;
-  aggregerteFeilmeldinger: FeiletAktivitet[];
   faktoromregningerMedAarsak: FaktoromregningMedAarsak[];
   antallVenterPaaRune: number;
   antallFeilendeBeregnytelser: number;
   antallFeilendeFamiliebehandlinger: number;
   antallIFeilendeverksettVedtak: number;
+}
+
+export type AggregerteFeilmeldinger = {
+  aggregerteFeilmeldinger: AntallFeilForKjoring[];
 }
 
 
@@ -80,28 +83,6 @@ export type AntallFeilForKjoring = {
   aktivitet: string;
   antall: number;
 }
-
-export type FeiletAktivitet = {
-  aktivitet: string;
-  feilmeldinger: Feilmelding[];
-}
-
-export type  Feilmelding = {
-  feilmelding: string;
-  antall: number;
-}
-
-/*
-    data class FeiletAktivitet(
-        val aktivitet: String,
-        val feilmeldinger: List<Feilmelding>
-    )
-
-    data class Feilmelding(
-        val feilmelding: String,
-        val antall: Int
-    )
- */
 
 export type FaktoromregningMedAarsak = {
   aarsak: string;
