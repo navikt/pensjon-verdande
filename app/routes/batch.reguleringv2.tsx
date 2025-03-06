@@ -14,17 +14,17 @@ import {
   ProgressBar,
   ReadMore,
   Stepper,
+  Table,
   Tabs,
   TextField,
   VStack,
 } from '@navikt/ds-react'
 import React, { useEffect, useState } from 'react'
-import type {
-  AggregertStatistikk,
-  ArbeidstabellStatistikk,
-  OrkestreringStatistikk,
+import {
+  AggregerteFeilmeldinger,
   ReguleringDetaljer,
   ReguleringOrkestrering,
+  ReguleringStatistikk,
   ReguleringUttrekk,
 } from '~/regulering.types'
 import { Behandlingstatus, DetaljertFremdriftDTO } from '~/types'
@@ -37,6 +37,7 @@ import { Entry } from '~/components/entry/Entry'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
+import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
 
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -51,7 +52,7 @@ export default function OpprettReguleringBatchRoute() {
 
   useRevalidateOnInterval({
     enabled: true,
-    interval: regulering.uttrekk?.status === Behandlingstatus.UNDER_BEHANDLING ? 500 : 1000,
+    interval: regulering.uttrekk?.status === Behandlingstatus.UNDER_BEHANDLING ? 500 : 1500,
   })
 
   console.log(regulering)
@@ -76,64 +77,265 @@ export default function OpprettReguleringBatchRoute() {
       </HStack>
       {reguleringSteg === 1 &&
         <Uttrekk uttrekk={regulering.uttrekk} goToOrkestrering={() => setReguleringSteg(2)}></Uttrekk>}
-      {reguleringSteg === 2 && <Orkestrering orkestreringer={regulering.orkestreringer} uttrekk={regulering.uttrekk} />}
-      {reguleringSteg === 3 && <AdministrerTilknyttetdeBehandlinger />}
+      {reguleringSteg === 2 && <Orkestrering orkestreringer={regulering.orkestreringer} uttrekk={regulering.uttrekk}
+                                             goToAdministrerBehandlinger={() => setReguleringSteg(3)} />}
+      {reguleringSteg === 3 &&
+        <AdministrerTilknyttetdeBehandlinger uttrekkBehandlingId={regulering.uttrekk?.behandlingId ?? null} />}
     </VStack>
   )
 }
 
 
-export function AdministrerTilknyttetdeBehandlinger() {
+export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { uttrekkBehandlingId: string | null }) {
+
+  const fetcher = useFetcher()
+  const fetcherFortsettFeilendeFamilieReguleringer = useFetcher()
+  const fetcherFortsettFeilendeIverksettVedtak = useFetcher()
+  const fetcherNyAvviksgrenser = useFetcher()
+  const fetcherFaktoromregningsmodus = useFetcher()
+  const fetcherFeilhandteringmodus = useFetcher()
+
+  // On Mount
+  useEffect(() => {
+    if (fetcher.data === undefined && fetcher.state === 'idle') {
+      fetcher.load(`hentStatistikk`)
+    }
+  }, [fetcher])
+
+  //Interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (fetcher.state === 'idle') {
+        fetcher.load(`hentOrkestreringStatistikk`)
+      }
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [fetcher])
+
+  const reguleringStatistikk = fetcher.data as ReguleringStatistikk | undefined
+
+  if (reguleringStatistikk === undefined) {
+    return null
+  }
+
+  const {
+    arbeidstabellStatistikk,
+    faktoromregningerMedAarsak,
+    antallVenterPaaRune,
+    antallFeilendeBeregnytelser,
+    antallFeilendeFamiliebehandlinger,
+    antallIFeilendeverksettVedtak,
+  } = reguleringStatistikk
+
+  const {
+    antallOversendesOppdrag,
+    antallFaktoromregnet,
+    antallFaktoromregnetDirekte,
+    antallReguleringsfeil,
+  } = arbeidstabellStatistikk
+
+
+  function fortsettFeilendeFamilieReguleringer() {
+    fetcherFortsettFeilendeFamilieReguleringer.submit(
+      {},
+      {
+        action: 'fortsettFeilendeFamilieReguleringer',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  function fortsettFeilendeIverksettVedtak() {
+    fetcherFortsettFeilendeIverksettVedtak.submit(
+      {},
+      {
+        action: 'fortsettFeilendeIverksettVedtak',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  function fortsettNyAvviksgrenser() {
+    fetcherNyAvviksgrenser.submit(
+      {},
+      {
+        action: 'fortsettNyAvviksgrenser',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  function fortsettFaktoromregningsmodus() {
+    fetcherFaktoromregningsmodus.submit(
+      {},
+      {
+        action: 'fortsettFaktoromregningsmodus',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  function fortsettFeilhandteringmodus() {
+    fetcherFeilhandteringmodus.submit(
+      {},
+      {
+        action: 'fortsettFeilhandteringmodus',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
 
 
   return (
-    <HStack>
-      <Bar
-        width={1000}
-        height={500}
-        id={'123'}
-        data={{
-          labels: ['Orkestrering', 'Familie', 'Iverksett vedtak'],
-          datasets: [
-            {
-              label: 'Opprettet',
-              data: [1123],
-              borderWidth: 1,
-            },
-            {
-              label: 'Under behandling',
-              data: [11233],
-              borderWidth: 1,
-            },
-            {
-              label: 'Feilende',
-              data: [11232],
-              borderWidth: 1,
-            },
-            {
-              label: 'Stoppet',
-              data: [11231],
-              borderWidth: 1,
-            },
-            {
-              label: 'Fullført',
-              data: [112311],
-              borderWidth: 1,
-            },
+    <VStack gap="5">
+      <HStack gap="3">
+        <Button icon={<PlayFillIcon />} size="small"
+                onClick={() => fortsettFeilendeFamilieReguleringer()}
+                loading={fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting'}>Fortsett feilende familie
+          reguleringer
+          ({antallFeilendeFamiliebehandlinger})</Button>
+        <Button icon={<PlayFillIcon />} size="small"
+                onClick={() => fortsettFeilendeIverksettVedtak()}
+                loading={fetcherFortsettFeilendeIverksettVedtak.state === 'submitting'}>Fortsett feilende iverksett
+          vedtak
+          ({antallIFeilendeverksettVedtak})</Button>
+        <Dropdown>
+          <Button icon={<ChevronDownIcon />} iconPosition="right" as={Dropdown.Toggle} variant="secondary" size="small"
+                  loading={fetcherFeilhandteringmodus.state === 'submitting'
+                    || fetcherFaktoromregningsmodus.state === 'submitting'
+                    || fetcherNyAvviksgrenser.state === 'submitting'}>Rune sin knapp</Button>
+          <Dropdown.Menu>
+            <Dropdown.Menu.List>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettNyAvviksgrenser()}>
+                Prøv på nytt med nye avviksgrenser ({antallVenterPaaRune})
+              </Dropdown.Menu.List.Item>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFaktoromregningsmodus()}>
+                Kjør i faktoromregningsmodus ({antallVenterPaaRune})
+              </Dropdown.Menu.List.Item>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFeilhandteringmodus()}>
+                Kjør i feilhåndteringsmodus
+                ({antallFeilendeBeregnytelser})
+              </Dropdown.Menu.List.Item>
+            </Dropdown.Menu.List>
+          </Dropdown.Menu>
+        </Dropdown>
+      </HStack>
+      <HStack>
+        <Tabs defaultValue="totaloversiktbehandlinger">
+          <Tabs.List>
+            <Tabs.Tab value="totaloversiktbehandlinger" label="Totaloversikt Behandlinger" />
+            <Tabs.Tab
+              value="arbeidstabell"
+              label="Arbeidstabell statistikk"
+            />
 
-          ],
-        }}
-        options={{
-          responsive: true,
-        }}
-      />
-    </HStack>
+            <Tabs.Tab
+              value="faktomregningArsak"
+              label="Faktoromregninger Årsak"
+            />
+          </Tabs.List>
+          <Tabs.Panel value="totaloversiktbehandlinger">
+            {uttrekkBehandlingId !== null ? <VStack gap="5">
+                <TotaloversiktBehandlinger behandlingId={uttrekkBehandlingId} />
+                  <Entry labelText={'Behandling'}>
+                    <Link to={`/behandling/${uttrekkBehandlingId}`} target="_blank">Gå til
+                      behandling</Link>
+                  </Entry>
+            </VStack>:
+              <Alert variant="info" inline>Uttrekk ikke kjørt enda</Alert>}
+
+          </Tabs.Panel>
+          <Tabs.Panel value="arbeidstabell">
+            <Bar
+              id={'123'}
+              height={500}
+              width={1000}
+              data={{
+                labels: ['Antall oversendes', 'Antall faktoromregnet', 'Antall fakoromregnet direkte', 'Antall reguleringsfeil'],
+                datasets: [
+                  {
+                    label: 'Arbeidstabell',
+                    data: [antallOversendesOppdrag, antallFaktoromregnet, antallFaktoromregnetDirekte, antallReguleringsfeil],
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+              }}
+            />
+          </Tabs.Panel>
+          <Tabs.Panel value="faktomregningArsak">
+            <Bar
+              id={'123'}
+              height={500}
+              width={1000}
+              data={{
+                labels: faktoromregningerMedAarsak.map((f) => f.aarsak),
+                datasets: [
+                  {
+                    label: 'Årsak faktoromregning',
+                    data: faktoromregningerMedAarsak.map((f) => f.antall),
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+              }}
+            />
+          </Tabs.Panel>
+        </Tabs>
+      </HStack>
+    </VStack>
   )
 }
 
-export function Orkestrering({ orkestreringer, uttrekk }: {
+export function TotaloversiktBehandlinger({ behandlingId }: {
+  behandlingId: string,
+}) {
+
+  const fetcher = useFetcher()
+
+  // On Mount
+  useEffect(() => {
+    if (fetcher.data === undefined && fetcher.state === 'idle') {
+      fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`)
+    }
+  }, [fetcher, behandlingId])
+
+  //Interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (fetcher.state === 'idle') {
+        fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`)
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [fetcher, behandlingId])
+
+  const orkestreringStatistikk = fetcher.data as DetaljertFremdriftDTO | undefined
+
+  if (orkestreringStatistikk === undefined) {
+    return null
+  }
+  return (
+    <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
+  )
+}
+
+
+export function Orkestrering({ orkestreringer, uttrekk, goToAdministrerBehandlinger }: {
   orkestreringer: ReguleringOrkestrering[],
   uttrekk: ReguleringUttrekk | null
+  goToAdministrerBehandlinger: () => void
 }) {
   const [antallFamilier, setAntallFamilier] = useState('100000')
   const [error, setError] = useState<string | undefined>(undefined)
@@ -176,7 +378,12 @@ export function Orkestrering({ orkestreringer, uttrekk }: {
           </Entry>
           <TextField label="Antall familier" error={error} onChange={(e) => setAntallFamilier(e.target.value)}
                      value={antallFamilier} />
-          <Button loading={fetcher.state === 'submitting'} onClick={startOrkestrering}>Start orkestrering</Button>
+          <HStack gap="3">
+            <Button loading={fetcher.state === 'submitting'} onClick={startOrkestrering}>Start orkestrering</Button>
+            {orkestreringer.length > 0 &&
+              <Button variant="secondary" onClick={goToAdministrerBehandlinger}>Administrer behandlinger</Button>
+            }
+          </HStack>
         </VStack>
       </HStack>
       <VStack gap="5">
@@ -191,11 +398,10 @@ export function Orkestrering({ orkestreringer, uttrekk }: {
                                     orkestrering={orkestrering} />
             ))}
           </VStack>
-          <VStack gap="4">
-            <Heading level="2" size="medium">Kjøring resultat</Heading>
+          <VStack gap="5">
             {orkestreringer.length === 0 ?
               <Alert variant="info" inline>Ingen kjøringer enda</Alert>
-              : <ArbeidstabellStatistikk />}
+              : <AggregerteFeilmeldingerTabell />}
 
           </VStack>
         </HStack>
@@ -248,13 +454,26 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
 }) {
 
   const fetcher = useFetcher()
-  const orkestreringStatistikk = fetcher.data as DetaljertFremdriftDTO | undefined
 
+  // On Mount
   useEffect(() => {
-    if (fetcher.state !== 'idle') return
-    fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`, {ms: 20000})
-  }, [behandlingId, behandlingStatus, fetcher])
+    if (fetcher.data === undefined && fetcher.state === 'idle') {
+      fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`)
+    }
+  }, [fetcher, behandlingId])
 
+  //Interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (fetcher.state === 'idle') {
+        fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`)
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [fetcher, behandlingId])
+
+  const orkestreringStatistikk = fetcher.data as DetaljertFremdriftDTO | undefined
 
   if (orkestreringStatistikk === undefined) {
     return null
@@ -265,145 +484,66 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
 }
 
 
-export function ArbeidstabellStatistikk() {
+export function AggregerteFeilmeldingerTabell() {
 
   const fetcher = useFetcher()
-  const aggregertStatistikk = fetcher.data as AggregertStatistikk | undefined
 
+  // On Mount
   useEffect(() => {
-    if (fetcher.state !== 'idle') return
-    fetcher.load(`hentArbeidstabellStatistikk`)
+    if (fetcher.data === undefined && fetcher.state === 'idle') {
+      fetcher.load('hentAggregerteFeilmeldinger')
+    }
   }, [fetcher])
 
-  if (aggregertStatistikk === undefined && fetcher.state === 'loading') {
+  //Interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (fetcher.state === 'idle') {
+        fetcher.load('hentAggregerteFeilmeldinger')
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [fetcher])
+
+  const aggregerteFeilmeldingerWrapper = fetcher.data as AggregerteFeilmeldinger | undefined
+
+  if (aggregerteFeilmeldingerWrapper === undefined && fetcher.state === 'loading') {
     return <Loader size="small" />
   }
 
-  if (aggregertStatistikk === undefined) {
+  if (aggregerteFeilmeldingerWrapper === undefined) {
     return null
   }
 
   const {
-    arbeidstabellStatistikk,
-  } = aggregertStatistikk
-
-  const {
-    antallOversendesOppdrag,
-    antallFaktoromregnet,
-    antallFaktoromregnetDirekte,
-    antallReguleringsfeil,
-  } = arbeidstabellStatistikk
-
-
-  const {
     aggregerteFeilmeldinger,
-  } = aggregertStatistikk
+  } = aggregerteFeilmeldingerWrapper
 
-  const {
-    faktoromregningerMedAarsak,
-  } = aggregertStatistikk
-
+  if (aggregerteFeilmeldinger.length === 0) {
+    return <Alert variant="success" inline>Ingen feilmeldinger enda</Alert>
+  }
 
   return (
     <VStack>
+      <Heading level="2" size="medium">
+        Feilmeldinger
+      </Heading>
       <HStack style={{ marginLeft: 'auto' }} gap="3">
-        <Button variant="secondary" size="small">Fortsett feilende familie reguleringer
-          ({aggregertStatistikk.antallFeilendeFamiliebehandlinger})</Button>
-        <Button variant="secondary" size="small">Fortsett feilende iverksett vedtak
-          ({aggregertStatistikk.antallIFeilendeverksettVedtak})</Button>
-        <Dropdown>
-          <Button as={Dropdown.Toggle} size="small">Rune sin knapp</Button>
-          <Dropdown.Menu>
-            <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item as={Button}>
-                Prøv på nytt med nye avviksgrenser ({aggregertStatistikk.antallVenterPaaRune})
-              </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item as={Button}>
-                Kjør i faktoromregningsmodus ({aggregertStatistikk.antallVenterPaaRune})
-              </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item as={Button}>
-                Kjør i feilhåndteringsmodus
-                ({aggregertStatistikk.antallFeilendeBeregnytelser})
-              </Dropdown.Menu.List.Item>
-            </Dropdown.Menu.List>
-          </Dropdown.Menu>
-        </Dropdown>
-
-      </HStack>
-      <Tabs defaultValue="arbeidstabell">
-        <Tabs.List>
-          <Tabs.Tab
-            value="arbeidstabell"
-            label="Arbeidstabell statistikk"
-          />
-          <Tabs.Tab
-            value="feilmeldinger"
-            label="Feilmeldinger"
-          />
-          <Tabs.Tab
-            value="faktomregningArsak"
-            label="Faktoromregninger Årsak"
-          />
-        </Tabs.List>
-        <Tabs.Panel value="arbeidstabell">
-          <Bar
-            id={'123'}
-            height={500}
-            width={1000}
-            data={{
-              labels: ['Antall oversendes', 'Antall faktoromregnet', 'Antall fakoromregnet direkte', 'Antall reguleringsfeil'],
-              datasets: [
-                {
-                  label: 'Arbeidstabell',
-                  data: [antallOversendesOppdrag, antallFaktoromregnet, antallFaktoromregnetDirekte, antallReguleringsfeil],
-                  borderWidth: 1,
-                },
-              ],
-            }}
-            options={{
-              responsive: true,
-            }}
-          />
-        </Tabs.Panel>
-        <Tabs.Panel value="feilmeldinger">
-          <Bar
-            id={'123'}
-            height={500}
-            width={1000}
-            data={{
-              labels: aggregerteFeilmeldinger.map((f) => f.aktivitet),
-              datasets: aggregerteFeilmeldinger.map((f) => ({
-                labels: f.feilmeldinger.map(value => value.feilmelding), data: f.feilmeldinger.map(value => value.antall), borderWidth: 1,
-              })),
-            }}
-            options={{
-              responsive: true,
-            }}
-          />
-        </Tabs.Panel>
-        <Tabs.Panel value="faktomregningArsak">
-          <Bar
-            id={'123'}
-            height={500}
-            width={1000}
-            data={{
-              labels: faktoromregningerMedAarsak.map((f) => f.aarsak),
-              datasets: [
-                {
-                  label: 'Årsak faktoromregning',
-                  data: faktoromregningerMedAarsak.map((f) => f.antall),
-                  borderWidth: 1,
-                },
-              ],
-            }}
-            options={{
-              responsive: true,
-            }}
-          />
-        </Tabs.Panel>
-      </Tabs>
-      <HStack>
-
+        <Table>
+          <Table.Row>
+            <Table.HeaderCell>Antall</Table.HeaderCell>
+            <Table.HeaderCell>Feilmelding</Table.HeaderCell>
+            <Table.HeaderCell>Aktivitet</Table.HeaderCell>
+          </Table.Row>
+          {aggregerteFeilmeldinger.map((feilmelding) => (
+            <Table.Row key={feilmelding.aktivitet + feilmelding.feilmelding}>
+              <Table.DataCell>{feilmelding.antall}</Table.DataCell>
+              <Table.DataCell>{feilmelding.feilmelding}</Table.DataCell>
+              <Table.DataCell>{feilmelding.aktivitet}</Table.DataCell>
+            </Table.Row>
+          ))}
+        </Table>
       </HStack>
     </VStack>
   )
@@ -449,7 +589,7 @@ export function Uttrekk({ uttrekk, goToOrkestrering }: {
           </>
         }
       </HStack>
-      <VStack>
+      <HStack gap="3">
         <ReadMore header="Vis kjøretid for aktiviteter">
           <VStack>
             {uttrekk?.kjoretidAktiviteter.map((aktivitet) => (
@@ -459,13 +599,16 @@ export function Uttrekk({ uttrekk, goToOrkestrering }: {
             ))}
           </VStack>
         </ReadMore>
-
-
-      </VStack>
+      </HStack>
       <HStack gap="5">
         <Entry labelText={'Satsdato'}>{formatIsoDate(uttrekk?.satsDato)}</Entry>
         <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>
         <Entry labelText={'Antall familier'}>{uttrekk?.familierTabellSize}</Entry>
+        {uttrekk !== null &&
+          <Entry labelText={'Behandling'}>
+            <Link to={`/behandling/${uttrekk.behandlingId}`} target="_blank">Gå til
+            behandling</Link>
+          </Entry>}
       </HStack>
       <HStack gap="3">
         {(uttrekk === null || (uttrekk.status === Behandlingstatus.FULLFORT || uttrekk.status === Behandlingstatus.STOPPET))
