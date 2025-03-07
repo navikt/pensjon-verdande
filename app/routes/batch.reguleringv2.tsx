@@ -299,15 +299,15 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
           <Tabs.Panel value="beregningsavvik">
             <Table>
               <Table.Row>
+                <Table.HeaderCell>Sakstype </Table.HeaderCell>
                 <Table.HeaderCell>Antall</Table.HeaderCell>
-                <Table.HeaderCell>Type avvik</Table.HeaderCell>
-                <Table.HeaderCell>Aktivitet</Table.HeaderCell>
+                <Table.HeaderCell>Avvik</Table.HeaderCell>
               </Table.Row>
               {beregningsavvikStatistikk.map((avvik) => (
                 <Table.Row key={avvik.typeAvvik + avvik.sakType}>
+                  <Table.DataCell>{avvik.sakType}</Table.DataCell>
                   <Table.DataCell>{avvik.antall}</Table.DataCell>
                   <Table.DataCell>{avvik.typeAvvik}</Table.DataCell>
-                  <Table.DataCell>{avvik.sakType}</Table.DataCell>
                 </Table.Row>
               ))}
             </Table>
