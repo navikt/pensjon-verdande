@@ -48,18 +48,10 @@ export type IverksettVedtakStats = {
 }
 
 
-/*
-    data class AggregertStatistikk(
-        val arbeidstabellStatistikk: ReguleringUttrekkArbTabRepository.ArbeidstabellStatistikk,
-        val aggregerteFeilmeldinger: List<ReguleringAvhengigeBehandlingerService.AntallFeilForKjoring>,
-        val faktoromregningerMedAarsak: List<ReguleringUttrekkArbTabRepository.FaktoromregningMedAarsak>,
-        val antallVenterPaaRune: Int
-    )
- */
-
 export type ReguleringStatistikk = {
   arbeidstabellStatistikk: ArbeidstabellStatistikk;
   faktoromregningerMedAarsak: FaktoromregningMedAarsak[];
+  beregningsavvikStatistikk: BeregningsavvikStatistikk[];
   antallVenterPaaRune: number;
   antallFeilendeBeregnytelser: number;
   antallFeilendeFamiliebehandlinger: number;
@@ -68,6 +60,7 @@ export type ReguleringStatistikk = {
 
 export type AggregerteFeilmeldinger = {
   aggregerteFeilmeldinger: AntallFeilForKjoring[];
+  antallVenterPaaRune: number;
 }
 
 
@@ -86,6 +79,12 @@ export type AntallFeilForKjoring = {
 
 export type FaktoromregningMedAarsak = {
   aarsak: string;
+  antall: number;
+}
+
+export type BeregningsavvikStatistikk = {
+  typeAvvik: string;
+  sakType: string;
   antall: number;
 }
 
