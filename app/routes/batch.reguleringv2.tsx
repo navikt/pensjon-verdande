@@ -122,6 +122,7 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
   const {
     arbeidstabellStatistikk,
     faktoromregningerMedAarsak,
+    beregningsavvikStatistikk,
     antallVenterPaaRune,
     antallFeilendeBeregnytelser,
     antallFeilendeFamiliebehandlinger,
@@ -239,6 +240,10 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
               value="faktomregningArsak"
               label="Faktoromregninger Årsak"
             />
+            <Tabs.Tab
+              value="beregningsavvik"
+              label="Beregningsavvik"
+              />
           </Tabs.List>
           <Tabs.Panel value="totaloversiktbehandlinger">
             {uttrekkBehandlingId !== null ? <VStack gap="5">
@@ -290,6 +295,22 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
                 responsive: true,
               }}
             />
+          </Tabs.Panel>
+          <Tabs.Panel value="beregningsavvik">
+            <Table>
+              <Table.Row>
+                <Table.HeaderCell>Antall</Table.HeaderCell>
+                <Table.HeaderCell>Type avvik</Table.HeaderCell>
+                <Table.HeaderCell>Aktivitet</Table.HeaderCell>
+              </Table.Row>
+              {beregningsavvikStatistikk.map((avvik) => (
+                <Table.Row key={avvik.typeAvvik + avvik.sakType}>
+                  <Table.DataCell>{avvik.antall}</Table.DataCell>
+                  <Table.DataCell>{avvik.typeAvvik}</Table.DataCell>
+                  <Table.DataCell>{avvik.sakType}</Table.DataCell>
+                </Table.Row>
+              ))}
+            </Table>
           </Tabs.Panel>
         </Tabs>
       </HStack>
@@ -525,7 +546,7 @@ export function AggregerteFeilmeldingerTabell() {
   }
 
   return (
-    <VStack>
+    <VStack gap="5">
       <Heading level="2" size="medium">
         Feilmeldinger
       </Heading>
@@ -544,6 +565,11 @@ export function AggregerteFeilmeldingerTabell() {
             </Table.Row>
           ))}
         </Table>
+      </HStack>
+      <HStack>
+        <Entry labelText="Antall venter på Rune">
+          {aggregerteFeilmeldingerWrapper.antallVenterPaaRune}
+        </Entry>
       </HStack>
     </VStack>
   )
