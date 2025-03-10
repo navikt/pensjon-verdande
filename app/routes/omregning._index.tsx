@@ -23,7 +23,7 @@ export default function BatchOpprett_index() {
   const [brukKjoreplan, setBrukKjoreplan] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
   const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
-  const [brukppen015, setBrukppen015] = useState(false)
+  const [brukPpen015, setBrukPpen015] = useState(false)
 
   const [hasError, setHasError] = useState(false)
   const submit = useSubmit()
@@ -179,9 +179,9 @@ export default function BatchOpprett_index() {
                 </Checkbox>
 
                 <Checkbox
-                  name='brukppen015'
-                  value={brukppen015}
-                  onChange={(event) => setBrukppen015(event.target.checked)}
+                  name='brukPPEN015'
+                  value={brukPpen015}
+                  onChange={(event) => setBrukPpen015(event.target.checked)}
                 >
                   Bruk PPEN015
                 </Checkbox>
