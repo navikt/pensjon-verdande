@@ -90,6 +90,7 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
 
   const fetcher = useFetcher()
   const fetcherFortsettFeilendeFamilieReguleringer = useFetcher()
+  const fetcherFortsettFamilieReguleringerTilBehandling = useFetcher()
   const fetcherFortsettFeilendeIverksettVedtak = useFetcher()
   const fetcherNyAvviksgrenser = useFetcher()
   const fetcherFaktoromregningsmodus = useFetcher()
@@ -148,6 +149,17 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
     )
   }
 
+  function fortsettFamilieReguleringerTilBehandling() {
+    fetcherFortsettFamilieReguleringerTilBehandling.submit(
+      {},
+      {
+        action: 'fortsettFamilieReguleringerTilBehandling',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
   function fortsettFeilendeIverksettVedtak() {
     fetcherFortsettFeilendeIverksettVedtak.submit(
       {},
@@ -196,11 +208,22 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
   return (
     <VStack gap="5">
       <HStack gap="3">
-        <Button icon={<PlayFillIcon />} size="small"
-                onClick={() => fortsettFeilendeFamilieReguleringer()}
-                loading={fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting'}>Fortsett feilende familie
-          reguleringer
-          ({antallFeilendeFamiliebehandlinger})</Button>
+        <Dropdown>
+          <Button icon={<PlayFillIcon />} as={Dropdown.Toggle} size="small"
+                  loading={fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting' || fetcherFortsettFamilieReguleringerTilBehandling.state === 'submitting'}>Fortsett  familie
+            reguleringer
+            ({antallFeilendeFamiliebehandlinger})</Button>
+          <Dropdown.Menu>
+            <Dropdown.Menu.List>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFamilieReguleringerTilBehandling()}>
+                Fortsett feilende behandlinger ({antallFeilendeFamiliebehandlinger})
+              </Dropdown.Menu.List.Item>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFamilieReguleringerTilBehandling()}>
+                Fortsett utsatte behandlinger
+              </Dropdown.Menu.List.Item>
+            </Dropdown.Menu.List>
+          </Dropdown.Menu>
+        </Dropdown>
         <Button icon={<PlayFillIcon />} size="small"
                 onClick={() => fortsettFeilendeIverksettVedtak()}
                 loading={fetcherFortsettFeilendeIverksettVedtak.state === 'submitting'}>Fortsett feilende iverksett
@@ -243,16 +266,16 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
             <Tabs.Tab
               value="beregningsavvik"
               label="Beregningsavvik"
-              />
+            />
           </Tabs.List>
           <Tabs.Panel value="totaloversiktbehandlinger">
             {uttrekkBehandlingId !== null ? <VStack gap="5">
                 <TotaloversiktBehandlinger behandlingId={uttrekkBehandlingId} />
-                  <Entry labelText={'Behandling'}>
-                    <Link to={`/behandling/${uttrekkBehandlingId}`} target="_blank">Gå til
-                      behandling</Link>
-                  </Entry>
-            </VStack>:
+                <Entry labelText={'Behandling'}>
+                  <Link to={`/behandling/${uttrekkBehandlingId}`} target="_blank">Gå til
+                    behandling</Link>
+                </Entry>
+              </VStack> :
               <Alert variant="info" inline>Uttrekk ikke kjørt enda</Alert>}
 
           </Tabs.Panel>
@@ -633,7 +656,7 @@ export function Uttrekk({ uttrekk, goToOrkestrering }: {
         {uttrekk !== null &&
           <Entry labelText={'Behandling'}>
             <Link to={`/behandling/${uttrekk.behandlingId}`} target="_blank">Gå til
-            behandling</Link>
+              behandling</Link>
           </Entry>}
       </HStack>
       <HStack gap="3">
