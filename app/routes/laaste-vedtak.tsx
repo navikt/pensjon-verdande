@@ -489,9 +489,10 @@ function KanIverksettes({ behandlingId, vedtak }: { behandlingId: string, vedtak
 function Kommentar({ behandlingId, vedtak }: { behandlingId: string, vedtak: LaasteVedtakRow }) {
   const fetcher = useFetcher()
   const [kommentar, setKommentar] = useState(vedtak.kommentar ?? '')
+  const [expanded, setExpanded] = useState(false)
 
   function oppdaterKommentar() {
-
+    setExpanded(false)
     if (kommentar === vedtak.kommentar) {
       return
     }
@@ -512,8 +513,11 @@ function Kommentar({ behandlingId, vedtak }: { behandlingId: string, vedtak: Laa
 
   return (
     <HStack>
-      <Textarea disabled={fetcher.state === 'submitting'} label="Kommentar til vedtak" size="small" minRows={2}
+      <Textarea disabled={fetcher.state === 'submitting'} label="Kommentar til vedtak" size="small"
+                maxRows={expanded ? 15 : 1}
+                minRows={expanded ? 15 : 1}
                 value={kommentar}
+                onFocus={() => setExpanded(true)}
                 onChange={(e) => setKommentar(e.target.value)} onBlur={() => oppdaterKommentar()} hideLabel resize />
       {fetcher.state === 'submitting' && <Loader size="xsmall" />}
     </HStack>
