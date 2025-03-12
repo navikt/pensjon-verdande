@@ -10,7 +10,7 @@ import * as build from './build/index.js'
 const logger = pino(ecsFormat())
 
 const app = express()
-app.use(PinoHttp())
+app.use(PinoHttp({ logger: logger }))
 app.use(express.static('public'))
 
 app.get(['/internal/live', '/internal/ready'], (_, res) => res.sendStatus(200))
