@@ -1,14 +1,15 @@
 import { createRequestHandler } from '@remix-run/express'
 import express from 'express'
+import PinoHttp from 'pino-http'
+import pino from 'pino'
 
 // notice that the result of `remix build` is "just a module"
 import * as build from './build/index.js'
 
-const pino = require('pino-http')()
-const logger = require('pino')()
+const logger = pino()
 
 const app = express()
-app.use(pino)
+app.use(PinoHttp())
 app.use(express.static('public'))
 
 app.get(['/internal/live', '/internal/ready'], (_, res) => res.sendStatus(200))
