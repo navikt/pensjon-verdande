@@ -107,7 +107,7 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
   useEffect(() => {
     const interval = setInterval(() => {
       if (fetcher.state === 'idle') {
-        fetcher.load(`hentOrkestreringStatistikk`)
+        fetcher.load(`hentStatistikk`)
       }
     }, 5000)
 
