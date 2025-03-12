@@ -22,6 +22,15 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Set version
+        id: version
+        shell: bash
+        run: |
+          TIME=$(TZ="Europe/Oslo" date +%Y.%m.%d-%H.%M)
+          COMMIT=$(git rev-parse --short=12 HEAD)
+          echo "TIME=$TIME" >> $GITHUB_OUTPUT
+          echo "VERSION=$TIME-$COMMIT" >> $GITHUB_OUTPUT
+
       - name: NAIS login
         if: ${{ github.actor != 'dependabot[bot]' }}
         uses: nais/login@v0
