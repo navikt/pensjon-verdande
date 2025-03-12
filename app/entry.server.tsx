@@ -6,7 +6,9 @@ import { RemixServer } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import pino from 'pino'
-const logger = pino()
+import { ecsFormat } from '@elastic/ecs-pino-format'
+
+const logger = pino(ecsFormat())
 
 const ABORT_DELAY = 120_000;
 
@@ -19,7 +21,7 @@ export function handleError(
   }: LoaderFunctionArgs | ActionFunctionArgs
 ) {
   if (!request.signal.aborted) {
-    logger.error(error)
+    logger.error({ err: error }, "Unhandled error");
   }
 }
 

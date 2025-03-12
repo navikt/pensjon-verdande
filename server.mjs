@@ -2,11 +2,12 @@ import { createRequestHandler } from '@remix-run/express'
 import express from 'express'
 import PinoHttp from 'pino-http'
 import pino from 'pino'
+import { ecsFormat } from '@elastic/ecs-pino-format'
 
 // notice that the result of `remix build` is "just a module"
 import * as build from './build/index.js'
 
-const logger = pino()
+const logger = pino(ecsFormat())
 
 const app = express()
 app.use(PinoHttp())
