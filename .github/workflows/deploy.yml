@@ -48,23 +48,23 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: pensjon-bpc
+          - name: pensjon-verdande
             cluster: prod-gcp
             vars: .nais/vars-prod.yaml
 
-          - name: pensjon-bpc-q0
+          - name: pensjon-verdande-q0
             cluster: dev-gcp
             vars: .nais/vars-dev-q0.yaml
 
-          - name: pensjon-bpc-q1
+          - name: pensjon-verdande-q1
             cluster: dev-gcp
             vars: .nais/vars-dev-q1.yaml
 
-          - name: pensjon-bpc-q2
+          - name: pensjon-verdande-q2
             cluster: dev-gcp
             vars: .nais/vars-dev-q2.yaml
 
-          - name: pensjon-bpc-q5
+          - name: pensjon-verdande-q5
             cluster: dev-gcp
             vars: .nais/vars-dev-q5.yaml
 

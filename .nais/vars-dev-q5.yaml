@@ -1,5 +1,5 @@
 app:
-  name: 'pensjon-bpc-q5'
+  name: 'pensjon-verdande-q5'
   namespace: 'pensjon-q5'
   team: 'pensjon-q5'
   ingress: 'https://pensjon-verdande-q5.intern.dev.nav.no'

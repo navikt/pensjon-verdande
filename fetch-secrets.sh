@@ -87,7 +87,7 @@ echo
 
 echo -e "${bold}Henter secrets fra Kubernetes${normal}"
 
-fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-bpc-$env" "strict" \
+fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-verdande-$env" "strict" \
   "AZURE_APP_CLIENT_ID" \
   "AZURE_APP_CLIENT_SECRET" \
   "AZURE_APP_TENANT_ID" \
