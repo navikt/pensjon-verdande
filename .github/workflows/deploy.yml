@@ -104,6 +104,5 @@ jobs:
         env:
           IMAGE: "${{ needs.build.outputs.image }}"
           RESOURCE: .nais/nais.yaml
-          CLUSTER: 'dev-fss'
-          VAR: "version=${{ needs.build.outputs.version }}"
-          VARS: '.nais/vars-dev-${{matrix.env}}.yaml'
+          CLUSTER: '${{ matrix.cluster }}'
+          VARS: ${{matrix.vars}}
