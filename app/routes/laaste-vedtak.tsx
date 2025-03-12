@@ -38,11 +38,11 @@ import {
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { getEnumValueByKey } from '~/common/utils'
 import { decodeTeam, Team } from '~/common/decodeTeam'
-import type {
+import {
   LaasteVedtakBehandlingSummary,
   LaasteVedtakRow,
   LaasteVedtakUttrekkStatus,
-  LaasteVedtakUttrekkSummary,
+  LaasteVedtakUttrekkSummary, muligeAksjonspunkt,
   VedtakYtelsekomponenter,
 } from '~/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
@@ -52,11 +52,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
   const { searchParams } = new URL(request.url)
   const team = searchParams.get('team')
+  const aksjonspunkt = searchParams.get('aksjonspunkt')
 
   const accessToken = await requireAccessToken(request)
   const laasteVedtakSummary = await getLaasteVedtakSummary(
     accessToken,
     team,
+    aksjonspunkt,
   )
   if (!laasteVedtakSummary) {
     throw new Response('Not Found', { status: 404 })
@@ -106,6 +108,7 @@ export default function LaasteVedtakPage() {
             <VStack gap="5">
               <HStack gap="4" align="end" justify="start">
                 <VelgTeam />
+                <VelgAksjonspunkt />
                 <Switch checked={avansertVisning} onChange={() => setAvansertVisning(!avansertVisning)}>Avansert
                   visning</Switch>
               </HStack>
@@ -175,7 +178,7 @@ export default function LaasteVedtakPage() {
                           <Kommentar behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
                         </Table.DataCell>
                         <Table.DataCell>
-                          <KanIverksettes behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
+                          <Aksjonspunkt behandlingId={laasteVedtakSummary.behandlingId!} vedtak={vedtak} />
                         </Table.DataCell>
                         <Table.DataCell>
                           {vedtak.opplaasVedtakInformasjon !== null &&
@@ -256,6 +259,52 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string, vedtak:
         {Object.keys(Team).map((teamKey: string) => (
           <option key={teamKey} value={teamKey}>
             {getEnumValueByKey(Team, teamKey)}
+          </option>
+        ))}
+      </Select>
+      {fetcher.state === 'submitting' && <Loader size="xsmall" />}
+    </HStack>
+  )
+}
+
+function Aksjonspunkt({ behandlingId, vedtak }: { behandlingId: string, vedtak: LaasteVedtakRow }) {
+
+  const fetcher = useFetcher()
+
+  function oppdaterAksjonspunkt(nyttAksjonspunkt: string) {
+
+    console.log('oppdater aksjonspunkt', nyttAksjonspunkt, behandlingId, vedtak)
+    fetcher.submit(
+      {
+        behandlingId,
+        kravId: vedtak.kravId,
+        aksjonspunkt: nyttAksjonspunkt,
+      },
+      {
+        action: 'oppdaterAksjonspunkt',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  return (
+    <HStack>
+      <Select
+        size="small"
+        label="Velg aksjonspunkt team"
+        hideLabel
+        id="aksjonspunkt-select"
+        value={vedtak.aksjonspunkt ?? ''}
+        onChange={(e) => oppdaterAksjonspunkt(e.target.value)}
+        disabled={fetcher.state === 'submitting'}
+      >
+        <option value="" disabled>
+          Velg et alternativ
+        </option>
+        {muligeAksjonspunkt.map((aksjonspunkt: string) => (
+          <option key={aksjonspunkt} value={aksjonspunkt}>
+            {aksjonspunkt}
           </option>
         ))}
       </Select>
@@ -455,37 +504,6 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Laa
 
 }
 
-function KanIverksettes({ behandlingId, vedtak }: { behandlingId: string, vedtak: LaasteVedtakRow }) {
-
-  const fetcher = useFetcher()
-
-  function oppdaterKanIverksettes(kanIverksettes: boolean) {
-
-    console.log('oppdater kanIverksettes', kanIverksettes, behandlingId, vedtak)
-    fetcher.submit(
-      {
-        behandlingId,
-        kravId: vedtak.kravId,
-        kanIverksettes,
-      },
-      {
-        action: 'oppdaterKanIverksettes',
-        method: 'POST',
-        encType: 'application/json',
-      },
-    )
-  }
-
-  return (
-    <HStack>
-      <Switch size="small" checked={vedtak.kanIverksettes} loading={fetcher.state === 'submitting'}
-              onChange={() => oppdaterKanIverksettes(!vedtak.kanIverksettes)}>
-        {null}
-      </Switch>
-    </HStack>
-  )
-}
-
 function Kommentar({ behandlingId, vedtak }: { behandlingId: string, vedtak: LaasteVedtakRow }) {
   const fetcher = useFetcher()
   const [kommentar, setKommentar] = useState(vedtak.kommentar ?? '')
@@ -570,6 +588,36 @@ function VelgTeam() {
   )
 }
 
+function VelgAksjonspunkt() {
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const team = searchParams.get('aksjonspunkt') as Team | null
+
+  return (
+    <Select size="small" label="Velg aksjonspunkt" defaultValue={team || undefined} onChange={(value) => {
+      const nyttAksjonspunkt = value.target.value
+      if (nyttAksjonspunkt === '') {
+        searchParams.delete('aksjonspunkt')
+      } else {
+        searchParams.set('aksjonspunkt', nyttAksjonspunkt)
+      }
+
+      setSearchParams(searchParams, {
+        preventScrollReset: true,
+      })
+    }
+    }>
+      <option value="">Alle aksjonspunkt</option>
+      {muligeAksjonspunkt.map((aksjonspunkt) => (
+        <option key={aksjonspunkt} value={aksjonspunkt}>
+          {aksjonspunkt}
+        </option>
+      ))}
+    </Select>
+  )
+}
+
+
 function AutoReloadUttrekkStatus({ behandlingId, uttrekkStatus, setUttrekkStatus, shouldAutoReload }: {
   behandlingId: string | null,
   uttrekkStatus: LaasteVedtakUttrekkStatus | null,
@@ -613,11 +661,15 @@ function AutoReloadUttrekkStatus({ behandlingId, uttrekkStatus, setUttrekkStatus
 export async function getLaasteVedtakSummary(
   accessToken: string,
   team: string | null,
+  aksjonspunkt: string | null,
 ): Promise<LaasteVedtakUttrekkSummary> {
 
   const url = new URL(`${env.penUrl}/api/behandling/laaste-vedtak`)
   if (team !== null) {
     url.searchParams.append('team', team)
+  }
+  if (aksjonspunkt !== null) {
+    url.searchParams.append('aksjonspunkt', aksjonspunkt)
   }
   const response = await fetch(
     url.toString(),
