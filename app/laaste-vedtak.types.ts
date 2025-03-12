@@ -26,6 +26,7 @@ export type LaasteVedtakRow = {
   endretAv: string | null,
   vedtaksType: string | null,
   kravStatus: string | null,
+  aksjonspunkt: string | null,
   opplaasVedtakInformasjon: OpplaasVedtakInformasjon | null,
   behandlinger: LaasteVedtakBehandlingSummary[]
 }
@@ -58,3 +59,4 @@ export type YtelsekomponentOversendtOppdrag = {
   belop: number,
 }
 
+export const muligeAksjonspunkt = ["Kan iverksettes", "Til analyse", "Avventer feilretting"]
