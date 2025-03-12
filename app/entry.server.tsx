@@ -1,12 +1,27 @@
 import { PassThrough } from "node:stream";
 
-import type { AppLoadContext, EntryContext } from "@remix-run/node";
+import type { ActionFunctionArgs, AppLoadContext, EntryContext, LoaderFunctionArgs } from '@remix-run/node'
 import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
+import pino from 'pino'
+const logger = pino()
 
 const ABORT_DELAY = 120_000;
+
+export function handleError(
+  error: unknown,
+  {
+    request,
+    params,
+    context,
+  }: LoaderFunctionArgs | ActionFunctionArgs
+) {
+  if (!request.signal.aborted) {
+    logger.error(error)
+  }
+}
 
 export default function handleRequest(
   request: Request,
