@@ -30,7 +30,6 @@ spec:
       memory: 256Mi
   ingresses:
     - {{app.ingress}}
-    - {{app.ingress2}}
   env:
     - name: ENV
       value: {{ app.env }}
@@ -59,7 +58,6 @@ spec:
         - "http://localhost:3000/auth/callback"
         - "http://localhost:3000/api/auth/callback/azure-ad"
         - "{{app.ingress}}/auth/callback"
-        - "{{app.ingress2}}/auth/callback"
     sidecar:
       enabled: true
       autoLogin: true

@@ -3,7 +3,6 @@ app:
   namespace: 'pensjon-q0'
   team: 'pensjon-q0'
   ingress: 'https://pensjon-verdande-q0.intern.dev.nav.no'
-  ingress2: 'https://pensjon-bpc-q0.intern.dev.nav.no'
   env: q0
 
 pen:
