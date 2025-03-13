@@ -215,7 +215,7 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
             ({antallFeilendeFamiliebehandlinger})</Button>
           <Dropdown.Menu>
             <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFamilieReguleringerTilBehandling()}>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFeilendeFamilieReguleringer()}>
                 Fortsett feilende behandlinger ({antallFeilendeFamiliebehandlinger})
               </Dropdown.Menu.List.Item>
               <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFamilieReguleringerTilBehandling()}>
