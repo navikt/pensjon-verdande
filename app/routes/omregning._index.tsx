@@ -76,8 +76,9 @@ export default function BatchOpprett_index() {
   ]
 
   const oppgavePrefiks = [
-    { value: 'REGELENDRING_PREFIKS', label: 'Regelendring prefiks' },
     { value: 'DEFAULT_PREFIKS', label: 'Default prefiks' },
+    { value: 'REGELENDRING_PREFIKS', label: 'Regelendring prefiks' },
+    { value: 'FEILRETTING_PREFIKS', label: 'Feilretting prefiks' },
   ]
 
   function setMonthSelected(date: Date | undefined): Date | undefined {
