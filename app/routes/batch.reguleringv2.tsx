@@ -22,6 +22,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import {
   AggregerteFeilmeldinger,
+  AvviksGrense,
   ReguleringDetaljer,
   ReguleringOrkestrering,
   ReguleringStatistikk,
@@ -80,13 +81,16 @@ export default function OpprettReguleringBatchRoute() {
       {reguleringSteg === 2 && <Orkestrering orkestreringer={regulering.orkestreringer} uttrekk={regulering.uttrekk}
                                              goToAdministrerBehandlinger={() => setReguleringSteg(3)} />}
       {reguleringSteg === 3 &&
-        <AdministrerTilknyttetdeBehandlinger uttrekkBehandlingId={regulering.uttrekk?.behandlingId ?? null} />}
+        <AdministrerTilknyttetdeBehandlinger avviksgrenser={regulering.avviksgrenser}
+                                             uttrekkBehandlingId={regulering.uttrekk?.behandlingId ?? null} />}
     </VStack>
   )
 }
 
-
-export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { uttrekkBehandlingId: string | null }) {
+export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId, avviksgrenser }: {
+  uttrekkBehandlingId: string | null,
+  avviksgrenser: AvviksGrense[]
+}) {
 
   const fetcher = useFetcher()
   const fetcherFortsettFeilendeFamilieReguleringer = useFetcher()
@@ -210,7 +214,8 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
       <HStack gap="3">
         <Dropdown>
           <Button icon={<PlayFillIcon />} as={Dropdown.Toggle} size="small"
-                  loading={fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting' || fetcherFortsettFamilieReguleringerTilBehandling.state === 'submitting'}>Fortsett  familie
+                  loading={fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting' || fetcherFortsettFamilieReguleringerTilBehandling.state === 'submitting'}>Fortsett
+            familie
             reguleringer
             ({antallFeilendeFamiliebehandlinger})</Button>
           <Dropdown.Menu>
@@ -266,6 +271,10 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
             <Tabs.Tab
               value="beregningsavvik"
               label="Beregningsavvik"
+            />
+            <Tabs.Tab
+              value="avviksgrenser"
+              label="Avviksgrenser"
             />
           </Tabs.List>
           <Tabs.Panel value="totaloversiktbehandlinger">
@@ -335,8 +344,112 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId }: { u
               ))}
             </Table>
           </Tabs.Panel>
+          <Tabs.Panel value="avviksgrenser">
+            <EndreAvviksgrenser avviksgrenser={avviksgrenser} />
+          </Tabs.Panel>
         </Tabs>
       </HStack>
+    </VStack>
+  )
+}
+
+function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }) {
+
+  const fetcher = useFetcher()
+  const response = fetcher.data as {success: boolean} | undefined
+
+  const [newAvviksgrenser, setAvviksgrenser] = useState(avviksgrenser)
+
+  function onAvviksgrenseChange(avvikParamId: number, key: string, value: string) {
+
+    if (isNaN(Number(value))) {
+      return
+    }
+    const newAvviksgrenserCopy = newAvviksgrenser.map((avviksgrense) => {
+      if (avviksgrense.avvikParamId === avvikParamId) {
+        return {
+          ...avviksgrense,
+          [key]: value,
+        }
+      }
+      return avviksgrense
+    })
+    setAvviksgrenser(newAvviksgrenserCopy)
+  }
+
+  function updateAvviksgrenser() {
+    fetcher.submit(
+      {
+      newAvviksgrenser
+      },
+      {
+        action: 'oppdaterAvviksgrenser',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  const [toggleEndreAvviksgrenser, setToggleEndreAvviksgrenser] = useState(false)
+  return (
+    <VStack gap="5" paddingBlock="5">
+      {response?.success === true && <Alert variant="success" inline>Avviksgrenser oppdatert</Alert>}
+      <Table>
+        <Table.Row>
+          <Table.HeaderCell>Sakstype</Table.HeaderCell>
+          <Table.HeaderCell>Positiv lav prosent</Table.HeaderCell>
+          <Table.HeaderCell>Negativ lav prosent</Table.HeaderCell>
+          <Table.HeaderCell>Positiv høy prosent</Table.HeaderCell>
+          <Table.HeaderCell>Negativ høy prosent</Table.HeaderCell>
+          <Table.HeaderCell>Positiv beløp</Table.HeaderCell>
+          <Table.HeaderCell>Negativ beløp</Table.HeaderCell>
+          <Table.HeaderCell>Underkategori</Table.HeaderCell>
+        </Table.Row>
+        {newAvviksgrenser.map((avviksgrense) => (
+          <Table.Row key={avviksgrense.avvikParamId}>
+            <Table.DataCell>{avviksgrense.sakType}</Table.DataCell>
+            <Table.DataCell>{toggleEndreAvviksgrenser ?
+              <TextField size="small" label="Positiv lav prosent" hideLabel value={avviksgrense.positivLavProsent}
+                         onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivLavProsent', event.target.value)} /> :
+              avviksgrense.positivLavProsent
+            }</Table.DataCell>
+            <Table.DataCell>{toggleEndreAvviksgrenser ?
+              <TextField size="small" label="Negativ lav prosent" hideLabel value={avviksgrense.negativLavProsent}
+                         onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativLavProsent', event.target.value)} /> :
+              avviksgrense.negativLavProsent
+            }</Table.DataCell>
+            <Table.DataCell>{toggleEndreAvviksgrenser ?
+              <TextField size="small" label="Positiv høy prosent" hideLabel value={avviksgrense.positivHoyProsent}
+                         onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivHoyProsent', event.target.value)} /> :
+              avviksgrense.positivHoyProsent
+            }</Table.DataCell>
+            <Table.DataCell>{toggleEndreAvviksgrenser ?
+              <TextField size="small" label="Negativ høy prosent" hideLabel value={avviksgrense.negativHoyProsent}
+                         onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativHoyProsent', event.target.value)} /> :
+              avviksgrense.negativHoyProsent
+            }</Table.DataCell>
+            <Table.DataCell>{toggleEndreAvviksgrenser ?
+              <TextField size="small" label="Positiv beløp" hideLabel value={avviksgrense.positivBelop}
+                         onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivBelop', event.target.value)} /> :
+              avviksgrense.positivBelop
+            }</Table.DataCell>
+            <Table.DataCell>{toggleEndreAvviksgrenser ?
+              <TextField size="small" label="Negativ beløp" hideLabel value={avviksgrense.negativBelop}
+                         onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativBelop', event.target.value)} /> :
+              avviksgrense.negativBelop
+            }</Table.DataCell>
+            <Table.DataCell>{avviksgrense.underkategori}</Table.DataCell>
+          </Table.Row>
+        ))}
+      </Table>
+      <div>
+        {toggleEndreAvviksgrenser ?
+          <HStack gap="3"><Button variant="secondary" onClick={() => setToggleEndreAvviksgrenser(false)}>Avbryt</Button>
+            <Button onClick={() => updateAvviksgrenser()} loading={fetcher.state === "submitting"}>Oppdater avviksgrenser</Button></HStack> :
+          <Button variant="secondary" onClick={() => setToggleEndreAvviksgrenser(true)}>Endre
+            avviksgrenser</Button>
+        }
+      </div>
     </VStack>
   )
 }

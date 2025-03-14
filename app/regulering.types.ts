@@ -5,6 +5,7 @@ export type ReguleringDetaljer =  {
   steg: number
   uttrekk: ReguleringUttrekk | null;
   orkestreringer: ReguleringOrkestrering[];
+  avviksgrenser: AvviksGrense[];
 }
 
 export type ReguleringUttrekk = {
@@ -98,4 +99,16 @@ export type KjoretidForAktivitet = {
   aktivitet: string;
   sekunder: number;
   minutter: number;
+}
+
+export type AvviksGrense = {
+  avvikParamId: number;
+  sakType: string;
+  positivLavProsent: number;
+  positivHoyProsent: number;
+  negativLavProsent: number;
+  negativHoyProsent: number;
+  positivBelop: number;
+  negativBelop: number;
+  underkategori: string;
 }
