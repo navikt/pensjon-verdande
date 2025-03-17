@@ -397,7 +397,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
       <Table>
         <Table.Row>
           <Table.HeaderCell>Sakstype</Table.HeaderCell>
-          <Table.HeaderCell>Positiv lav prosent</Table.HeaderCell>
+          <Table.HeaderCell align={'right'}>Positiv lav prosent</Table.HeaderCell>
           <Table.HeaderCell>Negativ lav prosent</Table.HeaderCell>
           <Table.HeaderCell>Positiv høy prosent</Table.HeaderCell>
           <Table.HeaderCell>Negativ høy prosent</Table.HeaderCell>
@@ -408,7 +408,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
         {newAvviksgrenser.map((avviksgrense) => (
           <Table.Row key={avviksgrense.avvikParamId}>
             <Table.DataCell>{avviksgrense.sakType}</Table.DataCell>
-            <Table.DataCell>{toggleEndreAvviksgrenser ?
+            <Table.DataCell align={'right'}>{toggleEndreAvviksgrenser ?
               <TextField size="small" label="Positiv lav prosent" hideLabel value={avviksgrense.positivLavProsent}
                          onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivLavProsent', event.target.value)} /> :
               avviksgrense.positivLavProsent
