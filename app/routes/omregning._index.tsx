@@ -17,7 +17,7 @@ export default function BatchOpprett_index() {
   const [isClicked, setIsClicked] = useState(false)
   const [omregningstidspunkt, setOmregningstidspunkt] = useState('')
 
-  const [omregneAFP, setOmregneAFP] = useState(false)
+  const [omregneAFP, setOmregneAFP] = useState(true)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
   const [brukKjoreplan, setBrukKjoreplan] = useState(false)
@@ -130,6 +130,7 @@ export default function BatchOpprett_index() {
             <Box>
               <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {console.log('change')}}>
                 <Checkbox
+                  defaultChecked={true}
                   name='omregneAFP'
                   value={omregneAFP}
                   onChange={(event) => {
@@ -180,7 +181,7 @@ export default function BatchOpprett_index() {
                 </Checkbox>
 
                 <Checkbox
-                  name='brukPPEN015'
+                  name='brukPpen015'
                   value={brukPpen015}
                   onChange={(event) => setBrukPpen015(event.target.checked)}
                 >
