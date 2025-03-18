@@ -289,44 +289,42 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId, avvik
 
           </Tabs.Panel>
           <Tabs.Panel value="arbeidstabell">
-            <Bar
-              id={'123'}
-              height={500}
-              width={1000}
-              data={{
-                labels: ['Antall oversendes', 'Antall faktoromregnet', 'Antall fakoromregnet direkte', 'Antall reguleringsfeil'],
-                datasets: [
-                  {
-                    label: 'Arbeidstabell',
-                    data: [antallOversendesOppdrag, antallFaktoromregnet, antallFaktoromregnetDirekte, antallReguleringsfeil],
-                    borderWidth: 1,
-                  },
-                ],
-              }}
-              options={{
-                responsive: true,
-              }}
-            />
+            <Table>
+              <Table.Row>
+                <Table.HeaderCell>Antall</Table.HeaderCell>
+                <Table.HeaderCell align="right">Antall</Table.HeaderCell>
+              </Table.Row>
+              <Table.Row>
+                <Table.DataCell>Antall oversendes oppdrag</Table.DataCell>
+                <Table.DataCell align="right">{antallOversendesOppdrag}</Table.DataCell>
+              </Table.Row>
+              <Table.Row>
+                <Table.DataCell>Antall faktoromregnet</Table.DataCell>
+                <Table.DataCell align="right">{antallFaktoromregnet}</Table.DataCell>
+              </Table.Row>
+              <Table.Row>
+                <Table.DataCell>Antall faktoromregnet direkte</Table.DataCell>
+                <Table.DataCell align="right">{antallFaktoromregnetDirekte}</Table.DataCell>
+              </Table.Row>
+              <Table.Row>
+                <Table.DataCell>Antall reguleringsfeil</Table.DataCell>
+                <Table.DataCell align="right">{antallReguleringsfeil}</Table.DataCell>
+              </Table.Row>
+            </Table>
           </Tabs.Panel>
           <Tabs.Panel value="faktomregningArsak">
-            <Bar
-              id={'123'}
-              height={500}
-              width={1000}
-              data={{
-                labels: faktoromregningerMedAarsak.map((f) => f.aarsak),
-                datasets: [
-                  {
-                    label: 'Årsak faktoromregning',
-                    data: faktoromregningerMedAarsak.map((f) => f.antall),
-                    borderWidth: 1,
-                  },
-                ],
-              }}
-              options={{
-                responsive: true,
-              }}
-            />
+            <Table>
+              <Table.Row>
+                <Table.HeaderCell>Årsak</Table.HeaderCell>
+                <Table.HeaderCell align="right">Antall</Table.HeaderCell>
+              </Table.Row>
+              {faktoromregningerMedAarsak.map((f) => (
+                <Table.Row key={f.aarsak}>
+                  <Table.DataCell>{f.aarsak}</Table.DataCell>
+                  <Table.DataCell align="right">{f.antall}</Table.DataCell>
+                </Table.Row>
+              ))}
+            </Table>
           </Tabs.Panel>
           <Tabs.Panel value="beregningsavvik">
             <Table>
@@ -397,13 +395,13 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
       <Table>
         <Table.Row>
           <Table.HeaderCell>Sakstype</Table.HeaderCell>
-          <Table.HeaderCell align={'right'}>Positiv lav prosent</Table.HeaderCell>
-          <Table.HeaderCell>Negativ lav prosent</Table.HeaderCell>
-          <Table.HeaderCell>Positiv høy prosent</Table.HeaderCell>
-          <Table.HeaderCell>Negativ høy prosent</Table.HeaderCell>
-          <Table.HeaderCell>Positiv beløp</Table.HeaderCell>
-          <Table.HeaderCell>Negativ beløp</Table.HeaderCell>
-          <Table.HeaderCell>Underkategori</Table.HeaderCell>
+          <Table.HeaderCell align='right'>Positiv lav prosent</Table.HeaderCell>
+          <Table.HeaderCell align='right'>Negativ lav prosent</Table.HeaderCell>
+          <Table.HeaderCell align='right'>Positiv høy prosent</Table.HeaderCell>
+          <Table.HeaderCell align='right'>Negativ høy prosent</Table.HeaderCell>
+          <Table.HeaderCell align='right'>Positiv beløp</Table.HeaderCell>
+          <Table.HeaderCell align='right'>Negativ beløp</Table.HeaderCell>
+          <Table.HeaderCell align='right'>Underkategori</Table.HeaderCell>
         </Table.Row>
         {newAvviksgrenser.map((avviksgrense) => (
           <Table.Row key={avviksgrense.avvikParamId}>
@@ -413,32 +411,32 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
                          onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivLavProsent', event.target.value)} /> :
               avviksgrense.positivLavProsent
             }</Table.DataCell>
-            <Table.DataCell>{toggleEndreAvviksgrenser ?
+            <Table.DataCell align={'right'}>{toggleEndreAvviksgrenser ?
               <TextField size="small" label="Negativ lav prosent" hideLabel value={avviksgrense.negativLavProsent}
                          onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativLavProsent', event.target.value)} /> :
               avviksgrense.negativLavProsent
             }</Table.DataCell>
-            <Table.DataCell>{toggleEndreAvviksgrenser ?
+            <Table.DataCell align={'right'}>{toggleEndreAvviksgrenser ?
               <TextField size="small" label="Positiv høy prosent" hideLabel value={avviksgrense.positivHoyProsent}
                          onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivHoyProsent', event.target.value)} /> :
               avviksgrense.positivHoyProsent
             }</Table.DataCell>
-            <Table.DataCell>{toggleEndreAvviksgrenser ?
+            <Table.DataCell align={'right'}>{toggleEndreAvviksgrenser ?
               <TextField size="small" label="Negativ høy prosent" hideLabel value={avviksgrense.negativHoyProsent}
                          onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativHoyProsent', event.target.value)} /> :
               avviksgrense.negativHoyProsent
             }</Table.DataCell>
-            <Table.DataCell>{toggleEndreAvviksgrenser ?
+            <Table.DataCell align={'right'}>{toggleEndreAvviksgrenser ?
               <TextField size="small" label="Positiv beløp" hideLabel value={avviksgrense.positivBelop}
                          onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivBelop', event.target.value)} /> :
               avviksgrense.positivBelop
             }</Table.DataCell>
-            <Table.DataCell>{toggleEndreAvviksgrenser ?
+            <Table.DataCell align={'right'}>{toggleEndreAvviksgrenser ?
               <TextField size="small" label="Negativ beløp" hideLabel value={avviksgrense.negativBelop}
                          onChange={(event) => onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativBelop', event.target.value)} /> :
               avviksgrense.negativBelop
             }</Table.DataCell>
-            <Table.DataCell>{avviksgrense.underkategori}</Table.DataCell>
+            <Table.DataCell align={'right'}>{avviksgrense.underkategori}</Table.DataCell>
           </Table.Row>
         ))}
       </Table>
