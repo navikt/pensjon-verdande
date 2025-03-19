@@ -167,4 +167,5 @@ export type OmregningRequest = {
   oppgaveSett: string
   brukPpen015: boolean
   oppgavePrefiks: string
+  utsattTil: string
 }

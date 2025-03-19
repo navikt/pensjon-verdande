@@ -22,6 +22,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     toleransegrenseSett: updates.toleransegrenseSett,
     oppgaveSett: updates.oppgaveSett,
     oppgavePrefiks: updates.oppgavePrefiks,
+    utsattTil:updates.datetimepicker as string
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)

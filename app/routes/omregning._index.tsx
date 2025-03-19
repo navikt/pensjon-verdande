@@ -11,6 +11,7 @@ import {
   useMonthpicker,
   VStack,
 } from '@navikt/ds-react'
+import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 
 export default function BatchOpprett_index() {
   const now = new Date()
@@ -24,6 +25,9 @@ export default function BatchOpprett_index() {
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
   const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
   const [brukPpen015, setBrukPpen015] = useState(false)
+  const [kjoreTidspunkt, setkjoreTidspunkt] = useState(false)
+
+  const [selectedKjoretidspunkt, setSelectedKjoretidspunkt] = useState<Date | null>(null)
 
   const [hasError, setHasError] = useState(false)
   const submit = useSubmit()
@@ -109,8 +113,30 @@ export default function BatchOpprett_index() {
       <h1>Omregn ytelser</h1>
       <p>Behandling som erstatter BPEN093</p>
       <Form action='omregning' method='POST'>
+        <Box style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
+          <Checkbox
+            value={kjoreTidspunkt}
+            onChange={(event) => setkjoreTidspunkt(event.target.checked)}
+          >Sett kjøretidspunkt</Checkbox>
+
+          <Box hidden={!kjoreTidspunkt}>
+            <DateTimePicker
+              id='date-picker'
+              name={"datetimepicker"}
+              labelText='Kjøredato'
+              selectedDate={selectedKjoretidspunkt}
+              setSelectedDate={(date) => setSelectedKjoretidspunkt(date)}
+              placeholderText={'Velg kjøredato'}
+              ariaLabel={'Velg kjøredato'}
+              tabIndex={6}
+            />
+          </Box>
+        </Box>
+
         <VStack gap='6'>
+
           <HGrid columns={2} gap='6'>
+
             <Box>
               <TextField label={'Behandlingsnøkkel'} name={'behandlingsnokkel'} size='small' />
 
@@ -128,9 +154,11 @@ export default function BatchOpprett_index() {
                      readOnly />
             </Box>
             <Box>
-              <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {console.log('change')}}>
+              <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {
+                console.log('change')
+              }}>
                 <Checkbox
-                  defaultChecked={true}
+                  defaultChecked={omregneAFP}
                   name='omregneAFP'
                   value={omregneAFP}
                   onChange={(event) => {
