@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { Link, useFetcher, useLoaderData, useRevalidator } from '@remix-run/react'
+import { Link, useFetcher, useLoaderData, useRevalidator, useSearchParams } from '@remix-run/react'
 import {
   Alert,
   BodyLong,
@@ -16,6 +16,7 @@ import {
   Stepper,
   Table,
   Tabs,
+  Textarea,
   TextField,
   VStack,
 } from '@navikt/ds-react'
@@ -23,13 +24,13 @@ import React, { useEffect, useState } from 'react'
 import {
   AggregerteFeilmeldinger,
   AvviksGrense,
+  EkskluderteSakerResponse,
   ReguleringDetaljer,
   ReguleringOrkestrering,
   ReguleringStatistikk,
   ReguleringUttrekk,
 } from '~/regulering.types'
 import { Behandlingstatus, DetaljertFremdriftDTO } from '~/types'
-import { Bar } from 'react-chartjs-2'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import { format, formatISO } from 'date-fns'
@@ -56,9 +57,17 @@ export default function OpprettReguleringBatchRoute() {
     interval: regulering.uttrekk?.status === Behandlingstatus.UNDER_BEHANDLING ? 500 : 1500,
   })
 
-  console.log(regulering)
+  const [searchParams, setSearchParams] = useSearchParams()
+  let reguleringSteg = 0
+  if (searchParams.has('steg')) {
+    reguleringSteg = parseInt(searchParams.get('steg')!)
+  } else {
+    reguleringSteg = regulering.steg
+  }
 
-  const [reguleringSteg, setReguleringSteg] = useState(regulering.steg)
+  function onStepChange(value: number) {
+    setSearchParams({ steg: value.toString() })
+  }
 
   return (
     <VStack gap="5">
@@ -67,22 +76,71 @@ export default function OpprettReguleringBatchRoute() {
         <Stepper
           aria-labelledby="stepper-heading"
           activeStep={reguleringSteg}
-          onStepChange={setReguleringSteg}
+          onStepChange={onStepChange}
           orientation="horizontal"
         >
-          <Stepper.Step href="#"
-                        completed={regulering.uttrekk?.status === Behandlingstatus.FULLFORT}>Uttrekk</Stepper.Step>
-          <Stepper.Step href="#" completed={regulering.uttrekk?.antallUbehandlende === 0}>Orkestrering</Stepper.Step>
-          <Stepper.Step href="#">Administrer tilknyttede behandlinger</Stepper.Step>
+          <Stepper.Step
+            completed={regulering.uttrekk?.status === Behandlingstatus.FULLFORT}>Uttrekk</Stepper.Step>
+          <Stepper.Step completed={regulering.uttrekk?.antallUbehandlende === 0}>Ekskluder saker</Stepper.Step>
+          <Stepper.Step completed={regulering.uttrekk?.antallUbehandlende === 0}>Orkestrering</Stepper.Step>
+          <Stepper.Step>Administrer tilknyttede behandlinger</Stepper.Step>
         </Stepper>
       </HStack>
       {reguleringSteg === 1 &&
-        <Uttrekk uttrekk={regulering.uttrekk} goToOrkestrering={() => setReguleringSteg(2)}></Uttrekk>}
-      {reguleringSteg === 2 && <Orkestrering orkestreringer={regulering.orkestreringer} uttrekk={regulering.uttrekk}
-                                             goToAdministrerBehandlinger={() => setReguleringSteg(3)} />}
-      {reguleringSteg === 3 &&
+        <Uttrekk uttrekk={regulering.uttrekk} goToOrkestrering={() => onStepChange(2)}></Uttrekk>}
+      {reguleringSteg === 2 && <EkskluderteSaker />}
+      {reguleringSteg === 3 && <Orkestrering orkestreringer={regulering.orkestreringer} uttrekk={regulering.uttrekk}
+                                             goToAdministrerBehandlinger={() => onStepChange(3)} />}
+      {reguleringSteg === 4 &&
         <AdministrerTilknyttetdeBehandlinger avviksgrenser={regulering.avviksgrenser}
                                              uttrekkBehandlingId={regulering.uttrekk?.behandlingId ?? null} />}
+    </VStack>
+  )
+}
+
+export function EkskluderteSaker({}: {}) {
+
+  const [saksnummerListe, setSaksnummerListe] = useState('')
+
+  const fetcher = useFetcher()
+  // On Mount
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data === undefined) {
+      fetcher.load(`ekskludertesaker`)
+    }
+    if (fetcher.data !== undefined && fetcher.state === 'idle' && saksnummerListe === '') {
+      const ekskluderteSaker = fetcher.data as EkskluderteSakerResponse
+      setSaksnummerListe(ekskluderteSaker.ekskluderteSaker.join('\n'))
+    }
+  }, [fetcher])
+
+
+  function opppdaterEksluderteSaker() {
+    fetcher.submit(
+      {
+        saksnummerListe,
+      },
+      {
+        action: 'ekskludertesaker',
+        method: 'POST',
+
+        encType: 'application/json'
+      })
+  }
+
+
+
+  return (
+    <VStack gap="5">
+      <Heading size="medium">Oppgi saksnummer for eksludering</Heading>
+      {fetcher.state === 'loading' || fetcher.data === undefined ? <Loader /> : <>
+        <Textarea label="Saksnummer"
+                  description="Liste av saker som skal eksluderes fra reguleringen. Oppgis med linjeskift."
+                  value={saksnummerListe} onChange={(e) => setSaksnummerListe(e.target.value)} minRows={30}
+                  style={{ width: '30em' }} resize />
+        <div><Button loading={fetcher.state === 'submitting'} onClick={() => opppdaterEksluderteSaker()}>Oppdater eksluderte saker</Button></div>
+      </>}
+
     </VStack>
   )
 }
@@ -354,7 +412,7 @@ export function AdministrerTilknyttetdeBehandlinger({ uttrekkBehandlingId, avvik
 function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }) {
 
   const fetcher = useFetcher()
-  const response = fetcher.data as {success: boolean} | undefined
+  const response = fetcher.data as { success: boolean } | undefined
 
   const [newAvviksgrenser, setAvviksgrenser] = useState(avviksgrenser)
 
@@ -378,7 +436,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
   function updateAvviksgrenser() {
     fetcher.submit(
       {
-      newAvviksgrenser
+        newAvviksgrenser,
       },
       {
         action: 'oppdaterAvviksgrenser',
@@ -395,13 +453,13 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
       <Table>
         <Table.Row>
           <Table.HeaderCell>Sakstype</Table.HeaderCell>
-          <Table.HeaderCell align='right'>Positiv lav prosent</Table.HeaderCell>
-          <Table.HeaderCell align='right'>Negativ lav prosent</Table.HeaderCell>
-          <Table.HeaderCell align='right'>Positiv høy prosent</Table.HeaderCell>
-          <Table.HeaderCell align='right'>Negativ høy prosent</Table.HeaderCell>
-          <Table.HeaderCell align='right'>Positiv beløp</Table.HeaderCell>
-          <Table.HeaderCell align='right'>Negativ beløp</Table.HeaderCell>
-          <Table.HeaderCell align='right'>Underkategori</Table.HeaderCell>
+          <Table.HeaderCell align="right">Positiv lav prosent</Table.HeaderCell>
+          <Table.HeaderCell align="right">Negativ lav prosent</Table.HeaderCell>
+          <Table.HeaderCell align="right">Positiv høy prosent</Table.HeaderCell>
+          <Table.HeaderCell align="right">Negativ høy prosent</Table.HeaderCell>
+          <Table.HeaderCell align="right">Positiv beløp</Table.HeaderCell>
+          <Table.HeaderCell align="right">Negativ beløp</Table.HeaderCell>
+          <Table.HeaderCell align="right">Underkategori</Table.HeaderCell>
         </Table.Row>
         {newAvviksgrenser.map((avviksgrense) => (
           <Table.Row key={avviksgrense.avvikParamId}>
@@ -443,7 +501,8 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
       <div>
         {toggleEndreAvviksgrenser ?
           <HStack gap="3"><Button variant="secondary" onClick={() => setToggleEndreAvviksgrenser(false)}>Avbryt</Button>
-            <Button onClick={() => updateAvviksgrenser()} loading={fetcher.state === "submitting"}>Oppdater avviksgrenser</Button></HStack> :
+            <Button onClick={() => updateAvviksgrenser()} loading={fetcher.state === 'submitting'}>Oppdater
+              avviksgrenser</Button></HStack> :
           <Button variant="secondary" onClick={() => setToggleEndreAvviksgrenser(true)}>Endre
             avviksgrenser</Button>
         }

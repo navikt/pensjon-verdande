@@ -112,3 +112,7 @@ export type AvviksGrense = {
   negativBelop: number;
   underkategori: string;
 }
+
+export type EkskluderteSakerResponse = {
+  ekskluderteSaker: number[];
+}
