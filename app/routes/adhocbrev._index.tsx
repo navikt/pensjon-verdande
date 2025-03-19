@@ -2,6 +2,7 @@ import { Form, useSubmit } from '@remix-run/react'
 import { json } from '@remix-run/node'
 import { env } from '~/services/env.server'
 import React, { useEffect, useRef, useState } from 'react'
+import { Select } from '@navikt/ds-react'
 
 export const loader = async () => {
   return json({
@@ -12,7 +13,10 @@ export const loader = async () => {
 export default function BatchOpprett_index() {
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
+  const handleSubmit = (e: any) => {
+    submit(e.target.form)
+    setIsClicked(true)
+  }
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -30,8 +34,10 @@ export default function BatchOpprett_index() {
     <div>
       <h1>Opprett ADHOC Brevbestilling batchkjøring på brevmal for sak</h1>
       <Form action="adhocBrev" method="POST">
+        <p style={{ fontWeight: 'bold' }}>
+          Brevmal kode for Sak:
+        </p>
         <p>
-          Brevmal kode for Sak
           <input
             ref={inputRef}
             defaultValue="ERSTATT MED BREVMAL KODE"
@@ -42,6 +48,18 @@ export default function BatchOpprett_index() {
             onInput={handleInput}
             style={{ width: 'auto' }}
           />
+        </p>
+        <p>
+          <Select
+            label="Ekskluder avdøde"
+            size={'small'}
+            name={'ekskluderAvdoed'}
+            defaultValue={'true'}
+            style={{ maxWidth: '5em' }}
+          >
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
         </p>
         <p>
           <button type="submit" disabled={isClicked} onClick={handleSubmit}>

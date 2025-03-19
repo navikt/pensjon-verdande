@@ -9,7 +9,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
 
-  let response = await opprettAdhocBrevBehandling(accessToken, updates.brevmal as string)
+  let response = await opprettAdhocBrevBehandling(accessToken, updates.brevmal as string, updates.ekskluderAvdoed === 'true')
 
   return redirect(`/behandling/${response.behandlingId}`)
 }
