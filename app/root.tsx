@@ -137,6 +137,9 @@ export default function App() {
                         <div />
                       )}
                     </li>
+                    <li>
+                      <NavLink to={`/kategoriserbruker`}>Kategoriser Bruker</NavLink>
+                    </li>
 
                   </ul>
                 </Accordion.Content>
