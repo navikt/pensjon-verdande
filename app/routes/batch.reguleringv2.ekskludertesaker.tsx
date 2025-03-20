@@ -3,13 +3,16 @@ import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import type { EkskluderteSakerResponse } from '~/regulering.types'
+import React, { useEffect, useState } from 'react'
+import { Form, useLoaderData, useNavigation } from '@remix-run/react'
+import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'
+import { useActionData } from 'react-router'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
-  const data = await request.json()
-
-  const ekskluderteSaker = data.saksnummerListe
+  const formData = await request.formData()
+  const ekskluderteSaker = (formData.get('saksnummerListe') as string)
     .split('\n')
     .map((t: string) => t.trim())
     .filter((t: string) => t !== '')
@@ -21,6 +24,41 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   return await hentEksluderteSaker(accessToken)
+}
+
+
+export default function EkskluderteSaker({}: {}) {
+  const { ekskluderteSaker } =
+    useLoaderData<typeof loader>()
+
+  const response = useActionData() as OppdaterEksluderteSakerResponse | undefined;
+  const navigation = useNavigation();
+
+  const [saksnummerListe, setSaksnummerListe] = useState('')
+
+  useEffect(() => {
+    setSaksnummerListe(ekskluderteSaker.join('\n'))
+  }, [ekskluderteSaker])
+
+
+  return (
+    <VStack gap="5">
+      <Heading size="medium">Oppgi saksnummer for ekskludering</Heading>
+      {response?.erOppdatert && <Alert variant="success" inline>Liste oppdatert </Alert>}
+      <Form method="post">
+        <VStack gap="5">
+          <Textarea label="Saksnummer"
+                    name="saksnummerListe"
+                    description="Liste av saker som skal eksluderes fra reguleringen. Oppgis med linjeskift."
+                    value={saksnummerListe} onChange={(e) => setSaksnummerListe(e.target.value)} minRows={30}
+                    style={{ width: '30em' }} resize />
+          <div><Button type="submit" loading={navigation.state === "submitting"}>Oppdater
+            ekskluderte saker</Button></div>
+        </VStack>
+      </Form>
+
+    </VStack>
+  )
 }
 
 
@@ -71,8 +109,11 @@ async function oppdaterEkskluderteSaker(
   if (!response.ok) {
     throw new Error(response.statusText)
   }
-  return null
+  return { erOppdatert: true }
 }
 
+type OppdaterEksluderteSakerResponse = {
+  erOppdatert: boolean
+}
 
 

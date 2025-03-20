@@ -56,7 +56,7 @@ export type ReguleringStatistikk = {
   antallVenterPaaRune: number;
   antallFeilendeBeregnytelser: number;
   antallFeilendeFamiliebehandlinger: number;
-  antallIFeilendeverksettVedtak: number;
+  antallFeilendeIverksettVedtak: number;
 }
 
 export type AggregerteFeilmeldinger = {
@@ -114,5 +114,6 @@ export type AvviksGrense = {
 }
 
 export type EkskluderteSakerResponse = {
+  erOppdatert?: boolean;
   ekskluderteSaker: number[];
 }
