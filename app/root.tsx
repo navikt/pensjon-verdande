@@ -138,7 +138,7 @@ export default function App() {
                       )}
                     </li>
                     <li>
-                      <NavLink to={`/kategoriserbruker`}>Kategoriser Bruker</NavLink>
+                      <NavLink to={`/opptjening/kategoriserbruker`}>Omregning ved opptjeningsendring</NavLink>
                     </li>
 
                   </ul>
