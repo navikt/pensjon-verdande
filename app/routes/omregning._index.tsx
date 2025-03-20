@@ -117,7 +117,7 @@ export default function BatchOpprett_index() {
           <Checkbox
             value={kjoreTidspunkt}
             onChange={(event) => setkjoreTidspunkt(event.target.checked)}
-          >Sett kjøretidspunkt</Checkbox>
+          >Sett kjøretidspunkt - Ikke implementert</Checkbox>
 
           <Box hidden={!kjoreTidspunkt}>
             <DateTimePicker
