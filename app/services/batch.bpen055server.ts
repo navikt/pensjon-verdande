@@ -6,7 +6,7 @@ export async function opprettBpen055(
   behandlingsmaned: number,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
-    `${env.penUrl}/api/omregnytelse/opprett`,
+    `${env.penUrl}/api/opptjening/kategoriserbruker/opprett`,
     {
       method: 'POST',
       headers: {
