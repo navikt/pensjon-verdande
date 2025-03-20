@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, redirect } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { Outlet, useLoaderData, useLocation } from '@remix-run/react'
+import { Outlet, useLoaderData, useLocation, useRevalidator } from '@remix-run/react'
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
 import React from 'react'
 import type { ReguleringDetaljer } from '~/regulering.types'
@@ -28,6 +28,11 @@ export default function OpprettReguleringBatchRoute() {
 
   const location = useLocation()
   const currentStep = getCurrentStep(location.pathname)
+
+  if(currentStep == null) {
+    window.location.reload();
+    return null;
+  }
 
   return (
     <VStack gap="5">
@@ -85,7 +90,7 @@ function getCurrentStep(currentPathName: string) {
     case "administrerbehandlinger":
       return 4
   }
-  throw new Error(`Unrecognized current path: ${currentPathName}`)
+  return null;
 }
 
 function stepToPath(step: number) {
