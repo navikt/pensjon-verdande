@@ -12,6 +12,7 @@ import { formatIsoTimestamp } from '~/common/date'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
+import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -29,6 +30,11 @@ export default function Orkestrering() {
   const [antallFamilier, setAntallFamilier] = useState('100000')
 
   const navigation = useNavigation()
+
+  useRevalidateOnInterval({
+    enabled: true,
+    interval: 1500,
+  })
 
   if (uttrekk === null) {
     return <>

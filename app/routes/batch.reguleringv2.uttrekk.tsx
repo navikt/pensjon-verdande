@@ -16,9 +16,9 @@ import {
 import { Behandlingstatus } from '~/types'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { Entry } from '~/components/entry/Entry'
-import { Link, useFetcher, useOutletContext, useRevalidator } from '@remix-run/react'
+import { Link, useFetcher, useOutletContext } from '@remix-run/react'
 import { format, formatISO } from 'date-fns'
-
+import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
 
 export default function Uttrekk() {
 
@@ -28,7 +28,6 @@ export default function Uttrekk() {
     enabled: true,
     interval: uttrekk?.status === Behandlingstatus.UNDER_BEHANDLING ? 500 : 1500,
   })
-
 
   const [isOpen, setIsOpen] = useState(false)
   return (
@@ -152,15 +151,6 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
         </Button>
       </Modal.Footer>
     </Modal>)
-}
-
-function useRevalidateOnInterval({ enabled = false, interval = 1000 }: { enabled?: boolean; interval?: number }) {
-  let revalidate = useRevalidator()
-  useEffect(function revalidateOnInterval() {
-    if (!enabled) return
-    let intervalId = setInterval(revalidate.revalidate, interval)
-    return () => clearInterval(intervalId)
-  }, [enabled, interval, revalidate])
 }
 
 
