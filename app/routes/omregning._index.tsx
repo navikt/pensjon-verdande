@@ -1,10 +1,14 @@
-import { Form, useSubmit } from '@remix-run/react'
+import { useFetcher } from '@remix-run/react'
 import React, { useEffect, useRef, useState } from 'react'
 import {
+  BodyLong,
   Box,
+  Button,
   Checkbox,
   CheckboxGroup,
   HGrid,
+  List,
+  Modal,
   MonthPicker,
   Select,
   TextField,
@@ -17,6 +21,8 @@ export default function BatchOpprett_index() {
   const now = new Date()
   const [isClicked, setIsClicked] = useState(false)
   const [omregningstidspunkt, setOmregningstidspunkt] = useState('')
+  const [behandlingsnokkel, setBehandlingsnokkel] = useState('')
+  const ref = useRef<HTMLDialogElement>(null)
 
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
@@ -30,17 +36,17 @@ export default function BatchOpprett_index() {
   const [selectedKjoretidspunkt, setSelectedKjoretidspunkt] = useState<Date | null>(null)
 
   const [hasError, setHasError] = useState(false)
-  const submit = useSubmit()
+  const fetcher = useFetcher()
 
   const handleSubmit = (e: any) => {
     if (hasError) {
       return
     } else {
-      submit(e.target.form)
+      fetcher.submit(e.target.form)
       setIsClicked(true)
     }
-
   }
+
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleInput = () => {
@@ -61,7 +67,7 @@ export default function BatchOpprett_index() {
     { value: 'ANNEN_ARSAK', label: 'Annen årsak' },
   ]
 
-  const toleransegrenseSett = [
+  const optionToleransegrenseSett = [
     { value: 'DEFAULT', label: 'Default' },
     { value: 'GPPROD', label: 'GPPROD' },
     { value: 'ENSLIGE4000', label: 'ENSLIGE4000' },
@@ -69,7 +75,7 @@ export default function BatchOpprett_index() {
     { value: 'INGEN_ENDR', label: 'INGEN_ENDR' },
   ]
 
-  const oppgaveSett = [
+  const optionOppgaveSett = [
     { value: 'INGEN_OPPGAVER', label: 'Ingen oppgaver' },
     { value: 'DEFAULT', label: 'Default' },
     { value: 'HENDELSE_UTLAND', label: 'Hendelse utland' },
@@ -79,7 +85,7 @@ export default function BatchOpprett_index() {
     { value: 'SOKNAD_AP', label: 'Søknad AP' },
   ]
 
-  const oppgavePrefiks = [
+  const optionOppgavePrefiks = [
     { value: 'DEFAULT_PREFIKS', label: 'Default prefiks' },
     { value: 'REGELENDRING_PREFIKS', label: 'Regelendring prefiks' },
     { value: 'FEILRETTING_PREFIKS', label: 'Feilretting prefiks' },
@@ -108,11 +114,19 @@ export default function BatchOpprett_index() {
     required: true,
   })
 
+
+  const [kravGjelder, setKravGjelder] = useState(optionsKravGjelder[0].value)
+  const [kravArsak, setKravArsak] = useState(optionsKravArsak[0].value)
+  const [toleransegrenseSett, setToleransegrenseSett] = useState(optionToleransegrenseSett[0].value)
+  const [oppgaveSett, setOppgaveSett] = useState(optionOppgaveSett[0].value)
+  const [oppgavePrefiks, setOppgavePrefiks] = useState(optionOppgavePrefiks[0].value)
+
+
   return (
     <div>
       <h1>Omregn ytelser</h1>
       <p>Behandling som erstatter BPEN093</p>
-      <Form action='omregning' method='POST'>
+      <fetcher.Form id={'skjema'} action='omregning' method='POST'>
         <Box style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
           <Checkbox
             value={kjoreTidspunkt}
@@ -122,7 +136,7 @@ export default function BatchOpprett_index() {
           <Box hidden={!kjoreTidspunkt}>
             <DateTimePicker
               id='date-picker'
-              name={"datetimepicker"}
+              name={'datetimepicker'}
               labelText='Kjøredato'
               selectedDate={selectedKjoretidspunkt}
               setSelectedDate={(date) => setSelectedKjoretidspunkt(date)}
@@ -138,7 +152,12 @@ export default function BatchOpprett_index() {
           <HGrid columns={2} gap='6'>
 
             <Box>
-              <TextField label={'Behandlingsnøkkel'} name={'behandlingsnokkel'} size='small' />
+              <TextField
+                label={'Behandlingsnøkkel'}
+                name={'behandlingsnokkel'}
+                size='small'
+                onChange={(event) => setBehandlingsnokkel(event.target.value)}
+              />
 
               <MonthPicker
                 {...monthpickerProps}
@@ -219,51 +238,119 @@ export default function BatchOpprett_index() {
             </Box>
 
             <Box>
-              <Select label='Krav gjelder' name={'kravGjelder'}>
+              <Select
+                label='Krav gjelder'
+                name={'kravGjelder'}
+                onChange={(event) => setKravGjelder(event.target.value)}>
                 {optionsKravGjelder.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
-              <Select label={'Kravårsak'} name={'kravArsak'}>
+
+              <Select
+                label={'Kravårsak'}
+                name={'kravArsak'}
+                onChange={(event) => setKravArsak(event.target.value)}>
                 {optionsKravArsak.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
-              <Select label={'Toleransegrense sett'} name={'toleransegrenseSett'}>
-                {toleransegrenseSett.map((option) => (
+
+              <Select
+                label={'Toleransegrense sett'}
+                name={'toleransegrenseSett'}
+                onChange={(event) => setToleransegrenseSett(event.target.value)}>
+                {optionToleransegrenseSett.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
-              <Select label={'Oppgave sett'} name={'oppgaveSett'}>
-                {oppgaveSett.map((option) => (
+
+              <Select
+                label={'Oppgave sett'}
+                name={'oppgaveSett'}
+                onChange={(event) => setOppgaveSett(event.target.value)}>
+                {optionOppgaveSett.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
-              <Select label={'Oppgave prefiks'} name={'oppgavePrefiks'}>
-                {oppgavePrefiks.map((option) => (
+
+              <Select
+                label={'Oppgave prefiks'}
+                name={'oppgavePrefiks'}
+                onChange={(event) => setOppgavePrefiks(event.target.value)}>
+                {optionOppgavePrefiks.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Select>
               <br />
-              <Box>
-                <button type='submit' disabled={isClicked} onClick={handleSubmit}>
-                  Opprett
-                </button>
-              </Box>
+
             </Box>
           </HGrid>
         </VStack>
-      </Form>
+      </fetcher.Form>
+
+      <Box>
+
+        <Button onClick={() => ref.current?.showModal()}>Start Omregning</Button>
+
+        <Modal ref={ref} header={{ heading: 'Start Omregning' }}>
+          <Modal.Body>
+            <BodyLong>
+              Du vil nå starte en behandling med følgende parametere:
+
+              {behandlingsnokkel && <p>Behandlingsnøkkel: {behandlingsnokkel}</p>}
+              {omregningstidspunkt && <p>Omregningstidspunkt: {omregningstidspunkt}</p>}
+              <List size={'small'}>
+                {omregneAFP && <List.Item>Omregne AFP: {omregneAFP ? 'Ja' : 'Nei'}</List.Item>}
+                {behandleApneKrav && <List.Item>Behandle åpne krav: {behandleApneKrav ? 'Ja' : 'Nei'}</List.Item>}
+                {brukFaktoromregning &&
+                  <List.Item>Bruk faktoromregning: {brukFaktoromregning ? 'Ja' : 'Nei'}</List.Item>}
+                {brukKjoreplan && <List.Item>Bruk kjøreplan: {brukKjoreplan ? 'Ja' : 'Nei'}</List.Item>}
+                {opprettAlleOppgaver &&
+                  <List.Item>Opprett alle oppgaver: {opprettAlleOppgaver ? 'Ja' : 'Nei'}</List.Item>}
+                {sjekkYtelseFraAvtaleland &&
+                  <List.Item>Sjekk ytelser fra avtaleland: {sjekkYtelseFraAvtaleland ? 'Ja' : 'Nei'}</List.Item>}
+                {brukPpen015 && <List.Item>Bruk PPEN015: {brukPpen015 ? 'Ja' : 'Nei'}</List.Item>}
+
+                <List.Item>Krav gjelder: {kravGjelder}</List.Item>
+                <List.Item>Kravårsak: {kravArsak}</List.Item>
+                <List.Item>Toleransegrense sett: {toleransegrenseSett}</List.Item>
+                <List.Item>Oppgave sett: {oppgaveSett}</List.Item>
+                <List.Item>Oppgave prefiks: {oppgavePrefiks}</List.Item>
+
+              </List>
+              Du kan ikke angre denne handlingen.
+            </BodyLong>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button form={'skjema'} type='submit' loading={fetcher.state === 'submitting'} disabled={isClicked}
+                    onClick={(e: any) => {
+                      handleSubmit(e.target.form)
+                    }}>
+              Submit
+            </Button>
+            <Button
+              type='button'
+              variant='secondary'
+              onClick={() => ref.current?.close()}
+            >
+              Tilbake
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Box>
+
+
     </div>
   )
 }
