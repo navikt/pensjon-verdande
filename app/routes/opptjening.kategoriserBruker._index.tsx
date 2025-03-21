@@ -31,7 +31,7 @@ export default function BatchOpprett_index() {
   return (
     <div>
       <h1>Start omregning av ytelse ved oppdaterte opptjeningsopplysninger</h1>
-      <Form action="bpen055" method="POST">
+      <Form action="opprett" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Behandlingsmåned</label>
           <br />
