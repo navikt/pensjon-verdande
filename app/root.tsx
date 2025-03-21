@@ -137,6 +137,9 @@ export default function App() {
                         <div />
                       )}
                     </li>
+                    <li>
+                      <NavLink to={`/opptjening/kategoriserbruker`}>Omregning ved opptjeningsendring</NavLink>
+                    </li>
 
                   </ul>
                 </Accordion.Content>
