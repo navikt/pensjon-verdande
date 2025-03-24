@@ -29,5 +29,5 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   let response = await opprettOmregningbehandling(accessToken, omregningRequest)
 
-  return redirect(`/behandlinger}`)
+  return redirect(`/behandling/${response.behandlingId}`)
 }

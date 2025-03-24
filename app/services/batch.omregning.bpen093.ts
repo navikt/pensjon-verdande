@@ -3,7 +3,7 @@ import { env } from '~/services/env.server'
 
 export async function opprettOmregningbehandling(
   accessToken: string, payload: OmregningRequest): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/api/saksbehandling/behandling/omregning/opprett`, {
+  const response = await fetch(`${env.penUrl}/api/behandling/omregning/opprett`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
