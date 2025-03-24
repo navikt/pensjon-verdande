@@ -36,7 +36,7 @@ export default function BatchOpprett_index() {
       <p>BPEN090 - Håndterer løpende inntektsavkortning for uføre</p>
       <Form action="bpen090" method="POST">
         <div style={{ display: 'inline-block' }}>
-          <label>Behandlingsmåned (yyyyMM)</label>
+          <label>Virkningsdato fra (yyyyMM)</label>
           <br/>
           <input
               defaultValue={nesteBehandlingsmaned}
