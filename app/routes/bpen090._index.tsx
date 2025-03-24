@@ -32,8 +32,9 @@ export default function BatchOpprett_index() {
 
   return (
     <div>
-      <h1>Opprett BPEN090 batchkjøring</h1>
-      <p>BPEN090 - Håndterer løpende inntektsavkortning for uføre. <b>Kjøremåned</b> er måneden du starter kjøringen. Inntekter hentes da til og med måneden <i>før</i> kjøremåned mens virkningsdato blir satt til den første i måneden <i>etter</i> kjøremåned. Gyldige verdier for kjøremåned er kun fra april til oktober.</p>
+      <h1>Batchkjøring for løpende inntektsavkorting for uføre (tidligere BPEN090)</h1>
+      <p><b>Kjøremåned</b> er måneden du starter kjøringen. Inntekter hentes da til og med måneden <i>før</i> kjøremåned mens virkningsdato blir satt til den første i måneden <i>etter</i> kjøremåned.</p>
+      <p>Gyldige verdier for kjøremåned er april til oktober.</p>
       <Form action="bpen090" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Kjøremåned (yyyyMM)</label>
