@@ -13,7 +13,7 @@ export const loader = async () => {
 
 export default function BatchOpprett_index() {
   const now = new Date()
-  const nesteBehandlingsmaned = now.getFullYear() * 100 + now.getMonth() + 2
+  const kjoremaaned = now.getFullYear() * 100 + now.getMonth() + 1
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
@@ -33,17 +33,17 @@ export default function BatchOpprett_index() {
   return (
     <div>
       <h1>Opprett BPEN090 batchkjøring</h1>
-      <p>BPEN090 - Håndterer løpende inntektsavkortning for uføre</p>
+      <p>BPEN090 - Håndterer løpende inntektsavkortning for uføre. <b>Kjøremåned</b> er måneden du starter kjøringen. Inntekter hentes da til og med måneden <i>før</i> kjøremåned mens virkningsdato blir satt til den første i måneden <i>etter</i> kjøremåned.</p>
       <Form action="bpen090" method="POST">
         <div style={{ display: 'inline-block' }}>
-          <label>Virkningsdato fra (yyyyMM)</label>
+          <label>Kjøremåned (yyyyMM)</label>
           <br/>
           <input
-              defaultValue={nesteBehandlingsmaned}
-              aria-label="behandlingsmaaned"
-              name="behandlingsmaaned"
+              defaultValue={kjoremaaned}
+              aria-label="kjoremaaned"
+              name="kjoremaaned"
               type="number"
-              placeholder="behandlingsmaaned"
+              placeholder="kjoremaaned"
           />
         </div>
         <br/>

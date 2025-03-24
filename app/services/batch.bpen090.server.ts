@@ -3,7 +3,7 @@ import { StartBatchResponse } from '~/types'
 
 export async function opprettBpen090(
   accessToken: string,
-  behandlingsmaaned: number,
+  kjoremaaned: number,
   begrensUtplukk: boolean,
   dryRun: boolean,
 ): Promise<StartBatchResponse> {
@@ -17,7 +17,7 @@ export async function opprettBpen090(
         'X-Request-ID': crypto.randomUUID(),
       },
       body: JSON.stringify({
-        behandlingsmaaned: behandlingsmaaned,
+        kjoremaaned: kjoremaaned,
         begrensUtplukk: begrensUtplukk,
         dryRun: dryRun,
       }),

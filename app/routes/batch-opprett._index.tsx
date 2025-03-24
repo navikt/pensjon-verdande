@@ -106,13 +106,13 @@ export default function BatchOpprett_index() {
       <h1>Opprett BPEN090 batchkjøring</h1>
       <Form action="bpen090" method="POST">
         <p>
-          Virkningsdato fra (yyyyMM)
+          Kjøremåned (yyyyMM)
           <input
             defaultValue={nesteBehandlingsmaneden}
-            aria-label="behandlingsmaaned"
-            name="behandlingsmaaned"
+            aria-label="kjoremaaned"
+            name="kjoremaaned"
             type="number"
-            placeholder="behandlingsmaaned"
+            placeholder="kjoremaaned"
           />
         </p>
         <p>
