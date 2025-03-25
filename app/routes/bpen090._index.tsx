@@ -32,9 +32,12 @@ export default function BatchOpprett_index() {
 
   return (
     <div>
-      <h1>Batchkjøring for løpende inntektsavkorting for uføre (tidligere BPEN090)</h1>
+      <h1>Løpende inntektsavkorting (tidligere BPEN090)</h1>
+      <p>Batchkjøring for løpende inntektsavkorting av uføretrygd</p>
       <p><b>Kjøremåned</b> er måneden du starter kjøringen. Inntekter hentes da til og med måneden <i>før</i> kjøremåned mens virkningsdato blir satt til den første i måneden <i>etter</i> kjøremåned.</p>
       <p>Gyldige verdier for kjøremåned er april til oktober.</p>
+      <p><b>Begrenset utplukk</b> krever oppføringer i tabellen T_BATCH_PERSON_FILTER med PERSON_ID for de personer man ønsker å kjøre behandlingen for</p>
+      <p><b>DryRun</b> kjører batchen uten å sende videre til VurderOmregning</p>
       <Form action="bpen090" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Kjøremåned (yyyyMM)</label>
@@ -50,7 +53,7 @@ export default function BatchOpprett_index() {
         <br/>
         <div style={{ display: 'inline-block' }}>
           <Select
-            label="begrenset utplukk"
+            label="Begrenset utplukk"
             size={'small'}
             name={'begrensUtplukk'}
             defaultValue={'false'}
@@ -62,7 +65,7 @@ export default function BatchOpprett_index() {
         <br />
         <div style={{ display: 'inline-block' }}>
           <Select
-            label="dryRun"
+            label="DryRun"
             size={'small'}
             name={'dryRun'}
             defaultValue={'true'}
