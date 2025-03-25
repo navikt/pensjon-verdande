@@ -6,7 +6,7 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
-  HGrid,
+  HGrid, Link,
   List,
   Modal,
   MonthPicker,
@@ -130,6 +130,8 @@ export default function BatchOpprett_index() {
     <div>
       <h1>Omregn ytelser</h1>
       <p>Behandling som erstatter BPEN093</p>
+      <p><Link href="https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Omregning.html" target="_blank">Dokumentasjon</Link></p>
+
       <fetcher.Form id={'skjema'} action='omregning' method='POST'>
         <Box style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
           <Checkbox
