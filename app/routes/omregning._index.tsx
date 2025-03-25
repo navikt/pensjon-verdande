@@ -76,6 +76,7 @@ export default function BatchOpprett_index() {
     { value: 'INGEN_ENDR', label: 'INGEN_ENDR' },
     { value: 'AFP2500', label: 'AFP2500' },
     { value: 'UFORE_MYT', label: 'UFORE_MYT' },
+    { value: 'not set', label: 'Ikke angitt' },
   ]
 
   const optionOppgaveSett = [
