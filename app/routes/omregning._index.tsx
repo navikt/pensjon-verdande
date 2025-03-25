@@ -71,8 +71,11 @@ export default function BatchOpprett_index() {
     { value: 'DEFAULT', label: 'Default' },
     { value: 'GPPROD', label: 'GPPROD' },
     { value: 'ENSLIGE4000', label: 'ENSLIGE4000' },
+    { value: 'ENSLIGE5000', label: 'ENSLIGE5000' },
     { value: 'EPS1000', label: 'EPS1000' },
     { value: 'INGEN_ENDR', label: 'INGEN_ENDR' },
+    { value: 'AFP2500', label: 'AFP2500' },
+    { value: 'UFORE_MYT', label: 'UFORE_MYT' },
   ]
 
   const optionOppgaveSett = [
