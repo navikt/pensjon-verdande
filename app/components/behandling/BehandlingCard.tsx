@@ -470,6 +470,15 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
+            {props.behandling._links && props.behandling._links['familieomregning'] ? (
+              <Tabs.Tab
+                value='familieomregning'
+                label='Familieomregning Input'
+                icon={<TasklistIcon />}
+              />
+            ) : (
+              <></>
+            )}
             {props.behandling._links && props.behandling._links['output'] ? (
               <Tabs.Tab
                 value='output'
@@ -497,17 +506,6 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
-
-            {props.behandling._links && props.behandling._links['familieomregning'] ? (
-              <Tabs.Tab
-                value='familieomregning'
-                label='Familieomregning Input'
-                icon={<TasklistIcon />}
-              />
-            ) : (
-              <></>
-            )}
-
           </Tabs.List>
           <Outlet/>
         </Tabs>

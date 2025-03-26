@@ -6,7 +6,7 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
-  HGrid,
+  HGrid, Link,
   List,
   Modal,
   MonthPicker,
@@ -71,8 +71,12 @@ export default function BatchOpprett_index() {
     { value: 'DEFAULT', label: 'Default' },
     { value: 'GPPROD', label: 'GPPROD' },
     { value: 'ENSLIGE4000', label: 'ENSLIGE4000' },
+    { value: 'ENSLIGE5000', label: 'ENSLIGE5000' },
     { value: 'EPS1000', label: 'EPS1000' },
     { value: 'INGEN_ENDR', label: 'INGEN_ENDR' },
+    { value: 'AFP2500', label: 'AFP2500' },
+    { value: 'UFORE_MYT', label: 'UFORE_MYT' },
+    { value: 'not set', label: 'Ikke angitt' },
   ]
 
   const optionOppgaveSett = [
@@ -126,6 +130,8 @@ export default function BatchOpprett_index() {
     <div>
       <h1>Omregn ytelser</h1>
       <p>Behandling som erstatter BPEN093</p>
+      <p><Link href="https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Omregning.html" target="_blank">Dokumentasjon</Link></p>
+
       <fetcher.Form id={'skjema'} action='omregning' method='POST'>
         <Box style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
           <Checkbox
