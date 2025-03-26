@@ -6,6 +6,7 @@ export async function opprettBpen090(
   kjoremaaned: number,
   begrensUtplukk: boolean,
   dryRun: boolean,
+  prioritet: number
 ): Promise<StartBatchResponse> {
   const response = await fetch(
     `${env.penUrl}/api/uforetrygd/lopendeinntektsavkorting/batch`,
@@ -20,6 +21,7 @@ export async function opprettBpen090(
         kjoremaaned: kjoremaaned,
         begrensUtplukk: begrensUtplukk,
         dryRun: dryRun,
+        prioritet: prioritet
       }),
     },
   )
