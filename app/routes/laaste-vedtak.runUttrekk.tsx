@@ -19,7 +19,7 @@ async function runUttrekk(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/run?nullstill=${nullstill}`,
+    `${env.penUrl}/api/laaste-vedtak/run?nullstill=${nullstill}`,
     {
       method: 'POST',
       headers: {

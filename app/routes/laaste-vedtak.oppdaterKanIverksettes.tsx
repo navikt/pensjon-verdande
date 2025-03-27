@@ -21,7 +21,7 @@ async function oppdaterKanIverksettes(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/iverksett/${behandlingId}/${kravId}?kanIverksettes=${kanIverksettes}`,
+    `${env.penUrl}/api/laaste-vedtak/iverksett/${behandlingId}/${kravId}?kanIverksettes=${kanIverksettes}`,
     {
       method: 'PUT',
       headers: {

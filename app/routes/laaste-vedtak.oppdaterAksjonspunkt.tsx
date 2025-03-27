@@ -21,7 +21,7 @@ async function oppdaterAksjonspunkt(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/aksjonspunkt/${behandlingId}/${kravId}`,
+    `${env.penUrl}/api/laaste-vedtak/aksjonspunkt/${behandlingId}/${kravId}`,
     {
       method: 'PUT',
       body: aksjonspunkt,

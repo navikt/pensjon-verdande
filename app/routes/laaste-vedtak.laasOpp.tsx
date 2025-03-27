@@ -18,7 +18,7 @@ async function laasOpp(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/laas-opp/${vedtakId}`,
+    `${env.penUrl}/api/laaste-vedtak/laas-opp/${vedtakId}`,
     {
       method: 'POST',
       headers: {

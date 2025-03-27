@@ -20,7 +20,7 @@ async function getVedtakIOppdrag(
 ): Promise<VedtakYtelsekomponenter> {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/hentVedtakIOppdrag/${vedtakId}`,
+    `${env.penUrl}/api/laaste-vedtak/hentVedtakIOppdrag/${vedtakId}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

@@ -21,7 +21,7 @@ async function oppdaterKommentar(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/kommentar/${behandlingId}/${kravId}`,
+    `${env.penUrl}/api/laaste-vedtak/kommentar/${behandlingId}/${kravId}`,
     {
       method: 'PUT',
       body: kommentar,
