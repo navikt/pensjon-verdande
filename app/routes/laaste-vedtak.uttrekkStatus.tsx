@@ -21,7 +21,7 @@ async function getUttrekkStatus(
 ): Promise<UttrekkStatus> {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/status/${behandlingId}`,
+    `${env.penUrl}/api/laaste-vedtak/status/${behandlingId}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

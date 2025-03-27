@@ -664,7 +664,7 @@ export async function getLaasteVedtakSummary(
   aksjonspunkt: string | null,
 ): Promise<LaasteVedtakUttrekkSummary> {
 
-  const url = new URL(`${env.penUrl}/api/behandling/laaste-vedtak`)
+  const url = new URL(`${env.penUrl}/api/laaste-vedtak`)
   if (team !== null) {
     url.searchParams.append('team', team)
   }

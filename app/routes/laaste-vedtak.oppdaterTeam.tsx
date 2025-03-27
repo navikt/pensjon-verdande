@@ -21,7 +21,7 @@ async function oppdaterTeam(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/team/${behandlingId}/${kravId}?team=${team}`,
+    `${env.penUrl}/api/laaste-vedtak/team/${behandlingId}/${kravId}?team=${team}`,
     {
       method: 'PUT',
       headers: {

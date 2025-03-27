@@ -17,7 +17,7 @@ async function bekreftOppdragsmeldingManuelt(
 ): Promise<boolean> {
 
   const response = await fetch(
-    `${env.penUrl}/api/behandling/laaste-vedtak/bekreftOppdragsmeldingManuelt/${vedtakId}`,
+    `${env.penUrl}/api/laaste-vedtak/bekreftOppdragsmeldingManuelt/${vedtakId}`,
     {
       method: 'POST',
       headers: {
