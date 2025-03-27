@@ -14,6 +14,7 @@ export const loader = async () => {
 export default function BatchOpprett_index() {
   const now = new Date()
   const kjoremaaned = now.getFullYear() * 100 + now.getMonth() + 1
+  const prioritet = 2
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
@@ -38,6 +39,7 @@ export default function BatchOpprett_index() {
       <p>Gyldige verdier for kjøremåned er april til oktober.</p>
       <p><b>Begrenset utplukk</b> krever oppføringer i tabellen T_BATCH_PERSON_FILTER med PERSON_ID for de personer man ønsker å kjøre behandlingen for</p>
       <p><b>DryRun</b> kjører batchen uten å sende videre til VurderOmregning</p>
+      <p><b>Prioritet</b> angir om batchen skal kjøres mot Oppdrag som en BATCH (HPEN) eller ONLINE_BATCH</p>
       <Form action="bpen090" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Kjøremåned (yyyyMM)</label>
@@ -73,6 +75,18 @@ export default function BatchOpprett_index() {
             <option value="true">Ja</option>
             <option value="false">Nei</option>
           </Select>
+        </div>
+        <br />
+        <div style={{ display: 'inline-block' }}>
+          <label>Prioritet (1 = ONLINE_BATCH, 2 = BATCH)</label>
+          <br/>
+          <input
+            defaultValue={prioritet}
+            aria-label="prioritet"
+            name="prioritet"
+            type="number"
+            placeholder="prioritet"
+          />
         </div>
         <p>
           <button type="submit" disabled={isClicked} onClick={handleSubmit}>
