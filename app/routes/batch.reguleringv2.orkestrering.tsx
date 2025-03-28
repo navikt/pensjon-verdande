@@ -5,7 +5,18 @@ import { env } from '~/services/env.server'
 import { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering.types'
 import React, { useEffect, useState } from 'react'
 import { Form, Link, useFetcher, useNavigation, useOutletContext } from '@remix-run/react'
-import { Alert, Button, Heading, HStack, Loader, Table, TextField, VStack } from '@navikt/ds-react'
+import {
+  Alert,
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Heading,
+  HStack,
+  Loader,
+  Table,
+  TextField,
+  VStack,
+} from '@navikt/ds-react'
 import { Entry } from '~/components/entry/Entry'
 import { Behandlingstatus, DetaljertFremdriftDTO } from '~/types'
 import { formatIsoTimestamp } from '~/common/date'
@@ -20,7 +31,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const antallFamilier = formData.get('antallFamilier') as string
-  return await startOrkestrering(accessToken, antallFamilier)
+  const kjorOnline = formData.get('kjorOnline') as string === 'true'
+  return await startOrkestrering(accessToken, antallFamilier, kjorOnline)
 }
 
 
@@ -28,7 +40,7 @@ export default function Orkestrering() {
 
   const { uttrekk, orkestreringer } = useOutletContext<ReguleringDetaljer>()
   const [antallFamilier, setAntallFamilier] = useState('100000')
-
+  const [kjorOnlineState, setKjorOnlineState] = useState(['']);
   const navigation = useNavigation()
 
   useRevalidateOnInterval({
@@ -55,6 +67,9 @@ export default function Orkestrering() {
               <TextField label="Antall familier" name="antallFamilier"
                          onChange={(e) => setAntallFamilier(e.target.value)}
                          value={antallFamilier} />
+              <CheckboxGroup legend="Kjør online kø" hideLegend={true} onChange={setKjorOnlineState} value={kjorOnlineState}>
+                <Checkbox  name={'kjorOnline'} value={'true'}>Kjør online kø mot oppdrag</Checkbox>
+              </CheckboxGroup>
               <HStack gap="3" align="center">
                 <div><Button loading={navigation.state === 'submitting'} type="submit">Start orkestrering</Button></div>
                 {orkestreringer.length > 0 &&
@@ -238,6 +253,7 @@ export function AggregerteFeilmeldingerTabell() {
 async function startOrkestrering(
   accessToken: string,
   antallFamilier: string | undefined,
+  kjorOnline: boolean,
 ) {
 
   const response = await fetch(
@@ -247,6 +263,7 @@ async function startOrkestrering(
       body: JSON.stringify(
         {
           antallFamilier,
+          kjorOnline
         },
       )
       ,
