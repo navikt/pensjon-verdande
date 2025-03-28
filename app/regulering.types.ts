@@ -69,7 +69,6 @@ export type ArbeidstabellStatistikk = {
   antallOversendesOppdrag: number;
   antallFaktoromregnet: number;
   antallFaktoromregnetDirekte: number;
-  antallReguleringsfeil: number;
 }
 
 export type AntallFeilForKjoring = {

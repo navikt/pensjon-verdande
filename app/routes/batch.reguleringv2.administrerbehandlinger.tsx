@@ -240,7 +240,6 @@ function ArbeidstabellStatistikkTable({ arbeidstabellStatistikk }: {
     antallOversendesOppdrag,
     antallFaktoromregnet,
     antallFaktoromregnetDirekte,
-    antallReguleringsfeil,
   } = arbeidstabellStatistikk
 
   return (<Table zebraStripes>
@@ -259,10 +258,6 @@ function ArbeidstabellStatistikkTable({ arbeidstabellStatistikk }: {
     <Table.Row>
       <Table.DataCell>Antall faktoromregnet direkte</Table.DataCell>
       <Table.DataCell align="right">{antallFaktoromregnetDirekte}</Table.DataCell>
-    </Table.Row>
-    <Table.Row>
-      <Table.DataCell>Antall reguleringsfeil</Table.DataCell>
-      <Table.DataCell align="right">{antallReguleringsfeil}</Table.DataCell>
     </Table.Row>
   </Table>)
 }
