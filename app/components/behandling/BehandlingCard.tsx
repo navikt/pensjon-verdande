@@ -470,10 +470,10 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
-            {props.behandling._links && props.behandling._links['familieomregning'] ? (
+            {props.behandling._links && props.behandling._links['input'] ? (
               <Tabs.Tab
-                value='familieomregning'
-                label='Familieomregning Input'
+                value='input'
+                label='Input'
                 icon={<TasklistIcon />}
               />
             ) : (

@@ -24,7 +24,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function FamilieomregningInput() {
+export default function Input() {
   const { output } = useLoaderData<typeof loader>()
   console.log(output)
   return (
