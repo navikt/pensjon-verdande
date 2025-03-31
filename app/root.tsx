@@ -112,6 +112,9 @@ export default function App() {
                       <NavLink to={`/bpen090`}>Løpende inntektsavkorting</NavLink>
                     </li>
                     <li>
+                      <NavLink to={`/bestem-etteroppgjor-resultat`}>Bestem etteroppgjør resultat</NavLink>
+                    </li>
+                    <li>
                       <NavLink to={`/bpen091`}>Fastsette inntekt for uføretrygd</NavLink>
                     </li>
                     <li>
