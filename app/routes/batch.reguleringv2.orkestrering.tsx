@@ -45,7 +45,7 @@ export default function Orkestrering() {
 
   useRevalidateOnInterval({
     enabled: true,
-    interval: orkestreringer[0]?.status === Behandlingstatus.UNDER_BEHANDLING ? 10000 : 1500,
+    interval: 1500,
   })
 
   if (uttrekk === null) {
