@@ -21,6 +21,7 @@ async function hentAggregerteFeilmeldinger(
         Authorization: `Bearer ${accessToken}`,
         'X-Request-ID': crypto.randomUUID(),
       },
+      priority: 'low'
     },
   )
 
