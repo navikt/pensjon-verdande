@@ -181,12 +181,6 @@ export function AggregerteFeilmeldingerTabell() {
 
   const fetcher = useFetcher()
 
-  // On Mount
-  useEffect(() => {
-    if (fetcher.data === undefined && fetcher.state === 'idle') {
-      fetcher.load('hentAggregerteFeilmeldinger')
-    }
-  }, [fetcher])
 
   //Interval
   useEffect(() => {
