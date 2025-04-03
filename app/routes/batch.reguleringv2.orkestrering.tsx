@@ -161,7 +161,7 @@ export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
       if (fetcher.state === 'idle') {
         fetcher.load(`hentOrkestreringStatistikk/${behandlingId}`)
       }
-    }, 3000)
+    }, 6000)
 
     return () => clearInterval(interval)
   }, [fetcher, behandlingId])
@@ -181,6 +181,12 @@ export function AggregerteFeilmeldingerTabell() {
 
   const fetcher = useFetcher()
 
+  // On Mount
+  useEffect(() => {
+    if (fetcher.data === undefined && fetcher.state === 'idle') {
+      fetcher.load('hentAggregerteFeilmeldinger')
+    }
+  }, [fetcher])
 
   //Interval
   useEffect(() => {
@@ -188,7 +194,7 @@ export function AggregerteFeilmeldingerTabell() {
       if (fetcher.state === 'idle') {
         fetcher.load('hentAggregerteFeilmeldinger')
       }
-    }, 3000)
+    }, 6000)
 
     return () => clearInterval(interval)
   }, [fetcher])
