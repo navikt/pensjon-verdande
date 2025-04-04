@@ -1,7 +1,7 @@
-import React from 'react'
-import { Box, Pagination, Select, Table } from '@navikt/ds-react'
+import React, { useState } from 'react'
+import { Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
 import type { BehandlingDto, BehandlingerPage } from '~/types'
-import { Link, useSearchParams } from '@remix-run/react'
+import { Link, useFetcher, useSearchParams } from '@remix-run/react'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam } from '~/common/decodeTeam'
@@ -13,11 +13,15 @@ interface Props {
 }
 
 export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek = true, behandlingerResponse}: Props) {
+  const fetcher = useFetcher()
+
   const [searchParams, setSearchParams] = useSearchParams()
 
   let sortParam = searchParams.get("sort")?.split(",")
   let sortKey = sortParam?.[0] || "behandlingId"
   let sortDecending = sortParam?.[1] || 'desc'
+
+  const [valgteBehandlingIder, setValgteBehandlingIder] = useState<number[]>([]);
 
   const onSortChange = (value: string | undefined) => {
     if (value) {
@@ -96,6 +100,25 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
     </Select>
   }
 
+  const toggleSelectedRow = (behandlingId: number) =>
+    setValgteBehandlingIder((list) =>
+      list.includes(behandlingId)
+        ? list.filter((id) => id !== behandlingId)
+        : [...list, behandlingId],
+    );
+
+  function fortsettValgteBehandlinger() {
+    fetcher.submit(
+      { behandlingIder: valgteBehandlingIder },
+      {
+        action: 'fortsett',
+        method: 'POST',
+      },
+    )
+    setValgteBehandlingIder([])
+  }
+
+
   return (
     <>
       <Box
@@ -115,6 +138,9 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
         >
           <Table.Header>
             <Table.Row>
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+                Velg
+              </Table.ColumnHeader>
               <Table.ColumnHeader sortable sortKey="behandlingId" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
                 BehandlingId
               </Table.ColumnHeader>
@@ -139,6 +165,23 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
             </Table.Row>
             <Table.Row>
               <Table.DataCell style={{ paddingTop: 0 }}>
+                <Checkbox
+                  checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
+                  disabled={behandlingerResponse.content.filter((it => it.utsattTil != null)).length == 0}
+                  indeterminate={
+                    valgteBehandlingIder.length > 0 && valgteBehandlingIder.length !== behandlingerResponse.content.length
+                  }
+                  onChange={() => {
+                    valgteBehandlingIder.length
+                      ? setValgteBehandlingIder([])
+                      : setValgteBehandlingIder(behandlingerResponse.content.filter((it => it.utsattTil != null)).map(({ behandlingId }) => behandlingId));
+                  }}
+                  hideLabel
+                >
+                  Velg alle rader
+                </Checkbox>
+              </Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
                 {visBehandlingTypeSoek ? behandlingtypeOptions() : <></>}
@@ -161,7 +204,19 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
           <Table.Body>
             {behandlingerResponse.content?.map((it: BehandlingDto) => {
               return (
-                <Table.Row key={it.uuid}>
+                <Table.Row
+                  key={it.behandlingId}
+                  selected={valgteBehandlingIder.includes(it.behandlingId)}
+                >
+                  <Table.DataCell align='center'>
+                    <Checkbox
+                      hideLabel
+                      disabled={it.utsattTil == null}
+                      checked={valgteBehandlingIder.includes(it.behandlingId)}
+                      onChange={() => toggleSelectedRow(it.behandlingId)}
+                      aria-labelledby={`id-${it.behandlingId}`}
+                    >Velg behandling</Checkbox>
+                  </Table.DataCell>
                   <Table.DataCell>
                     <Link to={`/behandling/${it.behandlingId}`}>
                       {it.behandlingId}
@@ -186,14 +241,29 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
             })}
           </Table.Body>
         </Table>
-        <Pagination
-          page={behandlingerResponse.number + 1}
-          count={behandlingerResponse.totalPages}
-          boundaryCount={1}
-          siblingCount={1}
-          prevNextTexts={true}
-          onPageChange={onPageChange}
-        />
+
+        <HStack align="center" marginBlock='4'>
+          <Button
+            variant="primary"
+            size="small"
+            onClick={fortsettValgteBehandlinger}
+            disabled={valgteBehandlingIder.length === 0}
+          >
+            Fortsett valgte behandlinger
+          </Button>
+          <Spacer />
+          <Pagination
+            size="small"
+            page={behandlingerResponse.number + 1}
+            count={behandlingerResponse.totalPages}
+            boundaryCount={1}
+            siblingCount={1}
+            prevNextTexts={true}
+            onPageChange={onPageChange}
+          />
+          <Spacer />
+          {behandlingerResponse.totalElements} behandlinger
+        </HStack>
       </Box>
     </>
 
