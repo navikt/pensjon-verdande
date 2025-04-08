@@ -329,7 +329,7 @@ function VedtakDropdown({ vedtak, onAapneLaasVedtak, onAapneVerifiserOppdragsmel
               Lås opp
             </Dropdown.Menu.GroupedList.Item>
           )}
-          {vedtak.vedtakStatus === 'Samordnet' && (
+          {(vedtak.vedtakStatus === 'Samordnet' || (vedtak.vedtakStatus === 'Til iverksettelse' && vedtak.opprettetAv === "REGULERING")) && (
             <Dropdown.Menu.GroupedList.Item onClick={onAapneVerifiserOppdragsmeldingManuelt}>
               Verifiser oppdragsmelding manuelt
             </Dropdown.Menu.GroupedList.Item>)}
