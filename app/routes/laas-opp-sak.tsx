@@ -14,7 +14,6 @@ import {
 } from '@navikt/ds-react'
 import React, { useEffect, useState } from 'react'
 import type {
-  AutomatiskKravUtenVedtak,
   LaasOppBehandlingSummary,
   LaasOppResultat,
   SakOppsummeringLaasOpp,
@@ -34,7 +33,7 @@ export default function LaasteVedtakPage() {
 
   const [sak, setSak] = useState<SakOppsummeringLaasOpp | undefined | null>(undefined)
   const [laasOppVedtak, setLaasOppVedtak] = useState<VedtakLaasOpp | null>(null)
-  const [kravTilManuell, setKravTilManuell] = useState<AutomatiskKravUtenVedtak | null>(null)
+  const [kravTilManuell, setKravTilManuell] = useState<string | null>(null)
 
   return (
     <div id="laaste_vedtak">
@@ -98,9 +97,13 @@ export default function LaasteVedtakPage() {
                             <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />
                           </Table.DataCell>
                           <Table.DataCell>
+                            <HStack gap="3">
+                            {vedtak.opplaasVedtakInformasjon?.erAutomatisk &&
+                              <Button onClick={() => setKravTilManuell(vedtak.kravId)} variant="secondary" size="small">Sett til manuell</Button>}
                             {vedtak.isLaast &&
                               <Button onClick={() => setLaasOppVedtak(vedtak)} variant="secondary" size="small">Lås
                                 opp</Button>}
+                            </HStack>
                           </Table.DataCell>
                         </Table.Row>
                       ))}
@@ -141,7 +144,7 @@ export default function LaasteVedtakPage() {
                             <Behandlinger kravid={krav.kravId} behandlinger={krav.behandlinger} />
                           </Table.DataCell>
                           <Table.DataCell>
-                              <Button onClick={() => setKravTilManuell(krav)} variant="secondary" size="small">Sett til manuell</Button>
+                              <Button onClick={() => setKravTilManuell(krav.kravId)} variant="secondary" size="small">Sett til manuell</Button>
                           </Table.DataCell>
                         </Table.Row>
                       ))}
@@ -156,7 +159,7 @@ export default function LaasteVedtakPage() {
         </HStack>
       </VStack>
       {laasOppVedtak !== null && <LaasOppVedtakModal vedtak={laasOppVedtak} onClose={() => setLaasOppVedtak(null)} />}
-      {kravTilManuell !== null && <SettTilManuellModal krav={kravTilManuell} onClose={() => setKravTilManuell(null)} />}
+      {kravTilManuell !== null && <SettTilManuellModal kravId={kravTilManuell} onClose={() => setKravTilManuell(null)} />}
     </div>
   )
 }
@@ -225,7 +228,7 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string, behandlinger: 
 }
 
 
-function SettTilManuellModal({ krav, onClose }: { krav: AutomatiskKravUtenVedtak, onClose: () => void }) {
+function SettTilManuellModal({ kravId, onClose }: { kravId: string, onClose: () => void }) {
 
   const fetcher = useFetcher()
   const revalidator = useRevalidator()
@@ -233,7 +236,7 @@ function SettTilManuellModal({ krav, onClose }: { krav: AutomatiskKravUtenVedtak
   function settTilManuell() {
     fetcher.submit(
       {
-        kravId: krav.kravId,
+        kravId: kravId,
       },
       {
         action: 'settTilManuell',
