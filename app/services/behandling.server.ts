@@ -26,6 +26,7 @@ export async function getBehandlinger(
   accessToken: string,
   behandlingType: string | null,
   status: string | null,
+  ansvarligTeam: string | null,
   forrigeBehandlingId: number | null,
   isBatch: boolean | null,
   page: number,
@@ -38,6 +39,9 @@ export async function getBehandlinger(
   }
   if (status) {
     request += `&status=${status}`
+  }
+  if (ansvarligTeam) {
+    request += `&ansvarligTeam=${ansvarligTeam}`
   }
   if (forrigeBehandlingId) {
     request += `&forrigeBehandlingId=${forrigeBehandlingId}`
@@ -73,6 +77,7 @@ export async function getAvhengigeBehandlinger(
   behandlingId: number | null,
   behandlingType: string | null,
   status: string | null,
+  ansvarligTeam: string | null,
   page: number,
   size: number,
   sort: string | null,
@@ -88,6 +93,10 @@ export async function getAvhengigeBehandlinger(
 
   if (sort) {
     request +=`&sort=${sort}`
+  }
+
+  if (ansvarligTeam) {
+    request +=`&ansvarligTeam=${ansvarligTeam}`
   }
 
   const response = await fetch(
@@ -112,6 +121,7 @@ export async function search(
   query: string,
   behandlingType: string | null,
   status: string | null,
+  ansvarligTeam: string | null,
   page: number,
   size: number,
   sort: string | null,
@@ -127,6 +137,10 @@ export async function search(
 
   if (sort) {
     request +=`&sort=${sort}`
+  }
+
+  if (ansvarligTeam) {
+    request +=`&ansvarligTeam=${ansvarligTeam}`
   }
 
   const response = await fetch(

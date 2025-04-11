@@ -24,6 +24,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     +params.behandlingId,
     searchParams.get('behandlingType'),
     searchParams.get('status'),
+    searchParams.get('ansvarligTeam'),
     page ? +page : 0,
     size ? +size : 10,
     searchParams.get('sort'),

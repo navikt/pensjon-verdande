@@ -20,6 +20,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     accessToken,
     searchParams.get('behandlingType'),
     searchParams.get('status'),
+    searchParams.get('ansvarligTeam'),
     null,
     null,
     page ? +page : 0,

@@ -4,15 +4,17 @@ import type { BehandlingDto, BehandlingerPage } from '~/types'
 import { Link, useFetcher, useSearchParams } from '@remix-run/react'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
-import { decodeTeam } from '~/common/decodeTeam'
+import { decodeTeam, Team } from '~/common/decodeTeam'
+import { getEnumValueByKey } from '~/common/utils'
 
 interface Props {
   visStatusSoek?: boolean | true,
   visBehandlingTypeSoek?: boolean | true,
+  visAnsvarligTeamSoek?: boolean | true,
   behandlingerResponse: BehandlingerPage,
 }
 
-export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek = true, behandlingerResponse}: Props) {
+export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek = true, visAnsvarligTeamSoek = true, behandlingerResponse}: Props) {
   const fetcher = useFetcher()
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -62,6 +64,28 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
       <option value='OPPRETTET'>Opprettet</option>
       <option value='STOPPET'>Stoppet</option>
       <option value='UNDER_BEHANDLING'>Under behandling</option>
+    </Select>
+  }
+
+  function ansvarligTeamOptions() {
+    return <Select
+      label="Ansvarlig team"
+      defaultValue={searchParams.get('ansvarligTeam') || undefined}
+      onChange={(value) => {
+        searchParams.set('ansvarligTeam', value.target.value)
+        setSearchParams(searchParams, {
+          preventScrollReset: true,
+        })
+      }}
+      hideLabel
+    >
+      <option value=''>Alle team</option>
+
+      {Object.keys(Team).map((teamKey: string) => (
+        <option key={teamKey} value={teamKey}>
+          {getEnumValueByKey(Team, teamKey)}
+        </option>
+      ))}
     </Select>
   }
 
@@ -193,6 +217,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                 {visBehandlingTypeSoek ? behandlingtypeOptions() : <></>}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
+                {visAnsvarligTeamSoek ? ansvarligTeamOptions() : <></>}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>

@@ -1,4 +1,5 @@
-import { ActionFunctionArgs, defer } from '@remix-run/node'
+import type { ActionFunctionArgs} from '@remix-run/node';
+import { defer } from '@remix-run/node'
 import { Search, VStack } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
@@ -22,6 +23,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       query,
       searchParams.get('behandlingType'),
       searchParams.get('status'),
+      searchParams.get('ansvarligTeam'),
       page ? +page : 0,
       size ? +size : 10,
       searchParams.get('sort'),
