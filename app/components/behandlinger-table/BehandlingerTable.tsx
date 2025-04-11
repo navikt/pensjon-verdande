@@ -159,9 +159,12 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.ColumnHeader sortable sortKey="utsattTil" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Utsatt til
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "14rem" }}>
-                Status
-              </Table.ColumnHeader>
+              {visStatusSoek ?
+                <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "14rem" }}>
+                  Status
+                </Table.ColumnHeader>
+                : <></>
+              }
               <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
                 Feilmelding
               </Table.ColumnHeader>
@@ -197,11 +200,12 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
-              <Table.DataCell style={{ paddingTop: 0 }}>
-                {visStatusSoek ?
-                  statusOptions()
-                  : <></>}
-              </Table.DataCell>
+              {visStatusSoek ?
+                <Table.DataCell style={{ paddingTop: 0 }}>
+                  { statusOptions() }
+                </Table.DataCell>
+                : <></>
+              }
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
             </Table.Row>
@@ -240,7 +244,10 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   <Table.DataCell>
                     {formatIsoTimestamp(it.utsattTil)}
                   </Table.DataCell>
-                  <Table.DataCell>{it.status}</Table.DataCell>
+                  {visStatusSoek ?
+                    <Table.DataCell>{it.status}</Table.DataCell>
+                    : <></>
+                  }
                   <Table.DataCell title={ it.feilmelding ? it.behandlingId + '\n' + it.feilmelding : undefined}>
                       <div className="feilmelding_kolonne">
                         {it.feilmelding}
