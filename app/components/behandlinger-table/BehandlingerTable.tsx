@@ -128,7 +128,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
         shadow="medium"
       >
         <Table
-          size={'small'}
+          size={'medium'}
           onSortChange={onSortChange}
           sort={{
             direction: sortDecending === 'desc' ? 'descending' : 'ascending',
@@ -159,7 +159,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.ColumnHeader sortable sortKey="utsattTil" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Utsatt til
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
+              <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "14rem" }}>
                 Status
               </Table.ColumnHeader>
               <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
@@ -241,7 +241,11 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                     {formatIsoTimestamp(it.utsattTil)}
                   </Table.DataCell>
                   <Table.DataCell>{it.status}</Table.DataCell>
-                  <Table.DataCell><div className="feilmelding_kolonne">{it.feilmelding}</div></Table.DataCell>
+                  <Table.DataCell title={ it.feilmelding ? it.behandlingId + '\n' + it.feilmelding : undefined}>
+                      <div className="feilmelding_kolonne">
+                        {it.feilmelding}
+                      </div>
+                  </Table.DataCell>
                 </Table.Row>
               )
             })}
