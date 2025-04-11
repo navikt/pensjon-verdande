@@ -128,7 +128,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
         shadow="medium"
       >
         <Table
-          size={'medium'}
+          size={'small'}
           onSortChange={onSortChange}
           sort={{
             direction: sortDecending === 'desc' ? 'descending' : 'ascending',
@@ -138,29 +138,32 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
         >
           <Table.Header>
             <Table.Row>
-              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: "4rem" }}>
                 Velg
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="behandlingId" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
-                BehandlingId
+              <Table.ColumnHeader sortable sortKey="behandlingId" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "7rem" }}>
+                Id
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="class" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+              <Table.ColumnHeader sortable sortKey="class" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "30rem"  }}>
                 Type
               </Table.ColumnHeader>
-              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: "8rem" }}>
                 Ansvarlig team
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="opprettet" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+              <Table.ColumnHeader sortable sortKey="opprettet" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Opprettet
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="sisteKjoring" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+              <Table.ColumnHeader sortable sortKey="sisteKjoring" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Siste kjøring
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="utsattTil" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+              <Table.ColumnHeader sortable sortKey="utsattTil" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Utsatt til
               </Table.ColumnHeader>
-              <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+              <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Status
+              </Table.ColumnHeader>
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
+                Feilmelding
               </Table.ColumnHeader>
             </Table.Row>
             <Table.Row>
@@ -199,6 +202,8 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   statusOptions()
                   : <></>}
               </Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}>
+              </Table.DataCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -236,6 +241,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                     {formatIsoTimestamp(it.utsattTil)}
                   </Table.DataCell>
                   <Table.DataCell>{it.status}</Table.DataCell>
+                  <Table.DataCell><div className="feilmelding_kolonne">{it.feilmelding}</div></Table.DataCell>
                 </Table.Row>
               )
             })}

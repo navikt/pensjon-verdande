@@ -36,6 +36,7 @@ export type BehandlingDto = {
   vedtakId: number | null
   journalpostId: string | null
   kibanaUrl?: string
+  feilmelding: string | null
 
   parametere: any | null
 

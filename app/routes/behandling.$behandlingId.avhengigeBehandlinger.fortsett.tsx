@@ -1,14 +1,18 @@
-import type { ActionFunctionArgs } from '@remix-run/node'
-import invariant from 'tiny-invariant'
+import { ActionFunctionArgs } from '@remix-run/node'
+import { fortsettBehandling } from '~/services/behandling.server'
 import { requireAccessToken } from '~/services/auth.server'
-import { fortsettBehandling, getBehandling } from '~/services/behandling.server'
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
-  invariant(params.behandlingId, 'Missing behandlingId param')
-
+export async function action({
+                               request,
+                             }: ActionFunctionArgs) {
   const accessToken = await requireAccessToken(request)
 
-  await fortsettBehandling(accessToken, params.behandlingId)
+  let body = await request.formData()
+  let behandlingIder = body.get('behandlingIder') as string
 
-  return getBehandling(accessToken, params.behandlingId)
+  await Promise.all(behandlingIder.split(',').map((behandlingId) => {
+    fortsettBehandling(accessToken, behandlingId)
+  }))
+
+  return null
 }
