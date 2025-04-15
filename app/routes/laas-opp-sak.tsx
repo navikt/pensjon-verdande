@@ -353,6 +353,11 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp, onClos
               Vedtakstatus vil bli endret til "Til Attestering"
             </List.Item>
           </List>
+          {vedtak.behandlinger.some(b => b.isFeilet) && (
+            <Alert variant="warning">
+              Obs!!! Denne saken har en behandling som har feilet teknisk, og det er derfor ikke sikkert det er riktig løsning å låse opp saken!
+            </Alert>
+          )}
         </VStack>
       </Modal.Body>
       <Modal.Footer>
