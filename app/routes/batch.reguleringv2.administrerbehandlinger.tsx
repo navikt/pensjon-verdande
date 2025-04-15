@@ -7,15 +7,19 @@ import type {
   ReguleringStatistikk,
 } from '~/regulering.types'
 import { ArbeidstabellStatistikk } from '~/regulering.types'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link, useFetcher, useOutletContext } from '@remix-run/react'
-import { Alert, Button, Dropdown, HStack, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
+import { Alert, Button, Dropdown, HStack, Loader, Modal, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
 import { Entry } from '~/components/entry/Entry'
 import { DetaljertFremdriftDTO } from '~/types'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
+
+
+
+type OpenConfirmationModalType = "fortsettFeilendeFamiliereguleringer" | "fortsettFamilieReguleringerTilBehandling" | "fortsettFeilendeIverksettVedtak" | "fortsettNyAvviksgrenser" | "fortsettFaktoromregningsmodus" | "fortsettFeilhandteringmodus"
 
 
 export default function AdministrerTilknyttetdeBehandlinger() {
@@ -64,7 +68,10 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   const antallFeilendeverksettVedtak = reguleringStatistikk?.antallFeilendeIverksettVedtak
 
 
+  const [openConfirmationModal, setOpenConfirmationModal] = useState<OpenConfirmationModalType | null>(null)
+
   function fortsettFeilendeFamilieReguleringer() {
+    setOpenConfirmationModal(null)
     fetcherFortsettFeilendeFamilieReguleringer.submit(
       {},
       {
@@ -76,6 +83,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   }
 
   function fortsettFamilieReguleringerTilBehandling() {
+    setOpenConfirmationModal(null)
     fetcherFortsettFamilieReguleringerTilBehandling.submit(
       {},
       {
@@ -87,6 +95,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   }
 
   function fortsettFeilendeIverksettVedtak() {
+    setOpenConfirmationModal(null)
     fetcherFortsettFeilendeIverksettVedtak.submit(
       {},
       {
@@ -98,6 +107,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   }
 
   function fortsettNyAvviksgrenser() {
+    setOpenConfirmationModal(null)
     fetcherNyAvviksgrenser.submit(
       {},
       {
@@ -109,6 +119,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   }
 
   function fortsettFaktoromregningsmodus() {
+    setOpenConfirmationModal(null)
     fetcherFaktoromregningsmodus.submit(
       {},
       {
@@ -120,6 +131,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   }
 
   function fortsettFeilhandteringmodus() {
+    setOpenConfirmationModal(null)
     fetcherFeilhandteringmodus.submit(
       {},
       {
@@ -142,17 +154,17 @@ export default function AdministrerTilknyttetdeBehandlinger() {
             ({antallFeilendeFamiliebehandlinger})</Button>
           <Dropdown.Menu>
             <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFeilendeFamilieReguleringer()}>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal("fortsettFeilendeFamiliereguleringer")}>
                 Fortsett feilende behandlinger ({antallFeilendeFamiliebehandlinger})
               </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFamilieReguleringerTilBehandling()}>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal("fortsettFamilieReguleringerTilBehandling")}>
                 Fortsett utsatte behandlinger
               </Dropdown.Menu.List.Item>
             </Dropdown.Menu.List>
           </Dropdown.Menu>
         </Dropdown>
         <Button icon={<PlayFillIcon />} size="small"
-                onClick={() => fortsettFeilendeIverksettVedtak()}
+                onClick={() => setOpenConfirmationModal("fortsettFeilendeIverksettVedtak")}
                 loading={fetcherFortsettFeilendeIverksettVedtak.state === 'submitting'}>Fortsett feilende iverksett
           vedtak
           ({antallFeilendeverksettVedtak})</Button>
@@ -163,13 +175,13 @@ export default function AdministrerTilknyttetdeBehandlinger() {
                     || fetcherNyAvviksgrenser.state === 'submitting'}>Rune sin knapp</Button>
           <Dropdown.Menu>
             <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettNyAvviksgrenser()}>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal("fortsettNyAvviksgrenser")}>
                 Prøv på nytt med nye avviksgrenser ({antallVenterPaaRune})
               </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFaktoromregningsmodus()}>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal("fortsettFaktoromregningsmodus")}>
                 Kjør i faktoromregningsmodus ({antallVenterPaaRune})
               </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => fortsettFeilhandteringmodus()}>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal("fortsettFeilhandteringmodus")}>
                 Kjør i feilhåndteringsmodus
                 ({antallFeilendeBeregnytelser})
               </Dropdown.Menu.List.Item>
@@ -229,6 +241,12 @@ export default function AdministrerTilknyttetdeBehandlinger() {
           </Tabs.Panel>
         </Tabs>
       </HStack>
+      <ConfirmationModal text="Er du sikker på at du vil fortsette familiereguleringer til behandling?" showModal={openConfirmationModal === "fortsettFamilieReguleringerTilBehandling"} onOk={() => {fortsettFamilieReguleringerTilBehandling()}} onCancel={() => setOpenConfirmationModal(null)} />
+      <ConfirmationModal text="Er du sikker på at du vil fortsette feilende familiereguleringer?" showModal={openConfirmationModal === "fortsettFeilendeFamiliereguleringer"} onOk={() => {fortsettFeilendeFamilieReguleringer()}} onCancel={() => setOpenConfirmationModal(null)} />
+      <ConfirmationModal text="Er du sikker på at du vil fortsette feilende iverksett vedtak?" showModal={openConfirmationModal === "fortsettFeilendeIverksettVedtak"} onOk={() => {fortsettFeilendeIverksettVedtak()}} onCancel={() => setOpenConfirmationModal(null)} />
+      <ConfirmationModal text="Er du sikker på at du vil prøve på ny med nye avviksgrenser?" showModal={openConfirmationModal === "fortsettNyAvviksgrenser"} onOk={() => {fortsettNyAvviksgrenser()}} onCancel={() => setOpenConfirmationModal(null)} />
+      <ConfirmationModal text="Er du sikker på at du vil kjøre i faktoromregningsmodus?" showModal={openConfirmationModal === "fortsettFaktoromregningsmodus"} onOk={() => {fortsettFaktoromregningsmodus()}} onCancel={() => setOpenConfirmationModal(null)} />
+      <ConfirmationModal text="Er du sikker på at du vil kjøre i feilhåndteringsmodus?" showModal={openConfirmationModal === "fortsettFeilhandteringmodus"} onOk={() => {fortsettFeilhandteringmodus()}} onCancel={() => setOpenConfirmationModal(null)} />
     </VStack>
   )
 }
@@ -324,6 +342,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
   }
 
   function updateAvviksgrenser() {
+
     fetcher.submit(
       {
         newAvviksgrenser,
@@ -434,4 +453,47 @@ export function TotaloversiktBehandlinger({ behandlingId }: {
     <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
   )
 }
+
+export function ConfirmationModal(props: {
+  text: string;
+  showModal: boolean;
+  onOk: () => void;
+  onCancel: () => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+
+  if (props.showModal) {
+    ref.current?.showModal();
+  } else {
+    ref.current?.close();
+  }
+
+  return (
+    <div>
+      <Modal
+        ref={ref}
+        header={{ heading: "Er du sikker?", closeButton: false }}
+        onClose={props.onCancel}
+      >
+        <Modal.Body>
+          {props.text}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button type="button" onClick={props.onOk} size="small">
+            Fortsett
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={props.onCancel}
+            size="small"
+          >
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+}
+
 
