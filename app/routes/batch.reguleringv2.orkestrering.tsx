@@ -24,6 +24,7 @@ import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
+import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -108,9 +109,32 @@ export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
   orkestrering: ReguleringOrkestrering,
   visStatistikk: boolean
 }) {
+
+  const fetcher = useFetcher()
+
+  function pauseOrkestrering() {
+    fetcher.submit(
+      { behandlingId: orkestrering.behandlingId },
+      {
+        method: 'post',
+        action: `pause/${orkestrering.behandlingId}`,
+      },
+    )
+  }
+
+  function fortsettOrkestrering() {
+    fetcher.submit(
+      { behandlingId: orkestrering.behandlingId },
+      {
+        method: 'post',
+        action: `fortsett/${orkestrering.behandlingId}`,
+      },
+    )
+  }
+
   return (
     <VStack gap="5">
-      <HStack gap="5">
+      <HStack gap="5" align="end">
         <Entry labelText="Status">
           {orkestrering.status === Behandlingstatus.OPPRETTET &&
             <Alert variant="info" size="small" inline>Opprettet</Alert>}
@@ -132,6 +156,8 @@ export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
         <Entry labelText="Behandling">
           <Link to={`/behandling/${orkestrering.behandlingId}`} target="_blank">Gå til behandling</Link>
         </Entry>
+        {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && <div><Button size="xsmall" variant="secondary-neutral" loading={fetcher.state === "submitting"} icon={<PauseIcon/>} onClick={() => pauseOrkestrering()}>Pause</Button></div>}
+        {orkestrering.status === Behandlingstatus.DEBUG && <Button size="xsmall" variant="secondary" icon={<PlayIcon/>} onClick={() => fortsettOrkestrering()}>Fortsett</Button>}
       </HStack>
       <HStack>
         {visStatistikk &&
