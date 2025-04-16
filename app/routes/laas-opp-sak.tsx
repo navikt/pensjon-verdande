@@ -355,9 +355,12 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp, onClos
           </List>
           {vedtak.behandlinger.some(b => b.isFeilet) && (
             <Alert variant="warning">
-              Obs!!! Denne saken har en behandling som har feilet teknisk, og det er derfor ikke sikkert det er riktig løsning å låse opp saken!
+              Obs!!! Denne saken har en behandling som har feilet teknisk, og det er derfor ikke sikkert det er riktig løsning å låse opp saken! En utvikler bør se på saken før du låser opp.
             </Alert>
           )}
+          {vedtak.behandlinger.some(b => b.type === "IverksettVedtakBehandling") && <Alert variant="warning">
+            Det er en Iverksett Vedtak behandling på dette vedtaket. Dersom du låser opp, så må kravet feilregistreres og nytt krav må opprettes.
+          </Alert>}
         </VStack>
       </Modal.Body>
       <Modal.Footer>
