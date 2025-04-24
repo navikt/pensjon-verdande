@@ -20,7 +20,7 @@ async function fortsettOrkestrering(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/regulering/orkestrering/${behandlingId}/fortsett`,
+    `${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/fortsett`,
     {
       method: 'POST',
       headers: {
@@ -31,8 +31,11 @@ async function fortsettOrkestrering(
     },
   )
 
-  return {
-    success: response.ok,
+  if(response.ok) {
+    return {success: true}
+  } else {
+    const error = await response.text()
+    throw new Error(error)
   }
 }
 

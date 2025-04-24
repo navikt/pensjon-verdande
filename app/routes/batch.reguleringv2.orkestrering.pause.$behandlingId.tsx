@@ -20,7 +20,7 @@ async function pauseOrkestrering(
 ) {
 
   const response = await fetch(
-    `${env.penUrl}/api/regulering/orkestrering/${behandlingId}/pause`,
+    `${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/pause`,
     {
       method: 'POST',
       headers: {
@@ -31,9 +31,14 @@ async function pauseOrkestrering(
     },
   )
 
-  return {
-    success: response.ok,
+
+  if(response.ok) {
+    return {success: true}
+  } else {
+    const error = await response.text()
+    throw new Error(error)
   }
+
 }
 
 
