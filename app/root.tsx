@@ -124,18 +124,10 @@ export default function App() {
                       <NavLink to={`/omregning`}>Omregn ytelser</NavLink>
                     </li>
                     <li>
-                      {env != 'p' ? (
-                        <NavLink to={`/batch/regulering`}>Regulering</NavLink>
-                      ) : (
-                        <div />
-                      )}
+                      <NavLink to={`/batch/regulering`}>Regulering</NavLink>
                     </li>
                     <li>
-                      {env != 'p' ? (
-                        <NavLink to={`/batch/reguleringv2`}>Regulering Next</NavLink>
-                      ) : (
-                        <div />
-                      )}
+                      <NavLink to={`/batch/reguleringv2`}>Regulering Next</NavLink>
                     </li>
 
                   </ul>
