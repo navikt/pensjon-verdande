@@ -33,8 +33,8 @@ export default function Uttrekk() {
   return (
     <>
       <HStack>
-        {uttrekk !== null &&
-          <>
+        {uttrekk !== null && uttrekk.behandlingId !== null &&
+          <VStack gap="3">
             {uttrekk.status === Behandlingstatus.UNDER_BEHANDLING && (
               <Alert variant="info" inline>
                 <VStack gap="2">
@@ -61,32 +61,32 @@ export default function Uttrekk() {
               <Alert variant="success" inline><VStack gap="2">Uttrekk er
                 fullført {formatIsoTimestamp(uttrekk.uttrekkDato)}</VStack></Alert>
             )}
-          </>
+            <HStack gap="3">
+              <ReadMore header="Vis kjøretid for aktiviteter">
+                <VStack>
+                  {uttrekk?.kjoretidAktiviteter.map((aktivitet) => (
+                    <Alert variant="success" inline size="small"
+                           key={aktivitet.aktivitet}>{aktivitet.minutter}min {aktivitet.sekunder}s
+                      - {aktivitet.aktivitet}</Alert>
+                  ))}
+                </VStack>
+              </ReadMore>
+            </HStack>
+            <HStack gap="5">
+              <Entry labelText={'Satsdato'}>{formatIsoDate(uttrekk?.satsDato)}</Entry>
+              <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>
+              <Entry labelText={'Antall familier'}>{uttrekk?.familierTabellSize}</Entry>
+
+                <Entry labelText={'Behandling'}>
+                  <Link to={`/behandling/${uttrekk.behandlingId}`} target="_blank">Gå til
+                    behandling</Link>
+                </Entry>
+            </HStack>
+          </VStack>
         }
       </HStack>
-      <HStack gap="3">
-        <ReadMore header="Vis kjøretid for aktiviteter">
-          <VStack>
-            {uttrekk?.kjoretidAktiviteter.map((aktivitet) => (
-              <Alert variant="success" inline size="small"
-                     key={aktivitet.aktivitet}>{aktivitet.minutter}min {aktivitet.sekunder}s
-                - {aktivitet.aktivitet}</Alert>
-            ))}
-          </VStack>
-        </ReadMore>
-      </HStack>
-      <HStack gap="5">
-        <Entry labelText={'Satsdato'}>{formatIsoDate(uttrekk?.satsDato)}</Entry>
-        <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>
-        <Entry labelText={'Antall familier'}>{uttrekk?.familierTabellSize}</Entry>
-        {uttrekk !== null &&
-          <Entry labelText={'Behandling'}>
-            <Link to={`/behandling/${uttrekk.behandlingId}`} target="_blank">Gå til
-              behandling</Link>
-          </Entry>}
-      </HStack>
       <HStack gap="3" align="center">
-        {(uttrekk === null || (uttrekk.status === Behandlingstatus.FULLFORT || uttrekk.status === Behandlingstatus.STOPPET))
+        {(uttrekk === null || uttrekk.behandlingId == null || (uttrekk.status === Behandlingstatus.FULLFORT || uttrekk.status === Behandlingstatus.STOPPET))
           && <Button onClick={() => setIsOpen(true)}>Kjør uttrekk</Button>
         }
         {uttrekk?.status === Behandlingstatus.FULLFORT &&
