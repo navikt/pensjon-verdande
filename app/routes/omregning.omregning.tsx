@@ -22,7 +22,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     toleransegrenseSett: updates.toleransegrenseSett,
     oppgaveSett: updates.oppgaveSett,
     oppgavePrefiks: updates.oppgavePrefiks,
-    utsattTil:updates.datetimepicker as string
+    utsattTil:updates.datetimepicker as string,
+    skalSletteIverksettingsoppgaver: updates.skalSletteIverksettingsoppgaver === 'true',
+    skalBestilleBrevOgSamordne: updates.skalBestilleBrevOgSamordne === 'true',
+    skalDistribuereUforevedtak: updates.skalDistribuereUforevedtak === 'true',
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
