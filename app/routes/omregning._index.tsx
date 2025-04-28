@@ -26,8 +26,8 @@ export default function BatchOpprett_index() {
 
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
-  const [skalBestilleBrevOgSamordne, setSkalBestilleBrevOgSamordne] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
+  const [skalBestilleBrevOgSamordne, setSkalBestilleBrevOgSamordne] = useState(false)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
@@ -214,6 +214,15 @@ export default function BatchOpprett_index() {
                 >
                   Sjekk ytelser fra avtaleland
                 </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalBestilleBrevOgSamordne}
+                  name='skalBestilleBrevOgSamordne'
+                  value={skalBestilleBrevOgSamordne}
+                  onChange={(event) => setSkalBestilleBrevOgSamordne(event.target.checked)}>
+                  Skal bestille brev og samordne
+                </Checkbox>
+
                 <h3>Følgende verdier er default satt:</h3>
                 <Checkbox
                   defaultChecked={omregneAFP}
@@ -231,14 +240,6 @@ export default function BatchOpprett_index() {
                   value={skalSletteIverksettingsoppgaver}
                   onChange={(event) => setSkalSletteIverksettingsoppgaver(event.target.checked)}>
                   Skal slette iverksettingsoppgaver
-                </Checkbox>
-
-                <Checkbox
-                  defaultChecked={skalBestilleBrevOgSamordne}
-                  name='skalBestilleBrevOgSamordne'
-                  value={skalBestilleBrevOgSamordne}
-                  onChange={(event) => setSkalBestilleBrevOgSamordne(event.target.checked)}>
-                  Skal bestille brev og samordne
                 </Checkbox>
 
                 <Checkbox
