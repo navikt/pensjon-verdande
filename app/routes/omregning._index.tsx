@@ -25,12 +25,13 @@ export default function BatchOpprett_index() {
   const ref = useRef<HTMLDialogElement>(null)
 
   const [omregneAFP, setOmregneAFP] = useState(true)
+  const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
+  const [skalBestilleBrevOgSamordne, setSkalBestilleBrevOgSamordne] = useState(true)
+  const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
-  const [brukKjoreplan, setBrukKjoreplan] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
   const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
-  const [brukPpen015, setBrukPpen015] = useState(false)
   const [kjoreTidspunkt, setkjoreTidspunkt] = useState(false)
 
   const [selectedKjoretidspunkt, setSelectedKjoretidspunkt] = useState<Date | null>(null)
@@ -183,17 +184,6 @@ export default function BatchOpprett_index() {
                 console.log('change')
               }}>
                 <Checkbox
-                  defaultChecked={omregneAFP}
-                  name='omregneAFP'
-                  value={omregneAFP}
-                  onChange={(event) => {
-                    setOmregneAFP(event.target.checked)
-                  }}
-                >
-                  Omregne AFP
-                </Checkbox>
-
-                <Checkbox
                   name='behandleApneKrav'
                   value={behandleApneKrav}
                   onChange={(event) => setBehandleApneKrav(event.target.checked)}
@@ -207,14 +197,6 @@ export default function BatchOpprett_index() {
                   onChange={(event) => setBrukFaktoromregning(event.target.checked)}
                 >
                   Bruk faktoromregning
-                </Checkbox>
-
-                <Checkbox
-                  name='brukKjoreplan'
-                  value={brukKjoreplan}
-                  onChange={(event) => setBrukKjoreplan(event.target.checked)}
-                >
-                  Bruk kjøreplan
                 </Checkbox>
 
                 <Checkbox
@@ -232,14 +214,41 @@ export default function BatchOpprett_index() {
                 >
                   Sjekk ytelser fra avtaleland
                 </Checkbox>
+                <h3>Følgende verdier er default satt:</h3>
+                <Checkbox
+                  defaultChecked={omregneAFP}
+                  name='omregneAFP'
+                  value={omregneAFP}
+                  onChange={(event) => {
+                    setOmregneAFP(event.target.checked)
+                  }}
+                >
+                  Omregne AFP
+                </Checkbox>
+                <Checkbox
+                  defaultChecked={skalSletteIverksettingsoppgaver}
+                  name='skalSletteIverksettingsoppgaver'
+                  value={skalSletteIverksettingsoppgaver}
+                  onChange={(event) => setSkalSletteIverksettingsoppgaver(event.target.checked)}>
+                  Skal slette iverksettingsoppgaver
+                </Checkbox>
 
                 <Checkbox
-                  name='brukPpen015'
-                  value={brukPpen015}
-                  onChange={(event) => setBrukPpen015(event.target.checked)}
-                >
-                  Bruk PPEN015
+                  defaultChecked={skalBestilleBrevOgSamordne}
+                  name='skalBestilleBrevOgSamordne'
+                  value={skalBestilleBrevOgSamordne}
+                  onChange={(event) => setSkalBestilleBrevOgSamordne(event.target.checked)}>
+                  Skal bestille brev og samordne
                 </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalDistribuereUforevedtak}
+                  name='skalDistribuereUforevedtak'
+                  value={skalDistribuereUforevedtak}
+                  onChange={(event) => setSkalDistribuereUforevedtak(event.target.checked)}>
+                  Skal distribuere uførevedtak
+                </Checkbox>
+
               </CheckboxGroup>
             </Box>
 
@@ -321,12 +330,13 @@ export default function BatchOpprett_index() {
                 {behandleApneKrav && <List.Item>Behandle åpne krav: {behandleApneKrav ? 'Ja' : 'Nei'}</List.Item>}
                 {brukFaktoromregning &&
                   <List.Item>Bruk faktoromregning: {brukFaktoromregning ? 'Ja' : 'Nei'}</List.Item>}
-                {brukKjoreplan && <List.Item>Bruk kjøreplan: {brukKjoreplan ? 'Ja' : 'Nei'}</List.Item>}
                 {opprettAlleOppgaver &&
                   <List.Item>Opprett alle oppgaver: {opprettAlleOppgaver ? 'Ja' : 'Nei'}</List.Item>}
                 {sjekkYtelseFraAvtaleland &&
                   <List.Item>Sjekk ytelser fra avtaleland: {sjekkYtelseFraAvtaleland ? 'Ja' : 'Nei'}</List.Item>}
-                {brukPpen015 && <List.Item>Bruk PPEN015: {brukPpen015 ? 'Ja' : 'Nei'}</List.Item>}
+                {skalSletteIverksettingsoppgaver && <List.Item>Skal slette Iverksettingsoppgaver: {skalSletteIverksettingsoppgaver ? 'Ja' : 'Nei'}</List.Item> }
+                {skalBestilleBrevOgSamordne && <List.Item>Skal bestille brev og samordne: {skalBestilleBrevOgSamordne ? 'Ja' : 'Nei'}</List.Item>}
+                {skalDistribuereUforevedtak && <List.Item>Skal distribuere uførevedtak: {skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</List.Item>}
 
                 <List.Item>Krav gjelder: {kravGjelder}</List.Item>
                 <List.Item>Kravårsak: {kravArsak}</List.Item>
