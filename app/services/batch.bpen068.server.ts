@@ -5,7 +5,6 @@ export async function startReguleringUttrekk(
   accessToken: string,
   satsDato: string,
   reguleringsDato: string,
-  sisteAktivitet: string,
   iDebug: boolean,
 ): Promise<StartBatchResponse> {
 
@@ -13,10 +12,6 @@ export async function startReguleringUttrekk(
       satsDato: satsDato,
       reguleringsDato: reguleringsDato,
       iDebug: iDebug,
-  }
-
-  if(sisteAktivitet !== ''){
-    body.sisteAktivitet = sisteAktivitet;
   }
 
   const response = await fetch(
@@ -43,7 +38,6 @@ export async function startReguleringOrkestrering(
   accessToken: string,
   satsDato: string,
   reguleringsDato: string,
-  sisteAktivitet: string,
   maxFamiliebehandlinger: string,
 ): Promise<StartBatchResponse> {
 
@@ -52,9 +46,6 @@ export async function startReguleringOrkestrering(
     reguleringsDato: reguleringsDato,
   }
 
-  if(sisteAktivitet !== ''){
-    body.sisteAktivitet = sisteAktivitet;
-  }
   if(maxFamiliebehandlinger !== ''){
     body.maxFamiliebehandlinger = maxFamiliebehandlinger;
   }
@@ -84,14 +75,12 @@ export async function fortsettAvhengigeBehandling(
   behandlingIdRegulering: string,
   reguleringBehandlingType: string,
   antallBehandlinger: string,
-  fortsettTilAktivitet: string,
   behandlingStatusType: string,
 ): Promise<FortsettBatchResponse> {
 
   const requestBody: any = {
     behandlingId: behandlingIdRegulering,
     reguleringBehandlingType: reguleringBehandlingType,
-    fortsettTilAktivitet: fortsettTilAktivitet,
     antallBehandlinger: antallBehandlinger,
     behandlingStatusType: behandlingStatusType,
   }

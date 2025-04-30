@@ -31,16 +31,6 @@ export default function ReguleringOrkestrering() {
       />
     </p>
     <p>
-      Kjør til og med aktivitet &nbsp;
-      <input
-        defaultValue="A100"
-        aria-label="SisteAktivitet"
-        name="sisteAktivitet"
-        type="text"
-        placeholder="SisteAktivitet"
-      />
-    </p>
-    <p>
       Opprett maks antall familiebehandlinger &nbsp;
       <input
         defaultValue="10"
