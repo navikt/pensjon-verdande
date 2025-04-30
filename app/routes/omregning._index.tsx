@@ -71,6 +71,7 @@ export default function BatchOpprett_index() {
   const optionToleransegrenseSett = [
     { value: 'DEFAULT', label: 'Default' },
     { value: 'GPPROD', label: 'GPPROD' },
+    { value: 'GJLKAP20', label: 'GJLKAP20' },
     { value: 'ENSLIGE4000', label: 'ENSLIGE4000' },
     { value: 'ENSLIGE5000', label: 'ENSLIGE5000' },
     { value: 'EPS1000', label: 'EPS1000' },
