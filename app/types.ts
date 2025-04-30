@@ -170,3 +170,6 @@ export type OmregningRequest = {
   oppgavePrefiks: string
   utsattTil: string
 }
+export type Toleransegrensesett = {
+  toleransegrenser: string[]
+}

@@ -1,4 +1,4 @@
-import { useFetcher } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import React, { useEffect, useRef, useState } from 'react'
 import {
   BodyLong,
@@ -6,7 +6,8 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
-  HGrid, Link,
+  HGrid,
+  Link,
   List,
   Modal,
   MonthPicker,
@@ -16,8 +17,24 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import type { LoaderFunctionArgs } from '@remix-run/node'
+import { requireAccessToken } from '~/services/auth.server'
+import { hentToleransegrensesett } from '~/services/batch.omregning.bpen093'
+
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+  const accesstoken = await requireAccessToken(request)
+
+  const toleransegrense = await hentToleransegrensesett(
+    accesstoken,
+  )
+  if (!toleransegrense) {
+    throw new Response('Not Found', { status: 404 })
+  }
+  return toleransegrense
+}
 
 export default function BatchOpprett_index() {
+  const data = useLoaderData<typeof loader>()
   const now = new Date()
   const [isClicked, setIsClicked] = useState(false)
   const [omregningstidspunkt, setOmregningstidspunkt] = useState('')
@@ -68,18 +85,11 @@ export default function BatchOpprett_index() {
     { value: 'ANNEN_ARSAK', label: 'Annen årsak' },
   ]
 
-  const optionToleransegrenseSett = [
-    { value: 'DEFAULT', label: 'Default' },
-    { value: 'GPPROD', label: 'GPPROD' },
-    { value: 'GJLKAP20', label: 'GJLKAP20' },
-    { value: 'ENSLIGE4000', label: 'ENSLIGE4000' },
-    { value: 'ENSLIGE5000', label: 'ENSLIGE5000' },
-    { value: 'EPS1000', label: 'EPS1000' },
-    { value: 'INGEN_ENDR', label: 'INGEN_ENDR' },
-    { value: 'AFP2500', label: 'AFP2500' },
-    { value: 'UFORE_MYT', label: 'UFORE_MYT' },
-    { value: 'not set', label: 'Ikke angitt' },
-  ]
+  const optionToleransegrenseSett = []
+  optionToleransegrenseSett.push({ value: 'not set', label: 'Ikke angitt' })
+  data.toleransegrenser.forEach((value: string) => {
+    optionToleransegrenseSett.push({ value: value, label: value })
+  })
 
   const optionOppgaveSett = [
     { value: 'INGEN_OPPGAVER', label: 'Ingen oppgaver' },
@@ -132,7 +142,8 @@ export default function BatchOpprett_index() {
     <div>
       <h1>Omregn ytelser</h1>
       <p>Behandling som erstatter BPEN093</p>
-      <p><Link href="https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Omregning.html" target="_blank">Dokumentasjon</Link></p>
+      <p><Link href='https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Omregning.html'
+               target='_blank'>Dokumentasjon</Link></p>
 
       <fetcher.Form id={'skjema'} action='omregning' method='POST'>
         <Box style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
@@ -336,9 +347,12 @@ export default function BatchOpprett_index() {
                   <List.Item>Opprett alle oppgaver: {opprettAlleOppgaver ? 'Ja' : 'Nei'}</List.Item>}
                 {sjekkYtelseFraAvtaleland &&
                   <List.Item>Sjekk ytelser fra avtaleland: {sjekkYtelseFraAvtaleland ? 'Ja' : 'Nei'}</List.Item>}
-                {skalSletteIverksettingsoppgaver && <List.Item>Skal slette Iverksettingsoppgaver: {skalSletteIverksettingsoppgaver ? 'Ja' : 'Nei'}</List.Item> }
-                {skalBestilleBrevOgSamordne && <List.Item>Skal bestille brev og samordne: {skalBestilleBrevOgSamordne ? 'Ja' : 'Nei'}</List.Item>}
-                {skalDistribuereUforevedtak && <List.Item>Skal distribuere uførevedtak: {skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</List.Item>}
+                {skalSletteIverksettingsoppgaver && <List.Item>Skal slette
+                  Iverksettingsoppgaver: {skalSletteIverksettingsoppgaver ? 'Ja' : 'Nei'}</List.Item>}
+                {skalBestilleBrevOgSamordne &&
+                  <List.Item>Skal bestille brev og samordne: {skalBestilleBrevOgSamordne ? 'Ja' : 'Nei'}</List.Item>}
+                {skalDistribuereUforevedtak &&
+                  <List.Item>Skal distribuere uførevedtak: {skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</List.Item>}
 
                 <List.Item>Krav gjelder: {kravGjelder}</List.Item>
                 <List.Item>Kravårsak: {kravArsak}</List.Item>
