@@ -26,7 +26,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       accessToken,
       updates.satsDato as string,
       updates.reguleringsDato as string,
-      updates.sisteAktivitet as string,
       updates.iDebug === 'on',
     )
     return redirect(`/batch/regulering`)
@@ -36,7 +35,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       accessToken,
       updates.satsDato as string,
       updates.reguleringsDato as string,
-      updates.sisteAktivitet as string,
       updates.maxFamiliebehandlinger as string,
     )
     return redirect(`/batch/regulering`)
@@ -47,7 +45,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       updates.behandlingIdRegulering as string,
       updates.reguleringBehandlingType as string,
       updates.antallBehandlinger as string,
-      updates.fortsettTilAktivitet as string,
       updates.behandlingStatusType as string,
     )
 

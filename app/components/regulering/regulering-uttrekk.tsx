@@ -32,16 +32,6 @@ export default function ReguleringUttrekk() {
       />
     </p>
     <p>
-      Kjør til og med aktivitet &nbsp;
-      <input
-        defaultValue="A100"
-        aria-label="SisteAktivitet"
-        name="sisteAktivitet"
-        type="text"
-        placeholder="SisteAktivitet"
-      />
-    </p>
-    <p>
       <Checkbox name="iDebug">Debug</Checkbox>
     </p>
     <p>

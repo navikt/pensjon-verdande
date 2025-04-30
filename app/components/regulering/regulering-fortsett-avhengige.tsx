@@ -60,16 +60,6 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
           </select>
         </p>
         <p>
-          Fortsett til aktivitet &nbsp;
-          <input
-            defaultValue=""
-            aria-label="FortsettTilAktivitet"
-            name="fortsettTilAktivitet"
-            type="text"
-            placeholder="Fortsett Til Aktivitet"
-          />
-        </p>
-        <p>
           <button type="submit" disabled={isClicked} onClick={handleSubmit}>
             Fortsett
           </button>
