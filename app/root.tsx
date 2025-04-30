@@ -176,6 +176,7 @@ export default function App() {
                   <NavLink to={`/laaste-vedtak`}>Låste vedtak</NavLink>
                   <NavLink to={`/laas-opp-sak`}>Lås opp sak</NavLink>
                   <NavLink to={`/linke-dnr-fnr`}>Linke Dnr Fnr</NavLink>
+                  <NavLink to={`/leveattester-sokos-spkmottak`}>Sokos SPK Mottak</NavLink>
                 </Accordion.Content>
               </Accordion.Item>
             </Accordion>
