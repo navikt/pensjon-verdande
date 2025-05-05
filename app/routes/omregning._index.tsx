@@ -91,7 +91,7 @@ export default function BatchOpprett_index() {
     optionToleransegrenseSett.push({ value: value, label: value })
   })
 
-  const optionOppgaveSett = []
+  const optionOppgaveSett: { value: string, label: string}[] = []
   data.oppgaveSett.forEach((value: string) => {
     optionOppgaveSett.push({ value: value, label: value })
   })
