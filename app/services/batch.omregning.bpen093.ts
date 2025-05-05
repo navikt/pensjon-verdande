@@ -1,4 +1,4 @@
-import { OmregningRequest, StartBatchResponse, Toleransegrensesett } from '~/types'
+import { OmregningRequest, StartBatchResponse, OmregningInit } from '~/types'
 import { env } from '~/services/env.server'
 
 export async function opprettOmregningbehandling(
@@ -20,10 +20,10 @@ export async function opprettOmregningbehandling(
   }
 }
 
-export async function hentToleransegrensesett(
+export async function hentOmregningInit(
   accessToken: string,
-): Promise<Toleransegrensesett> {
-  const response = await fetch(`${env.penUrl}/api/behandling/omregning/toleransegrensesett`, {
+): Promise<OmregningInit> {
+  const response = await fetch(`${env.penUrl}/api/behandling/omregning/init`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -33,7 +33,7 @@ export async function hentToleransegrensesett(
   })
 
   if (response.ok) {
-    return await response.json() as Toleransegrensesett
+    return await response.json() as OmregningInit
   } else {
     throw new Error()
   }

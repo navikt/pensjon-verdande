@@ -19,18 +19,18 @@ import {
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { hentToleransegrensesett } from '~/services/batch.omregning.bpen093'
+import { hentOmregningInit } from '~/services/batch.omregning.bpen093'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
 
-  const toleransegrense = await hentToleransegrensesett(
+  const omregningInit = await hentOmregningInit(
     accesstoken,
   )
-  if (!toleransegrense) {
+  if (!omregningInit) {
     throw new Response('Not Found', { status: 404 })
   }
-  return toleransegrense
+  return omregningInit
 }
 
 export default function BatchOpprett_index() {
@@ -91,15 +91,10 @@ export default function BatchOpprett_index() {
     optionToleransegrenseSett.push({ value: value, label: value })
   })
 
-  const optionOppgaveSett = [
-    { value: 'INGEN_OPPGAVER', label: 'Ingen oppgaver' },
-    { value: 'DEFAULT', label: 'Default' },
-    { value: 'HENDELSE_UTLAND', label: 'Hendelse utland' },
-    { value: 'OPPH_UT', label: 'Opphør utland' },
-    { value: 'DOD', label: 'Død' },
-    { value: 'BPEN056', label: 'BPEN056' },
-    { value: 'SOKNAD_AP', label: 'Søknad AP' },
-  ]
+  const optionOppgaveSett = []
+  data.oppgaveSett.forEach((value: string) => {
+    optionOppgaveSett.push({ value: value, label: value })
+  })
 
   const optionOppgavePrefiks = [
     { value: 'DEFAULT_PREFIKS', label: 'Default prefiks' },
