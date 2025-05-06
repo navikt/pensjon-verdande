@@ -40,6 +40,12 @@ export default function EkskluderteSaker({}: {}) {
     setSaksnummerListe(ekskluderteSaker.join('\n'))
   }, [ekskluderteSaker])
 
+  const antallSaker = saksnummerListe
+    .split('\n')
+    .map((t: string) => t.trim())
+    .filter((t: string) => t !== '')
+    .map(Number)
+    .length
 
   return (
     <VStack gap="5">
@@ -52,6 +58,12 @@ export default function EkskluderteSaker({}: {}) {
                     description="Liste av saker som skal eksluderes fra reguleringen. Oppgis med linjeskift."
                     value={saksnummerListe} onChange={(e) => setSaksnummerListe(e.target.value)} minRows={30}
                     style={{ width: '30em' }} resize />
+          <VStack>
+            <Alert variant="info" inline>
+              Antall saker i listen: {antallSaker}
+            </Alert>
+          </VStack>
+
           <div><Button type="submit" loading={navigation.state === "submitting"}>Oppdater
             ekskluderte saker</Button></div>
         </VStack>
