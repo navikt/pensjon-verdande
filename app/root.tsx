@@ -126,6 +126,9 @@ export default function App() {
                     <li>
                       <NavLink to={`/batch/reguleringv2`}>Regulering Next</NavLink>
                     </li>
+                    <li>
+                      <NavLink to={`/opptjening/kategoriserbruker`}>Omregning ved opptjeningsendring</NavLink>
+                    </li>
 
                   </ul>
                 </Accordion.Content>
