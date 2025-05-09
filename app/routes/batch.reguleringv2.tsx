@@ -48,6 +48,7 @@ export default function OpprettReguleringBatchRoute() {
           <Stepper.Step href="/batch/reguleringv2/ekskludertesaker" completed={regulering.uttrekk?.antallUbehandlende === 0}>Ekskluder saker</Stepper.Step>
           <Stepper.Step href="/batch/reguleringv2/orkestrering" completed={regulering.uttrekk?.antallUbehandlende === 0}>Orkestrering</Stepper.Step>
           <Stepper.Step href="/batch/reguleringv2/administrerbehandlinger">Administrer tilknyttede behandlinger</Stepper.Step>
+          <Stepper.Step href="/batch/reguleringv2/avsluttendeaktiviteter">Avsluttende aktiviteter</Stepper.Step>
         </Stepper>
       </HStack>
       <Outlet context={regulering}/>
@@ -89,6 +90,8 @@ function getCurrentStep(currentPathName: string) {
       return 3
     case "administrerbehandlinger":
       return 4
+    case "avsluttendeaktiviteter":
+      return 5
   }
   return null;
 }
@@ -103,6 +106,8 @@ function stepToPath(step: number) {
       return "/batch/reguleringv2/orkestrering"
     case 4:
       return "/batch/reguleringv2/administrerbehandlinger"
+    case 5:
+      return "/batch/reguleringv2/avsluttendeaktiviteter"
   }
   throw new Error(`Unrecognized step: ${step}`)
 }
