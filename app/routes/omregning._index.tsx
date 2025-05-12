@@ -28,7 +28,9 @@ export default function BatchOpprett_index() {
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
-  const [skalBestilleBrevOgSamordne, setSkalBestilleBrevOgSamordne] = useState(false)
+  const [skalBestilleBrev, setSkalBestilleBrev] = useState(true)
+  const [skalSamordne, setSkalSamordne] = useState(true)
+  const [skalSendeBrevBerorteSaker, setSkalSendeBrevBerorteSaker] = useState(false)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
@@ -279,11 +281,19 @@ export default function BatchOpprett_index() {
                 </Checkbox>
 
                 <Checkbox
-                  defaultChecked={skalBestilleBrevOgSamordne}
-                  name='skalBestilleBrevOgSamordne'
-                  value={skalBestilleBrevOgSamordne}
-                  onChange={(event) => setSkalBestilleBrevOgSamordne(event.target.checked)}>
-                  Skal bestille brev og samordne
+                  defaultChecked={skalBestilleBrev}
+                  name='skalBestilleBrev'
+                  value={skalBestilleBrev}
+                  onChange={(event) => setSkalBestilleBrev(event.target.checked)}>
+                  Skal bestille brev
+                </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalSamordne}
+                  name='skalSamordne'
+                  value={skalSamordne}
+                  onChange={(event) => setSkalSamordne(event.target.checked)}>
+                  Skal samordne
                 </Checkbox>
 
                 <h3>Følgende verdier er default satt:</h3>
@@ -297,6 +307,18 @@ export default function BatchOpprett_index() {
                 >
                   Omregne AFP
                 </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalSendeBrevBerorteSaker}
+                  name='sendBrevBerorteSaker'
+                  value={skalSendeBrevBerorteSaker}
+                  onChange={(event) => {
+                    setSkalSendeBrevBerorteSaker(event.target.checked)
+                  }}
+                >
+                  Send brev for berørte saker
+                </Checkbox>
+
                 <Checkbox
                   defaultChecked={skalSletteIverksettingsoppgaver}
                   name='skalSletteIverksettingsoppgaver'
@@ -345,7 +367,9 @@ export default function BatchOpprett_index() {
                 {sjekkYtelseFraAvtaleland &&
                   <List.Item>Sjekk ytelser fra avtaleland: {sjekkYtelseFraAvtaleland ? 'Ja' : 'Nei'}</List.Item>}
                 {skalSletteIverksettingsoppgaver && <List.Item>Skal slette Iverksettingsoppgaver: {skalSletteIverksettingsoppgaver ? 'Ja' : 'Nei'}</List.Item> }
-                {skalBestilleBrevOgSamordne && <List.Item>Skal bestille brev og samordne: {skalBestilleBrevOgSamordne ? 'Ja' : 'Nei'}</List.Item>}
+                {skalBestilleBrev && <List.Item>Skal bestille brev: {skalBestilleBrev ? 'Ja' : 'Nei'}</List.Item>}
+                {skalSamordne && <List.Item>Skal samordne: {skalSamordne ? 'Ja' : 'Nei'}</List.Item>}
+                {skalSendeBrevBerorteSaker && <List.Item>Send brev for berørte saker: {skalSendeBrevBerorteSaker ? 'Ja' : 'Nei'}</List.Item>}
                 {skalDistribuereUforevedtak && <List.Item>Skal distribuere uførevedtak: {skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</List.Item>}
 
                 <List.Item>Krav gjelder: {kravGjelder}</List.Item>
