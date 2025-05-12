@@ -111,7 +111,7 @@ export default function BatchOpprett_index() {
   const { monthpickerProps, inputProps } = useMonthpicker({
     onMonthChange: setMonthSelected,
     fromDate: new Date(`1 Oct ${now.getFullYear() - 10}`),
-    toDate: new Date(`1 Oct ${now.getFullYear() + 10}`),
+    toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
     onValidate: (val) => {
       if (!val.isValidMonth && val.isEmpty) {
         setHasError(true)
