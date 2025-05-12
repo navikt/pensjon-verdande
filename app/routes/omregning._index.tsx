@@ -16,6 +16,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import { PlayIcon } from '@navikt/aksel-icons'
 
 export default function BatchOpprett_index() {
   const now = new Date()
@@ -157,7 +158,7 @@ export default function BatchOpprett_index() {
 
         <VStack gap='6'>
 
-          <HGrid columns={2} gap='6'>
+          <HGrid columns={2} gap='12'>
 
             <Box>
               <TextField
@@ -179,7 +180,68 @@ export default function BatchOpprett_index() {
               <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt'
                      value={omregningstidspunkt}
                      readOnly />
+
+              <br />
+              <br />
+
+              <Select
+                label='Krav gjelder'
+                name={'kravGjelder'}
+                onChange={(event) => setKravGjelder(event.target.value)}>
+                {optionsKravGjelder.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
+                label={'Kravårsak'}
+                name={'kravArsak'}
+                onChange={(event) => setKravArsak(event.target.value)}>
+                {optionsKravArsak.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
+                label={'Toleransegrense sett'}
+                name={'toleransegrenseSett'}
+                onChange={(event) => setToleransegrenseSett(event.target.value)}>
+                {optionToleransegrenseSett.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
+                label={'Oppgave sett'}
+                name={'oppgaveSett'}
+                onChange={(event) => setOppgaveSett(event.target.value)}>
+                {optionOppgaveSett.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+
+              <Select
+                label={'Oppgave prefiks'}
+                name={'oppgavePrefiks'}
+                onChange={(event) => setOppgavePrefiks(event.target.value)}>
+                {optionOppgavePrefiks.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+              <br />
+
             </Box>
+
             <Box>
               <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {
                 console.log('change')
@@ -254,71 +316,17 @@ export default function BatchOpprett_index() {
               </CheckboxGroup>
             </Box>
 
-            <Box>
-              <Select
-                label='Krav gjelder'
-                name={'kravGjelder'}
-                onChange={(event) => setKravGjelder(event.target.value)}>
-                {optionsKravGjelder.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                label={'Kravårsak'}
-                name={'kravArsak'}
-                onChange={(event) => setKravArsak(event.target.value)}>
-                {optionsKravArsak.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                label={'Toleransegrense sett'}
-                name={'toleransegrenseSett'}
-                onChange={(event) => setToleransegrenseSett(event.target.value)}>
-                {optionToleransegrenseSett.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                label={'Oppgave sett'}
-                name={'oppgaveSett'}
-                onChange={(event) => setOppgaveSett(event.target.value)}>
-                {optionOppgaveSett.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-
-              <Select
-                label={'Oppgave prefiks'}
-                name={'oppgavePrefiks'}
-                onChange={(event) => setOppgavePrefiks(event.target.value)}>
-                {optionOppgavePrefiks.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-              <br />
-
-            </Box>
           </HGrid>
         </VStack>
       </fetcher.Form>
 
       <Box>
-
-        <Button onClick={() => ref.current?.showModal()}>Start Omregning</Button>
+        <br />
+        <Button
+          icon={<PlayIcon aria-hidden />}
+          onClick={() => ref.current?.showModal()}>
+          Start omregning
+        </Button>
 
         <Modal ref={ref} header={{ heading: 'Start Omregning' }}>
           <Modal.Body>
