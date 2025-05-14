@@ -126,6 +126,9 @@ export default function App() {
                     <li>
                       <NavLink to={`/batch/reguleringv2`}>Regulering Next</NavLink>
                     </li>
+                    <li>
+                      <NavLink to={`/opptjening/kategoriserbruker`}>Omregning ved opptjeningsendring</NavLink>
+                    </li>
 
                   </ul>
                 </Accordion.Content>
@@ -176,6 +179,7 @@ export default function App() {
                   <NavLink to={`/laaste-vedtak`}>Låste vedtak</NavLink>
                   <NavLink to={`/laas-opp-sak`}>Lås opp sak</NavLink>
                   <NavLink to={`/linke-dnr-fnr`}>Linke Dnr Fnr</NavLink>
+                  <NavLink to={`/leveattester-sokos-spkmottak`}>Verifiser antall fra MOT</NavLink>
                 </Accordion.Content>
               </Accordion.Item>
             </Accordion>

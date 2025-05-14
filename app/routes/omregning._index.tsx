@@ -17,6 +17,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import { PlayIcon } from '@navikt/aksel-icons'
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentOmregningInit } from '~/services/batch.omregning.bpen093'
@@ -44,7 +45,9 @@ export default function BatchOpprett_index() {
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
-  const [skalBestilleBrevOgSamordne, setSkalBestilleBrevOgSamordne] = useState(false)
+  const [skalBestilleBrev, setSkalBestilleBrev] = useState(false)
+  const [skalSamordne, setSkalSamordne] = useState(false)
+  const [skalSendeBrevBerorteSaker, setSkalSendeBrevBerorteSaker] = useState(true)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
@@ -91,7 +94,7 @@ export default function BatchOpprett_index() {
     optionToleransegrenseSett.push({ value: value, label: value })
   })
 
-  const optionOppgaveSett: { value: string, label: string}[] = []
+  const optionOppgaveSett: { value: string, label: string }[] = []
   data.oppgaveSett.forEach((value: string) => {
     optionOppgaveSett.push({ value: value, label: value })
   })
@@ -116,7 +119,7 @@ export default function BatchOpprett_index() {
   const { monthpickerProps, inputProps } = useMonthpicker({
     onMonthChange: setMonthSelected,
     fromDate: new Date(`1 Oct ${now.getFullYear() - 10}`),
-    toDate: new Date(`1 Oct ${now.getFullYear() + 10}`),
+    toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
     onValidate: (val) => {
       if (!val.isValidMonth && val.isEmpty) {
         setHasError(true)
@@ -163,7 +166,7 @@ export default function BatchOpprett_index() {
 
         <VStack gap='6'>
 
-          <HGrid columns={2} gap='6'>
+          <HGrid columns={2} gap='12'>
 
             <Box>
               <TextField
@@ -185,82 +188,10 @@ export default function BatchOpprett_index() {
               <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt'
                      value={omregningstidspunkt}
                      readOnly />
-            </Box>
-            <Box>
-              <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {
-                console.log('change')
-              }}>
-                <Checkbox
-                  name='behandleApneKrav'
-                  value={behandleApneKrav}
-                  onChange={(event) => setBehandleApneKrav(event.target.checked)}
-                >
-                  Behandle åpne krav
-                </Checkbox>
 
-                <Checkbox
-                  name='brukFaktoromregning'
-                  value={brukFaktoromregning}
-                  onChange={(event) => setBrukFaktoromregning(event.target.checked)}
-                >
-                  Bruk faktoromregning
-                </Checkbox>
+              <br />
+              <br />
 
-                <Checkbox
-                  name='opprettAlleOppgaver'
-                  value={opprettAlleOppgaver}
-                  onChange={(event) => setOpprettAlleOppgaver(event.target.checked)}
-                >
-                  Opprett alle oppgaver
-                </Checkbox>
-
-                <Checkbox
-                  name='sjekkYtelseFraAvtaleland'
-                  value={sjekkYtelseFraAvtaleland}
-                  onChange={(event) => setSjekkYtelseFraAvtaleland(event.target.checked)}
-                >
-                  Sjekk ytelser fra avtaleland
-                </Checkbox>
-
-                <Checkbox
-                  defaultChecked={skalBestilleBrevOgSamordne}
-                  name='skalBestilleBrevOgSamordne'
-                  value={skalBestilleBrevOgSamordne}
-                  onChange={(event) => setSkalBestilleBrevOgSamordne(event.target.checked)}>
-                  Skal bestille brev og samordne
-                </Checkbox>
-
-                <h3>Følgende verdier er default satt:</h3>
-                <Checkbox
-                  defaultChecked={omregneAFP}
-                  name='omregneAFP'
-                  value={omregneAFP}
-                  onChange={(event) => {
-                    setOmregneAFP(event.target.checked)
-                  }}
-                >
-                  Omregne AFP
-                </Checkbox>
-                <Checkbox
-                  defaultChecked={skalSletteIverksettingsoppgaver}
-                  name='skalSletteIverksettingsoppgaver'
-                  value={skalSletteIverksettingsoppgaver}
-                  onChange={(event) => setSkalSletteIverksettingsoppgaver(event.target.checked)}>
-                  Skal slette iverksettingsoppgaver
-                </Checkbox>
-
-                <Checkbox
-                  defaultChecked={skalDistribuereUforevedtak}
-                  name='skalDistribuereUforevedtak'
-                  value={skalDistribuereUforevedtak}
-                  onChange={(event) => setSkalDistribuereUforevedtak(event.target.checked)}>
-                  Skal distribuere uførevedtak
-                </Checkbox>
-
-              </CheckboxGroup>
-            </Box>
-
-            <Box>
               <Select
                 label='Krav gjelder'
                 name={'kravGjelder'}
@@ -318,13 +249,112 @@ export default function BatchOpprett_index() {
               <br />
 
             </Box>
+
+            <Box>
+              <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {
+                console.log('change')
+              }}>
+                <Checkbox
+                  name='behandleApneKrav'
+                  value={behandleApneKrav}
+                  onChange={(event) => setBehandleApneKrav(event.target.checked)}
+                >
+                  Behandle åpne krav
+                </Checkbox>
+
+                <Checkbox
+                  name='brukFaktoromregning'
+                  value={brukFaktoromregning}
+                  onChange={(event) => setBrukFaktoromregning(event.target.checked)}
+                >
+                  Bruk faktoromregning
+                </Checkbox>
+
+                <Checkbox
+                  name='opprettAlleOppgaver'
+                  value={opprettAlleOppgaver}
+                  onChange={(event) => setOpprettAlleOppgaver(event.target.checked)}
+                >
+                  Opprett alle oppgaver
+                </Checkbox>
+
+                <Checkbox
+                  name='sjekkYtelseFraAvtaleland'
+                  value={sjekkYtelseFraAvtaleland}
+                  onChange={(event) => setSjekkYtelseFraAvtaleland(event.target.checked)}
+                >
+                  Sjekk ytelser fra avtaleland
+                </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalBestilleBrev}
+                  name='skalBestilleBrev'
+                  value={skalBestilleBrev}
+                  onChange={(event) => setSkalBestilleBrev(event.target.checked)}>
+                  Skal bestille brev
+                </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalSamordne}
+                  name='skalSamordne'
+                  value={skalSamordne}
+                  onChange={(event) => setSkalSamordne(event.target.checked)}>
+                  Skal samordne
+                </Checkbox>
+
+                <h3>Følgende verdier er default satt:</h3>
+                <Checkbox
+                  defaultChecked={omregneAFP}
+                  name='omregneAFP'
+                  value={omregneAFP}
+                  onChange={(event) => {
+                    setOmregneAFP(event.target.checked)
+                  }}
+                >
+                  Omregne AFP
+                </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalSendeBrevBerorteSaker}
+                  name='sendBrevBerorteSaker'
+                  value={skalSendeBrevBerorteSaker}
+                  onChange={(event) => {
+                    setSkalSendeBrevBerorteSaker(event.target.checked)
+                  }}
+                >
+                  Send brev for berørte saker
+                </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalSletteIverksettingsoppgaver}
+                  name='skalSletteIverksettingsoppgaver'
+                  value={skalSletteIverksettingsoppgaver}
+                  onChange={(event) => setSkalSletteIverksettingsoppgaver(event.target.checked)}>
+                  Skal slette iverksettingsoppgaver
+                </Checkbox>
+
+                <Checkbox
+                  defaultChecked={skalDistribuereUforevedtak}
+                  name='skalDistribuereUforevedtak'
+                  value={skalDistribuereUforevedtak}
+                  onChange={(event) => setSkalDistribuereUforevedtak(event.target.checked)}>
+                  Skal distribuere uførevedtak
+                </Checkbox>
+
+              </CheckboxGroup>
+            </Box>
+
           </HGrid>
         </VStack>
       </fetcher.Form>
 
       <Box>
-
-        <Button onClick={() => ref.current?.showModal()}>Start Omregning</Button>
+        <br />
+        <Button
+          icon={<PlayIcon aria-hidden />}
+          onClick={() => ref.current?.showModal()}>
+          Start omregning
+        </Button>
 
         <Modal ref={ref} header={{ heading: 'Start Omregning' }}>
           <Modal.Body>
@@ -344,8 +374,10 @@ export default function BatchOpprett_index() {
                   <List.Item>Sjekk ytelser fra avtaleland: {sjekkYtelseFraAvtaleland ? 'Ja' : 'Nei'}</List.Item>}
                 {skalSletteIverksettingsoppgaver && <List.Item>Skal slette
                   Iverksettingsoppgaver: {skalSletteIverksettingsoppgaver ? 'Ja' : 'Nei'}</List.Item>}
-                {skalBestilleBrevOgSamordne &&
-                  <List.Item>Skal bestille brev og samordne: {skalBestilleBrevOgSamordne ? 'Ja' : 'Nei'}</List.Item>}
+                {skalBestilleBrev && <List.Item>Skal bestille brev: {skalBestilleBrev ? 'Ja' : 'Nei'}</List.Item>}
+                {skalSamordne && <List.Item>Skal samordne: {skalSamordne ? 'Ja' : 'Nei'}</List.Item>}
+                {skalSendeBrevBerorteSaker &&
+                  <List.Item>Send brev for berørte saker: {skalSendeBrevBerorteSaker ? 'Ja' : 'Nei'}</List.Item>}
                 {skalDistribuereUforevedtak &&
                   <List.Item>Skal distribuere uførevedtak: {skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</List.Item>}
 
@@ -376,7 +408,6 @@ export default function BatchOpprett_index() {
           </Modal.Footer>
         </Modal>
       </Box>
-
 
     </div>
   )

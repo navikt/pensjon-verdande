@@ -24,8 +24,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     oppgavePrefiks: updates.oppgavePrefiks,
     utsattTil:updates.datetimepicker as string,
     skalSletteIverksettingsoppgaver: updates.skalSletteIverksettingsoppgaver === 'true',
-    skalBestilleBrevOgSamordne: updates.skalBestilleBrevOgSamordne === 'true',
+    skalBestilleBrev: updates.skalBestilleBrevOgSamordne === 'true',
+    skalSamordne: updates.skalBestilleBrevOgSamordne === 'true',
     skalDistribuereUforevedtak: updates.skalDistribuereUforevedtak === 'true',
+    sendBrevBerorteSaker: updates.sendBrevBerorteSaker === 'true',
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)

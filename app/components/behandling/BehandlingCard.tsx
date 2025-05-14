@@ -129,7 +129,7 @@ export default function BehandlingCard(props: Props) {
               <BodyLong>
                 Ønsker du virkerlig å sende melding til oppdrag på nytt?
                 Dette skal kun gjøres når man har bekreftet med
-                #po-utbetaling at meldingen fra Pesys til Opppdrag er
+                #utbetaling at meldingen fra Pen til Oppdragssystemet er
                 borte
               </BodyLong>
             </Modal.Body>

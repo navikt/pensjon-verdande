@@ -10,7 +10,7 @@ import { BehandlingerPage } from '~/types'
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.status, 'Missing status param')
-  let { searchParams } = new URL(request.url);
+  let { searchParams } = new URL(request.url)
 
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -25,6 +25,7 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
     null,
     page ? +page : 0,
     size ? +size : 100,
+    searchParams.get('sort'),
   )
   if (!behandlinger) {
     throw new Response('Not Found', { status: 404 })
