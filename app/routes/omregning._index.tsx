@@ -16,7 +16,6 @@ import {
   useMonthpicker,
   VStack,
 } from '@navikt/ds-react'
-import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { PlayIcon } from '@navikt/aksel-icons'
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
