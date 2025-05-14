@@ -139,30 +139,12 @@ export default function BatchOpprett_index() {
   return (
     <div>
       <h1>Omregn ytelser</h1>
-      <p>Behandling som erstatter BPEN093</p>
-      <p><Link href='https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Omregning.html'
-               target='_blank'>Dokumentasjon</Link></p>
+      <p>Behandling som har erstattet BPEN093.&nbsp;
+        <Link href='https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Omregning.html' target='_blank'>Dokumentasjon</Link>.
+      </p>
+      <br />
 
       <fetcher.Form id={'skjema'} action='omregning' method='POST'>
-        <Box style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
-          <Checkbox
-            value={kjoreTidspunkt}
-            onChange={(event) => setkjoreTidspunkt(event.target.checked)}
-          >Sett kjøretidspunkt - Ikke implementert</Checkbox>
-
-          <Box hidden={!kjoreTidspunkt}>
-            <DateTimePicker
-              id='date-picker'
-              name={'datetimepicker'}
-              labelText='Kjøredato'
-              selectedDate={selectedKjoretidspunkt}
-              setSelectedDate={(date) => setSelectedKjoretidspunkt(date)}
-              placeholderText={'Velg kjøredato'}
-              ariaLabel={'Velg kjøredato'}
-              tabIndex={6}
-            />
-          </Box>
-        </Box>
 
         <VStack gap='6'>
 
@@ -181,7 +163,7 @@ export default function BatchOpprett_index() {
               >
                 <MonthPicker.Input
                   {...inputProps}
-                  label='Velg omregningstidspunkt'
+                  label='Omregningstidspunkt (virkFom)'
                   error={hasError && 'Du må velge måned'}
                 />
               </MonthPicker>
@@ -215,7 +197,7 @@ export default function BatchOpprett_index() {
               </Select>
 
               <Select
-                label={'Toleransegrense sett'}
+                label={'Toleransegrense-sett'}
                 name={'toleransegrenseSett'}
                 onChange={(event) => setToleransegrenseSett(event.target.value)}>
                 {optionToleransegrenseSett.map((option) => (
@@ -226,7 +208,7 @@ export default function BatchOpprett_index() {
               </Select>
 
               <Select
-                label={'Oppgave sett'}
+                label={'Oppgave-sett'}
                 name={'oppgaveSett'}
                 onChange={(event) => setOppgaveSett(event.target.value)}>
                 {optionOppgaveSett.map((option) => (
@@ -237,7 +219,7 @@ export default function BatchOpprett_index() {
               </Select>
 
               <Select
-                label={'Oppgave prefiks'}
+                label={'Oppgave-prefiks'}
                 name={'oppgavePrefiks'}
                 onChange={(event) => setOppgavePrefiks(event.target.value)}>
                 {optionOppgavePrefiks.map((option) => (
