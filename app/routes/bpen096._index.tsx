@@ -46,14 +46,14 @@ export default function BatchOpprett_index() {
         </div>
         <br />
         <div style={{ display: 'inline-block' }}>
-          <label>Antall sekvensnummer per aktivitet</label>
+          <label>Antall sekvensnummer per behandling</label>
           <br />
           <input
             defaultValue="10"
-            aria-label="sekvensnummerPerAktivitet"
-            name="sekvensnummerPerAktivitet"
+            aria-label="sekvensnummerPerBehandling"
+            name="sekvensnummerPerBehandling"
             type="number"
-            placeholder="sekvensnummerPerAktivitet"
+            placeholder="sekvensnummerPerBehandling"
           />
         </div>
         <br />
