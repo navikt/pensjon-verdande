@@ -484,7 +484,13 @@ export default function BatchOpprett_index() {
           <div>
             <h2>Legg til saker</h2>
             <fetcher.Form method='post' action='omregningsaker'>
-              <Textarea label='Legg til saker' resize size='small' name='saksnummerListe' />
+              <Textarea
+                label='Legg til saker. Oppgis med linjeskift.'
+                resize
+                size='small'
+                name='saksnummerListe'
+                style={{ width: '30em' }}
+              />
               <br />
               <Button variant='primary' loading={navigation.state === 'submitting'} onClick={oppdaterOmregningInput}>Legg
                 til</Button>
