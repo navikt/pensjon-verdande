@@ -4,7 +4,7 @@ import { StartBatchResponse } from '~/types'
 export async function opprettBpen096(
   accessToken: string,
   maksAntallSekvensnummer: number,
-  sekvensnummerPerAktivitet: number,
+  sekvensnummerPerBehandling: number,
   dryRun: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
@@ -18,7 +18,7 @@ export async function opprettBpen096(
       },
       body: JSON.stringify({
         maksAntallSekvensnummer: maksAntallSekvensnummer,
-        sekvensnummerPerAktivitet: sekvensnummerPerAktivitet,
+        sekvensnummerPerBehandling: sekvensnummerPerBehandling,
         dryRun: dryRun,
       }),
     },

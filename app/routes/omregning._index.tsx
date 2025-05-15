@@ -243,18 +243,18 @@ export default function BatchOpprett_index() {
                     onChange={(event) => setBehandlingsnokkel(event.target.value)}
                   />
 
-                  <MonthPicker
-                    {...monthpickerProps}
-                  >
-                    <MonthPicker.Input
-                      {...inputProps}
-                      label='Velg omregningstidspunkt'
-                      error={hasError && 'Du må velge måned'}
-                    />
-                  </MonthPicker>
-                  <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt'
-                         value={omregningstidspunkt}
-                         readOnly />
+              <MonthPicker
+                {...monthpickerProps}
+              >
+                <MonthPicker.Input
+                  {...inputProps}
+                  label='Omregningstidspunkt (virkFom)'
+                  error={hasError && 'Du må velge måned'}
+                />
+              </MonthPicker>
+              <input hidden type='text' id='omregningstidspunkt' name='omregningstidspunkt'
+                     value={omregningstidspunkt}
+                     readOnly />
 
                   <br />
                   <br />
@@ -281,39 +281,39 @@ export default function BatchOpprett_index() {
                     ))}
                   </Select>
 
-                  <Select
-                    label={'Toleransegrense sett'}
-                    name={'toleransegrenseSett'}
-                    onChange={(event) => setToleransegrenseSett(event.target.value)}>
-                    {optionToleransegrenseSett.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
+              <Select
+                label={'Toleransegrense-sett'}
+                name={'toleransegrenseSett'}
+                onChange={(event) => setToleransegrenseSett(event.target.value)}>
+                {optionToleransegrenseSett.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
 
-                  <Select
-                    label={'Oppgave sett'}
-                    name={'oppgaveSett'}
-                    onChange={(event) => setOppgaveSett(event.target.value)}>
-                    {optionOppgaveSett.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
+              <Select
+                label={'Oppgave-sett'}
+                name={'oppgaveSett'}
+                onChange={(event) => setOppgaveSett(event.target.value)}>
+                {optionOppgaveSett.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
 
-                  <Select
-                    label={'Oppgave prefiks'}
-                    name={'oppgavePrefiks'}
-                    onChange={(event) => setOppgavePrefiks(event.target.value)}>
-                    {optionOppgavePrefiks.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
-                  <br />
+              <Select
+                label={'Oppgave-prefiks'}
+                name={'oppgavePrefiks'}
+                onChange={(event) => setOppgavePrefiks(event.target.value)}>
+                {optionOppgavePrefiks.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+              <br />
 
                 </Box>
 
