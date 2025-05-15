@@ -36,8 +36,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   )
 
   let { searchParams } = new URL(request.url)
-  console.log('searchparam: ', searchParams)
-  console.log('request: ', request.url)
   let page = searchParams.get('page') ?? '0'
   let size = searchParams.get('size') ?? '10'
 
