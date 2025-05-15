@@ -175,17 +175,19 @@ export default function BatchOpprett_index() {
     if (omregningsaker?.content) {
       return (
         <div>
-          <Table size='medium'>
+          <Table size='medium' zebraStripes>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell scope='col'>SakId</Table.HeaderCell>
+                <Table.HeaderCell scope='col'>SakType</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {omregningsaker && omregningsaker.content?.map((sak, i) => {
                 return (
-                  <Table.Row key={sak + i}>
-                    <Table.HeaderCell scope='row'>{sak}</Table.HeaderCell>
+                  <Table.Row key={sak.sakId + i}>
+                    <Table.DataCell scope='row'>{sak.sakId}</Table.DataCell>
+                    <Table.DataCell scope='row'>{sak.sakType}</Table.DataCell>
                   </Table.Row>
                 )
               })}

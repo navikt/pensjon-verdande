@@ -178,7 +178,7 @@ export type OmregningInput = {
   saker: string[]
 }
 export type OmregningSakerPage = {
-  content: string[] | null
+  content: OmregningInputSaker[] | null
   pageable: {
     pageNumber: number
   },
@@ -190,5 +190,8 @@ export type OmregningSakerPage = {
   first: boolean
   numberOfElements: number
   empty: boolean
-
+}
+export type OmregningInputSaker = {
+  sakId: string,
+  sakType: string,
 }
