@@ -16,7 +16,6 @@ import {
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   spacingBottom?: string
   children: React.ReactNode
-  collapsable?: boolean
   background?: BackgroundToken
   borderRadius?: ResponsiveProp<SpaceDelimitedAttribute<BorderRadiiToken>>
 }
@@ -36,7 +35,6 @@ export const Card = forwardRef(
     {
       background,
       spacingBottom = '0',
-      collapsable = false,
       children,
       style: _style,
       ...rest
@@ -51,7 +49,7 @@ export const Card = forwardRef(
     }
 
     return (
-      <CardContext.Provider value={{ isOpen, setIsOpen, collapsable }}>
+      <CardContext.Provider value={{ isOpen, setIsOpen }}>
         <div className={cl(styles.card)} ref={ref} style={style} {...rest}>
           {children}
         </div>

@@ -54,22 +54,6 @@
   margin-right: 1px;
 }
 
-.cardChevronSvg {
-  width: 1.5em;
-  display: flex;
-  height: 100%;
-  align-items: center;
-}
-
-.cardChevron {
-  padding: 0 0.5em 0 0.5em;
-  background: var(--a-gray-100);
-}
-
-.cardCollapsable {
-  cursor: pointer;
-}
-
 .cardHeading {
   display: flex;
   position: relative;
