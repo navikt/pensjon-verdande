@@ -174,3 +174,21 @@ export type OmregningInit = {
   toleransegrenser: string[],
   oppgaveSett: string[],
 }
+export type OmregningInput = {
+  saker: string[]
+}
+export type OmregningSakerPage = {
+  content: string[] | null
+  pageable: {
+    pageNumber: number
+  },
+  last: boolean
+  totalPages: number
+  totalElements: number
+  size: number
+  number: 0
+  first: boolean
+  numberOfElements: number
+  empty: boolean
+
+}
