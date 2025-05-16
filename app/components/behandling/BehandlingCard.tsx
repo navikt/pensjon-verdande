@@ -20,6 +20,7 @@ import {
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import type { Team } from '~/common/decodeTeam';
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
+import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 
 export interface Props {
   behandling: BehandlingDto
@@ -32,8 +33,8 @@ export default function BehandlingCard(props: Props) {
   const navigate = useNavigate();
 
   const stopModal = useRef<HTMLDialogElement>(null)
+  const sendTilManuellMedKontrollpunktModal = useRef<HTMLDialogElement>(null)
   const sendTilOppdragPaNyttModal = useRef<HTMLDialogElement>(null)
-
   function beregnFremdriftProsent(ferdig: number, totalt: number): string {
     if ((ferdig === totalt)) {
       return "100"
@@ -67,6 +68,18 @@ export default function BehandlingCard(props: Props) {
     )
 
     stopModal.current?.close()
+  }
+
+  function sendTilManuellMedKontrollpunkt(kontrollpunkt: string) {
+    fetcher.submit(
+      { kontrollpunkt: kontrollpunkt },
+      {
+        action: 'sendTilManuellMedKontrollpunkt',
+        method: 'POST',
+      },
+    )
+
+    sendTilManuellMedKontrollpunktModal.current?.close()
   }
 
   function sendTilOppdragPaNytt() {
@@ -372,6 +385,16 @@ export default function BehandlingCard(props: Props) {
                   {sendTilOppdragPaNyttButton()}
 
                   {stoppButton()}
+
+                  {
+                    hasLink('sendTilManuellMedKontrollpunkt')
+                      ? <SendTilManuellMedKontrollpunktModal
+                          sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
+                          modalRef={sendTilManuellMedKontrollpunktModal}
+                          behandling={props.behandling}>
+                        </SendTilManuellMedKontrollpunktModal>
+                      : <></>
+                  }
 
                   {runButton()}
                 </Card.Grid>

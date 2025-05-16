@@ -29,6 +29,7 @@ export type BehandlingDto = {
   prioritet: number
   behandlingKjoringer: BehandlingKjoringDTO[]
   aktiviteter: AktivitetDTO[]
+  muligeKontrollpunkt: KontrollpunktDecode[]
 
   fnr: string | null
   sakId: number | null
@@ -43,6 +44,11 @@ export type BehandlingDto = {
   debugJson: string | null
 
   _links?: HalLinks
+}
+
+export type KontrollpunktDecode = {
+  kontrollpunkt: string
+  decode: string
 }
 
 export type DetaljertFremdriftDTO = {
