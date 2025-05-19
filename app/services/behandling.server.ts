@@ -373,6 +373,29 @@ export async function stopp(
   }
 }
 
+export async function sendTilManuellMedKontrollpunkt(
+  accessToken: string,
+  behandlingId: string,
+  kontrollpunkt: string,
+): Promise<void> {
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/${behandlingId}/sendTilManuellMedKontrollpunkt`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+      body: JSON.stringify({ kontrollpunkt: kontrollpunkt }),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`Feil ved sending til manuell behandling. Status: ${response.status} ${response.statusText}`)
+  }
+}
+
 export async function getOppdragsmelding(
   accessToken: string,
   behandlingId: string,
