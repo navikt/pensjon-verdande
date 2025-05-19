@@ -79,8 +79,8 @@ export default function Avsluttendeaktiviteter() {
       <Button onClick={() => setOpenConfirmationModal("avbrytBehandlingerFeiletIBeregnYtelse")}>
         Avbryt behandlinger feilet i Beregn Ytelse
       </Button>
-      <ConfirmationModal text="Er du sikker på at du vil avbryte behandlinger feilet mot POPP" showModal={openConfirmationModal === "avbrytBehandlingerFeiletMotPOPP"} onOk={() => {avbrytBehandlingerFeiletMotPopp()}} onCancel={() => setOpenConfirmationModal(null)} />
-      <ConfirmationModal text="Er du sikker på at du vil avbryte behandlinger feilet i Beregn Ytelse" showModal={openConfirmationModal === "avbrytBehandlingerFeiletIBeregnYtelse"} onOk={() => {avbrytBehandlerFeiletIBeregnYtelse()}} onCancel={() => setOpenConfirmationModal(null)} />
+      <ConfirmationModal text="Er du sikker på at du vil avbryte behandlinger som har feilet mot POPP? Dette vil sette det nye vedtaket til avbrutt og opprette oppgave til saksbehandler om at saken må reguleres manuelt." showModal={openConfirmationModal === "avbrytBehandlingerFeiletMotPOPP"} onOk={() => {avbrytBehandlingerFeiletMotPopp()}} onCancel={() => setOpenConfirmationModal(null)} />
+      <ConfirmationModal text="Er du sikker på at du vil avbryte behandlinger som har feilet i Beregn Ytelse? Dette vil sette det nye vedtaket til avbrutt og opprette oppgave til saksbehandler om at saken må reguleres manuelt." showModal={openConfirmationModal === "avbrytBehandlingerFeiletIBeregnYtelse"} onOk={() => {avbrytBehandlerFeiletIBeregnYtelse()}} onCancel={() => setOpenConfirmationModal(null)} />
     </HStack>
     </VStack>
   )
