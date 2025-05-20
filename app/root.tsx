@@ -176,6 +176,7 @@ export default function App() {
                   Adminverktøy
                 </Accordion.Header>
                 <Accordion.Content>
+                  <NavLink to={`/infobanner`}>Infobanner i PSAK</NavLink>
                   <NavLink to={`/laaste-vedtak`}>Låste vedtak</NavLink>
                   <NavLink to={`/laas-opp-sak`}>Lås opp sak</NavLink>
                   <NavLink to={`/linke-dnr-fnr`}>Linke Dnr Fnr</NavLink>
