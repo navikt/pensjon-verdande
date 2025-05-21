@@ -128,8 +128,8 @@ export default function LaasteVedtakPage() {
                                   </Button>
                                 )}
                                 {(vedtak.vedtakStatus === 'Samordnet' ||
-                                  vedtak.vedtakStatus ===
-                                    'Til iverksettelse') && (
+                                  vedtak.vedtaksType ===
+                                    'Regulering av pensjon') && (
                                   <Button
                                     onClick={() =>
                                       setVerifiserOppdragsmeldingManuelt(vedtak)
