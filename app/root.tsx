@@ -129,6 +129,9 @@ export default function App() {
                     <li>
                       <NavLink to={`/opptjening/kategoriserbruker`}>Omregning ved opptjeningsendring</NavLink>
                     </li>
+                    <li>
+                      <NavLink to={`/gjp`}>Gjenlevendepensjon - utvidet rett</NavLink>
+                    </li>
 
                   </ul>
                 </Accordion.Content>
