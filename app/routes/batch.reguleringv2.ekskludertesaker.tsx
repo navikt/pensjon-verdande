@@ -1,18 +1,29 @@
-import type { ActionFunctionArgs } from '@remix-run/node'
+import {
+  ActionFunctionArgs,
+  unstable_createMemoryUploadHandler,
+  unstable_parseMultipartFormData,
+} from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import type { EkskluderteSakerResponse } from '~/regulering.types'
 import React, { useEffect, useState } from 'react'
-import { Form, useLoaderData, useNavigation } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'
 import { useActionData } from 'react-router'
 
-
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
-  const formData = await request.formData()
-  const ekskluderteSaker = (formData.get('saksnummerListe') as string)
+
+  const uploadHandler = unstable_createMemoryUploadHandler({
+    maxPartSize: 500_000,
+  })
+  const formData = await unstable_parseMultipartFormData(request, uploadHandler)
+
+  const file = formData.get('saksnummerListe') as File
+  const saksnummerListe = (await file.text()) as string
+
+  const ekskluderteSaker = saksnummerListe
     .split('\n')
     .map((t: string) => t.trim())
     .filter((t: string) => t !== '')
@@ -32,7 +43,6 @@ export default function EkskluderteSaker({}: {}) {
     useLoaderData<typeof loader>()
 
   const response = useActionData() as OppdaterEksluderteSakerResponse | undefined;
-  const navigation = useNavigation();
 
   const [saksnummerListe, setSaksnummerListe] = useState('')
 
@@ -47,11 +57,32 @@ export default function EkskluderteSaker({}: {}) {
     .map(Number)
     .length
 
+  const fetcher = useFetcher()
+
+  function onSubmit() {
+    //antall saker to blob
+    const blob = new Blob([saksnummerListe], { type: 'text/plain' })
+    //til fil
+    const file = new File([blob], 'saksnummerListe.txt', { type: 'text/plain' })
+    //append til formdata
+    const formData = new FormData()
+    formData.append('saksnummerListe', file)
+
+    //submit
+    fetcher.submit(
+      formData,
+      {
+        method: 'POST',
+        encType: 'multipart/form-data',
+      },
+    )
+  }
+
   return (
+
     <VStack gap="5">
       <Heading size="medium">Oppgi saksnummer for ekskludering</Heading>
       {response?.erOppdatert && <Alert variant="success" inline>Liste oppdatert </Alert>}
-      <Form method="post">
         <VStack gap="5">
           <Textarea label="Saksnummer"
                     name="saksnummerListe"
@@ -64,10 +95,9 @@ export default function EkskluderteSaker({}: {}) {
             </Alert>
           </VStack>
 
-          <div><Button type="submit" loading={navigation.state === "submitting"}>Oppdater
+          <div><Button type="submit" loading={fetcher.state === "submitting"} onClick={onSubmit}>Oppdater
             ekskluderte saker</Button></div>
         </VStack>
-      </Form>
 
     </VStack>
   )
