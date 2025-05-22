@@ -16,7 +16,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const uploadHandler = unstable_createMemoryUploadHandler({
-    maxPartSize: 500_000,
+    maxPartSize: 1_500_000,
   })
   const formData = await unstable_parseMultipartFormData(request, uploadHandler)
 
