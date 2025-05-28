@@ -1,12 +1,16 @@
-import { ActionFunctionArgs, redirect } from '@remix-run/node'
+import type { ActionFunctionArgs} from '@remix-run/node';
+import { redirect } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
-import { OmregningRequest } from '~/types'
+import type { OmregningRequest } from '~/types'
 import { opprettOmregningbehandling } from '~/services/batch.omregning.bpen093'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
+  console.log("brevkodeSoker: ", updates.brevkodeSoker)
+  console.log("brevkodeBerorteSaker: ", updates.brevkodeBerorteSaker)
+  
   const omregningRequest = {
     behandlingsnokkel: updates.behandlingsnokkel,
     omregningstidspunkt: updates.omregningstidspunkt,
@@ -28,6 +32,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     skalSamordne: updates.skalBestilleBrevOgSamordne === 'true',
     skalDistribuereUforevedtak: updates.skalDistribuereUforevedtak === 'true',
     sendBrevBerorteSaker: updates.sendBrevBerorteSaker === 'true',
+    brevkodeSoker: updates.brevkodeSoker,
+    brevkodeBerorteSaker: updates.brevkodeBerorteSaker
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
