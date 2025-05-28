@@ -272,11 +272,19 @@ export default function BatchOpprett_index() {
     <div>
       <h1>Omregn ytelser</h1>
       <Box>
-        <BodyShort>
-          Behandling for Omregning av ytelser (tidligere BPEN093)
-        </BodyShort>
-        <Link href='https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlinger/Felles/Omregning.html'
-              target='_blank'>Dokumentasjon</Link>
+          Behandling for Omregning av ytelser (tidligere BPEN093).
+          <br />
+          Dokumentasjon kan finnes her:
+          <ul>
+            <li><Link href='https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlinger/Felles/Omregning.html'
+                                target='_blank'>Dokumentasjon lokal pc</Link>
+            </li>
+            <li>
+              <Link href='https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Felles/Omregning.html'
+                    target='_blank'>Dokumentasjon driftimage</Link>
+            </li>
+          </ul>
+
       </Box>
       <Tabs defaultValue='Omregning'>
 
