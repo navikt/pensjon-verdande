@@ -6,6 +6,7 @@ export async function opprettBpen096(
   maksAntallSekvensnummer: number,
   sekvensnummerPerBehandling: number,
   dryRun: boolean,
+  debug: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
     `${env.penUrl}/api/hentSkattehendelser`,
@@ -20,6 +21,7 @@ export async function opprettBpen096(
         maksAntallSekvensnummer: maksAntallSekvensnummer,
         sekvensnummerPerBehandling: sekvensnummerPerBehandling,
         dryRun: dryRun,
+        debug: debug
       }),
     },
   )
