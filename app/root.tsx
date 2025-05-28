@@ -132,6 +132,9 @@ export default function App() {
                     <li>
                       <NavLink to={`/gjp`}>Gjenlevendepensjon - utvidet rett</NavLink>
                     </li>
+                    <li>
+                      <NavLink to={`/batch/inntektskontroll`}>Inntektskontroll</NavLink>
+                    </li>
 
                   </ul>
                 </Accordion.Content>
