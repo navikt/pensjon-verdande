@@ -31,13 +31,13 @@ export default function BatchOpprett_index() {
       <h1>Start Inntektskontroll</h1>
       <Form action="opprett" method="POST">
         <div style={{ display: 'inline-block' }}>
-          <label>Aar</label>
+          <label>År</label>
           <br />
           <input
             aria-label="Behandling År"
             name="aar"
             type="number"
-            placeholder="År"
+            placeholder="KontrollÅr"
           />
         </div>
         <br />
