@@ -175,10 +175,14 @@ export type OmregningRequest = {
   brukPpen015: boolean
   oppgavePrefiks: string
   utsattTil: string
+
+  brevkoderSoker: {[key: string]: string}
+  brevkoderBerorteSaker: {[key: string]: string}
 }
 export type OmregningInit = {
   toleransegrenser: string[],
   oppgaveSett: string[],
+  batchbrevtyper: string[],
 }
 export type OmregningInput = {
   saker: string[]
