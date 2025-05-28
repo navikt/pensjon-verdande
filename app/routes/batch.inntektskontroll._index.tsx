@@ -34,10 +34,10 @@ export default function BatchOpprett_index() {
           <label>Aar</label>
           <br />
           <input
-            aria-label="aar"
+            aria-label="Behandling År"
             name="aar"
             type="number"
-            placeholder="aar"
+            placeholder="År"
           />
         </div>
         <br />
