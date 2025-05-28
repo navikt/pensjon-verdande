@@ -12,23 +12,23 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("brevkodeBerorteSaker: ", updates.brevkodeBerorteSaker)
 
   const brevkoderSoker = {
-    AFPPrivat: updates.brevkodeSokerAFPPrivat,
-    Gjenlevendepensjon: updates.brevkodeSokerGjenlevendepensjon,
-    Uforetrygd: updates.brevkodeSokerUforetrygd,
     AlderGammeltRegelverk: updates.brevkodeSokerAlderGammeltRegelverk,
     AlderNyttRegelverk: updates.brevkodeSokerAlderNyttRegelverk,
+    Uforetrygd: updates.brevkodeSokerUforetrygd,
     Barnepensjon: updates.brevkodeSokerBarnepensjon,
     AFP: updates.brevkodeSokerAFP,
+    Gjenlevendepensjon: updates.brevkodeSokerGjenlevendepensjon,
+    AFPPrivat: updates.brevkodeSokerAFPPrivat,
   }
 
   const brevkoderBerorteSaker = {
-    AFPPrivat: updates.brevkodeBerorteSakerAFPPrivat,
-    Gjenlevendepensjon: updates.brevkodeBerorteSakerGjenlevendepensjon,
+    AlderGammeltRegelverk: updates.brevkodeBerorteSakerAlderGammeltRegelverk,
+    AlderNyttRegelverk: updates.brevkodeBerorteSakerAlderNyttRegelverk,
     Uforetrygd: updates.brevkodeBerorteSakerUforetrygd,
-    AlderGammeltRegelverk: updates.brevkodeBerorteSakerSokerAlderGammeltRegelverk,
-    AlderNyttRegelverk: updates.brevkodeBerorteSakerSokerAlderNyttRegelverk,
-    Barnepensjon: updates.brevkodeBerorteSakerSokerBarnepensjon,
-    AFP: updates.brevkodeBerorteSakerSokerAFP,
+    Barnepensjon: updates.brevkodeBerorteSakerBarnepensjon,
+    AFP: updates.brevkodeBerorteSakerAFP,
+    Gjenlevendepensjon: updates.brevkodeBerorteSakerGjenlevendepensjon,
+    AFPPrivat: updates.brevkodeBerorteSakerAFPPrivat,
   }
 
   const omregningRequest = {

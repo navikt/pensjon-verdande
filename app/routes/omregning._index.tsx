@@ -1,7 +1,6 @@
 import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from '@remix-run/react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
-  BodyShort,
   Box,
   Button,
   Checkbox,
@@ -85,7 +84,6 @@ export default function BatchOpprett_index() {
   const [selectedBrevkoderBerorteSakerGjenlevendepensjon, setselectedBrevkoderBerorteSakerGjenlevendepensjon] = useState<ComboboxOption | undefined>(defaultbatchbrevtypeOption)
   const [selectedBrevkodeBerorteSakerAFPPrivat, setselectedBrevkodeBerorteSakerAFPPrivat] = useState<ComboboxOption | undefined>(defaultbatchbrevtypeOption)
 
-
   const [skalSamordne, setSkalSamordne] = useState(false)
   const [skalSendeBrevBerorteSaker, setSkalSendeBrevBerorteSaker] = useState(true)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
@@ -112,17 +110,6 @@ export default function BatchOpprett_index() {
     }
   }
 
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-  useEffect(() => {
-    handleInput()
-  })
   const optionsKravGjelder = [
     { value: 'REVURD', label: 'Revurdering' },
     { value: 'REGULERING', label: 'Regulering' },
