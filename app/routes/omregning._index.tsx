@@ -234,6 +234,40 @@ export default function BatchOpprett_index() {
     }
   }
 
+  function brevcheckbox(
+    navn: string,
+    skalVises: boolean,
+    tekst: string,
+    selectedBrevKode: ComboboxOption | undefined,
+    setselectedBrevKode: React.Dispatch<React.SetStateAction<ComboboxOption | undefined>>
+  ) {
+    return (
+      <Box
+        hidden={skalVises}
+        style={{ width: '50%' }}
+      >
+        <UNSAFE_Combobox
+          label = {tekst}
+          options={optionBatchbrevtyper}
+          isMultiSelect={false}
+          selectedOptions={selectedBrevKode ? [selectedBrevKode] : []}
+          onToggleSelected={(option) => {
+            const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
+            if (newOption === selectedBrevKode || newOption === undefined) {
+              setselectedBrevKode(defaultbatchbrevtypeOption)
+            }else {
+              setselectedBrevKode(newOption)
+            }
+          }}
+          name='brevkode'
+          shouldAutocomplete={true}
+          size={'small'}
+        />
+        <input hidden={true} name={navn} value={selectedBrevKode?.value} readOnly={true}/>
+      </Box>
+    )
+  }
+
   return (
     <div>
       <h1>Omregn ytelser</h1>
@@ -241,7 +275,7 @@ export default function BatchOpprett_index() {
         <BodyShort>
           Behandling for Omregning av ytelser (tidligere BPEN093)
         </BodyShort>
-        <Link href='https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Omregning.html'
+        <Link href='https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlinger/Felles/Omregning.html'
               target='_blank'>Dokumentasjon</Link>
       </Box>
       <Tabs defaultValue='Omregning'>
@@ -422,159 +456,58 @@ export default function BatchOpprett_index() {
                       Skal bestille brev
                     </Checkbox>
 
-                    <Box
-                      hidden={!skalBestilleBrev}
-                      style={{ width: '50%' }}
-                    >
-                      <UNSAFE_Combobox
-                        label='Velg brevkode for Alder, gammelt regelverk'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBrevkodeSokerAlderGammeltRegelverk ? [selectedBrevkodeSokerAlderGammeltRegelverk] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBrevkodeSokerAlderGammeltRegelverk || newOption === undefined) {
-                            setselectedBrevkodeSokerAlderGammeltRegelverk(defaultbatchbrevtypeOption)
-                            setHasError(true)
-                          }else {
-                            setselectedBrevkodeSokerAlderGammeltRegelverk(newOption)
-                          }
-                        }}
-                        error={hasError}
-                        name='brevkodeSokerOption'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeSokerAlderGammeltRegelverk" value={selectedBrevkodeSokerAlderGammeltRegelverk?.value} readOnly={true}/>
+                    {brevcheckbox(
+                      "brevkodeSokerAlderGammeltRegelverk",
+                      !skalBestilleBrev,
+                      "Velg brevkode for Alder, gammelt regelverk",
+                      selectedBrevkodeSokerAlderGammeltRegelverk,
+                      setselectedBrevkodeSokerAlderGammeltRegelverk
+                    )}
 
-                      <UNSAFE_Combobox
-                        label='Velg brevkode for Alder, nytt regelverk'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBrevkodeSokerAlderNyttRegelverk ? [selectedBrevkodeSokerAlderNyttRegelverk] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBrevkodeSokerAlderNyttRegelverk || newOption === undefined) {
-                            setselectedBrevkodeSokerAlderNyttRegelverk(defaultbatchbrevtypeOption)
-                            setHasError(true)
-                          }else {
-                            setselectedBrevkodeSokerAlderNyttRegelverk(newOption)
-                          }
-                        }}
-                        error={hasError}
-                        name='brevkodeSokerOption'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeSokerAlderNyttRegelverk" value={selectedBrevkodeSokerAlderNyttRegelverk?.value} readOnly={true}/>
+                    {brevcheckbox(
+                      "brevkodeSokerAlderNyttRegelverk",
+                      !skalBestilleBrev,
+                      "Velg brevkode for Alder, nytt regelverk",
+                      selectedBrevkodeSokerAlderNyttRegelverk,
+                      setselectedBrevkodeSokerAlderNyttRegelverk
+                    )}
+                    {brevcheckbox(
+                      "brevkodeSokerUforetrygd",
+                      !skalBestilleBrev,
+                      "Velg brevkode for Uføretrygd",
+                      selectedBrevkodeSokerUforetrygd,
+                      setselectedBrevkodeSokerUforetrygd
+                    )}
+                    {brevcheckbox(
+                      "brevkodeSokerBarnepensjon",
+                      !skalBestilleBrev,
+                      "Velg brevkode for Barnepensjon",
+                      selectedBrevkodeSokerBarnepensjon,
+                      setselectedBrevkodeSokerBarnepensjon
+                    )}
+                    {brevcheckbox(
+                      "brevkodeSokerAFP",
+                      !skalBestilleBrev,
+                      "Velg brevkode for AFP",
+                      selectedBrevkodeSokerAFP,
+                      setselectedBrevkodeSokerAFP
+                    )}
+                    {brevcheckbox(
+                      "brevkodeSokerGjenlevendepensjon",
+                      !skalBestilleBrev,
+                      "Velg brevkode for Gjenlevendepensjon",
+                      selectedBrevkodeSokerGjenlevendepensjon,
+                      setselectedBrevkodeSokerGjenlevendepensjon
+                    )}
+                    {brevcheckbox(
+                      "brevkodeSokerAFPPrivat",
+                      !skalBestilleBrev,
+                      "Velg brevkode for AFP Privat",
+                      selectedBrevkodeSokerAFPPrivat,
+                      setselectedBrevkodeSokerAFPPrivat
+                    )}
 
-                      <UNSAFE_Combobox
-                        label='Velg brevkode for Uføretrygd'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBrevkodeSokerUforetrygd ? [selectedBrevkodeSokerUforetrygd] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBrevkodeSokerUforetrygd || newOption === undefined) {
-                            setselectedBrevkodeSokerUforetrygd(defaultbatchbrevtypeOption)
-                            setHasError(true)
-                          }else {
-                            setselectedBrevkodeSokerUforetrygd(newOption)
-                          }
-                        }}
-                        error={hasError}
-                        name='brevkodeSokerOption'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeSokerUforetrygd" value={selectedBrevkodeSokerUforetrygd?.value} readOnly={true}/>
-
-                      <UNSAFE_Combobox
-                        label='Velg brevkode for barnepensjon'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBrevkodeSokerBarnepensjon ? [selectedBrevkodeSokerBarnepensjon] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBrevkodeSokerBarnepensjon || newOption === undefined) {
-                            setselectedBrevkodeSokerBarnepensjon(defaultbatchbrevtypeOption)
-                            setHasError(true)
-                          }else {
-                            setselectedBrevkodeSokerBarnepensjon(newOption)
-                          }
-                        }}
-                        error={hasError}
-                        name='brevkodeSokerOption'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeSokerBarnepensjon" value={selectedBrevkodeSokerBarnepensjon?.value} readOnly={true}/>
-
-                      <UNSAFE_Combobox
-                        label='Velg brevkode for AFP'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBrevkodeSokerAFP ? [selectedBrevkodeSokerAFP] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBrevkodeSokerAFP || newOption === undefined) {
-                            setselectedBrevkodeSokerAFP(defaultbatchbrevtypeOption)
-                            setHasError(true)
-                          }else {
-                            setselectedBrevkodeSokerAFP(newOption)
-                          }
-                        }}
-                        error={hasError}
-                        name='brevkodeSokerOption'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeSokerAFP" value={selectedBrevkodeSokerAFP?.value} readOnly={true}/>
-
-                      <UNSAFE_Combobox
-                        label='Velg brevkode for Gjenlevendepensjon'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBrevkodeSokerGjenlevendepensjon ? [selectedBrevkodeSokerGjenlevendepensjon] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBrevkodeSokerGjenlevendepensjon || newOption === undefined) {
-                            setselectedBrevkodeSokerGjenlevendepensjon(defaultbatchbrevtypeOption)
-                            setHasError(true)
-                          }else {
-                            setselectedBrevkodeSokerGjenlevendepensjon(newOption)
-                          }
-                        }}
-                        error={hasError}
-                        name='brevkodeSokerOption'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeSokerGjenlevendepensjon" value={selectedBrevkodeSokerGjenlevendepensjon?.value} readOnly={true}/>
-
-                      <UNSAFE_Combobox
-                        label='Velg brevkode for AFP Privat'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBrevkodeSokerAFPPrivat ? [selectedBrevkodeSokerAFPPrivat] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBrevkodeSokerAFPPrivat || newOption === undefined) {
-                            setselectedBrevkodeSokerAFPPrivat(defaultbatchbrevtypeOption)
-                            setHasError(true)
-                          }else {
-                            setselectedBrevkodeSokerAFPPrivat(newOption)
-                          }
-                        }}
-                        error={hasError}
-                        name='brevkodeSokerOption'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeSokerAFPPrivat" value={selectedBrevkodeSokerAFPPrivat?.value} readOnly={true}/>
-
-                    </Box>
-
+                    <br />
                     <Checkbox
                       defaultChecked={skalSendeBrevBerorteSaker}
                       name='sendBrevBerorteSaker'
@@ -585,29 +518,17 @@ export default function BatchOpprett_index() {
                     >
                       Send brev for berørte saker
                     </Checkbox>
-                    <Box
-                      hidden={!skalSendeBrevBerorteSaker}
-                      style={{ width: '50%' }}
-                    >
-                      <UNSAFE_Combobox
-                        label='Velg batchbrev for berørte saker'
-                        options={optionBatchbrevtyper}
-                        isMultiSelect={false}
-                        selectedOptions={selectedBatchbrevtypeBerorteSaker ? [selectedBatchbrevtypeBerorteSaker] : []}
-                        onToggleSelected={(option) => {
-                          const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-                          if (newOption === selectedBatchbrevtypeBerorteSaker || newOption === undefined) {
-                            setselectedBatchbrevtypeBerorteSaker(defaultbatchbrevtypeOption)
-                          }else {
-                            setselectedBatchbrevtypeBerorteSaker(newOption)
-                          }
-                        }}
-                        name='brevkodeBerorteSaker'
-                        shouldAutocomplete={true}
-                        size={'small'}
-                      />
-                      <input hidden={true} name="brevkodeBerorteSaker" value={selectedBatchbrevtypeBerorteSaker?.value} readOnly={true}/>
-                    </Box>
+
+                    {brevcheckbox(
+                      "brevkodeBerorteSaker",
+                      !skalSendeBrevBerorteSaker,
+                      "Velg batchbrev for berørte saker",
+                      selectedBatchbrevtypeBerorteSaker,
+                      setselectedBatchbrevtypeBerorteSaker
+                    )}
+
+
+
 
                   </CheckboxGroup>
                 </Box>
