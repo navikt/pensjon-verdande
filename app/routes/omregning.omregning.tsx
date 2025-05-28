@@ -10,7 +10,27 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   console.log("brevkodeSoker: ", updates.brevkodeSoker)
   console.log("brevkodeBerorteSaker: ", updates.brevkodeBerorteSaker)
-  
+
+  const brevkoderSoker = {
+    AFPPrivat: updates.brevkodeSokerAFPPrivat,
+    Gjenlevendepensjon: updates.brevkodeSokerGjenlevendepensjon,
+    Uforetrygd: updates.brevkodeSokerUforetrygd,
+    AlderGammeltRegelverk: updates.brevkodeSokerAlderGammeltRegelverk,
+    AlderNyttRegelverk: updates.brevkodeSokerAlderNyttRegelverk,
+    Barnepensjon: updates.brevkodeSokerBarnepensjon,
+    AFP: updates.brevkodeSokerAFP,
+  }
+
+  const brevkoderBerorteSaker = {
+    AFPPrivat: updates.brevkodeBerorteSakerAFPPrivat,
+    Gjenlevendepensjon: updates.brevkodeBerorteSakerGjenlevendepensjon,
+    Uforetrygd: updates.brevkodeBerorteSakerUforetrygd,
+    AlderGammeltRegelverk: updates.brevkodeBerorteSakerSokerAlderGammeltRegelverk,
+    AlderNyttRegelverk: updates.brevkodeBerorteSakerSokerAlderNyttRegelverk,
+    Barnepensjon: updates.brevkodeBerorteSakerSokerBarnepensjon,
+    AFP: updates.brevkodeBerorteSakerSokerAFP,
+  }
+
   const omregningRequest = {
     behandlingsnokkel: updates.behandlingsnokkel,
     omregningstidspunkt: updates.omregningstidspunkt,
@@ -32,9 +52,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     skalSamordne: updates.skalBestilleBrevOgSamordne === 'true',
     skalDistribuereUforevedtak: updates.skalDistribuereUforevedtak === 'true',
     sendBrevBerorteSaker: updates.sendBrevBerorteSaker === 'true',
-    brevkodeSoker: updates.brevkodeSoker,
-    brevkodeBerorteSaker: updates.brevkodeBerorteSaker,
-  } as unknown as OmregningRequest
+    brevkoderSoker: brevkoderSoker,
+    brevkoderBerorteSaker: brevkoderBerorteSaker,
+  }  as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
 

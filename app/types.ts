@@ -175,15 +175,9 @@ export type OmregningRequest = {
   brukPpen015: boolean
   oppgavePrefiks: string
   utsattTil: string
-  brevkodeSokerAlderGammeltRegelverk: string | unknown
-  brevkodeSokerAlderNyttRegelverk: string | unknown
-  brevkodeSokerUforetrygd: string | unknown
-  brevkodeSokerBarnepensjon: string | unknown
-  brevkodeSokerAFP: string | unknown
-  brevkodeSokerGjenlevendepensjon: string | unknown
-  brevkodeSokerAFPPrivat: string | unknown
 
-  brevkodeBerorteSaker: string | unknown
+  brevkoderSoker: {[key: string]: string}
+  brevkoderBerorteSaker: {[key: string]: string}
 }
 export type OmregningInit = {
   toleransegrenser: string[],
