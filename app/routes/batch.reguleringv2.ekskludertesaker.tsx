@@ -86,7 +86,7 @@ export default function EkskluderteSaker({}: {}) {
         <VStack gap="5">
           <Textarea label="Saksnummer"
                     name="saksnummerListe"
-                    description="Liste av saker som skal eksluderes fra reguleringen. Oppgis med linjeskift."
+                    description="Liste av saker som skal ekskluderes fra reguleringen. Oppgis med linjeskift."
                     value={saksnummerListe} onChange={(e) => setSaksnummerListe(e.target.value)} minRows={30}
                     style={{ width: '30em' }} resize />
           <VStack>
