@@ -26,15 +26,15 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     toleransegrenseSett: updates.toleransegrenseSett,
     oppgaveSett: updates.oppgaveSett,
     oppgavePrefiks: updates.oppgavePrefiks,
-    utsattTil:updates.datetimepicker as string,
+    utsattTil: updates.datetimepicker as string,
     skalSletteIverksettingsoppgaver: updates.skalSletteIverksettingsoppgaver === 'true',
     skalBestilleBrev: updates.skalBestilleBrevOgSamordne === 'true',
     skalSamordne: updates.skalBestilleBrevOgSamordne === 'true',
     skalDistribuereUforevedtak: updates.skalDistribuereUforevedtak === 'true',
     sendBrevBerorteSaker: updates.sendBrevBerorteSaker === 'true',
     brevkodeSoker: updates.brevkodeSoker,
-    brevkodeBerorteSaker: updates.brevkodeBerorteSaker
-  } as OmregningRequest
+    brevkodeBerorteSaker: updates.brevkodeBerorteSaker,
+  } as unknown as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
 

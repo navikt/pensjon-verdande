@@ -294,7 +294,7 @@ export default function BatchOpprett_index() {
           <Form id={'skjema'} action='omregning' method='POST' onSubmit={handleSubmit}>
             <VStack gap='6'>
 
-              <HGrid columns={2} gap='12'>
+              <HGrid columns={3} gap='12'>
 
                 <Box>
                   <TextField
@@ -376,9 +376,7 @@ export default function BatchOpprett_index() {
                     ))}
                   </Select>
                   <br />
-
                 </Box>
-
                 <Box>
                   <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
                     <Checkbox
@@ -446,8 +444,10 @@ export default function BatchOpprett_index() {
                       onChange={(event) => setSkalDistribuereUforevedtak(event.target.checked)}>
                       Skal distribuere uførevedtak
                     </Checkbox>
-
-                    <h3>Brev-parametere</h3>
+                  </CheckboxGroup>
+                </Box>
+                <Box>
+                  <CheckboxGroup legend={'Brevparametere'}>
                     <Checkbox
                       defaultChecked={skalBestilleBrev}
                       name='skalBestilleBrev'
@@ -526,10 +526,6 @@ export default function BatchOpprett_index() {
                       selectedBatchbrevtypeBerorteSaker,
                       setselectedBatchbrevtypeBerorteSaker
                     )}
-
-
-
-
                   </CheckboxGroup>
                 </Box>
 
