@@ -9,8 +9,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
+  const eps2g = updates.eps2g === 'true'
+  const gjenlevende = updates.gjenlevende === 'true'
 
-  let response = await opprettBpen014(accessToken, + updates.aar)
+  let response = await opprettBpen014(accessToken, + updates.aar,eps2g, gjenlevende)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

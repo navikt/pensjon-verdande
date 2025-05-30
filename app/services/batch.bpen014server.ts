@@ -4,6 +4,8 @@ import { StartBatchResponse } from '~/types'
 export async function opprettBpen014(
   accessToken: string,
   aar: number,
+  eps2g : boolean,
+  gjenlevende : boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
     `${env.penUrl}/pen/api/inntektskontroll/opprett`,
@@ -16,6 +18,8 @@ export async function opprettBpen014(
       },
       body: JSON.stringify({
         aar: aar,
+        eps2g: eps2g,
+        gjenlevende: gjenlevende,
       }),
     },
   )

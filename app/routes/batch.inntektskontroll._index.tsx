@@ -2,6 +2,7 @@ import { Form, useSubmit } from '@remix-run/react'
 import { json } from '@remix-run/node'
 import { env } from '~/services/env.server'
 import React, { useEffect, useRef, useState } from 'react'
+import { Box, Checkbox, CheckboxGroup } from '@navikt/ds-react'
 
 export const loader = async () => {
   return json({
@@ -22,6 +23,11 @@ export default function BatchOpprett_index() {
     }
   }
 
+
+  const [eps2g, setEps2g] = useState(false)
+
+  const [gjenlevende, setGjenlevende] = useState(false)
+
   useEffect(() => {
     handleInput()
   })
@@ -40,7 +46,29 @@ export default function BatchOpprett_index() {
             placeholder="KontrollÅr"
           />
         </div>
-        <br />
+        <Box>
+          <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {
+            console.log('change')
+          }}>
+            <Checkbox
+              name='eps2g'
+              value={eps2g}
+              onChange={(event) => setEps2g(event.target.checked)}
+            >
+              Inntektskontroll for ektefelle/samboer (2G)
+            </Checkbox>
+
+            <Checkbox
+              name='gjenlevende'
+              value={gjenlevende}
+              onChange={(event) => setGjenlevende(event.target.checked)}
+            >
+              Inntektskontroll for gjenlevende
+            </Checkbox>
+
+          </CheckboxGroup>
+        </Box>
+            <br />
         <p>
           <button type="submit" disabled={isClicked} onClick={handleSubmit}>
             Opprett
