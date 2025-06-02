@@ -621,31 +621,55 @@ export default function BatchOpprett_index() {
                     {skalDistribuereUforevedtak &&
                       <List.Item>Skal distribuere uførevedtak: {skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</List.Item>}
                     <br />
+
                     {skalBestilleBrev &&
-                      <List.Item>Skal bestille brev for søker: {skalBestilleBrev ? 'Ja' : 'Nei'}</List.Item>}
-                    {skalBestilleBrev &&
-                      <>
-                        <List.Item>Batchbrev for Alder gammelt regelverk: {selectedBrevkodeSokerAlderGammeltRegelverk?.value}</List.Item>
-                        <List.Item>Batchbrev for Alder nytt regelverk: {selectedBrevkodeSokerAlderNyttRegelverk?.value}</List.Item>
-                        <List.Item>Batchbrev for Uføretrygd: {selectedBrevkodeSokerUforetrygd?.value}</List.Item>
-                        <List.Item>Batchbrev for Barnepensjon: {selectedBrevkodeSokerBarnepensjon?.value}</List.Item>
-                        <List.Item>Batchbrev for AFP: {selectedBrevkodeSokerAFP?.value}</List.Item>
-                        <List.Item>Batchbrev for Gjenlevendepensjon: {selectedBrevkodeSokerGjenlevendepensjon?.value}</List.Item>
-                        <List.Item>Batchbrev for AFP Privat: {selectedBrevkodeSokerAFPPrivat?.value}</List.Item>
-                      </>
+                      <List.Item><b>Skal bestille brev for søker: {skalBestilleBrev ? 'Ja' : 'Nei'}</b></List.Item>}
+
+                    {skalBestilleBrev && selectedBrevkodeSokerAlderGammeltRegelverk && selectedBrevkodeSokerAlderGammeltRegelverk.value !== 'not set' &&
+                    <List.Item>Batchbrev for Alder gammelt regelverk: {selectedBrevkodeSokerAlderGammeltRegelverk.value}</List.Item>
                     }
+                    {skalBestilleBrev && selectedBrevkodeSokerAlderNyttRegelverk && selectedBrevkodeSokerAlderNyttRegelverk.value !== 'not set' &&
+                    <List.Item>Batchbrev for Alder nytt regelverk: {selectedBrevkodeSokerAlderNyttRegelverk.value}</List.Item>
+                    }
+                    {skalBestilleBrev && selectedBrevkodeSokerUforetrygd && selectedBrevkodeSokerUforetrygd.value !== 'not set' &&
+                    <List.Item>Batchbrev for Uføretrygd: {selectedBrevkodeSokerUforetrygd.value}</List.Item>
+                    }
+                    {skalBestilleBrev && selectedBrevkodeSokerBarnepensjon && selectedBrevkodeSokerBarnepensjon.value !== 'not set' &&
+                    <List.Item>Batchbrev for Barnepensjon: {selectedBrevkodeSokerBarnepensjon.value}</List.Item>
+                    }
+                    {skalBestilleBrev && selectedBrevkodeSokerAFP && selectedBrevkodeSokerAFP.value !== 'not set' &&
+                    <List.Item>Batchbrev for AFP: {selectedBrevkodeSokerAFP.value}</List.Item>
+                    }
+                    {skalBestilleBrev && selectedBrevkodeSokerGjenlevendepensjon && selectedBrevkodeSokerGjenlevendepensjon.value !== 'not set' &&
+                    <List.Item>Batchbrev for Gjenlevendepensjon: {selectedBrevkodeSokerGjenlevendepensjon.value}</List.Item>
+                    }
+                    {skalBestilleBrev && selectedBrevkodeSokerAFPPrivat && selectedBrevkodeSokerAFPPrivat.value !== 'not set' &&
+                    <List.Item>Batchbrev for AFP Privat: {selectedBrevkodeSokerAFPPrivat.value}</List.Item>
+                    }
+
                     {skalSendeBrevBerorteSaker &&
-                      <List.Item>Send brev for berørte saker: {skalSendeBrevBerorteSaker ? 'Ja' : 'Nei'}</List.Item>}
-                    {skalSendeBrevBerorteSaker &&
-                      <>
-                        <List.Item>Batchbrev for Alder gammelt regelverk: {selectedBrevkoderBerorteSakerAlderGammeltRegelverk?.value}</List.Item>
-                        <List.Item>Batchbrev for Alder nytt regelverk: {selectedBrevkoderBerorteSakerAlderNyttRegelverk?.value}</List.Item>
-                        <List.Item>Batchbrev for Uføretrygd: {selectedBrevkoderBerorteSakerUforetrygd?.value}</List.Item>
-                        <List.Item>Batchbrev for Barnepensjon: {selectedBrevkoderBerorteSakerBarnepensjon?.value}</List.Item>
-                        <List.Item>Batchbrev for AFP: {selectedBrevkoderBerorteSakerAFP?.value}</List.Item>
-                        <List.Item>Batchbrev for Gjenlevendepensjon: {selectedBrevkoderBerorteSakerGjenlevendepensjon?.value}</List.Item>
-                        <List.Item>Batchbrev for AFP Privat: {selectedBrevkodeBerorteSakerAFPPrivat?.value}</List.Item>
-                      </>
+                      <List.Item><b>Send brev for berørte saker: {skalSendeBrevBerorteSaker ? 'Ja' : 'Nei'}</b></List.Item>}
+
+                    {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerAlderGammeltRegelverk && selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value !== 'not set' &&
+                      <List.Item>Batchbrev for Alder gammelt regelverk: {selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value}</List.Item>
+                    }
+                    {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerAlderNyttRegelverk && selectedBrevkoderBerorteSakerAlderNyttRegelverk.value !== 'not set' &&
+                    <List.Item>Batchbrev for Alder nytt regelverk: {selectedBrevkoderBerorteSakerAlderNyttRegelverk.value}</List.Item>
+                    }
+                    {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerUforetrygd && selectedBrevkoderBerorteSakerUforetrygd.value !== 'not set' &&
+                    <List.Item>Batchbrev for Uføretrygd: {selectedBrevkoderBerorteSakerUforetrygd.value}</List.Item>
+                    }
+                    {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerBarnepensjon && selectedBrevkoderBerorteSakerBarnepensjon.value !== 'not set' &&
+                    <List.Item>Batchbrev for Barnepensjon: {selectedBrevkoderBerorteSakerBarnepensjon.value}</List.Item>
+                    }
+                    {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerAFP && selectedBrevkoderBerorteSakerAFP.value !== 'not set' &&
+                    <List.Item>Batchbrev for AFP: {selectedBrevkoderBerorteSakerAFP.value}</List.Item>
+                    }
+                    {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerGjenlevendepensjon && selectedBrevkoderBerorteSakerGjenlevendepensjon.value !== 'not set' &&
+                    <List.Item>Batchbrev for Gjenlevendepensjon: {selectedBrevkoderBerorteSakerGjenlevendepensjon.value}</List.Item>
+                    }
+                    {skalSendeBrevBerorteSaker && selectedBrevkodeBerorteSakerAFPPrivat && selectedBrevkodeBerorteSakerAFPPrivat.value !== 'not set' &&
+                    <List.Item>Batchbrev for AFP Privat: {selectedBrevkodeBerorteSakerAFPPrivat.value}</List.Item>
                     }
                     <br />
 
