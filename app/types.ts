@@ -165,20 +165,21 @@ export type OmregningRequest = {
   omregneAFP: boolean
   behandleApneKrav: boolean
   brukFaktoromregning: boolean
-  brukKjoreplan: boolean
   opprettAlleOppgaver: boolean
   sjekkYtelseFraAvtaleland: boolean
   kravGjelder: string
   kravArsak: string
   toleransegrenseSett: string
   oppgaveSett: string
-  brukPpen015: boolean
   oppgavePrefiks: string
-  utsattTil: string
+
+  brevkoderSoker: {[key: string]: string}
+  brevkoderBerorteSaker: {[key: string]: string}
 }
 export type OmregningInit = {
   toleransegrenser: string[],
   oppgaveSett: string[],
+  batchbrevtyper: string[],
 }
 export type OmregningInput = {
   saker: string[]
