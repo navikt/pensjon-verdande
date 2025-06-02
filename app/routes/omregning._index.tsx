@@ -449,6 +449,7 @@ export default function BatchOpprett_index() {
                 </Box>
                 <Box>
                   <CheckboxGroup legend={'Brevparametere'}>
+                    Ved å <b>ikke</b> angi brev for berørte saker vil default brevkode bli brukt.
                     <HGrid columns={2} gap='12'>
                      <Box
                        padding="4"
