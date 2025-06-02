@@ -24,8 +24,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     oppgavePrefiks: updates.oppgavePrefiks,
     utsattTil:updates.datetimepicker as string,
     skalSletteIverksettingsoppgaver: updates.skalSletteIverksettingsoppgaver === 'true',
-    skalBestilleBrev: updates.skalBestilleBrevOgSamordne === 'true',
-    skalSamordne: updates.skalBestilleBrevOgSamordne === 'true',
+    skalBestilleBrev: updates.skalBestilleBrev === 'true',
+    skalSamordne: updates.skalSamordne === 'true',
     skalDistribuereUforevedtak: updates.skalDistribuereUforevedtak === 'true',
     sendBrevBerorteSaker: updates.sendBrevBerorteSaker === 'true',
   } as OmregningRequest
