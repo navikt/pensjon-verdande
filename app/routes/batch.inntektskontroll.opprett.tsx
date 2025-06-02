@@ -9,8 +9,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
-  const eps2g = updates.eps2g === 'true'
-  const gjenlevende = updates.gjenlevende === 'true'
+  const eps2g = formData.get('eps2g') === 'true'
+  const gjenlevende = formData.get('gjenlevende') === 'true'
+
+  console.log(eps2g, gjenlevende)
 
   let response = await opprettBpen014(accessToken, + updates.aar,eps2g, gjenlevende)
 
