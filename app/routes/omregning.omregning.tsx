@@ -8,9 +8,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
-  console.log("brevkodeSoker: ", updates.brevkodeSoker)
-  console.log("brevkodeBerorteSaker: ", updates.brevkodeBerorteSaker)
-
   const brevkoderSoker = {
     AlderGammeltRegelverk: updates.brevkodeSokerAlderGammeltRegelverk,
     AlderNyttRegelverk: updates.brevkodeSokerAlderNyttRegelverk,
