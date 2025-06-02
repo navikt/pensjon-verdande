@@ -462,7 +462,7 @@ export default function BatchOpprett_index() {
                          name='skalBestilleBrev'
                          value={skalBestilleBrev}
                          onChange={(event) => setSkalBestilleBrev(event.target.checked)}>
-                         Skal bestille brev
+                         Bestille brev
                        </Checkbox>
 
                        {brevcheckbox(
@@ -531,7 +531,7 @@ export default function BatchOpprett_index() {
                             setSkalSendeBrevBerorteSaker(event.target.checked)
                           }}
                         >
-                          Brev berørte saker
+                          Bestille brev berørte saker
                         </Checkbox>
 
                         {brevcheckbox(
