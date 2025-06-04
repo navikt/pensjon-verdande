@@ -67,6 +67,7 @@ export default function BatchOpprett_index() {
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
   const [skalBestilleBrev, setSkalBestilleBrev] = useState(false)
+  const [skalIverksettOnline, setSkalIverksettOnline] = useState(false)
 
   const [selectedBrevkodeSokerAlderGammeltRegelverk, setselectedBrevkodeSokerAlderGammeltRegelverk] = useState<ComboboxOption | undefined>(defaultbatchbrevtypeOption)
   const [selectedBrevkodeSokerAlderNyttRegelverk, setselectedBrevkodeSokerAlderNyttRegelverk] = useState<ComboboxOption | undefined>(defaultbatchbrevtypeOption)
@@ -395,6 +396,15 @@ export default function BatchOpprett_index() {
                       onChange={(event) => setBehandleApneKrav(event.target.checked)}
                     >
                       Behandle åpne krav
+                    </Checkbox>
+
+                    <Checkbox
+                      defaultChecked={skalIverksettOnline}
+                      name='skalIverksettOnline'
+                      value={skalIverksettOnline}
+                      onChange={(event) => setSkalIverksettOnline(event.target.checked)}
+                    >
+                      Iverksett Online
                     </Checkbox>
 
                     <Checkbox
