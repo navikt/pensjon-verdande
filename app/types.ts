@@ -172,6 +172,7 @@ export type OmregningRequest = {
   toleransegrenseSett: string
   oppgaveSett: string
   oppgavePrefiks: string
+  skalIverksettOnline: boolean
 
   brevkoderSoker: {[key: string]: string}
   brevkoderBerorteSaker: {[key: string]: string}
