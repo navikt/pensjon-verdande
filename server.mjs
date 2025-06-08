@@ -1,10 +1,9 @@
-import { createRequestHandler } from '@remix-run/express'
-import express from 'express'
+import { createRequestHandler } from "@remix-run/express";
+import compression from "compression";
+import express from "express";
+import morgan from "morgan";
 import PinoHttp from 'pino-http'
 import pino from 'pino'
-
-// notice that the result of `remix build` is "just a module"
-import * as build from './build/index.js'
 
 const logger = pino({
   serializers: {
@@ -34,15 +33,34 @@ const logger = pino({
   },
 })
 
-const app = express()
+
+const remixHandler = createRequestHandler({
+  build: await import("./build/server/index.js"),
+});
+
+const app = express();
+
 app.use(PinoHttp({ logger: logger }))
-app.use(express.static('public'))
+app.use(compression());
 
-app.get(['/internal/live', '/internal/ready'], (_, res) => res.sendStatus(200))
+// http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
+app.disable("x-powered-by");
 
-// and your app is "just a request handler"
-app.all('*', createRequestHandler({ build }))
+ // Vite fingerprints its assets so we can cache forever.
+app.use(
+  "/assets",
+  express.static("build/client/assets", { immutable: true, maxAge: "1y" })
+);
+
+// Everything else (like favicon.ico) is cached for an hour. You may want to be
+// more aggressive with this caching.
+app.use(express.static("build/client", { maxAge: "1h" }));
+
+app.use(morgan("tiny"));
+
+// handle SSR requests
+app.all("*", remixHandler);
 
 app.listen(8080, () => {
-  logger.info('App listening on http://localhost:8080')
-})
+    console.log(`Express server listening at http://localhost:8080`)
+});
