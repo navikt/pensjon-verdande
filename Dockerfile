@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY node_modules/ node_modules/
 COPY build/ build/
-COPY server.mjs .
+COPY server.ts .
 
 EXPOSE 8080
 
-CMD ["./server.mjs"]
+CMD ["./server.ts"]
