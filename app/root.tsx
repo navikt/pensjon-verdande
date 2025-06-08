@@ -44,10 +44,12 @@ export default function App() {
 
   const { env, navIdent } = useLoaderData<typeof loader>()
 
+  let title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
+
   return (
     <html lang='en'>
     <head>
-      <title>Verdande</title>
+      <title>{title}</title>
       <meta charSet='utf-8' />
       <meta name='viewport' content='width=device-width, initial-scale=1' />
       <Meta />
@@ -66,7 +68,12 @@ export default function App() {
         </InternalHeader>
       ) : (
         <InternalHeader>
-          <InternalHeader.Title as='h1'>Verdande</InternalHeader.Title>
+          <InternalHeader.Title as='h1'>
+            Verdande
+            <span className="header-environment-postscript">
+              {env.toUpperCase()}
+            </span>
+          </InternalHeader.Title>
           <Spacer />
           <InternalHeader.User name={navIdent ? navIdent : ''} />
         </InternalHeader>

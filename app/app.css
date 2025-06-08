@@ -189,3 +189,10 @@ i {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.header-environment-postscript {
+  position: absolute;
+  top: 6px;
+  font-size: 16px;
+  color: var(--a-green-200);
+}
