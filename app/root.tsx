@@ -11,7 +11,6 @@ import {
   useLoaderData,
   useNavigation,
 } from '@remix-run/react'
-import navInternalStyles from '@navikt/ds-css-internal/dist/index.css'
 import navStyles from '@navikt/ds-css/dist/index.css'
 
 import appStylesHref from './app.css'
@@ -29,7 +28,6 @@ export const links: LinksFunction = () => {
         { rel: 'icon', href: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧝‍♀️</text></svg>' },
         { rel: 'stylesheet', href: cssBundleHref },
         { rel: 'stylesheet', href: navStyles },
-        { rel: 'stylesheet', href: navInternalStyles },
         { rel: 'stylesheet', href: appStylesHref },
       ]
       : []),
