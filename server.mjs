@@ -1,7 +1,6 @@
 import { createRequestHandler } from "@remix-run/express";
 import compression from "compression";
 import express from "express";
-import morgan from "morgan";
 import PinoHttp from 'pino-http'
 import pino from 'pino'
 
@@ -56,7 +55,7 @@ app.use(
 // more aggressive with this caching.
 app.use(express.static("build/client", { maxAge: "1h" }));
 
-app.use(morgan("tiny"));
+app.get(['/internal/live', '/internal/ready'], (_, res) => res.sendStatus(200))
 
 // handle SSR requests
 app.all("*", remixHandler);
