@@ -3,7 +3,7 @@ import { authenticator } from '~/services/auth.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   return await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
+    failureRedirect: '/auth/microsoft',
     successRedirect: '/dashboard',
   })
 }

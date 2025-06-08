@@ -56,7 +56,7 @@ function redirectUrl(request: Request) {
   let searchParams = new URLSearchParams([
     ['redirectTo', new URL(request.url).pathname],
   ])
-  return `/login?${searchParams}`
+  return `/auth/microsoft?${searchParams}`
 }
 
 export async function requireAccessToken(request: Request) {

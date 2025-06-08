@@ -4,6 +4,6 @@ import { authenticator } from '~/services/auth.server'
 export const loader = ({ request }: LoaderFunctionArgs) => {
   return authenticator.authenticate('azuread', request, {
     successRedirect: '/dashboard',
-    failureRedirect: '/login',
+    failureRedirect: '/auth/microsoft',
   })
 }
