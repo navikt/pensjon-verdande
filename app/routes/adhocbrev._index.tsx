@@ -1,6 +1,7 @@
 import { Form, useSubmit } from 'react-router';
 import React, { useEffect, useRef, useState } from 'react'
 import { Select } from '@navikt/ds-react'
+import { env } from '~/services/env.server'
 
 export const loader = async () => {
   return {
