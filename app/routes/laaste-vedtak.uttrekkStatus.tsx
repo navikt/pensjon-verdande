@@ -2,8 +2,8 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 import type { LaasteVedtakUttrekkStatus } from '~/laaste-vedtak.types'
 
 import { env } from '~/services/env.server'
-import { logger } from '../../server.mjs'
 import { requireAccessToken } from '~/services/auth.server'
+import { logger } from '~/services/logger.server'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {

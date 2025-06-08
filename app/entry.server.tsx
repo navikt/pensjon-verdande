@@ -5,10 +5,7 @@ import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import pino from 'pino'
-import { ecsFormat } from '@elastic/ecs-pino-format'
-
-const logger = pino(ecsFormat())
+import { logger } from '~/services/logger.server'
 
 const ABORT_DELAY = 120_000;
 

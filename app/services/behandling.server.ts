@@ -1,7 +1,6 @@
 import type { BehandlingDto, BehandlingerPage, DashboardResponse, DetaljertFremdriftDTO } from '~/types'
 import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
-import { logger } from '../../server.mjs'
 
 export async function getDashboardSummary(
   accessToken: string,

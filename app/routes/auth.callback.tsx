@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs} from '@remix-run/node';
 import { redirect } from '@remix-run/node'
 import { authenticator, commitSession, getSession } from '~/services/auth.server'
-import { logger } from '../../server.mjs'
+import { logger } from '~/services/logger.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   try {

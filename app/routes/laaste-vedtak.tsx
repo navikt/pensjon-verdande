@@ -47,7 +47,7 @@ import {
 } from '~/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
 import { LaasOppResultat } from '~/laas-opp.types'
-import { logger } from '../../server.mjs'
+import { logger } from '~/services/logger.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
 
