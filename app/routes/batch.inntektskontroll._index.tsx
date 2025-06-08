@@ -1,13 +1,11 @@
 import { Form, useSubmit } from '@remix-run/react'
-import { json } from '@remix-run/node'
-import { env } from '~/services/env.server'
 import React, { useEffect, useRef, useState } from 'react'
 import { Box, Checkbox, CheckboxGroup } from '@navikt/ds-react'
 
 export const loader = async () => {
-  return json({
+  return {
     env: env.env,
-  })
+  }
 }
 
 export default function BatchOpprett_index() {

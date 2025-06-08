@@ -9,13 +9,14 @@ import submit = Simulate.submit
 import { useSubmit } from '@remix-run/react'
 import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   return {}
 }
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   const data = await request.json() as FormType
 
@@ -48,7 +49,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   }
 
   return {success: true, action: data.action}
-}
+})
 
 
 export default function Avsluttendeaktiviteter() {

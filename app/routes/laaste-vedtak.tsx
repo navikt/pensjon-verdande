@@ -48,6 +48,7 @@ import {
 import { useSort } from '~/hooks/useSort'
 import { LaasOppResultat } from '~/laas-opp.types'
 import { logger } from '~/services/logger.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
 
@@ -659,11 +660,11 @@ function AutoReloadUttrekkStatus({ behandlingId, uttrekkStatus, setUttrekkStatus
   return null
 }
 
-export async function getLaasteVedtakSummary(
+export const getLaasteVedtakSummary = serverOnly$(async(
   accessToken: string,
   team: string | null,
   aksjonspunkt: string | null,
-): Promise<LaasteVedtakUttrekkSummary> {
+): Promise<LaasteVedtakUttrekkSummary> => {
 
   const url = new URL(`${env.penUrl}/api/laaste-vedtak`)
   if (team !== null) {
@@ -689,8 +690,4 @@ export async function getLaasteVedtakSummary(
     logger.error(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }
-}
-
-
-
-
+})

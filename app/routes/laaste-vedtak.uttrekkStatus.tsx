@@ -4,6 +4,7 @@ import type { LaasteVedtakUttrekkStatus } from '~/laaste-vedtak.types'
 import { env } from '~/services/env.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { logger } from '~/services/logger.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -15,10 +16,10 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
   return await getUttrekkStatus(accessToken, behandlingId)
 }
 
-async function getUttrekkStatus(
+const getUttrekkStatus = serverOnly$(async(
   accessToken: string,
   behandlingId: string,
-): Promise<LaasteVedtakUttrekkStatus> {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/laaste-vedtak/status/${behandlingId}`,
@@ -37,5 +38,4 @@ async function getUttrekkStatus(
     logger.error(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }
-}
-
+})

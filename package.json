@@ -3,11 +3,11 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build": "remix vite:build",
     "build:server": "tsc --project server/tsconfig.json",
-    "dev": "remix dev",
+    "dev": "remix vite:dev",
     "fetch-secrets": "./fetch-secrets.sh",
-    "start": "remix-serve build",
+    "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
   },
   "prettier": {
@@ -20,7 +20,6 @@
     "@navikt/aksel-icons": "^7.21.1",
     "@navikt/ds-css": "^7.21.1",
     "@navikt/ds-react": "^7.21.1",
-    "@remix-run/css-bundle": "^2.16.6",
     "@remix-run/express": "^2.9.1",
     "@remix-run/node": "^2",
     "@remix-run/react": "^2.16.6",
@@ -47,7 +46,10 @@
     "@types/react": "^18.3.21",
     "@types/react-dom": "^18.3.7",
     "eslint": "^9.28.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-env-only": "^3.0.3",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "engines": {
     "node": ">=18.0.0"

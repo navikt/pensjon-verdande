@@ -1,5 +1,4 @@
 import type { LoaderFunctionArgs } from '@remix-run/node'
-import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 
 import { getBehandling } from '~/services/behandling.server'
@@ -25,7 +24,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  return json({ behandling, aktivitet })
+  return { behandling, aktivitet }
 }
 
 export default function Behandling() {

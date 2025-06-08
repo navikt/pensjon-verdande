@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import type { SakOppsummeringLaasOpp } from '~/laas-opp.types'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -10,11 +11,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return await hentSak(accessToken, data.sakId)
 }
 
-async function hentSak(
+const hentSak = serverOnly$(async(
   accessToken: string,
   sakId: string,
-): Promise<SakOppsummeringLaasOpp | null> {
-
+) => {
   const response = await fetch(
     `${env.penUrl}/api/behandling/laas-opp/hentSak`,
     {
@@ -37,7 +37,7 @@ async function hentSak(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
+})
 
 
 

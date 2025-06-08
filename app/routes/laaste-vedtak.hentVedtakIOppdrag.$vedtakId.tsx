@@ -5,6 +5,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import { VedtakYtelsekomponenter } from '~/laaste-vedtak.types'
 import invariant from 'tiny-invariant'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -14,10 +15,10 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
   return await getVedtakIOppdrag(accessToken, params.vedtakId)
 }
 
-async function getVedtakIOppdrag(
+const getVedtakIOppdrag = serverOnly$(async(
   accessToken: string,
   vedtakId: string,
-): Promise<VedtakYtelsekomponenter> {
+): Promise<VedtakYtelsekomponenter> => {
 
   const response = await fetch(
     `${env.penUrl}/api/laaste-vedtak/hentVedtakIOppdrag/${vedtakId}`,
@@ -35,5 +36,4 @@ async function getVedtakIOppdrag(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
+})

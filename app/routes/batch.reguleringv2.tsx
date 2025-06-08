@@ -6,6 +6,7 @@ import React from 'react'
 import type { ReguleringDetaljer } from '~/regulering.types'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
+import { serverOnly$ } from 'vite-env-only/macros'
 import { env } from '~/services/env.server'
 
 
@@ -56,9 +57,9 @@ export default function OpprettReguleringBatchRoute() {
   )
 }
 
-export async function getReguleringDetaljer(
+export const getReguleringDetaljer = serverOnly$(async (
   accessToken: string,
-): Promise<ReguleringDetaljer> {
+): Promise<ReguleringDetaljer> => {
 
   const url = new URL(`${env.penUrl}/api/vedtak/regulering/detaljer`)
   const response = await fetch(
@@ -78,7 +79,7 @@ export async function getReguleringDetaljer(
     console.log(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }
-}
+})
 
 function getCurrentStep(currentPathName: string) {
   switch (currentPathName.split("/").pop()) {

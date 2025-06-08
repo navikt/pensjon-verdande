@@ -3,6 +3,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import invariant from 'tiny-invariant'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -14,10 +15,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return await pauseOrkestrering(accessToken, params.behandlingId)
 }
 
-async function pauseOrkestrering(
+const pauseOrkestrering = serverOnly$(async(
   accessToken: string,
   behandlingId: string,
-) {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/pause`,
@@ -38,7 +39,4 @@ async function pauseOrkestrering(
     const error = await response.text()
     throw new Error(error)
   }
-
-}
-
-
+})

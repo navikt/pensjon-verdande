@@ -3,6 +3,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import { AggregerteFeilmeldinger, ReguleringStatistikk } from '~/regulering.types'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -10,9 +11,9 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
   return await hentReguleringStatistikk(accessToken)
 }
 
-async function hentReguleringStatistikk(
+const hentReguleringStatistikk = serverOnly$(async(
   accessToken: string,
-): Promise<ReguleringStatistikk> {
+): Promise<ReguleringStatistikk> => {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/arbeidstabell/statistikk`,
@@ -30,6 +31,4 @@ async function hentReguleringStatistikk(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
-
+})

@@ -2,7 +2,6 @@ import type { LinksFunction } from '@remix-run/node'
 
 import {
   Links,
-  LiveReload,
   Meta,
   NavLink,
   Outlet,
@@ -11,11 +10,10 @@ import {
   useLoaderData,
   useNavigation,
 } from '@remix-run/react'
-import navStyles from '@navikt/ds-css/dist/index.css'
+import navStyles from '@navikt/ds-css/dist/index.css?url'
 
-import appStylesHref from './app.css'
+import appStylesHref from './app.css?url'
 
-import { cssBundleHref } from '@remix-run/css-bundle'
 import { Accordion, HStack, InternalHeader, Spacer, VStack } from '@navikt/ds-react'
 import { json, LoaderFunctionArgs } from '@remix-run/node'
 import { env } from '~/services/env.server'
@@ -23,24 +21,22 @@ import { getNAVident } from '~/services/auth.server'
 
 export const links: LinksFunction = () => {
   return [
-    ...(cssBundleHref
-      ? [
+    ...(
+      [
         { rel: 'icon', href: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧝‍♀️</text></svg>' },
-        { rel: 'stylesheet', href: cssBundleHref },
         { rel: 'stylesheet', href: navStyles },
         { rel: 'stylesheet', href: appStylesHref },
-      ]
-      : []),
+      ]),
   ]
 }
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const navIdent = await getNAVident(request)
 
-  return json({
+  return {
     env: env.env,
     navIdent: navIdent,
-  })
+  }
 }
 
 export default function App() {
@@ -204,7 +200,6 @@ export default function App() {
 
     <ScrollRestoration />
     <Scripts />
-    <LiveReload />
     </body>
     </html>
   )

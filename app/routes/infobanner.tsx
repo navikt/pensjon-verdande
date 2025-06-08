@@ -21,6 +21,7 @@ import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import { ExternalLinkIcon, FloppydiskIcon } from '@navikt/aksel-icons'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -195,7 +196,7 @@ export default function InfoBannerPage() {
   }
 }
 
-async function hentInfoBanner(accessToken: string): Promise<Infobanner> {
+const hentInfoBanner = serverOnly$(async (accessToken: string): Promise<Infobanner> => {
   const response = await fetch(`${env.penUrl}/api/verdande/infobanner`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -209,12 +210,12 @@ async function hentInfoBanner(accessToken: string): Promise<Infobanner> {
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
-}
+})
 
-async function oppdaterInfoBanner(
+const oppdaterInfoBanner = serverOnly$(async(
   infoBanner: Infobanner,
   accessToken: string,
-): Promise<OppdaterInfoBannerResponse> {
+): Promise<OppdaterInfoBannerResponse> => {
   const response = await fetch(`${env.penUrl}/api/verdande/infobanner`, {
     method: 'PUT',
     body: JSON.stringify({
@@ -235,7 +236,7 @@ async function oppdaterInfoBanner(
     throw new Error(response.statusText)
   }
   return { erOppdatert: true }
-}
+})
 
 type Infobanner = {
   validToDate: string | null

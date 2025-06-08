@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import type { LaasOppResultat } from '~/laas-opp.types'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -10,10 +11,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return await settTilManuell(accessToken, data.kravId)
 }
 
-async function settTilManuell(
+const settTilManuell = serverOnly$(async(
   accessToken: string,
   kravId: string,
-): Promise<LaasOppResultat> {
+): Promise<LaasOppResultat> => {
 
   const response = await fetch(
     `${env.penUrl}/api/behandling/laas-opp/settTilManuell/${kravId}`,
@@ -32,10 +33,4 @@ async function settTilManuell(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
-
-
-
-
-
+})

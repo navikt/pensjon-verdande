@@ -5,6 +5,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export default function SokosSPKMottakPage() {
 
@@ -52,11 +53,11 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return await hentMot(accessToken, formData.get('fomYear')!,formData.get('fomMonth')!)
 }
 
-async function hentMot(
+const hentMot = serverOnly$(async(
   accessToken: string,
   fomYear: FormDataEntryValue,
   fomMonth: FormDataEntryValue,
-): Promise<ActionData> {
+): Promise<ActionData> => {
 
   const response = await fetch(
     `${env.penUrl}/api/utbetaling/spkmottak/antall?fomYear=${fomYear}&fomMonth=${fomMonth}`,
@@ -81,7 +82,7 @@ async function hentMot(
       error: await response.text(),
     }
   }
-}
+})
 
 type ActionData = {
   antall: string | null

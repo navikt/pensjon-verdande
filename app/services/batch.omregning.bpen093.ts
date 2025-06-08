@@ -1,8 +1,9 @@
 import type { OmregningInit, OmregningInput, OmregningRequest, OmregningSakerPage, StartBatchResponse } from '~/types'
 import { env } from '~/services/env.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
-export async function opprettOmregningbehandling(
-  accessToken: string, payload: OmregningRequest): Promise<StartBatchResponse> {
+export const opprettOmregningbehandling = serverOnly$(async(
+  accessToken: string, payload: OmregningRequest): Promise<StartBatchResponse> => {
   const response = await fetch(`${env.penUrl}/api/behandling/omregning/opprett`, {
     method: 'POST',
     headers: {
@@ -18,11 +19,11 @@ export async function opprettOmregningbehandling(
   } else {
     throw new Error()
   }
-}
+})
 
-export async function hentOmregningInit(
+export const hentOmregningInit = serverOnly$(async(
   accessToken: string,
-): Promise<OmregningInit> {
+): Promise<OmregningInit> => {
   const response = await fetch(`${env.penUrl}/api/behandling/omregning/init`, {
     method: 'GET',
     headers: {
@@ -37,13 +38,13 @@ export async function hentOmregningInit(
   } else {
     throw new Error()
   }
-}
+})
 
-export async function hentOmregningInput(
+export const hentOmregningInput = serverOnly$(async(
   accessToken: string,
   page: number,
   size: number,
-): Promise<OmregningSakerPage> {
+): Promise<OmregningSakerPage> => {
   const response = await fetch(`${env.penUrl}/api/behandling/omregning/input?page=${page}&size=${size}`, {
     method: 'GET',
     headers: {
@@ -58,12 +59,12 @@ export async function hentOmregningInput(
   } else {
     throw new Error()
   }
-}
+})
 
-export async function oppdaterOmregningInput(
+export const oppdaterOmregningInput = serverOnly$(async(
   accessToken: string,
   request: { saker: number[] },
-): Promise<OmregningInput> {
+): Promise<OmregningInput> => {
   const response = await fetch(`${env.penUrl}/api/behandling/omregning/input`, {
     method: 'POST',
     headers: {
@@ -79,4 +80,4 @@ export async function oppdaterOmregningInput(
   } else {
     throw new Error()
   }
-}
+})

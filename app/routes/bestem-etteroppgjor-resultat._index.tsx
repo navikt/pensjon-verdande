@@ -2,8 +2,8 @@ import { Select } from '@navikt/ds-react'
 import React from 'react'
 import { ActionFunctionArgs, redirect } from '@remix-run/node'
 import { Form } from '@remix-run/react'
-import { env } from '~/services/env.server'
 import { requireAccessToken } from '~/services/auth.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export default function BestemEtteroppgjorResultat() {
   return <div>
@@ -25,7 +25,7 @@ export default function BestemEtteroppgjorResultat() {
   </div>
 }
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const formData = await request.formData()
@@ -52,4 +52,4 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log(response.status)
 
   return null;
-}
+})

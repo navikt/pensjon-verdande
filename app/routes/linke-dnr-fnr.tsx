@@ -5,6 +5,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export default function LinkeDnrFnrPage() {
 
@@ -45,19 +46,19 @@ export default function LinkeDnrFnrPage() {
 }
 
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs) => {
 
   const formData = await request.formData()
   const accessToken = await requireAccessToken(request)
 
   return await linkDnrFnr(accessToken, formData.get('gammelIdent'), formData.get('nyIdent'))
-}
+})
 
-async function linkDnrFnr(
+const linkDnrFnr = serverOnly$(async(
   accessToken: string,
   gammelIdent: FormDataEntryValue | null,
   nyIdent: FormDataEntryValue | null,
-): Promise<ActionData> {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/saksbehandling/person/oppdaterFodselsnummer`,
@@ -86,18 +87,9 @@ async function linkDnrFnr(
       error: await response.text(),
     }
   }
-}
+})
 
 type ActionData = {
   success: boolean
   error: string | null
 }
-
-
-
-
-
-
-
-
-

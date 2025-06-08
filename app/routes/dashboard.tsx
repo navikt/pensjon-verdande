@@ -1,5 +1,4 @@
 import type { ActionFunctionArgs } from '@remix-run/node'
-import { json } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import { getDashboardSummary } from '~/services/behandling.server'
 import { useLoaderData } from '@remix-run/react'
@@ -22,7 +21,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  return json({ dashboardResponse: dashboardResponse })
+  return { dashboardResponse: dashboardResponse }
 }
 
 export default function Dashboard() {

@@ -4,6 +4,7 @@ import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import invariant from 'tiny-invariant'
 import { DetaljertFremdriftDTO } from '~/types'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -13,10 +14,10 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
   return await hentOrkestreringsStatistikk(accessToken, params.behandlingId)
 }
 
-async function hentOrkestreringsStatistikk(
+const hentOrkestreringsStatistikk = serverOnly$(async(
   accessToken: string,
   behandlingId: string,
-): Promise<DetaljertFremdriftDTO> {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/detaljer`,
@@ -34,6 +35,4 @@ async function hentOrkestreringsStatistikk(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
-
+})

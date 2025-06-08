@@ -1,10 +1,11 @@
 import type { StartBatchResponse } from '~/types'
 import { env } from '~/services/env.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
-export async function opprettOmsorgsopptjeningUttrekk(
+export const opprettOmsorgsopptjeningUttrekk = serverOnly$(async(
   accessToken: string,
   bestilling: { verdier: string[] },
-): Promise<StartBatchResponse> {
+): Promise<StartBatchResponse> => {
   const response = await fetch(
     `${env.penUrl}/api/omsorgsopptjening/uttrekk/opprett`,
     {
@@ -22,5 +23,4 @@ export async function opprettOmsorgsopptjeningUttrekk(
   } else {
     throw new Error()
   }
-}
-
+})

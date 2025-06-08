@@ -1,9 +1,7 @@
 import type { ActionFunctionArgs } from '@remix-run/node'
-
-
-import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
-
+import { requireAccessToken } from '~/services/auth.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
 
@@ -13,12 +11,12 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return null
 }
 
-async function oppdaterKanIverksettes(
+const oppdaterKanIverksettes = serverOnly$(async(
   accessToken: string,
   behandlingId: string,
   kravId: string,
   kanIverksettes: string,
-) {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/laaste-vedtak/iverksett/${behandlingId}/${kravId}?kanIverksettes=${kanIverksettes}`,
@@ -35,4 +33,4 @@ async function oppdaterKanIverksettes(
   if (!response.ok) {
     throw new Error()
   }
-}
+})

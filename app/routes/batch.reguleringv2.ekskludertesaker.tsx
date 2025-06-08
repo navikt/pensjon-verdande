@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react'
 import { useFetcher, useLoaderData } from '@remix-run/react'
 import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'
 import { useActionData } from 'react-router'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -104,9 +105,9 @@ export default function EkskluderteSaker({}: {}) {
 }
 
 
-async function hentEksluderteSaker(
+const hentEksluderteSaker = serverOnly$(async(
   accessToken: string,
-): Promise<EkskluderteSakerResponse> {
+): Promise<EkskluderteSakerResponse> => {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/eksludertesaker`,
@@ -124,12 +125,12 @@ async function hentEksluderteSaker(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
-}
+})
 
-async function oppdaterEkskluderteSaker(
+const oppdaterEkskluderteSaker = serverOnly$(async(
   accessToken: string,
   ekskluderteSaker: number[],
-) {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/eksludertesaker`,
@@ -152,7 +153,7 @@ async function oppdaterEkskluderteSaker(
     throw new Error(response.statusText)
   }
   return { erOppdatert: true }
-}
+})
 
 type OppdaterEksluderteSakerResponse = {
   erOppdatert: boolean

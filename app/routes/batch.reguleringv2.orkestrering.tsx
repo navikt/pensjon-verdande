@@ -25,6 +25,7 @@ import {
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
 import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -276,11 +277,11 @@ export function AggregerteFeilmeldingerTabell() {
 }
 
 
-async function startOrkestrering(
+const startOrkestrering = serverOnly$(async(
   accessToken: string,
   antallFamilier: string | undefined,
   kjorOnline: boolean,
-) {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/orkestrering/startv2`,
@@ -304,7 +305,4 @@ async function startOrkestrering(
   return {
     success: response.ok,
   }
-}
-
-
-
+})

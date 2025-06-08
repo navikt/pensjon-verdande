@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
-import type { LaasOppResultat } from '~/laas-opp.types'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -10,10 +10,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return await laasOppVedtak(accessToken, data.vedtakId)
 }
 
-async function laasOppVedtak(
+const laasOppVedtak = serverOnly$(async(
   accessToken: string,
   vedtakId: string,
-): Promise<LaasOppResultat> {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/behandling/laas-opp/laasOppVedtak/${vedtakId}`,
@@ -32,10 +32,4 @@ async function laasOppVedtak(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
-
-
-
-
-
+})

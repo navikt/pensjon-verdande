@@ -3,6 +3,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import { AggregerteFeilmeldinger } from '~/regulering.types'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -10,9 +11,9 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
   return await hentAggregerteFeilmeldinger(accessToken)
 }
 
-async function hentAggregerteFeilmeldinger(
+const hentAggregerteFeilmeldinger = serverOnly$(async (
   accessToken: string,
-): Promise<AggregerteFeilmeldinger> {
+): Promise<AggregerteFeilmeldinger> => {
 
   const response = await fetch(
     `${env.penUrl}/api/vedtak/regulering/aggregerteFeilmeldinger`,
@@ -31,6 +32,4 @@ async function hentAggregerteFeilmeldinger(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
-
+})

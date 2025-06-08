@@ -3,6 +3,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
 
@@ -12,10 +13,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return await laasOpp(accessToken, data.vedtakId)
 }
 
-async function laasOpp(
+const laasOpp = serverOnly$(async(
   accessToken: string,
   vedtakId: string,
-) {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/laaste-vedtak/laas-opp/${vedtakId}`,
@@ -32,6 +33,4 @@ async function laasOpp(
   return {
     success: response.ok,
   }
-}
-
-
+})

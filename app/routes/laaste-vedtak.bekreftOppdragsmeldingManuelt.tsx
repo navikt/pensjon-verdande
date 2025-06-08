@@ -1,8 +1,8 @@
 import type { ActionFunctionArgs } from '@remix-run/node'
 
-
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
+import { serverOnly$ } from 'vite-env-only/macros'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -11,10 +11,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return await bekreftOppdragsmeldingManuelt(accessToken, data.vedtakId)
 }
 
-async function bekreftOppdragsmeldingManuelt(
+const bekreftOppdragsmeldingManuelt = serverOnly$(async(
   accessToken: string,
   vedtakId: string,
-): Promise<boolean> {
+) => {
 
   const response = await fetch(
     `${env.penUrl}/api/laaste-vedtak/bekreftOppdragsmeldingManuelt/${vedtakId}`,
@@ -33,5 +33,4 @@ async function bekreftOppdragsmeldingManuelt(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
+})
