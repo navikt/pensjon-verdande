@@ -37,5 +37,5 @@ export function decodeBehandling(string: string) {
   let oversetting = oversettinger.find((value) => value[0] === string)
   return oversetting
     ? oversetting[1]
-    : splitOnCapitals(string.replace(/Behandling$/, ''))
+    : splitOnCapitals(string.replace(/Behandling$/, ''));
 }

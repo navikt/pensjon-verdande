@@ -58,7 +58,7 @@ app.use(express.static("build/client", { maxAge: "1h" }));
 app.get(['/internal/live', '/internal/ready'], (_, res) => res.sendStatus(200))
 
 // handle SSR requests
-app.all("*", remixHandler);
+app.all('/{*splat}', remixHandler);
 
 app.listen(8080, () => {
     console.log(`Express server listening at http://localhost:8080`)
