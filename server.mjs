@@ -4,8 +4,19 @@ import express from "express";
 import PinoHttp from 'pino-http'
 import pino from 'pino'
 
-const logger = pino({
+let pinoHttp = PinoHttp({
+  logger: pino(),
   serializers: {
+    err: pino.stdSerializers.wrapErrorSerializer((res) => {
+      return {
+        statusCode: res.raw.statusCode,
+        // Allowlist useful headers
+        headers: {
+          'content-type': res.raw.headers['content-type'],
+          'content-length': res.raw.headers['content-length'],
+        }
+      };
+    }),
     req: pino.stdSerializers.wrapRequestSerializer((req) => {
       return {
         id: req.raw.id,
@@ -32,14 +43,13 @@ const logger = pino({
   },
 })
 
-
 const remixHandler = createRequestHandler({
   build: await import("./build/server/index.js"),
 });
 
 const app = express();
 
-app.use(PinoHttp({ logger: logger }))
+app.use(pinoHttp)
 app.use(compression());
 
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
