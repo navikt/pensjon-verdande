@@ -11,6 +11,9 @@ let pinoHttp = PinoHttp({
       return req.url.startsWith('/internal/');
     }
   },
+  customSuccessMessage: function (req, res) {
+    return `${req.method} ${req.url} ${res.statusCode}`
+  },
   serializers: {
     err: pino.stdSerializers.wrapErrorSerializer((res) => {
       return {
