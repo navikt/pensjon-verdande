@@ -6,6 +6,11 @@ import pino from 'pino'
 
 let pinoHttp = PinoHttp({
   logger: pino(),
+  autoLogging: {
+    ignore: (req) => {
+      return req.url.startsWith('/internal/');
+    }
+  },
   serializers: {
     err: pino.stdSerializers.wrapErrorSerializer((res) => {
       return {
