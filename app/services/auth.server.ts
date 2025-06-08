@@ -1,7 +1,6 @@
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
 import { redirect, createCookieSessionStorage } from '@remix-run/node'
-import * as process from 'process'
 import { exchange } from '~/services/obo.server'
 import { env } from '~/services/env.server'
 import type { JwtPayload } from 'jwt-decode'
