@@ -342,10 +342,13 @@ export default function BehandlingCard(props: Props) {
                     {props.behandling.funksjonellIdentifikator}
                   </Entry>
 
-                  <Entry labelText={'Stoppet'}>
-                    {formatIsoTimestamp(props.behandling.stoppet)}
-                  </Entry>
-
+                  {props.behandling.stoppet ? (
+                    <Entry labelText={'Stoppet'}>
+                      {formatIsoTimestamp(props.behandling.stoppet)}
+                    </Entry>
+                  ) : (
+                    <></>
+                  )}
                   <Entry labelText={'Prioritet'}>
                     {props.behandling.prioritet}
                   </Entry>
@@ -357,9 +360,22 @@ export default function BehandlingCard(props: Props) {
                   <Entry labelText={'Siste kjøring'}>
                     {formatIsoTimestamp(props.behandling.sisteKjoring)}
                   </Entry>
-                  <Entry labelText={'Utsatt til'}>
-                    {formatIsoTimestamp(props.behandling.utsattTil)}
-                  </Entry>
+                  {props.behandling.ferdig ? (
+                      <Entry labelText={'Ferdig'}>
+                        {formatIsoTimestamp(props.behandling.ferdig)}
+                      </Entry>
+                  ) : (
+                    <Entry labelText={'Utsatt til'}>
+                      {formatIsoTimestamp(props.behandling.utsattTil)}
+                    </Entry>
+                  )}
+                  {props.behandling.slettes ? (
+                    <Entry labelText={'Slettes'}>
+                      {formatIsoTimestamp(props.behandling.slettes)}
+                    </Entry>
+                  ) : (
+                    <></>
+                  )}
                 </Card.Grid>
                 <Card.Grid>
                   {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}

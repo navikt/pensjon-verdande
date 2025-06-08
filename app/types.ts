@@ -22,6 +22,8 @@ export type BehandlingDto = {
   forrigeBehandlingId: number | null
   sisteKjoring: string
   utsattTil: string | null
+  ferdig: string | null
+  slettes: string | null
   stoppet: string | null
   opprettet: string
   ansvarligTeam: string | null
