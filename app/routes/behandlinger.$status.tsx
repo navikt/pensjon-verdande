@@ -1,5 +1,5 @@
-import { ActionFunctionArgs, json } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { ActionFunctionArgs } from 'react-router';
+import { useLoaderData } from 'react-router';
 
 import { getBehandlinger } from '~/services/behandling.server'
 

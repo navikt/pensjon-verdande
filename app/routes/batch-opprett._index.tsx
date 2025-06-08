@@ -1,4 +1,4 @@
-import { Form, NavLink, useSubmit } from '@remix-run/react'
+import { Form, NavLink, useSubmit } from 'react-router';
 import React, { useState, useRef, useEffect } from 'react'
 import { Select } from '@navikt/ds-react'
 

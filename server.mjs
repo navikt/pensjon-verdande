@@ -1,4 +1,4 @@
-import { createRequestHandler } from "@remix-run/express";
+import { createRequestHandler } from "@react-router/express";
 import compression from "compression";
 import express from "express";
 import PinoHttp from 'pino-http'

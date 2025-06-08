@@ -1,7 +1,7 @@
 import { Select } from '@navikt/ds-react'
 import React from 'react'
-import { ActionFunctionArgs, redirect } from '@remix-run/node'
-import { Form } from '@remix-run/react'
+import { ActionFunctionArgs, redirect } from 'react-router';
+import { Form } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { serverOnly$ } from 'vite-env-only/macros'
 

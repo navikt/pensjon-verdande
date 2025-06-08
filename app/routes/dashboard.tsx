@@ -1,7 +1,7 @@
-import type { ActionFunctionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { getDashboardSummary } from '~/services/behandling.server'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData } from 'react-router';
 import { HGrid } from '@navikt/ds-react'
 import {
   ClipboardFillIcon,

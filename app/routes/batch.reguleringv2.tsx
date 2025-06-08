@@ -1,6 +1,6 @@
-import { ActionFunctionArgs, redirect } from '@remix-run/node'
+import { ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { Outlet, useLoaderData, useLocation, useRevalidator } from '@remix-run/react'
+import { Outlet, useLoaderData, useLocation, useRevalidator } from 'react-router';
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
 import React from 'react'
 import type { ReguleringDetaljer } from '~/regulering.types'

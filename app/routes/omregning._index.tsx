@@ -1,4 +1,4 @@
-import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from '@remix-run/react'
+import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from 'react-router';
 import React, { useRef, useState } from 'react'
 import {
   Box,
@@ -22,12 +22,12 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { PlayIcon } from '@navikt/aksel-icons'
-import type { LoaderFunctionArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { hentOmregningInit, hentOmregningInput } from '~/services/batch.omregning.bpen093'
 import type { OmregningSakerPage } from '~/types'
 import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
-import type { HTMLFormMethod } from '@remix-run/router'
+import type { HTMLFormMethod } from 'react-router';
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)

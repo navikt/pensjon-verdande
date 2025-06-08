@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs} from '@remix-run/node';
-import { redirect } from '@remix-run/node'
+import type { ActionFunctionArgs } from 'react-router';
+import { redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen005 } from '~/services/batch.bpen005.server'
 

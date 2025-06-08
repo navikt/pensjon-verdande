@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs} from '@remix-run/node';
-import { json, redirect } from '@remix-run/node'
+import type { ActionFunctionArgs } from 'react-router';
+import { redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import {
   endreKjorelopIverksettVedtakBehandlinger,
@@ -9,7 +9,7 @@ import {
 } from '~/services/batch.bpen068.server'
 import ReguleringUttrekk from '~/components/regulering/regulering-uttrekk'
 import FortsettAvhengigeReguleringBehandlinger from '~/components/regulering/regulering-fortsett-avhengige'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData } from 'react-router';
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import type { BehandlingerPage } from '~/types'
@@ -93,7 +93,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  return json({ behandlingerUttrekk, behandlingerOrkestrering })
+  return { behandlingerUttrekk, behandlingerOrkestrering }
 }
 
 export default function OpprettReguleringBatchRoute() {

@@ -1,6 +1,5 @@
-import type { LoaderFunctionArgs } from '@remix-run/node'
-import { defer } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import type { LoaderFunctionArgs } from 'react-router';
+import { useLoaderData } from 'react-router';
 
 import {
   getBehandling,
@@ -30,12 +29,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     )
   }
 
-  return defer(
-    {
+  return {
       behandling,
       avhengigeBehandlinger: avhengigeBehandlinger,
       detaljertFremdrift: detaljertFremdrift,
-    })
+    }
 }
 
 export default function Behandling() {

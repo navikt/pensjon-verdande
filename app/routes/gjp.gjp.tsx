@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from '@remix-run/node'
+import { ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettGjpUtvidetrett } from '~/services/batch.gjp-utvidetrett.server'
 

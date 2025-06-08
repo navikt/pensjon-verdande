@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from '@remix-run/node'
+import { ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import { getReguleringDetaljer } from '~/routes/batch.reguleringv2'
@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import { ConfirmationModal } from '~/routes/batch.reguleringv2.administrerbehandlinger'
 import { Simulate } from 'react-dom/test-utils'
 import submit = Simulate.submit
-import { useSubmit } from '@remix-run/react'
+import { useSubmit } from 'react-router';
 import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'
 import { serverOnly$ } from 'vite-env-only/macros'

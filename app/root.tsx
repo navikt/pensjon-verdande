@@ -1,4 +1,4 @@
-import type { LinksFunction } from '@remix-run/node'
+import type { LinksFunction } from 'react-router';
 
 import {
   Links,
@@ -9,13 +9,13 @@ import {
   ScrollRestoration,
   useLoaderData,
   useNavigation,
-} from '@remix-run/react'
+} from 'react-router';
 import navStyles from '@navikt/ds-css/dist/index.css?url'
 
 import appStylesHref from './app.css?url'
 
 import { Accordion, HStack, InternalHeader, Spacer, VStack } from '@navikt/ds-react'
-import { json, LoaderFunctionArgs } from '@remix-run/node'
+import { LoaderFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
 import { getNAVident } from '~/services/auth.server'
 

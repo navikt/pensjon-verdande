@@ -3,7 +3,7 @@ import type { AktivitetDTO, BehandlingDto } from '~/types'
 import Card from '~/components/card/Card'
 import { Entry } from '~/components/entry/Entry'
 import { formatIsoTimestamp } from '~/common/date'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router';
 import { Box, CopyButton, HStack, Tooltip } from '@navikt/ds-react'
 
 export type Props = {

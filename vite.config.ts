@@ -1,7 +1,7 @@
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from 'vite'
 import { envOnlyMacros } from "vite-env-only"
-import { vitePlugin as remix } from '@remix-run/dev'
+import { reactRouter } from '@react-router/dev/vite';
 
 export default defineConfig({
   server: {
@@ -9,10 +9,7 @@ export default defineConfig({
   },
   plugins: [
     envOnlyMacros(),
-    remix({
-      ignoredRouteFiles: ['**/.*'],
-      serverModuleFormat: 'cjs',
-    }),
+    reactRouter(),
     tsconfigPaths(),
   ],
 })

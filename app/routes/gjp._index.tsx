@@ -1,4 +1,4 @@
-import { Form, useSubmit } from '@remix-run/react'
+import { Form, useSubmit } from 'react-router';
 import { env } from '~/services/env.server'
 import React, { useEffect, useRef, useState } from 'react'
 import { Select } from '@navikt/ds-react'

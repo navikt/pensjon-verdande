@@ -1,6 +1,5 @@
-import type { LoaderFunctionArgs } from '@remix-run/node'
-import { defer } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import type { LoaderFunctionArgs } from 'react-router';
+import { useLoaderData } from 'react-router';
 
 import { getBehandlingInput } from '~/services/behandling.server'
 
@@ -18,9 +17,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (!output) {
     throw new Response('Not Found', { status: 404 })
   } else {
-    return defer({
+    return {
       output,
-    })
+    }
   }
 }
 

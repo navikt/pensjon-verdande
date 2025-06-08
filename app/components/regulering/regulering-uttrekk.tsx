@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react'
-import { Form, useSubmit } from '@remix-run/react'
+import { Form, useSubmit } from 'react-router';
 import { Checkbox } from '@navikt/ds-react'
 
 export default function ReguleringUttrekk() {

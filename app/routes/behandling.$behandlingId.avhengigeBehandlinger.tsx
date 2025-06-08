@@ -1,6 +1,5 @@
-import type { LoaderFunctionArgs } from '@remix-run/node'
-import { defer } from '@remix-run/node'
-import { Await, useLoaderData } from '@remix-run/react'
+import type { LoaderFunctionArgs } from 'react-router';
+import { Await, useLoaderData } from 'react-router';
 
 import { getAvhengigeBehandlinger } from '~/services/behandling.server'
 
@@ -30,10 +29,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     searchParams.get('sort'),
   )
 
-  return defer(
-    {
+  return {
       avhengigeBehandlinger,
-    })
+    }
 }
 
 export default function AvhengigeBehandlinger() {

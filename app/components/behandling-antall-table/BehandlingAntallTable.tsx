@@ -4,7 +4,7 @@ import React from 'react'
 import { Table } from '@navikt/ds-react'
 import { formatNumber } from '~/common/number'
 import { decodeBehandling } from '~/common/decodeBehandling'
-import { NavLink } from '@remix-run/react'
+import { NavLink } from 'react-router';
 
 type Props = {
   oppsummering: BehandlingAntall[]

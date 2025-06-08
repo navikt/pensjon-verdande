@@ -1,7 +1,7 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { Form } from '@remix-run/react'
-import type { ActionFunctionArgs } from '@remix-run/node'
+import { Form } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'

@@ -13,7 +13,7 @@ import {
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import { formatIsoTimestamp } from '~/common/date'
-import { Await, Link, Outlet, useFetcher, useLocation, useNavigate } from '@remix-run/react'
+import { Await, Link, Outlet, useFetcher, useLocation, useNavigate } from 'react-router';
 import { decodeBehandling } from '~/common/decodeBehandling'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,

@@ -1,9 +1,4 @@
-import {
-  Link,
-  useFetcher,
-  useRevalidator,
-  useSearchParams,
-} from '@remix-run/react'
+import { Link, useFetcher, useRevalidator, useSearchParams } from 'react-router';
 import {
   Alert,
   BodyLong,

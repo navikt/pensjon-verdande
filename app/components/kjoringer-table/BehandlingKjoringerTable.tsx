@@ -2,7 +2,7 @@ import type {BehandlingDto, BehandlingKjoringDTO, HalLink} from "~/types";
 import {useSort} from "~/hooks/useSort";
 import React from "react";
 import {CopyButton, Table, Tooltip} from "@navikt/ds-react";
-import {Link} from "@remix-run/react";
+import { Link } from "react-router";
 import {formatIsoTimestamp} from "~/common/date";
 import {formatNumber} from "~/common/number";
 import {ExternalLinkIcon} from "@navikt/aksel-icons";

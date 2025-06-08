@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { serverOnly$ } from 'vite-env-only/macros'

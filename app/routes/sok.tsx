@@ -1,9 +1,8 @@
-import type { ActionFunctionArgs} from '@remix-run/node';
-import { defer } from '@remix-run/node'
+import type { ActionFunctionArgs } from 'react-router';
 import { Search, VStack } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData } from 'react-router';
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -33,10 +32,9 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     behandlinger = null
   }
 
-  return defer(
-    {
+  return {
       behandlinger,
-    })
+    }
 }
 
 export default function Sok() {

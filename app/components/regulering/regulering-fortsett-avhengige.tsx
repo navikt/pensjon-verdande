@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Form, useSubmit } from '@remix-run/react'
+import { Form, useSubmit } from 'react-router';
 
 export default function FortsettAvhengigeReguleringBehandlinger() {
 

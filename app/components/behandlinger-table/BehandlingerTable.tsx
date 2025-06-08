@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
 import type { BehandlingDto, BehandlingerPage } from '~/types'
-import { Link, useFetcher, useSearchParams } from '@remix-run/react'
+import { Link, useFetcher, useSearchParams } from 'react-router';
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'

@@ -8,7 +8,7 @@ import type {
 } from '~/regulering.types'
 import { ArbeidstabellStatistikk } from '~/regulering.types'
 import React, { useEffect, useRef, useState } from 'react'
-import { Link, useFetcher, useOutletContext } from '@remix-run/react'
+import { Link, useFetcher, useOutletContext } from 'react-router';
 import { Alert, Button, Dropdown, HStack, Loader, Modal, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
 import { Entry } from '~/components/entry/Entry'
 import { DetaljertFremdriftDTO } from '~/types'

@@ -1,6 +1,5 @@
-import type { LoaderFunctionArgs } from '@remix-run/node'
-import { defer } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import type { LoaderFunctionArgs } from 'react-router';
+import { useLoaderData } from 'react-router';
 
 import {
   getBehandling,
@@ -20,10 +19,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  return defer(
-    {
+  return {
       behandling,
-    })
+    }
 }
 
 export default function BehandlingKjoringer() {

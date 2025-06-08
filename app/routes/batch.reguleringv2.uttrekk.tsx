@@ -16,7 +16,7 @@ import {
 import { Behandlingstatus } from '~/types'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { Entry } from '~/components/entry/Entry'
-import { Link, useFetcher, useOutletContext } from '@remix-run/react'
+import { Link, useFetcher, useOutletContext } from 'react-router';
 import { format, formatISO } from 'date-fns'
 import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
 

@@ -4,7 +4,7 @@ import { useSort } from '~/hooks/useSort'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
 import { findCommonAktivitetPrefixLength } from '~/common/string'
 import { formatIsoTimestamp } from '~/common/date'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router';
 
 interface Props {
   behandling: BehandlingDto

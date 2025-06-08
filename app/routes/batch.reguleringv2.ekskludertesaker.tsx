@@ -1,18 +1,17 @@
 import {
   ActionFunctionArgs,
-  unstable_createMemoryUploadHandler,
-  unstable_parseMultipartFormData,
-} from '@remix-run/node'
+} from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
 import type { EkskluderteSakerResponse } from '~/regulering.types'
 import React, { useEffect, useState } from 'react'
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData } from 'react-router';
 import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'
 import { useActionData } from 'react-router'
 import { serverOnly$ } from 'vite-env-only/macros'
 
+/*
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
@@ -159,4 +158,4 @@ type OppdaterEksluderteSakerResponse = {
   erOppdatert: boolean
 }
 
-
+*/
