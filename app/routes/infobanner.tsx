@@ -215,7 +215,6 @@ async function oppdaterInfoBanner(
   infoBanner: Infobanner,
   accessToken: string,
 ): Promise<OppdaterInfoBannerResponse> {
-  console.log(infoBanner)
   const response = await fetch(`${env.penUrl}/api/verdande/infobanner`, {
     method: 'PUT',
     body: JSON.stringify({

@@ -1,16 +1,13 @@
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
-import {
-  destroySession,
-  getSession,
-  sessionStorage,
-} from '~/services/session.server'
-import { redirect } from '@remix-run/node'
+import { redirect, createCookieSessionStorage } from '@remix-run/node'
 import * as process from 'process'
 import { exchange } from '~/services/obo.server'
 import { env } from '~/services/env.server'
 import type { JwtPayload } from 'jwt-decode'
 import { jwtDecode } from 'jwt-decode'
+import { type OAuth2Tokens, } from "arctic";
+
 
 type User = {
   accessToken: string
@@ -20,35 +17,44 @@ interface AzureADJwtPayload extends JwtPayload {
   NAVident?: string
 }
 
-function getUser(accessToken: string) {
-  return {
-    accessToken,
-  }
+function getUser(tokens: OAuth2Tokens, request: Request): Promise<User> {
+  return Promise.resolve({
+    accessToken: tokens.accessToken()
+  })
 }
 
-export let authenticator = new Authenticator<User>(sessionStorage)
+export let sessionStorage = createCookieSessionStorage({
+  cookie: {
+    name: '__session',
+    httpOnly: true,
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production', // enable this in prod only
+  },
+})
+
+export let { getSession, commitSession, destroySession } = sessionStorage
+
+export let authenticator = new Authenticator<User>()
 
 if (process.env.ENABLE_OAUTH20_CODE_FLOW && process.env.AZURE_CALLBACK_URL) {
   authenticator.use(
     new OAuth2Strategy(
       {
-        authorizationURL: env.tokenEnpoint.replace('token', 'authorize'),
-        tokenURL: env.tokenEnpoint,
-        clientID: env.clientId,
+        clientId: env.clientId,
         clientSecret: env.clientSecret,
-        callbackURL: process.env.AZURE_CALLBACK_URL,
-        scope: `openid offline_access api://${env.clientId}/.default`,
-        useBasicAuthenticationHeader: false, // defaults to false,
+
+        authorizationEndpoint: env.tokenEnpoint.replace('token', 'authorize'),
+        tokenEndpoint: env.tokenEnpoint,
+        redirectURI: process.env.AZURE_CALLBACK_URL,
+
+        scopes: ["openid", "offline_access", `api://${env.clientId}/.default`],
       },
-      async ({ accessToken }) => {
-        // here you can use the params above to get the user and return it
-        // what you do inside this and how you find the user is up to you
-        return getUser(accessToken)
+      async ({ tokens, request }) => {
+        return await getUser(tokens, request);
       },
     ),
-    // this is optional, but if you setup more than one OAuth2 instance you will
-    // need to set a custom name to each one
-    'azuread',
+    'entra-id',
   )
 }
 
@@ -59,14 +65,26 @@ function redirectUrl(request: Request) {
   return `/auth/microsoft?${searchParams}`
 }
 
+/**
+ * Returnerer en access token, om nødvendig redirekterer til innlogging. Har støtte for både nais-miljø og lokal
+ * utvikling
+ *
+ * - nais-miljø benytter Wonderwall og token kommer inn via authorization header.
+ * - lokal utvikling benytter oauth2 code flow og token kommer fra session cookie.
+ *
+ * Applikasjonen benytter On-Behalf-Of (OBO) flow og utveksler brukers access token for et nytt access token for
+ * å kalle API-er på vegne av brukeren.
+ */
 export async function requireAccessToken(request: Request) {
   let authorization = request.headers.get('authorization')
+
   if (authorization && authorization.toLowerCase().startsWith('bearer')) {
     let tokenResponse = await exchange(
       authorization.substring('bearer '.length),
       env.penScope,
     )
     return tokenResponse.access_token
+
   } else {
     const session = await getSession(request.headers.get('cookie'))
 

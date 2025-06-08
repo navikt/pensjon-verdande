@@ -1,6 +1,7 @@
 import type { BehandlingDto, BehandlingerPage, DashboardResponse, DetaljertFremdriftDTO } from '~/types'
 import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
+import { logger } from '../../server.mjs'
 
 export async function getDashboardSummary(
   accessToken: string,
@@ -67,7 +68,7 @@ export async function getBehandlinger(
     return (await response.json()) as BehandlingerPage
   } else {
     let body = await response.json()
-    console.log(`Feil ved kall til pen ${response.status}`, body)
+    logger.error(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }
 }

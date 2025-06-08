@@ -47,6 +47,7 @@ import {
 } from '~/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
 import { LaasOppResultat } from '~/laas-opp.types'
+import { logger } from '../../server.mjs'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
 
@@ -685,7 +686,7 @@ export async function getLaasteVedtakSummary(
     return (await response.json()) as LaasteVedtakUttrekkSummary
   } else {
     let body = await response.json()
-    console.log(`Feil ved kall til pen ${response.status}`, body)
+    logger.error(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }
 }

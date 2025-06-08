@@ -1,9 +1,9 @@
-import { ActionFunctionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from '@remix-run/node'
+import type { LaasteVedtakUttrekkStatus } from '~/laaste-vedtak.types'
 
-
-import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
-import { LaasteVedtakUttrekkStatus } from '~/routes/laaste-vedtak'
+import { logger } from '../../server.mjs'
+import { requireAccessToken } from '~/services/auth.server'
 
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
@@ -18,7 +18,7 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
 async function getUttrekkStatus(
   accessToken: string,
   behandlingId: string,
-): Promise<UttrekkStatus> {
+): Promise<LaasteVedtakUttrekkStatus> {
 
   const response = await fetch(
     `${env.penUrl}/api/laaste-vedtak/status/${behandlingId}`,
@@ -31,10 +31,10 @@ async function getUttrekkStatus(
   )
 
   if (response.ok) {
-    return (await response.json()) as UttrekkStatus
+    return (await response.json()) as LaasteVedtakUttrekkStatus
   } else {
     let body = await response.json()
-    console.log(`Feil ved kall til pen ${response.status}`, body)
+    logger.error(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }
 }

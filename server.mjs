@@ -6,7 +6,7 @@ import pino from 'pino'
 // notice that the result of `remix build` is "just a module"
 import * as build from './build/index.js'
 
-const logger = pino({
+export const logger = pino({
   serializers: {
     req: pino.stdSerializers.wrapRequestSerializer((req) => {
       return {

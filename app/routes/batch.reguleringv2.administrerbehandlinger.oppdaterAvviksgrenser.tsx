@@ -9,7 +9,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const data = await request.json()
-  console.log(accessToken)
   return await oppdaterAvviksgrenser(accessToken, data.newAvviksgrenser)
 }
 
