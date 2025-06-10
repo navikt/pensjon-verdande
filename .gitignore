@@ -6,3 +6,4 @@ node_modules
 .env
 .idea/
 .react-router/
+.DS_Store

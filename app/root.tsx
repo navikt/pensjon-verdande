@@ -18,22 +18,6 @@ import { Accordion, HStack, InternalHeader, Spacer, VStack } from '@navikt/ds-re
 import { LoaderFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
 import { getNAVident } from '~/services/auth.server'
-import { logger } from '~/services/logger.server'
-
-process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
-  console.error("Unhandled Rejection at:", p, "reason:", reason);
-
-  let stack = '';
-  if (reason && reason.stack) {
-    stack = reason.stack;
-  } else if (typeof reason === 'string') {
-    stack = reason;
-  } else {
-    stack = JSON.stringify(reason);
-  }
-
-  logger.error("Unhandled Promise Rejection", { reason, stack, promise: p });
-});
 
 export const links: LinksFunction = () => {
   return [

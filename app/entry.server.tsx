@@ -9,6 +9,21 @@ import { logger } from '~/services/logger.server'
 
 const ABORT_DELAY = 120_000;
 
+process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
+  logger.error("Unhandled Rejection at:", p, "reason:", reason);
+
+  let stack = '';
+  if (reason && reason.stack) {
+    stack = reason.stack;
+  } else if (typeof reason === 'string') {
+    stack = reason;
+  } else {
+    stack = JSON.stringify(reason);
+  }
+
+  logger.error("Unhandled Promise Rejection", { reason, stack, promise: p });
+});
+
 export function handleError(
   error: unknown,
   {
