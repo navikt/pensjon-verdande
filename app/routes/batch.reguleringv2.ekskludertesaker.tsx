@@ -31,6 +31,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   return await oppdaterEkskluderteSaker(accessToken, ekskluderteSaker)
 }
+*/
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -157,5 +158,3 @@ const oppdaterEkskluderteSaker = serverOnly$(async(
 type OppdaterEksluderteSakerResponse = {
   erOppdatert: boolean
 }
-
-*/
