@@ -1,4 +1,7 @@
 import { env } from '~/services/env.server'
+import NodeCache from 'node-cache'
+
+const oboTokenCache = new NodeCache()
 
 export type OnBehalfOfTokenResponse = {
   token_type: string
@@ -8,7 +11,12 @@ export type OnBehalfOfTokenResponse = {
   refresh_token: string
 }
 
-export async function exchange(assertion: String, scope: string) {
+export async function exchange(assertion: string, scope: string) {
+  let cachedOboToken = oboTokenCache.get(assertion)
+  if (cachedOboToken) {
+    return cachedOboToken as OnBehalfOfTokenResponse
+  }
+
   let details = {
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
     client_id: env.clientId,
@@ -34,7 +42,15 @@ export async function exchange(assertion: String, scope: string) {
   })
 
   if (response.ok) {
-    return (await response.json()) as OnBehalfOfTokenResponse
+    let oboToken = (await response.json()) as OnBehalfOfTokenResponse
+
+    // Holder tokenet litt lenger enn dets gyldighetstid, slik at cachen automatisk tømmes etter utløp.
+    // Obo-tokenet har samme eller kortere levetid enn access-tokenet som ble brukt for å hente det.
+    // Denne tjenesten skal aldri kalles med utløpte tokens, så de mellomlagrede tokenene vil alltid være gyldige når
+    // de returneres her.
+    oboTokenCache.set(assertion, oboToken, oboToken.expires_in + 60)
+
+    return oboToken
   } else {
     throw new Error(await response.text())
   }
