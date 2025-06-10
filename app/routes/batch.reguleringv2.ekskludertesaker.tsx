@@ -10,19 +10,26 @@ import { useFetcher, useLoaderData } from 'react-router';
 import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'
 import { useActionData } from 'react-router'
 import { serverOnly$ } from 'vite-env-only/macros'
+import { FileUpload, parseFormData } from '@mjackson/form-data-parser'
 
-/*
+
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
-  const uploadHandler = unstable_createMemoryUploadHandler({
-    maxPartSize: 1_500_000,
-  })
-  const formData = await unstable_parseMultipartFormData(request, uploadHandler)
 
-  const file = formData.get('saksnummerListe') as File
-  const saksnummerListe = (await file.text()) as string
+  const uploadHandler = async (fileUpload: FileUpload) => {
+    if (fileUpload.fieldName === "saksnummerListe") {
+      return fileUpload.text();
+    }
+  };
 
+  const formData = await parseFormData(
+    request,
+    uploadHandler
+  );
+
+  const saksnummerListe = formData.get('saksnummerListe') as string;
+  console.log("Saksnummerliste", saksnummerListe);
   const ekskluderteSaker = saksnummerListe
     .split('\n')
     .map((t: string) => t.trim())
@@ -31,7 +38,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   return await oppdaterEkskluderteSaker(accessToken, ekskluderteSaker)
 }
-*/
+
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
