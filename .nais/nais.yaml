@@ -52,6 +52,9 @@ spec:
       claims:
         groups:
           - id: {{ azure.grupper.drift }}
+          - id: {{ azure.grupper.verdande-les }}
+          - id: {{ azure.grupper.verdande-skriv }}
+          - id: {{ azure.grupper.verdande-admin }}
         extra:
           - NAVident
       replyURLs:

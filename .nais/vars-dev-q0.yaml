@@ -15,3 +15,7 @@ azure:
   tenant: trygdeetaten.no
   grupper:
     drift: '45095575-4a2b-4784-8f5d-c4ccfc9192ea' # 0000-GA-PENSJON_NDU - Nav drift og utvikling
+    verdande-les: c2e1d6a5-6a6d-4413-a924-cd44c9d059dd #Verdande les
+    verdande-skriv: 094d7338-2897-46a9-9672-f4a30aa9f315 #Verdande skriv
+    verdande-admin: ff6b81a5-6324-4213-b40d-246a2450b439 #Verdande admin
+

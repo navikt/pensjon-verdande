@@ -15,3 +15,6 @@ azure:
   tenant: nav.no
   grupper:
     drift: 'e1c41e4f-dc0f-4406-a8bc-2da00ef21f3c' # https://console.nav.cloud.nais.io/team/pensjon-verdande
+    verdande-les: d187a290-08a1-4acf-a53f-fe17e2e93bf9 #Verdande les
+    verdande-skriv: 30965367-457b-4f1e-93f0-ae756357297d #Verdande skriv
+    verdande-admin: b7148a64-ebc4-4e0a-9f45-ef742aee539c #Verdande admin
