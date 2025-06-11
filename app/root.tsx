@@ -1,4 +1,4 @@
-import type { LinksFunction } from 'react-router';
+import { LinksFunction } from 'react-router'
 
 import {
   Links,
@@ -14,10 +14,14 @@ import navStyles from '@navikt/ds-css/dist/index.css?url'
 
 import appStylesHref from './app.css?url'
 
-import { Accordion, HStack, InternalHeader, Spacer, VStack } from '@navikt/ds-react'
+import { Accordion, ActionMenu, HStack, InternalHeader, Spacer, VStack } from '@navikt/ds-react'
 import { LoaderFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
 import { getNAVident } from '~/services/auth.server'
+import {
+  BarChartIcon, BookIcon, ExternalLinkIcon,
+  MenuGridIcon,
+} from '@navikt/aksel-icons'
 
 export const links: LinksFunction = () => {
   return [
@@ -30,7 +34,7 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const navIdent = await getNAVident(request)
 
   return {
@@ -57,27 +61,66 @@ export default function App() {
     </head>
     <body>
     <VStack gap='0' style={{ width: '100%' }}>
-      {env === 'p' ? (
-        <InternalHeader className={'navds-tag--error-filled'}>
-          <InternalHeader.Title as='h1'>Verdande</InternalHeader.Title>
+      <InternalHeader className={env === 'p' ? 'navds-tag--error-filled' : ''}>
+        <InternalHeader.Title as='h1'>
+          Verdande
+          {env != 'p' ? (
+          <span className="header-environment-postscript">
+            {env.toUpperCase()}
+          </span>
+            ) : (<></>)
+          }
+        </InternalHeader.Title>
+        {env === 'p' ? (
           <InternalHeader.Title as='h1'>
             P R O D U K S J O N !
           </InternalHeader.Title>
-          <Spacer />
-          <InternalHeader.User name={navIdent ? navIdent : ''} />
-        </InternalHeader>
-      ) : (
-        <InternalHeader>
-          <InternalHeader.Title as='h1'>
-            Verdande
-            <span className="header-environment-postscript">
-              {env.toUpperCase()}
-            </span>
-          </InternalHeader.Title>
-          <Spacer />
-          <InternalHeader.User name={navIdent ? navIdent : ''} />
-        </InternalHeader>
-      )}
+        ) : (<></>)
+        }
+        <Spacer />
+
+        <ActionMenu>
+          <ActionMenu.Trigger>
+            <InternalHeader.Button>
+              <MenuGridIcon
+                fontSize="1.5rem"
+                title="Systemer og oppslagsverk"
+              />
+            </InternalHeader.Button>
+          </ActionMenu.Trigger>
+          <ActionMenu.Content>
+            <ActionMenu.Group label="Behandlingsløsningen">
+              <ActionMenu.Item
+                icon={<BookIcon />}
+              >
+                <a
+                  target="_blank"
+                  href={"https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html"}
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  Dokumentasjon
+                </a>
+                <ExternalLinkIcon/>
+
+              </ActionMenu.Item>
+              <ActionMenu.Item
+                icon={<BarChartIcon />}
+              >
+                <a
+                  target="_blank"
+                  href={"https://grafana.nav.cloud.nais.io/goto/mgXUC1LHg?orgId=1"}
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  Grafanadashboard
+                </a>
+                <ExternalLinkIcon/>
+              </ActionMenu.Item>
+            </ActionMenu.Group>
+          </ActionMenu.Content>
+        </ActionMenu>
+
+        <InternalHeader.User name={navIdent ? navIdent : ''} />
+      </InternalHeader>
       <HStack gap='0' wrap={false}>
         <div id='sidebar'>
           <nav>
