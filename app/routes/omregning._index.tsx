@@ -1,40 +1,39 @@
-import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from 'react-router';
+import type { HTMLFormMethod, LoaderFunctionArgs } from 'react-router'
+import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from 'react-router'
 import React, { useRef, useState } from 'react'
 import {
   Box,
   Button,
-  Checkbox,
   CheckboxGroup,
-  FormSummary,
   HGrid,
   Link,
   Loader,
   Modal,
   MonthPicker,
   Pagination,
-  Select,
   Table,
   Tabs,
   Textarea,
   TextField,
-  UNSAFE_Combobox,
   useMonthpicker,
   VStack,
 } from '@navikt/ds-react'
 import { PlayIcon } from '@navikt/aksel-icons'
-import type { LoaderFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { hentOmregningInit, hentOmregningInput } from '~/services/batch.omregning.bpen093'
-import type { OmregningSakerPage } from '~/types'
+import { hentOmregningInit, hentOmregningInput } from '~/services/batch.omregning.server'
+import type { OmregningInit, OmregningSakerPage } from '~/types'
 import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
-import type { HTMLFormMethod } from 'react-router';
+import OmregningSelector from '~/components/omregning/OmregningSelector'
+import ParameterCheckbox from '~/components/omregning/OmregningCheckbox'
+import BrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
+import OmregningOppsummering from '~/components/omregning/OmregningOppsummering'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   const omregningInit = await hentOmregningInit(
     accesstoken,
-  )
+  ) as OmregningInit
 
   let { searchParams } = new URL(request.url)
   let page = searchParams.get('page') ?? '0'
@@ -180,7 +179,6 @@ export default function BatchOpprett_index() {
     searchParams.set('page', (page - 1).toString())
     searchParams.set('size', omregningsaker?.size ? omregningsaker.size.toString() : '10')
     setSearchParams(searchParams)
-
   }
 
   function oppdaterOmregningInput() {
@@ -228,41 +226,6 @@ export default function BatchOpprett_index() {
         <Loader size='2xlarge' title='Laster data...' />
       )
     }
-  }
-
-  interface IProps {
-    navn: string,
-    skalVises: boolean,
-    tekst: string,
-    selectedBrevKode: ComboboxOption | undefined,
-    setselectedBrevKode: React.Dispatch<React.SetStateAction<ComboboxOption | undefined>>
-  }
-
-  const BrevCheckbox: React.FC<IProps> = ({ navn, skalVises, tekst, selectedBrevKode, setselectedBrevKode }) => {
-    return (
-      <Box
-        hidden={skalVises}
-      >
-        <UNSAFE_Combobox
-          label={tekst}
-          options={optionBatchbrevtyper}
-          isMultiSelect={false}
-          selectedOptions={selectedBrevKode ? [selectedBrevKode] : []}
-          onToggleSelected={(option) => {
-            const newOption = optionBatchbrevtyper.find(opt => opt.value === option)
-            if (newOption === selectedBrevKode || newOption === undefined) {
-              setselectedBrevKode(defaultbatchbrevtypeOption)
-            } else {
-              setselectedBrevKode(newOption)
-            }
-          }}
-          name='brevkode'
-          shouldAutocomplete={true}
-          size={'small'}
-        />
-        <input hidden={true} name={navn} value={selectedBrevKode?.value} readOnly={true} />
-      </Box>
-    )
   }
 
   return (
@@ -326,151 +289,56 @@ export default function BatchOpprett_index() {
                   <br />
                   <br />
 
-                  <Select
-                    label='Krav gjelder'
-                    name={'kravGjelder'}
-                    value={kravGjelder}
-                    onChange={(event) => setKravGjelder(event.target.value)}>
-                    {optionsKravGjelder.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
+                  <OmregningSelector label={'Krav gjelder'} navn={'kravGjelder'} value={kravGjelder}
+                                     setSelectedValue={setKravGjelder} optionsmap={optionsKravGjelder} />
+                  <OmregningSelector label={'Kravårsak'} navn={'kravArsak'} value={kravArsak}
+                                     setSelectedValue={setKravArsak} optionsmap={optionsKravArsak} />
+                  <OmregningSelector label={'Toleransegrense-sett'} navn={'toleransegrenseSett'}
+                                     value={toleransegrenseSett} setSelectedValue={setToleransegrenseSett}
+                                     optionsmap={optionToleransegrenseSett} />
+                  <OmregningSelector label={'Oppgave-sett'} navn={'oppgaveSett'} value={oppgaveSett}
+                                     setSelectedValue={setOppgaveSett} optionsmap={optionOppgaveSett} />
+                  <OmregningSelector label={'Oppgave-prefiks'} navn={'oppgavePrefiks'} value={oppgavePrefiks}
+                                     setSelectedValue={setOppgavePrefiks} optionsmap={optionOppgavePrefiks} />
 
-                  <Select
-                    label={'Kravårsak'}
-                    name={'kravArsak'}
-                    value={kravArsak}
-                    onChange={(event) => setKravArsak(event.target.value)}>
-                    {optionsKravArsak.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
-
-                  <Select
-                    label={'Toleransegrense-sett'}
-                    name={'toleransegrenseSett'}
-                    value={toleransegrenseSett}
-                    onChange={(event) => setToleransegrenseSett(event.target.value)}>
-                    {optionToleransegrenseSett.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
-
-                  <Select
-                    label={'Oppgave-sett'}
-                    name={'oppgaveSett'}
-                    value={oppgaveSett}
-                    onChange={(event) => setOppgaveSett(event.target.value)}>
-                    {optionOppgaveSett.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
-
-                  <Select
-                    label={'Oppgave-prefiks'}
-                    name={'oppgavePrefiks'}
-                    value={oppgavePrefiks}
-                    onChange={(event) => setOppgavePrefiks(event.target.value)}>
-                    {optionOppgavePrefiks.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
                   <br />
                 </Box>
                 <Box>
                   <VStack gap='2'>
                     <CheckboxGroup size={'medium'} legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
-                      <Checkbox
-                        defaultChecked={behandleApneKrav}
-                        name='behandleApneKrav'
-                        value={behandleApneKrav}
-                        onChange={(event) => setBehandleApneKrav(event.target.checked)}
-                      >
-                        Behandle åpne krav
-                      </Checkbox>
 
-                      <Checkbox
-                        defaultChecked={brukFaktoromregning}
-                        name='brukFaktoromregning'
-                        value={brukFaktoromregning}
-                        onChange={(event) => setBrukFaktoromregning(event.target.checked)}
-                      >
-                        Bruk faktoromregning
-                      </Checkbox>
-
-                      <Checkbox
-                        defaultChecked={opprettAlleOppgaver}
-                        name='opprettAlleOppgaver'
-                        value={opprettAlleOppgaver}
-                        onChange={(event) => setOpprettAlleOppgaver(event.target.checked)}
-                      >
-                        Opprett alle oppgaver
-                      </Checkbox>
-
-                      <Checkbox
-                        defaultChecked={sjekkYtelseFraAvtaleland}
-                        name='sjekkYtelseFraAvtaleland'
-                        value={sjekkYtelseFraAvtaleland}
-                        onChange={(event) => setSjekkYtelseFraAvtaleland(event.target.checked)}
-                      >
-                        Sjekk ytelser fra avtaleland
-                      </Checkbox>
-
-                      <Checkbox
-                        defaultChecked={omregneAFP}
-                        name='omregneAFP'
-                        value={omregneAFP}
-                        onChange={(event) => {
-                          setOmregneAFP(event.target.checked)
-                        }}
-                      >
-                        Omregne AFP
-                      </Checkbox>
+                      <ParameterCheckbox defaultChecked={behandleApneKrav} name={'behandleApneKrav'}
+                                         value={behandleApneKrav} onChange={setBehandleApneKrav}
+                                         children={'Behandle åpne krav'} />
+                      <ParameterCheckbox defaultChecked={brukFaktoromregning} name={'brukFaktoromregning'}
+                                         value={brukFaktoromregning} onChange={setBrukFaktoromregning}
+                                         children={'Bruk faktoromregning'} />
+                      <ParameterCheckbox defaultChecked={opprettAlleOppgaver} name={'opprettAlleOppgaver'}
+                                         value={opprettAlleOppgaver} onChange={setOpprettAlleOppgaver}
+                                         children={'Opprett alle oppgaver'} />
+                      <ParameterCheckbox defaultChecked={sjekkYtelseFraAvtaleland} name={'sjekkYtelseFraAvtaleland'}
+                                         value={sjekkYtelseFraAvtaleland} onChange={setSjekkYtelseFraAvtaleland}
+                                         children={'Sjekk ytelser fra avtaleland'} />
+                      <ParameterCheckbox defaultChecked={omregneAFP} name={'omregneAFP'} value={omregneAFP}
+                                         onChange={setOmregneAFP} children={'Omregne AFP'} />
 
                     </CheckboxGroup>
                     <CheckboxGroup size={'medium'} legend={'Iverksetting parametere'}>
-                      <Checkbox
-                        defaultChecked={skalIverksettOnline}
-                        name='skalIverksettOnline'
-                        value={skalIverksettOnline}
-                        onChange={(event) => setSkalIverksettOnline(event.target.checked)}
-                      >
-                        Iverksett Online
-                      </Checkbox>
 
-                      <Checkbox
-                        defaultChecked={skalSamordne}
-                        name='skalSamordne'
-                        value={skalSamordne}
-                        onChange={(event) => setSkalSamordne(event.target.checked)}>
-                        Skal samordne
-                      </Checkbox>
+                      <ParameterCheckbox defaultChecked={skalIverksettOnline} name={'skalIverksettOnline'}
+                                         value={skalIverksettOnline} onChange={setSkalIverksettOnline}
+                                         children={'Iverksett Online'} />
+                      <ParameterCheckbox defaultChecked={skalSamordne} name={'skalSamordne'} value={skalSamordne}
+                                         onChange={setSkalSamordne} children={'Skal samordne'} />
+                      <ParameterCheckbox defaultChecked={skalSletteIverksettingsoppgaver}
+                                         name={'skalSletteIverksettingsoppgaver'}
+                                         value={skalSletteIverksettingsoppgaver}
+                                         onChange={setSkalSletteIverksettingsoppgaver}
+                                         children={'Skal slette iverksettingsoppgaver'} />
+                      <ParameterCheckbox defaultChecked={skalDistribuereUforevedtak} name={'skalDistribuereUforevedtak'}
+                                         value={skalDistribuereUforevedtak} onChange={setSkalDistribuereUforevedtak}
+                                         children={'Skal distribuere uførevedtak'} />
 
-                      <Checkbox
-                        defaultChecked={skalSletteIverksettingsoppgaver}
-                        name='skalSletteIverksettingsoppgaver'
-                        value={skalSletteIverksettingsoppgaver}
-                        onChange={(event) => setSkalSletteIverksettingsoppgaver(event.target.checked)}>
-                        Skal slette iverksettingsoppgaver
-                      </Checkbox>
-
-                      <Checkbox
-                        defaultChecked={skalDistribuereUforevedtak}
-                        name='skalDistribuereUforevedtak'
-                        value={skalDistribuereUforevedtak}
-                        onChange={(event) => setSkalDistribuereUforevedtak(event.target.checked)}>
-                        Skal distribuere uførevedtak
-                      </Checkbox>
                     </CheckboxGroup>
                   </VStack>
                 </Box>
@@ -484,41 +352,44 @@ export default function BatchOpprett_index() {
                         borderColor='border-info'
                         borderWidth='4'
                       >
-                        <Checkbox
-                          defaultChecked={skalBestilleBrev}
-                          name='skalBestilleBrev'
-                          value={skalBestilleBrev}
-                          onChange={(event) => setSkalBestilleBrev(event.target.checked)}>
-                          Bestille brev
-                        </Checkbox>
+                        <ParameterCheckbox defaultChecked={skalBestilleBrev} name={'skalBestilleBrev'}
+                                           value={skalBestilleBrev} onChange={setSkalBestilleBrev}
+                                           children={'Bestille brev'} />
 
                         <BrevCheckbox navn={'brevkodeSokerAlderGammeltRegelverk'} skalVises={!skalBestilleBrev}
                                       tekst={'Velg brevkode for Alder, gammelt regelverk'}
                                       selectedBrevKode={selectedBrevkodeSokerAlderGammeltRegelverk}
-                                      setselectedBrevKode={setselectedBrevkodeSokerAlderGammeltRegelverk} />
+                                      setselectedBrevKode={setselectedBrevkodeSokerAlderGammeltRegelverk}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeSokerAlderNyttRegelverk'} skalVises={!skalBestilleBrev}
                                       tekst={'Velg brevkode for Alder, nytt regelverk'}
                                       selectedBrevKode={selectedBrevkodeSokerAlderNyttRegelverk}
-                                      setselectedBrevKode={setselectedBrevkodeSokerAlderNyttRegelverk} />
+                                      setselectedBrevKode={setselectedBrevkodeSokerAlderNyttRegelverk}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeSokerUforetrygd'} skalVises={!skalBestilleBrev}
                                       tekst={'Velg brevkode for Uføretrygd'}
                                       selectedBrevKode={selectedBrevkodeSokerUforetrygd}
-                                      setselectedBrevKode={setselectedBrevkodeSokerUforetrygd} />
+                                      setselectedBrevKode={setselectedBrevkodeSokerUforetrygd}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeSokerBarnepensjon'} skalVises={!skalBestilleBrev}
                                       tekst={'Velg brevkode for Barnepensjon'}
                                       selectedBrevKode={selectedBrevkodeSokerBarnepensjon}
-                                      setselectedBrevKode={setselectedBrevkodeSokerBarnepensjon} />
+                                      setselectedBrevKode={setselectedBrevkodeSokerBarnepensjon}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeSokerAFP'} skalVises={!skalBestilleBrev}
                                       tekst={'Velg brevkode for AFP'} selectedBrevKode={selectedBrevkodeSokerAFP}
-                                      setselectedBrevKode={setselectedBrevkodeSokerAFP} />
+                                      setselectedBrevKode={setselectedBrevkodeSokerAFP}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeSokerGjenlevendepensjon'} skalVises={!skalBestilleBrev}
                                       tekst={'Velg brevkode for Gjenlevendepensjon'}
                                       selectedBrevKode={selectedBrevkodeSokerGjenlevendepensjon}
-                                      setselectedBrevKode={setselectedBrevkodeSokerGjenlevendepensjon} />
+                                      setselectedBrevKode={setselectedBrevkodeSokerGjenlevendepensjon}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeSokerAFPPrivat'} skalVises={!skalBestilleBrev}
                                       tekst={'Velg brevkode for AFP Privat'}
                                       selectedBrevKode={selectedBrevkodeSokerAFPPrivat}
-                                      setselectedBrevKode={setselectedBrevkodeSokerAFPPrivat} />
+                                      setselectedBrevKode={setselectedBrevkodeSokerAFPPrivat}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
 
                       </Box>
                       <Box
@@ -527,48 +398,49 @@ export default function BatchOpprett_index() {
                         borderColor='border-info'
                         borderWidth='4'
                       >
-                        <Checkbox
-                          defaultChecked={skalSendeBrevBerorteSaker}
-                          name='sendBrevBerorteSaker'
-                          value={skalSendeBrevBerorteSaker}
-                          onChange={(event) => {
-                            setSkalSendeBrevBerorteSaker(event.target.checked)
-                          }}
-                        >
-                          Bestille brev berørte saker
-                        </Checkbox>
+
+                        <ParameterCheckbox defaultChecked={skalSendeBrevBerorteSaker} name={'sendBrevBerorteSaker'}
+                                           value={skalSendeBrevBerorteSaker} onChange={setSkalSendeBrevBerorteSaker}
+                                           children={'Bestille brev berørte saker'} />
 
                         <BrevCheckbox navn={'brevkodeBerorteSakerAlderGammeltRegelverk'}
                                       skalVises={!skalSendeBrevBerorteSaker}
                                       tekst={'Velg brevkode for Alder, gammelt regelverk'}
                                       selectedBrevKode={selectedBrevkoderBerorteSakerAlderGammeltRegelverk}
-                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerAlderGammeltRegelverk} />
+                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerAlderGammeltRegelverk}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeBerorteSakerAlderNyttRegelverk'}
                                       skalVises={!skalSendeBrevBerorteSaker}
                                       tekst={'Velg brevkode for Alder, nytt regelverk'}
                                       selectedBrevKode={selectedBrevkoderBerorteSakerAlderNyttRegelverk}
-                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerAlderNyttRegelverk} />
+                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerAlderNyttRegelverk}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeBerorteSakerUforetrygd'} skalVises={!skalSendeBrevBerorteSaker}
                                       tekst={'Velg brevkode for Uføretrygd'}
                                       selectedBrevKode={selectedBrevkoderBerorteSakerUforetrygd}
-                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerUforetrygd} />
+                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerUforetrygd}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeBerorteSakerBarnepensjon'} skalVises={!skalSendeBrevBerorteSaker}
                                       tekst={'Velg brevkode for Barnepensjon'}
                                       selectedBrevKode={selectedBrevkoderBerorteSakerBarnepensjon}
-                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerBarnepensjon} />
+                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerBarnepensjon}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeBerorteSakerAFP'} skalVises={!skalSendeBrevBerorteSaker}
                                       tekst={'Velg brevkode for AFP'}
                                       selectedBrevKode={selectedBrevkoderBerorteSakerAFP}
-                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerAFP} />
+                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerAFP}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeBerorteSakerGjenlevendepensjon'}
                                       skalVises={!skalSendeBrevBerorteSaker}
                                       tekst={'Velg brevkode for Gjenlevendepensjon'}
                                       selectedBrevKode={selectedBrevkoderBerorteSakerGjenlevendepensjon}
-                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerGjenlevendepensjon} />
+                                      setselectedBrevKode={setselectedBrevkoderBerorteSakerGjenlevendepensjon}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
                         <BrevCheckbox navn={'brevkodeBerorteSakerAFPPrivat'} skalVises={!skalSendeBrevBerorteSaker}
                                       tekst={'Velg brevkode for AFP Privat'}
                                       selectedBrevKode={selectedBrevkodeBerorteSakerAFPPrivat}
-                                      setselectedBrevKode={setselectedBrevkodeBerorteSakerAFPPrivat} />
+                                      setselectedBrevKode={setselectedBrevkodeBerorteSakerAFPPrivat}
+                                      optionBatchbrevtyper={optionBatchbrevtyper} />
 
                       </Box>
                     </HGrid>
@@ -596,204 +468,43 @@ export default function BatchOpprett_index() {
               }}
             >
               <Modal.Body>
-                <FormSummary>
-                  <FormSummary.Header> Du vil nå starte en behandling med følgende parametere</FormSummary.Header>
+                <OmregningOppsummering
+                  skalBestilleBrev={skalBestilleBrev}
+                  skalSendeBrevBerorteSaker={skalSendeBrevBerorteSaker}
+                  selectedBrevkodeSokerAlderGammeltRegelverk={selectedBrevkodeSokerAlderGammeltRegelverk}
+                  selectedBrevkodeSokerAlderNyttRegelverk={selectedBrevkodeSokerAlderNyttRegelverk}
+                  selectedBrevkodeSokerUforetrygd={selectedBrevkodeSokerUforetrygd}
+                  selectedBrevkodeSokerBarnepensjon={selectedBrevkodeSokerBarnepensjon}
+                  selectedBrevkodeSokerAFP={selectedBrevkodeSokerAFP}
+                  selectedBrevkodeSokerGjenlevendepensjon={selectedBrevkodeSokerGjenlevendepensjon}
+                  selectedBrevkodeSokerAFPPrivat={selectedBrevkodeSokerAFPPrivat}
 
-                  <FormSummary.Answers>
-                    <FormSummary.Answer>
-                      <FormSummary.Label>Behandlingsnøkkel</FormSummary.Label>
-                      <FormSummary.Value>{behandlingsnokkel && <>{behandlingsnokkel}</>}</FormSummary.Value>
-                    </FormSummary.Answer>
+                  selectedBrevkoderBerorteSakerAlderGammeltRegelverk={selectedBrevkoderBerorteSakerAlderGammeltRegelverk}
+                  selectedBrevkoderBerorteSakerAlderNyttRegelverk={selectedBrevkoderBerorteSakerAlderNyttRegelverk}
+                  selectedBrevkoderBerorteSakerUforetrygd={selectedBrevkoderBerorteSakerUforetrygd}
+                  selectedBrevkoderBerorteSakerBarnepensjon={selectedBrevkoderBerorteSakerBarnepensjon}
+                  selectedBrevkoderBerorteSakerAFP={selectedBrevkoderBerorteSakerAFP}
+                  selectedBrevkoderBerorteSakerGjenlevendepensjon={selectedBrevkoderBerorteSakerGjenlevendepensjon}
+                  selectedBrevkodeBerorteSakerAFPPrivat={selectedBrevkodeBerorteSakerAFPPrivat}
 
-                    <FormSummary.Answer>
-                      <FormSummary.Label>Omregningstidspunkt</FormSummary.Label>
-                      <FormSummary.Value>{omregningstidspunkt && <>{omregningstidspunkt}</>}</FormSummary.Value>
-                    </FormSummary.Answer>
+                  omregningstidspunkt={omregningstidspunkt}
+                  behandlingsnokkel={behandlingsnokkel}
+                  kravGjelder={kravGjelder}
+                  kravArsak={kravArsak}
+                  toleransegrenseSett={toleransegrenseSett}
+                  oppgaveSett={oppgaveSett}
+                  oppgavePrefiks={oppgavePrefiks}
 
-                    <FormSummary.Answer>
-                      <FormSummary.Label>Omregning</FormSummary.Label>
-                      <HGrid columns={3} gap='10'>
-                        <FormSummary.Value>
-                          <FormSummary.Answers>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Krav gjelder</FormSummary.Label>
-                              <FormSummary.Value>{kravGjelder}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Kravårsak</FormSummary.Label>
-                              <FormSummary.Value>{kravArsak}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Toleransegrense-sett</FormSummary.Label>
-                              <FormSummary.Value>{toleransegrenseSett}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Oppgave-sett</FormSummary.Label>
-                              <FormSummary.Value>{oppgaveSett}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Oppgave-prefiks</FormSummary.Label>
-                              <FormSummary.Value>{oppgavePrefiks}</FormSummary.Value>
-                            </FormSummary.Answer>
-                          </FormSummary.Answers>
-                        </FormSummary.Value>
-
-                        <FormSummary.Value>
-                          <FormSummary.Answers>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Behandle åpne krav</FormSummary.Label>
-                              <FormSummary.Value>{behandleApneKrav ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Bruk faktoromregning</FormSummary.Label>
-                              <FormSummary.Value>{brukFaktoromregning ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Opprett alle oppgaver</FormSummary.Label>
-                              <FormSummary.Value>{opprettAlleOppgaver ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Sjekk ytelser fra avtaleland</FormSummary.Label>
-                              <FormSummary.Value>{sjekkYtelseFraAvtaleland ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Omregne AFP</FormSummary.Label>
-                              <FormSummary.Value>{omregneAFP ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                          </FormSummary.Answers>
-                        </FormSummary.Value>
-
-                        <FormSummary.Value>
-                          <FormSummary.Answers>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Skal Iverksett Online</FormSummary.Label>
-                              <FormSummary.Value>{skalIverksettOnline ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Skal samordne</FormSummary.Label>
-                              <FormSummary.Value>{skalSamordne ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Skal slette iverksettingsoppgaver</FormSummary.Label>
-                              <FormSummary.Value>{skalSletteIverksettingsoppgaver ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Skal distribuere uførevedtak</FormSummary.Label>
-                              <FormSummary.Value>{skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                          </FormSummary.Answers>
-                        </FormSummary.Value>
-                      </HGrid>
-                    </FormSummary.Answer>
-
-                    <FormSummary.Answer>
-                      <FormSummary.Label>Omregning brev</FormSummary.Label>
-                      <HGrid columns={2} gap='10'>
-                        <FormSummary.Value>
-                          <FormSummary.Answers>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Skal bestille brev for søker</FormSummary.Label>
-                              <FormSummary.Value>{skalBestilleBrev ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            {skalBestilleBrev && selectedBrevkodeSokerAlderGammeltRegelverk && selectedBrevkodeSokerAlderGammeltRegelverk.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Alder gammelt regelverk</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeSokerAlderGammeltRegelverk.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalBestilleBrev && selectedBrevkodeSokerAlderNyttRegelverk && selectedBrevkodeSokerAlderNyttRegelverk.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Alder nytt regelverk</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeSokerAlderNyttRegelverk.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalBestilleBrev && selectedBrevkodeSokerUforetrygd && selectedBrevkodeSokerUforetrygd.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Uføretrygd</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeSokerUforetrygd.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalBestilleBrev && selectedBrevkodeSokerBarnepensjon && selectedBrevkodeSokerBarnepensjon.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Barnepensjon</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeSokerBarnepensjon.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalBestilleBrev && selectedBrevkodeSokerAFP && selectedBrevkodeSokerAFP.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for AFP</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeSokerAFP.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalBestilleBrev && selectedBrevkodeSokerGjenlevendepensjon && selectedBrevkodeSokerGjenlevendepensjon.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Gjenlevendepensjon</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeSokerGjenlevendepensjon.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalBestilleBrev && selectedBrevkodeSokerAFPPrivat && selectedBrevkodeSokerAFPPrivat.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for AFP Privat</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeSokerAFPPrivat.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                          </FormSummary.Answers>
-                        </FormSummary.Value>
-                        <FormSummary.Value>
-                          <FormSummary.Answers>
-                            <FormSummary.Answer>
-                              <FormSummary.Label>Skal sende brev for berørte saker</FormSummary.Label>
-                              <FormSummary.Value>{skalSendeBrevBerorteSaker ? 'Ja' : 'Nei'}</FormSummary.Value>
-                            </FormSummary.Answer>
-                            {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerAlderGammeltRegelverk && selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Alder gammelt regelverk</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerAlderNyttRegelverk && selectedBrevkoderBerorteSakerAlderNyttRegelverk.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Alder nytt regelverk</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkoderBerorteSakerAlderNyttRegelverk.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerUforetrygd && selectedBrevkoderBerorteSakerUforetrygd.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Uføretrygd</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkoderBerorteSakerUforetrygd.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerBarnepensjon && selectedBrevkoderBerorteSakerBarnepensjon.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Barnepensjon</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkoderBerorteSakerBarnepensjon.value
-                                }</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerAFP && selectedBrevkoderBerorteSakerAFP.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for AFP</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkoderBerorteSakerAFP.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalSendeBrevBerorteSaker && selectedBrevkoderBerorteSakerGjenlevendepensjon && selectedBrevkoderBerorteSakerGjenlevendepensjon.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for Gjenlevendepensjon</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkoderBerorteSakerGjenlevendepensjon.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                            {skalSendeBrevBerorteSaker && selectedBrevkodeBerorteSakerAFPPrivat && selectedBrevkodeBerorteSakerAFPPrivat.value !== 'not set' &&
-                              <FormSummary.Answer>
-                                <FormSummary.Label>Batchbrev for AFP Privat</FormSummary.Label>
-                                <FormSummary.Value>{selectedBrevkodeBerorteSakerAFPPrivat.value}</FormSummary.Value>
-                              </FormSummary.Answer>
-                            }
-                          </FormSummary.Answers>
-                        </FormSummary.Value>
-                      </HGrid>
-                    </FormSummary.Answer>
-                  </FormSummary.Answers>
-                </FormSummary>
+                  omregneAFP={omregneAFP}
+                  skalIverksettOnline={skalIverksettOnline}
+                  skalSamordne={skalSamordne}
+                  skalSletteIverksettingsoppgaver={skalSletteIverksettingsoppgaver}
+                  skalDistribuereUforevedtak={skalDistribuereUforevedtak}
+                  behandleApneKrav={behandleApneKrav}
+                  brukFaktoromregning={brukFaktoromregning}
+                  opprettAlleOppgaver={opprettAlleOppgaver}
+                  sjekkYtelseFraAvtaleland={sjekkYtelseFraAvtaleland}
+                />
                 Du kan ikke angre denne handlingen.
               </Modal.Body>
               <Modal.Footer>

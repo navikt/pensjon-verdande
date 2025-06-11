@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { oppdaterOmregningInput } from '~/services/batch.omregning.bpen093'
+import { oppdaterOmregningInput } from '~/services/batch.omregning.server'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
