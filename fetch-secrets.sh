@@ -18,9 +18,9 @@ if command -v nais >& /dev/null; then
   DISCONNECT_STATUS=$(nais device status | grep -c Disconnected)
 
   if [ $DISCONNECT_STATUS -eq 1 ]; then
-    read -p "Du er ikke koblet til med naisdevice. Vil du koble til? (j/n) " -n 1 -r
+    read -p "Du er ikke koblet til med naisdevice. Vil du koble til? (J/n) " -n 1 -r -s
     echo
-    if [[ $REPLY =~ ^[YyjJ]$ ]]; then
+    if [[ $REPLY = "" || $REPLY =~ ^[YyjJ]$ ]]; then
       nais device connect
     else
       echo -e "${red}Du må være koblet til med naisdevice, avslutter${endcolor}"
@@ -30,9 +30,9 @@ if command -v nais >& /dev/null; then
 fi
 
 gcloud auth print-access-token >& /dev/null || (
-  read -p "Inlogging i GCP er utløpt. Vil du autentisere på nytt? (j/n) " -n 1 -r
+  read -p "Inlogging i GCP er utløpt. Vil du autentisere på nytt? (J/n) " -n 1 -r -s
   echo
-  if [[ $REPLY =~ ^[YyjJ]$ ]]; then
+  if [[ $REPLY == "" || $REPLY =~ ^[YyjJ]$ ]]; then
     gcloud auth login
   else
     echo -e "${red}Du må ha en gyldig innlogging i GCP. Du kan logge inn med 'gcloud auth login', avslutter${endcolor}"
