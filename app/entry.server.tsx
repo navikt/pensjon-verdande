@@ -9,6 +9,8 @@ import { logger } from '~/services/logger.server'
 
 const ABORT_DELAY = 120_000;
 
+export const streamTimeout = 30_000;
+
 process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
   logger.error("Unhandled Rejection at:", p, "reason:", reason);
 
