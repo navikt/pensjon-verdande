@@ -9,7 +9,7 @@ interface OmregningCheckboxProps {
   children: React.ReactNode
 }
 
-export default function ParameterCheckbox(props: OmregningCheckboxProps)  {
+export default function OmregningCheckbox(props: OmregningCheckboxProps)  {
   return (
     <Checkbox
       defaultChecked={props.defaultChecked}

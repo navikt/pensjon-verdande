@@ -205,3 +205,32 @@ export type OmregningInputSaker = {
   sakId: string,
   sakType: string,
 }
+export type OmregningBehandlingsnoekler = {
+  behandlingsnoekkel: string[]
+}
+export type OmregningStatistikk = {
+  behandlingsnoekkel: string,
+  vedtakId: number | undefined,
+  behandlingsrekkefolge: number | undefined,
+  behandlingstype: string | undefined,
+  berortSakBegrunnelser: string | undefined,
+  status: string,
+  sorteringsregel: string | undefined,
+  kontrollpunkter: string,
+  sakId: string,
+  familieId: string,
+}
+export type OmregningStatistikkPage = {
+  content: OmregningStatistikk[] | null
+  pageable: {
+    pageNumber: number
+  },
+  last: boolean
+  totalPages: number
+  totalElements: number
+  size: number
+  number: 0
+  first: boolean
+  numberOfElements: number
+  empty: boolean
+}

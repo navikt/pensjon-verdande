@@ -121,6 +121,11 @@ export default function App() {
                     </li>
                     <li>
                       <NavLink to={`/omregning`}>Omregn ytelser</NavLink>
+                      <ul>
+                        <li>
+                          <NavLink to={`/omregningStatistikk`}>Omregn statistikk</NavLink>
+                        </li>
+                      </ul>
                     </li>
                     <li>
                       <NavLink to={`/batch/regulering`}>Regulering</NavLink>

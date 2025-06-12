@@ -10,7 +10,7 @@ interface OmregningBrevCheckboxProps {
   optionBatchbrevtyper: ComboboxOption[],
 }
 
-export default function BrevCheckbox(props: OmregningBrevCheckboxProps) {
+export default function OmregningBrevCheckbox(props: OmregningBrevCheckboxProps) {
   const defaultbatchbrevtypeOption: ComboboxOption = { value: 'not set', label: 'Ikke angitt' }
 
   return (
