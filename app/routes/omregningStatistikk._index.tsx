@@ -1,7 +1,7 @@
 import { requireAccessToken } from '~/services/auth.server'
 import { hentOmregningbehandlingsnokler, hentOmregningStatistikk } from '~/services/batch.omregning.server'
-import React, { useState } from 'react'
-import { Box, Button, Pagination, Select, Table } from '@navikt/ds-react'
+import React, { useEffect, useState } from 'react'
+import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import {
   type ActionFunctionArgs,
   Form,
@@ -29,7 +29,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const behandlingsNoekkel = formData.get('behandlingsnoekler') as string
   let omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
-  return { omregningStatistikkPage }
+
+  let content = ""
+  omregningStatistikkPage.content?.forEach(value => {
+    content += JSON.stringify(value, null, 4) + ','
+    // For å kunne laste ned som en gyldig json-fil
+    if (content.length > 2) {
+      content = content.slice(0, -1)
+    }
+  })
+
+  return { omregningStatistikkPage, content}
 }
 
 export default function OmregningStatistikk() {
@@ -55,6 +65,22 @@ export default function OmregningStatistikk() {
     setSearchParams(searchParams)
   }
 
+  let temp = data?.content
+  const [downloadLink, setDownloadLink] = useState('')
+  const makeTextFile = () => {
+    const data = new Blob(["["+temp+"]"], { type: 'application/json' })
+
+    // this part avoids memory leaks
+    if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
+
+    // update the download link state
+    setDownloadLink(window.URL.createObjectURL(data))
+  }
+
+  useEffect(() => {
+    makeTextFile()
+  }, [temp])
+
   return (
     <div>
       <h1>Omregning Statistikk</h1>
@@ -78,6 +104,15 @@ export default function OmregningStatistikk() {
       </Form>
 
       <Box>
+      <Link
+        style={{padding: 1 + 'em', position: 'relative', right: 0, float: 'right'}}
+        // this attribute sets the filename
+        download='omregningTabell.json'
+        // link to the download URL
+        href={downloadLink}
+      >Last ned tabell</Link>
+      </Box>
+        <Box>
         <Table size='small' zebraStripes>
           <Table.Header>
             <Table.Row>
