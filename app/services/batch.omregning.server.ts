@@ -3,7 +3,6 @@ import type {
   OmregningInput,
   OmregningRequest,
   OmregningSakerPage,
-  OmregningStatistikkInit,
   StartBatchResponse,
 } from '~/types'
 import { env } from '~/services/env.server'
@@ -88,4 +87,4 @@ export async function oppdaterOmregningInput(
   } else {
     throw new Error()
   }
-})
+}
