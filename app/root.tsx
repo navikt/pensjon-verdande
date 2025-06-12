@@ -162,9 +162,7 @@ export default function App() {
                     <li>
                       <NavLink to={`/bpen091`}>Fastsette inntekt for uføretrygd</NavLink>
                     </li>
-                    <li>
-                      <NavLink to={`/omregning`}>Omregn ytelser</NavLink>
-                    </li>
+
                     <li>
                       <NavLink to={`/batch/regulering`}>Regulering</NavLink>
                     </li>
@@ -180,7 +178,17 @@ export default function App() {
                     <li>
                       <NavLink to={`/batch/inntektskontroll`}>Inntektskontroll</NavLink>
                     </li>
-
+                    <li>
+                      <Accordion.Item defaultOpen={false}>
+                        <Accordion.Header>
+                          Omregning
+                        </Accordion.Header>
+                        <Accordion.Content>
+                          <NavLink to={`/omregning`}>Omregn ytelser</NavLink>
+                          <NavLink to={`/omregningStatistikk`}>Omregn statistikk</NavLink>
+                        </Accordion.Content>
+                      </Accordion.Item>
+                    </li>
                   </ul>
                 </Accordion.Content>
               </Accordion.Item>
