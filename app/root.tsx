@@ -1,9 +1,8 @@
-import { LinksFunction } from 'react-router'
+import { isRouteErrorResponse, LinksFunction } from 'react-router'
 
 import {
   Links,
   Meta,
-  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
@@ -14,14 +13,15 @@ import navStyles from '@navikt/ds-css/dist/index.css?url'
 
 import appStylesHref from './app.css?url'
 
-import { Accordion, ActionMenu, HStack, InternalHeader, Spacer, VStack } from '@navikt/ds-react'
+import { HStack, VStack } from '@navikt/ds-react'
 import { LoaderFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
-import { getNAVident } from '~/services/auth.server'
-import {
-  BarChartIcon, BookIcon, ExternalLinkIcon,
-  MenuGridIcon,
-} from '@navikt/aksel-icons'
+import { tryAccessToken } from '~/services/auth.server'
+import { hentMe, hentTilgangskontrollMeta } from '~/services/brukere.server'
+import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
+import NavHeader from '~/components/nav-header/NavHeader'
+import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
+import { Route } from './+types/root';
 
 export const links: LinksFunction = () => {
   return [
@@ -35,18 +35,19 @@ export const links: LinksFunction = () => {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const navIdent = await getNAVident(request)
+  let accessToken = await tryAccessToken(request)
 
   return {
     env: env.env,
-    navIdent: navIdent,
+    me: accessToken ? await hentMe(accessToken) : undefined,
+    tilgangskontrollMeta: accessToken ? await hentTilgangskontrollMeta(accessToken) : undefined
   }
 }
 
 export default function App() {
   const navigation = useNavigation()
 
-  const { env, navIdent } = useLoaderData<typeof loader>()
+  const { env, me } = useLoaderData<typeof loader>()
 
   let title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
 
@@ -61,191 +62,22 @@ export default function App() {
     </head>
     <body>
     <VStack gap='0' style={{ width: '100%' }}>
-      <InternalHeader className={env === 'p' ? 'navds-tag--error-filled' : ''}>
-        <InternalHeader.Title as='h1'>
-          Verdande
-          {env != 'p' ? (
-          <span className="header-environment-postscript">
-            {env.toUpperCase()}
-          </span>
-            ) : (<></>)
-          }
-        </InternalHeader.Title>
-        {env === 'p' ? (
-          <InternalHeader.Title as='h1'>
-            P R O D U K S J O N !
-          </InternalHeader.Title>
-        ) : (<></>)
-        }
-        <Spacer />
+      {
+        me ? (
+          <NavHeader erProduksjon={env === 'p'} env={env} me={me}></NavHeader>
+        ) : (
+          <></>
+        )
+      }
 
-        <ActionMenu>
-          <ActionMenu.Trigger>
-            <InternalHeader.Button>
-              <MenuGridIcon
-                fontSize="1.5rem"
-                title="Systemer og oppslagsverk"
-              />
-            </InternalHeader.Button>
-          </ActionMenu.Trigger>
-          <ActionMenu.Content>
-            <ActionMenu.Group label="Behandlingsløsningen">
-              <ActionMenu.Item
-                icon={<BookIcon />}
-              >
-                <a
-                  target="_blank"
-                  href={"https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html"}
-                  style={{ textDecoration: "none", color: "black" }}
-                >
-                  Dokumentasjon
-                </a>
-                <ExternalLinkIcon/>
-
-              </ActionMenu.Item>
-              <ActionMenu.Item
-                icon={<BarChartIcon />}
-              >
-                <a
-                  target="_blank"
-                  href={"https://grafana.nav.cloud.nais.io/goto/mgXUC1LHg?orgId=1"}
-                  style={{ textDecoration: "none", color: "black" }}
-                >
-                  Grafanadashboard
-                </a>
-                <ExternalLinkIcon/>
-              </ActionMenu.Item>
-            </ActionMenu.Group>
-          </ActionMenu.Content>
-        </ActionMenu>
-
-        <InternalHeader.User name={navIdent ? navIdent : ''} />
-      </InternalHeader>
       <HStack gap='0' wrap={false}>
-        <div id='sidebar'>
-          <nav>
-            <Accordion size="small" headingSize="xsmall">
-              <Accordion.Item>
-                <NavLink to={`/dashboard`}>Dashboard</NavLink>
-              </Accordion.Item>
-
-              <Accordion.Item>
-                <NavLink to={`/sok`}>Søk</NavLink>
-              </Accordion.Item>
-
-
-              <Accordion.Item defaultOpen>
-                <Accordion.Header>Batcher</Accordion.Header>
-                <Accordion.Content>
-                  <ul>
-                    <li>
-                      <NavLink to={`/batcher`}>Kjøringer</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/aldersovergang`}>Aldersovergang</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/lever-samboeropplysning`}>Lever Samboeropplysning</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/adhocbrev`}>Adhoc brevbestilling</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/bpen096`}>Hent opplysninger fra Skatt</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/bpen090`}>Løpende inntektsavkorting</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/bestem-etteroppgjor-resultat`}>Bestem etteroppgjør resultat</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/bpen091`}>Fastsette inntekt for uføretrygd</NavLink>
-                    </li>
-
-                    <li>
-                      <NavLink to={`/batch/regulering`}>Regulering</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/batch/reguleringv2`}>Regulering Next</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/opptjening/kategoriserbruker`}>Omregning ved opptjeningsendring</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/gjp`}>Gjenlevendepensjon - utvidet rett</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/batch/inntektskontroll`}>Inntektskontroll</NavLink>
-                    </li>
-                    <li>
-                      <Accordion.Item defaultOpen={false}>
-                        <Accordion.Header>
-                          Omregning
-                        </Accordion.Header>
-                        <Accordion.Content>
-                          <NavLink to={`/omregning`}>Omregn ytelser</NavLink>
-                          <NavLink to={`/omregningStatistikk`}>Omregn statistikk</NavLink>
-                        </Accordion.Content>
-                      </Accordion.Item>
-                    </li>
-                  </ul>
-                </Accordion.Content>
-              </Accordion.Item>
-
-              <Accordion.Item defaultOpen>
-                <Accordion.Header>Behandlinger</Accordion.Header>
-                <Accordion.Content>
-                  <ul>
-                    <li><NavLink to={`/behandlinger`} end>
-                      Alle behandlinger
-                    </NavLink></li>
-                    <li>
-                      <NavLink to={`/behandlinger/FEILENDE`}>
-                        Feilende
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/behandlinger/DEBUG`}>I debug</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/behandlinger/STOPPET`}>Stoppede</NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/behandlinger/UNDER_BEHANDLING`}>
-                        Under behandling
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/behandlinger/OPPRETTET`}>
-                        Opprettet
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink to={`/behandlinger/FULLFORT`}>
-                        Fullførte
-                      </NavLink>
-                    </li>
-                  </ul>
-                </Accordion.Content>
-              </Accordion.Item>
-
-              <Accordion.Item defaultOpen>
-                <Accordion.Header>
-                  Adminverktøy
-                </Accordion.Header>
-                <Accordion.Content>
-                  <NavLink to={`/infobanner`}>Infobanner i PSAK</NavLink>
-                  <NavLink to={`/laaste-vedtak`}>Låste vedtak</NavLink>
-                  <NavLink to={`/laas-opp-sak`}>Lås opp sak</NavLink>
-                  <NavLink to={`/linke-dnr-fnr`}>Linke Dnr Fnr</NavLink>
-                  <NavLink to={`/leveattester-sokos-spkmottak`}>Verifiser antall fra MOT</NavLink>
-                </Accordion.Content>
-              </Accordion.Item>
-            </Accordion>
-
-          </nav>
-        </div>
+        {
+          me ? (
+            <VenstreMeny me={me}></VenstreMeny>
+          ) : (
+            <></>
+          )
+        }
 
         <div
           className={navigation.state === 'loading' ? 'loading' : ''}
@@ -261,4 +93,35 @@ export default function App() {
     </body>
     </html>
   )
+}
+
+export function ErrorBoundary({
+                                error,
+                              }: Route.ErrorBoundaryProps) {
+  if (isRouteErrorResponse(error)) {
+    if (error.status === 403) {
+      console.log(error)
+      return (<IkkeTilgang error={error}></IkkeTilgang>)
+    } else {
+      return (
+        <>
+          <h1>
+            {error.status} {error.statusText}
+          </h1>
+          <p>{error.data}</p>
+        </>
+      );
+    }
+  } else if (error instanceof Error) {
+    return (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+        <p>The stack trace is:</p>
+        <pre>{error.stack}</pre>
+      </div>
+    );
+  } else {
+    return <h1>Unknown Error</h1>;
+  }
 }
