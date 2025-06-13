@@ -32,6 +32,7 @@ const batcherMeny = [
 ]
 
 let omregningMeny = [
+  ['OMREGN_YTELSER', '/omregning/behandlinger', 'Behandlinger'],
   ['OMREGN_YTELSER', '/omregning', 'Omregn ytelser'],
   ['OMREGN_YTELSER', '/omregningStatistikk', 'Omregn statistikk'],
 ]
