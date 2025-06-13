@@ -4,7 +4,7 @@ import type {
   OmregningRequest,
   OmregningSakerPage,
   OmregningBehandlingsnoekler,
-  StartBatchResponse, OmregningStatistikkPage,
+  StartBatchResponse, OmregningStatistikkPage, OmregningStatistikk,
 } from '~/types'
 import { env } from '~/services/env.server'
 
@@ -126,6 +126,26 @@ export async function hentOmregningStatistikk(
 
   if (response.ok) {
     return await response.json() as OmregningStatistikkPage
+  } else {
+    throw new Error()
+  }
+}
+
+export async function hentOmregningStatistikkJson(
+  accessToken: string,
+  behandlingsnoekkel: string,
+): Promise<OmregningStatistikk[]> {
+  const response = await fetch(`${env.penUrl}/api/behandling/omregning/statistikk?behandlingsnoekkel=${behandlingsnoekkel}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (response.ok) {
+    return await response.json() as OmregningStatistikk[]
   } else {
     throw new Error()
   }

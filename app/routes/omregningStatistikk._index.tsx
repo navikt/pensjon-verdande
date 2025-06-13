@@ -1,5 +1,9 @@
 import { requireAccessToken } from '~/services/auth.server'
-import { hentOmregningbehandlingsnokler, hentOmregningStatistikk } from '~/services/batch.omregning.server'
+import {
+  hentOmregningbehandlingsnokler,
+  hentOmregningStatistikk,
+  hentOmregningStatistikkJson,
+} from '~/services/batch.omregning.server'
 import React, { useEffect, useState } from 'react'
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import {
@@ -9,7 +13,7 @@ import {
   useLoaderData,
   useSearchParams,
 } from 'react-router'
-import type { OmregningStatistikkPage } from '~/types'
+import type { OmregningStatistikk, OmregningStatistikkPage } from '~/types'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
@@ -19,9 +23,18 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   let size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
   let omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
+  let omregningStatistikkJson = await hentOmregningStatistikkJson(accesstoken, behandlingsNoekkel) as OmregningStatistikk[]
+  let content = ''
+  omregningStatistikkJson?.forEach(value => {
+    content += JSON.stringify(value, null, 4) + ','
+    // For å kunne laste ned som en gyldig json-fil
+    if (content.length > 2) {
+      content = content.slice(0, -1)
+    }
+  })
 
   const omregningStatistikkInit = await hentOmregningbehandlingsnokler(accesstoken)
-  return { omregningStatistikkInit: omregningStatistikkInit, omregningStatistikkPage: omregningStatistikkPage }
+  return { omregningStatistikkInit: omregningStatistikkInit, omregningStatistikkPage: omregningStatistikkPage, omregningStatistikkJson: content }
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -37,7 +50,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function OmregningStatistikk() {
-  const { omregningStatistikkInit, omregningStatistikkPage } = useLoaderData<typeof loader>()
+  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkJson } = useLoaderData<typeof loader>()
 
   const optionBehandlingsNoekler: { value: string, label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })
@@ -57,14 +70,7 @@ export default function OmregningStatistikk() {
     setSearchParams(searchParams)
   }
 
-  let content = ""
-  omregningStatistikkPage.content?.forEach(value => {
-    content += JSON.stringify(value, null, 4) + ','
-    // For å kunne laste ned som en gyldig json-fil
-    if (content.length > 2) {
-      content = content.slice(0, -1)
-    }
-  })
+  let content = omregningStatistikkJson
 
   const [downloadLink, setDownloadLink] = useState('')
   const makeTextFile = () => {
