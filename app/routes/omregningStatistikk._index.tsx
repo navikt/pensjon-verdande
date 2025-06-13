@@ -6,9 +6,7 @@ import {
   type ActionFunctionArgs,
   Form,
   LoaderFunctionArgs,
-  useActionData,
   useLoaderData,
-  useNavigation,
   useSearchParams,
 } from 'react-router'
 import type { OmregningStatistikkPage } from '~/types'
@@ -16,8 +14,14 @@ import type { OmregningStatistikkPage } from '~/types'
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
 
+  let { searchParams } = new URL(request.url)
+  let page = searchParams.get('page') ?? '0'
+  let size = searchParams.get('size') ?? '10'
+  const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
+  let omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
+
   const omregningStatistikkInit = await hentOmregningbehandlingsnokler(accesstoken)
-  return { omregningStatistikkInit: omregningStatistikkInit }
+  return { omregningStatistikkInit: omregningStatistikkInit, omregningStatistikkPage: omregningStatistikkPage }
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -26,27 +30,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)
   let page = searchParams.get('page') ?? '0'
   let size = searchParams.get('size') ?? '10'
+  let behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? formData.get('behandlingsnoekler') as string
 
-  const behandlingsNoekkel = formData.get('behandlingsnoekler') as string
   let omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
-
-  let content = ""
-  omregningStatistikkPage.content?.forEach(value => {
-    content += JSON.stringify(value, null, 4) + ','
-    // For å kunne laste ned som en gyldig json-fil
-    if (content.length > 2) {
-      content = content.slice(0, -1)
-    }
-  })
-
-  return { omregningStatistikkPage, content}
+  return { omregningStatistikkPage }
 }
 
 export default function OmregningStatistikk() {
-  const { omregningStatistikkInit } = useLoaderData<typeof loader>()
-  const data = useActionData<typeof action>()
-
-  const navigation = useNavigation()
+  const { omregningStatistikkInit, omregningStatistikkPage } = useLoaderData<typeof loader>()
 
   const optionBehandlingsNoekler: { value: string, label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })
@@ -57,18 +48,27 @@ export default function OmregningStatistikk() {
   const [behandlingsNoekler, setBehandlingsNoekler] = useState(optionBehandlingsNoekler[0].value)
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const omregningsaker = data?.omregningStatistikkPage
+  const omregningsaker = omregningStatistikkPage
 
   const onPageChange = (page: number) => {
     searchParams.set('page', (page - 1).toString())
     searchParams.set('size', omregningsaker?.size ? omregningsaker.size.toString() : '10')
+    searchParams.set('behandlingsnoekler', behandlingsNoekler)
     setSearchParams(searchParams)
   }
 
-  let temp = data?.content
+  let content = ""
+  omregningStatistikkPage.content?.forEach(value => {
+    content += JSON.stringify(value, null, 4) + ','
+    // For å kunne laste ned som en gyldig json-fil
+    if (content.length > 2) {
+      content = content.slice(0, -1)
+    }
+  })
+
   const [downloadLink, setDownloadLink] = useState('')
   const makeTextFile = () => {
-    const data = new Blob(["["+temp+"]"], { type: 'application/json' })
+    const data = new Blob(["["+content+"]"], { type: 'application/json' })
 
     // this part avoids memory leaks
     if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
@@ -79,14 +79,20 @@ export default function OmregningStatistikk() {
 
   useEffect(() => {
     makeTextFile()
-  }, [temp])
+  }, [content])
+
+  function setSearchParamsWithBehandlingsNoekler() {
+    searchParams.set('behandlingsnoekler', behandlingsNoekler)
+    searchParams.set('page', '0') // Reset to first page
+    setSearchParams(searchParams)
+  }
 
   return (
     <div>
       <h1>Omregning Statistikk</h1>
       <p>Her vil statistikk relatert til omregning bli vist.</p>
 
-      <Form method={'POST'}>
+      <Form method={'POST'} navigate={false}>
         <Select
           label={'Behandlingsnøkler'}
           name={'behandlingsnoekler'}
@@ -99,7 +105,7 @@ export default function OmregningStatistikk() {
           ))}
         </Select>
         <br />
-        <Button variant='primary' loading={navigation.state === 'submitting'} type={'submit'}>Hent statistikk for
+        <Button variant='primary' onClick={setSearchParamsWithBehandlingsNoekler}>Hent statistikk for
           nøkkel</Button>
       </Form>
 
