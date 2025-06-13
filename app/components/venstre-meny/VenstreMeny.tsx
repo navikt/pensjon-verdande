@@ -67,7 +67,7 @@ export default function VenstreMeny(props: Props) {
 
   function tilgangNavLink(operasjon: string, link: string, label: string) {
     if (harTilgang(operasjon)) {
-      return (<li key={operasjon + link + label}><NavLink to={link}>{label}</NavLink></li>)
+      return (<li key={operasjon + link + label}><NavLink to={link} end>{label}</NavLink></li>)
     } return (<></>)
   }
 
@@ -119,10 +119,10 @@ export default function VenstreMeny(props: Props) {
               : (<></>)
           }
 
-          {byggMeny('Administrasjon', administrasjonMeny)}
-          {byggMeny("Batcher", batcherMeny)}
+          {byggMeny("Større kjøringer", batcherMeny)}
           {byggMeny("Behandlinger", behandlingerMeny)}
           {byggMeny("Omregning", omregningMeny)}
+          {byggMeny('Vedlikehold', administrasjonMeny)}
 
         </Accordion>
 
