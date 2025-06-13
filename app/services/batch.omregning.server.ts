@@ -131,11 +131,11 @@ export async function hentOmregningStatistikk(
   }
 }
 
-export async function hentOmregningStatistikkJson(
+export async function hentOmregningStatistikkCsv(
   accessToken: string,
   behandlingsnoekkel: string,
-): Promise<OmregningStatistikk[]> {
-  const response = await fetch(`${env.penUrl}/api/behandling/omregning/statistikk?behandlingsnoekkel=${behandlingsnoekkel}`, {
+): Promise<string> {
+  const response = await fetch(`${env.penUrl}/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsnoekkel}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -145,7 +145,7 @@ export async function hentOmregningStatistikkJson(
   })
 
   if (response.ok) {
-    return await response.json() as OmregningStatistikk[]
+    return await response.text()
   } else {
     throw new Error()
   }
