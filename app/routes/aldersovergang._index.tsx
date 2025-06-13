@@ -1,15 +1,41 @@
-import { Form, useSubmit } from 'react-router';
+import { ActionFunctionArgs, Form, useLoaderData, useSubmit } from 'react-router'
 import React, { useEffect, useRef, useState } from 'react'
 import { Select } from '@navikt/ds-react'
-import { env } from '~/services/env.server'
+import { requireAccessToken } from '~/services/auth.server'
+import { getBehandlinger } from '~/services/behandling.server'
+import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { BehandlingerPage } from '~/types'
 
-export const loader = async () => {
+export const loader = async ({ request }: ActionFunctionArgs) => {
+  let { searchParams } = new URL(request.url)
+
+  const size = searchParams.get('size')
+  const page = searchParams.get('page')
+
+  const accessToken = await requireAccessToken(request)
+  const behandlinger = await getBehandlinger(
+    accessToken,
+    'AldersovergangIdentifiserBruker',
+    null,
+    searchParams.get('ansvarligTeam'),
+    null,
+    null,
+    page ? +page : 0,
+    size ? +size : 100,
+    searchParams.get('sort'),
+  )
+  if (!behandlinger) {
+    throw new Response('Not Found', { status: 404 })
+  }
+
   return {
-    env: env.env,
+    behandlinger: behandlinger,
   }
 }
 
 export default function BatchOpprett_index() {
+  const { behandlinger } = useLoaderData<typeof loader>()
+
   const now = new Date()
   const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const [isClicked, setIsClicked] = useState(false)
@@ -61,6 +87,9 @@ export default function BatchOpprett_index() {
           </button>
         </p>
       </Form>
+      <div id="behandlinger">
+        <BehandlingerTable visStatusSoek={true} visBehandlingTypeSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
+      </div>
     </div>
   )
 }

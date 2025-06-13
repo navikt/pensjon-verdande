@@ -5,10 +5,9 @@ import { getBehandlinger } from '~/services/behandling.server'
 
 import { requireAccessToken } from '~/services/auth.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import invariant from 'tiny-invariant'
 import { BehandlingerPage } from '~/types'
 
-export const loader = async ({ params, request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)
 
   const size = searchParams.get('size')
@@ -38,7 +37,7 @@ export default function BehandlingerStatus() {
 
   return (
     <div id="behandlinger">
-      <BehandlingerTable visStatusSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
+      <BehandlingerTable visStatusSoek={true} visBehandlingTypeSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
     </div>
   )
 }
