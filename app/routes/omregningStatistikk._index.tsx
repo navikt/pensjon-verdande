@@ -2,18 +2,12 @@ import { requireAccessToken } from '~/services/auth.server'
 import {
   hentOmregningbehandlingsnokler,
   hentOmregningStatistikk,
-  hentOmregningStatistikkJson,
+  hentOmregningStatistikkCsv,
 } from '~/services/batch.omregning.server'
 import React, { useEffect, useState } from 'react'
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
-import {
-  type ActionFunctionArgs,
-  Form,
-  LoaderFunctionArgs,
-  useLoaderData,
-  useSearchParams,
-} from 'react-router'
-import type { OmregningStatistikk, OmregningStatistikkPage } from '~/types'
+import { type ActionFunctionArgs, Form, LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import type { OmregningStatistikkPage } from '~/types'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
@@ -23,18 +17,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   let size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
   let omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
-  let omregningStatistikkJson = await hentOmregningStatistikkJson(accesstoken, behandlingsNoekkel) as OmregningStatistikk[]
-  let content = ''
-  omregningStatistikkJson?.forEach(value => {
-    content += JSON.stringify(value, null, 4) + ','
-    // For å kunne laste ned som en gyldig json-fil
-    if (content.length > 2) {
-      content = content.slice(0, -1)
-    }
-  })
+  let content = await hentOmregningStatistikkCsv(accesstoken, behandlingsNoekkel)
 
   const omregningStatistikkInit = await hentOmregningbehandlingsnokler(accesstoken)
-  return { omregningStatistikkInit: omregningStatistikkInit, omregningStatistikkPage: omregningStatistikkPage, omregningStatistikkJson: content }
+  return {
+    omregningStatistikkInit: omregningStatistikkInit,
+    omregningStatistikkPage: omregningStatistikkPage,
+    omregningStatistikkCsv: content,
+  }
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -50,7 +40,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function OmregningStatistikk() {
-  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkJson } = useLoaderData<typeof loader>()
+  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkCsv } = useLoaderData<typeof loader>()
 
   const optionBehandlingsNoekler: { value: string, label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })
@@ -70,11 +60,11 @@ export default function OmregningStatistikk() {
     setSearchParams(searchParams)
   }
 
-  let content = omregningStatistikkJson
+  let content = omregningStatistikkCsv
 
   const [downloadLink, setDownloadLink] = useState('')
   const makeTextFile = () => {
-    const data = new Blob(["["+content+"]"], { type: 'application/json' })
+    const data = new Blob(['[' + content + ']'], { type: 'application/json' })
 
     // this part avoids memory leaks
     if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
@@ -116,15 +106,15 @@ export default function OmregningStatistikk() {
       </Form>
 
       <Box>
-      <Link
-        style={{padding: 1 + 'em', position: 'relative', right: 0, float: 'right'}}
-        // this attribute sets the filename
-        download='omregningTabell.json'
-        // link to the download URL
-        href={downloadLink}
-      >Last ned tabell</Link>
+        <Link
+          style={{ padding: 1 + 'em', position: 'relative', right: 0, float: 'right' }}
+          // this attribute sets the filename
+          download='omregningTabell.csv'
+          // link to the download URL
+          href={downloadLink}
+        >Last ned tabell</Link>
       </Box>
-        <Box>
+      <Box>
         <Table size='small' zebraStripes>
           <Table.Header>
             <Table.Row>
