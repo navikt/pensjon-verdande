@@ -29,6 +29,8 @@ export type BrukerTilgang = {
   fjernetAvBruker?: string | null
 }
 
-export const tilgangsmetaSort = (a: Tilgangsmeta, b: Tilgangsmeta) => a.operasjonBeskrivelse.localeCompare(b.operasjonBeskrivelse)
+export const tilgangsmetaSort = (a: Tilgangsmeta, b: Tilgangsmeta) => a.operasjonBeskrivelse.localeCompare(b.operasjonBeskrivelse, 'nb', { sensitivity: 'base' })
 
 export const decodeOmfang = (meta: Tilgangsmeta[], omfang: string) => meta.find(it => it.omfangNavn === omfang)?.omfangBeskrivelse ?? omfang
+
+export const decodeOperasjon = (meta: Tilgangsmeta[], operasjon: string)=> meta.find(it => it.operasjonNavn == operasjon)?.operasjonBeskrivelse ?? operasjon

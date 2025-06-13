@@ -34,9 +34,7 @@ export async function action({ params,
     throw new Error(`Ugyldig HTTP-metode: ${request.method}`)
   }
 
-  return {
-    brukernavn: params.brukernavn
-  }
+  return null
 }
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -47,13 +45,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   return {
     bruker: params.brukernavn === "me" ? await hentMe(accesstoken) : await hentBruker(accesstoken, params.brukernavn),
     tilgangskontrollmeta: await hentTilgangskontrollMeta(accesstoken),
+    readOnly: params.brukernavn === "me", // hack -- må styres av pen
   }
 }
 
 export default function Foo() {
-  const { bruker, tilgangskontrollmeta } = useLoaderData<typeof loader>()
+  const { bruker, tilgangskontrollmeta, readOnly } = useLoaderData<typeof loader>()
 
   return (
-    <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta}></Bruker>
+    <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta} readOnly={readOnly}></Bruker>
   )
 }

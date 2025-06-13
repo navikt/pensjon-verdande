@@ -67,7 +67,7 @@ export default function VenstreMeny(props: Props) {
 
   function tilgangNavLink(operasjon: string, link: string, label: string) {
     if (harTilgang(operasjon)) {
-      return (<li><NavLink to={link}>{label}</NavLink></li>)
+      return (<li key={operasjon + link + label}><NavLink to={link}>{label}</NavLink></li>)
     } return (<></>)
   }
 
@@ -76,7 +76,7 @@ export default function VenstreMeny(props: Props) {
 
     if (harTilgangTilMeny) {
       return (
-        <Accordion.Item defaultOpen>
+        <Accordion.Item defaultOpen key={navn}>
           <Accordion.Header>{navn}</Accordion.Header>
           <Accordion.Content>
             <ul>
