@@ -1,8 +1,8 @@
 import { ActionFunctionArgs, Await } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
-import { getDashboardSummary } from '~/services/behandling.server'
+import { getBehandlinger, getDashboardSummary } from '~/services/behandling.server'
 import { useLoaderData } from 'react-router'
-import { HGrid, Skeleton } from '@navikt/ds-react'
+import { Box, HGrid, HStack, Skeleton, VStack } from '@navikt/ds-react'
 import {
   ClipboardFillIcon,
   CogFillIcon,
@@ -16,7 +16,9 @@ import {
   BehandlingerPerDagLineChartCard,
 } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import React from 'react'
-import { da } from 'date-fns/locale'
+import Kalender from '~/components/kalender/Kalender'
+import { BehandlingerPage } from '~/types'
+import { PlanlagtOppgave } from '~/components/kalender/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -25,11 +27,37 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  return { loadingDashboardResponse: dashboardResponse }
+  // TODO: Quick and dirty hack for å hente batch-behandlinger for en måned (antar at det er mindre enn 100 i prod for en måned), uten å legge til et api i pen
+  // Erstatt med et eget endepunkt i pen som henter batch-behandlinger for en måned
+  const behandlinger: BehandlingerPage = await getBehandlinger(
+    accessToken,
+    null,
+    null,
+    null,
+    null,
+    true,
+    0,
+    100,
+    'opprettet,desc'
+  )
+
+  function behandlingerAsOppgaver(): PlanlagtOppgave[] {
+    return behandlinger.content.map(behandling => ({
+      tidspunkt: new Date(behandling.opprettet),
+      type: behandling.type,
+      kjoremonster: "Automatisk",
+    }))
+  }
+
+
+  return {
+    loadingDashboardResponse: dashboardResponse,
+    planlagteOppgaver: behandlingerAsOppgaver()
+  }
 }
 
 export default function Dashboard() {
-  const { loadingDashboardResponse } = useLoaderData<typeof loader>()
+  const { loadingDashboardResponse, planlagteOppgaver } = useLoaderData<typeof loader>()
 
   return (
     <React.Suspense fallback={
@@ -80,18 +108,27 @@ export default function Dashboard() {
                 icon={XMarkOctagonFillIcon}
               />
             </HGrid>
-            <div className={'flex-grid'} style={{ paddingTop: '12px' }}>
-              <div className={'col'}>
+
+            <HGrid gap="2" style={{ paddingTop: '12px' }} columns={2}>
+              <VStack gap="2">
                 <BehandlingerPerDagLineChartCard
                   opprettetPerDag={dashboardResponse.opprettetPerDag}
                 />
-              </div>
+                <Box
+                  background={'surface-default'}
+                  borderRadius="medium"
+                  shadow="medium"
+                  style={{ padding: '6px', width: '100%' }}
+                >
+                <Kalender planlagteOppgaver={planlagteOppgaver} visKlokkeslett={false}></Kalender>
+                </Box>
+              </VStack>
               <div className={'col'}>
                 <BehandlingAntallTableCard
                   behandlingAntall={dashboardResponse.behandlingAntall}
                 />
               </div>
-            </div>
+            </HGrid>
           </div>)
         }
         }
