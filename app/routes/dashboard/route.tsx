@@ -69,15 +69,15 @@ export default function Dashboard() {
           <Skeleton variant="rounded" width="100%" height={70} />
           <Skeleton variant="rounded" width="100%" height={70} />
         </HGrid>
-        <div className={'flex-grid'} style={{ paddingTop: '12px' }}>
-          <div className={'col'}>
+        <HGrid gap="2" style={{ paddingTop: '12px' }} columns={2}>
+          <VStack gap="2">
             <Skeleton variant="rounded" width="100%" height={550} />
             <Skeleton variant="rounded" width="100%" height={550} />
-          </div>
-          <div className={'col'}>
+          </VStack>
+          <VStack gap="2">
             <Skeleton variant="rounded" width="100%" height={1024} />
-          </div>
-        </div>
+          </VStack>
+        </HGrid>
       </div>
     }>
       <Await resolve={loadingDashboardResponse}>
@@ -125,11 +125,11 @@ export default function Dashboard() {
                 <Kalender planlagteOppgaver={planlagteOppgaver} visKlokkeslett={false}></Kalender>
                 </Box>
               </VStack>
-              <div className={'col'}>
+              <VStack gap="2">
                 <BehandlingAntallTableCard
                   behandlingAntall={dashboardResponse.behandlingAntall}
                 />
-              </div>
+              </VStack>
             </HGrid>
           </div>)
         }
