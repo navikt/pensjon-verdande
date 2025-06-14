@@ -1,11 +1,14 @@
 import { isSameDay } from '~/common/date'
-import { PlanlagtOppgave } from '~/components/kalender/types'
 import { getWeek } from '~/common/weeknumber'
+import { BehandlingDto } from '~/types'
+import { Link as ReactRouterLink } from 'react-router'
+import React from 'react'
+import { Link } from '@navikt/ds-react'
 
 export type Props = {
   highlightMaaned: Date,
   dato: Date,
-  planlagteOppgaver: PlanlagtOppgave[],
+  behandlinger: BehandlingDto[],
   visKlokkeSlett: boolean,
 }
 
@@ -40,10 +43,10 @@ export default function Dag(props: Props) {
     }
   }
 
-  function dagensOppgaver() {
-    return props.planlagteOppgaver
-      .filter((oppgave) => isSameDay(oppgave.tidspunkt, props.dato))
-      .map((oppgave, idx) => (
+  function dagensBehandlinger() {
+    return props.behandlinger
+      .filter((behandling) => isSameDay(new Date(behandling.opprettet), props.dato))
+      .map((behandling, idx) => (
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '0.8em' }}>
           <span
             style={{
@@ -53,8 +56,16 @@ export default function Dag(props: Props) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
-          >{oppgave.type}</span>
-          {props.visKlokkeSlett && <span style={{ textAlign: 'right', color: textColor }}>{oppgave.tidspunkt.getHours().toString().padStart(2, '0') + ':' + oppgave.tidspunkt.getMinutes().toString().padStart(2, '0')}</span>}
+          >
+            <Link as={ReactRouterLink}
+              to={`/behandling/${behandling.behandlingId}`}
+              variant="neutral"
+                  underline={false}
+            >
+              {behandling.type}
+            </Link>
+          </span>
+          {props.visKlokkeSlett && <span style={{ textAlign: 'right', color: textColor }}>{new Date(behandling.opprettet).getHours().toString().padStart(2, '0') + ':' + new Date(behandling.opprettet).getMinutes().toString().padStart(2, '0')}</span>}
         </div>
       ));
   }
@@ -67,7 +78,7 @@ export default function Dag(props: Props) {
       </tr>
       </thead>
       <tbody>
-      <tr>{dagensOppgaver()}</tr>
+      <tr>{dagensBehandlinger()}</tr>
       </tbody>
     </table>
   );

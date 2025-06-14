@@ -1,14 +1,14 @@
 import { getDato } from '~/common/date'
 import Dag from '~/components/kalender/Dag'
-import { PlanlagtOppgave } from '~/components/kalender/types'
 import { getWeek, getWeekYear } from '~/common/weeknumber'
 import { Heading } from '@navikt/ds-react'
 import React from 'react'
+import { BehandlingDto } from '~/types'
 
 const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
 
 export type Props = {
-  planlagteOppgaver: PlanlagtOppgave[],
+  behandlinger: BehandlingDto[],
   visKlokkeSlett: boolean,
 }
 
@@ -45,7 +45,7 @@ export default function Kalender(props: Props) {
                   <Dag
                     highlightMaaned={now}
                     dato={day(rowIdx + forsteUkeNr, colIdx)}
-                    planlagteOppgaver={props.planlagteOppgaver}
+                    behandlinger={props.behandlinger}
                     visKlokkeSlett={props.visKlokkeSlett}
                   ></Dag>
                 </td>

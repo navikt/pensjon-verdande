@@ -1,8 +1,7 @@
-import { ActionFunctionArgs, Await } from 'react-router'
+import { ActionFunctionArgs, Await, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger, getDashboardSummary } from '~/services/behandling.server'
-import { useLoaderData } from 'react-router'
-import { Box, HGrid, HStack, Skeleton, VStack } from '@navikt/ds-react'
+import { Box, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import {
   ClipboardFillIcon,
   CogFillIcon,
@@ -18,8 +17,6 @@ import {
 import React from 'react'
 import Kalender from '~/components/kalender/Kalender'
 import { BehandlingerPage } from '~/types'
-import { PlanlagtOppgave } from '~/components/kalender/types'
-import { decodeBehandling } from '~/common/decodeBehandling'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -42,23 +39,14 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     'opprettet,desc'
   )
 
-  function behandlingerAsOppgaver(): PlanlagtOppgave[] {
-    return behandlinger.content.map(behandling => ({
-      tidspunkt: new Date(behandling.opprettet),
-      type: decodeBehandling(behandling.type),
-      kjoremonster: "Automatisk",
-    }))
-  }
-
-
   return {
     loadingDashboardResponse: dashboardResponse,
-    planlagteOppgaver: behandlingerAsOppgaver()
+    behandlinger: behandlinger.content
   }
 }
 
 export default function Dashboard() {
-  const { loadingDashboardResponse, planlagteOppgaver } = useLoaderData<typeof loader>()
+  const { loadingDashboardResponse, behandlinger } = useLoaderData<typeof loader>()
 
   return (
     <React.Suspense fallback={
@@ -128,7 +116,7 @@ export default function Dashboard() {
                     width: '100%',
                   }}
                 >
-                <Kalender planlagteOppgaver={planlagteOppgaver} visKlokkeslett={false}></Kalender>
+                <Kalender behandlinger={behandlinger} visKlokkeSlett={false}></Kalender>
                 </Box>
               </VStack>
               <VStack gap="2">
