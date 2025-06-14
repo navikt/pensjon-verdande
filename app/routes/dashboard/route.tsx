@@ -19,6 +19,7 @@ import React from 'react'
 import Kalender from '~/components/kalender/Kalender'
 import { BehandlingerPage } from '~/types'
 import { PlanlagtOppgave } from '~/components/kalender/types'
+import { decodeBehandling } from '~/common/decodeBehandling'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -44,7 +45,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   function behandlingerAsOppgaver(): PlanlagtOppgave[] {
     return behandlinger.content.map(behandling => ({
       tidspunkt: new Date(behandling.opprettet),
-      type: behandling.type,
+      type: decodeBehandling(behandling.type),
       kjoremonster: "Automatisk",
     }))
   }
@@ -70,7 +71,8 @@ export default function Dashboard() {
         </HGrid>
         <div className={'flex-grid'} style={{ paddingTop: '12px' }}>
           <div className={'col'}>
-            <Skeleton variant="rounded" width="100%" height={329} />
+            <Skeleton variant="rounded" width="100%" height={550} />
+            <Skeleton variant="rounded" width="100%" height={550} />
           </div>
           <div className={'col'}>
             <Skeleton variant="rounded" width="100%" height={1024} />
