@@ -4,6 +4,7 @@ import { BehandlingDto } from '~/types'
 import { Link as ReactRouterLink } from 'react-router'
 import React from 'react'
 import { Link } from '@navikt/ds-react'
+import { decodeBehandling } from '~/common/decodeBehandling'
 
 export type Props = {
   highlightMaaned: Date,
@@ -62,7 +63,7 @@ export default function Dag(props: Props) {
               variant="neutral"
                   underline={false}
             >
-              {behandling.type}
+              {decodeBehandling(behandling.type)}
             </Link>
           </span>
           {props.visKlokkeSlett && <span style={{ textAlign: 'right', color: textColor }}>{new Date(behandling.opprettet).getHours().toString().padStart(2, '0') + ':' + new Date(behandling.opprettet).getMinutes().toString().padStart(2, '0')}</span>}
