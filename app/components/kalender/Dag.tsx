@@ -60,18 +60,16 @@ export default function Dag(props: Props) {
   }
 
   return(
-    <td key={props.dato.toISOString()} style={{ border: "1px solid #ddd"}}>
-      <table style={{width: '100%'}}>
-        <thead>
-        <tr>
-          {dayRow()}
-        </tr>
-        </thead>
-        <tbody>
-        <tr>{dagensOppgaver()}</tr>
-        </tbody>
-      </table>
-    </td>
+    <table style={{width: '100%', tableLayout: 'fixed'}}>
+      <thead>
+      <tr>
+        {dayRow()}
+      </tr>
+      </thead>
+      <tbody>
+      <tr>{dagensOppgaver()}</tr>
+      </tbody>
+    </table>
   );
 
 }

@@ -15,7 +15,7 @@ export type Props = {
 export default function Kalender(props: Props) {
   let now = new Date()
   let firstInThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-  let førsteUkeNr = getWeek(firstInThisMonth)
+  let forsteUkeNr = getWeek(firstInThisMonth)
 
   function day(ukenr: number, colIdx: number) {
     return getDato(getWeekYear(now), ukenr, colIdx + 1)
@@ -27,11 +27,11 @@ export default function Kalender(props: Props) {
         <strong>juni</strong> 2025
       </Heading>
 
-      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+      <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed' }}>
         <thead>
         <tr>
           {weekdays.map((day) => (
-            <th key={day} style={{ textAlign: 'right', width: 'calc(100% / 7)' }}>{day}</th>
+            <th key={day} style={{ textAlign: 'right', width: 'calc(100% / 7)', maxWidth: 'calc(100% / 7)' }}>{day}</th>
           ))}
         </tr>
         </thead>
@@ -40,12 +40,15 @@ export default function Kalender(props: Props) {
           <>
             <tr key={rowIdx + 'dato'} style={{ height: '8em', verticalAlign: 'top' }}>
               {[...Array(7)].map((_, colIdx) => (
-                <Dag
-                  highlightMaaned={now}
-                  dato={day(rowIdx + førsteUkeNr, colIdx)}
-                  planlagteOppgaver={props.planlagteOppgaver}
-                  visKlokkeSlett={props.visKlokkeSlett}
-                ></Dag>
+                <td key={'col' + colIdx + 'row' + rowIdx}
+                    style={{ border: '1px solid #ddd', width: 'calc(100% / 7)', maxWidth: 'calc(100% / 7)' }}>
+                  <Dag
+                    highlightMaaned={now}
+                    dato={day(rowIdx + forsteUkeNr, colIdx)}
+                    planlagteOppgaver={props.planlagteOppgaver}
+                    visKlokkeSlett={props.visKlokkeSlett}
+                  ></Dag>
+                </td>
               ))}
             </tr>
           </>
