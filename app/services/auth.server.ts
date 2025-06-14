@@ -7,12 +7,14 @@ import { type OAuth2Tokens, } from "arctic";
 
 
 type User = {
-  accessToken: string
+  accessToken: string,
+  accessTokenExpiresAt: Date,
 }
 
 function getUser(tokens: OAuth2Tokens, request: Request): Promise<User> {
   return Promise.resolve({
-    accessToken: tokens.accessToken()
+    accessToken: tokens.accessToken(),
+    accessTokenExpiresAt: tokens.accessTokenExpiresAt()
   })
 }
 
@@ -85,19 +87,16 @@ export async function requireAccessToken(request: Request) {
       // if there is no user session, redirect to login
       throw redirect(redirectUrl(request))
     } else {
-      try {
-        let tokenResponse = await exchange(
-          (session.get('user') as User).accessToken,
-          env.penScope,
-        )
-        return tokenResponse.access_token
-      } catch (e) {
-        throw redirect(redirectUrl(request), {
-          headers: {
-            'Set-Cookie': await destroySession(session),
-          },
-        })
+      let user = session.get('user') as User
+      if (!user.accessToken || !user.accessTokenExpiresAt || user.accessTokenExpiresAt < new Date()) {
+        throw redirect(redirectUrl(request))
       }
+
+      let tokenResponse = await exchange(
+        user.accessToken,
+        env.penScope,
+      )
+      return tokenResponse.access_token
     }
   }
 }
@@ -128,19 +127,16 @@ export async function tryAccessToken(request: Request) {
     if (!session.has('user')) {
       return null
     } else {
-      try {
-        let tokenResponse = await exchange(
-          (session.get('user') as User).accessToken,
-          env.penScope,
-        )
-        return tokenResponse.access_token
-      } catch (e) {
-        throw redirect(redirectUrl(request), {
-          headers: {
-            'Set-Cookie': await destroySession(session),
-          },
-        })
+      let user = session.get('user') as User
+      if (!user.accessToken || !user.accessTokenExpiresAt || user.accessTokenExpiresAt < new Date()) {
+        return null
       }
+
+      let tokenResponse = await exchange(
+        user.accessToken,
+        env.penScope,
+      )
+      return tokenResponse.access_token
     }
   }
 }
