@@ -120,7 +120,13 @@ export default function Dashboard() {
                   background={'surface-default'}
                   borderRadius="medium"
                   shadow="medium"
-                  style={{ padding: '6px', width: '100%' }}
+                  style={{
+                    paddingTop: '6px',
+                    paddingBottom: '6px',
+                    paddingLeft: '12px',
+                    paddingRight: '12px',
+                    width: '100%',
+                  }}
                 >
                 <Kalender planlagteOppgaver={planlagteOppgaver} visKlokkeslett={false}></Kalender>
                 </Box>
