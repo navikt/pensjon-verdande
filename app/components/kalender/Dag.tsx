@@ -45,7 +45,15 @@ export default function Dag(props: Props) {
       .filter((oppgave) => isSameDay(oppgave.tidspunkt, props.dato))
       .map((oppgave, idx) => (
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '0.8em' }}>
-          <span style={{ textAlign: 'left', color: textColor }}>{oppgave.type}</span>
+          <span
+            style={{
+              textAlign: 'left',
+              color: textColor,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >{oppgave.type}</span>
           {props.visKlokkeSlett && <span style={{ textAlign: 'right', color: textColor }}>{oppgave.tidspunkt.getHours().toString().padStart(2, '0') + ':' + oppgave.tidspunkt.getMinutes().toString().padStart(2, '0')}</span>}
         </div>
       ));
