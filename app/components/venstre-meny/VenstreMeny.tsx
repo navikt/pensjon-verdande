@@ -16,19 +16,19 @@ let administrasjonMeny = [
 ]
 
 const batcherMeny = [
-  [ 'BATCH_KJORINGER', '/batcher', 'Alle batchkjøringer' ],
-  [ 'ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang' ],
-  [ 'LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning' ],
   [ 'ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling' ],
-  [ 'HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt' ],
-  [ 'LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting' ],
+  [ 'ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang' ],
+  [ 'BATCH_KJORINGER', '/batcher', 'Alle batchkjøringer' ],
   [ 'BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat' ],
   [ 'FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd' ],
+  [ 'GJENLEVENDEPENSJON_UTVIDET_RETT', `/gjp`, 'Gjenlevendepensjon - utvidet rett' ],
+  [ 'HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt' ],
+  [ 'INNTEKTSKONTROLL', `/batch/inntektskontroll`, 'Inntektskontroll' ],
+  [ 'LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning' ],
+  [ 'LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting' ],
+  [ 'OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/kategoriserbruker`, 'Omregning ved opptjeningsendring' ],
   [ 'REGULERING', `/batch/regulering`, 'Regulering' ],
   [ 'REGULERING', `/batch/reguleringv2`, 'Regulering Next' ],
-  [ 'OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/kategoriserbruker`, 'Omregning ved opptjeningsendring' ],
-  [ 'GJENLEVENDEPENSJON_UTVIDET_RETT', `/gjp`, 'Gjenlevendepensjon - utvidet rett' ],
-  [ 'INNTEKTSKONTROLL', `/batch/inntektskontroll`, 'Inntektskontroll' ],
 ]
 
 let omregningMeny = [
@@ -39,12 +39,12 @@ let omregningMeny = [
 
 let behandlingerMeny = [
   ['SE_BEHANDLINGER', '/behandlinger', 'Alle behandlinger'],
-  ['SE_BEHANDLINGER', '/behandlinger/FEILENDE', 'Feilende'],
   ['SE_BEHANDLINGER', '/behandlinger/DEBUG', 'I debug'],
+  ['SE_BEHANDLINGER', '/behandlinger/FEILENDE', 'Feilende'],
+  ['SE_BEHANDLINGER', '/behandlinger/FULLFORT', 'Fullførte'],
+  ['SE_BEHANDLINGER', '/behandlinger/OPPRETTET', 'Opprettet'],
   ['SE_BEHANDLINGER', '/behandlinger/STOPPET', 'Stoppede'],
   ['SE_BEHANDLINGER', '/behandlinger/UNDER_BEHANDLING', 'Under behandling'],
-  ['SE_BEHANDLINGER', '/behandlinger/OPPRETTET', 'Opprettet'],
-  ['SE_BEHANDLINGER', '/behandlinger/FULLFORT', 'Fullførte'],
 ]
 
 export default function VenstreMeny(props: Props) {
@@ -110,6 +110,10 @@ export default function VenstreMeny(props: Props) {
                 <></>
               )
           }
+
+          <Accordion.Item>
+            <NavLink to={`/planlegging`}>Planlegging</NavLink>
+          </Accordion.Item>
 
           {
             harRolle('VERDANDE_ADMIN') ?
