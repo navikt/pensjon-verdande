@@ -1,5 +1,5 @@
 export function splitOnCapitals(string: string) {
-  let match = string.match(/[A-Z][a-z]+/g)
+  let match = string.match(/([A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+)/g)
   if (match) {
     return match.join(' ')
   } else {
