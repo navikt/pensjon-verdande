@@ -110,11 +110,6 @@ export default function VenstreMeny(props: Props) {
                 <></>
               )
           }
-
-          <Accordion.Item>
-            <NavLink to={`/planlegging`}>Planlegging</NavLink>
-          </Accordion.Item>
-
           {
             harRolle('VERDANDE_ADMIN') ?
               (<Accordion.Item>
