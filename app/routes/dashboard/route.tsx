@@ -50,7 +50,7 @@ export default function Dashboard() {
 
   return (
     <React.Suspense fallback={
-      <div>
+      <VStack gap="2">
         <HGrid gap="2" columns={4}>
           <Skeleton variant="rounded" width="100%" height={70} />
           <Skeleton variant="rounded" width="100%" height={70} />
@@ -66,12 +66,13 @@ export default function Dashboard() {
             <Skeleton variant="rounded" width="100%" height={1024} />
           </VStack>
         </HGrid>
-      </div>
+      </VStack>
     }>
       <Await resolve={loadingDashboardResponse}>
         {(dashboardResponse) => {
           if (!dashboardResponse) return (<></>)
-          return (<div>
+          return (
+            <VStack gap="2">
             <HGrid gap="2" columns={4}>
               <DashboardCard
                 iconBackgroundColor={'var(--a-green-400)'}
@@ -99,7 +100,7 @@ export default function Dashboard() {
               />
             </HGrid>
 
-            <HGrid gap="2" style={{ paddingTop: '12px' }} columns={2}>
+            <HGrid gap="2" columns={2}>
               <VStack gap="2">
                 <BehandlingerPerDagLineChartCard
                   opprettetPerDag={dashboardResponse.opprettetPerDag}
@@ -125,7 +126,7 @@ export default function Dashboard() {
                 />
               </VStack>
             </HGrid>
-          </div>)
+            </VStack>)
         }
         }
       </Await>
