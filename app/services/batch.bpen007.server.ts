@@ -1,5 +1,6 @@
 import { env } from '~/services/env.server'
 import { StartBatchResponse } from '~/types'
+import { data } from 'react-router'
 
 export async function opprettBpen007(
   accessToken: string,
@@ -23,6 +24,9 @@ export async function opprettBpen007(
   if (response.ok) {
     return (await response.json()) as StartBatchResponse
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved opprettelse av behandling Feil var\n" + text, {
+      status: response.status
+    })
   }
 }

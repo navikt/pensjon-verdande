@@ -1,36 +1,71 @@
-import { Form } from 'react-router';
-import { env } from '~/services/env.server'
-import React, { useEffect, useRef } from 'react'
+import { ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
+import React from 'react'
+import {
+  BodyLong,
+  Button,
+  Heading,
+  Label,
+} from '@navikt/ds-react'
+import { requireAccessToken } from '~/services/auth.server'
+import { opprettBpen007 } from '~/services/batch.bpen007.server'
+import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { getBehandlinger } from '~/services/behandling.server'
 
-export const loader = async () => {
+export const loader = async ({ request }: ActionFunctionArgs) => {
+  let { searchParams } = new URL(request.url)
+
+  const size = searchParams.get('size')
+  const page = searchParams.get('page')
+
+  const accessToken = await requireAccessToken(request)
+  const behandlinger = await getBehandlinger(
+    accessToken,
+    'VurderSamboereBatch',
+    null,
+    null,
+    null,
+    null,
+    page ? +page : 0,
+    size ? +size : 5,
+    searchParams.get('sort'),
+  )
+  if (!behandlinger) {
+    throw new Response('Not Found', { status: 404 })
+  }
+
   return {
-    env: env.env,
+    behandlinger: behandlinger,
   }
 }
 
+export const action = async ({ params, request }: ActionFunctionArgs) => {
+  const formData = await request.formData()
+  const updates = Object.fromEntries(formData)
+  console.log('formData', formData)
+
+  const accessToken = await requireAccessToken(request)
+  await opprettBpen007(accessToken, +updates.behandlingsAr, updates.kjoretidspunkt)
+  return redirect('.')
+}
+
 export default function BatchOpprett_index() {
+  const { behandlinger } = useLoaderData<typeof loader>()
+
   const now = new Date()
   const lastYear = now.getFullYear() - 1
 
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-  useEffect(() => {
-    handleInput()
-  })
 
   return (
     <div>
-      <h1>Opprett BPEN007 batchkjøring</h1>
-      <p>Lever samboeropplysning til SKD</p>
-      <Form action="bpen007" method="POST">
-        <p>
+      <Heading size="large" spacing>Lever samboeropplysning til Skattedirektoratet</Heading>
+      <BodyLong spacing>
+        Finner personer som har vært samboere i behandlingsåret og oppretter data som kan overleveres til Skattedirektoratet.
+      </BodyLong>
+      <Form action="." method="POST">
+        <Label as="p" spacing>
           Behandlingsår
+        </Label>
+        <p>
           <input
             defaultValue={lastYear}
             aria-label="År"
@@ -39,10 +74,19 @@ export default function BatchOpprett_index() {
             placeholder="År"
           />
         </p>
+
         <p>
-          <button type="submit">Opprett</button>
+          <Button type="submit">Opprett</Button>
         </p>
       </Form>
+
+      <BehandlingerTable
+        visStatusSoek={true}
+        visBehandlingTypeSoek={false}
+        visAnsvarligTeamSoek={false}
+        behandlingerResponse={behandlinger}
+      />
+
     </div>
   )
 }

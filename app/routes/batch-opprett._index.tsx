@@ -4,14 +4,12 @@ import { Select } from '@navikt/ds-react'
 
 export const loader = async () => {
   return {
-    env: env.env,
   }
 }
 
 export default function BatchOpprett_index() {
   const now = new Date()
   const lastYear = now.getFullYear() - 1
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const nesteBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 2
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
@@ -31,54 +29,6 @@ export default function BatchOpprett_index() {
 
   return (
     <div>
-      <h1>Start aldersovergang</h1>
-      <Form action="bpen005" method="POST">
-        <div style={{ display: 'inline-block' }}>
-          <label>Behandlingsmåned</label>
-          <br />
-          <input
-            defaultValue={denneBehandlingsmaneden}
-            aria-label="Behandlingsmåned"
-            name="behandlingsmaned"
-            type="number"
-            placeholder="Behandlingsmåned"
-          />
-        </div>
-        <br />
-        <div style={{ display: 'inline-block' }}>
-          <Select
-            label="Begrenset utplukk"
-            size={'small'}
-            name={'begrensetUtplukk'}
-            defaultValue={'false'}
-          >
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-        </div>
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Opprett
-          </button>
-        </p>
-      </Form>
-
-      <h1>Opprett BPEN007 batchkjøring</h1>
-      <Form action="bpen007" method="POST">
-        <p>
-          Behandlingsår
-          <input
-            defaultValue={lastYear}
-            aria-label="År"
-            name="behandlingsAr"
-            type="number"
-            placeholder="År"
-          />
-        </p>
-        <p>
-          <button type="submit">Opprett</button>
-        </p>
-      </Form>
       <h1>Opprett ADHOC Brevbestilling batchkjøring på brevmal for sak</h1>
       <Form action="adhocBrev" method="POST">
         <p>
