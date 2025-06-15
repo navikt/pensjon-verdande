@@ -8,13 +8,13 @@ import { type OAuth2Tokens, } from "arctic";
 
 type User = {
   accessToken: string,
-  accessTokenExpiresAt: Date,
+  accessTokenExpiresAt: string,
 }
 
 function getUser(tokens: OAuth2Tokens, request: Request): Promise<User> {
   return Promise.resolve({
     accessToken: tokens.accessToken(),
-    accessTokenExpiresAt: tokens.accessTokenExpiresAt()
+    accessTokenExpiresAt: tokens.accessTokenExpiresAt().toISOString()
   })
 }
 
@@ -88,7 +88,7 @@ export async function requireAccessToken(request: Request) {
       throw redirect(redirectUrl(request))
     } else {
       let user = session.get('user') as User
-      if (!user.accessToken || !user.accessTokenExpiresAt || user.accessTokenExpiresAt < new Date()) {
+      if (!user.accessToken || !user.accessTokenExpiresAt || new Date(user.accessTokenExpiresAt) < new Date()) {
         throw redirect(redirectUrl(request))
       }
 
@@ -128,7 +128,7 @@ export async function tryAccessToken(request: Request) {
       return null
     } else {
       let user = session.get('user') as User
-      if (!user.accessToken || !user.accessTokenExpiresAt || user.accessTokenExpiresAt < new Date()) {
+      if (!user.accessToken || !user.accessTokenExpiresAt || new Date(user.accessTokenExpiresAt) < new Date()) {
         return null
       }
 
