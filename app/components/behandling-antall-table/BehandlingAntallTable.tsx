@@ -1,10 +1,11 @@
 import { useSort } from '~/hooks/useSort'
 import { BehandlingAntall } from '~/types'
 import React from 'react'
-import { Table } from '@navikt/ds-react'
+import { HelpText, HStack, Link, Table } from '@navikt/ds-react'
 import { formatNumber } from '~/common/number'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { NavLink } from 'react-router';
+import { QuestionmarkDiamondIcon } from '@navikt/aksel-icons'
 
 type Props = {
   oppsummering: BehandlingAntall[]
@@ -29,10 +30,22 @@ export default function BehandlingAntallTable(props: Props) {
       <Table.Body>
         {sortedOppsummering.map((it: BehandlingAntall, index) => {
           return (
-            <Table.Row key={it.navn}>
+            <Table.Row key={it.navn} style={{backgroundColor: it.behandlingType === null ? 'var(--a-surface-warning-subtle)' : 'inherit'}}>
               <Table.DataCell align={'right'}>{index + 1}</Table.DataCell>
               <Table.DataCell>
-                <NavLink to={`/behandlinger?behandlingType=${it.navn}`}>{decodeBehandling(it.navn)}</NavLink>
+                <HStack>
+                  <Link as={NavLink} to={`/behandlinger?behandlingType=${it.navn}`}>{decodeBehandling(it.navn)}</Link>
+                  {
+                    it.behandlingType === null
+                      ? (
+                        <HelpText title="Ukjent behandlingstype">
+                          Behandlingstypen er ukjent. Det kan være fordi den er fjernet fra systemet,
+                          eller fordi navnet er endret uten at databasen er oppdatert.
+                        </HelpText>
+                      )
+                      : (<></>)
+                  }
+                </HStack>
               </Table.DataCell>
               <Table.DataCell align={'right'}>
                 {formatNumber(it.antall)}

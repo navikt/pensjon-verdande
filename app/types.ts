@@ -125,6 +125,7 @@ export type PageSort = {
 
 export type BehandlingAntall = {
   navn: string
+  behandlingType: string | undefined | null
   antall: number
 }
 
