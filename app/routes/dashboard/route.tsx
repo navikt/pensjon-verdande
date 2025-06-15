@@ -6,7 +6,7 @@ import {
   ClipboardFillIcon,
   CogFillIcon,
   ExclamationmarkTriangleFillIcon,
-  XMarkOctagonFillIcon,
+  QuestionmarkDiamondFillIcon,
 } from '@navikt/aksel-icons'
 import { formatNumber } from '~/common/number'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
@@ -86,16 +86,16 @@ export default function Dashboard() {
                 icon={CogFillIcon}
               />
               <DashboardCard
-                iconBackgroundColor={'var(--a-surface-warning)'}
+                iconBackgroundColor={'var(--a-surface-danger)'}
                 title="Feilende"
                 value={formatNumber(dashboardResponse.feilendeBehandlinger)}
                 icon={ExclamationmarkTriangleFillIcon}
               />
               <DashboardCard
-                iconBackgroundColor={'var(--a-surface-danger)'}
+                iconBackgroundColor={'var(--a-surface-warning)'}
                 title="Ukjente typer"
                 value={formatNumber(dashboardResponse.ukjenteBehandlingstyper.length)}
-                icon={XMarkOctagonFillIcon}
+                icon={QuestionmarkDiamondFillIcon}
               />
             </HGrid>
 
