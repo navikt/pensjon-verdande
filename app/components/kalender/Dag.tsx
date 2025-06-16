@@ -19,7 +19,7 @@ export default function Dag(props: Props) {
   if (props.dato.getDate() === 1) {
     dagStreng = props.dato.getDate() + '. ' + props.dato.toLocaleDateString('no-NO', { month: 'long' })
   } else {
-    dagStreng = props.dato.getDate().toString()
+    dagStreng = props.dato.getDate().toString() + '.'
   }
 
   let dagLabel: JSX.Element
