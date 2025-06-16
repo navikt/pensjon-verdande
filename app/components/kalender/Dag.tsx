@@ -5,6 +5,7 @@ import { Link as ReactRouterLink } from 'react-router'
 import React from 'react'
 import { Link } from '@navikt/ds-react'
 import { decodeBehandling } from '~/common/decodeBehandling'
+import { JSX } from 'react/jsx-runtime'
 
 export type Props = {
   highlightMaaned: Date,
@@ -14,11 +15,22 @@ export type Props = {
 }
 
 export default function Dag(props: Props) {
-  let dagLabel: string
+  let dagStreng: string
   if (props.dato.getDate() === 1) {
-    dagLabel = props.dato.getDate() + '. ' + props.dato.toLocaleDateString('no-NO', { month: 'long' })
+    dagStreng = props.dato.getDate() + '. ' + props.dato.toLocaleDateString('no-NO', { month: 'long' })
   } else {
-    dagLabel = props.dato.getDate().toString()
+    dagStreng = props.dato.getDate().toString()
+  }
+
+  let dagLabel: JSX.Element
+  if (isSameDay(props.dato, new Date())) {
+    dagLabel = <span
+      style={{
+        fontWeight: 'bold'
+      }}
+    >{dagStreng}</span>
+  } else {
+    dagLabel = <span>{dagStreng}</span>
   }
 
   let textColor: string
