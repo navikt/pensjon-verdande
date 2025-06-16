@@ -3,7 +3,7 @@ import { getWeek } from '~/common/weeknumber'
 import { BehandlingDto } from '~/types'
 import { Link as ReactRouterLink } from 'react-router'
 import React from 'react'
-import { Link } from '@navikt/ds-react'
+import { HStack, Link, Spacer } from '@navikt/ds-react'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { JSX } from 'react/jsx-runtime'
 
@@ -43,10 +43,11 @@ export default function Dag(props: Props) {
   function dayRow() {
     if (props.dato.getDay() === 1) {
       return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <HStack>
           <span style={{ textAlign: 'left', color: 'gray', fontSize: '0.9em' }}>{getWeek(props.dato)}</span>
+          <Spacer></Spacer>
           <span style={{ textAlign: 'right', color: textColor }}>{dagLabel}</span>
-        </div>
+        </HStack>
       )
 
     } else {
@@ -60,7 +61,7 @@ export default function Dag(props: Props) {
     return props.behandlinger
       .filter((behandling) => isSameDay(new Date(behandling.opprettet), props.dato))
       .map((behandling, idx) => (
-        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '0.8em' }}>
+        <HStack style={{ fontSize: '0.8em' }}>
           <span
             style={{
               textAlign: 'left',
@@ -79,11 +80,14 @@ export default function Dag(props: Props) {
               {decodeBehandling(behandling.type)}
             </Link>
           </span>
+          <Spacer></Spacer>
+          <span>
           {props.visKlokkeSlett && <span style={{
             textAlign: 'right',
             color: textColor,
           }}>{new Date(behandling.opprettet).getHours().toString().padStart(2, '0') + ':' + new Date(behandling.opprettet).getMinutes().toString().padStart(2, '0')}</span>}
-        </div>
+          </span>
+        </HStack>
       ))
   }
 
