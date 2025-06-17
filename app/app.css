@@ -122,6 +122,7 @@ i {
 }
 #venstre-meny {
   background-color: var(--a-surface-inverted);
+  height: 100vh;
 }
 
 .mainmenu, .submenu {
