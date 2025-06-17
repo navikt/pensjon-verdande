@@ -1,6 +1,15 @@
-import { Accordion } from '@navikt/ds-react'
 import { NavLink } from 'react-router'
 import { MeResponse } from '~/types/brukere'
+import { useState } from 'react'
+import {
+  ChevronDownIcon, CurrencyExchangeIcon,
+  HouseIcon,
+  MagnifyingGlassIcon,
+  NumberListIcon,
+  PersonGroupIcon, RecycleIcon,
+  SackPensionIcon,
+} from '@navikt/aksel-icons'
+import { Link } from '@navikt/ds-react'
 
 export type Props = {
   me: MeResponse,
@@ -16,19 +25,19 @@ let administrasjonMeny = [
 ]
 
 const batcherMeny = [
-  [ 'ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling' ],
-  [ 'ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang' ],
-  [ 'BATCH_KJORINGER', '/batcher', 'Alle batchkjøringer' ],
-  [ 'BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat' ],
-  [ 'FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd' ],
-  [ 'GJENLEVENDEPENSJON_UTVIDET_RETT', `/gjp`, 'Gjenlevendepensjon - utvidet rett' ],
-  [ 'HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt' ],
-  [ 'INNTEKTSKONTROLL', `/batch/inntektskontroll`, 'Inntektskontroll' ],
-  [ 'LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning' ],
-  [ 'LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting' ],
-  [ 'OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/kategoriserbruker`, 'Omregning ved opptjeningsendring' ],
-  [ 'REGULERING', `/batch/regulering`, 'Regulering' ],
-  [ 'REGULERING', `/batch/reguleringv2`, 'Regulering Next' ],
+  ['ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling'],
+  ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
+  ['BATCH_KJORINGER', '/batcher', 'Alle batchkjøringer'],
+  ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
+  ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
+  ['GJENLEVENDEPENSJON_UTVIDET_RETT', `/gjp`, 'Gjenlevendepensjon - utvidet rett'],
+  ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
+  ['INNTEKTSKONTROLL', `/batch/inntektskontroll`, 'Inntektskontroll'],
+  ['LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning'],
+  ['LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting'],
+  ['OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/kategoriserbruker`, 'Omregning ved opptjeningsendring'],
+  ['REGULERING', `/batch/regulering`, 'Regulering'],
+  ['REGULERING', `/batch/reguleringv2`, 'Regulering Next'],
 ]
 
 let omregningMeny = [
@@ -68,24 +77,33 @@ export default function VenstreMeny(props: Props) {
   function tilgangNavLink(operasjon: string, link: string, label: string) {
     if (harTilgang(operasjon)) {
       return (<li key={operasjon + link + label}><NavLink to={link} end>{label}</NavLink></li>)
-    } return (<></>)
+    }
+    return (<></>)
   }
 
-  function byggMeny(navn: string, menyElementer: string[][]) {
-    let harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
 
+  const handleMenuClick = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index)
+  }
+
+  function byggMeny(navn: string, menyElementer: string[][], idx: number, p0?: any) {
+    let harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
     if (harTilgangTilMeny) {
       return (
-        <Accordion.Item defaultOpen key={navn}>
-          <Accordion.Header>{navn}</Accordion.Header>
-          <Accordion.Content>
-            <ul>
-              {
-                menyElementer.map(([operasjon, link, label]) => (tilgangNavLink(operasjon, link, label)))
-              }
-            </ul>
-          </Accordion.Content>
-        </Accordion.Item>
+        <li className={openIndex === idx ? 'open' : ''}
+            >
+          <Link id="filter-toggle" as="a" onClick={() => handleMenuClick(idx)} style={{display: 'flex', justifyContent: 'flex-start'}}>
+            {p0}
+            {navn}
+            <ChevronDownIcon title='a11y-title' fontSize='1.5rem' style={{ marginLeft: 'auto', transition: 'transform 0.2s', transform: openIndex === idx ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+          </Link>
+          <ul className='submenu'>
+            {
+              menyElementer.map(([operasjon, link, label]) => (tilgangNavLink(operasjon, link, label)))
+            }
+          </ul>
+        </li>
       )
     } else {
       return (<></>)
@@ -93,37 +111,43 @@ export default function VenstreMeny(props: Props) {
   }
 
   return (
-    <div id='sidebar'>
-      <nav>
-        <Accordion size="small" headingSize="xsmall">
-          <Accordion.Item>
-            <NavLink to={`/dashboard`}>Dashboard</NavLink>
-          </Accordion.Item>
+    <div id="venstre-meny">
+      <nav className="sticky-sidebar">
+        <ul className='mainmenu'>
+          <li>
+            <Link as={NavLink} to={`/dashboard`} style={{display: 'flex', justifyContent: 'flex-start'}}>
+              <HouseIcon title='a11y-title' fontSize='1.5rem' />
+              Hjem</Link>
+          </li>
 
           {
             harTilgang('SE_BEHANDLINGER') ?
               (
-                <Accordion.Item>
-                  <NavLink to={`/sok`}>Søk</NavLink>
-                </Accordion.Item>
+                <li>
+                  <Link as={NavLink} to={`/sok`} style={{display: 'flex', justifyContent: 'flex-start'}}>
+                    <MagnifyingGlassIcon title='a11y-title' fontSize='1.5rem' />
+                    Søk</Link>
+                </li>
               ) : (
                 <></>
               )
           }
           {
             harRolle('VERDANDE_ADMIN') ?
-              (<Accordion.Item>
-                <NavLink to={`/brukere`}>Brukere</NavLink>
-              </Accordion.Item>)
+              (<li>
+                <Link as={NavLink} to={`/brukere`} style={{display: 'flex', justifyContent: 'flex-start'}}>
+                  <PersonGroupIcon title='a11y-title' fontSize='1.5rem' />
+                  Brukere</Link>
+              </li>)
               : (<></>)
           }
 
-          {byggMeny("Større kjøringer", batcherMeny)}
-          {byggMeny("Behandlinger", behandlingerMeny)}
-          {byggMeny("Omregning", omregningMeny)}
-          {byggMeny('Vedlikehold', administrasjonMeny)}
+          {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="a11y-title" fontSize="1.5rem" />)}
+          {byggMeny('Behandlinger', behandlingerMeny, 1, <NumberListIcon title="a11y-title" fontSize="1.5rem" />)}
+          {byggMeny('Omregning', omregningMeny, 2, <CurrencyExchangeIcon title="a11y-title" fontSize="1.5rem" />)}
+          {byggMeny('Vedlikehold', administrasjonMeny, 3, <RecycleIcon title="a11y-title" fontSize="1.5rem" />)}
 
-        </Accordion>
+        </ul>
 
       </nav>
     </div>
