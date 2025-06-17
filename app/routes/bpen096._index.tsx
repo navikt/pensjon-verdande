@@ -10,8 +10,8 @@ export default function BatchOpprett_index() {
 
   return (
     <div>
-      <h1>Opprett BPEN096 batchkjøring</h1>
-      <p>BPEN096 - Hent opplysninger fra Skatt for Uføretrygd Etteroppgjør</p>
+      <h1>Hent opplysninger fra Skatt (tidligere BPEN096)</h1>
+      <p>Batchkjøring for henting av opplysninger fra Skatteetaten for Uføretrygd Etteroppgjør</p>
       <Form action="bpen096" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Max antall sekvensnummer</label>
