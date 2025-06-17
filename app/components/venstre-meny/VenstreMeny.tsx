@@ -6,8 +6,8 @@ import {
   HouseIcon,
   MagnifyingGlassIcon,
   NumberListIcon,
-  PersonGroupIcon, RecycleIcon,
-  SackPensionIcon,
+  PersonGroupIcon,
+  SackPensionIcon, WrenchIcon,
 } from '@navikt/aksel-icons'
 import { Link } from '@navikt/ds-react'
 
@@ -145,7 +145,7 @@ export default function VenstreMeny(props: Props) {
           {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="a11y-title" fontSize="1.5rem" />)}
           {byggMeny('Behandlinger', behandlingerMeny, 1, <NumberListIcon title="a11y-title" fontSize="1.5rem" />)}
           {byggMeny('Omregning', omregningMeny, 2, <CurrencyExchangeIcon title="a11y-title" fontSize="1.5rem" />)}
-          {byggMeny('Vedlikehold', administrasjonMeny, 3, <RecycleIcon title="a11y-title" fontSize="1.5rem" />)}
+          {byggMeny('Vedlikehold', administrasjonMeny, 3, <WrenchIcon title="a11y-title" fontSize="1.5rem" />)}
 
         </ul>
 
