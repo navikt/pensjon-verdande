@@ -17,7 +17,7 @@ export default function BatchOpprett_index() {
           <label>Max antall sekvensnummer</label>
           <br />
           <input
-            defaultValue="100"
+            defaultValue="10000"
             aria-label="maxSekvensnummer"
             name="maksAntallSekvensnummer"
             type="number"
