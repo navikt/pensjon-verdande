@@ -114,15 +114,14 @@ i {
   color: var(--a-green-200);
 }
 
-.sticky-sidebar {
-  top: 0;
-  overflow: auto;
-  position: sticky;
-  min-width: 250px;
-}
 #venstre-meny {
   background-color: var(--a-surface-inverted);
   height: 100vh;
+  position: sticky;
+  position: -webkit-sticky;
+  top:0;
+  overflow: auto;
+
 }
 
 .mainmenu, .submenu {

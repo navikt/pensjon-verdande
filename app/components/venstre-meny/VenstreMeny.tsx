@@ -116,7 +116,7 @@ export default function VenstreMeny(props: Props) {
         <ul className='mainmenu'>
           <li>
             <Link as={NavLink} to={`/dashboard`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-              <HouseIcon title='a11y-title' fontSize='1.5rem' />
+              <HouseIcon title='Hjem' fontSize='1.5rem' />
               Hjem</Link>
           </li>
 
@@ -125,7 +125,7 @@ export default function VenstreMeny(props: Props) {
               (
                 <li>
                   <Link as={NavLink} to={`/sok`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-                    <MagnifyingGlassIcon title='a11y-title' fontSize='1.5rem' />
+                    <MagnifyingGlassIcon title='Søk' fontSize='1.5rem' />
                     Søk</Link>
                 </li>
               ) : (
@@ -136,16 +136,16 @@ export default function VenstreMeny(props: Props) {
             harRolle('VERDANDE_ADMIN') ?
               (<li>
                 <Link as={NavLink} to={`/brukere`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-                  <PersonGroupIcon title='a11y-title' fontSize='1.5rem' />
+                  <PersonGroupIcon title='Brukere' fontSize='1.5rem' />
                   Brukere</Link>
               </li>)
               : (<></>)
           }
 
-          {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="a11y-title" fontSize="1.5rem" />)}
-          {byggMeny('Behandlinger', behandlingerMeny, 1, <NumberListIcon title="a11y-title" fontSize="1.5rem" />)}
-          {byggMeny('Omregning', omregningMeny, 2, <CurrencyExchangeIcon title="a11y-title" fontSize="1.5rem" />)}
-          {byggMeny('Vedlikehold', administrasjonMeny, 3, <WrenchIcon title="a11y-title" fontSize="1.5rem" />)}
+          {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" />)}
+          {byggMeny('Behandlinger', behandlingerMeny, 1, <NumberListIcon title="Behandlinger" fontSize="1.5rem" />)}
+          {byggMeny('Omregning', omregningMeny, 2, <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" />)}
+          {byggMeny('Vedlikehold', administrasjonMeny, 3, <WrenchIcon title="Vedlikehold" fontSize="1.5rem" />)}
 
         </ul>
 
