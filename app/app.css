@@ -121,7 +121,35 @@ i {
   position: -webkit-sticky;
   top:0;
   overflow: auto;
+  transition: width 0.5s ease-in-out;
+  width: 20em;
+}
 
+#venstre-meny .meny-tekst {
+  display: block;
+}
+#venstre-meny.kun-ikoner {
+  width: 3em;
+  transition: width 0.5s ease-in-out;
+}
+
+#venstre-meny.kun-ikoner .meny-tekst {
+  display: none;
+}
+
+#venstre-meny.kun-ikoner .meny-ikon {
+  margin: 0;
+}
+
+#venstre-meny.kun-ikoner:hover
+{
+  width: 20em;
+  transition: width 0.5s ease-in-out;
+}
+
+#venstre-meny.kun-ikoner:hover .meny-tekst {
+  display: inline;
+  transition: ease-out;
 }
 
 .mainmenu, .submenu {
