@@ -4,7 +4,7 @@ import { useState } from 'react'
 import {
   ChevronDownIcon, CurrencyExchangeIcon,
   HouseIcon,
-  MagnifyingGlassIcon,
+  MagnifyingGlassIcon, MenuElipsisVerticalCircleIcon,
   NumberListIcon,
   PersonGroupIcon,
   SackPensionIcon, WrenchIcon,
@@ -76,7 +76,14 @@ export default function VenstreMeny(props: Props) {
 
   function tilgangNavLink(operasjon: string, link: string, label: string) {
     if (harTilgang(operasjon)) {
-      return (<li key={operasjon + link + label}><NavLink to={link} end>{label}</NavLink></li>)
+      return (
+        <li key={operasjon + link + label}>
+          <Link as={NavLink} to={link} className="submenu-link" end style={{display: 'flex', justifyContent: 'flex-start'}}>
+            <span className="meny-ikon"><MenuElipsisVerticalCircleIcon title={label} fontSize="1.5rem" /></span>
+            <span className="meny-tekst">{label}</span>
+          </Link>
+        </li>
+      )
     }
     return (<></>)
   }
@@ -94,8 +101,8 @@ export default function VenstreMeny(props: Props) {
         <li className={openIndex === idx ? 'open' : ''}
             >
           <Link id="filter-toggle" as="a" onClick={() => handleMenuClick(idx)} style={{display: 'flex', justifyContent: 'flex-start'}}>
-            {p0}
-            {navn}
+            <span className="meny-ikon">{p0}</span>
+            <span className="meny-tekst">{navn}</span>
             <ChevronDownIcon title='a11y-title' fontSize='1.5rem' style={{ marginLeft: 'auto', transition: 'transform 0.2s', transform: openIndex === idx ? 'rotate(180deg)' : 'rotate(0deg)' }} />
           </Link>
           <ul className='submenu'>
@@ -116,8 +123,9 @@ export default function VenstreMeny(props: Props) {
         <ul className='mainmenu'>
           <li>
             <Link as={NavLink} to={`/dashboard`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-              <HouseIcon title='Hjem' fontSize='1.5rem' />
-              Hjem</Link>
+              <span className="meny-ikon"><HouseIcon title='Hjem' fontSize='1.5rem' /></span>
+              <span className="meny-tekst">Hjem</span>
+            </Link>
           </li>
 
           {
@@ -125,8 +133,9 @@ export default function VenstreMeny(props: Props) {
               (
                 <li>
                   <Link as={NavLink} to={`/sok`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-                    <MagnifyingGlassIcon title='Søk' fontSize='1.5rem' />
-                    Søk</Link>
+                    <span className="meny-ikon"><MagnifyingGlassIcon title='Søk' fontSize='1.5rem' className={"meny-ikon"} /></span>
+                    <span className="meny-tekst">Søk</span>
+                  </Link>
                 </li>
               ) : (
                 <></>
@@ -136,16 +145,17 @@ export default function VenstreMeny(props: Props) {
             harRolle('VERDANDE_ADMIN') ?
               (<li>
                 <Link as={NavLink} to={`/brukere`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-                  <PersonGroupIcon title='Brukere' fontSize='1.5rem' />
-                  Brukere</Link>
+                   <span className="meny-ikon"><PersonGroupIcon title='Brukere' fontSize='1.5rem' className={"meny-ikon"} /></span>
+                  <span className="meny-tekst">Brukere</span>
+                </Link>
               </li>)
               : (<></>)
           }
 
-          {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" />)}
-          {byggMeny('Behandlinger', behandlingerMeny, 1, <NumberListIcon title="Behandlinger" fontSize="1.5rem" />)}
-          {byggMeny('Omregning', omregningMeny, 2, <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" />)}
-          {byggMeny('Vedlikehold', administrasjonMeny, 3, <WrenchIcon title="Vedlikehold" fontSize="1.5rem" />)}
+          {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" className={"meny-ikon"} />)}
+          {byggMeny('Behandlinger', behandlingerMeny, 1, <NumberListIcon title="Behandlinger" fontSize="1.5rem" className={"meny-ikon"} />)}
+          {byggMeny('Omregning', omregningMeny, 2, <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" className={"meny-ikon"} />)}
+          {byggMeny('Vedlikehold', administrasjonMeny, 3, <WrenchIcon title="Vedlikehold" fontSize="1.5rem" className={"meny-ikon"} />)}
 
         </ul>
 
