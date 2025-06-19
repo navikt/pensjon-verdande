@@ -49,7 +49,7 @@ export default function NavHeader(props: Props) {
       }
       <Box style={{ display: 'flex', alignItems: 'center', paddingLeft: '1rem' }}>
         <label htmlFor={'menu-toggle'}>
-          <MenuHamburgerIcon color={'white'} title='a11y-title' fontSize='2rem' display={'flex'} />
+          <MenuHamburgerIcon color={'white'} title='Vis sidemeny' fontSize='2rem' display={'flex'} />
         </label>
         <input type={'checkbox'} id={'menu-toggle'} hidden
                onChange={(event) => setoppdaterVenstremeny(event.target.checked)} />
