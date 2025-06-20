@@ -176,6 +176,11 @@ export type OmregningRequest = {
   oppgaveSett: string
   oppgavePrefiks: string
   skalIverksettOnline: boolean
+  skalBestilleBrev: string
+  skalSletteIverksettingsoppgaver: boolean
+  skalSamordne: boolean
+  skalDistribuereUforevedtak: boolean
+  sendBrevBerorteSaker: boolean
 
   brevkoderSoker: {[key: string]: string}
   brevkoderBerorteSaker: {[key: string]: string}
