@@ -65,8 +65,8 @@ export default function BatchOpprett_index() {
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
-  const [skalBestilleBrev, setSkalBestilleBrev] = useState(false)
   const [skalIverksettOnline, setSkalIverksettOnline] = useState(false)
+  const [skalBestilleBrev, setSkalBestilleBrev] = useState("INGEN")
 
   const [selectedBrevkodeSokerAlderGammeltRegelverk, setselectedBrevkodeSokerAlderGammeltRegelverk] = useState<ComboboxOption | undefined>(defaultbatchbrevtypeOption)
   const [selectedBrevkodeSokerAlderNyttRegelverk, setselectedBrevkodeSokerAlderNyttRegelverk] = useState<ComboboxOption | undefined>(defaultbatchbrevtypeOption)
@@ -141,6 +141,12 @@ export default function BatchOpprett_index() {
     { value: 'DEFAULT_PREFIKS', label: 'Default prefiks' },
     { value: 'REGELENDRING_PREFIKS', label: 'Regelendring prefiks' },
     { value: 'FEILRETTING_PREFIKS', label: 'Feilretting prefiks' },
+  ]
+
+  const optionBestilleBrev = [
+    { value: 'INGEN', label: 'Ingen' },
+    { value: 'ALLE', label: 'Alle' },
+    { value: 'ALLE_MED_ENDRING_I_BELOP', label: 'Alle med endring i beløp' },
   ]
 
   function setMonthSelected(date: Date | undefined): Date | undefined {
@@ -352,40 +358,38 @@ export default function BatchOpprett_index() {
                         borderColor='border-info'
                         borderWidth='4'
                       >
-                        <OmregningCheckbox defaultChecked={skalBestilleBrev} name={'skalBestilleBrev'}
-                                           value={skalBestilleBrev} onChange={setSkalBestilleBrev}
-                                           children={'Bestille brev'} />
+                        <OmregningSelector label={"Bestill brev for"} navn={"skalBestilleBrev"} value={skalBestilleBrev} setSelectedValue={setSkalBestilleBrev} optionsmap={optionBestilleBrev} />
 
-                        <OmregningBrevCheckbox navn={'brevkodeSokerAlderGammeltRegelverk'} skalVises={!skalBestilleBrev}
+                        <OmregningBrevCheckbox navn={'brevkodeSokerAlderGammeltRegelverk'} skalVises={skalBestilleBrev != 'INGEN'}
                                                tekst={'Velg brevkode for Alder, gammelt regelverk'}
                                                selectedBrevKode={selectedBrevkodeSokerAlderGammeltRegelverk}
                                                setselectedBrevKode={setselectedBrevkodeSokerAlderGammeltRegelverk}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeSokerAlderNyttRegelverk'} skalVises={!skalBestilleBrev}
+                        <OmregningBrevCheckbox navn={'brevkodeSokerAlderNyttRegelverk'} skalVises={skalBestilleBrev != 'INGEN'}
                                                tekst={'Velg brevkode for Alder, nytt regelverk'}
                                                selectedBrevKode={selectedBrevkodeSokerAlderNyttRegelverk}
                                                setselectedBrevKode={setselectedBrevkodeSokerAlderNyttRegelverk}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeSokerUforetrygd'} skalVises={!skalBestilleBrev}
+                        <OmregningBrevCheckbox navn={'brevkodeSokerUforetrygd'} skalVises={skalBestilleBrev != 'INGEN'}
                                                tekst={'Velg brevkode for Uføretrygd'}
                                                selectedBrevKode={selectedBrevkodeSokerUforetrygd}
                                                setselectedBrevKode={setselectedBrevkodeSokerUforetrygd}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeSokerBarnepensjon'} skalVises={!skalBestilleBrev}
+                        <OmregningBrevCheckbox navn={'brevkodeSokerBarnepensjon'} skalVises={skalBestilleBrev != 'INGEN'}
                                                tekst={'Velg brevkode for Barnepensjon'}
                                                selectedBrevKode={selectedBrevkodeSokerBarnepensjon}
                                                setselectedBrevKode={setselectedBrevkodeSokerBarnepensjon}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeSokerAFP'} skalVises={!skalBestilleBrev}
+                        <OmregningBrevCheckbox navn={'brevkodeSokerAFP'} skalVises={skalBestilleBrev != 'INGEN'}
                                                tekst={'Velg brevkode for AFP'} selectedBrevKode={selectedBrevkodeSokerAFP}
                                                setselectedBrevKode={setselectedBrevkodeSokerAFP}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeSokerGjenlevendepensjon'} skalVises={!skalBestilleBrev}
+                        <OmregningBrevCheckbox navn={'brevkodeSokerGjenlevendepensjon'} skalVises={skalBestilleBrev != 'INGEN'}
                                                tekst={'Velg brevkode for Gjenlevendepensjon'}
                                                selectedBrevKode={selectedBrevkodeSokerGjenlevendepensjon}
                                                setselectedBrevKode={setselectedBrevkodeSokerGjenlevendepensjon}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeSokerAFPPrivat'} skalVises={!skalBestilleBrev}
+                        <OmregningBrevCheckbox navn={'brevkodeSokerAFPPrivat'} skalVises={skalBestilleBrev != 'INGEN'}
                                                tekst={'Velg brevkode for AFP Privat'}
                                                selectedBrevKode={selectedBrevkodeSokerAFPPrivat}
                                                setselectedBrevKode={setselectedBrevkodeSokerAFPPrivat}
@@ -404,39 +408,39 @@ export default function BatchOpprett_index() {
                                            children={'Bestille brev berørte saker'} />
 
                         <OmregningBrevCheckbox navn={'brevkodeBerorteSakerAlderGammeltRegelverk'}
-                                               skalVises={!skalSendeBrevBerorteSaker}
+                                               skalVises={skalSendeBrevBerorteSaker}
                                                tekst={'Velg brevkode for Alder, gammelt regelverk'}
                                                selectedBrevKode={selectedBrevkoderBerorteSakerAlderGammeltRegelverk}
                                                setselectedBrevKode={setselectedBrevkoderBerorteSakerAlderGammeltRegelverk}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
                         <OmregningBrevCheckbox navn={'brevkodeBerorteSakerAlderNyttRegelverk'}
-                                               skalVises={!skalSendeBrevBerorteSaker}
+                                               skalVises={skalSendeBrevBerorteSaker}
                                                tekst={'Velg brevkode for Alder, nytt regelverk'}
                                                selectedBrevKode={selectedBrevkoderBerorteSakerAlderNyttRegelverk}
                                                setselectedBrevKode={setselectedBrevkoderBerorteSakerAlderNyttRegelverk}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerUforetrygd'} skalVises={!skalSendeBrevBerorteSaker}
+                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerUforetrygd'} skalVises={skalSendeBrevBerorteSaker}
                                                tekst={'Velg brevkode for Uføretrygd'}
                                                selectedBrevKode={selectedBrevkoderBerorteSakerUforetrygd}
                                                setselectedBrevKode={setselectedBrevkoderBerorteSakerUforetrygd}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerBarnepensjon'} skalVises={!skalSendeBrevBerorteSaker}
+                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerBarnepensjon'} skalVises={skalSendeBrevBerorteSaker}
                                                tekst={'Velg brevkode for Barnepensjon'}
                                                selectedBrevKode={selectedBrevkoderBerorteSakerBarnepensjon}
                                                setselectedBrevKode={setselectedBrevkoderBerorteSakerBarnepensjon}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerAFP'} skalVises={!skalSendeBrevBerorteSaker}
+                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerAFP'} skalVises={skalSendeBrevBerorteSaker}
                                                tekst={'Velg brevkode for AFP'}
                                                selectedBrevKode={selectedBrevkoderBerorteSakerAFP}
                                                setselectedBrevKode={setselectedBrevkoderBerorteSakerAFP}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
                         <OmregningBrevCheckbox navn={'brevkodeBerorteSakerGjenlevendepensjon'}
-                                               skalVises={!skalSendeBrevBerorteSaker}
+                                               skalVises={skalSendeBrevBerorteSaker}
                                                tekst={'Velg brevkode for Gjenlevendepensjon'}
                                                selectedBrevKode={selectedBrevkoderBerorteSakerGjenlevendepensjon}
                                                setselectedBrevKode={setselectedBrevkoderBerorteSakerGjenlevendepensjon}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
-                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerAFPPrivat'} skalVises={!skalSendeBrevBerorteSaker}
+                        <OmregningBrevCheckbox navn={'brevkodeBerorteSakerAFPPrivat'} skalVises={skalSendeBrevBerorteSaker}
                                                tekst={'Velg brevkode for AFP Privat'}
                                                selectedBrevKode={selectedBrevkodeBerorteSakerAFPPrivat}
                                                setselectedBrevKode={setselectedBrevkodeBerorteSakerAFPPrivat}

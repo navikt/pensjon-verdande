@@ -42,7 +42,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     oppgaveSett: updates.oppgaveSett,
     oppgavePrefiks: updates.oppgavePrefiks,
     skalSletteIverksettingsoppgaver: updates.skalSletteIverksettingsoppgaver === 'true',
-    skalBestilleBrev: updates.skalBestilleBrev === 'true',
+    skalBestilleBrev: updates.skalBestilleBrev,
     skalSamordne: updates.skalSamordne === 'true',
     skalDistribuereUforevedtak: updates.skalDistribuereUforevedtak === 'true',
     sendBrevBerorteSaker: updates.sendBrevBerorteSaker === 'true',

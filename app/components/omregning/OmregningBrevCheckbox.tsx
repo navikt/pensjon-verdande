@@ -15,7 +15,7 @@ export default function OmregningBrevCheckbox(props: OmregningBrevCheckboxProps)
 
   return (
     <Box
-      hidden={props.skalVises}
+      hidden={!props.skalVises}
     >
       <UNSAFE_Combobox
         label={props.tekst}
