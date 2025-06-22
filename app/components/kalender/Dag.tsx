@@ -99,7 +99,7 @@ export default function Dag(props: Props) {
   function visDagensBehandlingerMedBegrensning(maksAntall: number = 5) {
     const dagens = props.behandlinger.filter((b) =>
       isSameDay(new Date(b.opprettet), props.dato)
-    );
+    ).sort((a, b) => a.opprettet.localeCompare(b.opprettet))
 
     const behandlingerSomVises =
       dagens.length > maksAntall
