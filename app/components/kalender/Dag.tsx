@@ -61,7 +61,10 @@ export default function Dag(props: Props) {
     return props.behandlinger
       .filter((behandling) => isSameDay(new Date(behandling.opprettet), props.dato))
       .map((behandling, idx) => (
-        <HStack style={{ fontSize: '0.8em' }}>
+        <HStack
+          key={`behandling-${behandling.behandlingId}`}
+          style={{ fontSize: '0.8em' }}
+        >
           <span
             style={{
               textAlign: 'left',
@@ -95,11 +98,17 @@ export default function Dag(props: Props) {
     <table style={{ width: '100%', tableLayout: 'fixed' }}>
       <thead>
       <tr>
-        {dayRow()}
+        <td>
+          {dayRow()}
+        </td>
       </tr>
       </thead>
       <tbody>
-      <tr>{dagensBehandlinger()}</tr>
+      <tr>
+        <td>
+          {dagensBehandlinger()}
+        </td>
+      </tr>
       </tbody>
     </table>
   )

@@ -9,12 +9,13 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
 const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
 
 export type Props = {
+  startDato: Date,
   behandlinger: BehandlingDto[],
   visKlokkeSlett: boolean,
 }
 
 export default function Kalender(props: Props) {
-  const [valgtDato, setValgtDato] = useState(new Date())
+  const [valgtDato, setValgtDato] = useState(props.startDato)
   let firstInThisMonth = new Date(valgtDato.getFullYear(), valgtDato.getMonth(), 1)
   let forsteUkeNr = getWeek(firstInThisMonth)
 
@@ -62,7 +63,6 @@ export default function Kalender(props: Props) {
         </thead>
         <tbody>
         {[...Array(6)].map((_, rowIdx) => (
-          <>
             <tr key={rowIdx + 'dato'} style={{ height: '8em', verticalAlign: 'top' }}>
               {[...Array(7)].map((_, colIdx) => (
                 <td key={'col' + colIdx + 'row' + rowIdx}
@@ -76,7 +76,6 @@ export default function Kalender(props: Props) {
                 </td>
               ))}
             </tr>
-          </>
         ))}
         </tbody>
       </table>

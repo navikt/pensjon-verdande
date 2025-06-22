@@ -41,12 +41,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
   return {
     loadingDashboardResponse: dashboardResponse,
-    behandlinger: behandlinger.content
+    behandlinger: behandlinger.content,
+    startDato: new Date(),
   }
 }
 
 export default function Dashboard() {
-  const { loadingDashboardResponse, behandlinger } = useLoaderData<typeof loader>()
+  const { loadingDashboardResponse, behandlinger, startDato } = useLoaderData<typeof loader>()
 
   return (
     <React.Suspense fallback={
@@ -117,7 +118,7 @@ export default function Dashboard() {
                     width: '100%',
                   }}
                 >
-                <Kalender behandlinger={behandlinger} visKlokkeSlett={false}></Kalender>
+                <Kalender behandlinger={behandlinger} visKlokkeSlett={false} startDato={startDato}></Kalender>
                 </Box>
               </VStack>
               <VStack gap="2">
