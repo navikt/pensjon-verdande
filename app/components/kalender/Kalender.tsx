@@ -12,6 +12,7 @@ export type Props = {
   startDato: Date,
   behandlinger: BehandlingDto[],
   visKlokkeSlett: boolean,
+  maksAntallPerDag: number,
 }
 
 export default function Kalender(props: Props) {
@@ -72,6 +73,7 @@ export default function Kalender(props: Props) {
                     dato={day(rowIdx + forsteUkeNr, colIdx)}
                     behandlinger={props.behandlinger}
                     visKlokkeSlett={props.visKlokkeSlett}
+                    maksAntallPerDag={props.maksAntallPerDag}
                   ></Dag>
                 </td>
               ))}

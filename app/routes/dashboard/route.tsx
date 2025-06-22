@@ -118,7 +118,7 @@ export default function Dashboard() {
                     width: '100%',
                   }}
                 >
-                <Kalender behandlinger={behandlinger} visKlokkeSlett={false} startDato={startDato}></Kalender>
+                <Kalender behandlinger={behandlinger} visKlokkeSlett={false} startDato={startDato} maksAntallPerDag={6}></Kalender>
                 </Box>
               </VStack>
               <VStack gap="2">

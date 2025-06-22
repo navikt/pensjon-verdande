@@ -12,7 +12,13 @@ export type Props = {
   dato: Date,
   behandlinger: BehandlingDto[],
   visKlokkeSlett: boolean,
+  maksAntallPerDag?: number
 }
+
+const formatTidspunkt = (datoStr: string) => {
+  const dato = new Date(datoStr);
+  return `${dato.getHours().toString().padStart(2, '0')}:${dato.getMinutes().toString().padStart(2, '0')}`;
+};
 
 export default function Dag(props: Props) {
   let dagStreng: string
@@ -57,14 +63,11 @@ export default function Dag(props: Props) {
     }
   }
 
-  function dagensBehandlinger() {
-    return props.behandlinger
-      .filter((behandling) => isSameDay(new Date(behandling.opprettet), props.dato))
-      .map((behandling, idx) => (
-        <HStack
-          key={`behandling-${behandling.behandlingId}`}
-          style={{ fontSize: '0.8em' }}
-        >
+  function behandlingElement(behandling: BehandlingDto, textColor: string, visKlokkeSlett: boolean) {
+    return <HStack
+      key={`behandling-${behandling.behandlingId}`}
+      style={{ fontSize: '0.8em' }}
+    >
           <span
             style={{
               textAlign: 'left',
@@ -83,15 +86,45 @@ export default function Dag(props: Props) {
               {decodeBehandling(behandling.type)}
             </Link>
           </span>
-          <Spacer></Spacer>
-          <span>
-          {props.visKlokkeSlett && <span style={{
+      <Spacer></Spacer>
+      <span>
+          {visKlokkeSlett && <span style={{
             textAlign: 'right',
             color: textColor,
-          }}>{new Date(behandling.opprettet).getHours().toString().padStart(2, '0') + ':' + new Date(behandling.opprettet).getMinutes().toString().padStart(2, '0')}</span>}
+          }}>{formatTidspunkt(behandling.opprettet)}</span>}
+          </span>
+    </HStack>
+  }
+
+  function visDagensBehandlingerMedBegrensning(maksAntall: number = 5) {
+    const dagens = props.behandlinger.filter((b) =>
+      isSameDay(new Date(b.opprettet), props.dato)
+    );
+
+    const behandlingerSomVises =
+      dagens.length > maksAntall
+        ? dagens.slice(0, maksAntall - 1)
+        : dagens
+
+    const antallEkstra = Math.max(0, dagens.length - behandlingerSomVises.length)
+
+    const behandlingElementer = behandlingerSomVises.map((behandling) =>
+      behandlingElement(behandling, textColor, props.visKlokkeSlett)
+    )
+
+    if (antallEkstra > 0) {
+      behandlingElementer.push(
+        <HStack key="ekstra" style={{ fontSize: '0.8em' }}>
+          <span style={{
+            color: textColor,
+          }}>
+            og {antallEkstra} til
           </span>
         </HStack>
-      ))
+      )
+    }
+
+    return behandlingElementer
   }
 
   return (
@@ -106,7 +139,7 @@ export default function Dag(props: Props) {
       <tbody>
       <tr>
         <td>
-          {dagensBehandlinger()}
+          {visDagensBehandlingerMedBegrensning(props.maksAntallPerDag)}
         </td>
       </tr>
       </tbody>

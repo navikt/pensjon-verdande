@@ -2,6 +2,7 @@ import { NavLink } from 'react-router'
 import { MeResponse } from '~/types/brukere'
 import { useState } from 'react'
 import {
+  CalendarIcon,
   ChevronDownIcon, CurrencyExchangeIcon,
   HouseIcon,
   MagnifyingGlassIcon, MenuElipsisVerticalCircleIcon,
@@ -125,6 +126,13 @@ export default function VenstreMeny(props: Props) {
             <Link as={NavLink} to={`/dashboard`} style={{display: 'flex', justifyContent: 'flex-start'}}>
               <span className="meny-ikon"><HouseIcon title='Hjem' fontSize='1.5rem' /></span>
               <span className="meny-tekst">Hjem</span>
+            </Link>
+          </li>
+
+          <li>
+            <Link as={NavLink} to={`/kalender`} style={{display: 'flex', justifyContent: 'flex-start'}}>
+              <span className="meny-ikon"><CalendarIcon title='Kalender' fontSize='1.5rem' /></span>
+              <span className="meny-tekst">Kalender</span>
             </Link>
           </li>
 
