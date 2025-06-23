@@ -14,7 +14,7 @@ interface Props {
   behandlingerResponse: BehandlingerPage,
 }
 
-export default function BehandlingerTable(props: Props) {
+export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek = true, visAnsvarligTeamSoek = true, behandlingerResponse}: Props) {
   const fetcher = useFetcher()
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -92,7 +92,7 @@ export default function BehandlingerTable(props: Props) {
   function behandlingtypeOptions() {
     let ekstraBehandlingType
     let currentBehandlingType = searchParams.get('behandlingType')
-    if (currentBehandlingType && !props.behandlingerResponse.behandlingTyper.includes(currentBehandlingType)) {
+    if (currentBehandlingType && !behandlingerResponse.behandlingTyper.includes(currentBehandlingType)) {
       ekstraBehandlingType = (<option value={currentBehandlingType}>{decodeBehandling(currentBehandlingType)}</option>)
     } else {
       ekstraBehandlingType = (<></>)
@@ -114,8 +114,8 @@ export default function BehandlingerTable(props: Props) {
         ekstraBehandlingType
       }
 
-      { props.behandlingerResponse.behandlingTyper ?
-        props.behandlingerResponse.behandlingTyper.sort((a,b) => a.localeCompare(b)).map((type) => {
+      { behandlingerResponse.behandlingTyper ?
+        behandlingerResponse.behandlingTyper.sort((a,b) => a.localeCompare(b)).map((type) => {
         return (<option key={type} value={type}>{decodeBehandling(type)}</option>)
       })
         : <></>
@@ -183,7 +183,7 @@ export default function BehandlingerTable(props: Props) {
               <Table.ColumnHeader sortable sortKey="utsattTil" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Utsatt til
               </Table.ColumnHeader>
-              {props.visStatusSoek ?
+              {visStatusSoek ?
                 <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "14rem" }}>
                   Status
                 </Table.ColumnHeader>
@@ -196,15 +196,15 @@ export default function BehandlingerTable(props: Props) {
             <Table.Row>
               <Table.DataCell style={{ paddingTop: 0 }}>
                 <Checkbox
-                  checked={valgteBehandlingIder.length === props.behandlingerResponse.content.length}
-                  disabled={props.behandlingerResponse.content.filter((it => it.utsattTil != null)).length == 0}
+                  checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
+                  disabled={behandlingerResponse.content.filter((it => it.utsattTil != null)).length == 0}
                   indeterminate={
-                    valgteBehandlingIder.length > 0 && valgteBehandlingIder.length !== props.behandlingerResponse.content.length
+                    valgteBehandlingIder.length > 0 && valgteBehandlingIder.length !== behandlingerResponse.content.length
                   }
                   onChange={() => {
                     valgteBehandlingIder.length
                       ? setValgteBehandlingIder([])
-                      : setValgteBehandlingIder(props.behandlingerResponse.content.filter((it => it.utsattTil != null)).map(({ behandlingId }) => behandlingId));
+                      : setValgteBehandlingIder(behandlingerResponse.content.filter((it => it.utsattTil != null)).map(({ behandlingId }) => behandlingId));
                   }}
                   hideLabel
                 >
@@ -214,18 +214,18 @@ export default function BehandlingerTable(props: Props) {
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
-                {props.visBehandlingTypeSoek ? behandlingtypeOptions() : <></>}
+                {visBehandlingTypeSoek ? behandlingtypeOptions() : <></>}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
-                {(props.visAnsvarligTeamSoek === null || props.visAnsvarligTeamSoek === undefined || props.visAnsvarligTeamSoek) ? ansvarligTeamOptions() : <></>}
-              </Table.DataCell>
-              <Table.DataCell style={{ paddingTop: 0 }}>
+                {visAnsvarligTeamSoek ? ansvarligTeamOptions() : <></>}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
-              {props.visStatusSoek ?
+              <Table.DataCell style={{ paddingTop: 0 }}>
+              </Table.DataCell>
+              {visStatusSoek ?
                 <Table.DataCell style={{ paddingTop: 0 }}>
                   { statusOptions() }
                 </Table.DataCell>
@@ -236,7 +236,7 @@ export default function BehandlingerTable(props: Props) {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {props.behandlingerResponse.content?.map((it: BehandlingDto) => {
+            {behandlingerResponse.content?.map((it: BehandlingDto) => {
               return (
                 <Table.Row
                   key={it.behandlingId}
@@ -269,7 +269,7 @@ export default function BehandlingerTable(props: Props) {
                   <Table.DataCell>
                     {formatIsoTimestamp(it.utsattTil)}
                   </Table.DataCell>
-                  {props.visStatusSoek ?
+                  {visStatusSoek ?
                     <Table.DataCell>{it.status}</Table.DataCell>
                     : <></>
                   }
@@ -296,15 +296,15 @@ export default function BehandlingerTable(props: Props) {
           <Spacer />
           <Pagination
             size="small"
-            page={props.behandlingerResponse.number + 1}
-            count={props.behandlingerResponse.totalPages}
+            page={behandlingerResponse.number + 1}
+            count={behandlingerResponse.totalPages}
             boundaryCount={1}
             siblingCount={1}
             prevNextTexts={true}
             onPageChange={onPageChange}
           />
           <Spacer />
-          {props.behandlingerResponse.totalElements} behandlinger
+          {behandlingerResponse.totalElements} behandlinger
         </HStack>
       </Box>
     </>
