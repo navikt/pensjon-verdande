@@ -20,11 +20,11 @@ export default function Bruker(props: Props) {
 
       <div style={{ margin: '12px' }}></div>
 
-      <Box
-        background={'surface-default'}
+      <Box.New
+        background={"sunken"}
         style={{ padding: '6px' }}
         borderRadius="medium"
-        shadow="medium"
+        shadow="dialog"
       >
         <Card>
           <Tabs defaultValue="tilganger">
@@ -56,7 +56,7 @@ export default function Bruker(props: Props) {
           </Tabs>
 
         </Card>
-      </Box>
+      </Box.New>
     </>
 
   )

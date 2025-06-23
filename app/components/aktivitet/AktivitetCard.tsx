@@ -13,7 +13,7 @@ export type Props = {
 
 export default function AktivitetCard(props: Props) {
   return (
-    <Box
+    <Box.New
       background={'surface-default'}
       style={{ padding: '6px' }}
       borderRadius="medium"
@@ -75,6 +75,6 @@ export default function AktivitetCard(props: Props) {
           </Card.Grid>
         </Card.Body>
       </Card>
-    </Box>
+    </Box.New>
   )
 }

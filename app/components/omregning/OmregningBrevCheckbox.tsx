@@ -14,7 +14,7 @@ export default function OmregningBrevCheckbox(props: OmregningBrevCheckboxProps)
   const defaultbatchbrevtypeOption: ComboboxOption = { value: 'not set', label: 'Ikke angitt' }
 
   return (
-    <Box
+    <Box.New
       hidden={!props.skalVises}
     >
       <UNSAFE_Combobox
@@ -35,6 +35,6 @@ export default function OmregningBrevCheckbox(props: OmregningBrevCheckboxProps)
         size={'small'}
       />
       <input hidden={true} name={props.navn} value={props.selectedBrevKode?.value} readOnly={true} />
-    </Box>
+    </Box.New>
   )
 }

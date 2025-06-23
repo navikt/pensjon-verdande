@@ -305,12 +305,7 @@ export default function BehandlingCard(props: Props) {
     <>
       <div className={'flex-grid'} style={{ paddingTop: '12px' }}>
         <div className={'col'}>
-          <Box
-            background={'surface-default'}
-            style={{ padding: '6px' }}
-            borderRadius='medium'
-            shadow='medium'
-          >
+
             <Card id={props.behandling.uuid}>
               <Card.Header>
                 <Card.Heading>
@@ -425,15 +420,14 @@ export default function BehandlingCard(props: Props) {
                 </Card.Grid>
               </Card.Body>
             </Card>
-          </Box>
         </div>
         {props.detaljertFremdrift ? (
           <div className={'col'}>
-            <Box
-              background={'surface-default'}
+            <Box.New
+              background={"sunken"}
               style={{ padding: '6px' }}
               borderRadius='medium'
-              shadow='medium'
+              shadow="dialog"
             >
               <Card.Header>
                 <Card.Heading>
@@ -466,18 +460,18 @@ export default function BehandlingCard(props: Props) {
                   </Suspense>
                 </Card.Grid>
               </Card>
-            </Box>
+            </Box.New>
           </div>
         ) : (
           <></>
         )}
       </div>
 
-      <Box
-        background={'surface-default'}
+      <Box.New
+        background={"sunken"}
         style={{ padding: '6px', marginTop: '12px' }}
         borderRadius='medium'
-        shadow='medium'
+        shadow="dialog"
       >
         <Tabs
           value={getCurrentChild()}
@@ -553,7 +547,7 @@ export default function BehandlingCard(props: Props) {
           </Tabs.List>
           <Outlet/>
         </Tabs>
-      </Box>
+      </Box.New>
     </>
   )
 }

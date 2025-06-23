@@ -22,7 +22,6 @@
 }
 
 .cardHeader {
-  background-color: var(--a-gray-100);
   height: 48px;
   vertical-align: middle;
   display: flex;

@@ -1,6 +1,6 @@
 import { DatoAntall } from '~/types'
 import { BehandlingerPerDagLineChart } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChart'
-import { Box, Button } from '@navikt/ds-react'
+import { Box, Button, HStack, Spacer } from '@navikt/ds-react'
 import { AreaChartFillIcon } from '@navikt/aksel-icons'
 import { useState } from 'react'
 
@@ -12,22 +12,20 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
   let [antallDager, setAntallDager] = useState(30)
 
   return (
-    <Box
-      background={'surface-default'}
+    <Box.New
+      background={"raised"}
       borderRadius="medium"
-      shadow="medium"
+      shadow="dialog"
       style={{ padding: '6px' }}
     >
-      <Box>
-        <div style={{ float: 'left', textAlign: 'center' }}>
+      <HStack>
           <AreaChartFillIcon
             title="Antall behandlinger"
             fontSize="1.5rem"
             style={{ verticalAlign: 'middle', marginRight: '6px' }}
           />
           Antall behandlinger
-        </div>
-        <div style={{ float: 'right' }}>
+        <Spacer></Spacer>
           <Button
             size="xsmall"
             variant={antallDager === 365 ? 'primary' : 'tertiary'}
@@ -57,12 +55,11 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
           >
             7 dager
           </Button>
-        </div>
-      </Box>
+      </HStack>
       <BehandlingerPerDagLineChart
         opprettetPerDag={props.opprettetPerDag}
         antallDager={antallDager}
-      />
-    </Box>
+      ></BehandlingerPerDagLineChart>
+    </Box.New>
   )
 }

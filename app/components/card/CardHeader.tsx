@@ -12,9 +12,21 @@ export type CardHeaderType = OverridableComponent<Props, HTMLElement>
 
 export const CardHeader: CardHeaderType = forwardRef(
   (
-    { children, className, as: Component = 'div', ...rest },
+    {
+      background,
+      children,
+      className,
+      as: Component = 'div',
+      style: _style,
+      ...rest
+    },
     ref: ForwardedRef<HTMLElement>,
   ) => {
+    const style: React.CSSProperties = {
+      ..._style,
+      backgroundColor: background ? `var(--a-${background})` : 'var(--ax-bg-sunken)',
+    }
+
     return (
       <Component
         className={cl(className, styles.cardHeader )}

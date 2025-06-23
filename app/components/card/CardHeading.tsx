@@ -55,9 +55,9 @@ export const CardHeading: CardHeadingType = forwardRef(
         ref={ref}
         className={cl(
           className,
-          'navds-heading',
+          'aksel-heading',
           styles.cardHeading,
-          `navds-heading--${size}`,
+          `aksel-heading--${size}`,
           inputs,
         )}
       />

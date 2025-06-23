@@ -1,13 +1,13 @@
-import { ActionMenu, Box, InternalHeader, Spacer } from '@navikt/ds-react'
+import { ActionMenu, Box, InternalHeader, Link, Spacer } from '@navikt/ds-react'
 import {
   BarChartIcon,
   BookIcon,
   ExternalLinkIcon,
   MenuGridIcon,
-  MenuHamburgerIcon,
-  PersonIcon,
+  MenuHamburgerIcon, MoonIcon,
+  PersonIcon, SunIcon,
 } from '@navikt/aksel-icons'
-import { NavLink } from 'react-router'
+import { Link as ReactRouterLink } from 'react-router'
 import { MeResponse } from '~/types/brukere'
 import { useEffect, useState } from 'react'
 
@@ -15,6 +15,8 @@ export type Props = {
   erProduksjon: boolean,
   env: string,
   me: MeResponse,
+  darkmode: boolean,
+  setDarkmode: (darkmode: boolean) => void,
 }
 
 export default function NavHeader(props: Props) {
@@ -67,13 +69,19 @@ export default function NavHeader(props: Props) {
         </ActionMenu.Trigger>
         <ActionMenu.Content>
           <ActionMenu.Group label='Verdande'>
-            <ActionMenu.Item onSelect={console.info} icon={<PersonIcon />}>
-              <NavLink
+            <ActionMenu.Item icon={<PersonIcon />}>
+              <Link as={ReactRouterLink}
                 to={`/brukere/me`}
-                style={{ textDecoration: 'none', color: 'black' }}
+                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }}
               >
                 Brukeroversikt
-              </NavLink>
+              </Link>
+            </ActionMenu.Item>
+            <ActionMenu.Item disabled={!props.darkmode} icon={<SunIcon/>} onClick={() => props.setDarkmode(false)}>
+              Bytt til lys modus
+            </ActionMenu.Item>
+            <ActionMenu.Item disabled={props.darkmode} icon={<MoonIcon/>} onClick={() => props.setDarkmode(true)}>
+              Bytt til mørk modus
             </ActionMenu.Item>
           </ActionMenu.Group>
           <ActionMenu.Divider />
@@ -84,7 +92,7 @@ export default function NavHeader(props: Props) {
               <a
                 target='_blank'
                 href={'https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html'}
-                style={{ textDecoration: 'none', color: 'black' }}
+                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }}
               >
                 Dokumentasjon
               </a>
@@ -97,7 +105,7 @@ export default function NavHeader(props: Props) {
               <a
                 target='_blank'
                 href={'https://grafana.nav.cloud.nais.io/goto/mgXUC1LHg?orgId=1'}
-                style={{ textDecoration: 'none', color: 'black' }}
+                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }}
               >
                 Grafanadashboard
               </a>

@@ -1,27 +1,30 @@
-import { isRouteErrorResponse, LinksFunction } from 'react-router'
-
 import {
+  createCookie,
+  isRouteErrorResponse,
   Links,
+  LinksFunction,
+  LoaderFunctionArgs,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
   useNavigation,
-} from 'react-router';
+} from 'react-router'
 import navStyles from '@navikt/ds-css/dist/index.css?url'
+import darkStyles from '@navikt/ds-css/dist/darkside/index.css?url'
 
 import appStylesHref from './app.css?url'
 
-import { HStack, VStack } from '@navikt/ds-react'
-import { LoaderFunctionArgs } from 'react-router';
+import { Box, HStack, Theme, VStack } from '@navikt/ds-react'
 import { env } from '~/services/env.server'
 import { tryAccessToken } from '~/services/auth.server'
 import { hentMe, hentTilgangskontrollMeta } from '~/services/brukere.server'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
-import { Route } from './+types/root';
+import { Route } from './+types/root'
+import { useState } from 'react'
 
 export const links: LinksFunction = () => {
   return [
@@ -29,6 +32,7 @@ export const links: LinksFunction = () => {
       [
         { rel: 'icon', href: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧝‍♀️</text></svg>' },
         { rel: 'stylesheet', href: navStyles },
+        { rel: 'stylesheet', href: darkStyles },
         { rel: 'stylesheet', href: appStylesHref },
       ]),
   ]
@@ -37,17 +41,26 @@ export const links: LinksFunction = () => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   let accessToken = await tryAccessToken(request)
 
+  let darkmode = await createCookie("darkmode").parse(request.headers.get('cookie'))
+
   return {
     env: env.env,
     me: accessToken ? await hentMe(accessToken) : undefined,
-    tilgangskontrollMeta: accessToken ? await hentTilgangskontrollMeta(accessToken) : undefined
+    tilgangskontrollMeta: accessToken ? await hentTilgangskontrollMeta(accessToken) : undefined,
+    darkmode: darkmode === 'true' || darkmode === true,
   }
 }
 
 export default function App() {
   const navigation = useNavigation()
 
-  const { env, me } = useLoaderData<typeof loader>()
+  const { env, me, darkmode } = useLoaderData<typeof loader>()
+  const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
+
+  function setDarkmode(darkmode: boolean) {
+    setIsDarkmode(darkmode)
+    document.cookie = `darkmode=${encodeURIComponent(btoa(darkmode.toString()))}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
+  }
 
   let title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
 
@@ -61,10 +74,11 @@ export default function App() {
       <Links />
     </head>
     <body>
-    <VStack gap='0' style={{ width: '100%' }}>
+    <Theme theme={isDarkmode ? 'dark' : 'light'}>
+    <VStack gap='0' style={{ width: '100vw' }}>
       {
         me ? (
-          <NavHeader erProduksjon={env === 'p'} env={env} me={me}></NavHeader>
+          <NavHeader erProduksjon={env === 'p'} env={env} me={me} darkmode={isDarkmode} setDarkmode={setDarkmode}></NavHeader>
         ) : (
           <></>
         )
@@ -79,14 +93,15 @@ export default function App() {
           )
         }
 
-        <div
+        <Box.New
           className={navigation.state === 'loading' ? 'loading' : ''}
           id='detail'
         >
           <Outlet />
-        </div>
+        </Box.New>
       </HStack>
     </VStack>
+    </Theme>
 
     <ScrollRestoration />
     <Scripts />
