@@ -32,6 +32,14 @@ export default function NavHeader(props: Props) {
 
   return (
     <InternalHeader className={props.erProduksjon ? 'navds-tag--error-filled' : ''}>
+      <Box style={{ display: 'flex', alignItems: 'center', paddingLeft: '0.5rem' }}>
+        <label htmlFor={'menu-toggle'}>
+          <MenuHamburgerIcon color={'white'} title='Vis/skjul sidemeny' fontSize='2rem' display={'flex'} />
+        </label>
+        <input type={'checkbox'} id={'menu-toggle'} hidden
+               onChange={(event) => setoppdaterVenstremeny(event.target.checked)} />
+      </Box>
+
       <InternalHeader.Title as='h1'>
         Verdande
         {!props.erProduksjon ? (
@@ -47,13 +55,7 @@ export default function NavHeader(props: Props) {
         </InternalHeader.Title>
       ) : (<></>)
       }
-      <Box style={{ display: 'flex', alignItems: 'center', paddingLeft: '1rem' }}>
-        <label htmlFor={'menu-toggle'}>
-          <MenuHamburgerIcon color={'white'} title='Vis/skjul sidemeny' fontSize='2rem' display={'flex'} />
-        </label>
-        <input type={'checkbox'} id={'menu-toggle'} hidden
-               onChange={(event) => setoppdaterVenstremeny(event.target.checked)} />
-      </Box>
+
       <Spacer />
 
       <ActionMenu>
