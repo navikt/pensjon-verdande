@@ -166,7 +166,6 @@ i {
 
   color: var(--a-text-on-inverted);
   background-color: var(--a-surface-inverted);
-  border-right: solid 1px #e3e3e3;
 }
 
 .mainmenu a:hover {
