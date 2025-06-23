@@ -21,6 +21,8 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     null,
     null,
     null,
+    null,
+    null,
     page ? +page : 0,
     size ? +size : 5,
     searchParams.get('sort'),

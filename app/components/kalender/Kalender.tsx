@@ -2,11 +2,26 @@ import { getDato } from '~/common/date'
 import Dag from '~/components/kalender/Dag'
 import { getWeek, getWeekYear } from '~/common/weeknumber'
 import { Button, Heading, HStack, Spacer } from '@navikt/ds-react'
-import React, { useState } from 'react'
+import React from 'react'
 import { BehandlingDto } from '~/types'
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
+import { useSearchParams } from 'react-router'
 
 const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
+
+
+/**
+ * Returnerer første og siste dag som vil vises i kalenderen for en gitt dato
+ */
+export function forsteOgSisteDatoForKalender(dato: Date): { forsteDato: Date, sisteDato: Date } {
+  let forsteUkeNr = getWeek(new Date(dato.getFullYear(), dato.getMonth(), 1))
+  let sisteUkeNr = forsteUkeNr + 5 // kalenderen viser alltid 6 uker i kalenderen
+
+  return {
+    forsteDato: getDato(getWeekYear(dato), forsteUkeNr, 1),
+    sisteDato: getDato(getWeekYear(dato), sisteUkeNr, 7)
+  }
+}
 
 export type Props = {
   startDato: Date,
@@ -16,12 +31,17 @@ export type Props = {
 }
 
 export default function Kalender(props: Props) {
-  const [valgtDato, setValgtDato] = useState(props.startDato)
+  let valgtDato = props.startDato;
+  const [, setSearchParams] = useSearchParams()
   let firstInThisMonth = new Date(valgtDato.getFullYear(), valgtDato.getMonth(), 1)
   let forsteUkeNr = getWeek(firstInThisMonth)
 
   function day(ukenr: number, colIdx: number) {
     return getDato(getWeekYear(valgtDato), ukenr, colIdx + 1)
+  }
+
+  function setValgtDato(dato: Date) {
+    setSearchParams({ dato: dato.toISOString().slice(0, 10) })
   }
 
   function iDag() {

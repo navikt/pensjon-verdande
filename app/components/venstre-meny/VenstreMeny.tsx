@@ -3,10 +3,9 @@ import { MeResponse } from '~/types/brukere'
 import { useState } from 'react'
 import {
   CalendarIcon,
-  ChevronDownIcon, CurrencyExchangeIcon,
+  ChevronDownIcon, CircleIcon, CurrencyExchangeIcon,
   HouseIcon,
-  MagnifyingGlassIcon, MenuElipsisVerticalCircleIcon,
-  NumberListIcon,
+  MagnifyingGlassIcon, NumberListIcon,
   PersonGroupIcon,
   SackPensionIcon, WrenchIcon,
 } from '@navikt/aksel-icons'
@@ -81,7 +80,7 @@ export default function VenstreMeny(props: Props) {
       return (
         <li key={operasjon + link + label}>
           <Link as={NavLink} to={link} className="submenu-link" end style={{display: 'flex', justifyContent: 'flex-start'}}>
-            <span className="meny-ikon"><MenuElipsisVerticalCircleIcon title={label} fontSize="1.5rem" /></span>
+            <span className="meny-ikon"><CircleIcon title={label} fontSize="1.5rem" /></span>
             <span className="meny-tekst">{label}</span>
           </Link>
         </li>

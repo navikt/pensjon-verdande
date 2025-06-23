@@ -1,30 +1,38 @@
-import { ActionFunctionArgs, Await, useLoaderData } from 'react-router'
+import { ActionFunctionArgs, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
-import { Box, Skeleton } from '@navikt/ds-react'
-import React, { Suspense } from 'react'
-import Kalender from '~/components/kalender/Kalender'
+import { Box } from '@navikt/ds-react'
+import React from 'react'
+import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
-  // TODO: Quick and dirty hack for å hente batch-behandlinger for en måned (antar at det er mindre enn 100 i prod for en måned), uten å legge til et api i pen
-  // Erstatt med et eget endepunkt i pen som henter batch-behandlinger for en måned
+  let { searchParams } = new URL(request.url)
+
+  const dato = searchParams.get('dato')
+
+  let startDato = dato ? new Date(dato) : new Date()
+
+  let { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
+
   const behandlinger = await getBehandlinger(
     accessToken,
     null,
     null,
     null,
+    forsteDato,
+    sisteDato,
     null,
     true,
     0,
-    100,
+    1000,
     'opprettet,desc'
   )
 
   return {
     behandlinger: behandlinger,
-    startDato: new Date(),
+    startDato: startDato,
   }
 }
 

@@ -23,6 +23,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     searchParams.get('ansvarligTeam'),
     null,
     null,
+    null,
+    null,
     page ? +page : 0,
     size ? +size : 100,
     searchParams.get('sort'),
