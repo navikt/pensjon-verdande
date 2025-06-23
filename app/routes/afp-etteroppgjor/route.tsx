@@ -1,10 +1,9 @@
 import { Button, Heading } from '@navikt/ds-react'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import React from 'react'
-import { ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
+import { ActionFunctionArgs, Form, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
-import { startAfpEtteroppgjor } from '~/routes/afp-etteroppgjor/afp-etteroppgjor.server'
 import Input from '~/routes/behandling.$behandlingId.input'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -14,19 +13,12 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const page = searchParams.get('page')
 
   const accessToken = await requireAccessToken(request)
-  const behandlinger = await getBehandlinger(
-    accessToken,
-    'AfpEtteroppgjor',
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    page ? +page : 0,
-    size ? +size : 5,
-    searchParams.get('sort'),
-  )
+  const behandlinger = await getBehandlinger(accessToken, {
+    behandlingType: 'AfpEtteroppgjor',
+    page: page ? +page : 0,
+    size: size ? +size : 5,
+    sort: searchParams.get('sort'),
+  })
   if (!behandlinger) {
     throw new Response('Not Found', { status: 404 })
   }

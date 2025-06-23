@@ -1,9 +1,6 @@
-import { LoaderFunctionArgs } from 'react-router';
-import { useLoaderData } from 'react-router';
+import { LoaderFunctionArgs, useLoaderData } from 'react-router'
 
-import {
-  getBehandlinger,
-} from '~/services/behandling.server'
+import { getBehandlinger } from '~/services/behandling.server'
 
 import { requireAccessToken } from '~/services/auth.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
@@ -16,19 +13,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   let page = searchParams.get('page')
   let size = searchParams.get('size')
 
-  const behandlinger = await getBehandlinger(
-    accessToken,
-    searchParams.get('behandlingType'),
-    searchParams.get('status'),
-    searchParams.get('ansvarligTeam'),
-    null,
-    null,
-    null,
-    null,
-    page ? +page : 0,
-    size ? +size : 100,
-    searchParams.get('sort'),
-  )
+  const behandlinger = await getBehandlinger(accessToken, {
+    behandlingType: searchParams.get('behandlingType'),
+    status: searchParams.get('status'),
+    ansvarligTeam: searchParams.get('ansvarligTeam'),
+    page: page ? +page : 0,
+    size: size ? +size : 100,
+    sort: searchParams.get('sort'),
+  })
   if (!behandlinger) {
     throw new Response('Not Found', { status: 404 })
   }

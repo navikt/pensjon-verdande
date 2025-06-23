@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs } from 'react-router';
-import { redirect } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
+import { redirect, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import {
   endreKjorelopIverksettVedtakBehandlinger,
@@ -9,7 +9,6 @@ import {
 } from '~/services/batch.bpen068.server'
 import ReguleringUttrekk from '~/components/regulering/regulering-uttrekk'
 import FortsettAvhengigeReguleringBehandlinger from '~/components/regulering/regulering-fortsett-avhengige'
-import { useLoaderData } from 'react-router';
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import type { BehandlingerPage } from '~/types'
@@ -67,32 +66,23 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const page = searchParams.get('page')
 
   const accessToken = await requireAccessToken(request)
-  const behandlingerUttrekk = await getBehandlinger(
-    accessToken,
-    "ReguleringUttrekk",
-    searchParams.get('status'),
-    searchParams.get('ansvarligTeam'),
-    null,
-    null,
-    null,
-    true,
-    page ? +page : 0,
-    size ? +size : 3,
-    null
-  )
-  const behandlingerOrkestrering = await getBehandlinger(
-    accessToken,
-    "ReguleringOrkestrering",
-    searchParams.get('status'),
-    searchParams.get('ansvarligTeam'),
-    null,
-    null,
-    null,
-    true,
-    page ? +page : 0,
-    size ? +size : 3,
-    null
-  )
+  const behandlingerUttrekk = await getBehandlinger(accessToken, {
+    behandlingType: "ReguleringUttrekk",
+    status: searchParams.get('status'),
+    ansvarligTeam: searchParams.get('ansvarligTeam'),
+    isBatch: true,
+    page: page ? +page : 0,
+    size: size ? +size : 3,
+    sort: null,
+  })
+  const behandlingerOrkestrering = await getBehandlinger(accessToken, {
+    behandlingType: "ReguleringOrkestrering",
+    status: searchParams.get('status'),
+    ansvarligTeam: searchParams.get('ansvarligTeam'),
+    isBatch: true,
+    page: page ? +page : 0,
+    size: size ? +size : 3,
+  })
   if (!behandlingerUttrekk) {
     throw new Response('Not Found', { status: 404 })
   }

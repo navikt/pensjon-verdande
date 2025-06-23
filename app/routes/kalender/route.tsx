@@ -16,19 +16,14 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
   let { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
 
-  const behandlinger = await getBehandlinger(
-    accessToken,
-    null,
-    null,
-    null,
-    forsteDato,
-    sisteDato,
-    null,
-    true,
-    0,
-    1000,
-    'opprettet,desc'
-  )
+  const behandlinger = await getBehandlinger(accessToken, {
+    fom: forsteDato,
+    tom: sisteDato,
+    isBatch: true,
+    page: 0,
+    size: 1000,
+    sort: 'opprettet,desc',
+  })
 
   return {
     behandlinger: behandlinger,

@@ -13,19 +13,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const page = searchParams.get('page')
 
   const accessToken = await requireAccessToken(request)
-  const behandlinger = await getBehandlinger(
-    accessToken,
-    'AldersovergangIdentifiserBruker',
-    null,
-    searchParams.get('ansvarligTeam'),
-    null,
-    null,
-    null,
-    null,
-    page ? +page : 0,
-    size ? +size : 5,
-    searchParams.get('sort'),
-  )
+  const behandlinger = await getBehandlinger(accessToken, {
+    behandlingType: 'AldersovergangIdentifiserBruker',
+    ansvarligTeam: searchParams.get('ansvarligTeam'),
+    page: page ? +page : 0,
+    size: size ? +size : 5,
+    sort: searchParams.get('sort'),
+  })
   if (!behandlinger) {
     throw new Response('Not Found', { status: 404 })
   }
