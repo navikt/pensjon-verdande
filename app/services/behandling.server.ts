@@ -9,6 +9,7 @@ import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
 import { logger } from '~/services/logger.server'
 import { data } from 'react-router'
+import { asLocalDateString } from '~/common/date'
 
 export async function getDashboardSummary(
   accessToken: string,
@@ -35,6 +36,8 @@ export async function getBehandlinger(
   behandlingType: string | null,
   status: string | null,
   ansvarligTeam: string | null,
+  fom: Date | null,
+  tom: Date | null,
   forrigeBehandlingId: number | null,
   isBatch: boolean | null,
   page: number,
@@ -50,6 +53,12 @@ export async function getBehandlinger(
   }
   if (ansvarligTeam) {
     request += `&ansvarligTeam=${ansvarligTeam}`
+  }
+  if (fom) {
+    request += `&fom=${asLocalDateString(fom)}`
+  }
+  if (tom) {
+    request += `&tom=${asLocalDateString(tom)}`
   }
   if (forrigeBehandlingId) {
     request += `&forrigeBehandlingId=${forrigeBehandlingId}`
