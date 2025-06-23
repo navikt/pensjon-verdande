@@ -217,7 +217,7 @@ export default function BehandlingerTable(props: Props) {
                 {props.visBehandlingTypeSoek ? behandlingtypeOptions() : <></>}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
-                {props.visAnsvarligTeamSoek ? ansvarligTeamOptions() : <></>}
+                {(props.visAnsvarligTeamSoek === null || props.visAnsvarligTeamSoek === undefined || props.visAnsvarligTeamSoek) ? ansvarligTeamOptions() : <></>}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
