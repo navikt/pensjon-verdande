@@ -1,5 +1,4 @@
-import { ActionFunctionArgs, json } from 'react-router';
-import { useLoaderData } from 'react-router';
+import { ActionFunctionArgs, useLoaderData } from 'react-router'
 
 import { getBehandlinger } from '~/services/behandling.server'
 
@@ -13,19 +12,15 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const page = searchParams.get('page')
 
   const accessToken = await requireAccessToken(request)
-  const behandlinger = await getBehandlinger(
-    accessToken,
-    searchParams.get('behandlingType'),
-    searchParams.get('status'),
-    searchParams.get('ansvarligTeam'),
-    null,
-    null,
-    null,
-    true,
-    page ? +page : 0,
-    size ? +size : 100,
-    searchParams.get('sort'),
-  )
+  const behandlinger = await getBehandlinger(accessToken, {
+    behandlingType: searchParams.get('behandlingType'),
+    status: searchParams.get('status'),
+    ansvarligTeam: searchParams.get('ansvarligTeam'),
+    isBatch: true,
+    page: page ? +page : 0,
+    size: size ? +size : 100,
+    sort: searchParams.get('sort'),
+  })
   if (!behandlinger) {
     throw new Response('Not Found', { status: 404 })
   }

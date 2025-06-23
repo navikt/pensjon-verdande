@@ -33,17 +33,30 @@ export async function getDashboardSummary(
 
 export async function getBehandlinger(
   accessToken: string,
-  behandlingType: string | null,
-  status: string | null,
-  ansvarligTeam: string | null,
-  fom: Date | null,
-  tom: Date | null,
-  forrigeBehandlingId: number | null,
-  isBatch: boolean | null,
-  page: number,
-  size: number,
-  sort?: string | null,
-): Promise<BehandlingerPage> {
+  {
+    behandlingType,
+    status,
+    ansvarligTeam,
+    fom,
+    tom,
+    forrigeBehandlingId,
+    isBatch,
+    page,
+    size,
+    sort,
+  }: {
+    behandlingType?: string | null,
+    status?: string | null,
+    ansvarligTeam?: string | null,
+    fom?: Date | null,
+    tom?: Date | null,
+    forrigeBehandlingId?: number | null,
+    isBatch?: boolean | null,
+    page: number,
+    size: number,
+    sort?: string | null,
+  },
+) {
   let request = ''
   if (behandlingType) {
     request += `&behandlingType=${behandlingType}`
@@ -85,7 +98,9 @@ export async function getBehandlinger(
   } else {
     let body = await response.json()
     logger.error(`Feil ved kall til pen ${response.status}`, body)
-    throw new Error()
+    throw data("Feil ved henting av behandlinger. Feil var\n" + body, {
+      status: response.status
+    })
   }
 }
 
