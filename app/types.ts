@@ -72,6 +72,16 @@ export type BehandlingDetaljertFremdriftDTO = {
   feilende: number
 }
 
+export type IkkeFullforteAktiviteterDTO = {
+  aktivitetOppsummering: GjenværendeAktivitetOppsummering[];
+};
+
+export type GjenværendeAktivitetOppsummering = {
+  behandling: string;
+  aktivitet: string;
+  status: string;
+  antall: number;
+};
 export type BehandlingKjoringDTO = {
   behandlingKjoringId: number
   behandlingId: number

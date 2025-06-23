@@ -509,6 +509,11 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
+            <Tabs.Tab
+              value='ikkeFullforteAktiviteter'
+              label='Uferdige aktiviteter'
+              icon={<TasklistIcon />}
+            />
             {props.behandling._links && props.behandling._links['input'] ? (
               <Tabs.Tab
                 value='input'

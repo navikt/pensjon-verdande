@@ -9,6 +9,7 @@ export function splitOnCapitals(string: string) {
 
 const oversettinger = [
   ['AfpPrivatBehandling', 'Privat AFP'],
+  ['AfpEtteroppgjorBehandling', 'AFP Etteroppgjør'],
   ['BarnepensjonOpphoerBehandling', 'Opphør barnepensjon'],
   ['DistribuerBrevBehandling', 'Distribuer brev'],
   ['DodsmeldingBehandling', 'Dødsmelding'],

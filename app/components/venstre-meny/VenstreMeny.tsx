@@ -26,9 +26,10 @@ let administrasjonMeny = [
 ]
 
 const batcherMeny = [
-  ['ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling'],
-  ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
   ['BATCH_KJORINGER', '/batcher', 'Alle batchkjøringer'],
+  ['ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling'],
+  ['AFP_ETTEROPPGJOR', '/afp-etteroppgjor', 'AFP Etteroppgjør'],
+  ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
   ['GJENLEVENDEPENSJON_UTVIDET_RETT', `/gjp`, 'Gjenlevendepensjon - utvidet rett'],

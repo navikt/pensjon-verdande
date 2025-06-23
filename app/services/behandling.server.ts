@@ -1,7 +1,14 @@
-import type { BehandlingDto, BehandlingerPage, DashboardResponse, DetaljertFremdriftDTO } from '~/types'
+import {
+  BehandlingDto,
+  BehandlingerPage,
+  DashboardResponse,
+  DetaljertFremdriftDTO,
+  IkkeFullforteAktiviteterDTO,
+} from '~/types'
 import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
 import { logger } from '~/services/logger.server'
+import { data } from 'react-router'
 
 export async function getDashboardSummary(
   accessToken: string,
@@ -210,7 +217,7 @@ export async function getOutputFromBehandling(
 
 export async function getDetaljertFremdrift(
   accessToken: string,
-  forrigeBehandlingId: number | null,
+  forrigeBehandlingId: number,
 ): Promise<DetaljertFremdriftDTO | null> {
   const response = await fetch(
     `${env.penUrl}/api/behandling/${forrigeBehandlingId}/detaljertfremdrift`,
@@ -224,10 +231,35 @@ export async function getDetaljertFremdrift(
 
   if (response.ok) {
     return (await response.json()) as DetaljertFremdriftDTO
-  } else if (response.status === 404) {
-    return null // inntil nytt endepunkt er på plass
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved henting av detaljer fremdrift. Feil var\n" + text, {
+      status: response.status
+    })
+  }
+}
+
+export async function getIkkeFullforteAktiviteter(
+  accessToken: string,
+  behandlingId: number,
+) {
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return (await response.json()) as IkkeFullforteAktiviteterDTO
+  } else {
+    let text = await response.text()
+    throw data("Feil ved henting av detaljer fremdrift. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
