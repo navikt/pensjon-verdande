@@ -1,0 +1,66 @@
+import {
+  ActionMenu,
+  BodyShort,
+  Detail,
+  Dropdown,
+  InternalHeader, Link,
+} from '@navikt/ds-react'
+import { MoonIcon, PersonIcon, SunIcon } from '@navikt/aksel-icons'
+import { MeResponse } from '~/types/brukere'
+import { Link as ReactRouterLink } from 'react-router'
+
+export default function MeMenu({
+                                 meResponse,
+                                 isDarkmode,
+                                 setIsDarkmode,
+                               }: {
+  meResponse: MeResponse
+  isDarkmode: boolean
+  setIsDarkmode: React.Dispatch<React.SetStateAction<boolean>>
+}) {
+  function setDarkmode(darkmode: boolean) {
+    setIsDarkmode(darkmode)
+    document.cookie = `darkmode=${encodeURIComponent(btoa(darkmode.toString()))}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
+  }
+
+  return (
+    <ActionMenu>
+      <ActionMenu.Trigger>
+        <InternalHeader.UserButton
+          name={`${meResponse.fornavn} ${meResponse.etternavn}`}
+        />
+      </ActionMenu.Trigger>
+      <ActionMenu.Content>
+        <dl>
+          <BodyShort as="dt" size="small">
+            {`${meResponse.fornavn} ${meResponse.etternavn}`}
+          </BodyShort>
+          <Detail as="dd">{`${meResponse.brukernavn}`}</Detail>
+        </dl>
+        <ActionMenu.Item icon={<PersonIcon />}>
+          <Link as={ReactRouterLink}
+                to={`/brukere/me`}
+                style={{ textDecoration: 'none', color: 'var(--ax-text-neutral)' }}
+          >
+            Brukeroversikt
+          </Link>
+        </ActionMenu.Item>
+        <Dropdown.Menu.Divider />
+        <ActionMenu.Item
+          disabled={!isDarkmode}
+          icon={<SunIcon />}
+          onClick={() => setDarkmode(false)}
+        >
+          Bytt til lys modus
+        </ActionMenu.Item>
+        <ActionMenu.Item
+          disabled={isDarkmode}
+          icon={<MoonIcon />}
+          onClick={() => setDarkmode(true)}
+        >
+          Bytt til mørk modus
+        </ActionMenu.Item>
+      </ActionMenu.Content>
+    </ActionMenu>
+  )
+}

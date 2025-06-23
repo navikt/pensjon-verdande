@@ -12,13 +12,26 @@ export type CardBodyType = OverridableComponent<Props, HTMLElement>
 
 export const CardBody: CardBodyType = forwardRef(
   (
-    { children, className, as: Component = 'div', ...rest },
+    {
+      background,
+      children,
+      className,
+      style: _style,
+      as: Component = 'div',
+      ...rest
+    },
     ref: ForwardedRef<HTMLElement>,
   ) => {
+
+    const style: React.CSSProperties = {
+      ..._style,
+      backgroundColor: background ? `var(--a-${background})` : 'var(--ax-bg-raised)',
+    }
 
     return (
       <Component
         className={cl(className, styles.cardBody.toString())}
+        style={style}
         ref={ref}
         {...rest}
       >

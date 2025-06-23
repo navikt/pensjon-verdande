@@ -20,14 +20,14 @@ type Props = {
 
 export function DashboardCard(props: Props) {
   return (
-    <Box
-      background={'surface-default'}
+    <Box.New
+      background={"raised"}
       borderRadius="medium"
-      shadow="medium"
+      shadow="dialog"
       style={{ padding: '6px' }}
     >
       <HStack>
-        <Box
+        <Box.New
           style={{
             height: '70px',
             width: '70px',
@@ -45,12 +45,12 @@ export function DashboardCard(props: Props) {
               color: 'var(--a-icon-on-neutral)',
             }}
           />
-        </Box>
+        </Box.New>
         <VStack gap="4">
-          <Box>{props.title}</Box>
-          <Box>{props.value}</Box>
+          <Box.New>{props.title}</Box.New>
+          <Box.New>{props.value}</Box.New>
         </VStack>
       </HStack>
-    </Box>
+    </Box.New>
   )
 }

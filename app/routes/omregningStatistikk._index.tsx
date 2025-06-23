@@ -105,7 +105,7 @@ export default function OmregningStatistikk() {
           nøkkel</Button>
       </Form>
 
-      <Box>
+      <Box.New>
         <Link
           style={{ padding: 1 + 'em', position: 'relative', right: 0, float: 'right' }}
           // this attribute sets the filename
@@ -113,8 +113,8 @@ export default function OmregningStatistikk() {
           // link to the download URL
           href={downloadLink}
         >Last ned tabell</Link>
-      </Box>
-      <Box>
+      </Box.New>
+      <Box.New>
         <Table size='small' zebraStripes>
           <Table.Header>
             <Table.Row>
@@ -156,7 +156,7 @@ export default function OmregningStatistikk() {
           boundaryCount={1}
           siblingCount={1}
         />
-      </Box>
+      </Box.New>
 
     </div>
   )

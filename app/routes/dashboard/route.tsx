@@ -47,19 +47,19 @@ export default function Dashboard() {
 
   return (
     <React.Suspense fallback={
-      <VStack gap="2">
-        <HGrid gap="2" columns={4}>
+      <VStack gap="6">
+        <HGrid gap="6" columns={4}>
           <Skeleton variant="rounded" width="100%" height={70} />
           <Skeleton variant="rounded" width="100%" height={70} />
           <Skeleton variant="rounded" width="100%" height={70} />
           <Skeleton variant="rounded" width="100%" height={70} />
         </HGrid>
-        <HGrid gap="2" style={{ paddingTop: '12px' }} columns={2}>
-          <VStack gap="2">
+        <HGrid gap="6" style={{ paddingTop: '12px' }} columns={2}>
+          <VStack gap="6">
             <Skeleton variant="rounded" width="100%" height={550} />
             <Skeleton variant="rounded" width="100%" height={550} />
           </VStack>
-          <VStack gap="2">
+          <VStack gap="6">
             <Skeleton variant="rounded" width="100%" height={1024} />
           </VStack>
         </HGrid>
@@ -69,8 +69,8 @@ export default function Dashboard() {
         {(dashboardResponse) => {
           if (!dashboardResponse) return (<></>)
           return (
-            <VStack gap="2">
-            <HGrid gap="2" columns={4}>
+            <VStack gap="6">
+            <HGrid gap="6" columns={4}>
               <DashboardCard
                 iconBackgroundColor={'var(--a-green-400)'}
                 title="Totalt"
@@ -97,32 +97,18 @@ export default function Dashboard() {
               />
             </HGrid>
 
-            <HGrid gap="2" columns={2}>
-              <VStack gap="2">
+            <HGrid gap="6" columns={2}>
+              <VStack gap="6">
                 <BehandlingerPerDagLineChartCard
                   opprettetPerDag={dashboardResponse.opprettetPerDag}
                 />
-                <Box
-                  background={'surface-default'}
-                  borderRadius="medium"
-                  shadow="medium"
-                  style={{
-                    paddingTop: '6px',
-                    paddingBottom: '6px',
-                    paddingLeft: '12px',
-                    paddingRight: '12px',
-                    width: '100%',
-                  }}
-                >
-                  <Kalender
+                <Kalender
                     kalenderHendelser={kalenderHendelser}
                     maksAntallPerDag={6}
                     startDato={startDato}
-                    visKlokkeSlett={false}
-                  ></Kalender>
-                </Box>
+                    visKlokkeSlett={false}></Kalender>
               </VStack>
-              <VStack gap="2">
+              <VStack gap="6">
                 <BehandlingAntallTableCard
                   behandlingAntall={dashboardResponse.behandlingAntall}
                 />

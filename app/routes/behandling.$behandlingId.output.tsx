@@ -69,13 +69,13 @@ export default function BehandlingOutput() {
           <Accordion.Header>Json liste</Accordion.Header>
           <Accordion.Content>
             <CopyButton copyText={'[' + temp + ']'} />
-            <Box background='surface-info-subtle' id='outputbox'>
+            <Box.New background='surface-info-subtle' id='outputbox'>
               {output.str.map((verdi: string, index: number) => (<>
                   {JSON.stringify(JSON.parse(verdi), null, 4)},
                   <br />
                 </>
               ))}
-            </Box>
+            </Box.New>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>

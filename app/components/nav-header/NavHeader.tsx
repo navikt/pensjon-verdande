@@ -1,20 +1,23 @@
-import { ActionMenu, Box, InternalHeader, Spacer } from '@navikt/ds-react'
+import { ActionMenu, Box, InternalHeader, Link, Spacer } from '@navikt/ds-react'
 import {
   BarChartIcon,
   BookIcon,
   ExternalLinkIcon,
   MenuGridIcon,
-  MenuHamburgerIcon,
-  PersonIcon,
+  MenuHamburgerIcon, MoonIcon,
+  PersonIcon, SunIcon,
 } from '@navikt/aksel-icons'
-import { NavLink } from 'react-router'
+import { Link as ReactRouterLink } from 'react-router'
 import { MeResponse } from '~/types/brukere'
 import { useEffect, useState } from 'react'
+import MeMenu from '~/components/nav-header/MeMenu'
 
 export type Props = {
   erProduksjon: boolean,
   env: string,
   me: MeResponse,
+  darkmode: boolean,
+  setDarkmode: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export default function NavHeader(props: Props) {
@@ -32,15 +35,22 @@ export default function NavHeader(props: Props) {
 
   return (
     <InternalHeader className={props.erProduksjon ? 'navds-tag--error-filled' : ''}>
-      <Box style={{ display: 'flex', alignItems: 'center', paddingLeft: '0.5rem' }}>
+      <Box.New style={{ display: 'flex', alignItems: 'center', paddingLeft: '0.5rem' }}>
         <label htmlFor={'menu-toggle'}>
           <MenuHamburgerIcon color={'white'} title='Vis/skjul sidemeny' fontSize='2rem' display={'flex'} />
         </label>
         <input type={'checkbox'} id={'menu-toggle'} hidden
                onChange={(event) => setoppdaterVenstremeny(event.target.checked)} />
-      </Box>
+      </Box.New>
 
-      <InternalHeader.Title as='h1'>
+      <InternalHeader.Title
+        as="a"
+        href="/"
+        style={{
+          textDecoration: 'none',
+          color: 'var(--ax-text-neutral)',
+        }}
+      >
         Verdande
         {!props.erProduksjon ? (
           <span className='header-environment-postscript'>
@@ -68,17 +78,6 @@ export default function NavHeader(props: Props) {
           </InternalHeader.Button>
         </ActionMenu.Trigger>
         <ActionMenu.Content>
-          <ActionMenu.Group label='Verdande'>
-            <ActionMenu.Item onSelect={console.info} icon={<PersonIcon />}>
-              <NavLink
-                to={`/brukere/me`}
-                style={{ textDecoration: 'none', color: 'black' }}
-              >
-                Brukeroversikt
-              </NavLink>
-            </ActionMenu.Item>
-          </ActionMenu.Group>
-          <ActionMenu.Divider />
           <ActionMenu.Group label='Behandlingsløsningen'>
             <ActionMenu.Item
               icon={<BookIcon />}
@@ -86,7 +85,7 @@ export default function NavHeader(props: Props) {
               <a
                 target='_blank'
                 href={'https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html'}
-                style={{ textDecoration: 'none', color: 'black' }}
+                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }}
               >
                 Dokumentasjon
               </a>
@@ -99,7 +98,7 @@ export default function NavHeader(props: Props) {
               <a
                 target='_blank'
                 href={'https://grafana.nav.cloud.nais.io/goto/mgXUC1LHg?orgId=1'}
-                style={{ textDecoration: 'none', color: 'black' }}
+                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }}
               >
                 Grafanadashboard
               </a>
@@ -109,7 +108,7 @@ export default function NavHeader(props: Props) {
         </ActionMenu.Content>
       </ActionMenu>
 
-      <InternalHeader.User name={props.me ? props.me.fornavn + ' ' + props.me.etternavn : ''} />
+      <MeMenu meResponse={props.me} isDarkmode={props.darkmode} setIsDarkmode={props.setDarkmode}/>
     </InternalHeader>
   )
 }

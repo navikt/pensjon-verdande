@@ -45,7 +45,7 @@ export default function BatchOpprett_index() {
             placeholder="KontrollÅr"
           />
         </div>
-        <Box>
+        <Box.New>
           <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {
             console.log('change')
           }}>
@@ -66,7 +66,7 @@ export default function BatchOpprett_index() {
             </Checkbox>
 
           </CheckboxGroup>
-        </Box>
+        </Box.New>
             <br />
         <p>
           <button type="submit" disabled={isClicked} onClick={handleSubmit}>

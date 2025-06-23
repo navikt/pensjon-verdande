@@ -15,7 +15,7 @@ export default function Brukere() {
   const { brukere } = useLoaderData<typeof loader>()
 
   return (
-    <Box
+    <Box.New
       background={'surface-default'}
       style={{ padding: '6px' }}
       borderRadius="medium"
@@ -43,6 +43,6 @@ export default function Brukere() {
           ))}
         </Table.Body>
       </Table>
-    </Box>
+    </Box.New>
   )
 }

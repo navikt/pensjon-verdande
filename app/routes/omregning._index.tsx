@@ -237,7 +237,7 @@ export default function BatchOpprett_index() {
   return (
     <div>
       <h1>Omregn ytelser</h1>
-      <Box>
+      <Box.New>
         Behandling for Omregning av ytelser (tidligere BPEN093).
         <br />
         Dokumentasjon kan finnes her:
@@ -251,7 +251,7 @@ export default function BatchOpprett_index() {
           </li>
         </ul>
 
-      </Box>
+      </Box.New>
       <Tabs defaultValue='Omregning'>
 
         <Tabs.List>
@@ -268,7 +268,7 @@ export default function BatchOpprett_index() {
           <Form id={'skjema'} action='omregning' method='POST' onSubmit={handleSubmit}>
             <VStack gap='6'>
               <HGrid columns={3} gap='12'>
-                <Box>
+                <Box.New>
                   <TextField
                     label={'Behandlingsnøkkel'}
                     name={'behandlingsnokkel'}
@@ -308,8 +308,8 @@ export default function BatchOpprett_index() {
                                      setSelectedValue={setOppgavePrefiks} optionsmap={optionOppgavePrefiks} />
 
                   <br />
-                </Box>
-                <Box>
+                </Box.New>
+                <Box.New>
                   <VStack gap='2'>
                     <CheckboxGroup size={'medium'} legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
 
@@ -347,12 +347,12 @@ export default function BatchOpprett_index() {
 
                     </CheckboxGroup>
                   </VStack>
-                </Box>
-                <Box>
+                </Box.New>
+                <Box.New>
                   <CheckboxGroup legend={'Brevparametere'}>
                     Ved å <b>ikke</b> angi brev for berørte saker vil default brevkode bli brukt.
                     <HGrid columns={2} gap='12'>
-                      <Box
+                      <Box.New
                         padding='4'
                         background='surface-info-subtle'
                         borderColor='border-info'
@@ -395,8 +395,8 @@ export default function BatchOpprett_index() {
                                                setselectedBrevKode={setselectedBrevkodeSokerAFPPrivat}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
 
-                      </Box>
-                      <Box
+                      </Box.New>
+                      <Box.New
                         padding='4'
                         background='surface-info-subtle'
                         borderColor='border-info'
@@ -446,16 +446,16 @@ export default function BatchOpprett_index() {
                                                setselectedBrevKode={setselectedBrevkodeBerorteSakerAFPPrivat}
                                                optionBatchbrevtyper={optionBatchbrevtyper} />
 
-                      </Box>
+                      </Box.New>
                     </HGrid>
                   </CheckboxGroup>
-                </Box>
+                </Box.New>
 
               </HGrid>
             </VStack>
           </Form>
 
-          <Box>
+          <Box.New>
             <br />
             <Button
               icon={<PlayIcon aria-hidden />}
@@ -525,7 +525,7 @@ export default function BatchOpprett_index() {
                 <CopyButton copyText={getHumanReadableParameterText()} text="Kopier parameterliste"/>
               </Modal.Footer>
             </Modal>
-          </Box>
+          </Box.New>
         </Tabs.Panel>
 
         <Tabs.Panel value='Saker til Omregning'>

@@ -1,7 +1,7 @@
 import { erHelgedag, getDato, isSameDay } from '~/common/date'
 import Dag from '~/components/kalender/Dag'
 import { getWeek, getWeekYear } from '~/common/weeknumber'
-import { Button, Heading, HStack, Spacer } from '@navikt/ds-react'
+import { Box, Button, Heading, HStack, Spacer } from '@navikt/ds-react'
 import React from 'react'
 import { BehandlingDto } from '~/types'
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
@@ -90,9 +90,14 @@ export default function Kalender(props: Props) {
   }
 
   return (
-    <div>
+    <Box.New
+      background={"raised"}
+      borderRadius="medium"
+      shadow="dialog"
+      style={{ padding: '6px' }}
+    >
       <Heading size={'xlarge'} level="1" spacing>
-        <HStack align="center">
+        <HStack align="center" padding="space-4">
           <span><strong>{valgtDato.toLocaleDateString('no-NO', { month: 'long' })}</strong> {valgtDato.getFullYear()}</span>
           <Spacer></Spacer>
           <HStack gap="1" style={{ height: '10px' }}>
@@ -103,7 +108,7 @@ export default function Kalender(props: Props) {
         </HStack>
       </Heading>
 
-      <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed' }}>
+      <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed'}}>
         <thead>
         <tr>
           {weekdays.map((day) => (
@@ -119,6 +124,6 @@ export default function Kalender(props: Props) {
         ))}
         </tbody>
       </table>
-    </div>
+    </Box.New>
   )
 }

@@ -32,7 +32,7 @@ export default function Dag(props: Props) {
   if (isSameDay(props.dato, new Date())) {
     dagLabel = <span
       style={{
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       }}
     >{dagStreng}</span>
   } else {
@@ -41,9 +41,9 @@ export default function Dag(props: Props) {
 
   let textColor: string
   if (props.dato.getFullYear() === props.highlightMaaned.getFullYear() && props.dato.getMonth() === props.highlightMaaned.getMonth()) {
-    textColor = 'black'
+    textColor = 'var(--ax-text-neutral)'
   } else {
-    textColor = 'gray'
+    textColor = 'var(--ax-neutral-600)'
   }
 
   let offentligFridag = props.kalenderHendelser.offentligeFridager.find(it => isSameDay(it.dato, props.dato))?.navn
@@ -52,7 +52,11 @@ export default function Dag(props: Props) {
     if (props.dato.getDay() === 1) {
       return (
         <HStack>
-          <span style={{ textAlign: 'left', color: 'gray', fontSize: '0.9em' }}>{getWeek(props.dato)}</span>
+          <span style={{
+            textAlign: 'left',
+            color: 'var(--ax-neutral-600)',
+            fontSize: '0.9em',
+          }}>{getWeek(props.dato)}</span>
           <Spacer></Spacer>
           <span style={{ textAlign: 'right', color: textColor }}>{dagLabel}</span>
         </HStack>

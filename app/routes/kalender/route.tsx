@@ -29,24 +29,11 @@ export default function KalenderVisning() {
   const { kalenderHendelser, startDato } = useLoaderData<typeof loader>()
 
   return (
-    <Box
-      background={'surface-default'}
-      borderRadius="medium"
-      shadow="medium"
-      style={{
-        paddingTop: '6px',
-        paddingBottom: '6px',
-        paddingLeft: '12px',
-        paddingRight: '12px',
-        width: '100%',
-      }}
-    >
-      <Kalender
+    <Kalender
         kalenderHendelser={kalenderHendelser}
         maksAntallPerDag={6}
         startDato={startDato}
         visKlokkeSlett={true}
       ></Kalender>
-    </Box>
   )
 }

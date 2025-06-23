@@ -45,7 +45,7 @@ export const Card = forwardRef(
 
     const style: React.CSSProperties = {
       ..._style,
-      backgroundColor: background ? `var(--a-${background})` : undefined,
+      backgroundColor: background ? `var(--a-${background})` : 'var(--ax-bg-sunken)',
     }
 
     return (
