@@ -5,7 +5,6 @@ import { HelpText, HStack, Link, Table } from '@navikt/ds-react'
 import { formatNumber } from '~/common/number'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { NavLink } from 'react-router';
-import { QuestionmarkDiamondIcon } from '@navikt/aksel-icons'
 
 type Props = {
   oppsummering: BehandlingAntall[]
@@ -34,7 +33,7 @@ export default function BehandlingAntallTable(props: Props) {
               <Table.DataCell align={'right'}>{index + 1}</Table.DataCell>
               <Table.DataCell>
                 <HStack>
-                  <Link as={NavLink} to={`/behandlinger?behandlingType=${it.navn}`}>{decodeBehandling(it.navn)}</Link>
+                  <Link as={NavLink} to={`/behandlinger?behandlingType=${it.behandlingType ?? it.navn}`}>{decodeBehandling(it.behandlingType ?? it.navn)}</Link>
                   {
                     it.behandlingType === null
                       ? (

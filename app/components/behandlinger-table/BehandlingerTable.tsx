@@ -115,7 +115,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
       }
 
       { behandlingerResponse.behandlingTyper ?
-        behandlingerResponse.behandlingTyper.sort((a,b) => a.localeCompare(b)).map((type) => {
+        behandlingerResponse.behandlingTyper.sort((a,b) => decodeBehandling(a).localeCompare(decodeBehandling(b))).map((type) => {
         return (<option key={type} value={type}>{decodeBehandling(type)}</option>)
       })
         : <></>
