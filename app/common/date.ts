@@ -53,7 +53,15 @@ export const getDato = function(year: number, weekNumber: number, weekday: numbe
 }
 
 
-export function isSameDay(date1: Date, date2: Date) {
+export function isSameDay(date1: Date | string, date2: Date | string) {
+  if (typeof date1 === 'string') {
+    date1 = new Date(date1);
+  }
+
+  if (typeof date2 === 'string') {
+    date2 = new Date(date2);
+  }
+
   return date1.getDate() === date2.getDate() &&
          date1.getMonth() === date2.getMonth() &&
          date1.getFullYear() === date2.getFullYear();
@@ -64,4 +72,8 @@ export function asLocalDateString(date: Date): string {
   const mm = String(date.getMonth() + 1).padStart(2, '0')
   const dd = String(date.getDate()).padStart(2, '0')
   return `${yyyy}-${mm}-${dd}`
+}
+
+export function erHelgedag(dato: Date): boolean {
+  return dato.getDay() === 0 || dato.getDay() === 6
 }

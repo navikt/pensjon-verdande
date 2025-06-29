@@ -6,13 +6,15 @@ import React from 'react'
 import { HStack, Link, Spacer } from '@navikt/ds-react'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { JSX } from 'react/jsx-runtime'
+import { KalenderHendelser } from '~/components/kalender/types'
 
 export type Props = {
-  highlightMaaned: Date,
-  dato: Date,
   behandlinger: BehandlingDto[],
-  visKlokkeSlett: boolean,
+  dato: Date,
+  highlightMaaned: Date,
   maksAntallPerDag?: number
+  kalenderHendelser: KalenderHendelser,
+  visKlokkeSlett: boolean,
 }
 
 const formatTidspunkt = (datoStr: string) => {
@@ -45,6 +47,8 @@ export default function Dag(props: Props) {
   } else {
     textColor = 'gray'
   }
+
+  let offentligFridag = props.kalenderHendelser.offentligeFridager.find(it => isSameDay(it.dato, props.dato))?.navn
 
   function dayRow() {
     if (props.dato.getDay() === 1) {
@@ -108,12 +112,23 @@ export default function Dag(props: Props) {
 
     const antallEkstra = Math.max(0, dagens.length - behandlingerSomVises.length)
 
+    const offentligFridagElement = offentligFridag
+      ? [
+        <HStack key="kalenderHendelse" style={{ fontSize: '0.8em' }}>
+        <span style={{
+          color: 'red',
+        }}>
+          {offentligFridag}
+        </span>
+      </HStack>,]
+      : []
+
     const behandlingElementer = behandlingerSomVises.map((behandling) =>
       behandlingElement(behandling, textColor, props.visKlokkeSlett)
     )
 
-    if (antallEkstra > 0) {
-      behandlingElementer.push(
+    const ekstreElement = antallEkstra > 0
+    ? [
         <HStack key="ekstra" style={{ fontSize: '0.8em' }}>
           <span style={{
             color: textColor,
@@ -121,10 +136,10 @@ export default function Dag(props: Props) {
             og {antallEkstra} til
           </span>
         </HStack>
-      )
-    }
+        ]
+      : []
 
-    return behandlingElementer
+    return [...offentligFridagElement, ...behandlingElementer, ...ekstreElement]
   }
 
   return (
@@ -145,5 +160,4 @@ export default function Dag(props: Props) {
       </tbody>
     </table>
   )
-
 }

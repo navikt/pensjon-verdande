@@ -10,6 +10,7 @@ import { kibanaLink } from '~/services/kibana.server'
 import { logger } from '~/services/logger.server'
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
+import { KalenderHendelser } from '~/components/kalender/types'
 
 export async function getDashboardSummary(
   accessToken: string,
@@ -513,5 +514,40 @@ export async function getBehandlingInput(
     return await response.text()
   } else {
     throw new Error()
+  }
+}
+
+export async function hentKalenderHendelser(
+  accessToken: string,
+  {
+    fom,
+    tom,
+  }: {
+    fom: Date,
+    tom: Date,
+  }
+): Promise<KalenderHendelser> {
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return await response.json() as KalenderHendelser
+  } else if (response.status === 400) { // TODO: Fjern etter at støtte i pen er prodsatt
+    return {
+      offentligeFridager: []
+    }
+  } else {
+    let text = await response.text()
+    throw data("Feil ved henting av kalenderhendelser. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }

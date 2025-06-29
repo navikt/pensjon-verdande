@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, Await, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
-import { getBehandlinger, getDashboardSummary } from '~/services/behandling.server'
+import { getBehandlinger, getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
 import { Box, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import {
   ClipboardFillIcon,
@@ -32,24 +32,26 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
   let { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
 
-  const behandlinger = await getBehandlinger(accessToken, {
-    fom: forsteDato,
-    tom: sisteDato,
-    isBatch: true,
-    page: 0,
-    size: 1000,
-    sort: 'opprettet,desc',
-  })
-
   return {
     loadingDashboardResponse: dashboardResponse,
-    behandlinger: behandlinger.content,
+    behandlinger: await getBehandlinger(accessToken, {
+      fom: forsteDato,
+      tom: sisteDato,
+      isBatch: true,
+      page: 0,
+      size: 1000,
+      sort: 'opprettet,desc',
+    }),
+    kalenderHendelser: await hentKalenderHendelser(accessToken, {
+      fom: forsteDato,
+      tom: sisteDato,
+    }),
     startDato: startDato,
   }
 }
 
 export default function Dashboard() {
-  const { loadingDashboardResponse, behandlinger, startDato } = useLoaderData<typeof loader>()
+  const { behandlinger, kalenderHendelser, loadingDashboardResponse, startDato } = useLoaderData<typeof loader>()
 
   return (
     <React.Suspense fallback={
@@ -120,7 +122,13 @@ export default function Dashboard() {
                     width: '100%',
                   }}
                 >
-                <Kalender behandlinger={behandlinger} visKlokkeSlett={false} startDato={startDato} maksAntallPerDag={6}></Kalender>
+                  <Kalender
+                    behandlinger={behandlinger.content}
+                    kalenderHendelser={kalenderHendelser}
+                    maksAntallPerDag={6}
+                    startDato={startDato}
+                    visKlokkeSlett={false}
+                  ></Kalender>
                 </Box>
               </VStack>
               <VStack gap="2">

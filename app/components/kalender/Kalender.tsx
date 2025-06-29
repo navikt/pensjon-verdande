@@ -1,4 +1,4 @@
-import { getDato } from '~/common/date'
+import { erHelgedag, getDato, isSameDay } from '~/common/date'
 import Dag from '~/components/kalender/Dag'
 import { getWeek, getWeekYear } from '~/common/weeknumber'
 import { Button, Heading, HStack, Spacer } from '@navikt/ds-react'
@@ -6,6 +6,7 @@ import React from 'react'
 import { BehandlingDto } from '~/types'
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
 import { useSearchParams } from 'react-router'
+import { KalenderHendelser } from '~/components/kalender/types'
 
 const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
 
@@ -24,10 +25,19 @@ export function forsteOgSisteDatoForKalender(dato: Date): { forsteDato: Date, si
 }
 
 export type Props = {
-  startDato: Date,
   behandlinger: BehandlingDto[],
-  visKlokkeSlett: boolean,
+  kalenderHendelser: KalenderHendelser,
   maksAntallPerDag: number,
+  startDato: Date,
+  visKlokkeSlett: boolean,
+}
+
+function backgroundColorForDato(kalenderHendelser: KalenderHendelser, dato: Date): string {
+  if (erHelgedag(dato) || kalenderHendelser.offentligeFridager.find(it => isSameDay(it.dato, dato)) !== undefined) {
+    return 'var(--a-grayalpha-50)'
+  } else {
+    return 'transparent'
+  }
 }
 
 export default function Kalender(props: Props) {
@@ -60,6 +70,27 @@ export default function Kalender(props: Props) {
     setValgtDato(nextMonth);
   }
 
+  function dag(colIdx: number, rowIdx: number) {
+    let dato = day(rowIdx + forsteUkeNr, colIdx)
+
+    return <td key={'col' + colIdx + 'row' + rowIdx}
+               style={{
+                 border: '1px solid #ddd',
+                 width: 'calc(100% / 7)',
+                 maxWidth: 'calc(100% / 7)',
+                 backgroundColor: backgroundColorForDato(props.kalenderHendelser, dato),
+               }}>
+      <Dag
+        behandlinger={props.behandlinger}
+        dato={dato}
+        highlightMaaned={valgtDato}
+        kalenderHendelser={props.kalenderHendelser}
+        maksAntallPerDag={props.maksAntallPerDag}
+        visKlokkeSlett={props.visKlokkeSlett}
+      ></Dag>
+    </td>
+  }
+
   return (
     <div>
       <Heading size={'xlarge'} level="1" spacing>
@@ -85,18 +116,7 @@ export default function Kalender(props: Props) {
         <tbody>
         {[...Array(6)].map((_, rowIdx) => (
             <tr key={rowIdx + 'dato'} style={{ height: '8em', verticalAlign: 'top' }}>
-              {[...Array(7)].map((_, colIdx) => (
-                <td key={'col' + colIdx + 'row' + rowIdx}
-                    style={{ border: '1px solid #ddd', width: 'calc(100% / 7)', maxWidth: 'calc(100% / 7)' }}>
-                  <Dag
-                    highlightMaaned={valgtDato}
-                    dato={day(rowIdx + forsteUkeNr, colIdx)}
-                    behandlinger={props.behandlinger}
-                    visKlokkeSlett={props.visKlokkeSlett}
-                    maksAntallPerDag={props.maksAntallPerDag}
-                  ></Dag>
-                </td>
-              ))}
+              {[...Array(7)].map((_, colIdx) => dag(colIdx, rowIdx))}
             </tr>
         ))}
         </tbody>
