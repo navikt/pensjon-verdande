@@ -28,7 +28,10 @@ export async function getDashboardSummary(
   if (response.ok) {
     return (await response.json()) as DashboardResponse
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved henting av dashboard oppsummering. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -145,7 +148,10 @@ export async function getAvhengigeBehandlinger(
   if (response.ok) {
     return (await response.json()) as BehandlingerPage
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved henting av avhengige behandlinger. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -189,7 +195,10 @@ export async function search(
   if (response.ok) {
     return (await response.json()) as BehandlingerPage
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved søking etter behandlinger. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -212,7 +221,10 @@ export async function getBehandling(
     behandling.kibanaUrl = kibanaLink(behandling)
     return behandling
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved henting av behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -236,7 +248,10 @@ export async function getOutputFromBehandling(
   if (response.ok) {
     return (await response.json()) as Output
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved hending av output fra behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -304,7 +319,10 @@ export async function fortsettBehandling(
   )
 
   if (!response.ok) {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved forsetting av behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -324,7 +342,10 @@ export async function fortsettAvhengigeBehandlinger(
   )
 
   if (!response.ok) {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved forsetting av avhengige behandlinger. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -344,7 +365,10 @@ export async function taTilDebug(
   )
 
   if (!response.ok) {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved sending til debug. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -364,7 +388,10 @@ export async function fjernFraDebug(
   )
 
   if (!response.ok) {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved fjerning av debug. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -387,7 +414,10 @@ export async function patchBehandling(
   )
 
   if (!response.ok) {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved oppdatering av behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -407,7 +437,10 @@ export async function runBehandling(
   )
 
   if (!response.ok) {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved kjøring av behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -427,7 +460,10 @@ export async function stopp(
   )
 
   if (!response.ok) {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved stopping av behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -450,7 +486,10 @@ export async function sendTilManuellMedKontrollpunkt(
   )
 
   if (!response.ok) {
-    throw new Error(`Feil ved sending til manuell behandling. Status: ${response.status} ${response.statusText}`)
+    let text = await response.text()
+    throw data("Feil ved sending til manuell behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -471,7 +510,10 @@ export async function getOppdragsmelding(
   if (response.ok) {
     return await response.text()
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved henting av oppdragsmelding. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -492,7 +534,10 @@ export async function getOppdragskvittering(
   if (response.ok) {
     return await response.text()
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved henting av oppdragskvittering. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
@@ -513,7 +558,10 @@ export async function getBehandlingInput(
   if (response.ok) {
     return await response.text()
   } else {
-    throw new Error()
+    let text = await response.text()
+    throw data("Feil ved henting av behandling. Feil var\n" + text, {
+      status: response.status
+    })
   }
 }
 
