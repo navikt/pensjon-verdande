@@ -1,12 +1,12 @@
 import { ActionFunctionArgs, Form, useLoaderData, useSubmit } from 'react-router'
 import React, { useEffect, useRef, useState } from 'react'
-import { Select } from '@navikt/ds-react'
+import { MonthPicker, Select } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { BehandlingerPage } from '~/types'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
-import { format } from 'date-fns'
+import { addYears, format, subYears } from 'date-fns'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)
@@ -35,8 +35,8 @@ export default function BatchOpprett_index() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
   const now = new Date()
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedMonth, setSelectedMonth] = useState<Date>(now)
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e: any) => {
@@ -63,11 +63,22 @@ export default function BatchOpprett_index() {
         <br />
         <label><b>Behandlingsmåned</b></label>
         <br />
+        <MonthPicker.Standalone
+          dropdownCaption
+          defaultSelected={now}
+          fromDate={subYears(now, 1)}
+          toDate={addYears(now, 1)}
+          onMonthSelect={(month: Date | undefined) => {
+            if (month !== undefined) {
+              setSelectedMonth(month)
+            }
+          }}
+        />
         <input
+          type="hidden"
           name="behandlingsmaned"
-          defaultValue={denneBehandlingsmaneden}
-          type="number"
-          placeholder="Behandlingsmåned"
+          defaultValue={now.getFullYear() * 100 + now.getMonth() + 1}
+          value={selectedMonth.getFullYear() * 100 + now.getMonth() + 1}
         />
 
         <br />
