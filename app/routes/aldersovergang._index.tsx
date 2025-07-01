@@ -5,6 +5,8 @@ import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { BehandlingerPage } from '~/types'
+import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import { format } from 'date-fns'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)
@@ -34,9 +36,13 @@ export default function BatchOpprett_index() {
 
   const now = new Date()
   const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
+  const handleSubmit = (e: any) => {
+    submit(e.target.form)
+    setIsClicked(true)
+  }
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -54,29 +60,41 @@ export default function BatchOpprett_index() {
     <div>
       <h1>Start aldersovergang</h1>
       <Form action="bpen005" method="POST">
-        <div style={{ display: 'inline-block' }}>
-          <label>Behandlingsmåned</label>
-          <br />
-          <input
-            defaultValue={denneBehandlingsmaneden}
-            aria-label="Behandlingsmåned"
-            name="behandlingsmaned"
-            type="number"
-            placeholder="Behandlingsmåned"
-          />
-        </div>
         <br />
-        <div style={{ display: 'inline-block' }}>
-          <Select
-            label="Begrenset utplukk"
-            size={'small'}
-            name={'begrensetUtplukk'}
-            defaultValue={'false'}
-          >
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-        </div>
+        <label><b>Behandlingsmåned</b></label>
+        <br />
+        <input
+          name="behandlingsmaned"
+          defaultValue={denneBehandlingsmaneden}
+          type="number"
+          placeholder="Behandlingsmåned"
+        />
+
+        <br />
+        <label><b>Kjøretidspunkt</b></label>
+        <DateTimePicker
+          selectedDate={selectedDate}
+          setSelectedDate={(date: Date | null) => setSelectedDate(date)}
+          labelText={''}
+        />
+        <input
+          type="hidden"
+          name="kjoeretidspunkt"
+          value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
+        />
+
+        <label><b>Begrenset utplukk</b></label>
+        <br />
+        <Select style={{width: '200px'}}
+          label=''
+          size={'small'}
+          name={'begrensetUtplukk'}
+          defaultValue={'false'}
+        >
+          <option value="true">Ja</option>
+          <option value="false">Nei</option>
+        </Select>
+
         <p>
           <button type="submit" disabled={isClicked} onClick={handleSubmit}>
             Opprett

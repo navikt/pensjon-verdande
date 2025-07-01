@@ -4,8 +4,15 @@ import type { StartBatchResponse } from '~/types'
 export async function opprettBpen005(
   accessToken: string,
   behandlingsmaned: number,
+  kjoeretidspunkt: string,
   begrensetUtplukk: boolean,
 ): Promise<StartBatchResponse> {
+  let body = JSON.stringify({
+    behandlingsmaned: behandlingsmaned,
+    kjoeretidspunkt: kjoeretidspunkt,
+    begrensetUtplukk: begrensetUtplukk,
+  })
+  console.log(body)
   const response = await fetch(
     `${env.penUrl}/api/aldersovergang/utplukk`,
     {
@@ -15,10 +22,7 @@ export async function opprettBpen005(
         'Content-Type': 'application/json',
         'X-Request-ID': crypto.randomUUID(),
       },
-      body: JSON.stringify({
-        behandlingsmaned: behandlingsmaned,
-        begrensetUtplukk: begrensetUtplukk,
-      }),
+      body: body,
     },
   )
 
