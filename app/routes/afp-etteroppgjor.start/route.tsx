@@ -5,7 +5,11 @@ import { startAfpEtteroppgjor } from '~/routes/afp-etteroppgjor/afp-etteroppgjor
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
-  let response = await startAfpEtteroppgjor(accessToken)
+  let formData = Object.fromEntries(await request.formData())
+
+  let response = await startAfpEtteroppgjor(accessToken, {
+    kjøreår: +(formData.kjorear as string),
+  })
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

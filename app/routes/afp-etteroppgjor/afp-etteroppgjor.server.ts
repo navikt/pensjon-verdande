@@ -4,8 +4,12 @@ import { data } from 'react-router'
 
 export async function startAfpEtteroppgjor(
   accessToken: string,
+  {
+    kjøreår,
+  }: {
+    kjøreår: number,
+  }
 ): Promise<StartEtteroppgjorResponse> {
-
   const response = await fetch(
     `${env.penUrl}/api/afpoffentlig/etteroppgjor/behandling/start`,
     {
@@ -15,6 +19,9 @@ export async function startAfpEtteroppgjor(
         'Content-Type': 'application/json',
         'X-Request-ID': crypto.randomUUID(),
       },
+      body: JSON.stringify({
+        kjorear: kjøreår,
+      }),
     },
   )
 
