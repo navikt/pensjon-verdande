@@ -1,12 +1,24 @@
-import { ActionFunctionArgs, Form, useLoaderData, useSubmit } from 'react-router'
-import React, { useEffect, useRef, useState } from 'react'
-import { Select } from '@navikt/ds-react'
+import {
+  ActionFunctionArgs,
+  Form,
+  useLoaderData,
+  useSubmit,
+} from 'react-router'
+import React, { useState } from 'react'
+import {
+  BodyShort,
+  Button,
+  Heading, HStack,
+  Label,
+  MonthPicker,
+  Select, VStack,
+} from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { BehandlingerPage } from '~/types'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
-import { format } from 'date-fns'
+import { addYears, format, subYears } from 'date-fns'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)
@@ -22,12 +34,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     size: size ? +size : 5,
     sort: searchParams.get('sort'),
   })
+
   if (!behandlinger) {
     throw new Response('Not Found', { status: 404 })
   }
 
   return {
-    behandlinger: behandlinger,
+    behandlinger,
   }
 }
 
@@ -35,74 +48,104 @@ export default function BatchOpprett_index() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
   const now = new Date()
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedMonth, setSelectedMonth] = useState<Date>(now)
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
-  const handleSubmit = (e: any) => {
-    submit(e.target.form)
+
+  const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
+    submit(e.currentTarget.form)
     setIsClicked(true)
   }
 
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-  useEffect(() => {
-    handleInput()
-  })
-
   return (
     <div>
-      <h1>Start aldersovergang</h1>
-      <Form action="bpen005" method="POST">
-        <br />
-        <label><b>Behandlingsmåned</b></label>
-        <br />
-        <input
-          name="behandlingsmaned"
-          defaultValue={denneBehandlingsmaneden}
-          type="number"
-          placeholder="Behandlingsmåned"
-        />
+      <Form action="bpen005" method="POST" style={{ width: '100%', maxWidth: 800 }}>
+        <Heading level="1" size="large" spacing>
+          Start aldersovergang
+        </Heading>
 
-        <br />
-        <label><b>Kjøretidspunkt</b></label>
-        <DateTimePicker
-          selectedDate={selectedDate}
-          setSelectedDate={(date: Date | null) => setSelectedDate(date)}
-          labelText={''}
-        />
-        <input
-          type="hidden"
-          name="kjoeretidspunkt"
-          value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
-        />
+        <HStack gap="8" align="start" wrap={false} style={{ marginBottom: '2rem' }}>
+          <VStack gap="2" style={{ flex: 1.2 }}>
+            <div>
+              <Label>Behandlingsmåned</Label>
+              <BodyShort size="small">
+                Velg hvilken måned som skal behandles. Vanligvis inneværende måned.
+              </BodyShort>
+            </div>
+            <div style={{ padding: '0.5rem 0.75rem' }}>
+              <MonthPicker.Standalone
+                dropdownCaption
+                defaultSelected={now}
+                fromDate={subYears(now, 1)}
+                toDate={addYears(now, 1)}
+                onMonthSelect={(month: Date | undefined) => {
+                  if (month !== undefined) {
+                    setSelectedMonth(month)
+                  }
+                }}
+              />
+            </div>
+            <input
+              type="hidden"
+              name="behandlingsmaned"
+              value={selectedMonth.getFullYear() * 100 + (selectedMonth.getMonth() + 1)}
+            />
+          </VStack>
 
-        <label><b>Begrenset utplukk</b></label>
-        <br />
-        <Select style={{width: '200px'}}
-          label=''
-          size={'small'}
-          name={'begrensetUtplukk'}
-          defaultValue={'false'}
+          <VStack gap="6" style={{ flex: 1 }}>
+            <VStack gap="2">
+              <Label>Kjøretidspunkt</Label>
+              <BodyShort size="small">
+                Velg tidspunkt (valgfritt) for når behandlingen skal kjøres. Vanligvis etter arbeidstid.
+              </BodyShort>
+              <DateTimePicker
+                selectedDate={selectedDate}
+                setSelectedDate={(date: Date | null) => setSelectedDate(date)}
+                labelText=""
+              />
+              <input
+                type="hidden"
+                name="kjoeretidspunkt"
+                value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
+              />
+            </VStack>
+
+            <VStack gap="2">
+              <Label>Begrenset utplukk</Label>
+              <BodyShort size="small">
+                Behandler kun personer som ligger i utplukkstabellen.
+              </BodyShort>
+              <Select
+                label=""
+                size="small"
+                name="begrensetUtplukk"
+                defaultValue="false"
+                style={{ width: '100%' }}
+              >
+                <option value="true">Ja</option>
+                <option value="false">Nei</option>
+              </Select>
+            </VStack>
+          </VStack>
+        </HStack>
+
+        <Button
+          type="submit"
+          disabled={isClicked}
+          onClick={handleSubmit}
+          variant="primary"
         >
-          <option value="true">Ja</option>
-          <option value="false">Nei</option>
-        </Select>
-
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Opprett
-          </button>
-        </p>
+          Opprett
+        </Button>
       </Form>
-      <div id="behandlinger">
-        <BehandlingerTable visStatusSoek={true} visBehandlingTypeSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
+
+      <div id="behandlinger" style={{ marginTop: '2rem' }}>
+        <BehandlingerTable
+          visStatusSoek={true}
+          visBehandlingTypeSoek={false}
+          behandlingerResponse={behandlinger as BehandlingerPage}
+        />
       </div>
     </div>
   )
