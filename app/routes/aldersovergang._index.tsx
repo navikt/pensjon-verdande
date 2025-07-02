@@ -8,10 +8,10 @@ import React, { useState } from 'react'
 import {
   BodyShort,
   Button,
-  Heading,
+  Heading, HStack,
   Label,
   MonthPicker,
-  Select,
+  Select, VStack,
 } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
@@ -65,13 +65,15 @@ export default function BatchOpprett_index() {
           Start aldersovergang
         </Heading>
 
-        <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
-          <div style={{ flex: 1.2 }}>
-            <Label>Behandlingsmåned</Label>
-            <BodyShort spacing size="small">
-              Velg hvilken måned som skal behandles. Vanligvis inneværende måned.
-            </BodyShort>
-            <div style={{ padding: '0.5rem 0.75rem', marginTop: '0.5rem' }}>
+        <HStack gap="8" align="start" wrap={false} style={{ marginBottom: '2rem' }}>
+          <VStack gap="2" style={{ flex: 1.2 }}>
+            <div>
+              <Label>Behandlingsmåned</Label>
+              <BodyShort size="small">
+                Velg hvilken måned som skal behandles. Vanligvis inneværende måned.
+              </BodyShort>
+            </div>
+            <div style={{ padding: '0.5rem 0.75rem' }}>
               <MonthPicker.Standalone
                 dropdownCaption
                 defaultSelected={now}
@@ -89,31 +91,29 @@ export default function BatchOpprett_index() {
               name="behandlingsmaned"
               value={selectedMonth.getFullYear() * 100 + (selectedMonth.getMonth() + 1)}
             />
-          </div>
+          </VStack>
 
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div>
+          <VStack gap="6" style={{ flex: 1 }}>
+            <VStack gap="2">
               <Label>Kjøretidspunkt</Label>
-              <BodyShort spacing size="small">
+              <BodyShort size="small">
                 Velg tidspunkt (valgfritt) for når behandlingen skal kjøres. Vanligvis etter arbeidstid.
               </BodyShort>
-              <div style={{ marginTop: '0.5rem' }}>
-                <DateTimePicker
-                  selectedDate={selectedDate}
-                  setSelectedDate={(date: Date | null) => setSelectedDate(date)}
-                  labelText=""
-                />
-              </div>
+              <DateTimePicker
+                selectedDate={selectedDate}
+                setSelectedDate={(date: Date | null) => setSelectedDate(date)}
+                labelText=""
+              />
               <input
                 type="hidden"
                 name="kjoeretidspunkt"
                 value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
               />
-            </div>
+            </VStack>
 
-            <div>
+            <VStack gap="2">
               <Label>Begrenset utplukk</Label>
-              <BodyShort spacing size="small">
+              <BodyShort size="small">
                 Behandler kun personer som ligger i utplukkstabellen.
               </BodyShort>
               <Select
@@ -126,9 +126,9 @@ export default function BatchOpprett_index() {
                 <option value="true">Ja</option>
                 <option value="false">Nei</option>
               </Select>
-            </div>
-          </div>
-        </div>
+            </VStack>
+          </VStack>
+        </HStack>
 
         <Button
           type="submit"
