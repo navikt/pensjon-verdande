@@ -4,6 +4,7 @@ import type { StartBatchResponse } from '~/types'
 export async function opprettBpen005(
   accessToken: string,
   behandlingsmaned: number,
+  kjoeretidspunkt: string,
   begrensetUtplukk: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
@@ -17,6 +18,7 @@ export async function opprettBpen005(
       },
       body: JSON.stringify({
         behandlingsmaned: behandlingsmaned,
+        kjoeretidspunkt: kjoeretidspunkt,
         begrensetUtplukk: begrensetUtplukk,
       }),
     },
