@@ -25,7 +25,14 @@ import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { hentMuligeAldersoverganger } from '~/services/batch.bpen005.server'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+type LoaderData = {
+  behandlinger: BehandlingerPage
+  maneder: string[]
+  erBegrensUtplukkLovlig: boolean
+  kanOverstyreBehandlingsmaned: boolean
+  defaultMonth: string
+}
+export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -53,12 +60,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     erBegrensUtplukkLovlig: aldersoverganger.erBegrensUtplukkLovlig,
     kanOverstyreBehandlingsmaned: aldersoverganger.kanOverstyreBehandlingsmaned,
     defaultMonth,
-  } satisfies {
-    behandlinger: BehandlingerPage
-    maneder: string[]
-    erBegrensUtplukkLovlig: boolean
-    kanOverstyreBehandlingsmaned: boolean
-    defaultMonth: string
   }
 }
 
