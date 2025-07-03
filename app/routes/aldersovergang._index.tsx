@@ -121,7 +121,10 @@ export default function BatchOpprett_index() {
             <div>
               <Select
                 id="behandlingsmaned"
-                onChange={(e) => setSelectedMonthStr(e.target.value)}
+                onChange={(e) => {
+                  setSelectedMonthStr(e.target.value)
+                  setSelectedDate(null)
+                }}
                 value={selectedMonthStr}
                 required
                 size="small"
