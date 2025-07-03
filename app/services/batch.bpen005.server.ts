@@ -1,5 +1,6 @@
 import { env } from '~/services/env.server'
 import type { StartBatchResponse } from '~/types'
+import { data } from 'react-router'
 
 export async function opprettBpen005(
   accessToken: string,
@@ -17,18 +18,22 @@ export async function opprettBpen005(
         'X-Request-ID': crypto.randomUUID(),
       },
       body: JSON.stringify({
-        behandlingsmaned: behandlingsmaned,
-        kjoeretidspunkt: kjoeretidspunkt,
-        begrensetUtplukk: begrensetUtplukk,
+        behandlingsmaned,
+        kjoeretidspunkt,
+        begrensetUtplukk,
       }),
-    },
+    }
   )
 
-  if (response.ok) {
-    return (await response.json()) as StartBatchResponse
-  } else {
-    throw new Error()
+  if (!response.ok) {
+    const text = await response.text()
+    throw data(
+      { message: 'Feil ved oppretting av Bpen005 batch', detail: text },
+      { status: response.status }
+    )
   }
+
+  return (await response.json()) as StartBatchResponse
 }
 
 export async function hentMuligeAldersoverganger(
@@ -46,11 +51,15 @@ export async function hentMuligeAldersoverganger(
     },
   )
 
-  if (response.ok) {
-    return (await response.json()) as MuligeAldersovergangerResponse
-  } else {
-    throw new Error()
+  if (!response.ok) {
+    const text = await response.text()
+    throw data(
+      { message: 'Feil ved henting av mulige aldersoverganger', detail: text },
+      { status: response.status },
+    )
   }
+
+  return (await response.json()) as MuligeAldersovergangerResponse
 }
 
 export type MuligeAldersovergangerResponse = {
