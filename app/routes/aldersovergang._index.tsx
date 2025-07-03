@@ -23,7 +23,7 @@ import { BehandlingerPage } from '~/types'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import { hentMuligeAldersoverganger } from '~/services/batch.bpen005.server'
+import { hentMuligeAldersoverganger } from '~/services/behandling.aldersovergang.server'
 
 type LoaderData = {
   behandlinger: BehandlingerPage
@@ -104,7 +104,7 @@ export default function BatchOpprett_index() {
         </Alert>
       )}
 
-      <Form action="bpen005" method="POST" style={{ width: '100%', maxWidth: 800 }}>
+      <Form action="opprett" method="POST" style={{ width: '100%', maxWidth: 800 }}>
         <VStack gap="4" style={{ marginBottom: '2rem' }}>
           <div
             style={{

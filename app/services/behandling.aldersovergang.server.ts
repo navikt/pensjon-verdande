@@ -2,7 +2,7 @@ import { env } from '~/services/env.server'
 import type { StartBatchResponse } from '~/types'
 import { data } from 'react-router'
 
-export async function opprettBpen005(
+export async function opprettAldersovergang(
   accessToken: string,
   behandlingsmaned: number,
   kjoeretidspunkt: string,
@@ -28,7 +28,7 @@ export async function opprettBpen005(
   if (!response.ok) {
     const text = await response.text()
     throw data(
-      { message: 'Feil ved oppretting av Bpen005 batch', detail: text },
+      { message: 'Feil ved oppretting av aldersovergang behandling', detail: text },
       { status: response.status }
     )
   }
