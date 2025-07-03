@@ -1,7 +1,7 @@
-import React from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import {nb} from 'date-fns/locale';
+import React from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { nb } from 'date-fns/locale'
 
 interface DateTimePickerProps {
   selectedDate: Date | null;
@@ -21,7 +21,7 @@ interface DateTimePickerProps {
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
- selectedDate,
+                                                         selectedDate,
                                                          setSelectedDate,
                                                          id = 'date-picker',
                                                          labelText = 'Dato',
@@ -62,7 +62,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         maxDate={maxDate}
       />
     </div>
-  );
-};
+  )
+}
 
-export default DateTimePicker;
+export default DateTimePicker
