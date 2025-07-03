@@ -200,7 +200,7 @@ export default function BatchOpprett_index() {
 
       <div id="behandlinger" style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
-          Tidligere aldersoverganger
+          Aldersoverganger
         </Heading>
         <BehandlingerTable
           visStatusSoek={true}
