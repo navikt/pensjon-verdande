@@ -1,6 +1,21 @@
-import { ActionFunctionArgs, Form, useLoaderData, useSubmit } from 'react-router'
-import React, { useEffect, useState } from 'react'
-import { Alert, BodyShort, Button, Heading, Label, Radio, RadioGroup, Select, VStack } from '@navikt/ds-react'
+import {
+  LoaderFunctionArgs,
+  useLoaderData,
+  useSubmit,
+  Form,
+} from 'react-router'
+import React, { useMemo, useState } from 'react'
+import {
+  Alert,
+  BodyShort,
+  Button,
+  Heading,
+  Label,
+  Radio,
+  RadioGroup,
+  Select,
+  VStack,
+} from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
@@ -8,13 +23,15 @@ import { BehandlingerPage } from '~/types'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
+import { hentMuligeAldersoverganger } from '~/services/batch.bpen005.server'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
   const accessToken = await requireAccessToken(request)
+
   const behandlinger = await getBehandlinger(accessToken, {
     behandlingType: 'AldersovergangIdentifiserBruker',
     ansvarligTeam: searchParams.get('ansvarligTeam'),
@@ -23,62 +40,51 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     sort: searchParams.get('sort'),
   })
 
-  if (!behandlinger) {
-    throw new Response('Not Found', { status: 404 })
-  }
+  const aldersoverganger = await hentMuligeAldersoverganger(accessToken)
 
-  return { behandlinger }
+  const currentMonth = format(new Date(), 'yyyy-MM')
+  const defaultMonth = aldersoverganger.maneder.includes(currentMonth)
+    ? currentMonth
+    : aldersoverganger.maneder[0]
+
+  return {
+    behandlinger,
+    maneder: aldersoverganger.maneder,
+    erBegrensUtplukkLovlig: aldersoverganger.erBegrensUtplukkLovlig,
+    kanOverstyreBehandlingsmaned: aldersoverganger.kanOverstyreBehandlingsmaned,
+    defaultMonth,
+  } satisfies {
+    behandlinger: BehandlingerPage
+    maneder: string[]
+    erBegrensUtplukkLovlig: boolean
+    kanOverstyreBehandlingsmaned: boolean
+    defaultMonth: string
+  }
 }
 
 export default function BatchOpprett_index() {
-  const { behandlinger } = useLoaderData<typeof loader>()
-  const [selectedMonthStr, setSelectedMonthStr] = useState<string>('')
-  const [selectedMonthDate, setSelectedMonthDate] = useState<Date | null>(null)
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [maneder, setManeder] = useState<string[]>([])
-  const [begrensetUtplukkEnabled, setBegrensetUtplukkEnabled] = useState(false)
-  const [kanOverstyre, setKanOverstyre] = useState(false)
+  const {
+    behandlinger,
+    maneder,
+    erBegrensUtplukkLovlig,
+    kanOverstyreBehandlingsmaned,
+    defaultMonth,
+  } = useLoaderData<typeof loader>()
 
+  const [selectedMonthStr, setSelectedMonthStr] = useState(defaultMonth)
+  const selectedMonthDate = useMemo(
+    () => parse(selectedMonthStr, 'yyyy-MM', new Date()),
+    [selectedMonthStr]
+  )
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const submit = useSubmit()
 
   const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
     submit(e.currentTarget.form)
   }
 
-  useEffect(() => {
-    const fetchMulige = async () => {
-      try {
-        const res = await fetch('/aldersovergang-mulige')
-        if (!res.ok) throw new Error('Feil fra backend')
-
-        const data = await res.json()
-        setManeder(data.maneder)
-        setBegrensetUtplukkEnabled(data.erBegrensUtplukkLovlig)
-        setKanOverstyre(data.kanOverstyreBehandlingsmaned)
-
-        const currentMonth = format(new Date(), 'yyyy-MM')
-        const defaultMonth = data.maneder.includes(currentMonth)
-          ? currentMonth
-          : data.maneder[0]
-
-        setSelectedMonthStr(defaultMonth)
-        setSelectedMonthDate(parse(defaultMonth, 'yyyy-MM', new Date()))
-      } catch (err) {
-        console.error('Feil ved henting av mulige aldersoverganger', err)
-      }
-    }
-
-    fetchMulige()
-  }, [])
-
-  useEffect(() => {
-    if (selectedMonthStr) {
-      setSelectedMonthDate(parse(selectedMonthStr, 'yyyy-MM', new Date()))
-    }
-  }, [selectedMonthStr])
-
-  const minDate = kanOverstyre ? undefined : selectedMonthDate ? startOfMonth(selectedMonthDate) : undefined
-  const maxDate = kanOverstyre ? undefined : selectedMonthDate ? endOfMonth(selectedMonthDate) : undefined
+  const minDate = kanOverstyreBehandlingsmaned ? undefined : startOfMonth(selectedMonthDate)
+  const maxDate = kanOverstyreBehandlingsmaned ? undefined : endOfMonth(selectedMonthDate)
 
   return (
     <div>
@@ -90,7 +96,7 @@ export default function BatchOpprett_index() {
         Velg behandlingsmåned og tidspunkt for kjøring.
       </BodyShort>
 
-      {!kanOverstyre && (
+      {!kanOverstyreBehandlingsmaned && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
@@ -114,7 +120,7 @@ export default function BatchOpprett_index() {
             </div>
             <div>
               <Label htmlFor="kjoeretidspunkt" style={{ marginBottom: '0.25rem' }}>
-                Kjøretidspunkt {kanOverstyre ? '(valgfritt)' : ''}
+                Kjøretidspunkt {kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}
               </Label>
             </div>
 
@@ -126,7 +132,6 @@ export default function BatchOpprett_index() {
                   setSelectedDate(null)
                 }}
                 value={selectedMonthStr}
-                required
                 size="small"
                 label=""
                 style={{ width: '100%' }}
@@ -139,15 +144,13 @@ export default function BatchOpprett_index() {
               </Select>
             </div>
             <div style={{ paddingTop: '7px' }}>
-              {selectedMonthDate && (
-                <DateTimePicker
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  minDate={minDate}
-                  maxDate={maxDate}
-                  labelText=""
-                />
-              )}
+              <DateTimePicker
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                minDate={minDate}
+                maxDate={maxDate}
+                labelText=""
+              />
             </div>
           </div>
 
@@ -156,7 +159,7 @@ export default function BatchOpprett_index() {
               <input
                 type="hidden"
                 name="kjoeretidspunkt"
-                value={selectedDate ? format(selectedDate, 'yyyy-MM-dd\'T\'HH:mm:ss') : ''}
+                value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
               />
               <input
                 type="hidden"
@@ -166,7 +169,7 @@ export default function BatchOpprett_index() {
             </>
           )}
 
-          {selectedMonthDate && begrensetUtplukkEnabled && (
+          {selectedMonthDate && erBegrensUtplukkLovlig && (
             <div>
               <Label>Begrenset utplukk</Label>
               <BodyShort size="small" style={{ marginBottom: '0.5rem' }}>
@@ -184,7 +187,7 @@ export default function BatchOpprett_index() {
             </div>
           )}
 
-          {selectedMonthDate && (kanOverstyre || selectedDate) && (
+          {selectedMonthDate && (kanOverstyreBehandlingsmaned || selectedDate) && (
             <div style={{ marginTop: '1rem' }}>
               <Button
                 type="submit"
