@@ -31,3 +31,33 @@ export async function opprettBpen005(
   }
 }
 
+export async function hentMuligeAldersoverganger(
+  accessToken: string,
+  kjoeretidspunkt: string | null,
+): Promise<MuligeAldersovergangerResponse> {
+  const response = await fetch(
+    `${env.penUrl}/api/aldersovergang/muligeAldersoverganger`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+      body: JSON.stringify({
+        kjoeretidspunkt: kjoeretidspunkt,
+      }),
+    },
+  )
+
+  if (response.ok) {
+    return (await response.json()) as MuligeAldersovergangerResponse
+  } else {
+    throw new Error()
+  }
+}
+
+export type MuligeAldersovergangerResponse = {
+  maneder: string[],
+  erBegrensUtplukkLovlig: boolean,
+}
