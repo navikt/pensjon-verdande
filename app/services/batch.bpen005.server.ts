@@ -33,20 +33,16 @@ export async function opprettBpen005(
 
 export async function hentMuligeAldersoverganger(
   accessToken: string,
-  kjoeretidspunkt: string | null,
 ): Promise<MuligeAldersovergangerResponse> {
   const response = await fetch(
     `${env.penUrl}/api/aldersovergang/muligeAldersoverganger`,
     {
-      method: 'POST',
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
         'X-Request-ID': crypto.randomUUID(),
       },
-      body: JSON.stringify({
-        kjoeretidspunkt: kjoeretidspunkt,
-      }),
     },
   )
 
@@ -60,4 +56,5 @@ export async function hentMuligeAldersoverganger(
 export type MuligeAldersovergangerResponse = {
   maneder: string[],
   erBegrensUtplukkLovlig: boolean,
+  kanOverstyreBehandlingsmaned: boolean,
 }

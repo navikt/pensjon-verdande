@@ -16,10 +16,12 @@ interface DateTimePickerProps {
   labelText?: string;
   tabIndex?: number;
   name?: string;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
-                                                         selectedDate,
+ selectedDate,
                                                          setSelectedDate,
                                                          id = 'date-picker',
                                                          labelText = 'Dato',
@@ -31,6 +33,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
                                                          ariaLabel = 'Velg dato',
                                                          tabIndex,
                                                          name,
+                                                         minDate,
+                                                         maxDate,
                                                        }) => {
 
 
@@ -54,6 +58,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         aria-label={ariaLabel}
         tabIndex={tabIndex}
         name={name}
+        minDate={minDate}
+        maxDate={maxDate}
       />
     </div>
   );
