@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettBpen005 } from '~/services/batch.bpen005.server'
+import { opprettAldersovergang } from '~/services/behandling.aldersovergang.server'
 
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -9,7 +9,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
 
-  let response = await opprettBpen005(accessToken, +updates.behandlingsmaned, updates.kjoeretidspunkt as string, updates.begrensetUtplukk === 'true')
+  let response = await opprettAldersovergang(accessToken, +updates.behandlingsmaned, updates.kjoeretidspunkt as string, updates.begrensetUtplukk === 'true')
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

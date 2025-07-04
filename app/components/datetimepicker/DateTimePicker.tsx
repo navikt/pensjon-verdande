@@ -1,7 +1,7 @@
-import React from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import {nb} from 'date-fns/locale';
+import React from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { nb } from 'date-fns/locale'
 
 interface DateTimePickerProps {
   selectedDate: Date | null;
@@ -16,6 +16,8 @@ interface DateTimePickerProps {
   labelText?: string;
   tabIndex?: number;
   name?: string;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
@@ -31,6 +33,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
                                                          ariaLabel = 'Velg dato',
                                                          tabIndex,
                                                          name,
+                                                         minDate,
+                                                         maxDate,
                                                        }) => {
 
 
@@ -54,9 +58,11 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         aria-label={ariaLabel}
         tabIndex={tabIndex}
         name={name}
+        minDate={minDate}
+        maxDate={maxDate}
       />
     </div>
-  );
-};
+  )
+}
 
-export default DateTimePicker;
+export default DateTimePicker

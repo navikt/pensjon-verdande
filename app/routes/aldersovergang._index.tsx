@@ -1,32 +1,44 @@
 import {
-  ActionFunctionArgs,
-  Form,
+  LoaderFunctionArgs,
   useLoaderData,
   useSubmit,
+  Form,
 } from 'react-router'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
+  Alert,
   BodyShort,
   Button,
-  Heading, HStack,
+  Heading,
   Label,
-  MonthPicker,
-  Select, VStack,
+  Radio,
+  RadioGroup,
+  Select,
+  VStack,
 } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { BehandlingerPage } from '~/types'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
-import { addYears, format, subYears } from 'date-fns'
+import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
+import { nb } from 'date-fns/locale'
+import { hentMuligeAldersoverganger } from '~/services/behandling.aldersovergang.server'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
-  let { searchParams } = new URL(request.url)
-
+type LoaderData = {
+  behandlinger: BehandlingerPage
+  maneder: string[]
+  erBegrensUtplukkLovlig: boolean
+  kanOverstyreBehandlingsmaned: boolean
+  defaultMonth: string
+}
+export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
+  const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
   const accessToken = await requireAccessToken(request)
+
   const behandlinger = await getBehandlinger(accessToken, {
     behandlingType: 'AldersovergangIdentifiserBruker',
     ansvarligTeam: searchParams.get('ansvarligTeam'),
@@ -35,112 +47,165 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     sort: searchParams.get('sort'),
   })
 
-  if (!behandlinger) {
-    throw new Response('Not Found', { status: 404 })
-  }
+  const aldersoverganger = await hentMuligeAldersoverganger(accessToken)
+
+  const currentMonth = format(new Date(), 'yyyy-MM')
+  const defaultMonth = aldersoverganger.maneder.includes(currentMonth)
+    ? currentMonth
+    : aldersoverganger.maneder[0]
 
   return {
     behandlinger,
+    maneder: aldersoverganger.maneder,
+    erBegrensUtplukkLovlig: aldersoverganger.erBegrensUtplukkLovlig,
+    kanOverstyreBehandlingsmaned: aldersoverganger.kanOverstyreBehandlingsmaned,
+    defaultMonth,
   }
 }
 
 export default function BatchOpprett_index() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+  const {
+    behandlinger,
+    maneder,
+    erBegrensUtplukkLovlig,
+    kanOverstyreBehandlingsmaned,
+    defaultMonth,
+  } = useLoaderData<typeof loader>()
 
-  const now = new Date()
+  const [selectedMonthStr, setSelectedMonthStr] = useState(defaultMonth)
+  const selectedMonthDate = useMemo(
+    () => parse(selectedMonthStr, 'yyyy-MM', new Date()),
+    [selectedMonthStr]
+  )
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [selectedMonth, setSelectedMonth] = useState<Date>(now)
-  const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
 
   const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
     submit(e.currentTarget.form)
-    setIsClicked(true)
   }
+
+  const minDate = kanOverstyreBehandlingsmaned ? undefined : startOfMonth(selectedMonthDate)
+  const maxDate = kanOverstyreBehandlingsmaned ? undefined : endOfMonth(selectedMonthDate)
 
   return (
     <div>
-      <Form action="bpen005" method="POST" style={{ width: '100%', maxWidth: 800 }}>
-        <Heading level="1" size="large" spacing>
-          Start aldersovergang
-        </Heading>
+      <Heading level="1" size="large" spacing>
+        Aldersovergang
+      </Heading>
 
-        <HStack gap="8" align="start" wrap={false} style={{ marginBottom: '2rem' }}>
-          <VStack gap="2" style={{ flex: 1.2 }}>
+      <BodyShort spacing>
+        Velg behandlingsmåned og tidspunkt for kjøring.
+      </BodyShort>
+
+      {!kanOverstyreBehandlingsmaned && (
+        <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
+          Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
+          aktuelle måneden.
+        </Alert>
+      )}
+
+      <Form action="opprett" method="POST" style={{ width: '100%', maxWidth: 800 }}>
+        <VStack gap="4" style={{ marginBottom: '2rem' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '200px 200px',
+              columnGap: '1rem',
+              rowGap: '0.25rem',
+            }}
+          >
             <div>
-              <Label>Behandlingsmåned</Label>
-              <BodyShort size="small">
-                Velg hvilken måned som skal behandles. Vanligvis inneværende måned.
-              </BodyShort>
+              <Label htmlFor="behandlingsmaned" style={{ marginBottom: '0.25rem' }}>
+                Behandlingsmåned
+              </Label>
             </div>
-            <div style={{ padding: '0.5rem 0.75rem' }}>
-              <MonthPicker.Standalone
-                dropdownCaption
-                defaultSelected={now}
-                fromDate={subYears(now, 1)}
-                toDate={addYears(now, 1)}
-                onMonthSelect={(month: Date | undefined) => {
-                  if (month !== undefined) {
-                    setSelectedMonth(month)
-                  }
-                }}
-              />
+            <div>
+              <Label htmlFor="kjoeretidspunkt" style={{ marginBottom: '0.25rem' }}>
+                Kjøretidspunkt {kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}
+              </Label>
             </div>
-            <input
-              type="hidden"
-              name="behandlingsmaned"
-              value={selectedMonth.getFullYear() * 100 + (selectedMonth.getMonth() + 1)}
-            />
-          </VStack>
 
-          <VStack gap="6" style={{ flex: 1 }}>
-            <VStack gap="2">
-              <Label>Kjøretidspunkt</Label>
-              <BodyShort size="small">
-                Velg tidspunkt (valgfritt) for når behandlingen skal kjøres. Vanligvis etter arbeidstid.
-              </BodyShort>
+            <div>
+              <Select
+                id="behandlingsmaned"
+                onChange={(e) => {
+                  setSelectedMonthStr(e.target.value)
+                  setSelectedDate(null)
+                }}
+                value={selectedMonthStr}
+                size="small"
+                label=""
+                style={{ width: '100%' }}
+              >
+                {maneder.map((mnd) => (
+                  <option key={mnd} value={mnd}>
+                    {format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div style={{ paddingTop: '7px' }}>
               <DateTimePicker
                 selectedDate={selectedDate}
-                setSelectedDate={(date: Date | null) => setSelectedDate(date)}
+                setSelectedDate={setSelectedDate}
+                minDate={minDate}
+                maxDate={maxDate}
                 labelText=""
               />
+            </div>
+          </div>
+
+          {selectedMonthDate && (
+            <>
               <input
                 type="hidden"
                 name="kjoeretidspunkt"
                 value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
               />
-            </VStack>
+              <input
+                type="hidden"
+                name="behandlingsmaned"
+                value={selectedMonthDate.getFullYear() * 100 + (selectedMonthDate.getMonth() + 1)}
+              />
+            </>
+          )}
 
-            <VStack gap="2">
+          {selectedMonthDate && erBegrensUtplukkLovlig && (
+            <div>
               <Label>Begrenset utplukk</Label>
-              <BodyShort size="small">
+              <BodyShort size="small" style={{ marginBottom: '0.5rem' }}>
                 Behandler kun personer som ligger i utplukkstabellen.
               </BodyShort>
-              <Select
-                label=""
-                size="small"
+              <RadioGroup
                 name="begrensetUtplukk"
                 defaultValue="false"
-                style={{ width: '100%' }}
+                legend=""
+                size="small"
               >
-                <option value="true">Ja</option>
-                <option value="false">Nei</option>
-              </Select>
-            </VStack>
-          </VStack>
-        </HStack>
+                <Radio value="true">Ja</Radio>
+                <Radio value="false">Nei</Radio>
+              </RadioGroup>
+            </div>
+          )}
 
-        <Button
-          type="submit"
-          disabled={isClicked}
-          onClick={handleSubmit}
-          variant="primary"
-        >
-          Opprett
-        </Button>
+          {selectedMonthDate && (kanOverstyreBehandlingsmaned || selectedDate) && (
+            <div style={{ marginTop: '1rem' }}>
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                variant="primary"
+              >
+                Opprett
+              </Button>
+            </div>
+          )}
+        </VStack>
       </Form>
 
       <div id="behandlinger" style={{ marginTop: '2rem' }}>
+        <Heading level="2" size="medium" spacing>
+          Aldersoverganger
+        </Heading>
         <BehandlingerTable
           visStatusSoek={true}
           visBehandlingTypeSoek={false}
