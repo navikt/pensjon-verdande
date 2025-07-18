@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react'
 import {
   Box,
   Button,
-  CheckboxGroup,
+  CheckboxGroup, CopyButton,
   HGrid,
   Link,
   Loader,
@@ -522,6 +522,7 @@ export default function BatchOpprett_index() {
                 >
                   Tilbake
                 </Button>
+                <CopyButton copyText={getHumanReadableParameterText()} text="Kopier parameterliste"/>
               </Modal.Footer>
             </Modal>
           </Box>
@@ -554,4 +555,33 @@ export default function BatchOpprett_index() {
 
     </div>
   )
+
+  function getHumanReadableParameterText() {
+    return [
+      `behandlingsnøkkel: ${behandlingsnokkel}`,
+      `omregningstidspunkt: ${omregningstidspunkt}`,
+      ``,
+      `kravGjelder: ${kravGjelder}`,
+      `kravÅrsak: ${kravArsak}`,
+      `toleransegrenseSett: ${toleransegrenseSett}`,
+      `oppgaveSett: ${oppgaveSett}`,
+      `oppgavePrefiks: ${oppgavePrefiks}`,
+      ``,
+      `behandleApneKrav: ${behandleApneKrav}`,
+      `brukFaktoromregning: ${brukFaktoromregning}`,
+      `opprettAlleOppgaver: ${opprettAlleOppgaver}`,
+      `sjekkYtelseFraAvtaleland: ${sjekkYtelseFraAvtaleland}`,
+      `omregneAFP: ${omregneAFP}`,
+      ``,
+      `skalIverksettOnline: ${skalIverksettOnline}`,
+      `skalSamordne: ${skalSamordne}`,
+      `skalSletteIverksettingsoppgaver: ${skalSletteIverksettingsoppgaver}`,
+      `skalDistribuereUførevedtak: ${skalDistribuereUforevedtak}`,
+      ``,
+      `skalBestilleBrevForSøker: ${skalBestilleBrev}`,
+      `skalSendeBrevBerørteSaker: ${skalSendeBrevBerorteSaker}`,
+
+    ].join('\n')
+  }
+
 }
