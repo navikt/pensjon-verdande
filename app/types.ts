@@ -133,6 +133,51 @@ export type PageSort = {
   empty: boolean
 }
 
+export type BehandlingManuellDto = {
+  id: string; // UUID
+  aktivitetId: number;
+  opprettet: string;
+
+  sakId: number;
+  kravId?: number | null;
+  kategori: string;
+  beskrivelse: string;
+
+  fagomrade: string;
+  fagomradeDekode: string;
+  oppgavekode: string;
+  oppgavekodeDekode: string;
+
+  aktivFra: string;
+
+  oppgaveId?: number | null;
+  oppgaveOpprettet: string | null;
+
+  isFerdig: boolean;
+};
+
+export type BehandlingManuellPage = {
+  content: BehandlingManuellDto[]
+
+  pageable: string
+  totalPages: number
+  totalElements: number
+  last: boolean
+  first: boolean
+  numberOfElements: number
+  number: number
+  size: number
+  empty: boolean
+
+  sort: PageSort
+}
+
+export type PageSort = {
+  unsorted: boolean
+  sorted: boolean
+  empty: boolean
+}
+
 export type BehandlingAntall = {
   navn: string
   behandlingType: string | undefined | null

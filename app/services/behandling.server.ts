@@ -1,6 +1,6 @@
 import {
   BehandlingDto,
-  BehandlingerPage,
+  BehandlingerPage, BehandlingManuellPage,
   DashboardResponse,
   DetaljertFremdriftDTO,
   IkkeFullforteAktiviteterDTO,
@@ -564,6 +564,40 @@ export async function getBehandlingInput(
     })
   }
 }
+
+export async function henBehandlingManuell(
+  accessToken: string,
+  behandlingId: number,
+  page: number,
+  size: number,
+  sort: string | null,
+): Promise<BehandlingManuellPage> {
+  let request = ''
+
+  if (sort) {
+    request +=`&sort=${sort}`
+  }
+
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/${behandlingId}/behandlingManuell?page=${page}&size=${size}${request}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return (await response.json()) as BehandlingManuellPage
+  } else {
+    let text = await response.text()
+    throw data("Feil ved henting av manuelle behandlinger. Feil var\n" + text, {
+      status: response.status
+    })
+  }
+}
+
 
 export async function hentKalenderHendelser(
   accessToken: string,
