@@ -18,6 +18,7 @@ export type Props = {
 
 let administrasjonMeny = [
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
+  ['MANGLENDE_FOREIGN_KEY_INDEXER', `/manglende-foreign-key-indexer`, 'Manglende indekser for fjernnøkler'],
   ['LAAS_OPP_SAK', `/laas-opp-sak`, 'Lås opp sak'],
   ['LAASTE_VEDTAK', `/laaste-vedtak`, 'Låste vedtak'],
   ['LINKE_DNR_TIL_FNR', `/linke-dnr-fnr`, 'Linke Dnr Fnr'],
