@@ -1,9 +1,11 @@
 import {
   BehandlingDto,
-  BehandlingerPage, BehandlingManuellPage,
+  BehandlingerPage,
+  BehandlingManuellPage,
   DashboardResponse,
   DetaljertFremdriftDTO,
   IkkeFullforteAktiviteterDTO,
+  SchedulerStatusResponse,
 } from '~/types'
 import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
@@ -11,6 +13,34 @@ import { logger } from '~/services/logger.server'
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
 import { KalenderHendelser } from '~/components/kalender/types'
+
+export async function getSchedulerStatus(
+  accessToken: string,
+): Promise<SchedulerStatusResponse | null> {
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/scheduler-status`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (!response.ok) {
+    throw data(
+      {
+        message: 'Feil ved henting av schedulerstatus',
+        detail: await response.text()
+      },
+      {
+        status: response.status
+      },
+    )
+  } else {
+    return (await response.json()) as SchedulerStatusResponse
+  }
+}
 
 export async function getDashboardSummary(
   accessToken: string,

@@ -13,15 +13,16 @@ import navStyles from '@navikt/ds-css/dist/index.css?url'
 
 import appStylesHref from './app.css?url'
 
-import { HStack, VStack } from '@navikt/ds-react'
+import { Alert, HStack, VStack } from '@navikt/ds-react'
 import { LoaderFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
 import { tryAccessToken } from '~/services/auth.server'
-import { hentMe, hentTilgangskontrollMeta } from '~/services/brukere.server'
+import { hentMe } from '~/services/brukere.server'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
 import { Route } from './+types/root';
+import { getSchedulerStatus } from '~/services/behandling.server'
 
 export const links: LinksFunction = () => {
   return [
@@ -35,21 +36,40 @@ export const links: LinksFunction = () => {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  let accessToken = await tryAccessToken(request)
+  const accessToken = await tryAccessToken(request)
+
+  if (!accessToken) {
+    return {
+      env: env.env,
+      me: undefined,
+      schedulerStatus: undefined,
+    }
+  }
+
+  const [me, schedulerStatus] = await Promise.all([
+    hentMe(accessToken),
+    getSchedulerStatus(accessToken),
+  ])
 
   return {
     env: env.env,
-    me: accessToken ? await hentMe(accessToken) : undefined,
-    tilgangskontrollMeta: accessToken ? await hentTilgangskontrollMeta(accessToken) : undefined
+    me,
+    schedulerStatus,
   }
 }
 
 export default function App() {
   const navigation = useNavigation()
 
-  const { env, me } = useLoaderData<typeof loader>()
+  const { env, me, schedulerStatus } = useLoaderData<typeof loader>()
 
   let title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
+
+  const schedulerAlert = schedulerStatus && !schedulerStatus.schedulerEnabled && !schedulerStatus.schedulerLocal && (
+    <Alert variant="error" style={{ marginBottom: '1rem' }}>
+      Behandlingsløsningen er avslått i dette miljøet. Behandlinger vil ikke bli prosessert.
+    </Alert>
+  )
 
   return (
     <html lang='en'>
@@ -61,35 +81,21 @@ export default function App() {
       <Links />
     </head>
     <body>
-    <VStack gap='0' style={{ width: '100%' }}>
-      {
-        me ? (
-          <NavHeader erProduksjon={env === 'p'} env={env} me={me}></NavHeader>
-        ) : (
-          <></>
-        )
-      }
+      <VStack gap='0' style={{ width: '100%' }}>
+        {me && <NavHeader erProduksjon={env === 'p'} env={env} me={me} />}
 
-      <HStack gap='0' wrap={false}>
-        {
-          me ? (
-            <VenstreMeny me={me}></VenstreMeny>
-          ) : (
-            <></>
-          )
-        }
+        <HStack gap='0' wrap={false}>
+          {me && <VenstreMeny me={me} />}
 
-        <div
-          className={navigation.state === 'loading' ? 'loading' : ''}
-          id='detail'
-        >
-          <Outlet />
-        </div>
-      </HStack>
-    </VStack>
+          <div className={navigation.state === 'loading' ? 'loading' : ''} id='detail'>
+            {schedulerAlert}
+            <Outlet />
+          </div>
+        </HStack>
+      </VStack>
 
-    <ScrollRestoration />
-    <Scripts />
+      <ScrollRestoration />
+      <Scripts />
     </body>
     </html>
   )

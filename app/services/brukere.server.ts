@@ -1,6 +1,7 @@
 import { env } from '~/services/env.server'
 import { BrukerResponse, MeResponse, Tilgangsmeta } from '~/types/brukere'
 import { data } from 'react-router'
+import { SchedulerStatusResponse } from '~/types'
 
 export async function hentTilgangskontrollMeta(
   accessToken: string,
@@ -65,10 +66,18 @@ export async function hentMe(
     },
   )
 
-  if (response.ok) {
-    return await response.json() as MeResponse
+  if (!response.ok) {
+    throw data(
+      {
+        message: 'Feil ved henting av \'me\' bruker fra pen',
+        detail: await response.text()
+      },
+      {
+        status: response.status
+      },
+    )
   } else {
-    throw new Error("Feil ved henting av 'me' bruker fra pen. Feil var\n" + await response.text())
+    return (await response.json()) as SchedulerStatusResponse
   }
 }
 

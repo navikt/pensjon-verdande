@@ -189,6 +189,11 @@ export type DatoAntall = {
   antall: number
 }
 
+export type SchedulerStatusResponse = {
+  schedulerEnabled: boolean
+  schedulerLocal: boolean
+}
+
 export type DashboardResponse = {
   totaltAntallBehandlinger: number
   feilendeBehandlinger: number
