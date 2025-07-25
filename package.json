@@ -24,7 +24,7 @@
     "@react-router/express": "^7.6.2",
     "@react-router/fs-routes": "^7.6.2",
     "@react-router/node": "^7.6.2",
-    "@react-router/serve": "^7.6.2",
+    "@react-router/serve": "^7.7.1",
     "chart.js": "^4.4.9",
     "chartjs-plugin-datalabels": "^2.2.0",
     "date-fns-tz": "^3.2.0",
