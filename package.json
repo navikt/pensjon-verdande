@@ -21,10 +21,10 @@
     "@navikt/aksel-icons": "^7.21.1",
     "@navikt/ds-css": "^7.21.1",
     "@navikt/ds-react": "^7.21.1",
-    "@react-router/express": "^7.6.2",
-    "@react-router/fs-routes": "^7.6.2",
-    "@react-router/node": "^7.6.2",
-    "@react-router/serve": "^7.6.2",
+    "@react-router/express": "^7.7.1",
+    "@react-router/fs-routes": "^7.7.1",
+    "@react-router/node": "^7.7.1",
+    "@react-router/serve": "^7.7.1",
     "chart.js": "^4.4.9",
     "chartjs-plugin-datalabels": "^2.2.0",
     "date-fns-tz": "^3.2.0",
@@ -45,7 +45,7 @@
     "xml-formatter": "^3.6.6"
   },
   "devDependencies": {
-    "@react-router/dev": "^7.6.2",
+    "@react-router/dev": "^7.7.1",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "eslint": "^9.28.0",
