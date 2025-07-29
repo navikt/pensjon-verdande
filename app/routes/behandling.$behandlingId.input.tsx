@@ -28,6 +28,7 @@ export default function Input() {
   console.log(output)
   return (
     <pre>
+      {JSON.stringify(JSON.parse(output), null, 2)}
     </pre>
   )
 }
