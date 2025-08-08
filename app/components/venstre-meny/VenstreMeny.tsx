@@ -36,7 +36,7 @@ const batcherMeny = [
   ['INNTEKTSKONTROLL', `/batch/inntektskontroll`, 'Inntektskontroll'],
   ['LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning'],
   ['LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting'],
-  ['OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/kategoriserbruker`, 'Omregning ved opptjeningsendring'],
+  ['OMREGNING_VED_OPPTJENINGSENDRING2', `/opptjening/manedlig/omregning`, 'Månedlig omregning ved opptjeningsendring'],
   ['REGULERING', `/batch/regulering`, 'Regulering'],
   ['REGULERING', `/batch/reguleringv2`, 'Regulering Next'],
 ]
