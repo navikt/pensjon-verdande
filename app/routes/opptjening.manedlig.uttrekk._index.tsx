@@ -1,14 +1,7 @@
 import { Form, useSubmit } from 'react-router';
-import { env } from '~/services/env.server'
 import React, { useEffect, useRef, useState } from 'react'
 
-export const loader = async () => {
-  return {
-    env: env.env,
-  }
-}
-
-export default function BatchOpprett_index() {
+export default function EndretOpptjeningManedligUttrekk() {
   const now = new Date()
   const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const [isClicked, setIsClicked] = useState(false)
@@ -29,8 +22,8 @@ export default function BatchOpprett_index() {
 
   return (
     <div>
-      <h1>Start omregning av ytelse ved oppdaterte opptjeningsopplysninger</h1>
-      <Form action="kategoriserBruker" method="POST">
+      <h1>Start uttrekk</h1>
+      <Form action="uttrekk" method="POST">
         <div style={{ display: 'inline-block' }}>
           <label>Behandlingsmåned</label>
           <br />
