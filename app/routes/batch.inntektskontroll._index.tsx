@@ -27,6 +27,8 @@ export default function BatchOpprett_index() {
 
   const [gjenlevende, setGjenlevende] = useState(false)
 
+  const [opprettOppgave, setOpprettOppgave] = useState(false)
+
   useEffect(() => {
     handleInput()
   })
@@ -63,6 +65,14 @@ export default function BatchOpprett_index() {
               onChange={(event) => setGjenlevende(event.target.checked)}
             >
               Inntektskontroll for gjenlevende
+            </Checkbox>
+
+            <Checkbox
+              name='opprettOppgave'
+              value={opprettOppgave}
+              onChange={(event) => setOpprettOppgave(event.target.checked)}
+            >
+              Opprett Oppgave
             </Checkbox>
 
           </CheckboxGroup>

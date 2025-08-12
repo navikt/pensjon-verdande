@@ -6,6 +6,7 @@ export async function opprettBpen014(
   aar: number,
   eps2g : boolean,
   gjenlevende : boolean,
+  opprettOppgave : boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
     `${env.penUrl}/pen/api/inntektskontroll/opprett`,
@@ -20,6 +21,7 @@ export async function opprettBpen014(
         aar: aar,
         eps2g: eps2g,
         gjenlevende: gjenlevende,
+        opprettOppgave : opprettOppgave
       }),
     },
   )
