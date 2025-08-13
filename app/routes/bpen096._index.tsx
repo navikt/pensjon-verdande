@@ -29,7 +29,7 @@ export default function BatchOpprett_index() {
           <label>Antall sekvensnummer per behandling</label>
           <br />
           <input
-            defaultValue="1000"
+            defaultValue="100"
             aria-label="sekvensnummerPerBehandling"
             name="sekvensnummerPerBehandling"
             type="number"
