@@ -300,3 +300,16 @@ export type OmregningStatistikkPage = {
   numberOfElements: number
   empty: boolean
 }
+
+
+export type BehandlingManuellOpptellingDto = {
+  behandlingType: string,
+  kategori: string,
+  kategoriDecode: string,
+  antall: number,
+}
+
+
+export type BehandlingManuellOpptellingResponse = {
+  behandlingManuellOpptelling: BehandlingManuellOpptellingDto[]
+}
