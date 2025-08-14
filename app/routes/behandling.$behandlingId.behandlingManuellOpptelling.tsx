@@ -35,7 +35,7 @@ export default function BehandlingManuellOpptelling() {
         <Table.Row>
           <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
           <Table.HeaderCell>Kategori</Table.HeaderCell>
-          <Table.HeaderCell>Antall</Table.HeaderCell>
+          <Table.HeaderCell align={'right'}>Antall</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -46,7 +46,7 @@ export default function BehandlingManuellOpptelling() {
             >
               <Table.DataCell>{it.behandlingType}</Table.DataCell>
               <Table.DataCell>{it.kategoriDecode}</Table.DataCell>
-              <Table.DataCell>{it.antall}</Table.DataCell>
+              <Table.DataCell align={'right'}>{it.antall}</Table.DataCell>
             </Table.Row>)
         })}
       </Table.Body>
