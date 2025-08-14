@@ -555,6 +555,11 @@ export default function BehandlingCard(props: Props) {
               label='Manuelle oppgaver'
               icon={<TasklistIcon />}
             />
+            <Tabs.Tab
+              value='behandlingManuellOpptelling'
+              label='Oppgaveoppsummering'
+              icon={<TasklistIcon />}
+            />
           </Tabs.List>
           <Outlet/>
         </Tabs>

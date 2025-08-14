@@ -101,33 +101,73 @@ export default function App() {
   )
 }
 
-export function ErrorBoundary({
-                                error,
-                              }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
+    const data = error.data as
+      | Partial<{
+      status: number
+      title?: string
+      message?: string
+      detail?: string
+      path?: string
+      timestamp?: string
+      trace?: string
+    }>
+      | string
+      | undefined
+
+    const obj = typeof data === 'object' && data ? data : undefined
+    const str = typeof data === 'string' ? data : undefined
+
     if (error.status === 403) {
-      console.log(error)
       return (<IkkeTilgang error={error}></IkkeTilgang>)
-    } else {
-      return (
-        <>
-          <h1>
-            {error.status} {error.statusText}
-          </h1>
-          <p>{error.data}</p>
-        </>
-      );
     }
-  } else if (error instanceof Error) {
+
     return (
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-        <p>The stack trace is:</p>
-        <pre>{error.stack}</pre>
+      <div className="p-6 space-y-3">
+        <h1 className="text-xl font-semibold">
+          {error.status} {error.statusText}
+        </h1>
+
+        {obj?.message && <p>{obj.message}</p>}
+        {obj?.detail && (
+          <pre className="whitespace-pre-wrap">{obj.detail}</pre>
+        )}
+        {str && <pre className="whitespace-pre-wrap">{str}</pre>}
+
+        <div className="text-sm opacity-70 space-y-1">
+          {obj?.path && (
+            <div>
+              Path: <code>{obj.path}</code>
+            </div>
+          )}
+          {obj?.timestamp && <div>Tid: {obj.timestamp}</div>}
+        </div>
+
+        {obj?.trace && (
+          <details className="mt-2">
+            <summary>Stack trace</summary>
+            <pre className="mt-2 overflow-auto">{obj.trace}</pre>
+          </details>
+        )}
       </div>
-    );
-  } else {
-    return <h1>Unknown Error</h1>;
+    )
   }
+
+  if (error instanceof Error) {
+    return (
+      <div className="p-6 space-y-2">
+        <h1 className="text-xl font-semibold">Feil</h1>
+        <p>{error.message}</p>
+        {error.stack && (
+          <details>
+            <summary>Stack trace</summary>
+            <pre className="mt-2 overflow-auto">{error.stack}</pre>
+          </details>
+        )}
+      </div>
+    )
+  }
+
+  return <h1>Ukjent feil</h1>
 }

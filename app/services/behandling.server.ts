@@ -1,6 +1,6 @@
 import {
   BehandlingDto,
-  BehandlingerPage,
+  BehandlingerPage, BehandlingManuellOpptellingResponse,
   BehandlingManuellPage,
   DashboardResponse,
   DetaljertFremdriftDTO,
@@ -13,6 +13,7 @@ import { logger } from '~/services/logger.server'
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
 import { KalenderHendelser } from '~/components/kalender/types'
+import { apiGet, RequestCtx } from '~/services/api.server'
 
 export async function getSchedulerStatus(
   accessToken: string,
@@ -662,4 +663,14 @@ export async function hentKalenderHendelser(
       status: response.status
     })
   }
+}
+
+export async function getBehandlingManuellOpptelling(
+  ctx: RequestCtx,
+  behandlingId: number,
+): Promise<BehandlingManuellOpptellingResponse> {
+  return apiGet(
+    `/api/behandling/${behandlingId}/behandlingManuellOpptelling`,
+    ctx,
+  )
 }
