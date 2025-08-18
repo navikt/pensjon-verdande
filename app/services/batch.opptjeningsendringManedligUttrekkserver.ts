@@ -1,12 +1,12 @@
 import { env } from '~/services/env.server'
 import type { StartBatchResponse } from '~/types'
 
-export async function opprettBpen055(
+export async function opprettOpptjeningsendringMandeligUttrekk(
   accessToken: string,
   behandlingsmaned: number,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
-    `${env.penUrl}/api/opptjening/kategoriserbruker/opprett`,
+    `${env.penUrl}/api/opptjening/mandeliguttrekk/opprett`,
     {
       method: 'POST',
       headers: {

@@ -1,7 +1,7 @@
 import { env } from '~/services/env.server'
 import type { StartBatchResponse } from '~/types'
 
-export async function opprettBpen055ArligUttrekk(
+export async function opprettOpptjeningsendringArligUttrekk(
   accessToken: string,
 ): Promise<StartBatchResponse> {
   const response = await fetch(
