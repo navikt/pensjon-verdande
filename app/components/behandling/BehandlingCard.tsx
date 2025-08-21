@@ -33,6 +33,7 @@ export default function BehandlingCard(props: Props) {
   const navigate = useNavigate();
 
   const stopModal = useRef<HTMLDialogElement>(null)
+  const fortsettModal = useRef<HTMLDialogElement>(null)
   const sendTilManuellMedKontrollpunktModal = useRef<HTMLDialogElement>(null)
   const sendTilOppdragPaNyttModal = useRef<HTMLDialogElement>(null)
   function beregnFremdriftProsent(ferdig: number, totalt: number): string {
@@ -168,25 +169,74 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
-  function fortsettBehandling() {
-    if (hasLink('fortsett')) {
-      return (
-        <Tooltip content='Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart'>
-          <fetcher.Form method='post' action='fortsett'>
-            <Button
-              variant={'secondary'}
-              icon={<PlayIcon aria-hidden />}
-              name={'fortsett'}
-            >
-              Fortsett
-            </Button>
-          </fetcher.Form>
-        </Tooltip>
-      )
-    } else {
-      return <></>
+    function fortsettBehandling(planlagtStartet: string | null) {
+        if (hasLink('fortsett')) {
+            return (
+                <>
+                    {planlagtStartet ? (
+                            <>
+                                <Tooltip
+                                    content='Fjerner utsatt tidspunkt og planlagt startet tidspunkt slik at behandling kan kjøres umiddelbart'>
+                                    <Button
+                                        variant={'secondary'}
+                                        icon={<PlayIcon aria-hidden />}
+                                        onClick={() => fortsettModal.current?.showModal()}
+                                    >
+                                        Fortsett
+                                    </Button>
+                                </Tooltip>
+                                <Modal ref={fortsettModal} header={{heading: 'Fortsett behandling'}}>
+                                    <Modal.Body>
+                                        <BodyLong>
+                                            Dette er en behandling planlagt kjørt<strong> {formatIsoTimestamp(planlagtStartet)}</strong>.
+                                            Vil du kjøre den nå med en gang? Denne handlingen kan ikke angres.
+                                        </BodyLong>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <fetcher.Form method='post' action='fortsett'>
+                                            <input
+                                                type='hidden'
+                                                name='nullstillPlanlagtStartet'
+                                                value='true'
+                                            />
+                                            <Button
+                                                variant={'primary'}
+                                                icon={<PlayIcon aria-hidden/>}
+                                                name={'fortsett'}
+                                            >
+                                                Kjør planlagt startet behandling nå
+                                            </Button>
+                                        </fetcher.Form>
+                                        <Button
+                                            type='button'
+                                            variant='secondary'
+                                            onClick={() => fortsettModal.current?.close()}
+                                        >
+                                            Avbryt
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
+                            </>
+                        ) :
+                        <Tooltip content='Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart'>
+                            <fetcher.Form method='post' action='fortsett'>
+                                <Button
+                                    variant={'secondary'}
+                                    icon={<PlayIcon aria-hidden/>}
+                                    name={'fortsett'}
+                                >
+                                    Fortsett
+                                </Button>
+                            </fetcher.Form>
+                        </Tooltip>
+                    }
+                </>
+            )
+        } else {
+            fortsettModal.current?.close()
+            return <></>
+        }
     }
-  }
 
   function fortsettAvhengigeBehandlinger() {
     if (hasLink('fortsettAvhengigeBehandlinger')) {
@@ -376,6 +426,13 @@ export default function BehandlingCard(props: Props) {
                   ) : (
                     <></>
                   )}
+                {props.behandling.planlagtStartet ? (
+                <Entry labelText={'Planlagt kjøring frem i tid'}>
+                    {formatIsoTimestamp(props.behandling.planlagtStartet)}
+                </Entry>
+                    ) : (
+                        <></>
+                    )}
                 </Card.Grid>
                 <Card.Grid>
                   {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
@@ -392,7 +449,7 @@ export default function BehandlingCard(props: Props) {
                   }
                 </Card.Grid>
                 <Card.Grid>
-                  {fortsettBehandling()}
+                  {fortsettBehandling(props.behandling.planlagtStartet)}
 
                   {fortsettAvhengigeBehandlinger()}
 

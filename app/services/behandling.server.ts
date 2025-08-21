@@ -337,6 +337,7 @@ export async function getIkkeFullforteAktiviteter(
 export async function fortsettBehandling(
   accessToken: string,
   behandlingId: string,
+  nullstillPlanlagtStartet: boolean,
 ): Promise<void> {
   const response = await fetch(
     `${env.penUrl}/api/behandling/${behandlingId}/fortsett`,
@@ -345,7 +346,9 @@ export async function fortsettBehandling(
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'X-Request-ID': crypto.randomUUID(),
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ nullstillPlanlagtStartet: nullstillPlanlagtStartet }),
     },
   )
 

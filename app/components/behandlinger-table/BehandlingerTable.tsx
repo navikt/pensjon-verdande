@@ -183,6 +183,9 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.ColumnHeader sortable sortKey="utsattTil" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Utsatt til
               </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="planlagtStartet" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
+                Planlagt startet
+              </Table.ColumnHeader>
               {visStatusSoek ?
                 <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "14rem" }}>
                   Status
@@ -225,6 +228,8 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}>
+              </Table.DataCell>
               {visStatusSoek ?
                 <Table.DataCell style={{ paddingTop: 0 }}>
                   { statusOptions() }
@@ -245,7 +250,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   <Table.DataCell align='center'>
                     <Checkbox
                       hideLabel
-                      disabled={it.utsattTil == null}
+                      disabled={it.status == 'FULLFORT' || it.status === 'STOPPET' }
                       checked={valgteBehandlingIder.includes(it.behandlingId)}
                       onChange={() => toggleSelectedRow(it.behandlingId)}
                       aria-labelledby={`id-${it.behandlingId}`}
@@ -268,6 +273,9 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   </Table.DataCell>
                   <Table.DataCell>
                     {formatIsoTimestamp(it.utsattTil)}
+                  </Table.DataCell>
+                  <Table.DataCell>
+                    {formatIsoTimestamp(it.planlagtStartet)}
                   </Table.DataCell>
                   {visStatusSoek ?
                     <Table.DataCell>{it.status}</Table.DataCell>

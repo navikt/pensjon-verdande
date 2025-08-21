@@ -26,6 +26,7 @@ export type BehandlingDto = {
   slettes: string | null
   stoppet: string | null
   opprettet: string
+  planlagtStartet: string | null,
   ansvarligTeam: string | null
   status: string
   prioritet: number
