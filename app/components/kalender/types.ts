@@ -3,7 +3,7 @@ export type KalenderHendelser = {
     kalenderBehandlinger: KalenderBehandling[];
 };
 
-export  type KalenderBehandling = {
+export type KalenderBehandling = {
     behandlingId: number;
     type: string;
     kjoreDato: string;
