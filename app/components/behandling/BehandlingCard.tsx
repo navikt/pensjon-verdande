@@ -426,13 +426,12 @@ export default function BehandlingCard(props: Props) {
                   ) : (
                     <></>
                   )}
-                {props.behandling.planlagtStartet ? (
+                {props.behandling.planlagtStartet && (
                 <Entry labelText={'Planlagt kjøring frem i tid'}>
                     {formatIsoTimestamp(props.behandling.planlagtStartet)}
                 </Entry>
-                    ) : (
-                        <></>
-                    )}
+                    )
+                }
                 </Card.Grid>
                 <Card.Grid>
                   {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
