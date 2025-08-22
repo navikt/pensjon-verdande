@@ -42,7 +42,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       size: 1000,
       sort: 'opprettet,desc',
     }),
-    kalenderHendelser: await hentKalenderHendelser(accessToken, {
+    kalenderHendelser: await hentKalenderHendelser({accessToken: accessToken}, {
       fom: forsteDato,
       tom: sisteDato,
     }),

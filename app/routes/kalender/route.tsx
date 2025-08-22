@@ -17,7 +17,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   let { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
 
   return {
-    kalenderHendelser: await hentKalenderHendelser(accessToken, {
+    kalenderHendelser: await hentKalenderHendelser({accessToken: accessToken}, {
       fom: forsteDato,
       tom: sisteDato,
     }),

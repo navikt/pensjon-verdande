@@ -23,7 +23,7 @@ const formatTidspunkt = (datoStr: string) => {
 export default function Dag(props: Props) {
   let dagStreng: string
   if (props.dato.getDate() === 1) {
-    dagStreng = props.dato.getDate() + '. ' + props.dato.toLocaleDateString('no-NO', { month: 'long' })
+    dagStreng = props.dato.getDate() + '. ' + props.dato.toLocaleDateString('no-NO', { month: 'short' })
   } else {
     dagStreng = props.dato.getDate().toString() + '.'
   }

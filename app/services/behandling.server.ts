@@ -636,37 +636,15 @@ export async function henBehandlingManuell(
 }
 
 export async function hentKalenderHendelser(
-    accessToken: string,
-    { fom, tom }: { fom: Date; tom: Date }
+  ctx: RequestCtx,
+  { fom, tom }: { fom: Date; tom: Date },
 ): Promise<KalenderHendelser> {
-    const response = await fetch(
-        `${env.penUrl}/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
-        {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'X-Request-ID': crypto.randomUUID(),
-            },
-        },
-    )
+  const dto = await apiGet<KalenderHendelserDTO>(
+    `/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
+    ctx,
+  )
 
-    if (response.status === 400) {
-        return {
-            offentligeFridager: [],
-            kalenderBehandlinger: [],
-        }
-    }
-
-    if (!response.ok) {
-        const text = await response.text()
-        throw data(
-            'Feil ved henting av kalenderhendelser. Feil var\n' + text,
-            { status: response.status },
-        )
-    }
-
-    const dto = (await response.json()) as KalenderHendelserDTO
-    return mapKalenderHendelser(dto)
+  return mapKalenderHendelser(dto)
 }
 
 function mapKalenderHendelser(dto: KalenderHendelserDTO): KalenderHendelser {
