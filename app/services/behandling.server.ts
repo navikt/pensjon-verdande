@@ -675,7 +675,7 @@ function mapKalenderHendelser(dto: KalenderHendelserDTO): KalenderHendelser {
         kalenderBehandlinger: dto.kalenderBehandlinger.map(b => ({
             behandlingId: b.behandlingId,
             type: b.type,
-            kjoreDato: (b.planlagtStartet && b.planlagtStartet.trim() !== '') ? b.planlagtStartet : b.opprettet,
+            kjoreDato: (typeof b.planlagtStartet === 'string' && b.planlagtStartet.trim() !== '') ? b.planlagtStartet : b.opprettet,
         })),
     }
 }
