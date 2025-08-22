@@ -12,7 +12,10 @@ import { kibanaLink } from '~/services/kibana.server'
 import { logger } from '~/services/logger.server'
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
-import { KalenderHendelser } from '~/components/kalender/types'
+import {
+    KalenderHendelser,
+    KalenderHendelserDTO
+} from '~/components/kalender/types'
 import { apiGet, RequestCtx } from '~/services/api.server'
 
 export async function getSchedulerStatus(
@@ -632,40 +635,27 @@ export async function henBehandlingManuell(
   }
 }
 
-
 export async function hentKalenderHendelser(
-  accessToken: string,
-  {
-    fom,
-    tom,
-  }: {
-    fom: Date,
-    tom: Date,
-  }
+  ctx: RequestCtx,
+  { fom, tom }: { fom: Date; tom: Date },
 ): Promise<KalenderHendelser> {
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
+  const dto = await apiGet<KalenderHendelserDTO>(
+    `/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
+    ctx,
   )
 
-  if (response.ok) {
-    return await response.json() as KalenderHendelser
-  } else if (response.status === 400) { // TODO: Fjern etter at støtte i pen er prodsatt
+  return mapKalenderHendelser(dto)
+}
+
+function mapKalenderHendelser(dto: KalenderHendelserDTO): KalenderHendelser {
     return {
-      offentligeFridager: []
+        offentligeFridager: dto.offentligeFridager,
+        kalenderBehandlinger: dto.kalenderBehandlinger.map(b => ({
+            behandlingId: b.behandlingId,
+            type: b.type,
+            kjoreDato: (typeof b.planlagtStartet === 'string' && b.planlagtStartet.trim() !== '') ? b.planlagtStartet : b.opprettet,
+        })),
     }
-  } else {
-    let text = await response.text()
-    throw data("Feil ved henting av kalenderhendelser. Feil var\n" + text, {
-      status: response.status
-    })
-  }
 }
 
 export async function getBehandlingManuellOpptelling(

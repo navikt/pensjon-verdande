@@ -25,7 +25,6 @@ export function forsteOgSisteDatoForKalender(dato: Date): { forsteDato: Date, si
 }
 
 export type Props = {
-  behandlinger: BehandlingDto[],
   kalenderHendelser: KalenderHendelser,
   maksAntallPerDag: number,
   startDato: Date,
@@ -81,7 +80,6 @@ export default function Kalender(props: Props) {
                  backgroundColor: backgroundColorForDato(props.kalenderHendelser, dato),
                }}>
       <Dag
-        behandlinger={props.behandlinger}
         dato={dato}
         highlightMaaned={valgtDato}
         kalenderHendelser={props.kalenderHendelser}
