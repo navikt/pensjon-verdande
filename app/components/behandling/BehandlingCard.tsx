@@ -188,7 +188,7 @@ export default function BehandlingCard(props: Props) {
                                 <Modal ref={fortsettModal} header={{heading: 'Fortsett behandling'}}>
                                     <Modal.Body>
                                         <BodyLong>
-                                            Dette er en behandling planlagt kjørt<strong> {formatIsoTimestamp(planlagtStartet)}</strong>.
+                                            Dette er en behandling planlagt kjørt <strong>{formatIsoTimestamp(planlagtStartet)}</strong>.
                                             Vil du kjøre den nå med en gang? Denne handlingen kan ikke angres.
                                         </BodyLong>
                                     </Modal.Body>
