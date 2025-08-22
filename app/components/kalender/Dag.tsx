@@ -1,15 +1,13 @@
 import { isSameDay } from '~/common/date'
 import { getWeek } from '~/common/weeknumber'
-import { BehandlingDto } from '~/types'
 import { Link as ReactRouterLink } from 'react-router'
 import React from 'react'
 import { HStack, Link, Spacer } from '@navikt/ds-react'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { JSX } from 'react/jsx-runtime'
-import { KalenderHendelser } from '~/components/kalender/types'
+import {KalenderBehandling, KalenderHendelser} from '~/components/kalender/types'
 
 export type Props = {
-  behandlinger: BehandlingDto[],
   dato: Date,
   highlightMaaned: Date,
   maksAntallPerDag?: number
@@ -67,8 +65,8 @@ export default function Dag(props: Props) {
     }
   }
 
-  function behandlingElement(behandling: BehandlingDto, textColor: string, visKlokkeSlett: boolean) {
-    return <HStack
+  function behandlingElement(behandling: KalenderBehandling, textColor: string, visKlokkeSlett: boolean) {
+      return <HStack
       key={`behandling-${behandling.behandlingId}`}
       style={{ fontSize: '0.8em' }}
     >
@@ -95,15 +93,15 @@ export default function Dag(props: Props) {
           {visKlokkeSlett && <span style={{
             textAlign: 'right',
             color: textColor,
-          }}>{formatTidspunkt(behandling.opprettet)}</span>}
+          }}>{formatTidspunkt(behandling.kjoreDato)}</span>}
           </span>
     </HStack>
   }
 
   function visDagensBehandlingerMedBegrensning(maksAntall: number = 5) {
-    const dagens = props.behandlinger.filter((b) =>
-      isSameDay(new Date(b.opprettet), props.dato)
-    ).sort((a, b) => a.opprettet.localeCompare(b.opprettet))
+    const dagens = props.kalenderHendelser.kalenderBehandlinger.filter((b) =>
+      isSameDay(new Date(b.kjoreDato), props.dato)
+    ).sort((a, b) => a.kjoreDato.localeCompare(b.kjoreDato))
 
     const behandlingerSomVises =
       dagens.length > maksAntall
@@ -124,7 +122,7 @@ export default function Dag(props: Props) {
       : []
 
     const behandlingElementer = behandlingerSomVises.map((behandling) =>
-      behandlingElement(behandling, textColor, props.visKlokkeSlett)
+        behandlingElement(behandling, textColor, props.visKlokkeSlett)
     )
 
     const ekstreElement = antallEkstra > 0

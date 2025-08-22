@@ -12,7 +12,10 @@ import { kibanaLink } from '~/services/kibana.server'
 import { logger } from '~/services/logger.server'
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
-import { KalenderHendelser } from '~/components/kalender/types'
+import {
+    KalenderHendelser,
+    KalenderHendelserDTO
+} from '~/components/kalender/types'
 import { apiGet, RequestCtx } from '~/services/api.server'
 
 export async function getSchedulerStatus(
@@ -632,40 +635,49 @@ export async function henBehandlingManuell(
   }
 }
 
-
 export async function hentKalenderHendelser(
-  accessToken: string,
-  {
-    fom,
-    tom,
-  }: {
-    fom: Date,
-    tom: Date,
-  }
+    accessToken: string,
+    { fom, tom }: { fom: Date; tom: Date }
 ): Promise<KalenderHendelser> {
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
+    const response = await fetch(
+        `${env.penUrl}/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'X-Request-ID': crypto.randomUUID(),
+            },
+        },
+    )
 
-  if (response.ok) {
-    return await response.json() as KalenderHendelser
-  } else if (response.status === 400) { // TODO: Fjern etter at støtte i pen er prodsatt
-    return {
-      offentligeFridager: []
+    if (response.status === 400) {
+        return {
+            offentligeFridager: [],
+            kalenderBehandlinger: [],
+        }
     }
-  } else {
-    let text = await response.text()
-    throw data("Feil ved henting av kalenderhendelser. Feil var\n" + text, {
-      status: response.status
-    })
-  }
+
+    if (!response.ok) {
+        const text = await response.text()
+        throw data(
+            'Feil ved henting av kalenderhendelser. Feil var\n' + text,
+            { status: response.status },
+        )
+    }
+
+    const dto = (await response.json()) as KalenderHendelserDTO
+    return mapKalenderHendelser(dto)
+}
+
+function mapKalenderHendelser(dto: KalenderHendelserDTO): KalenderHendelser {
+    return {
+        offentligeFridager: dto.offentligeFridager,
+        kalenderBehandlinger: dto.kalenderBehandlinger.map(b => ({
+            behandlingId: b.behandlingId,
+            type: b.type,
+            kjoreDato: (b.planlagtStartet && b.planlagtStartet.trim() !== '') ? b.planlagtStartet : b.opprettet,
+        })),
+    }
 }
 
 export async function getBehandlingManuellOpptelling(
