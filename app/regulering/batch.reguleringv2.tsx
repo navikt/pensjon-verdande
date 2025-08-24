@@ -1,13 +1,11 @@
 import { ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { Outlet, useLoaderData, useLocation, useRevalidator } from 'react-router';
+import { Outlet, useLoaderData, useLocation } from 'react-router';
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
 import React from 'react'
-import type { ReguleringDetaljer } from '~/regulering/regulering.types'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
-import { serverOnly$ } from 'vite-env-only/macros'
-import { env } from '~/services/env.server'
+import { getReguleringDetaljer } from '~/regulering/regulering.server'
 
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -56,30 +54,6 @@ export default function OpprettReguleringBatchRoute() {
     </VStack>
   )
 }
-
-export const getReguleringDetaljer = serverOnly$(async (
-  accessToken: string,
-): Promise<ReguleringDetaljer> => {
-
-  const url = new URL(`${env.penUrl}/api/vedtak/regulering/detaljer`)
-  const response = await fetch(
-    url.toString(),
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return (await response.json()) as ReguleringDetaljer
-  } else {
-    let body = await response.json()
-    console.log(`Feil ved kall til pen ${response.status}`, body)
-    throw new Error()
-  }
-})
 
 function getCurrentStep(currentPathName: string) {
   switch (currentPathName.split("/").pop()) {

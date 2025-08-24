@@ -1,7 +1,6 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
-import { env } from '~/services/env.server'
 import { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering/regulering.types'
 import React, { useEffect, useState } from 'react'
 import { Form, Link, useFetcher, useNavigation, useOutletContext } from 'react-router';
@@ -25,10 +24,10 @@ import {
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
 import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
-import { serverOnly$ } from 'vite-env-only/macros'
+import { startOrkestrering } from '~/regulering/regulering.server'
 
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
 
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
@@ -168,7 +167,7 @@ export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
   )
 }
 
-export function OrkestreringStatistikk({ behandlingId, behandlingStatus }: {
+export function OrkestreringStatistikk({ behandlingId }: {
   behandlingId: string,
   behandlingStatus: Behandlingstatus
 }) {
@@ -277,32 +276,3 @@ export function AggregerteFeilmeldingerTabell() {
 }
 
 
-const startOrkestrering = serverOnly$(async(
-  accessToken: string,
-  antallFamilier: string | undefined,
-  kjorOnline: boolean,
-) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/orkestrering/startv2`,
-    {
-      method: 'POST',
-      body: JSON.stringify(
-        {
-          antallFamilier,
-          kjorOnline
-        },
-      )
-      ,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  return {
-    success: response.ok,
-  }
-})

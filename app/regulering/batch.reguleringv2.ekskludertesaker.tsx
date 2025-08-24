@@ -3,17 +3,15 @@ import {
 } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
-import { env } from '~/services/env.server'
-import type { EkskluderteSakerResponse } from '~/regulering/regulering.types'
 import React, { useEffect, useState } from 'react'
 import { useFetcher, useLoaderData } from 'react-router';
 import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'
 import { useActionData } from 'react-router'
-import { serverOnly$ } from 'vite-env-only/macros'
 import { FileUpload, parseFormData } from '@mjackson/form-data-parser'
+import { hentEksluderteSaker, oppdaterEkskluderteSaker } from '~/regulering/regulering.server'
 
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
 
@@ -40,7 +38,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 }
 
 
-export const loader = async ({ params, request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   return await hentEksluderteSaker(accessToken)
 }
@@ -110,57 +108,6 @@ export default function EkskluderteSaker({}: {}) {
     </VStack>
   )
 }
-
-
-const hentEksluderteSaker = serverOnly$(async(
-  accessToken: string,
-): Promise<EkskluderteSakerResponse> => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/eksludertesaker`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return (await response.json()) as EkskluderteSakerResponse
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
-  }
-})
-
-const oppdaterEkskluderteSaker = serverOnly$(async(
-  accessToken: string,
-  ekskluderteSaker: number[],
-) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/eksludertesaker`,
-    {
-      method: 'POST',
-      body: JSON.stringify(
-        {
-          ekskluderteSaker: ekskluderteSaker,
-        },
-      ),
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (!response.ok) {
-    throw new Error(response.statusText)
-  }
-  return { erOppdatert: true }
-})
 
 type OppdaterEksluderteSakerResponse = {
   erOppdatert: boolean
