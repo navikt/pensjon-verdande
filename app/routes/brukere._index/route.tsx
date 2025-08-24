@@ -16,10 +16,8 @@ export default function Brukere() {
 
   return (
     <Box.New
-      background={'surface-default'}
       style={{ padding: '6px' }}
       borderRadius="medium"
-      shadow="medium"
     >
       <Table>
         <Table.Header>

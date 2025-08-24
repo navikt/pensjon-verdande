@@ -112,7 +112,11 @@ function IndexBox({ index }: { index: ManglendeForeignKeyIndex }) {
   const indexDdl = `CREATE INDEX ${index.tableName}_${index.foreignKeyColumns.replace(/,/g, '_')}_IDX ON ${index.tableName} (${index.foreignKeyColumns}) ONLINE;`
 
   return (
-    <Box background={"surface-default"} borderRadius="medium" shadow="medium" padding="2">
+    <Box.New
+      background={'sunken'}
+      borderRadius="medium"
+      padding="2"
+    >
       <VStack gap="5">
         <Heading size="medium">
           Opprett indeks for {index.tableName} – {index.foreignKeyName}
@@ -121,12 +125,14 @@ function IndexBox({ index }: { index: ManglendeForeignKeyIndex }) {
           For å opprette en indeks for en fjernnøkkel som mangler én, kan du bruke følgende SQL-kommando i et
           Flyway-skript. Husk å endre indeksnavnet dersom du ønsker et annet navn.
         </BodyShort>
-        <div>
+        <Box.New
+          background={'raised'}
+        >
           <pre>{indexDdl}</pre>
           <CopyButton copyText={indexDdl} text="Kopier SQL" />
-        </div>
+        </Box.New>
       </VStack>
-    </Box>
+    </Box.New>
   )
 }
 
@@ -138,10 +144,9 @@ export default function ManglendeForeignKeyIndexer() {
   return (
     <VStack gap="5">
 
-      <Box
-        background={'surface-default'}
+      <Box.New
+        background={'sunken'}
         borderRadius="medium"
-        shadow="medium"
         padding="2"
       >
         <VStack gap="5">
@@ -157,12 +162,18 @@ export default function ManglendeForeignKeyIndexer() {
                 Dette kan føre til dårlig ytelse ved sletting av rader i de refererte tabellene.
                 For å sikre god ytelse bør det opprettes indekser på disse kolonnene.
               </BodyShort>
+              <Box.New
+                background={'raised'}
+                >
+
+
               <ManglendeForeignKeyIndexerTable
                 manglendeForeignKeyIndexer={manglendeForeignKeyIndexer}
                 selectedRow={valgtManglendeForeignKeyIndex}
                 searchParams={searchParams}
                 setSearchParams={setSearchParams}
               ></ManglendeForeignKeyIndexerTable>
+              </Box.New>
             </>
           ) : (
             <BodyShort>
@@ -170,19 +181,18 @@ export default function ManglendeForeignKeyIndexer() {
             </BodyShort>
           )}
         </VStack>
-      </Box>
+      </Box.New>
       {valgtManglendeForeignKeyIndex ? <IndexBox index={valgtManglendeForeignKeyIndex}/> : manglendeForeignKeyIndexer.length > 0 ? (
-        <Box
-          background={'surface-default'}
+        <Box.New
+          background={'sunken'}
           borderRadius="medium"
-          shadow="medium"
           padding="2"
         >
           <BodyShort>
             Trykk på en rad i tabellen for å se forslag til hvordan du kan opprette manglende indeks for den valgte
             raden.
           </BodyShort>
-        </Box>
+        </Box.New>
       ) : null}
     </VStack>
   )
