@@ -21,7 +21,7 @@ import type {
   LaasOppResultat,
   SakOppsummeringLaasOpp,
   VedtakLaasOpp,
-} from '~/laas-opp.types'
+} from '~/vedlikehold/laas-opp.types'
 import { Entry } from '~/components/entry/Entry'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import {
@@ -30,7 +30,7 @@ import {
   ExclamationmarkTriangleIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
-import { VedtakYtelsekomponenter } from '~/laaste-vedtak.types'
+import { VedtakYtelsekomponenter } from '~/vedlikehold/laaste-vedtak.types'
 
 export default function LaasteVedtakPage() {
   const [sak, setSak] = useState<SakOppsummeringLaasOpp | undefined | null>(

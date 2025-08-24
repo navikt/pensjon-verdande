@@ -4,7 +4,7 @@ import {
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
-import type { EkskluderteSakerResponse } from '~/regulering.types'
+import type { EkskluderteSakerResponse } from '~/regulering/regulering.types'
 import React, { useEffect, useState } from 'react'
 import { useFetcher, useLoaderData } from 'react-router';
 import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'

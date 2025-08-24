@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
-import type { SakOppsummeringLaasOpp } from '~/laas-opp.types'
+import type { SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.types'
 import { serverOnly$ } from 'vite-env-only/macros'
 
 

@@ -1,4 +1,4 @@
-import type { OpplaasVedtakInformasjon } from '~/laas-opp.types'
+import type { OpplaasVedtakInformasjon } from '~/vedlikehold/laas-opp.types'
 
 export type LaasteVedtakUttrekkSummary = {
   behandlingId: string | null,

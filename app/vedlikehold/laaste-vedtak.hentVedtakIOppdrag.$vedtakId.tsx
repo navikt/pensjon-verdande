@@ -3,7 +3,7 @@ import { ActionFunctionArgs } from 'react-router';
 
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
-import { VedtakYtelsekomponenter } from '~/laaste-vedtak.types'
+import { VedtakYtelsekomponenter } from '~/vedlikehold/laaste-vedtak.types'
 import invariant from 'tiny-invariant'
 import { serverOnly$ } from 'vite-env-only/macros'
 

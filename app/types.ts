@@ -6,13 +6,6 @@ export enum Behandlingstatus {
   DEBUG="DEBUG",
 }
 
-export enum Aktivitetstatus {
-  OPPRETTET='OPPRETTET',
-  FEILENDE='FEILENDE',
-  FULLFORT='FULLFORT',
-  UNDER_BEHANDLING='UNDER_BEHANDLING',
-}
-
 export type BehandlingDto = {
   level: number | null
   behandlingId: number
@@ -171,12 +164,6 @@ export type BehandlingManuellPage = {
   empty: boolean
 
   sort: PageSort
-}
-
-export type PageSort = {
-  unsorted: boolean
-  sorted: boolean
-  empty: boolean
 }
 
 export type BehandlingAntall = {

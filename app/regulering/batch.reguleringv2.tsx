@@ -3,7 +3,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import { Outlet, useLoaderData, useLocation, useRevalidator } from 'react-router';
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
 import React from 'react'
-import type { ReguleringDetaljer } from '~/regulering.types'
+import type { ReguleringDetaljer } from '~/regulering/regulering.types'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
 import { serverOnly$ } from 'vite-env-only/macros'

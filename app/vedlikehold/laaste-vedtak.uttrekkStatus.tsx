@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from 'react-router';
-import type { LaasteVedtakUttrekkStatus } from '~/laaste-vedtak.types'
+import type { LaasteVedtakUttrekkStatus } from '~/vedlikehold/laaste-vedtak.types'
 
 import { env } from '~/services/env.server'
 import { requireAccessToken } from '~/services/auth.server'

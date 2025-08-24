@@ -2,7 +2,7 @@ import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
-import { AggregerteFeilmeldinger } from '~/regulering.types'
+import { AggregerteFeilmeldinger } from '~/regulering/regulering.types'
 import { serverOnly$ } from 'vite-env-only/macros'
 
 

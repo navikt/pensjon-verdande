@@ -2,7 +2,7 @@ import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { env } from '~/services/env.server'
-import { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering.types'
+import { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering/regulering.types'
 import React, { useEffect, useState } from 'react'
 import { Form, Link, useFetcher, useNavigation, useOutletContext } from 'react-router';
 import {

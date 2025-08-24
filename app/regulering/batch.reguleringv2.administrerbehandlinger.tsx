@@ -5,8 +5,8 @@ import type {
   FaktoromregningMedAarsak,
   ReguleringDetaljer,
   ReguleringStatistikk,
-} from '~/regulering.types'
-import { ArbeidstabellStatistikk } from '~/regulering.types'
+} from '~/regulering/regulering.types'
+import { ArbeidstabellStatistikk } from '~/regulering/regulering.types'
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useFetcher, useOutletContext } from 'react-router';
 import { Alert, Button, Dropdown, HStack, Loader, Modal, Table, Tabs, TextField, VStack } from '@navikt/ds-react'

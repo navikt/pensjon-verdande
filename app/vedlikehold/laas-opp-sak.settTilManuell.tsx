@@ -1,8 +1,8 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
-import type { LaasOppResultat } from '~/laas-opp.types'
 import { serverOnly$ } from 'vite-env-only/macros'
+import { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {

@@ -44,9 +44,9 @@ import {
   LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary, muligeAksjonspunkt,
   VedtakYtelsekomponenter,
-} from '~/laaste-vedtak.types'
+} from '~/vedlikehold/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
-import { LaasOppResultat } from '~/laas-opp.types'
+import { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import { logger } from '~/services/logger.server'
 import { serverOnly$ } from 'vite-env-only/macros'
 
