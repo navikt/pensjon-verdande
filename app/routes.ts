@@ -92,24 +92,24 @@ export default [
     route('fortsett', 'routes/behandlinger.$status.fortsett.tsx'),
   ]),
 
-  route('bestem-etteroppgjor-resultat', 'routes/bestem-etteroppgjor-resultat._index.tsx'),
+  route('bestem-etteroppgjor-resultat', 'uforetrygd/bestem-etteroppgjor-resultat._index.tsx'),
 
-  route('bpen090', 'routes/bpen090._index.tsx', [
+  route('bpen090', 'uforetrygd/bpen090._index.tsx', [
     //index('routes/bpen090._index.tsx'),
   ]),
 
-  route('bpen090/bpen090', 'routes/bpen090.bpen090.tsx'),
+  route('bpen090/bpen090', 'uforetrygd/bpen090.bpen090.tsx'),
 
-  route('bpen091', 'routes/bpen091._index.tsx', [
+  route('bpen091', 'uforetrygd/bpen091._index.tsx', [
     //index('routes/bpen091._index.tsx'),
   ]),
 
-  route('bpen091/bpen091', 'routes/bpen091.bpen091.tsx'),
+  route('bpen091/bpen091', 'uforetrygd/bpen091.bpen091.tsx'),
 
-  route('bpen096', 'routes/bpen096._index.tsx', [
+  route('bpen096', 'uforetrygd/bpen096._index.tsx', [
     //index('routes/bpen096._index.tsx'),
   ]),
-  route('bpen096/bpen096', 'routes/bpen096.bpen096.tsx'),
+  route('bpen096/bpen096', 'uforetrygd/bpen096.bpen096.tsx'),
 
   route('brukere', 'routes/brukere._index/route.tsx', [
     //index('routes/brukere._index/route.tsx'),
