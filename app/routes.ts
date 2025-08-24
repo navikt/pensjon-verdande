@@ -118,26 +118,26 @@ export default [
 
   route('dashboard', 'routes/dashboard/route.tsx'),
 
-  route('infobanner', 'routes/infobanner.tsx'),
+  route('infobanner', 'vedlikehold/infobanner.tsx'),
 
   route('kalender', 'routes/kalender/route.tsx'),
 
-  route('laas-opp-sak', 'routes/laas-opp-sak.tsx', [
-    route('settTilManuell', 'routes/laas-opp-sak.settTilManuell.tsx'),
-    route('hentSak', 'routes/laas-opp-sak.hentSak.tsx'),
-    route('laasOpp', 'routes/laas-opp-sak.laasOpp.tsx'),
+  route('laas-opp-sak', 'vedlikehold/laas-opp-sak.tsx', [
+    route('settTilManuell', 'vedlikehold/laas-opp-sak.settTilManuell.tsx'),
+    route('hentSak', 'vedlikehold/laas-opp-sak.hentSak.tsx'),
+    route('laasOpp', 'vedlikehold/laas-opp-sak.laasOpp.tsx'),
   ]),
 
-  route('laaste-vedtak', 'routes/laaste-vedtak.tsx', [
-    route('bekreftOppdragsmeldingManuelt', 'routes/laaste-vedtak.bekreftOppdragsmeldingManuelt.tsx'),
-    route('hentVedtakIOppdrag/:vedtakId', 'routes/laaste-vedtak.hentVedtakIOppdrag.$vedtakId.tsx'),
-    route('oppdaterKanIverksettes', 'routes/laaste-vedtak.oppdaterKanIverksettes.tsx'),
-    route('oppdaterAksjonspunkt', 'routes/laaste-vedtak.oppdaterAksjonspunkt.tsx'),
-    route('oppdaterKommentar', 'routes/laaste-vedtak.oppdaterKommentar.tsx'),
-    route('uttrekkStatus', 'routes/laaste-vedtak.uttrekkStatus.tsx'),
-    route('oppdaterTeam', 'routes/laaste-vedtak.oppdaterTeam.tsx'),
-    route('runUttrekk', 'routes/laaste-vedtak.runUttrekk.tsx'),
-    route('laasOpp', 'routes/laaste-vedtak.laasOpp.tsx'),
+  route('laaste-vedtak', 'vedlikehold/laaste-vedtak.tsx', [
+    route('bekreftOppdragsmeldingManuelt', 'vedlikehold/laaste-vedtak.bekreftOppdragsmeldingManuelt.tsx'),
+    route('hentVedtakIOppdrag/:vedtakId', 'vedlikehold/laaste-vedtak.hentVedtakIOppdrag.$vedtakId.tsx'),
+    route('oppdaterKanIverksettes', 'vedlikehold/laaste-vedtak.oppdaterKanIverksettes.tsx'),
+    route('oppdaterAksjonspunkt', 'vedlikehold/laaste-vedtak.oppdaterAksjonspunkt.tsx'),
+    route('oppdaterKommentar', 'vedlikehold/laaste-vedtak.oppdaterKommentar.tsx'),
+    route('uttrekkStatus', 'vedlikehold/laaste-vedtak.uttrekkStatus.tsx'),
+    route('oppdaterTeam', 'vedlikehold/laaste-vedtak.oppdaterTeam.tsx'),
+    route('runUttrekk', 'vedlikehold/laaste-vedtak.runUttrekk.tsx'),
+    route('laasOpp', 'vedlikehold/laaste-vedtak.laasOpp.tsx'),
   ]),
 
   route('leveattester-sokos-spkmottak', 'routes/leveattester-sokos-spkmottak.tsx'),
@@ -148,7 +148,7 @@ export default [
 
   route('linke-dnr-fnr', 'routes/linke-dnr-fnr.tsx'),
 
-  route('manglende-foreign-key-indexer', 'routes/manglende-foreign-key-indexer.tsx'),
+  route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
 
   route('omregning', 'routes/omregning._index.tsx', [
     //index('routes/omregning._index.tsx'),
