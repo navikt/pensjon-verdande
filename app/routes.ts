@@ -150,14 +150,14 @@ export default [
 
   route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
 
-  route('omregning', 'routes/omregning._index.tsx', [
-    //index('routes/omregning._index.tsx'),
+  route('omregning', 'omregning/omregning._index.tsx', [
+    //index('omregning/omregning._index.tsx'),
   ]),
-  route('omregning/behandlinger', 'routes/omregning.behandlinger.tsx'),
-  route('omregning/omregning', 'routes/omregning.omregning.tsx'),
-  route('omregning/omregningsaker', 'routes/omregning.omregningsaker.tsx'),
-  route('omregningStatistikk', 'routes/omregningStatistikk._index.tsx', [
-    //index('routes/omregningStatistikk._index.tsx'),
+  route('omregning/behandlinger', 'omregning/omregning.behandlinger.tsx'),
+  route('omregning/omregning', 'omregning/omregning.omregning.tsx'),
+  route('omregning/omregningsaker', 'omregning/omregning.omregningsaker.tsx'),
+  route('omregningStatistikk', 'omregning/omregningStatistikk._index.tsx', [
+    //index('omregning/omregningStatistikk._index.tsx'),
   ]),
 
   route('oppdatersakstatus', 'routes/oppdatersakstatus._index.tsx', [
