@@ -12,11 +12,11 @@ export default [
 
   route('aktivitet/:behandlingId/:aktivitetId', 'routes/aktivitet.$behandlingId.$aktivitetId.tsx'),
 
-  route('aldersovergang', 'routes/aldersovergang._index.tsx', [
-    //index('routes/aldersovergang._index.tsx'),
+  route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx', [
+    //index('aldersovergang/aldersovergang._index.tsx'),
   ]),
 
-  route('aldersovergang/opprett', 'routes/aldersovergang.opprett.tsx'),
+  route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),
 
   route('auth/callback', 'auth/auth.callback.tsx'),
   route('auth/failed', 'auth/auth.failed.tsx'),
