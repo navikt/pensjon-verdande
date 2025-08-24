@@ -2,9 +2,9 @@ import type { ActionFunctionArgs } from 'react-router';
 import { redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningRequest } from '~/types'
-import { opprettOmregningbehandling } from '~/services/batch.omregning.server'
+import { opprettOmregningbehandling } from '~/omregning/batch.omregning.server'
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 

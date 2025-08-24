@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettAdhocBrevBehandling } from '~/services/batch.adhocBrev.server'
+import { opprettAdhocBrevBehandling } from '~/adhocbrev/batch.adhocBrev.server'
 
 
 export const action = async ({ request }: ActionFunctionArgs) => {

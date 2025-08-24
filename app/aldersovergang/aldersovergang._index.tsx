@@ -23,7 +23,7 @@ import { BehandlingerPage } from '~/types'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import { hentMuligeAldersoverganger } from '~/services/behandling.aldersovergang.server'
+import { hentMuligeAldersoverganger } from '~/aldersovergang/behandling.aldersovergang.server'
 
 type LoaderData = {
   behandlinger: BehandlingerPage

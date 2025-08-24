@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettBpen091 } from '~/services/batch.bpen091.server'
+import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData()

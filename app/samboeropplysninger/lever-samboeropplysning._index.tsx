@@ -2,9 +2,9 @@ import { ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
 import React from 'react'
 import { BodyLong, Button, Heading, Label } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettBpen007 } from '~/services/batch.bpen007.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { getBehandlinger } from '~/services/behandling.server'
+import { startVurderSamboereBatch } from '~/samboeropplysninger/samboeropplysninger.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)
@@ -28,13 +28,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   console.log('formData', formData)
 
   const accessToken = await requireAccessToken(request)
-  await opprettBpen007(accessToken, +updates.behandlingsAr, updates.kjoretidspunkt)
+  await startVurderSamboereBatch(accessToken, +updates.behandlingsAr)
   return redirect('.')
 }
 

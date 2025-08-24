@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettAldersovergang } from '~/services/behandling.aldersovergang.server'
+import { opprettAldersovergang } from '~/aldersovergang/behandling.aldersovergang.server'
 
 
 export const action = async ({ request }: ActionFunctionArgs) => {

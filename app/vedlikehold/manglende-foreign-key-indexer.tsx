@@ -4,7 +4,7 @@ import { BodyShort, Box, CopyButton, Heading, SortState, Table, VStack } from '@
 import React, { useState } from 'react'
 import { ManglendeForeignKeyIndex } from '~/types/vedlikehold'
 import { requireAccessToken } from '~/services/auth.server'
-import { finnManglendeForeignKeyIndexer } from '~/services/vedlikehold.server'
+import { finnManglendeForeignKeyIndexer } from '~/vedlikehold/vedlikehold.server'
 
 interface ScopedSortState extends SortState {
   orderBy: keyof ManglendeForeignKeyIndex;

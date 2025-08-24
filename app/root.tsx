@@ -17,7 +17,6 @@ import { Alert, HStack, Page, Theme, VStack } from '@navikt/ds-react'
 import { LoaderFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
 import { tryAccessToken } from '~/services/auth.server'
-import { hentMe } from '~/services/brukere.server'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import NavHeader from '~/components/nav-header/NavHeader'
 import { getSchedulerStatus } from '~/services/behandling.server'
@@ -25,6 +24,7 @@ import React, { useState } from 'react'
 import { Route } from '../.react-router/types/app/+types/root'
 import '@navikt/ds-css/darkside'
 import VenstreMeny from './components/venstre-meny/VenstreMeny';
+import { hentMe } from '~/brukere/brukere.server'
 
 export const links: LinksFunction = () => {
   return [

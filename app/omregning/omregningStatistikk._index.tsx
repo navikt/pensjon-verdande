@@ -1,15 +1,15 @@
 import { requireAccessToken } from '~/services/auth.server'
-import {
-  hentOmregningbehandlingsnokler,
-  hentOmregningStatistikk,
-  hentOmregningStatistikkCsv,
-} from '~/services/batch.omregning.server'
 import React, { useEffect, useState } from 'react'
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { type ActionFunctionArgs, Form, LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
 import type { OmregningStatistikkPage } from '~/types'
+import {
+  hentOmregningbehandlingsnokler,
+  hentOmregningStatistikk,
+  hentOmregningStatistikkCsv,
+} from '~/omregning/batch.omregning.server'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   let { searchParams } = new URL(request.url)

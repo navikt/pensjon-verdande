@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettOpptjeningsendringMandeligUttrekk } from '~/services/batch.opptjeningsendringManedligUttrekkserver'
+import { opprettOpptjeningsendringMandeligUttrekk } from '~/opptjening/batch.opptjeningsendringManedligUttrekkserver'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()

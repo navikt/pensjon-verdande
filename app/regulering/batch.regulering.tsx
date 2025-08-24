@@ -1,12 +1,6 @@
 import type { ActionFunctionArgs } from 'react-router'
 import { redirect, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
-import {
-  endreKjorelopIverksettVedtakBehandlinger,
-  fortsettAvhengigeBehandling,
-  startReguleringOrkestrering,
-  startReguleringUttrekk,
-} from '~/services/batch.bpen068.server'
 import ReguleringUttrekk from '~/components/regulering/regulering-uttrekk'
 import FortsettAvhengigeReguleringBehandlinger from '~/components/regulering/regulering-fortsett-avhengige'
 import { getBehandlinger } from '~/services/behandling.server'
@@ -14,6 +8,12 @@ import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable
 import type { BehandlingerPage } from '~/types'
 import ReguleringOrkestrering from '~/components/regulering/regulering-orkestrering'
 import EndreKjoreLopTilBehandlinger from '~/components/regulering/regulering-endre-kjore-lop'
+import {
+  endreKjorelopIverksettVedtakBehandlinger,
+  fortsettAvhengigeBehandling,
+  startReguleringOrkestrering,
+  startReguleringUttrekk,
+} from '~/regulering/batch.bpen068.server'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()

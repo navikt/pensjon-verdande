@@ -20,13 +20,13 @@ import {
 } from '@navikt/ds-react'
 import { PlayIcon } from '@navikt/aksel-icons'
 import { requireAccessToken } from '~/services/auth.server'
-import { hentOmregningInit, hentOmregningInput } from '~/services/batch.omregning.server'
 import type { OmregningInit, OmregningSakerPage } from '~/types'
 import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
 import OmregningSelector from '~/components/omregning/OmregningSelector'
 import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
 import OmregningOppsummering from '~/components/omregning/OmregningOppsummering'
+import { hentOmregningInit, hentOmregningInput } from '~/omregning/batch.omregning.server'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)

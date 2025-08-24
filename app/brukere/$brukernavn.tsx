@@ -1,13 +1,14 @@
-import {
-  fjernBrukertilgang,
-  giBrukerTilgang,
-  hentBruker, hentMe,
-  hentTilgangskontrollMeta,
-} from '~/services/brukere.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import Bruker from '~/brukere/Bruker'
+import {
+  fjernBrukertilgang,
+  giBrukerTilgang,
+  hentBruker,
+  hentMe,
+  hentTilgangskontrollMeta,
+} from '~/brukere/brukere.server'
 
 export async function action({ params,
                                request,

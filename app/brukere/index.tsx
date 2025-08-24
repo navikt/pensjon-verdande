@@ -1,7 +1,7 @@
-import { hentBrukere } from '~/services/brukere.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { Link, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import { Box, Table } from '@navikt/ds-react'
+import { hentBrukere } from '~/brukere/brukere.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)

@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettBpen090 } from '~/services/batch.bpen090.server'
+import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
 
 
 
