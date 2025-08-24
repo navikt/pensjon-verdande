@@ -1,9 +1,9 @@
 import { Select } from '@navikt/ds-react'
 import React from 'react'
-import { ActionFunctionArgs, redirect } from 'react-router';
+import { ActionFunctionArgs } from 'react-router';
 import { Form } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { serverOnly$ } from 'vite-env-only/macros'
+import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
 
 export default function BestemEtteroppgjorResultat() {
   return <div>
@@ -25,7 +25,7 @@ export default function BestemEtteroppgjorResultat() {
   </div>
 }
 
-export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const formData = await request.formData()
@@ -34,22 +34,9 @@ export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs
   console.log('formData', formData)
   console.log('updates', updates)
 
-  const response = await fetch(
-    `${env.penUrl}/api/uforetrygd/bestemetteroppgjor/start`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify({
-        dryRun: updates.dryRun,
-      }),
-    },
-  )
+  const response = await startBestemEtteroppgjorResultat(accessToken, updates)
 
   console.log(response.status)
 
   return null;
-})
+}
