@@ -21,8 +21,9 @@ import { hentMe } from '~/services/brukere.server'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
-import { Route } from './+types/root';
 import { getSchedulerStatus } from '~/services/behandling.server'
+import React from 'react'
+import { Route } from '../.react-router/types/app/+types/root'
 
 export const links: LinksFunction = () => {
   return [

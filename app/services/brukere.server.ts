@@ -1,7 +1,6 @@
 import { env } from '~/services/env.server'
 import { BrukerResponse, MeResponse, Tilgangsmeta } from '~/types/brukere'
 import { data } from 'react-router'
-import { SchedulerStatusResponse } from '~/types'
 
 export async function hentTilgangskontrollMeta(
   accessToken: string,
@@ -77,7 +76,7 @@ export async function hentMe(
       },
     )
   } else {
-    return (await response.json()) as SchedulerStatusResponse
+    return (await response.json()) as MeResponse
   }
 }
 

@@ -1,6 +1,7 @@
 import {
   BehandlingDto,
-  BehandlingerPage, BehandlingManuellOpptellingResponse,
+  BehandlingerPage,
+  BehandlingManuellOpptellingResponse,
   BehandlingManuellPage,
   DashboardResponse,
   DetaljertFremdriftDTO,
@@ -9,13 +10,9 @@ import {
 } from '~/types'
 import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
-import { logger } from '~/services/logger.server'
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
-import {
-    KalenderHendelser,
-    KalenderHendelserDTO
-} from '~/components/kalender/types'
+import { KalenderHendelser, KalenderHendelserDTO } from '~/components/kalender/types'
 import { apiGet, RequestCtx } from '~/services/api.server'
 
 export async function getSchedulerStatus(
@@ -121,25 +118,10 @@ export async function getBehandlinger(
     request +=`&sort=${sort}`
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/behandling?page=${page}&size=${size}${request}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
+  return await apiGet<BehandlingerPage>(
+    `/api/behandling?page=${page}&size=${size}${request}`,
+    { accessToken: accessToken }
   )
-
-  if (response.ok) {
-    return (await response.json()) as BehandlingerPage
-  } else {
-    let body = await response.json()
-    logger.error(`Feil ved kall til pen ${response.status}`, body)
-    throw data("Feil ved henting av behandlinger. Feil var\n" + body, {
-      status: response.status
-    })
-  }
 }
 
 export async function getAvhengigeBehandlinger(
@@ -239,27 +221,10 @@ export async function search(
 export async function getBehandling(
   accessToken: string,
   behandlingId: string,
-): Promise<BehandlingDto | null> {
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/${behandlingId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    const behandling = (await response.json()) as BehandlingDto
-    behandling.kibanaUrl = kibanaLink(behandling)
-    return behandling
-  } else {
-    let text = await response.text()
-    throw data("Feil ved henting av behandling. Feil var\n" + text, {
-      status: response.status
-    })
-  }
+): Promise<BehandlingDto> {
+  const behandling = await apiGet<BehandlingDto>(`/api/behandling/${behandlingId}`, { accessToken: accessToken })
+  behandling.kibanaUrl = kibanaLink(behandling)
+  return behandling
 }
 
 type Output = {
@@ -582,24 +547,7 @@ export async function getBehandlingInput(
   accessToken: string,
   behandlingId: string,
 ) {
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/uttrekk/${behandlingId}/input`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return await response.text()
-  } else {
-    let text = await response.text()
-    throw data("Feil ved henting av behandling. Feil var\n" + text, {
-      status: response.status
-    })
-  }
+  return await apiGet<string>(`${env.penUrl}/api/behandling/uttrekk/${behandlingId}/input`, { accessToken: accessToken })
 }
 
 export async function henBehandlingManuell(
