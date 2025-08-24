@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image: "${{ steps.set-outputs.outputs.IMAGE }}"
+      image-digest: "${{ steps.login.outputs.registry }}/${{ github.repository }}/${{ github.repository_owner}}@${{ steps.build_push.outputs.digest }}"
     steps:
       - uses: actions/checkout@v4
 
@@ -106,3 +107,35 @@ jobs:
           RESOURCE: .nais/nais.yaml
           CLUSTER: '${{ matrix.cluster }}'
           VARS: ${{matrix.vars}}
+
+  attest-sign:
+    permissions:
+      contents: read
+      id-token: write
+    needs: [build]
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: NAIS login
+        uses: nais/login@v0
+        id: login
+        with:
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          team: pensjondeployer
+
+      - name: 'Generate SBOM'
+        uses: aquasecurity/trivy-action@0.32.0
+        with:
+          scan-type: 'image'
+          format: 'cyclonedx'
+          output: 'trivy-results.cyclonedx'
+          image-ref: "${{ needs.build.outputs.image-digest }}"
+
+      - name: Attest and sign image
+        id: attest-sign
+        uses: nais/attest-sign@v1
+        with:
+          image_ref: "${{ needs.build.outputs.image-digest }}"
+          sbom: "trivy-results.cyclonedx"
