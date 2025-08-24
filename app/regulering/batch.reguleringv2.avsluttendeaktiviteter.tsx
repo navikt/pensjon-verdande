@@ -2,7 +2,7 @@ import { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { ConfirmationModal } from '~/routes/batch.reguleringv2.administrerbehandlinger'
+import { ConfirmationModal } from '~/regulering/batch.reguleringv2.administrerbehandlinger'
 import { useSubmit } from 'react-router';
 import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'
