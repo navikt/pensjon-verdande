@@ -355,7 +355,6 @@ export default function BehandlingCard(props: Props) {
     <>
       <div className={'flex-grid'} style={{ paddingTop: '12px' }}>
         <div className={'col'}>
-
             <Card id={props.behandling.uuid}>
               <Card.Header>
                 <Card.Heading>
@@ -442,40 +441,41 @@ export default function BehandlingCard(props: Props) {
                     : (<></>)
                   }
                 </Card.Grid>
-                <Card.Grid>
-                  {fortsettBehandling(props.behandling.planlagtStartet)}
-
-                  {fortsettAvhengigeBehandlinger()}
-
-                  {debugButton()}
-
-                  {sendTilOppdragPaNyttButton()}
-
-                  {stoppButton()}
-
-                  {
-                    hasLink('sendTilManuellMedKontrollpunkt')
-                      ? <SendTilManuellMedKontrollpunktModal
-                          sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
-                          modalRef={sendTilManuellMedKontrollpunktModal}
-                          behandling={props.behandling}>
-                        </SendTilManuellMedKontrollpunktModal>
-                      : <></>
-                  }
-
-                  {runButton()}
-                </Card.Grid>
-                <Card.Grid>
-                  <a
-                    href={props.behandling.kibanaUrl}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    Kibana
-                  </a>
-                </Card.Grid>
               </Card.Body>
             </Card>
+
+            <HStack gap="space-16">
+              {fortsettBehandling(props.behandling.planlagtStartet)}
+
+              {fortsettAvhengigeBehandlinger()}
+
+              {debugButton()}
+
+              {sendTilOppdragPaNyttButton()}
+
+              {stoppButton()}
+
+              {
+                hasLink('sendTilManuellMedKontrollpunkt')
+                  ? <SendTilManuellMedKontrollpunktModal
+                      sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
+                      modalRef={sendTilManuellMedKontrollpunktModal}
+                      behandling={props.behandling}>
+                    </SendTilManuellMedKontrollpunktModal>
+                  : <></>
+              }
+
+              {runButton()}
+            </HStack>
+            <HStack gap="space-16">
+              <a
+                href={props.behandling.kibanaUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                Kibana
+              </a>
+            </HStack>
         </div>
         {props.detaljertFremdrift ? (
           <div className={'col'}>
