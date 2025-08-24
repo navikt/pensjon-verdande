@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router'
-import { MeResponse } from '~/types/brukere'
 import { useState } from 'react'
 import {
   CalendarIcon,
@@ -10,6 +9,7 @@ import {
   SackPensionIcon, WrenchIcon,
 } from '@navikt/aksel-icons'
 import { Link } from '@navikt/ds-react'
+import { MeResponse } from '~/brukere/brukere'
 
 export type Props = {
   me: MeResponse,

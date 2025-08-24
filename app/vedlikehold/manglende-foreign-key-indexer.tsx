@@ -2,9 +2,9 @@ import { LoaderFunctionArgs, SetURLSearchParams, useLoaderData, useSearchParams 
 
 import { BodyShort, Box, CopyButton, Heading, SortState, Table, VStack } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { ManglendeForeignKeyIndex } from '~/types/vedlikehold'
 import { requireAccessToken } from '~/services/auth.server'
 import { finnManglendeForeignKeyIndexer } from '~/vedlikehold/vedlikehold.server'
+import { ManglendeForeignKeyIndex } from '~/vedlikehold/vedlikehold.types'
 
 interface ScopedSortState extends SortState {
   orderBy: keyof ManglendeForeignKeyIndex;

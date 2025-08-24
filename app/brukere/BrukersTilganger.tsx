@@ -1,9 +1,9 @@
 import { uniqueFilter } from '~/common/utils'
 import Card from '~/components/card/Card'
 import { Checkbox, CheckboxGroup } from '@navikt/ds-react'
-import { BrukerResponse, decodeOmfang, Tilgangsmeta, tilgangsmetaSort } from '~/types/brukere'
 import { useFetcher } from 'react-router'
 import { useState } from 'react'
+import { BrukerResponse, decodeOmfang, Tilgangsmeta, tilgangsmetaSort } from '~/brukere/brukere'
 
 export interface Props {
   bruker: BrukerResponse,

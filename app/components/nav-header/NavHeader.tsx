@@ -1,16 +1,14 @@
-import { ActionMenu, Box, InternalHeader, Link, Spacer } from '@navikt/ds-react'
+import { ActionMenu, Box, InternalHeader, Spacer } from '@navikt/ds-react'
 import {
   BarChartIcon,
   BookIcon,
   ExternalLinkIcon,
   MenuGridIcon,
-  MenuHamburgerIcon, MoonIcon,
-  PersonIcon, SunIcon,
+  MenuHamburgerIcon,
 } from '@navikt/aksel-icons'
-import { Link as ReactRouterLink } from 'react-router'
-import { MeResponse } from '~/types/brukere'
 import { useEffect, useState } from 'react'
 import MeMenu from '~/components/nav-header/MeMenu'
+import { MeResponse } from '~/brukere/brukere'
 
 export type Props = {
   erProduksjon: boolean,

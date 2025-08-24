@@ -1,13 +1,17 @@
 import { env } from '~/services/env.server'
 import { LaasOppResultat, SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.types'
-import { ActionData, Infobanner, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
+import {
+  ActionData,
+  Infobanner,
+  ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse,
+  OppdaterInfoBannerResponse,
+} from '~/vedlikehold/vedlikehold.types'
 import {
   type LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary,
   VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'
 import { logger } from '~/services/logger.server'
-import { ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse } from '~/types/vedlikehold'
 import { data } from 'react-router'
 
 

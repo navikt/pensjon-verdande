@@ -5,7 +5,7 @@ import type { RefObject } from 'react'
 import { useState } from 'react'
 
 export interface Props {
-  modalRef: RefObject<HTMLDialogElement>
+  modalRef: RefObject<HTMLDialogElement | null>
   behandling: BehandlingDto
   sendTilManuellMedKontrollpunkt: (kontrollpunkt: string) => void
 }

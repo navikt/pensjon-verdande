@@ -6,8 +6,8 @@ import {
   InternalHeader, Link,
 } from '@navikt/ds-react'
 import { MoonIcon, PersonIcon, SunIcon } from '@navikt/aksel-icons'
-import { MeResponse } from '~/types/brukere'
 import { Link as ReactRouterLink } from 'react-router'
+import { MeResponse } from '~/brukere/brukere'
 
 export default function MeMenu({
                                  meResponse,

@@ -1,9 +1,9 @@
 import { Box, Heading, Tabs } from '@navikt/ds-react'
 import Card from '~/components/card/Card'
-import { BrukerResponse, Tilgangsmeta } from '~/types/brukere'
 import { ClockDashedIcon, KeyHorizontalIcon } from '@navikt/aksel-icons'
 import BrukersTilganger from '~/brukere/BrukersTilganger'
 import { BrukersTilgangsLogg } from '~/brukere/BrukersTilgangsLogg'
+import { BrukerResponse, Tilgangsmeta } from '~/brukere/brukere'
 
 export interface Props {
   tilgangskontrollmeta: Tilgangsmeta[],
