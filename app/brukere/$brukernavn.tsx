@@ -1,4 +1,3 @@
-import Bruker from '~/routes/brukere.$brukernavn/Bruker'
 import {
   fjernBrukertilgang,
   giBrukerTilgang,
@@ -8,6 +7,7 @@ import {
 import { requireAccessToken } from '~/services/auth.server'
 import { ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
+import Bruker from '~/brukere/Bruker'
 
 export async function action({ params,
                                request,

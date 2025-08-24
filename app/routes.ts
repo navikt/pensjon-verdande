@@ -111,10 +111,10 @@ export default [
   ]),
   route('bpen096/bpen096', 'uforetrygd/bpen096.bpen096.tsx'),
 
-  route('brukere', 'routes/brukere._index/route.tsx', [
+  route('brukere', 'brukere/index.tsx', [
     //index('routes/brukere._index/route.tsx'),
   ]),
-  route('brukere/:brukernavn', 'routes/brukere.$brukernavn/route.tsx'),
+  route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),
 
   route('dashboard', 'routes/dashboard/route.tsx'),
 
