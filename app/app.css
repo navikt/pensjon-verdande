@@ -41,6 +41,10 @@ i {
   color: #818181;
 }
 
+.nav-header-production {
+    background-color: rgb(195,33,33);
+}
+
 @keyframes progress {
   0% {
     background: #e3e3e3;

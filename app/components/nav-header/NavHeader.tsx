@@ -34,7 +34,7 @@ export default function NavHeader(props: Props) {
   }, [oppdaterVenstremeny])
 
   return (
-    <InternalHeader className={props.erProduksjon ? 'navds-tag--error-filled' : ''}>
+    <InternalHeader className={props.erProduksjon ? 'nav-header-production' : ''}>
       <Box.New style={{ display: 'flex', alignItems: 'center', paddingLeft: '0.5rem' }}>
         <label htmlFor={'menu-toggle'}>
           <MenuHamburgerIcon color={'white'} title='Vis/skjul sidemeny' fontSize='2rem' display={'flex'} />
@@ -60,7 +60,12 @@ export default function NavHeader(props: Props) {
         }
       </InternalHeader.Title>
       {props.erProduksjon ? (
-        <InternalHeader.Title as='h1'>
+        <InternalHeader.Title
+          style={{
+            textDecoration: 'none',
+            color: 'var(--ax-text-neutral)',
+          }}
+        >
           P R O D U K S J O N !
         </InternalHeader.Title>
       ) : (<></>)

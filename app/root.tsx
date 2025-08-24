@@ -58,11 +58,6 @@ export default function App() {
   const { env, me, schedulerStatus, darkmode } = useLoaderData<typeof loader>()
   const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
 
-  function setDarkmode(darkmode: boolean) {
-    setIsDarkmode(darkmode)
-    document.cookie = `darkmode=${encodeURIComponent(btoa(darkmode.toString()))}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
-  }
-
   let title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
 
   const schedulerAlert = schedulerStatus && !schedulerStatus.schedulerEnabled && !schedulerStatus.schedulerLocal && (
@@ -85,7 +80,7 @@ export default function App() {
       <Theme theme={isDarkmode ? 'dark' : 'light'}>
 
         {me &&
-          <NavHeader erProduksjon={env === 'p'} env={env} me={me} darkmode={isDarkmode} setDarkmode={setDarkmode} />}
+          <NavHeader erProduksjon={env === 'p'} env={env} me={me} darkmode={isDarkmode} setDarkmode={setIsDarkmode} />}
 
         <HStack gap="0" wrap={false}>
           {me && <VenstreMeny me={me} />}
