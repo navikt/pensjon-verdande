@@ -1,11 +1,41 @@
 import {
   AggregerteFeilmeldinger,
   AvviksGrense,
-  type EkskluderteSakerResponse, type ReguleringDetaljer,
+  type EkskluderteSakerResponse,
+  type ReguleringDetaljer,
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
 import { env } from '~/services/env.server'
 import { DetaljertFremdriftDTO } from '~/types'
+
+export async function avbrytBehandlinger(action: 'avbrytBehandlingerFeiletMotPOPP' | 'avbrytBehandlingerFeiletIBeregnYtelse' | null, accessToken: string) {
+  let urlPostfix: string
+
+  switch (action) {
+    case 'avbrytBehandlingerFeiletMotPOPP':
+      urlPostfix = '/avbryt/oppdaterpopp'
+      break
+    case 'avbrytBehandlingerFeiletIBeregnYtelse':
+      urlPostfix = '/avbryt/beregnytelser'
+      break
+    default:
+      urlPostfix = ''
+      break
+  }
+
+  return await fetch(
+    `${env.penUrl}/api/vedtak/regulering${urlPostfix}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({}),
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    })
+}
+
 
 export const fortsettFaktoromregningModus = async(
   accessToken: string,

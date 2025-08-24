@@ -1,44 +1,21 @@
-import { ActionFunctionArgs } from 'react-router';
+import { ActionFunctionArgs, useActionData, useSubmit } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import React, { useState } from 'react'
 import { ConfirmationModal } from '~/regulering/batch.reguleringv2.administrerbehandlinger'
-import { useSubmit } from 'react-router';
-import { env } from '~/services/env.server'
-import { useActionData } from 'react-router'
-import { serverOnly$ } from 'vite-env-only/macros'
+import { avbrytBehandlinger } from '~/regulering/regulering.server'
 
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async () => {
   return {}
 }
 
-export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   const data = await request.json() as FormType
 
 
-  let urlPostfix = ''
-  switch (data.action) {
-    case 'avbrytBehandlingerFeiletMotPOPP':
-      urlPostfix = '/avbryt/oppdaterpopp'
-      break
-    case 'avbrytBehandlingerFeiletIBeregnYtelse':
-      urlPostfix = '/avbryt/beregnytelser'
-      break
-  }
-
-  const res = await fetch(
-    `${env.penUrl}/api/vedtak/regulering${urlPostfix}`,
-    {
-    method: 'POST',
-    body: JSON.stringify({}),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
+  const res = await avbrytBehandlinger(data.action, accessToken)
 
 
   if(res.status !== 200) {
@@ -46,7 +23,7 @@ export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs
   }
 
   return {success: true, action: data.action}
-})
+}
 
 
 export default function Avsluttendeaktiviteter() {
