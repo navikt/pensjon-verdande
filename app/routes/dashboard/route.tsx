@@ -34,14 +34,6 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
   return {
     loadingDashboardResponse: dashboardResponse,
-    behandlinger: await getBehandlinger(accessToken, {
-      fom: forsteDato,
-      tom: sisteDato,
-      isBatch: true,
-      page: 0,
-      size: 1000,
-      sort: 'opprettet,desc',
-    }),
     kalenderHendelser: await hentKalenderHendelser({accessToken: accessToken}, {
       fom: forsteDato,
       tom: sisteDato,
@@ -51,7 +43,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function Dashboard() {
-  const { behandlinger, kalenderHendelser, loadingDashboardResponse, startDato } = useLoaderData<typeof loader>()
+  const { kalenderHendelser, loadingDashboardResponse, startDato } = useLoaderData<typeof loader>()
 
   return (
     <React.Suspense fallback={
@@ -123,7 +115,6 @@ export default function Dashboard() {
                   }}
                 >
                   <Kalender
-                    behandlinger={behandlinger.content}
                     kalenderHendelser={kalenderHendelser}
                     maksAntallPerDag={6}
                     startDato={startDato}
