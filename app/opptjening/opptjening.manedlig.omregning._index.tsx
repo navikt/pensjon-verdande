@@ -2,7 +2,7 @@ import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
 import EndretOpptjeningManedligUttrekk from '~/opptjening/opptjening.manedlig.uttrekk._index'
-import BatchOpprett_index from '~/routes/adhocbrev._index'
+import BatchOpprett_index from '~/adhocbrev/adhocbrev._index'
 
 export const loader = async () => {
   return {

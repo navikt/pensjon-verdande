@@ -1,16 +1,18 @@
 import { index, route, type RouteConfig } from '@react-router/dev/routes'
 
 export default [
-  route('adhocbrev', 'routes/adhocbrev._index.tsx', [
-    //index('routes/adhocbrev._index.tsx'),
+  index('index.tsx'),
+
+  route('adhocbrev', 'adhocbrev/adhocbrev._index.tsx', [
+    //index('adhocbrev/adhocbrev._index.tsx'),
   ]),
-  route('adhocbrev/adhocbrev', 'routes/adhocbrev.adhocbrev.tsx'),
+  route('adhocbrev/adhocbrev', 'adhocbrev/adhocbrev.adhocbrev.tsx'),
 
   route('afp-etteroppgjor', 'afp-etteroppgjor/route.tsx', [
     route('start', 'afp-etteroppgjor/start.tsx'),
   ]),
 
-  route('aktivitet/:behandlingId/:aktivitetId', 'routes/aktivitet.$behandlingId.$aktivitetId.tsx'),
+  route('aktivitet/:behandlingId/:aktivitetId', 'behandling/aktivitet.$behandlingId.$aktivitetId.tsx'),
 
   route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx', [
     //index('aldersovergang/aldersovergang._index.tsx'),
@@ -22,14 +24,14 @@ export default [
   route('auth/failed', 'auth/auth.failed.tsx'),
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
-  route('batch-opprett', 'routes/batch-opprett._index.tsx', [
-    //index('routes/batch-opprett._index.tsx'),
+  route('batch-opprett', 'batcher/batch-opprett._index.tsx', [
+    //index('batcher/batch-opprett._index.tsx'),
   ]),
 
-  route('batch/inntektskontroll', 'routes/batch.inntektskontroll._index.tsx', [
-    //index('routes/batch.inntektskontroll._index.tsx'),
+  route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx', [
+    //index('inntektskontroll/batch.inntektskontroll._index.tsx'),
   ]),
-  route('batch/inntektskontroll/opprett', 'routes/batch.inntektskontroll.opprett.tsx'),
+  route('batch/inntektskontroll/opprett', 'inntektskontroll/batch.inntektskontroll.opprett.tsx'),
 
   route('batch/regulering', 'regulering/batch.regulering.tsx'),
 
@@ -58,7 +60,7 @@ export default [
     ]),
   ]),
 
-  route('batcher', 'routes/batcher.tsx'), index('routes/_index.tsx'),
+  route('batcher', 'batcher/batcher.tsx'),
 
   route('behandling/:behandlingId', 'behandling/behandling.$behandlingId.tsx', [
     index('behandling/behandling.$behandlingId._index.tsx'),
@@ -85,34 +87,34 @@ export default [
     route('stopp', 'behandling/behandling.$behandlingId.stopp.tsx'),
   ]),
 
-  route('behandlinger', 'routes/behandlinger._index.tsx', [
-    //index('routes/behandlinger._index.tsx'),
+  route('behandlinger', 'behandlinger/behandlinger._index.tsx', [
+    //index('behandlinger/behandlinger._index.tsx'),
   ]),
-  route('behandlinger/:status', 'routes/behandlinger.$status.tsx', [
-    route('fortsett', 'routes/behandlinger.$status.fortsett.tsx'),
+  route('behandlinger/:status', 'behandlinger/behandlinger.$status.tsx', [
+    route('fortsett', 'behandlinger/behandlinger.$status.fortsett.tsx'),
   ]),
 
   route('bestem-etteroppgjor-resultat', 'uforetrygd/bestem-etteroppgjor-resultat._index.tsx'),
 
   route('bpen090', 'uforetrygd/bpen090._index.tsx', [
-    //index('routes/bpen090._index.tsx'),
+    //index('uforetrygd/bpen090._index.tsx'),
   ]),
 
   route('bpen090/bpen090', 'uforetrygd/bpen090.bpen090.tsx'),
 
   route('bpen091', 'uforetrygd/bpen091._index.tsx', [
-    //index('routes/bpen091._index.tsx'),
+    //index('uforetrygd/bpen091._index.tsx'),
   ]),
 
   route('bpen091/bpen091', 'uforetrygd/bpen091.bpen091.tsx'),
 
   route('bpen096', 'uforetrygd/bpen096._index.tsx', [
-    //index('routes/bpen096._index.tsx'),
+    //index('uforetrygd/bpen096._index.tsx'),
   ]),
   route('bpen096/bpen096', 'uforetrygd/bpen096.bpen096.tsx'),
 
   route('brukere', 'brukere/index.tsx', [
-    //index('routes/brukere._index/route.tsx'),
+    //index('brukere/brukere._index/route.tsx'),
   ]),
   route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),
 
@@ -142,8 +144,8 @@ export default [
 
   route('leveattester-sokos-spkmottak', 'vedlikehold/leveattester-sokos-spkmottak.tsx'),
 
-  route('lever-samboeropplysning', 'routes/lever-samboeropplysning._index.tsx', [
-    //index('routes/lever-samboeropplysning._index.tsx'),
+  route('lever-samboeropplysning', 'samboeropplysninger/lever-samboeropplysning._index.tsx', [
+    //index('samboeropplysninger/lever-samboeropplysning._index.tsx'),
   ]),
 
   route('linke-dnr-fnr', 'vedlikehold/linke-dnr-fnr.tsx'),
@@ -160,13 +162,13 @@ export default [
     //index('omregning/omregningStatistikk._index.tsx'),
   ]),
 
-  route('oppdatersakstatus', 'routes/oppdatersakstatus._index.tsx', [
-    //index('routes/oppdatersakstatus._index.tsx'),
+  route('oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus._index.tsx', [
+    //index('oppdatersakstatus/oppdatersakstatus._index.tsx'),
   ]),
-  route('oppdatersakstatus/oppdatersakstatus', 'routes/oppdatersakstatus.oppdatersakstatus.tsx'),
+  route('oppdatersakstatus/oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus.oppdatersakstatus.tsx'),
 
   route('opptjening/kategoriserBruker', 'opptjening/opptjening.kategoriserBruker._index.tsx', [
-    //index('routes/opptjening.kategoriserBruker._index.tsx'),
+    //index('opptjening/opptjening.kategoriserBruker._index.tsx'),
   ]),
   route('opptjening/arlig/omregning/uttrekk', 'opptjening/opptjening.arlig.omregning.uttrekk.tsx'),
   route('opptjening/manedlig/uttrekk', 'opptjening/opptjening.manedlig.uttrekk._index.tsx', [
@@ -179,5 +181,5 @@ export default [
   route('opptjening/manedlig/omregning/kategoriserBruker', 'opptjening/opptjening.manedlig.omregning.kategoriserBruker.tsx'),
   route('opptjening/manedlig/omregning/uttrekk', 'opptjening/opptjening.manedlig.omregning.uttrekk.tsx'),
 
-  route('sok', 'routes/sok.tsx'),
+  route('sok', 'sok/sok.tsx'),
 ] satisfies RouteConfig

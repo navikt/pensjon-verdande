@@ -5,7 +5,7 @@ import { getBehandlinger } from '~/services/behandling.server'
 import { requireAccessToken } from '~/services/auth.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   let { searchParams } = new URL(request.url);
 
   const accessToken = await requireAccessToken(request)
