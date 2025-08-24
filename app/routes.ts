@@ -140,13 +140,13 @@ export default [
     route('laasOpp', 'vedlikehold/laaste-vedtak.laasOpp.tsx'),
   ]),
 
-  route('leveattester-sokos-spkmottak', 'routes/leveattester-sokos-spkmottak.tsx'),
+  route('leveattester-sokos-spkmottak', 'vedlikehold/leveattester-sokos-spkmottak.tsx'),
 
   route('lever-samboeropplysning', 'routes/lever-samboeropplysning._index.tsx', [
     //index('routes/lever-samboeropplysning._index.tsx'),
   ]),
 
-  route('linke-dnr-fnr', 'routes/linke-dnr-fnr.tsx'),
+  route('linke-dnr-fnr', 'vedlikehold/linke-dnr-fnr.tsx'),
 
   route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
 
