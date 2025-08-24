@@ -6,8 +6,8 @@ export default [
   ]),
   route('adhocbrev/adhocbrev', 'routes/adhocbrev.adhocbrev.tsx'),
 
-  route('afp-etteroppgjor', 'routes/afp-etteroppgjor/route.tsx', [
-    route('start', 'routes/afp-etteroppgjor.start/route.tsx'),
+  route('afp-etteroppgjor', 'afp-etteroppgjor/route.tsx', [
+    route('start', 'afp-etteroppgjor/start.tsx'),
   ]),
 
   route('aktivitet/:behandlingId/:aktivitetId', 'routes/aktivitet.$behandlingId.$aktivitetId.tsx'),

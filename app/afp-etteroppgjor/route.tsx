@@ -1,10 +1,9 @@
-import { Button, Heading, HStack, Select, VStack } from '@navikt/ds-react'
+import { Button, Heading, Select, VStack } from '@navikt/ds-react'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import React, { useState } from 'react'
 import { ActionFunctionArgs, Form, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
-import Input from '~/routes/behandling.$behandlingId.input'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)
