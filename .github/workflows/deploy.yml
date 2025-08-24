@@ -123,7 +123,7 @@ jobs:
         with:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          team: pensjondeployer
+          team: teampensjon
 
       - name: 'Generate SBOM'
         uses: aquasecurity/trivy-action@0.32.0
