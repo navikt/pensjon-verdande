@@ -1,7 +1,7 @@
 import { ActionFunctionArgs, Await, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
-import { getBehandlinger, getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
-import { Box, HGrid, Skeleton, VStack } from '@navikt/ds-react'
+import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
+import { HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import {
   ClipboardFillIcon,
   CogFillIcon,

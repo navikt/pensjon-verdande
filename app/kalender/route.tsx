@@ -1,7 +1,6 @@
 import { ActionFunctionArgs, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentKalenderHendelser } from '~/services/behandling.server'
-import { Box } from '@navikt/ds-react'
 import React from 'react'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 

@@ -116,11 +116,11 @@ export default [
   ]),
   route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),
 
-  route('dashboard', 'routes/dashboard/route.tsx'),
+  route('dashboard', 'dashboard/route.tsx'),
 
   route('infobanner', 'vedlikehold/infobanner.tsx'),
 
-  route('kalender', 'routes/kalender/route.tsx'),
+  route('kalender', 'kalender/route.tsx'),
 
   route('laas-opp-sak', 'vedlikehold/laas-opp-sak.tsx', [
     route('settTilManuell', 'vedlikehold/laas-opp-sak.settTilManuell.tsx'),
