@@ -2,7 +2,6 @@ import type { ActionFunctionArgs } from 'react-router';
 
 
 import { requireAccessToken } from '~/services/auth.server'
-import { env } from '~/services/env.server'
 import { Link, useFetcher, useLoaderData, useSearchParams } from 'react-router';
 import {
   Alert,
@@ -47,11 +46,9 @@ import {
 } from '~/vedlikehold/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
 import { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
-import { logger } from '~/services/logger.server'
-import { serverOnly$ } from 'vite-env-only/macros'
+import { getLaasteVedtakSummary } from '~/vedlikehold/vedlikehold.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-
   const { searchParams } = new URL(request.url)
   const team = searchParams.get('team')
   const aksjonspunkt = searchParams.get('aksjonspunkt')
@@ -659,35 +656,3 @@ function AutoReloadUttrekkStatus({ behandlingId, uttrekkStatus, setUttrekkStatus
 
   return null
 }
-
-export const getLaasteVedtakSummary = serverOnly$(async(
-  accessToken: string,
-  team: string | null,
-  aksjonspunkt: string | null,
-): Promise<LaasteVedtakUttrekkSummary> => {
-
-  const url = new URL(`${env.penUrl}/api/laaste-vedtak`)
-  if (team !== null) {
-    url.searchParams.append('team', team)
-  }
-  if (aksjonspunkt !== null) {
-    url.searchParams.append('aksjonspunkt', aksjonspunkt)
-  }
-  const response = await fetch(
-    url.toString(),
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return (await response.json()) as LaasteVedtakUttrekkSummary
-  } else {
-    let body = await response.json()
-    logger.error(`Feil ved kall til pen ${response.status}`, body)
-    throw new Error()
-  }
-})

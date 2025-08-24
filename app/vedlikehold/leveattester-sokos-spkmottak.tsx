@@ -3,12 +3,11 @@ import React, { useState } from 'react'
 import { Form } from 'react-router';
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'
-import { serverOnly$ } from 'vite-env-only/macros'
+import { ActionData } from '~/vedlikehold/vedlikehold.types'
+import { hentMot } from '~/vedlikehold/vedlikehold.server'
 
 export default function SokosSPKMottakPage() {
-
   const [fomYear, setFomYear] = useState('')
   const [fomMonth, setFomMonth] = useState('')
 
@@ -45,46 +44,10 @@ export default function SokosSPKMottakPage() {
   )
 }
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
 
   const formData = await request.formData()
   const accessToken = await requireAccessToken(request)
 
   return await hentMot(accessToken, formData.get('fomYear')!,formData.get('fomMonth')!)
-}
-
-const hentMot = serverOnly$(async(
-  accessToken: string,
-  fomYear: FormDataEntryValue,
-  fomMonth: FormDataEntryValue,
-): Promise<ActionData> => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/utbetaling/spkmottak/antall?fomYear=${fomYear}&fomMonth=${fomMonth}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return {
-      antall: await response.text(),
-      error: null,
-    }
-  } else {
-    return {
-      antall: null,
-      error: await response.text(),
-    }
-  }
-})
-
-type ActionData = {
-  antall: string | null
-  error: string | null
 }

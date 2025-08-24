@@ -1,6 +1,5 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { env } from '~/services/env.server'
 import { Form, useFetcher, useLoaderData } from 'react-router';
 import {
   Alert,
@@ -21,14 +20,15 @@ import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import { ExternalLinkIcon, FloppydiskIcon } from '@navikt/aksel-icons'
-import { serverOnly$ } from 'vite-env-only/macros'
+import { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
+import { hentInfoBanner, oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 
-export const loader = async ({ params, request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   return await hentInfoBanner(accessToken)
 }
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   const infoBanner = (await request.json()) as Infobanner
   return await oppdaterInfoBanner(infoBanner, accessToken)
@@ -195,62 +195,6 @@ export default function InfoBannerPage() {
 
   }
 }
-
-const hentInfoBanner = serverOnly$(async (accessToken: string): Promise<Infobanner> => {
-  const response = await fetch(`${env.penUrl}/api/verdande/infobanner`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as Infobanner
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
-  }
-})
-
-const oppdaterInfoBanner = serverOnly$(async(
-  infoBanner: Infobanner,
-  accessToken: string,
-): Promise<OppdaterInfoBannerResponse> => {
-  const response = await fetch(`${env.penUrl}/api/verdande/infobanner`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      gyldigTil: infoBanner.validToDate,
-      beskrivelse: infoBanner.description,
-      variant: infoBanner.variant,
-      url: infoBanner.url,
-      urlTekst: infoBanner.urlText,
-    }),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(response.statusText)
-  }
-  return { erOppdatert: true }
-})
-
-type Infobanner = {
-  validToDate: string | null
-  variant: InfobannerVariant | null
-  description: string | null
-  url: string | null
-  urlText: string | null
-}
-
-type OppdaterInfoBannerResponse = {
-  erOppdatert: boolean
-}
-
-type InfobannerVariant = 'INFO' | 'WARNING' | 'ERROR'
 
 function toAkselVariant(
   variant: InfobannerVariant,

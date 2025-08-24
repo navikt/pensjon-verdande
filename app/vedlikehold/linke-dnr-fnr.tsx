@@ -3,9 +3,8 @@ import React, { useState } from 'react'
 import { Form } from 'react-router';
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
-import { env } from '~/services/env.server'
 import { useActionData } from 'react-router'
-import { serverOnly$ } from 'vite-env-only/macros'
+import { linkDnrFnr } from '~/vedlikehold/vedlikehold.server'
 
 export default function LinkeDnrFnrPage() {
 
@@ -46,48 +45,14 @@ export default function LinkeDnrFnrPage() {
 }
 
 
-export const action = serverOnly$(async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
 
   const formData = await request.formData()
   const accessToken = await requireAccessToken(request)
 
   return await linkDnrFnr(accessToken, formData.get('gammelIdent'), formData.get('nyIdent'))
-})
+}
 
-const linkDnrFnr = serverOnly$(async(
-  accessToken: string,
-  gammelIdent: FormDataEntryValue | null,
-  nyIdent: FormDataEntryValue | null,
-) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/saksbehandling/person/oppdaterFodselsnummer`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        gammelIdent: gammelIdent,
-        nyIdent: nyIdent,
-      }),
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return {
-      success: true,
-      error: null,
-    }
-  } else {
-    return {
-      success: false,
-      error: await response.text(),
-    }
-  }
-})
 
 type ActionData = {
   success: boolean
