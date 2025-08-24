@@ -1,8 +1,8 @@
 import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
-import BatchOpprett_index from '~/routes/opptjening.kategoriserBruker._index'
-import EndretOpptjeningManedligUttrekk from '~/routes/opptjening.manedlig.uttrekk._index'
 import { env } from '~/services/env.server'
+import EndretOpptjeningManedligUttrekk from '~/opptjening/opptjening.manedlig.uttrekk._index'
+import BatchOpprett_index from '~/routes/adhocbrev._index'
 
 export const loader = async () => {
   return {

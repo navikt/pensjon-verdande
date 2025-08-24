@@ -165,19 +165,19 @@ export default [
   ]),
   route('oppdatersakstatus/oppdatersakstatus', 'routes/oppdatersakstatus.oppdatersakstatus.tsx'),
 
-  route('opptjening/kategoriserBruker', 'routes/opptjening.kategoriserBruker._index.tsx', [
+  route('opptjening/kategoriserBruker', 'opptjening/opptjening.kategoriserBruker._index.tsx', [
     //index('routes/opptjening.kategoriserBruker._index.tsx'),
   ]),
-  route('opptjening/arlig/omregning/uttrekk', 'routes/opptjening.arlig.omregning.uttrekk.tsx'),
-  route('opptjening/manedlig/uttrekk', 'routes/opptjening.manedlig.uttrekk._index.tsx', [
-    //index('routes/opptjening.manedlig.uttrekk._index.tsx'),
+  route('opptjening/arlig/omregning/uttrekk', 'opptjening/opptjening.arlig.omregning.uttrekk.tsx'),
+  route('opptjening/manedlig/uttrekk', 'opptjening/opptjening.manedlig.uttrekk._index.tsx', [
+    //index('opptjening/opptjening.manedlig.uttrekk._index.tsx'),
   ]),
-  route('opptjening/arlig/omregning', 'routes/opptjening.arlig.omregning._index.tsx', [
-    //index('routes/opptjening.arlig.omregning._index.tsx'),
+  route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx', [
+    //index('opptjening/opptjening.arlig.omregning._index.tsx'),
   ]),
-  route('opptjening/manedlig/omregning', 'routes/opptjening.manedlig.omregning._index.tsx'),
-  route('opptjening/manedlig/omregning/kategoriserBruker', 'routes/opptjening.manedlig.omregning.kategoriserBruker.tsx'),
-  route('opptjening/manedlig/omregning/uttrekk', 'routes/opptjening.manedlig.omregning.uttrekk.tsx'),
+  route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),
+  route('opptjening/manedlig/omregning/kategoriserBruker', 'opptjening/opptjening.manedlig.omregning.kategoriserBruker.tsx'),
+  route('opptjening/manedlig/omregning/uttrekk', 'opptjening/opptjening.manedlig.omregning.uttrekk.tsx'),
 
   route('sok', 'routes/sok.tsx'),
 ] satisfies RouteConfig
