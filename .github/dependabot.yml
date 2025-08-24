@@ -4,6 +4,17 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      aksel:
+        applies-to: version-updates
+        patterns:
+          - "@navikt/aksel*"
+          - "@navikt/ds*"
+      react-router:
+        applies-to: version-updates
+        patterns:
+          - "@react-router*"
+          - "react-router*"
 
   - package-ecosystem: "docker"
     directory: "/"
