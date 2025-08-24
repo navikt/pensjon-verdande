@@ -18,9 +18,9 @@ export default [
 
   route('aldersovergang/opprett', 'routes/aldersovergang.opprett.tsx'),
 
-  route('auth/callback', 'routes/auth.callback.tsx'),
-  route('auth/failed', 'routes/auth.failed.tsx'),
-  route('auth/microsoft', 'routes/auth.microsoft.tsx'),
+  route('auth/callback', 'auth/auth.callback.tsx'),
+  route('auth/failed', 'auth/auth.failed.tsx'),
+  route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
   route('batch-opprett', 'routes/batch-opprett._index.tsx', [
     //index('routes/batch-opprett._index.tsx'),
