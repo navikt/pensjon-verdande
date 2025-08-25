@@ -65,26 +65,18 @@ export default [
   route('behandling/:behandlingId', 'behandling/behandling.$behandlingId.tsx', [
     index('behandling/behandling.$behandlingId._index.tsx'),
 
-    route('sendTilManuellMedKontrollpunkt', 'behandling/behandling.$behandlingId.sendTilManuellMedKontrollpunkt.tsx'),
-    route('fortsettAvhengigeBehandlinger', 'behandling/behandling.$behandlingId.fortsettAvhengigeBehandlinger.tsx'),
     route('behandlingManuellOpptelling', 'behandling/behandling.$behandlingId.behandlingManuellOpptelling.tsx'),
     route('ikkeFullforteAktiviteter', 'behandling/behandling.$behandlingId.ikkeFullforteAktiviteter.tsx'),
     route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [
       route('fortsett', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.fortsett.tsx'),
     ]),
     route('oppdaterAnsvarligTeam', 'behandling/behandling.$behandlingId.oppdaterAnsvarligTeam.tsx'),
-    route('sendTilOppdragPaNytt', 'behandling/behandling.$behandlingId.sendTilOppdragPaNytt.tsx'),
     route('oppdragskvittering', 'behandling/behandling.$behandlingId.oppdragskvittering.tsx'),
     route('manuelleOppgaver', 'behandling/behandling.$behandlingId.manuelleOppgaver.tsx'),
     route('oppdragsmelding', 'behandling/behandling.$behandlingId.oppdragsmelding.tsx'),
-    route('fjernFraDebug', 'behandling/behandling.$behandlingId.fjernFraDebug.tsx'),
-    route('runBehandling', 'behandling/behandling.$behandlingId.runBehandling.tsx'),
     route('aktiviteter', 'behandling/behandling.$behandlingId.aktiviteter.tsx'),
-    route('taTilDebug', 'behandling/behandling.$behandlingId.taTilDebug.tsx'),
-    route('fortsett', 'behandling/behandling.$behandlingId.fortsett.tsx'),
     route('output', 'behandling/behandling.$behandlingId.output.tsx'),
     route('input', 'behandling/behandling.$behandlingId.input.tsx'),
-    route('stopp', 'behandling/behandling.$behandlingId.stopp.tsx'),
   ]),
 
   route('behandlinger', 'behandlinger/behandlinger._index.tsx', [

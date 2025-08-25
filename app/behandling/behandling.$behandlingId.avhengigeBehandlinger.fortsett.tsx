@@ -11,7 +11,7 @@ export async function action({
   let behandlingIder = body.get('behandlingIder') as string
 
   await Promise.all(behandlingIder.split(',').map((behandlingId) => {
-    fortsettBehandling(accessToken, behandlingId)
+    fortsettBehandling(accessToken, behandlingId, false)
   }))
 
   return null
