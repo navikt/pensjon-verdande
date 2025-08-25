@@ -70,7 +70,6 @@ export default [
     route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [
       route('fortsett', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.fortsett.tsx'),
     ]),
-    route('oppdaterAnsvarligTeam', 'behandling/behandling.$behandlingId.oppdaterAnsvarligTeam.tsx'),
     route('oppdragskvittering', 'behandling/behandling.$behandlingId.oppdragskvittering.tsx'),
     route('manuelleOppgaver', 'behandling/behandling.$behandlingId.manuelleOppgaver.tsx'),
     route('oppdragsmelding', 'behandling/behandling.$behandlingId.oppdragsmelding.tsx'),

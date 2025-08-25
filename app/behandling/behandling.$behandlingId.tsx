@@ -6,7 +6,7 @@ import {
   fortsettAvhengigeBehandlinger,
   fortsettBehandling,
   getBehandling,
-  getDetaljertFremdrift,
+  getDetaljertFremdrift, patchBehandling,
   runBehandling,
   sendTilManuellMedKontrollpunkt,
   stopp,
@@ -18,20 +18,23 @@ import { requireAccessToken } from '~/services/auth.server'
 import BehandlingCard from '~/components/behandling/BehandlingCard'
 import type { BehandlingerPage, DetaljertFremdriftDTO } from '~/types'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
+import { oppdaterTeam } from '~/vedlikehold/vedlikehold.server'
 
-const OPERATIONS = [
-  "fjernFraDebug",
-  "fortsett",
-  "fortsettAvhengigeBehandlinger",
-  "runBehandling",
-  "sendTilManuellMedKontrollpunkt",
-  "sendTilOppdragPaNytt",
-  "stopp",
-  "taTilDebug",
-] as const
+export const OPERATION = {
+  fjernFraDebug: "fjernFraDebug",
+  fortsett: "fortsett",
+  fortsettAvhengigeBehandlinger: "fortsettAvhengigeBehandlinger",
+  oppdaterAnsvarligTeam: 'oppdaterAnsvarligTeam',
+  runBehandling: "runBehandling",
+  sendTilManuellMedKontrollpunkt: "sendTilManuellMedKontrollpunkt",
+  sendTilOppdragPaNytt: "sendTilOppdragPaNytt",
+  stopp: "stopp",
+  taTilDebug: "taTilDebug",
+} as const
 
-type Operation = (typeof OPERATIONS)[number]
-const OperationSet = new Set<string>(OPERATIONS)
+export type Operation = typeof OPERATION[keyof typeof OPERATION];
+export const OPERATIONS = Object.values(OPERATION) as Operation[];
+export const OperationSet = new Set<string>(OPERATIONS)
 
 function isOperation(x: unknown): x is Operation {
   return typeof x === "string" && OperationSet.has(x)
@@ -58,6 +61,15 @@ function operationHandlers(accessToken: string, behandlingId: string, form: Form
 
     fortsettAvhengigeBehandlinger: () =>
       fortsettAvhengigeBehandlinger(accessToken, behandlingId),
+
+    oppdaterAnsvarligTeam: () =>
+      patchBehandling(
+        accessToken,
+        behandlingId,
+        {
+          ansvarligTeam: requireField(form, 'ansvarligTeam'),
+        }
+      ),
 
     runBehandling: () =>
       runBehandling(accessToken, behandlingId),

@@ -21,6 +21,7 @@ import {
 import type { Team } from '~/common/decodeTeam';
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
+import { OPERATION } from '~/behandling/behandling.$behandlingId'
 
 export interface Props {
   behandling: BehandlingDto
@@ -51,9 +52,11 @@ export default function BehandlingCard(props: Props) {
 
   function oppdaterAnsvarligTeam(team: Team) {
       fetcher.submit(
-        { ansvarligTeam: team },
         {
-          action: 'oppdaterAnsvarligTeam',
+          ansvarligTeam: team,
+          operation: OPERATION.oppdaterAnsvarligTeam,
+        },
+        {
           method: 'POST',
         },
       )
@@ -62,7 +65,7 @@ export default function BehandlingCard(props: Props) {
   function stopp() {
     fetcher.submit(
       {
-        operation: 'stopp',
+        operation: OPERATION.stopp,
       },
       {
         method: 'POST',
@@ -76,7 +79,7 @@ export default function BehandlingCard(props: Props) {
     fetcher.submit(
       {
         kontrollpunkt: kontrollpunkt,
-        operation: 'sendTilManuellMedKontrollpunkt',
+        operation: OPERATION.sendTilManuellMedKontrollpunkt,
       },
       {
         method: 'POST',
@@ -89,7 +92,7 @@ export default function BehandlingCard(props: Props) {
   function sendTilOppdragPaNytt() {
     fetcher.submit(
       {
-        operation: 'sendTilOppdragPaNytt',
+        operation: OPERATION.sendTilOppdragPaNytt,
       },
       {
         method: 'POST',
@@ -108,7 +111,7 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content='Avslutt debugging slik at behandlingen forsetter automatisk'>
           <fetcher.Form method='post'>
-            <input hidden readOnly name={"operation"} value={'fjernFraDebug'}/>
+            <input hidden readOnly name="operation" value={OPERATION.fjernFraDebug}/>
             <Button variant={'secondary'} icon={<SandboxIcon aria-hidden />}>
               Fjern fra debug
             </Button>
@@ -119,7 +122,7 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content='Pause automatisk behandling slik at behandlingen kan kjøres i debugger lokalt'>
           <fetcher.Form method='post'>
-            <input hidden readOnly name={"operation"} value={'taTilDebug'}/>
+            <input hidden readOnly name="operation" value={OPERATION.taTilDebug}/>
             <Button variant={'secondary'} icon={<SandboxIcon aria-hidden />}>
               Ta til debug
             </Button>
@@ -200,7 +203,7 @@ export default function BehandlingCard(props: Props) {
                                     </Modal.Body>
                                     <Modal.Footer>
                                         <fetcher.Form method='post'>
-                                          <input hidden readOnly name={"operation"} value={'fortsett'}/>
+                                          <input hidden readOnly name="operation" value={OPERATION.fortsett}/>
 
                                           <input
                                                 type='hidden'
@@ -228,7 +231,7 @@ export default function BehandlingCard(props: Props) {
                         ) :
                         <Tooltip content='Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart'>
                             <fetcher.Form method='post'>
-                              <input hidden readOnly name={"operation"} value={'fortsett'}/>
+                              <input hidden readOnly name="operation" value={OPERATION.fortsett}/>
                                 <Button
                                     variant={'secondary'}
                                     icon={<PlayIcon aria-hidden/>}
@@ -252,7 +255,7 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content='Fjerner utsatt tidspunkt på de avhengige behandlingene slik at de kan kjøres umiddelbart'>
           <fetcher.Form method='post'>
-            <input hidden readOnly name={"operation"} value={'fortsettAvhengigeBehandlinger'}/>
+            <input hidden readOnly name="operation" value={OPERATION.fortsettAvhengigeBehandlinger}/>
             <Button
               variant={'secondary'}
               icon={<PlayIcon aria-hidden />}
@@ -273,7 +276,7 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content='Kjører behandlingen lokalt'>
           <fetcher.Form method='post'>
-            <input hidden readOnly name={"operation"} value={'runBehandling'}/>
+            <input hidden readOnly name="operation" value={OPERATION.runBehandling}/>
             <Button
               variant={'secondary'}
               icon={<CogFillIcon aria-hidden />}
