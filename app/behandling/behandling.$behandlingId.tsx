@@ -18,7 +18,6 @@ import { requireAccessToken } from '~/services/auth.server'
 import BehandlingCard from '~/components/behandling/BehandlingCard'
 import type { BehandlingerPage, DetaljertFremdriftDTO } from '~/types'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
-import { oppdaterTeam } from '~/vedlikehold/vedlikehold.server'
 
 export const OPERATION = {
   fjernFraDebug: "fjernFraDebug",
