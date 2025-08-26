@@ -73,8 +73,7 @@ export default function VenstreMeny(props: Props) {
     if (!me) {
       return false
     }
-    // TODO: Fjern harRolle-fallback når brukere har fått tilgangskontroll satt opp i Verdande
-    return harRolle('NDU') || harRolle('VERDANDE') || me.tilganger.find(it => it == operasjon)
+    return me.tilganger.find(it => it == operasjon)
   }
 
   function tilgangNavLink(operasjon: string, link: string, label: string) {
