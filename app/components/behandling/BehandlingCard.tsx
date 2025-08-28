@@ -6,7 +6,7 @@ import { BodyLong, Box, Button, CopyButton, HStack, Loader, Modal, Tabs, Tooltip
 import {
   BankNoteIcon,
   ClockDashedIcon,
-  CogFillIcon,
+  CogFillIcon, ExternalLinkIcon,
   PlayIcon,
   SandboxIcon,
   TasklistIcon,
@@ -24,6 +24,7 @@ import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTil
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
 
 export interface Props {
+  env: string,
   behandling: BehandlingDto
   detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null
 }
@@ -458,7 +459,29 @@ export default function BehandlingCard(props: Props) {
               </Card.Body>
             </Card>
 
-            <HStack gap="space-16">
+          <HStack gap="space-16">
+            <a
+              href={props.behandling.kibanaUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              Kibana
+            </a>
+            { props.env === "q2" && props.behandling.type === 'FleksibelApSakBehandling' &&
+            <div>
+              <a
+                href={`https://pensjon-alde-q2.intern.dev.nav.no/behandling/${props.behandling.behandlingId}`}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                Åpne i Alde
+              </a>
+              <ExternalLinkIcon />
+            </div>
+            }
+          </HStack>
+
+          <HStack gap="space-16">
               {fortsettBehandling(props.behandling.planlagtStartet)}
 
               {fortsettAvhengigeBehandlinger()}
@@ -480,15 +503,6 @@ export default function BehandlingCard(props: Props) {
               }
 
               {runButton()}
-            </HStack>
-            <HStack gap="space-16">
-              <a
-                href={props.behandling.kibanaUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                Kibana
-              </a>
             </HStack>
         </div>
         {props.detaljertFremdrift ? (

@@ -18,6 +18,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import BehandlingCard from '~/components/behandling/BehandlingCard'
 import type { BehandlingerPage, DetaljertFremdriftDTO } from '~/types'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
+import { env } from '~/services/env.server'
 
 export const OPERATION = {
   fjernFraDebug: "fjernFraDebug",
@@ -122,6 +123,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 
   return {
+      env: env.env,
       behandling,
       avhengigeBehandlinger: avhengigeBehandlinger,
       detaljertFremdrift: detaljertFremdrift,
@@ -129,10 +131,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 }
 
 export default function Behandling() {
-  const { behandling, detaljertFremdrift } = useLoaderData<typeof loader>()
+  const { env, behandling, detaljertFremdrift } = useLoaderData<typeof loader>()
 
   return (
     <BehandlingCard
+      env={env}
       behandling={behandling}
       detaljertFremdrift={detaljertFremdrift}
     />
