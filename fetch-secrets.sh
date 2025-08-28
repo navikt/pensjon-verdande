@@ -101,6 +101,8 @@ fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-verda
   echo ENABLE_OAUTH20_CODE_FLOW=true
   echo ENV=q2
   echo PEN_APPLICATION=pensjon-pen-q2
+  echo ALDE_LINK_ENABLED='true'
+  echo ALDE_BEHANDLING_URL_TEMPLATE='http://localhost:3001/behandling/{behandlingId}'
 } >> ${envfile}
 
 echo

@@ -31,6 +31,10 @@ spec:
   ingresses:
     - {{app.ingress}}
   env:
+    - name: ALDE_LINK_ENABLED
+      value: "{{ alde.link_enabled }}"
+    - name: ALDE_BEHANDLING_URL_TEMPLATE
+      value: "{{ alde.behandling_url_template }}"
     - name: ENV
       value: {{ app.env }}
     - name: PEN_APPLICATION

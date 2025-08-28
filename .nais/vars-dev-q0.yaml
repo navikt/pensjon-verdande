@@ -11,6 +11,10 @@ pen:
   scope: 'api://dev-fss.pensjon-q0.pensjon-pen-q0/.default'
   url: 'https://pensjon-pen-q0.dev-fss-pub.nais.io'
 
+alde:
+  link_enabled: false
+  behandling_url_template: 'https://https://pensjon-alde-q0.intern.dev.nav.no/behandling/{behandlingId}'
+
 azure:
   tenant: trygdeetaten.no
   grupper:

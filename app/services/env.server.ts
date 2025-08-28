@@ -10,4 +10,9 @@ export const env = ensureEnv({
   penApplication: 'PEN_APPLICATION',
   penScope: 'PEN_SCOPE',
   penUrl: 'PEN_URL',
+
+  aldeLinkEnabled: 'ALDE_LINK_ENABLED',
+  aldeBehandlingUrlTemplate: 'ALDE_BEHANDLING_URL_TEMPLATE',
 })
+
+export const isAldeLinkEnabled = env.aldeLinkEnabled === 'true'

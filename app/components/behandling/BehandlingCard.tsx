@@ -22,9 +22,10 @@ import type { Team } from '~/common/decodeTeam';
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
+import { buildUrl } from '~/common/build-url'
 
 export interface Props {
-  env: string,
+  aldeBehandlingUrlTemplate?: string,
   behandling: BehandlingDto
   detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null
 }
@@ -467,10 +468,10 @@ export default function BehandlingCard(props: Props) {
             >
               Kibana
             </a>
-            { props.env === "q2" && props.behandling.type === 'FleksibelApSakBehandling' &&
+            { props.aldeBehandlingUrlTemplate !== undefined &&
             <div>
               <a
-                href={`https://pensjon-alde-q2.intern.dev.nav.no/behandling/${props.behandling.behandlingId}`}
+                href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
                 target='_blank'
                 rel='noopener noreferrer'
               >
