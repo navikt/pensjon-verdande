@@ -13,7 +13,7 @@ pen:
 
 alde:
   link_enabled: false
-  behandling_url_template: 'https://https://pensjon-alde-q5.intern.dev.nav.no/behandling/{behandlingId}'
+  behandling_url_template: 'https://pensjon-alde-q5.intern.dev.nav.no/behandling/{behandlingId}'
 
 azure:
   tenant: trygdeetaten.no
