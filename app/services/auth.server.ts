@@ -20,7 +20,7 @@ function getUser(tokens: OAuth2Tokens, request: Request): Promise<User> {
 
 export let sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: '__session',
+    name: '__verdande_session',
     httpOnly: true,
     path: '/',
     sameSite: 'lax',
