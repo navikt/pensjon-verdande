@@ -1,9 +1,8 @@
-import { ActionMenu, Box, InternalHeader, Spacer } from '@navikt/ds-react'
+import { ActionMenu, Box, HStack, InternalHeader, Search, Spacer } from '@navikt/ds-react'
 import {
   BarChartIcon,
   BookIcon,
-  ExternalLinkIcon,
-  MenuGridIcon,
+  ExternalLinkIcon, MenuGridIcon,
   MenuHamburgerIcon,
 } from '@navikt/aksel-icons'
 import { useEffect, useState } from 'react'
@@ -30,6 +29,10 @@ export default function NavHeader(props: Props) {
     }
     updateVenstremenyWidth(oppdaterVenstremeny)
   }, [oppdaterVenstremeny])
+
+  function harTilgang(operasjon: string) {
+    return props.me.tilganger.find(it => it == operasjon)
+  }
 
   return (
     <InternalHeader className={props.erProduksjon ? 'nav-header-production' : ''}>
@@ -70,6 +73,24 @@ export default function NavHeader(props: Props) {
       }
 
       <Spacer />
+      {
+        harTilgang('SE_BEHANDLINGER') &&
+          <HStack
+            as="form"
+            paddingInline="space-20"
+            align="center"
+            method='get'
+            action={"/sok"}
+          >
+            <Search
+              label="InternalHeader søk"
+              size="small"
+              variant="simple"
+              name="query"
+              placeholder="Søk"
+            />
+          </HStack>
+      }
 
       <ActionMenu>
         <ActionMenu.Trigger>

@@ -1,14 +1,15 @@
-import type { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 import { Search, VStack } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
-import { useLoaderData } from 'react-router';
+import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { BehandlingerPage } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  let { searchParams } = new URL(request.url);
+  let { searchParams } = new URL(request.url)
 
-  let behandlinger = null
+  let behandlinger: BehandlingerPage | null
 
   let query = searchParams.get('query')
   if (query) {
@@ -33,8 +34,8 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 
   return {
-      behandlinger,
-    }
+    behandlinger,
+  }
 }
 
 export default function Sok() {
@@ -42,10 +43,6 @@ export default function Sok() {
 
   return (
     <VStack gap="4">
-      <form method='get'>
-        <Search label='sok' variant='primary' name='query'></Search>
-      </form>
-
       {
         behandlinger ?
           <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />

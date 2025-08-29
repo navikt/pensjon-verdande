@@ -138,19 +138,6 @@ export default function VenstreMeny(props: Props) {
           </li>
 
           {
-            harTilgang('SE_BEHANDLINGER') ?
-              (
-                <li>
-                  <Link as={NavLink} to={`/sok`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-                    <span className="meny-ikon"><MagnifyingGlassIcon title='Søk' fontSize='1.5rem' className={"meny-ikon"} /></span>
-                    <span className="meny-tekst">Søk</span>
-                  </Link>
-                </li>
-              ) : (
-                <></>
-              )
-          }
-          {
             harRolle('VERDANDE_ADMIN') ?
               (<li>
                 <Link as={NavLink} to={`/brukere`} style={{display: 'flex', justifyContent: 'flex-start'}}>
