@@ -87,7 +87,7 @@ export function BehandlingKjoringerTable(props: Props) {
                     <Table.ColumnHeader sortable sortKey="avsluttet">
                         Avsluttet
                     </Table.ColumnHeader>
-                    <Table.ColumnHeader>
+                    <Table.ColumnHeader align={'right'}>
                         Tidsbruk
                     </Table.ColumnHeader>
                     <Table.ColumnHeader sortable sortKey="correlationId">
@@ -142,7 +142,7 @@ export function BehandlingKjoringerTable(props: Props) {
                             <Table.DataCell>
                                 {formatIsoTimestamp(it.avsluttet)}
                             </Table.DataCell>
-                            <Table.DataCell>
+                            <Table.DataCell align={'right'}>
                                 {
                                     tidsbruk(it)
                                 }
