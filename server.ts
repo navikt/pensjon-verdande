@@ -1,55 +1,6 @@
 import { createRequestHandler } from "@react-router/express";
 import compression from "compression";
 import express from "express";
-import PinoHttp from 'pino-http'
-import pino from 'pino'
-
-let pinoHttp = PinoHttp({
-  logger: pino(),
-  autoLogging: {
-    ignore: (req) => {
-      return req.url.startsWith('/internal/');
-    }
-  },
-  customSuccessMessage: function (req, res) {
-    return `${req.method} ${req.url} ${res.statusCode}`
-  },
-  serializers: {
-    err: pino.stdSerializers.wrapErrorSerializer((res) => {
-      return {
-        statusCode: res.raw.statusCode,
-        // Allowlist useful headers
-        headers: {
-          'content-type': res.raw.headers['content-type'],
-          'content-length': res.raw.headers['content-length'],
-        }
-      };
-    }),
-    req: pino.stdSerializers.wrapRequestSerializer((req) => {
-      return {
-        id: req.raw.id,
-        method: req.raw.method,
-        path: req.raw.url.split('?')[0], // Remove query params which might be sensitive
-        // Allowlist useful headers
-        headers: {
-          host: req.raw.headers.host,
-          'user-agent': req.raw.headers['user-agent'],
-          referer: req.raw.headers.referer,
-        }
-      };
-    }),
-    res: pino.stdSerializers.wrapResponseSerializer((res) => {
-      return {
-        statusCode: res.raw.statusCode,
-        // Allowlist useful headers
-        headers: {
-          'content-type': res.raw.headers['content-type'],
-          'content-length': res.raw.headers['content-length'],
-        }
-      };
-    }),
-  },
-})
 
 const remixHandler = createRequestHandler({
   build: await import("./build/server/index.js"),
@@ -57,7 +8,6 @@ const remixHandler = createRequestHandler({
 
 const app = express();
 
-app.use(pinoHttp)
 app.use(compression());
 
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
