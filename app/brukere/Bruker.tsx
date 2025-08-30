@@ -1,5 +1,4 @@
-import { Box, Heading, Tabs } from '@navikt/ds-react'
-import Card from '~/components/card/Card'
+import { BodyShort, Box, Heading, Tabs } from '@navikt/ds-react'
 import { ClockDashedIcon, KeyHorizontalIcon } from '@navikt/aksel-icons'
 import BrukersTilganger from '~/brukere/BrukersTilganger'
 import { BrukersTilgangsLogg } from '~/brukere/BrukersTilgangsLogg'
@@ -15,49 +14,48 @@ export default function Bruker(props: Props) {
   return (
     <>
       <Heading level="1" size="xlarge">
-        {props.bruker.brukernavn} - {props.bruker.fornavn} {props.bruker.etternavn}
+        {props.bruker.fornavn} {props.bruker.etternavn}
+        <BodyShort size={'small'}>{props.bruker.brukernavn}</BodyShort>
       </Heading>
 
-      <div style={{ margin: '12px' }}></div>
-
       <Box.New
-        background={"sunken"}
+        background={'sunken'}
         style={{ padding: '6px' }}
         borderRadius="medium"
         shadow="dialog"
       >
-        <Card>
-          <Tabs defaultValue="tilganger">
-            <Tabs.List>
-              <Tabs.Tab
-                value="tilganger"
-                label="Tilganger"
-                icon={<KeyHorizontalIcon aria-hidden />}
-              />
-              <Tabs.Tab
-                value="historikk"
-                label="Historikk"
-                icon={<ClockDashedIcon aria-hidden />}
-              />
-            </Tabs.List>
-            <Tabs.Panel value="tilganger" style={{ paddingTop: '12px' }}>
+        <Tabs defaultValue="tilganger">
+          <Tabs.List>
+            <Tabs.Tab
+              value="tilganger"
+              label="Tilganger"
+              icon={<KeyHorizontalIcon aria-hidden />}
+            />
+            <Tabs.Tab
+              value="historikk"
+              label="Historikk"
+              icon={<ClockDashedIcon aria-hidden />}
+            />
+          </Tabs.List>
+          <Tabs.Panel value="tilganger" style={{ paddingTop: '12px' }}>
+            <Box.New background={'raised'} padding={'4'}>
               <BrukersTilganger
                 bruker={props.bruker}
                 readonly={props.readOnly}
                 tilgangskontrollmeta={props.tilgangskontrollmeta}
               ></BrukersTilganger>
-            </Tabs.Panel>
-            <Tabs.Panel value="historikk" style={{ paddingTop: '12px' }}>
+            </Box.New>
+          </Tabs.Panel>
+          <Tabs.Panel value="historikk" style={{ paddingTop: '12px' }}>
+            <Box.New background={'raised'} padding={'4'}>
               <BrukersTilgangsLogg
                 bruker={props.bruker}
                 tilgangskontrollmeta={props.tilgangskontrollmeta}
               ></BrukersTilgangsLogg>
-            </Tabs.Panel>
-          </Tabs>
-
-        </Card>
+            </Box.New>
+          </Tabs.Panel>
+        </Tabs>
       </Box.New>
     </>
-
   )
 }
