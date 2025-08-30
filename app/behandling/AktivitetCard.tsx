@@ -1,11 +1,12 @@
 import React from 'react'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
-import Card from '~/components/card/Card'
 import { Entry } from '~/components/entry/Entry'
 import { formatIsoTimestamp } from '~/common/date'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router'
-import { Box, CopyButton, HStack, Tabs, Tooltip } from '@navikt/ds-react'
+import { Box, CopyButton, Heading, HGrid, HStack, Tabs, Tooltip, VStack } from '@navikt/ds-react'
 import { EnvelopeClosedIcon, InboxDownIcon, InboxUpIcon } from '@navikt/aksel-icons'
+import { decodeBehandling } from '~/common/decodeBehandling'
+import { decodeAktivitetStatus } from '~/common/decode'
 
 export type Props = {
   behandling: BehandlingDto
@@ -14,33 +15,33 @@ export type Props = {
 
 export default function AktivitetCard(props: Props) {
   const getCurrentChild = () => {
-    const location = useLocation();
-    let childPath = location.pathname.split('/').slice(-1)[0]
-    if (childPath === "" || !isNaN(+childPath)) {
-      return "input"
+    const location = useLocation()
+
+    let strings = location.pathname.split('/').slice(-2)
+    let childPath = strings[0]
+    if (childPath === '' || !isNaN(+childPath)) {
+      return ''
     } else {
-      return childPath
+      return strings.join("/")
     }
   }
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <>
-    <Box.New
-      background={'default'}
-      style={{ padding: '6px' }}
-      borderRadius="medium"
-      shadow="dialog"
-    >
-      <Card id={props.aktivitet.uuid}>
-        <Card.Header>
-          <Card.Heading>
-            {props.behandling.type} - {props.aktivitet.type}
-          </Card.Heading>
-        </Card.Header>
-        <Card.Body>
-          <Card.Grid>
+      <Heading size={'large'}>
+        {`${decodeBehandling(props.behandling.type)} - ${props.aktivitet.type}`}
+      </Heading>
+      <VStack gap={'4'}>
+        <Box.New
+          background={'raised'}
+          borderRadius={'xlarge'}
+          borderWidth={'1'}
+          borderColor={'neutral-subtleA'}
+          padding={'4'}
+        >
+          <HGrid columns={{ md: 2, lg: 3, xl: 4 }} gap="space-24">
             <Entry labelText={'BehandlingId'}>
               <HStack align="start">
                 <Link to={`/behandling/${props.behandling.behandlingId}`}>
@@ -65,7 +66,7 @@ export default function AktivitetCard(props: Props) {
                 </Tooltip>
               </HStack>
             </Entry>
-            <Entry labelText={'Status'}>{props.aktivitet.status}</Entry>
+            <Entry labelText={'Status'}>{decodeAktivitetStatus(props.aktivitet.status)}</Entry>
             <Entry labelText={'Funksjonell identifikator'}>
               {props.aktivitet.funksjonellIdentifikator}
             </Entry>
@@ -86,42 +87,41 @@ export default function AktivitetCard(props: Props) {
             <Entry labelText={'Vent på foregående aktiviteter'}>
               {props.aktivitet.ventPaForegaendeAktiviteter ? 'ja' : 'nei'}
             </Entry>
-          </Card.Grid>
-        </Card.Body>
-      </Card>
-    </Box.New>
-      <Box.New
-        background={"sunken"}
-        style={{ padding: '6px', marginTop: '12px' }}
-        borderRadius='medium'
-        shadow="dialog"
-      >
-        <Tabs
-          value=''
-          onChange={(value) => {
-            navigate(`./${value}`)
-          }}
+          </HGrid>
+        </Box.New>
+        <Box.New
+          background={'sunken'}
+          style={{ padding: '6px', marginTop: '12px' }}
+          borderRadius="medium"
+          shadow="dialog"
         >
-          <Tabs.List>
-            <Tabs.Tab
-              value='felt/input'
-              label='Input'
-              icon={<InboxDownIcon />}
-            />
-            <Tabs.Tab
-              value='felt/output'
-              label='Output'
-              icon={<InboxUpIcon />}
-            />
-            <Tabs.Tab
-              value='felt/message'
-              label='Message'
-              icon={<EnvelopeClosedIcon />}
-            />
-          </Tabs.List>
-          <Outlet/>
-        </Tabs>
-      </Box.New>
-      </>
+          <Tabs
+            value={getCurrentChild()}
+            onChange={(value) => {
+              navigate(`./${value}`)
+            }}
+          >
+            <Tabs.List>
+              <Tabs.Tab
+                value="felt/input"
+                label="Input"
+                icon={<InboxDownIcon />}
+              />
+              <Tabs.Tab
+                value="felt/output"
+                label="Output"
+                icon={<InboxUpIcon />}
+              />
+              <Tabs.Tab
+                value="felt/message"
+                label="Message"
+                icon={<EnvelopeClosedIcon />}
+              />
+            </Tabs.List>
+            <Outlet />
+          </Tabs>
+        </Box.New>
+      </VStack>
+    </>
   )
 }

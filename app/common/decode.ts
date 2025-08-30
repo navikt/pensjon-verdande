@@ -1,4 +1,4 @@
-const STATUS_MAP = {
+const BEHANDLING_STATUS_MAP = {
   DEBUG: "Debug",
   FEILENDE: "Feilende",
   FULLFORT: "Fullført",
@@ -7,8 +7,16 @@ const STATUS_MAP = {
   UNDER_BEHANDLING: "Under behandling",
 } as const;
 
+const AKTIVITET_STATUS_MAP = {
+  OPPRETTET: "Opprettet",
+  FEILET: "Feilet",
+  FULLFORT: "Fullfort",
+  UNDER_BEHANDLING: "Under behandling",
+}
+
 function makeDecoder<M extends Record<string, string>>(map: M) {
   return (key: string) => map[key as keyof M] ?? key;
 }
 
-export const decodeStatus = makeDecoder(STATUS_MAP);
+export const decodeBehandlingStatus = makeDecoder(BEHANDLING_STATUS_MAP);
+export const decodeAktivitetStatus = makeDecoder(AKTIVITET_STATUS_MAP);

@@ -33,7 +33,7 @@ import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
 import { buildUrl } from '~/common/build-url'
-import { decodeStatus } from '~/common/decode'
+import { decodeBehandlingStatus } from '~/common/decode'
 
 export interface Props {
   aldeBehandlingUrlTemplate?: string,
@@ -405,7 +405,7 @@ export default function BehandlingCard(props: Props) {
                   ) : (
                     <></>
                   )}
-                  <Entry labelText={'Status'}>{decodeStatus(props.behandling.status)}</Entry>
+                  <Entry labelText={'Status'}>{decodeBehandlingStatus(props.behandling.status)}</Entry>
               <Await resolve={props.detaljertFremdrift}>
                 {detaljertFremdrift =>
                   detaljertFremdrift ? (
