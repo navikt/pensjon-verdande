@@ -9,26 +9,22 @@ import { requireAccessToken } from '~/services/auth.server'
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
-  const output = await getBehandlingInput(
+  const input = await getBehandlingInput(
     await requireAccessToken(request),
     params.behandlingId,
   )
 
-  if (!output) {
-    throw new Response('Not Found', { status: 404 })
-  } else {
-    return {
-      output,
-    }
+  return {
+    input: input,
   }
 }
 
 export default function Input() {
-  const { output } = useLoaderData<typeof loader>()
-  console.log(output)
+  const { input } = useLoaderData<typeof loader>()
+
   return (
     <pre>
-      {JSON.stringify(JSON.parse(output), null, 2)}
+      {JSON.stringify(input, null, 2)}
     </pre>
   )
 }

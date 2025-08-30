@@ -547,7 +547,7 @@ export async function getBehandlingInput(
   accessToken: string,
   behandlingId: string,
 ) {
-  return await apiGet<string>(`${env.penUrl}/api/behandling/uttrekk/${behandlingId}/input`, { accessToken: accessToken })
+  return await apiGet<string>(`/api/behandling/uttrekk/${behandlingId}/input`, { accessToken: accessToken })
 }
 
 export async function henBehandlingManuell(
