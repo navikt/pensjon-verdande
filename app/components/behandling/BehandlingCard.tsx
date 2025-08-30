@@ -1,8 +1,18 @@
 import React, { Suspense, useRef } from 'react'
 import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
-import Card from '~/components/card/Card'
 import { Entry } from '~/components/entry/Entry'
-import { BodyLong, Box, Button, CopyButton, HStack, Loader, Modal, Tabs, Tooltip } from '@navikt/ds-react'
+import {
+  BodyLong, Box,
+  Button,
+  CopyButton, Heading,
+  HGrid,
+  HStack,
+  Loader,
+  Modal,
+  Page, ProgressBar,
+  Tabs, Tooltip,
+  VStack,
+} from '@navikt/ds-react'
 import {
   BankNoteIcon,
   ClockDashedIcon,
@@ -23,6 +33,7 @@ import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
 import { buildUrl } from '~/common/build-url'
+import { decodeStatus } from '~/common/decode'
 
 export interface Props {
   aldeBehandlingUrlTemplate?: string,
@@ -369,16 +380,19 @@ export default function BehandlingCard(props: Props) {
 
   return (
     <>
-      <div className={'flex-grid'} style={{ paddingTop: '12px' }}>
-        <div className={'col'}>
-            <Card id={props.behandling.uuid}>
-              <Card.Header>
-                <Card.Heading>
-                  {decodeBehandling(props.behandling.type)}
-                </Card.Heading>
-              </Card.Header>
-              <Card.Body>
-                <Card.Grid>
+    <Heading size={"large"}>
+      {decodeBehandling(props.behandling.type)}
+    </Heading>
+      <HGrid gap={"space-24"} columns={{ xl: 1, "2xl": props.detaljertFremdrift ? 2 : 1 }}>
+        <VStack gap={"4"}>
+          <Box.New
+            background={"raised"}
+            borderRadius={"xlarge"}
+            borderWidth={"1"}
+            borderColor={"neutral-subtleA"}
+            padding={"4"}
+          >
+            <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
                   {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
                   {props.behandling.forrigeBehandlingId ? (
                     <Entry labelText={'Opprettet av behandling'}>
@@ -391,8 +405,28 @@ export default function BehandlingCard(props: Props) {
                   ) : (
                     <></>
                   )}
-                  <Entry labelText={'Status'}>{props.behandling.status}</Entry>
-                  <Entry labelText={'Ansvarlig team'}>
+                  <Entry labelText={'Status'}>{decodeStatus(props.behandling.status)}</Entry>
+              <Await resolve={props.detaljertFremdrift}>
+                {detaljertFremdrift =>
+                  detaljertFremdrift ? (
+                      <Entry labelText={'Fremdrift'}>
+                        <Tooltip content={beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt) + " % ferdig"}>
+                        <ProgressBar
+                          value={+beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}
+                          valueMax={100}
+                          size={'large'}
+                          aria-labelledby="progress-bar-fremdrift"
+                        >
+                        </ProgressBar>
+                        </Tooltip>
+                      </Entry>
+                  ) : (
+                    <></>
+                  )
+                }
+              </Await>
+
+              <Entry labelText={'Ansvarlig team'}>
                     <AnsvarligTeamSelector
                       ansvarligTeam={props.behandling.ansvarligTeam}
                       onAnsvarligTeamChange={oppdaterAnsvarligTeam}
@@ -412,8 +446,7 @@ export default function BehandlingCard(props: Props) {
                   <Entry labelText={'Prioritet'}>
                     {props.behandling.prioritet}
                   </Entry>
-                </Card.Grid>
-                <Card.Grid>
+
                   <Entry labelText={'Opprettet'}>
                     {formatIsoTimestamp(props.behandling.opprettet)}
                   </Entry>
@@ -442,8 +475,7 @@ export default function BehandlingCard(props: Props) {
                 </Entry>
                     )
                 }
-                </Card.Grid>
-                <Card.Grid>
+
                   {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
                   {copyPasteEntry('SakId', props.behandling.sakId)}
                   {copyPasteEntry('KravId', props.behandling.kravId)}
@@ -456,9 +488,8 @@ export default function BehandlingCard(props: Props) {
                     })
                     : (<></>)
                   }
-                </Card.Grid>
-              </Card.Body>
-            </Card>
+            </HGrid>
+          </Box.New>
 
           <HStack gap="space-16">
             <a
@@ -505,33 +536,17 @@ export default function BehandlingCard(props: Props) {
 
               {runButton()}
             </HStack>
-        </div>
+        </VStack>
+        <HStack gap="space-16">
         {props.detaljertFremdrift ? (
-          <div className={'col'}>
+          <Page.Block>
             <Box.New
-              background={"sunken"}
-              style={{ padding: '6px' }}
-              borderRadius='medium'
-              shadow="dialog"
+              background={"raised"}
+              borderRadius={"xlarge"}
+              borderWidth={"1"}
+              borderColor={"neutral-subtleA"}
+              padding={"4"}
             >
-              <Card.Header>
-                <Card.Heading>
-                  Fremdrift behandlinger
-                  <Suspense fallback={<Loader size="small" title="Venter..." />}>
-                    <Await resolve={props.detaljertFremdrift}>
-                      {detaljertFremdrift =>
-                        detaljertFremdrift ? (
-                          ' ' + (beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)) + '%'
-                        ) : (
-                          <></>
-                        )
-                      }
-                    </Await>
-                  </Suspense>
-                </Card.Heading>
-              </Card.Header>
-              <Card>
-                <Card.Grid>
                   <Suspense fallback={<Loader size='3xlarge' title='Venter...' />}>
                     <Await resolve={props.detaljertFremdrift}>
                       {detaljertFremdrift =>
@@ -543,20 +558,21 @@ export default function BehandlingCard(props: Props) {
                       }
                     </Await>
                   </Suspense>
-                </Card.Grid>
-              </Card>
             </Box.New>
-          </div>
+          </Page.Block>
         ) : (
           <></>
         )}
-      </div>
+        </HStack>
+      </HGrid>
 
       <Box.New
-        background={"sunken"}
+        background={"raised"}
         style={{ padding: '6px', marginTop: '12px' }}
-        borderRadius='medium'
-        shadow="dialog"
+        borderColor={"neutral-subtle"}
+        borderWidth={"1"}
+        borderRadius={"medium"}
+        shadow={"dialog"}
       >
         <Tabs
           value={getCurrentChild()}
