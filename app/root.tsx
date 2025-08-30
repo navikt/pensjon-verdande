@@ -1,4 +1,4 @@
-import { createCookie, isRouteErrorResponse, LinksFunction } from 'react-router'
+import { isRouteErrorResponse, LinksFunction } from 'react-router'
 
 import {
   Links,
@@ -7,24 +7,17 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useNavigation,
-} from 'react-router';
+} from 'react-router'
 import navStyles from '@navikt/ds-css/dist/index.css?url'
 
 import appStylesHref from './app.css?url'
 
-import { Alert, HStack, Page, Theme, VStack } from '@navikt/ds-react'
-import { LoaderFunctionArgs } from 'react-router';
 import { env } from '~/services/env.server'
-import { tryAccessToken } from '~/services/auth.server'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
-import NavHeader from '~/components/nav-header/NavHeader'
-import { getSchedulerStatus } from '~/services/behandling.server'
-import React, { useState } from 'react'
+import React from 'react'
 import { Route } from '../.react-router/types/app/+types/root'
 import '@navikt/ds-css/darkside'
-import VenstreMeny from './components/venstre-meny/VenstreMeny';
-import { hentMe } from '~/brukere/brukere.server'
+import { VStack } from '@navikt/ds-react'
 
 export const links: LinksFunction = () => {
   return [
@@ -35,64 +28,30 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const accessToken = await tryAccessToken(request)
-  const darkmodeCookie = await createCookie("darkmode").parse(request.headers.get("cookie"))
-  const darkmode = darkmodeCookie === "true" || darkmodeCookie === true
-
-  const [me, schedulerStatus] = accessToken
-    ? await Promise.all([hentMe(accessToken), getSchedulerStatus(accessToken)])
-    : [undefined, undefined]
-
+export const loader = async () => {
   return {
     env: env.env,
-    me: me,
-    schedulerStatus: schedulerStatus,
-    darkmode: darkmode
   }
 }
 
 export default function App() {
-  const navigation = useNavigation()
-
-  const { env, me, schedulerStatus, darkmode } = useLoaderData<typeof loader>()
-  const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
+  const { env } = useLoaderData<typeof loader>()
 
   let title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
 
-  const schedulerAlert = schedulerStatus && !schedulerStatus.schedulerEnabled && !schedulerStatus.schedulerLocal && (
-    <Alert variant="error" style={{ marginBottom: '1rem' }}>
-      Behandlingsløsningen er avslått i dette miljøet. Behandlinger vil ikke bli prosessert.
-    </Alert>
-  )
-
   return (
-    <html lang='en'>
+    <html lang="en">
     <head>
       <title>{title}</title>
-      <meta charSet='utf-8' />
-      <meta name='viewport' content='width=device-width, initial-scale=1' />
+      <meta charSet="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
       <Meta />
       <Links />
     </head>
     <body>
-    <VStack gap="0" style={{ width: '100%' }}>
-      <Theme theme={isDarkmode ? 'dark' : 'light'}>
-
-        {me &&
-          <NavHeader erProduksjon={env === 'p'} env={env} me={me} darkmode={isDarkmode} setDarkmode={setIsDarkmode} />}
-
-        <HStack gap="0" wrap={false}>
-          {me && <VenstreMeny me={me} />}
-
-          <div className={navigation.state === 'loading' ? 'loading' : ''} id="detail">
-            {schedulerAlert}
-            <Outlet />
-          </div>
-        </HStack>
-      </Theme>
-    </VStack>
-
+    <div style={{ width: '100%' }}>
+      <Outlet />
+    </div>
     <ScrollRestoration />
     <Scripts />
     </body>
