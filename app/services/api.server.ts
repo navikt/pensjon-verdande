@@ -1,5 +1,6 @@
 import { data } from 'react-router'
 import { env } from './env.server'
+import { requireAccessToken } from '~/services/auth.server'
 
 export type RequestCtx = {
     accessToken: string
@@ -18,7 +19,16 @@ export function withTimeout(ms: number) {
     return { signal: ac.signal, cancel: () => clearTimeout(t) }
 }
 
-export async function apiGet<T>(path: string, ctx: RequestCtx): Promise<T> {
+export async function apiGet<T>(path: string, requestCtx: RequestCtx | Request): Promise<T> {
+  let ctx: RequestCtx
+  if ("accessToken" in requestCtx ) {
+    ctx = requestCtx
+  } else {
+    ctx = {
+      accessToken: await requireAccessToken(requestCtx)
+    }
+  }
+
     const url = `${env.penUrl}${path}`
     const { signal, cancel } = withTimeout(15_000)
     try {
@@ -30,6 +40,31 @@ export async function apiGet<T>(path: string, ctx: RequestCtx): Promise<T> {
     } finally {
         cancel()
     }
+}
+
+export async function apiGetOrUndefined<T>(path: string, requestCtx: RequestCtx | Request): Promise<T | undefined> {
+  let ctx: RequestCtx
+  if ("accessToken" in requestCtx ) {
+    ctx = requestCtx
+  } else {
+    ctx = {
+      accessToken: await requireAccessToken(requestCtx)
+    }
+  }
+
+  const url = `${env.penUrl}${path}`
+  const { signal, cancel } = withTimeout(15_000)
+  try {
+    const res = await fetch(url, { headers: buildHeaders(ctx), signal })
+    if (res.status === 404) {
+      return undefined
+    } else if (!res.ok) {
+      await normalizeAndThrow(res, `Feil ved GET ${path}`)
+    }
+    return (await res.json()) as T
+  } finally {
+    cancel()
+  }
 }
 
 export type NormalizedError = {

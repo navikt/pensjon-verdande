@@ -56,7 +56,7 @@ export default function ManuelleBehandlinger() {
               key={it.id}
             >
               <Table.DataCell>
-                <Link to={`/aktivitet/${behandling.behandlingId}/${it.aktivitetId}`}>
+                <Link to={`/behandling/${behandling.behandlingId}/aktivitet/${it.aktivitetId}`}>
                   {behandling.aktiviteter.find((a) => a.aktivitetId == it.aktivitetId)?.type || 'Ukjent aktivitet'}
                 </Link>
               </Table.DataCell>

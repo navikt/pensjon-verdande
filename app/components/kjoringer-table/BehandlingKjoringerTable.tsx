@@ -121,7 +121,7 @@ export function BehandlingKjoringerTable(props: Props) {
                             }
                             <Table.DataCell>
                                 <Link
-                                    to={`/aktivitet/${it.behandlingId}/${it.aktivitetId}`}
+                                    to={`/behandling/${it.behandlingId}/aktivitet/${it.aktivitetId}`}
                                 >
                                     {finnAktivitet(it.aktivitetId)?.type}
                                 </Link>
@@ -129,7 +129,7 @@ export function BehandlingKjoringerTable(props: Props) {
                             {props.visAktivitetId ?
                                 <Table.DataCell>
                                     <Link
-                                        to={`/aktivitet/${it.behandlingId}/${it.aktivitetId}`}
+                                        to={`/behandling/${it.behandlingId}/aktivitet/${it.aktivitetId}`}
                                     >
                                         {it.aktivitetId}
                                     </Link>

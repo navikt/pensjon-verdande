@@ -69,7 +69,7 @@ export default function BehandlingAktivitetTable(props: Props) {
             <Table.Row key={aktivitet.uuid}>
               <Table.DataCell>
                 <Link
-                  to={`/aktivitet/${props.behandling.behandlingId}/${aktivitet.aktivitetId}`}
+                  to={`/behandling/${props.behandling.behandlingId}/aktivitet/${aktivitet.aktivitetId}`}
                 >
                   {aktivitet.aktivitetId}
                 </Link>

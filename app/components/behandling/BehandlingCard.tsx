@@ -6,7 +6,7 @@ import { BodyLong, Box, Button, CopyButton, HStack, Loader, Modal, Tabs, Tooltip
 import {
   BankNoteIcon,
   ClockDashedIcon,
-  CogFillIcon, ExternalLinkIcon,
+  CogFillIcon, CogIcon, ExternalLinkIcon, InboxDownIcon, PersonIcon,
   PlayIcon,
   SandboxIcon,
   TasklistIcon,
@@ -561,10 +561,11 @@ export default function BehandlingCard(props: Props) {
         <Tabs
           value={getCurrentChild()}
           onChange={(value) => {
+            const prefix = `/behandling/${props.behandling.behandlingId}`
             if (value === 'kjoringer') {
-              navigate(`./`)
+              navigate(prefix)
             } else {
-              navigate(`./${value}`)
+              navigate(`${prefix}/${encodeURIComponent(value)}`)
             }
           }}
         >
@@ -572,7 +573,7 @@ export default function BehandlingCard(props: Props) {
             <Tabs.Tab
               value='kjoringer'
               label='Kjøringer'
-              icon={<TasklistIcon />}
+              icon={<CogIcon />}
             />
             <Tabs.Tab
               value='aktiviteter'
@@ -597,7 +598,7 @@ export default function BehandlingCard(props: Props) {
               <Tabs.Tab
                 value='input'
                 label='Input'
-                icon={<TasklistIcon />}
+                icon={<InboxDownIcon />}
               />
             ) : (
               <></>
@@ -632,7 +633,7 @@ export default function BehandlingCard(props: Props) {
             <Tabs.Tab
               value='manuelleOppgaver'
               label='Manuelle oppgaver'
-              icon={<TasklistIcon />}
+              icon={<PersonIcon />}
             />
             <Tabs.Tab
               value='behandlingManuellOpptelling'

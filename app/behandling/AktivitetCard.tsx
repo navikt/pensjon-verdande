@@ -3,8 +3,9 @@ import type { AktivitetDTO, BehandlingDto } from '~/types'
 import Card from '~/components/card/Card'
 import { Entry } from '~/components/entry/Entry'
 import { formatIsoTimestamp } from '~/common/date'
-import { Link } from 'react-router';
-import { Box, CopyButton, HStack, Tooltip } from '@navikt/ds-react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router'
+import { Box, CopyButton, HStack, Tabs, Tooltip } from '@navikt/ds-react'
+import { EnvelopeClosedIcon, InboxDownIcon, InboxUpIcon } from '@navikt/aksel-icons'
 
 export type Props = {
   behandling: BehandlingDto
@@ -12,12 +13,25 @@ export type Props = {
 }
 
 export default function AktivitetCard(props: Props) {
+  const getCurrentChild = () => {
+    const location = useLocation();
+    let childPath = location.pathname.split('/').slice(-1)[0]
+    if (childPath === "" || !isNaN(+childPath)) {
+      return "input"
+    } else {
+      return childPath
+    }
+  }
+
+  const navigate = useNavigate();
+
   return (
+    <>
     <Box.New
-      background={'surface-default'}
+      background={'default'}
       style={{ padding: '6px' }}
       borderRadius="medium"
-      shadow="medium"
+      shadow="dialog"
     >
       <Card id={props.aktivitet.uuid}>
         <Card.Header>
@@ -76,5 +90,38 @@ export default function AktivitetCard(props: Props) {
         </Card.Body>
       </Card>
     </Box.New>
+      <Box.New
+        background={"sunken"}
+        style={{ padding: '6px', marginTop: '12px' }}
+        borderRadius='medium'
+        shadow="dialog"
+      >
+        <Tabs
+          value=''
+          onChange={(value) => {
+            navigate(`./${value}`)
+          }}
+        >
+          <Tabs.List>
+            <Tabs.Tab
+              value='felt/input'
+              label='Input'
+              icon={<InboxDownIcon />}
+            />
+            <Tabs.Tab
+              value='felt/output'
+              label='Output'
+              icon={<InboxUpIcon />}
+            />
+            <Tabs.Tab
+              value='felt/message'
+              label='Message'
+              icon={<EnvelopeClosedIcon />}
+            />
+          </Tabs.List>
+          <Outlet/>
+        </Tabs>
+      </Box.New>
+      </>
   )
 }

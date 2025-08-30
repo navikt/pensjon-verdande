@@ -1,4 +1,4 @@
-import { index, route, type RouteConfig } from '@react-router/dev/routes'
+import { index, layout, prefix, route, type RouteConfig } from '@react-router/dev/routes'
 
 export default [
   index('index.tsx'),
@@ -11,8 +11,6 @@ export default [
   route('afp-etteroppgjor', 'afp-etteroppgjor/route.tsx', [
     route('start', 'afp-etteroppgjor/start.tsx'),
   ]),
-
-  route('aktivitet/:behandlingId/:aktivitetId', 'behandling/aktivitet.$behandlingId.$aktivitetId.tsx'),
 
   route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx', [
     //index('aldersovergang/aldersovergang._index.tsx'),
@@ -62,20 +60,26 @@ export default [
 
   route('batcher', 'batcher/batcher.tsx'),
 
-  route('behandling/:behandlingId', 'behandling/behandling.$behandlingId.tsx', [
-    index('behandling/behandling.$behandlingId._index.tsx'),
+  ...prefix("behandling/:behandlingId", [
+    layout('behandling/behandling.$behandlingId.tsx', [
+      index('behandling/behandling.$behandlingId._index.tsx'),
 
-    route('behandlingManuellOpptelling', 'behandling/behandling.$behandlingId.behandlingManuellOpptelling.tsx'),
-    route('ikkeFullforteAktiviteter', 'behandling/behandling.$behandlingId.ikkeFullforteAktiviteter.tsx'),
-    route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [
-      route('fortsett', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.fortsett.tsx'),
+      route('behandlingManuellOpptelling', 'behandling/behandling.$behandlingId.behandlingManuellOpptelling.tsx'),
+      route('ikkeFullforteAktiviteter', 'behandling/behandling.$behandlingId.ikkeFullforteAktiviteter.tsx'),
+      route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [
+        route('fortsett', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.fortsett.tsx'),
+      ]),
+      route('oppdragskvittering', 'behandling/behandling.$behandlingId.oppdragskvittering.tsx'),
+      route('manuelleOppgaver', 'behandling/behandling.$behandlingId.manuelleOppgaver.tsx'),
+      route('oppdragsmelding', 'behandling/behandling.$behandlingId.oppdragsmelding.tsx'),
+      route('aktiviteter', 'behandling/behandling.$behandlingId.aktiviteter.tsx'),
+      route('output', 'behandling/behandling.$behandlingId.output.tsx'),
+      route('input', 'behandling/behandling.$behandlingId.input.tsx'),
     ]),
-    route('oppdragskvittering', 'behandling/behandling.$behandlingId.oppdragskvittering.tsx'),
-    route('manuelleOppgaver', 'behandling/behandling.$behandlingId.manuelleOppgaver.tsx'),
-    route('oppdragsmelding', 'behandling/behandling.$behandlingId.oppdragsmelding.tsx'),
-    route('aktiviteter', 'behandling/behandling.$behandlingId.aktiviteter.tsx'),
-    route('output', 'behandling/behandling.$behandlingId.output.tsx'),
-    route('input', 'behandling/behandling.$behandlingId.input.tsx'),
+
+    route('aktivitet/:aktivitetId', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.tsx', [
+      route('felt/:felt', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.felt.$felt.tsx'),
+    ]),
   ]),
 
   route('behandlinger', 'behandlinger/behandlinger._index.tsx', [

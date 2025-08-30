@@ -5,7 +5,7 @@ import { getBehandling } from '~/services/behandling.server'
 
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
-import AktivitetCard from '~/components/aktivitet/AktivitetCard'
+import AktivitetCard from '~/behandling/AktivitetCard'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
