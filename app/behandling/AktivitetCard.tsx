@@ -90,10 +90,12 @@ export default function AktivitetCard(props: Props) {
           </HGrid>
         </Box.New>
         <Box.New
-          background={'sunken'}
+          background={"raised"}
           style={{ padding: '6px', marginTop: '12px' }}
-          borderRadius="medium"
-          shadow="dialog"
+          borderColor={"neutral-subtle"}
+          borderWidth={"1"}
+          borderRadius={"medium"}
+          shadow={"dialog"}
         >
           <Tabs
             value={getCurrentChild()}

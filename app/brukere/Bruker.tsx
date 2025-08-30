@@ -19,7 +19,7 @@ export default function Bruker(props: Props) {
       </Heading>
 
       <Box.New
-        background={'sunken'}
+        background={'raised'}
         style={{ padding: '6px' }}
         borderRadius="medium"
         shadow="dialog"
@@ -37,8 +37,8 @@ export default function Bruker(props: Props) {
               icon={<ClockDashedIcon aria-hidden />}
             />
           </Tabs.List>
-          <Tabs.Panel value="tilganger" style={{ paddingTop: '12px' }}>
-            <Box.New background={'raised'} padding={'4'}>
+          <Tabs.Panel value="tilganger">
+            <Box.New padding={'4'}>
               <BrukersTilganger
                 bruker={props.bruker}
                 readonly={props.readOnly}
@@ -46,8 +46,8 @@ export default function Bruker(props: Props) {
               ></BrukersTilganger>
             </Box.New>
           </Tabs.Panel>
-          <Tabs.Panel value="historikk" style={{ paddingTop: '12px' }}>
-            <Box.New background={'raised'} padding={'4'}>
+          <Tabs.Panel value="historikk">
+            <Box.New padding={'4'}>
               <BrukersTilgangsLogg
                 bruker={props.bruker}
                 tilgangskontrollmeta={props.tilgangskontrollmeta}
