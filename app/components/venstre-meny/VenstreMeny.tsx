@@ -66,14 +66,14 @@ export default function VenstreMeny(props: Props) {
     if (!me) {
       return false
     }
-    return me.verdandeRoller.find(it => it.toUpperCase() == rolle.toUpperCase())
+    return me.verdandeRoller.find(it => it.toUpperCase() === rolle.toUpperCase())
   }
 
   function harTilgang(operasjon: string) {
     if (!me) {
       return false
     }
-    return me.tilganger.find(it => it == operasjon)
+    return me.tilganger.find(it => it === operasjon)
   }
 
   function createMenuItem(operasjon: string, link: string, label: string) {

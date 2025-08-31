@@ -18,7 +18,7 @@ export async function sendTilOppdragPaNytt(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved sending til oppdrag på nytt. Feil var\n" + text, {
+    throw data(`Feil ved sending til oppdrag på nytt. Feil var\n${text}`, {
       status: response.status
     })
   }

@@ -6,7 +6,6 @@ import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { Table } from '@navikt/ds-react'
 import type { BehandlingManuellDto } from '~/types'
-import React from 'react'
 import { formatIsoTimestamp } from '~/common/date'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -57,7 +56,7 @@ export default function ManuelleBehandlinger() {
             >
               <Table.DataCell>
                 <Link to={`/behandling/${behandling.behandlingId}/aktivitet/${it.aktivitetId}`}>
-                  {behandling.aktiviteter.find((a) => a.aktivitetId == it.aktivitetId)?.type || 'Ukjent aktivitet'}
+                  {behandling.aktiviteter.find((a) => a.aktivitetId === it.aktivitetId)?.type || 'Ukjent aktivitet'}
                 </Link>
               </Table.DataCell>
               <Table.DataCell>{formatIsoTimestamp(it.opprettet)}</Table.DataCell>

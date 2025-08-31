@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import type { JSX } from 'react'
+import { useState } from 'react'
 import { Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
 import type { BehandlingDto, BehandlingerPage } from '~/types'
 import { Link, useFetcher, useSearchParams } from 'react-router';
@@ -90,7 +91,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
   }
 
   function behandlingtypeOptions() {
-    let ekstraBehandlingType
+    let ekstraBehandlingType: JSX.Element
     const currentBehandlingType = searchParams.get('behandlingType')
     if (currentBehandlingType && !behandlingerResponse.behandlingTyper.includes(currentBehandlingType)) {
       ekstraBehandlingType = (<option value={currentBehandlingType}>{decodeBehandling(currentBehandlingType)}</option>)
@@ -114,11 +115,9 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
         ekstraBehandlingType
       }
 
-      { behandlingerResponse.behandlingTyper ?
-        behandlingerResponse.behandlingTyper.sort((a,b) => decodeBehandling(a).localeCompare(decodeBehandling(b))).map((type) => {
+      { behandlingerResponse.behandlingTyper?.sort((a,b) => decodeBehandling(a).localeCompare(decodeBehandling(b))).map((type) => {
         return (<option key={type} value={type}>{decodeBehandling(type)}</option>)
       })
-        : <></>
       }
 
     </Select>
@@ -144,7 +143,6 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
 
 
   return (
-    <>
       <Box.New
         background={'default'}
         style={{ padding: '6px' }}
@@ -200,7 +198,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.DataCell style={{ paddingTop: 0 }}>
                 <Checkbox
                   checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
-                  disabled={behandlingerResponse.content.filter((it => it.utsattTil != null)).length == 0}
+                  disabled={behandlingerResponse.content.filter((it => it.utsattTil != null)).length === 0}
                   indeterminate={
                     valgteBehandlingIder.length > 0 && valgteBehandlingIder.length !== behandlingerResponse.content.length
                   }
@@ -250,7 +248,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   <Table.DataCell align='center'>
                     <Checkbox
                       hideLabel
-                      disabled={it.status == 'FULLFORT' || it.status === 'STOPPET' }
+                      disabled={it.status === 'FULLFORT' || it.status === 'STOPPET' }
                       checked={valgteBehandlingIder.includes(it.behandlingId)}
                       onChange={() => toggleSelectedRow(it.behandlingId)}
                       aria-labelledby={`id-${it.behandlingId}`}
@@ -315,7 +313,5 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
           {behandlingerResponse.totalElements} behandlinger
         </HStack>
       </Box.New>
-    </>
-
 )
 }

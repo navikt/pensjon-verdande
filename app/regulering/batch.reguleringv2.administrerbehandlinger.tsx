@@ -7,7 +7,7 @@ import type {
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
 import type { ArbeidstabellStatistikk } from '~/regulering/regulering.types'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useFetcher, useOutletContext } from 'react-router';
 import { Alert, Button, Dropdown, HStack, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
 import { Entry } from '~/components/entry/Entry'
@@ -16,6 +16,7 @@ import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
+import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 
 
 
@@ -326,7 +327,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
 
   function onAvviksgrenseChange(avvikParamId: number, key: string, value: string) {
 
-    if (isNaN(Number(value))) {
+    if (Number.isNaN(Number(value))) {
       return
     }
     const newAvviksgrenserCopy = newAvviksgrenser.map((avviksgrense) => {

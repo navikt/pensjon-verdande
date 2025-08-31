@@ -1,6 +1,6 @@
 import 'chart.js/auto'
 import type { ReguleringDetaljer } from '~/regulering/regulering.types'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   Alert,
   BodyLong,

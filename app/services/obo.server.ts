@@ -30,7 +30,7 @@ export async function exchange(assertion: string, scope: string) {
   for (const [k, v] of Object.entries(details)) {
     const encodedKey = encodeURIComponent(k)
     const encodedValue = encodeURIComponent(v.toString())
-    formBody.push(encodedKey + '=' + encodedValue)
+    formBody.push(`${encodedKey}=${encodedValue}`)
   }
 
   const response = await fetch(env.tokenEnpoint, {

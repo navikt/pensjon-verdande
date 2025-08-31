@@ -4,7 +4,7 @@ import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
 
 
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)

@@ -1,5 +1,5 @@
 import { requireAccessToken } from '~/services/auth.server'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
 import type { OmregningStatistikkPage } from '~/types'

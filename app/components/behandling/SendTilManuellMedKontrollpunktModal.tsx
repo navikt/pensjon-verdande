@@ -36,7 +36,7 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
           lagret på kravet og det vil bli opprettet en oppgave med oppgitt kontrollpunkt. Det er ikke mulig å angre
           denne handlingen
 
-          <form method="dialog" id="skjema" onSubmit={() => alert("onSubmit")}>
+          <form method="dialog" onSubmit={() => alert("onSubmit")}>
 
             <UNSAFE_Combobox label="Velg kontrollpunkt"
                              onToggleSelected={(option, isSelected) =>

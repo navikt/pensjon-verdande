@@ -1,5 +1,5 @@
 import { Form, useSubmit } from 'react-router';
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Box, Checkbox, CheckboxGroup } from '@navikt/ds-react'
 import { env } from '~/services/env.server'
 

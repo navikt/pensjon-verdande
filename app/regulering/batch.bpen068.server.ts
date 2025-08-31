@@ -8,7 +8,7 @@ export async function startReguleringUttrekk(
   iDebug: boolean,
 ): Promise<StartBatchResponse> {
 
-  const body: any = {
+  const body = {
       satsDato: satsDato,
       reguleringsDato: reguleringsDato,
       iDebug: iDebug,
@@ -41,13 +41,16 @@ export async function startReguleringOrkestrering(
   maxFamiliebehandlinger: string,
 ): Promise<StartBatchResponse> {
 
-  const body: any = {
+  type Body = {
+    satsDato: string;
+    reguleringsDato: string;
+    maxFamiliebehandlinger?: string;
+  };
+
+  const body: Body = {
     satsDato: satsDato,
     reguleringsDato: reguleringsDato,
-  }
-
-  if(maxFamiliebehandlinger !== ''){
-    body.maxFamiliebehandlinger = maxFamiliebehandlinger;
+    maxFamiliebehandlinger: maxFamiliebehandlinger !== "" ? maxFamiliebehandlinger : undefined,
   }
 
   const response = await fetch(
@@ -78,7 +81,7 @@ export async function fortsettAvhengigeBehandling(
   behandlingStatusType: string,
 ): Promise<FortsettBatchResponse> {
 
-  const requestBody: any = {
+  const requestBody = {
     behandlingId: behandlingIdRegulering,
     reguleringBehandlingType: reguleringBehandlingType,
     antallBehandlinger: antallBehandlinger,
@@ -110,7 +113,7 @@ export async function endreKjorelopIverksettVedtakBehandlinger(
   velgKjoreLop: string,
 ): Promise<FortsettBatchResponse> {
 
-  const requestBody: any = {
+  const requestBody = {
     behandlingId: behandlingIdRegulering,
     velgKjoreLop: velgKjoreLop,
   }

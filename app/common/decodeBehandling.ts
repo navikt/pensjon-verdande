@@ -2,7 +2,7 @@ function splitOnCapitals(string: string) {
   const match = string.match(/([A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+)/g)
   if (match) {
     return match.map((value, index) => {
-      if (index == 0) {
+      if (index === 0) {
         return value
       } else {
         return value.toLocaleLowerCase('no-NO')

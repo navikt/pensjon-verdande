@@ -6,7 +6,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url)
 
   const accessToken = await requireAccessToken(request)
 
@@ -33,8 +33,6 @@ export default function AvhengigeBehandlinger() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
   return (
-    <div id="behandlinger">
-      <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
-    </div>
+    <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
   )
 }

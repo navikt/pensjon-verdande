@@ -42,7 +42,7 @@ export default function LaasteVedtakPage() {
     useState<VedtakLaasOpp | null>(null)
 
   return (
-    <div id="laaste_vedtak">
+    <div>
       <VStack gap="5">
         <HStack>
           <Heading size="large">Lås opp sak</Heading>
@@ -51,7 +51,7 @@ export default function LaasteVedtakPage() {
           <HentSakInput onLoad={setSak} />
         </HStack>
         <HStack>
-          {sak != undefined && (
+          {sak !== undefined && (
             <VStack gap="5">
               <HStack gap="4" align="end" justify="start">
                 <Entry labelText={'Saktype'}>{sak.sakType}</Entry>

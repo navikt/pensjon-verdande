@@ -1,17 +1,9 @@
-import {Form, useFetcher, useSubmit} from 'react-router';
-import React, { useEffect, useRef, useState } from 'react'
-import {Button, DatePicker, Select} from '@navikt/ds-react'
-import { env } from '~/services/env.server'
-import {format, formatISO} from "date-fns";
-
-export const loader = async () => {
-  return {
-    env: env.env,
-  }
-}
+import {useFetcher, } from 'react-router';
+import { useState } from 'react'
+import {Button, DatePicker} from '@navikt/ds-react'
+import {formatISO} from "date-fns";
 
 export default function BehandlingOpprett_index() {
-
   const year = new Date().getFullYear()
   const defaultStartdato = new Date(`1 May ${year}`)
   const [startDato, setStartDato] = useState<Date | undefined>(defaultStartdato)

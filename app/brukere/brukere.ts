@@ -33,4 +33,4 @@ export const tilgangsmetaSort = (a: Tilgangsmeta, b: Tilgangsmeta) => a.operasjo
 
 export const decodeOmfang = (meta: Tilgangsmeta[], omfang: string) => meta.find(it => it.omfangNavn === omfang)?.omfangBeskrivelse ?? omfang
 
-export const decodeOperasjon = (meta: Tilgangsmeta[], operasjon: string)=> meta.find(it => it.operasjonNavn == operasjon)?.operasjonBeskrivelse ?? operasjon
+export const decodeOperasjon = (meta: Tilgangsmeta[], operasjon: string)=> meta.find(it => it.operasjonNavn === operasjon)?.operasjonBeskrivelse ?? operasjon

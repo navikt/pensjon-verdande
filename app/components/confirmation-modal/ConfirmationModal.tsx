@@ -1,5 +1,5 @@
-import React, { useRef } from 'react'
 import { Button, Modal } from '@navikt/ds-react'
+import { useRef } from 'react'
 
 
 export function ConfirmationModal(props: {

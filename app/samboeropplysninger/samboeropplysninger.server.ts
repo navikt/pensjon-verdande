@@ -25,7 +25,7 @@ export async function startVurderSamboereBatch(
     return (await response.json()) as StartBatchResponse
   } else {
     const text = await response.text()
-    throw data("Feil ved opprettelse av behandling Feil var\n" + text, {
+    throw data(`Feil ved opprettelse av behandling Feil var\n${text}`, {
       status: response.status
     })
   }

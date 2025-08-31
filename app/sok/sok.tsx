@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from 'react-router'
-import { Search, VStack } from '@navikt/ds-react'
+import { VStack } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
 import { useLoaderData } from 'react-router'

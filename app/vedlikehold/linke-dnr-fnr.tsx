@@ -1,5 +1,5 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Form } from 'react-router';
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
@@ -17,7 +17,7 @@ export default function LinkeDnrFnrPage() {
   const error = actionData?.error
 
   return (
-    <div id="linke_dnr_fnr">
+    <div>
       <VStack gap="5">
         <HStack>
           <Heading size="large">Linke Dnr Fnr</Heading>

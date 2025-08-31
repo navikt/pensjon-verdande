@@ -110,7 +110,7 @@ export default function OpprettReguleringBatchRoute() {
         </table>
       </div>
 
-      <div id="behandlinger">
+      <div>
         <h2>Orkestrering</h2>
         <BehandlingerTable
           visStatusSoek={true}

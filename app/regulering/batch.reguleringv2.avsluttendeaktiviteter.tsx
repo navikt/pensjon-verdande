@@ -1,7 +1,7 @@
 import { type ActionFunctionArgs, useActionData, useSubmit } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { avbrytBehandlinger } from '~/regulering/regulering.server'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 

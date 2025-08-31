@@ -16,7 +16,7 @@ type Props = {
 function tidsbruk(it: BehandlingKjoringDTO) {
     const startet = new Date(it.startet)
     const avsluttet = new Date(it.avsluttet)
-    return formatNumber(avsluttet.getTime() - startet.getTime()) + " ms"
+    return `${formatNumber(avsluttet.getTime() - startet.getTime())} ms`
 }
 
 export function BehandlingKjoringerTable(props: Props) {
@@ -29,16 +29,16 @@ export function BehandlingKjoringerTable(props: Props) {
 
     function finnAktivitet(aktivitetId: number | null) {
         if (aktivitetId) {
-            return props.behandling.aktiviteter.find((it) => it.aktivitetId == aktivitetId)
+            return props.behandling.aktiviteter.find((it) => it.aktivitetId === aktivitetId)
         } else {
             return undefined;
         }
     }
 
     function correlationID(it: BehandlingKjoringDTO) {
-        if (it._links && it._links['kibana']) {
+        if (it._links?.kibana) {
             return <a
-                href={(it._links['kibana'] as HalLink).href}
+                href={(it._links.kibana as HalLink).href}
                 target="_blank"
                 rel="noopener noreferrer"
             >
@@ -66,20 +66,18 @@ export function BehandlingKjoringerTable(props: Props) {
                 <Table.Row>
                     <Table.HeaderCell />
 
-                    { props.visBehandlingId ?
+                    { props.visBehandlingId &&
                     <Table.ColumnHeader sortable sortKey="behandlingId">
                         BehandlingId
                     </Table.ColumnHeader>
-                    : <></>
                     }
                     <Table.ColumnHeader>
                         Aktivitet
                     </Table.ColumnHeader>
-                    { props.visAktivitetId ?
+                    { props.visAktivitetId &&
                     <Table.ColumnHeader sortable sortKey="aktivitetId">
                         AktivitetId
                     </Table.ColumnHeader>
-                    : <></>
                     }
                     <Table.ColumnHeader sortable sortKey="startet">
                         Startet
@@ -109,7 +107,7 @@ export function BehandlingKjoringerTable(props: Props) {
                             content={<pre>{it.stackTrace}</pre>}
 
                         >
-                            {props.visBehandlingId ?
+                            {props.visBehandlingId &&
                                 <Table.DataCell>
                                     <Link
                                         to={`/behandling/${it.behandlingId}`}
@@ -117,7 +115,6 @@ export function BehandlingKjoringerTable(props: Props) {
                                         {it.behandlingId}
                                     </Link>
                                 </Table.DataCell>
-                                : <></>
                             }
                             <Table.DataCell>
                                 <Link
@@ -126,7 +123,7 @@ export function BehandlingKjoringerTable(props: Props) {
                                     {finnAktivitet(it.aktivitetId)?.type}
                                 </Link>
                             </Table.DataCell>
-                            {props.visAktivitetId ?
+                            {props.visAktivitetId &&
                                 <Table.DataCell>
                                     <Link
                                         to={`/behandling/${it.behandlingId}/aktivitet/${it.aktivitetId}`}
@@ -134,7 +131,6 @@ export function BehandlingKjoringerTable(props: Props) {
                                         {it.aktivitetId}
                                     </Link>
                                 </Table.DataCell>
-                                : <></>
                             }
                             <Table.DataCell>
                                 {formatIsoTimestamp(it.startet)}
@@ -154,11 +150,10 @@ export function BehandlingKjoringerTable(props: Props) {
                                 {it.feilmelding}
                             </Table.DataCell>
                             <Table.DataCell>
-                                {it.stackTrace ?
+                                {it.stackTrace &&
                                     <Tooltip content={`Kopier stack trace`}>
                                         <CopyButton copyText={it.stackTrace} size={'xsmall'}/>
                                     </Tooltip>
-                                    : <></>
                                 }
                             </Table.DataCell>
                         </Table.ExpandableRow>

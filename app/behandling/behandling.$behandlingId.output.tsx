@@ -28,7 +28,7 @@ export default function BehandlingOutput() {
   const { output } = useLoaderData<typeof loader>()
 
   let temp = ""
-  output.str.map((verdi: string, index: number) => (
+  output.str.map((verdi: string) => (
     temp += JSON.stringify(JSON.parse(verdi), null, 4) + ','
   ))
 
@@ -69,8 +69,8 @@ export default function BehandlingOutput() {
           <Accordion.Header>Json liste</Accordion.Header>
           <Accordion.Content>
             <CopyButton copyText={'[' + temp + ']'} />
-            <Box.New background={'raised'} id='outputbox'>
-              {output.str.map((verdi: string, index: number) => (<>
+            <Box.New background={'raised'}>
+              {output.str.map((verdi: string) => (<>
                   {JSON.stringify(JSON.parse(verdi), null, 4)},
                   <br />
                 </>

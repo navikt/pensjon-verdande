@@ -1,4 +1,4 @@
-import React from 'react'
+import { useMemo } from 'react'
 import { Table } from '@navikt/ds-react'
 import { useSort } from '~/hooks/useSort'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
@@ -14,7 +14,7 @@ export default function BehandlingAktivitetTable(props: Props) {
   const { sortKey, onSort, sortFunc, sortDecending } =
     useSort<AktivitetDTO>('aktivitetId')
 
-  const sortedAktiviteter: AktivitetDTO[] = React.useMemo(() => {
+  const sortedAktiviteter: AktivitetDTO[] = useMemo(() => {
     return props.behandling.aktiviteter.sort(sortFunc)
   }, [props.behandling.aktiviteter, sortFunc])
 

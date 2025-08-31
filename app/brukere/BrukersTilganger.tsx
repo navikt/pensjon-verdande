@@ -37,7 +37,7 @@ export default function BrukersTilganger(props: Props) {
       return (
           <CheckboxGroup key={`omfang-${omfangNavn}`} legend={decodeOmfang(props.tilgangskontrollmeta, omfangNavn)} value={gitteTilganger} readOnly={props.readonly}>
             {
-              props.tilgangskontrollmeta.filter(it => it.omfangNavn == omfangNavn).sort(tilgangsmetaSort).map((oppgave) => {
+              props.tilgangskontrollmeta.filter(it => it.omfangNavn === omfangNavn).sort(tilgangsmetaSort).map((oppgave) => {
                 return (<Checkbox key={`${omfangNavn}:${oppgave.operasjonNavn}`} value={oppgave.operasjonNavn} onChange={() => toggleTilgang(oppgave)}>
                   {oppgave.operasjonBeskrivelse}
                 </Checkbox>)

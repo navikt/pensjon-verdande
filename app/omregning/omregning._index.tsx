@@ -26,7 +26,7 @@ import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/comb
 import OmregningSelector from '~/components/omregning/OmregningSelector'
 import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
-import OmregningOppsummering from '~/components/omregning/OmregningOppsummering'
+import { OmregningOppsummering } from '~/components/omregning/OmregningOppsummering'
 import { hentOmregningInit, hentOmregningInput } from '~/omregning/batch.omregning.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

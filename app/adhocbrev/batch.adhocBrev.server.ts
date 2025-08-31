@@ -7,7 +7,7 @@ export async function opprettAdhocBrevBehandling(
   ekskluderAvdoed: boolean,
 ): Promise<StartBatchResponse> {
 
-  const body: any = {
+  const body = {
     brevmal: brevmal,
     ekskluderAvdoed: ekskluderAvdoed
   }

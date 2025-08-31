@@ -11,7 +11,7 @@ type User = {
   accessTokenExpiresAt: string,
 }
 
-function getUser(tokens: OAuth2Tokens, request: Request): Promise<User> {
+function getUser(tokens: OAuth2Tokens): Promise<User> {
   return Promise.resolve({
     accessToken: tokens.accessToken(),
     accessTokenExpiresAt: tokens.accessTokenExpiresAt().toISOString()
@@ -28,7 +28,7 @@ export const sessionStorage = createCookieSessionStorage({
   },
 })
 
-export const { getSession, commitSession, destroySession } = sessionStorage
+export const { getSession, commitSession } = sessionStorage
 
 export const authenticator = new Authenticator<User>()
 
@@ -45,8 +45,8 @@ if (process.env.ENABLE_OAUTH20_CODE_FLOW && process.env.AZURE_CALLBACK_URL) {
 
         scopes: ["openid", "offline_access", `api://${env.clientId}/.default`],
       },
-      async ({ tokens, request }) => {
-        return await getUser(tokens, request);
+      async ({ tokens }) => {
+        return await getUser(tokens);
       },
     ),
     'entra-id',
@@ -73,7 +73,7 @@ function redirectUrl(request: Request) {
 export async function requireAccessToken(request: Request) {
   const authorization = request.headers.get('authorization')
 
-  if (authorization && authorization.toLowerCase().startsWith('bearer')) {
+  if (authorization?.toLowerCase().startsWith('bearer')) {
     const tokenResponse = await exchange(
       authorization.substring('bearer '.length),
       env.penScope,

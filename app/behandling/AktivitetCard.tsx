@@ -1,4 +1,3 @@
-import React from 'react'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
 import { Entry } from '~/components/entry/Entry'
 import { formatIsoTimestamp } from '~/common/date'

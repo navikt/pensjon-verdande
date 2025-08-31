@@ -31,8 +31,6 @@ export default function BehandlingerStatus() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
   return (
-    <div id="behandlinger">
-      <BehandlingerTable visStatusSoek={true} visBehandlingTypeSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
-    </div>
+    <BehandlingerTable visStatusSoek={true} visBehandlingTypeSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
   )
 }

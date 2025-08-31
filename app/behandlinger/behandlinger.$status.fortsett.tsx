@@ -10,9 +10,11 @@ export async function action({
   const body = await request.formData()
   const behandlingIder = body.get('behandlingIder') as string
 
-  await Promise.all(behandlingIder.split(',').map((behandlingId) => {
-    fortsettBehandling(accessToken, behandlingId, false)
-  }))
-
-  return null
+  await Promise.all(
+    behandlingIder
+      .split(',')
+      .map((behandlingId) =>
+        fortsettBehandling(accessToken, behandlingId, false),
+      ),
+  )
 }

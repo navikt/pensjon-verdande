@@ -2,7 +2,6 @@ import { type ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { Outlet, useLoaderData, useLocation } from 'react-router';
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
-import React from 'react'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
 import { getReguleringDetaljer } from '~/regulering/regulering.server'

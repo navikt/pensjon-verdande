@@ -1,7 +1,7 @@
 import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
 
 import { BodyLong, BodyShort, Box, CopyButton, Heading, type SortState, Table, VStack } from '@navikt/ds-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import type { ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse } from '~/vedlikehold/vedlikehold.types'
 import { apiGet } from '~/services/api.server'
 

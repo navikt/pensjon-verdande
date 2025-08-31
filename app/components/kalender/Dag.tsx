@@ -1,7 +1,7 @@
 import { isSameDay } from '~/common/date'
 import { getWeek } from '~/common/weeknumber'
 import { Link as ReactRouterLink } from 'react-router'
-import React, { type JSX } from 'react'
+import type { JSX } from 'react'
 import { HStack, Link, Spacer } from '@navikt/ds-react'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import type { KalenderBehandling, KalenderHendelser } from '~/components/kalender/types'
@@ -22,9 +22,9 @@ const formatTidspunkt = (datoStr: string) => {
 export default function Dag(props: Props) {
   let dagStreng: string
   if (props.dato.getDate() === 1) {
-    dagStreng = props.dato.getDate() + '. ' + props.dato.toLocaleDateString('no-NO', { month: 'short' })
+    dagStreng = `${props.dato.getDate()}. ${props.dato.toLocaleDateString('no-NO', { month: 'short' })}`
   } else {
-    dagStreng = props.dato.getDate().toString() + '.'
+    dagStreng = `${props.dato.getDate().toString()}.`
   }
 
   let dagLabel: JSX.Element

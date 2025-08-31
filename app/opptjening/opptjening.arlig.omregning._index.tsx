@@ -1,6 +1,6 @@
 import { Form, useSubmit } from 'react-router';
 import { env } from '~/services/env.server'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 export const loader = async () => {
   return {

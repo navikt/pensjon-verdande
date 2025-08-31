@@ -17,7 +17,6 @@ export default function AnsvarligTeamSelector(props: Props) {
     <Select
       label="Velg ansvarlig team"
       hideLabel
-      id="team-select"
       value={props.ansvarligTeam || ''}
       onChange={handleChange}
     >

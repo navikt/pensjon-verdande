@@ -10,7 +10,7 @@ import {
   Tag,
   VStack,
 } from '@navikt/ds-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { type ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'

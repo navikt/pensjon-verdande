@@ -5,7 +5,7 @@ export function formatIsoTimestamp(
   if (isoDate) {
     const date = new Date(isoDate)
     if (includeMillis) {
-      return date.toLocaleString('no-NO') + '.' + date.getMilliseconds()
+      return `${date.toLocaleString('no-NO')}.${date.getMilliseconds()}`
     } else {
       return date.toLocaleString('no-NO')
     }

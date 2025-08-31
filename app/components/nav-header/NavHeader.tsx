@@ -31,7 +31,7 @@ export default function NavHeader(props: Props) {
   }, [oppdaterVenstremeny])
 
   function harTilgang(operasjon: string) {
-    return props.me.tilganger.find(it => it == operasjon)
+    return props.me.tilganger.find(it => it === operasjon)
   }
 
   return (

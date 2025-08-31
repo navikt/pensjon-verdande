@@ -21,7 +21,7 @@ export async function hentTilgangskontrollMeta(
       tilgangsmeta: Tilgangsmeta[]
     }).tilgangsmeta
   } else {
-    throw new Error("Feil ved henting av tilgangsmeta fra pen. Feil var\n" + await response.text())
+    throw new Error(`Feil ved henting av tilgangsmeta fra pen. Feil var\n${await response.text()}`)
   }
 }
 
@@ -45,7 +45,7 @@ export async function hentBrukere(
     }).brukere
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av bruker fra pen. Feil var\n" + text, {
+    throw data(`Feil ved henting av bruker fra pen. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -98,7 +98,7 @@ export async function hentBruker(
   if (response.ok) {
     return await response.json() as BrukerResponse
   } else {
-    throw new Error("Feil ved henting av bruker fra pen. Feil var\n" + await response.text())
+    throw new Error(`Feil ved henting av bruker fra pen. Feil var\n${await response.text()}`)
   }
 }
 
@@ -124,7 +124,7 @@ export async function giBrukerTilgang(
   )
 
   if (!response.ok) {
-    throw data("Feil ved lagring av brukertilgang: " + await response.text())
+    throw data(`Feil ved lagring av brukertilgang: ${await response.text()}`)
   }
 }
 
@@ -150,6 +150,6 @@ export async function fjernBrukertilgang(
   )
 
   if (!response.ok) {
-    throw data("Feil ved lagring av brukertilgang: " + await response.text())
+    throw data(`Feil ved lagring av brukertilgang: ${await response.text()}`)
   }
 }

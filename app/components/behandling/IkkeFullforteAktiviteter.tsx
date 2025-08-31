@@ -1,13 +1,12 @@
-import React from 'react'
+import { Table } from '@navikt/ds-react'
 import type { IkkeFullforteAktiviteterDTO } from '~/types'
-import { Alert, Table } from '@navikt/ds-react'
 
 export interface Props {
   ikkeFullforteAktiviteter: IkkeFullforteAktiviteterDTO
 }
 
 export default function IkkeFullforteAktiviteter(props: Props) {
-  return (<>
+  return (
     <Table>
       <Table.Header>
         <Table.Row>
@@ -36,5 +35,5 @@ export default function IkkeFullforteAktiviteter(props: Props) {
         ))}
       </Table.Body>
     </Table>
-  </>)
+  )
 }

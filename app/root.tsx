@@ -14,7 +14,6 @@ import appStylesHref from './app.css?url'
 
 import { env } from '~/services/env.server'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
-import React from 'react'
 import type { Route } from '../.react-router/types/app/+types/root'
 import '@navikt/ds-css/darkside'
 

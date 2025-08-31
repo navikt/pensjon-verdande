@@ -79,7 +79,7 @@ export default function LaasteVedtakPage() {
   }, [laasteVedtakSummary.laasteVedtak, sortFunc])
 
   return (
-    <div id="laaste_vedtak">
+    <div>
       <VStack gap="5">
         <HStack align="center" justify="center" gap="2">
           <Heading size="large">Låste vedtak</Heading>
@@ -247,7 +247,6 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string, vedtak:
         size="small"
         label="Velg ansvarlig team"
         hideLabel
-        id="team-select"
         value={vedtak.team}
         onChange={(e) => oppdaterTeam(e.target.value)}
         disabled={fetcher.state === 'submitting'}
@@ -293,7 +292,6 @@ function Aksjonspunkt({ behandlingId, vedtak }: { behandlingId: string, vedtak: 
         size="small"
         label="Velg aksjonspunkt team"
         hideLabel
-        id="aksjonspunkt-select"
         value={vedtak.aksjonspunkt ?? ''}
         onChange={(e) => oppdaterAksjonspunkt(e.target.value)}
         disabled={fetcher.state === 'submitting'}

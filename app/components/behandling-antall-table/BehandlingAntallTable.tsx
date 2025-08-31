@@ -35,14 +35,12 @@ export default function BehandlingAntallTable(props: Props) {
                 <HStack>
                   <Link as={NavLink} to={`/behandlinger?behandlingType=${it.behandlingType ?? it.navn}`}>{decodeBehandling(it.behandlingType ?? it.navn)}</Link>
                   {
-                    it.behandlingType === null
-                      ? (
+                    it.behandlingType === null && (
                         <HelpText title="Ukjent behandlingstype">
                           Behandlingstypen er ukjent. Det kan være fordi den er fjernet fra systemet,
                           eller fordi navnet er endret uten at databasen er oppdatert.
                         </HelpText>
                       )
-                      : (<></>)
                   }
                 </HStack>
               </Table.DataCell>

@@ -19,13 +19,13 @@ export async function action({ params,
 
   const formData = await request.formData()
 
-  if (request.method == 'PUT') {
+  if (request.method === 'PUT') {
     await giBrukerTilgang(
       accesstoken,
       params.brukernavn,
       formData.get('operasjon') as string,
     )
-  } else if (request.method == 'DELETE') {
+  } else if (request.method === 'DELETE') {
     await fjernBrukertilgang(
       accesstoken,
       params.brukernavn,

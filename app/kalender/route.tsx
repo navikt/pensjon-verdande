@@ -1,7 +1,6 @@
 import { type ActionFunctionArgs, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentKalenderHendelser } from '~/services/behandling.server'
-import React from 'react'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
