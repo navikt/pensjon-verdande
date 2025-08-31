@@ -1,38 +1,28 @@
-import { LoaderFunctionArgs, SetURLSearchParams, useLoaderData, useSearchParams } from 'react-router'
+import { LoaderFunctionArgs, useLoaderData } from 'react-router'
 
-import { BodyShort, Box, CopyButton, Heading, SortState, Table, VStack } from '@navikt/ds-react'
+import { BodyLong, BodyShort, Box, CopyButton, Heading, SortState, Table, VStack } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { requireAccessToken } from '~/services/auth.server'
-import { finnManglendeForeignKeyIndexer } from '~/vedlikehold/vedlikehold.server'
-import { ManglendeForeignKeyIndex } from '~/vedlikehold/vedlikehold.types'
+import { ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse } from '~/vedlikehold/vedlikehold.types'
+import { apiGet } from '~/services/api.server'
 
 interface ScopedSortState extends SortState {
   orderBy: keyof ManglendeForeignKeyIndex;
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
-  const manglendeForeignKeyIndexer = await finnManglendeForeignKeyIndexer(accessToken)
-
-  const url = new URL(request.url)
-  const fkParam = url.searchParams.get('fk')
-
-  const valgtManglendeForeignKeyIndex = fkParam
-    ? manglendeForeignKeyIndexer.find(fk => fk.foreignKeyName === fkParam) ?? null
-    : null
+  const manglendeForeignKeyIndexer: ManglendeForeignKeyIndexResponse = await apiGet('/api/vedlikehold/manglende-fk-index', request)
 
   return {
-    manglendeForeignKeyIndexer,
-    valgtManglendeForeignKeyIndex,
+    manglendeForeignKeyIndexer: manglendeForeignKeyIndexer.manglendeForeignKeyIndexer,
   }
 }
 
-function ManglendeForeignKeyIndexerTable({ manglendeForeignKeyIndexer, selectedRow, searchParams, setSearchParams }: {
+function getIndexDdl(index: ManglendeForeignKeyIndex) {
+  return `CREATE INDEX ${index.tableName}_${index.foreignKeyColumns.replace(/,/g, '_')}_IDX ON ${index.tableName} (${index.foreignKeyColumns}) ONLINE;`
+}
+
+function ManglendeForeignKeyIndexerTable({ manglendeForeignKeyIndexer }: {
   manglendeForeignKeyIndexer: ManglendeForeignKeyIndex[]
-  selectedRow: ManglendeForeignKeyIndex | null,
-  searchParams: URLSearchParams
-  setSearchParams: SetURLSearchParams
 }) {
   const [sort, setSort] = useState<ScopedSortState | undefined>({ 'orderBy': 'tableName', 'direction': 'ascending' })
 
@@ -79,121 +69,71 @@ function ManglendeForeignKeyIndexerTable({ manglendeForeignKeyIndexer, selectedR
           <Table.ColumnHeader sortKey="foreignKeyColumns" sortable>Kolonner</Table.ColumnHeader>
           <Table.ColumnHeader sortKey="referencedTableName" sortable>Referert tabell</Table.ColumnHeader>
           <Table.ColumnHeader sortKey="referencedColumns" sortable>Refererte kolonner</Table.ColumnHeader>
+          <Table.HeaderCell />
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {sortedData.map((it) => {
+          const indexDdl = getIndexDdl(it)
           return (
-            <Table.Row
+            <Table.ExpandableRow
+              content={
+                <>
+                  <BodyShort weight={'semibold'}>
+                    {indexDdl}
+                    <CopyButton copyText={indexDdl} />
+                  </BodyShort>
+                </>
+              }
               key={`${it.tableName}-${it.foreignKeyName}`}
-              onClick={() => {
-                if (it === selectedRow) {
-                  searchParams.delete("fk")
-                  setSearchParams(searchParams)
-                } else {
-                  setSearchParams({ fk: it.foreignKeyName })
-                }
-              }}
-              selected={it.foreignKeyName === selectedRow?.foreignKeyName}
+              togglePlacement="right"
+              expandOnRowClick={true}
             >
               <Table.DataCell>{it.tableName}</Table.DataCell>
               <Table.DataCell>{it.foreignKeyName}</Table.DataCell>
               <Table.DataCell>{it.foreignKeyColumns}</Table.DataCell>
               <Table.DataCell>{it.referencedTableName}</Table.DataCell>
               <Table.DataCell>{it.referencedColumns}</Table.DataCell>
-            </Table.Row>)
+            </Table.ExpandableRow>)
         })}
       </Table.Body>
     </Table>
   )
 }
 
-function IndexBox({ index }: { index: ManglendeForeignKeyIndex }) {
-  const indexDdl = `CREATE INDEX ${index.tableName}_${index.foreignKeyColumns.replace(/,/g, '_')}_IDX ON ${index.tableName} (${index.foreignKeyColumns}) ONLINE;`
-
-  return (
-    <Box.New
-      background={'sunken'}
-      borderRadius="medium"
-      padding="2"
-    >
-      <VStack gap="5">
-        <Heading size="medium">
-          Opprett indeks for {index.tableName} – {index.foreignKeyName}
-        </Heading>
-        <BodyShort>
-          For å opprette en indeks for en fjernnøkkel som mangler én, kan du bruke følgende SQL-kommando i et
-          Flyway-skript. Husk å endre indeksnavnet dersom du ønsker et annet navn.
-        </BodyShort>
-        <Box.New
-          background={'raised'}
-        >
-          <pre>{indexDdl}</pre>
-          <CopyButton copyText={indexDdl} text="Kopier SQL" />
-        </Box.New>
-      </VStack>
-    </Box.New>
-  )
-}
-
 export default function ManglendeForeignKeyIndexer() {
-  const { manglendeForeignKeyIndexer, valgtManglendeForeignKeyIndex } = useLoaderData<typeof loader>()
-
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { manglendeForeignKeyIndexer } = useLoaderData<typeof loader>()
 
   return (
     <VStack gap="5">
+      <Heading size="large">
+        Manglende indekser for fjernnøkler
+      </Heading>
 
-      <Box.New
-        background={'sunken'}
-        borderRadius="medium"
-        padding="2"
-      >
-        <VStack gap="5">
-          <Heading size="large">
-            Manglende indekser for fjernnøkler
-          </Heading>
-
-          {manglendeForeignKeyIndexer.length > 0 ? (
-            <>
-              <BodyShort>
-                Tabellen under viser alle tabeller og kolonner som inngår i en fjernnøkkel (foreign key), men som
-                mangler en tilhørende indeks.
-                Dette kan føre til dårlig ytelse ved sletting av rader i de refererte tabellene.
-                For å sikre god ytelse bør det opprettes indekser på disse kolonnene.
-              </BodyShort>
-              <Box.New
-                background={'raised'}
-                >
-
-
-              <ManglendeForeignKeyIndexerTable
-                manglendeForeignKeyIndexer={manglendeForeignKeyIndexer}
-                selectedRow={valgtManglendeForeignKeyIndex}
-                searchParams={searchParams}
-                setSearchParams={setSearchParams}
-              ></ManglendeForeignKeyIndexerTable>
-              </Box.New>
-            </>
-          ) : (
-            <BodyShort>
-              Ingen manglende indekser ble funnet 🎉. Alle fjernnøkler har tilhørende indekser.
-            </BodyShort>
-          )}
-        </VStack>
-      </Box.New>
-      {valgtManglendeForeignKeyIndex ? <IndexBox index={valgtManglendeForeignKeyIndex}/> : manglendeForeignKeyIndexer.length > 0 ? (
-        <Box.New
-          background={'sunken'}
-          borderRadius="medium"
-          padding="2"
-        >
-          <BodyShort>
-            Trykk på en rad i tabellen for å se forslag til hvordan du kan opprette manglende indeks for den valgte
-            raden.
+      {manglendeForeignKeyIndexer.length > 0 ? (
+        <>
+          <BodyLong>
+            Tabellen viser alle tabeller og kolonner som inngår i en fjernnøkkel (foreign key), men som mangler en
+            tilhørende indeks. Dette kan gi dårlig ytelse ved sletting av rader i de refererte tabellene.
+            For å sikre god ytelse bør det opprettes indekser på disse kolonnene.
+          </BodyLong>
+          <BodyShort weight={'semibold'}>
+            Trykk på en rad for å se forslag til SQL-kommando for opprettelse av manglende indeks
           </BodyShort>
-        </Box.New>
-      ) : null}
+          <Box.New
+            background={'raised'}
+          >
+
+            <ManglendeForeignKeyIndexerTable
+              manglendeForeignKeyIndexer={manglendeForeignKeyIndexer}
+            ></ManglendeForeignKeyIndexerTable>
+          </Box.New>
+        </>
+      ) : (
+        <BodyLong>
+          Ingen manglende indekser ble funnet 🎉. Alle fjernnøkler har tilhørende indekser
+        </BodyLong>
+      )}
     </VStack>
   )
 }

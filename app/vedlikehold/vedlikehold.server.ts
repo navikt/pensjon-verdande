@@ -3,7 +3,6 @@ import { LaasOppResultat, SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.
 import {
   ActionData,
   Infobanner,
-  ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse,
   OppdaterInfoBannerResponse,
 } from '~/vedlikehold/vedlikehold.types'
 import {
@@ -12,7 +11,6 @@ import {
   VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'
 import { logger } from '~/services/logger.server'
-import { data } from 'react-router'
 
 
 export const bekreftOppdragsmeldingManuelt = async(
@@ -37,30 +35,6 @@ export const bekreftOppdragsmeldingManuelt = async(
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
   }
-}
-
-export async function finnManglendeForeignKeyIndexer(
-  accessToken: string,
-): Promise<ManglendeForeignKeyIndex[]> {
-  const response = await fetch(
-    `${env.penUrl}/api/vedlikehold/manglende-fk-index`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(
-      { message: 'Feil ved henting av manglende foreign key indexer', detail: text },
-      { status: response.status }
-    )
-  }
-
-  return ((await response.json()) as ManglendeForeignKeyIndexResponse).manglendeForeignKeyIndexer
 }
 
 export const getLaasteVedtakSummary = async(
