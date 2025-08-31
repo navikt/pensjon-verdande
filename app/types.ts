@@ -39,6 +39,8 @@ export type BehandlingDto = {
 
   debugJson: string | null
 
+  erAldeBehandling?: boolean
+
   _links?: HalLinks
 }
 

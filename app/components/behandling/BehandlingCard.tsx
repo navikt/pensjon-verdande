@@ -6,7 +6,7 @@ import {
   Button,
   CopyButton, Heading,
   HGrid,
-  HStack,
+  HStack, Link,
   Loader,
   Modal,
   Page, ProgressBar,
@@ -23,7 +23,7 @@ import {
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import { formatIsoTimestamp } from '~/common/date'
-import { Await, Link, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
+import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,
@@ -143,8 +143,6 @@ export default function BehandlingCard(props: Props) {
           </fetcher.Form>
         </Tooltip>
       )
-    } else {
-      return <></>
     }
   }
 
@@ -187,8 +185,6 @@ export default function BehandlingCard(props: Props) {
           </Modal>
         </>
       )
-    } else {
-      return (<></>)
     }
   }
 
@@ -258,9 +254,6 @@ export default function BehandlingCard(props: Props) {
           }
         </>
       )
-    } else {
-      fortsettModal.current?.close()
-      return <></>
     }
   }
 
@@ -280,8 +273,6 @@ export default function BehandlingCard(props: Props) {
           </fetcher.Form>
         </Tooltip>
       )
-    } else {
-      return <></>
     }
   }
 
@@ -301,8 +292,6 @@ export default function BehandlingCard(props: Props) {
           </fetcher.Form>
         </Tooltip>
       )
-    } else {
-      return <></>
     }
   }
 
@@ -347,8 +336,6 @@ export default function BehandlingCard(props: Props) {
           </Modal>
         </>
       )
-    } else {
-      return <></>
     }
   }
 
@@ -364,8 +351,6 @@ export default function BehandlingCard(props: Props) {
           </HStack>
         </Entry>
       )
-    } else {
-      return <></>
     }
   }
 
@@ -385,7 +370,10 @@ export default function BehandlingCard(props: Props) {
         {decodeBehandling(props.behandling.type)}
       </Heading>
       <VStack gap={'4'}>
-        <HGrid gap={'space-24'} columns={{ xl: 1, '2xl': props.detaljertFremdrift ? 2 : 1 }}>
+        <HGrid
+          gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
+          columns={{ xl: 1, '2xl': props.detaljertFremdrift !== null ? 2 : 1 }}
+        >
           <Box.New
             background={'raised'}
             borderRadius={'xlarge'}
@@ -397,7 +385,7 @@ export default function BehandlingCard(props: Props) {
               {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
               {props.behandling.forrigeBehandlingId && (
                 <Entry labelText={'Opprettet av behandling'}>
-                  <Link
+                  <Link as={NavLink}
                     to={`/behandling/${props.behandling.forrigeBehandlingId}`}
                   >
                     {props.behandling.forrigeBehandlingId}
@@ -508,24 +496,23 @@ export default function BehandlingCard(props: Props) {
           </HStack>
         </HGrid>
         <HStack gap="space-16">
-          <a
+          <Link
             href={props.behandling.kibanaUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Kibana
-          </a>
-          {props.aldeBehandlingUrlTemplate !== undefined &&
-            <div>
-              <a
-                href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Åpne i Alde
-              </a>
-              <ExternalLinkIcon />
-            </div>
+            Se logger i Kibana
+            <ExternalLinkIcon title={'Se logger i Kibana'} />
+          </Link>
+          {props.aldeBehandlingUrlTemplate !== undefined && props.behandling.erAldeBehandling === true &&
+            <Link
+              href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Åpne i Alde
+              <ExternalLinkIcon title={'Åpne i Alde'} />
+            </Link>
           }
         </HStack>
 
