@@ -76,18 +76,21 @@ export default function VenstreMeny(props: Props) {
     return me.tilganger.find(it => it == operasjon)
   }
 
-  function tilgangNavLink(operasjon: string, link: string, label: string) {
-    if (harTilgang(operasjon)) {
-      return (
-        <li key={operasjon + link + label}>
-          <Link as={NavLink} to={link} className="submenu-link" end style={{display: 'flex', justifyContent: 'flex-start'}}>
-            <span className="meny-ikon"><CircleIcon title={label} fontSize="1.5rem" /></span>
-            <span className="meny-tekst">{label}</span>
-          </Link>
-        </li>
-      )
-    }
-    return (<></>)
+  function createMenuItem(operasjon: string, link: string, label: string) {
+    return (
+      <li key={operasjon + link + label}>
+        <Link
+          as={NavLink}
+          to={link}
+          className="submenu-link"
+          end
+          style={{ display: 'flex', justifyContent: 'flex-start' }}
+        >
+          <span className="meny-ikon"><CircleIcon title={label} fontSize="1.5rem" /></span>
+          <span className="meny-tekst">{label}</span>
+        </Link>
+      </li>
+    )
   }
 
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -100,7 +103,7 @@ export default function VenstreMeny(props: Props) {
     let harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
     if (harTilgangTilMeny) {
       return (
-        <li className={openIndex === idx ? 'open' : ''}
+        <li key={`meny-${navn}`} className={openIndex === idx ? 'open' : ''}
             >
           <Link id="filter-toggle" as="a" onClick={() => handleMenuClick(idx)} style={{display: 'flex', justifyContent: 'flex-start'}}>
             <span className="meny-ikon">{p0}</span>
@@ -109,7 +112,11 @@ export default function VenstreMeny(props: Props) {
           </Link>
           <ul className='submenu'>
             {
-              menyElementer.map(([operasjon, link, label]) => (tilgangNavLink(operasjon, link, label)))
+              menyElementer
+                .filter(([operasjon, link, label]) => harTilgang(operasjon))
+                .map(([operasjon, link, label]) => (
+                  createMenuItem(operasjon, link, label))
+                )
             }
           </ul>
         </li>

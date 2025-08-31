@@ -72,9 +72,6 @@ export function BehandlingerPerDagLineChart(props: Props) {
           tooltip: {
             mode: 'point',
           },
-          datalabels: {
-            display: false
-          },
         },
         scales: {
           x: {
