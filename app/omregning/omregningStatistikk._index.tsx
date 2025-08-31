@@ -12,12 +12,12 @@ import {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
 
-  let { searchParams } = new URL(request.url)
-  let page = searchParams.get('page') ?? '0'
-  let size = searchParams.get('size') ?? '10'
+  const { searchParams } = new URL(request.url)
+  const page = searchParams.get('page') ?? '0'
+  const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
-  let omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
-  let content = await hentOmregningStatistikkCsv(accesstoken, behandlingsNoekkel)
+  const omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
+  const content = await hentOmregningStatistikkCsv(accesstoken, behandlingsNoekkel)
 
   const omregningStatistikkInit = await hentOmregningbehandlingsnokler(accesstoken)
   return {
@@ -30,12 +30,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
   const formData = await request.formData()
-  let { searchParams } = new URL(request.url)
-  let page = searchParams.get('page') ?? '0'
-  let size = searchParams.get('size') ?? '10'
-  let behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? formData.get('behandlingsnoekler') as string
+  const { searchParams } = new URL(request.url)
+  const page = searchParams.get('page') ?? '0'
+  const size = searchParams.get('size') ?? '10'
+  const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? formData.get('behandlingsnoekler') as string
 
-  let omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
+  const omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
   return { omregningStatistikkPage }
 }
 
@@ -60,7 +60,7 @@ export default function OmregningStatistikk() {
     setSearchParams(searchParams)
   }
 
-  let content = omregningStatistikkCsv
+  const content = omregningStatistikkCsv
 
   const [downloadLink, setDownloadLink] = useState('')
   const makeTextFile = () => {

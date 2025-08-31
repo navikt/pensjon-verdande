@@ -63,7 +63,7 @@ export const getLaasteVedtakSummary = async(
   if (response.ok) {
     return (await response.json()) as LaasteVedtakUttrekkSummary
   } else {
-    let body = await response.json()
+    const body = await response.json()
     logger.error(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }
@@ -87,7 +87,7 @@ export const getUttrekkStatus = async(
   if (response.ok) {
     return (await response.json()) as LaasteVedtakUttrekkStatus
   } else {
-    let body = await response.json()
+    const body = await response.json()
     logger.error(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }

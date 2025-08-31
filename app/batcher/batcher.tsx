@@ -7,7 +7,7 @@ import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable
 import type { BehandlingerPage } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  let { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
@@ -32,8 +32,6 @@ export default function BehandlingerStatus() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
   return (
-    <div id="behandlinger">
-      <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger as BehandlingerPage} />
-    </div>
+    <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger as BehandlingerPage} />
   )
 }

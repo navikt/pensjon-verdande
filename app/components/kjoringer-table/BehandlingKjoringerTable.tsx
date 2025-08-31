@@ -14,8 +14,8 @@ type Props = {
 }
 
 function tidsbruk(it: BehandlingKjoringDTO) {
-    let startet = new Date(it.startet)
-    let avsluttet = new Date(it.avsluttet)
+    const startet = new Date(it.startet)
+    const avsluttet = new Date(it.avsluttet)
     return formatNumber(avsluttet.getTime() - startet.getTime()) + " ms"
 }
 

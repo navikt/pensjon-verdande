@@ -9,7 +9,7 @@ type Props = {
 }
 
 export function BehandlingerPerDagLineChartCard(props: Props) {
-  let [antallDager, setAntallDager] = useState(30)
+  const [antallDager, setAntallDager] = useState(30)
 
   return (
     <Box.New

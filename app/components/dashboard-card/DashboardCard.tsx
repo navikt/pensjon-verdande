@@ -1,6 +1,6 @@
 import { Box, HStack, VStack } from '@navikt/ds-react'
 import type { Property } from 'csstype'
-import React from 'react'
+import type React from 'react'
 
 interface SVGRProps {
   title?: string

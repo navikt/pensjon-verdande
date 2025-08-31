@@ -17,7 +17,7 @@ export async function action({ params,
 
   invariant(params.brukernavn, 'Missing brukernavn param')
 
-  let formData = await request.formData()
+  const formData = await request.formData()
 
   if (request.method == 'PUT') {
     await giBrukerTilgang(

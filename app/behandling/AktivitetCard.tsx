@@ -2,7 +2,7 @@ import React from 'react'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
 import { Entry } from '~/components/entry/Entry'
 import { formatIsoTimestamp } from '~/common/date'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router'
+import { Link, Outlet, useNavigate } from 'react-router'
 import { Box, CopyButton, Heading, HGrid, HStack, Tabs, Tooltip, VStack } from '@navikt/ds-react'
 import { EnvelopeClosedIcon, InboxDownIcon, InboxUpIcon } from '@navikt/aksel-icons'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -11,15 +11,15 @@ import { decodeAktivitetStatus } from '~/common/decode'
 export type Props = {
   behandling: BehandlingDto
   aktivitet: AktivitetDTO
+  pathname: string
 }
 
 export default function AktivitetCard(props: Props) {
   const getCurrentChild = () => {
-    const location = useLocation()
 
-    let strings = location.pathname.split('/').slice(-2)
-    let childPath = strings[0]
-    if (childPath === '' || !isNaN(+childPath)) {
+    const strings = props.pathname.split('/').slice(-2)
+    const childPath = strings[0]
+    if (childPath === '' || !Number.isNaN(+childPath)) {
       return ''
     } else {
       return strings.join("/")

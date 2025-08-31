@@ -109,7 +109,7 @@ export default function NavHeader(props: Props) {
               <a
                 target='_blank'
                 href={'https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html'}
-                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }}
+                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }} rel="noopener"
               >
                 Dokumentasjon
               </a>
@@ -122,7 +122,7 @@ export default function NavHeader(props: Props) {
               <a
                 target='_blank'
                 href={'https://grafana.nav.cloud.nais.io/goto/mgXUC1LHg?orgId=1'}
-                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }}
+                style={{ textDecoration: "none", color: "var(--ax-text-neutral)" }} rel="noopener"
               >
                 Grafanadashboard
               </a>

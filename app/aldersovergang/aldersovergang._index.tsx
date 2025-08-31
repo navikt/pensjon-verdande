@@ -4,7 +4,8 @@ import {
   useSubmit,
   Form,
 } from 'react-router'
-import React, { useMemo, useState } from 'react'
+import type React from 'react'
+import { useMemo, useState } from 'react'
 import {
   Alert,
   BodyShort,
@@ -127,7 +128,6 @@ export default function BatchOpprett_index() {
 
             <div>
               <Select
-                id="behandlingsmaned"
                 onChange={(e) => {
                   setSelectedMonthStr(e.target.value)
                   setSelectedDate(null)
@@ -202,7 +202,7 @@ export default function BatchOpprett_index() {
         </VStack>
       </Form>
 
-      <div id="behandlinger" style={{ marginTop: '2rem' }}>
+      <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
           Aldersoverganger
         </Heading>

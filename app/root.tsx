@@ -36,7 +36,7 @@ export const loader = async () => {
 export default function App() {
   const { env } = useLoaderData<typeof loader>()
 
-  let title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
+  const title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
 
   return (
     <html lang="en">

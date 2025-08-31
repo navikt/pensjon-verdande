@@ -8,7 +8,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   const accessToken = await requireAccessToken(request)
 
-  let response = await opprettBpen091(accessToken, +updates.behandlingsAr)
+  const response = await opprettBpen091(accessToken, +updates.behandlingsAr)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

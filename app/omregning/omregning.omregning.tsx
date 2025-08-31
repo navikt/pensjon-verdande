@@ -53,7 +53,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const accessToken = await requireAccessToken(request)
 
-  let response = await opprettOmregningbehandling(accessToken, omregningRequest)
+  const response = await opprettOmregningbehandling(accessToken, omregningRequest)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

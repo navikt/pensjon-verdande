@@ -8,7 +8,6 @@ import {
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { BehandlingKjoringerTable } from '~/components/kjoringer-table/BehandlingKjoringerTable'
-import React from 'react'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')

@@ -6,12 +6,12 @@ import { requireAccessToken } from '~/services/auth.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  let { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
 
   const accessToken = await requireAccessToken(request)
 
-  let page = searchParams.get('page')
-  let size = searchParams.get('size')
+  const page = searchParams.get('page')
+  const size = searchParams.get('size')
 
   const behandlinger = await getBehandlinger(accessToken, {
     behandlingType: searchParams.get('behandlingType'),

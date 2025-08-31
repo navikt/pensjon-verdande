@@ -7,7 +7,6 @@ import {
 
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
-import React from 'react'
 import BehandlingAktivitetTable from '~/components/aktiviteter-table/BehandlingAktivitetTable'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {

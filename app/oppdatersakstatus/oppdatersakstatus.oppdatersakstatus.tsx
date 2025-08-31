@@ -6,6 +6,6 @@ import { opprettOppdaterSakBehandlingPEN } from '~/oppdatersakstatus/oppdatersak
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   const data = await request.json()
-  let response= await opprettOppdaterSakBehandlingPEN(accessToken, data.startDato)
+  const response= await opprettOppdaterSakBehandlingPEN(accessToken, data.startDato)
   return redirect(`/behandling/${response.behandlingId}`)
 }

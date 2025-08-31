@@ -13,7 +13,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     .map(Number)
   console.log("Saker", omregnedeSaker)
 
-  let requestPen: { saker: number[] } = {
+  const requestPen: { saker: number[] } = {
     saker: omregnedeSaker,
   }
 

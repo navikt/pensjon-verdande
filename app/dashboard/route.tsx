@@ -24,13 +24,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  let { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
 
   const dato = searchParams.get('dato')
 
-  let startDato = dato ? new Date(dato) : new Date()
+  const startDato = dato ? new Date(dato) : new Date()
 
-  let { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
+  const { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
 
   return {
     loadingDashboardResponse: dashboardResponse,

@@ -193,7 +193,7 @@ export const getReguleringDetaljer = async (
   if (response.ok) {
     return (await response.json()) as ReguleringDetaljer
   } else {
-    let body = await response.json()
+    const body = await response.json()
     console.log(`Feil ved kall til pen ${response.status}`, body)
     throw new Error()
   }

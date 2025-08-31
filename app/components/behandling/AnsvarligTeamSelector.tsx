@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 import { Team } from '~/common/decodeTeam'
 import { Select } from '@navikt/ds-react'
 import { getEnumValueByKey } from '~/common/utils'

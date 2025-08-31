@@ -16,7 +16,7 @@ import { apiGet } from '~/services/api.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import { Behandlingstatus } from '~/types'
+import type { Behandlingstatus } from '~/types'
 import { BugIcon, CheckmarkCircleIcon, ClockIcon, HourglassIcon, StopIcon } from '@navikt/aksel-icons'
 import { requireAccessToken } from '~/services/auth.server'
 import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
@@ -37,9 +37,9 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
-  let formData = Object.fromEntries(await request.formData())
+  const formData = Object.fromEntries(await request.formData())
 
-  let response = await startAfpEtteroppgjor(accessToken, {
+  const response = await startAfpEtteroppgjor(accessToken, {
     kjøreår: +(formData.kjorear as string),
   })
 

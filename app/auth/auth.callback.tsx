@@ -5,10 +5,10 @@ import { logger } from '~/services/logger.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   try {
-    let user = await authenticator.authenticate('entra-id', request)
+    const user = await authenticator.authenticate('entra-id', request)
 
 
-    let session = await getSession(request.headers.get("cookie"));
+    const session = await getSession(request.headers.get("cookie"));
 
     session.set("user", user);
 

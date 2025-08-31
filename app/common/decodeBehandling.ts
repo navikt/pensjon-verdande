@@ -1,5 +1,5 @@
 function splitOnCapitals(string: string) {
-  let match = string.match(/([A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+)/g)
+  const match = string.match(/([A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+)/g)
   if (match) {
     return match.map((value, index) => {
       if (index == 0) {
@@ -48,7 +48,7 @@ const oversettinger = [
   ['UtvandringMeldingBehandling', 'Utvandringsmelding'],
 ]
 export function decodeBehandling(string: string) {
-  let oversetting = oversettinger.find((value) => value[0] === string)
+  const oversetting = oversettinger.find((value) => value[0] === string)
   return oversetting
     ? oversetting[1]
     : splitOnCapitals(string.replace(/Behandling$/, ''));

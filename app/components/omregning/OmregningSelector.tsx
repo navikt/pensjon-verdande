@@ -1,5 +1,5 @@
 import { Select } from '@navikt/ds-react'
-import React from 'react'
+import type React from 'react'
 
 interface OmregningSelectorProps {
   label: string,

@@ -9,7 +9,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
 
-  let response = await opprettBpen090(accessToken, +updates.kjoremaaned, updates.begrensUtplukk === 'true', updates.dryRun === 'true', +updates.prioritet)
+  const response = await opprettBpen090(accessToken, +updates.kjoremaaned, updates.begrensUtplukk === 'true', updates.dryRun === 'true', +updates.prioritet)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

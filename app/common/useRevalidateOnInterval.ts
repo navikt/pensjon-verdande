@@ -6,11 +6,11 @@ export function useRevalidateOnInterval({ enabled = false, interval = 1000 }: { 
 
   const fetchers = useFetchers()
 
-  let revalidate = useRevalidator()
+  const revalidate = useRevalidator()
   useEffect(function revalidateOnInterval() {
     if (!enabled) return
     if(fetchers.map(fetcher => fetcher.state).includes('loading')) return
-    let intervalId = setInterval(revalidate.revalidate, interval)
+    const intervalId = setInterval(revalidate.revalidate, interval)
     return () => clearInterval(intervalId)
   }, [enabled, fetchers, interval, revalidate])
 }

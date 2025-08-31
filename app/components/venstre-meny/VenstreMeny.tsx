@@ -16,7 +16,7 @@ export type Props = {
 }
 
 
-let administrasjonMeny = [
+const administrasjonMeny = [
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
   ['MANGLENDE_FOREIGN_KEY_INDEXER', `/manglende-foreign-key-indexer`, 'Manglende indekser for fjernnøkler'],
   ['LAAS_OPP_SAK', `/laas-opp-sak`, 'Lås opp sak'],
@@ -43,13 +43,13 @@ const batcherMeny = [
   ['REGULERING', `/batch/reguleringv2`, 'Regulering Next'],
 ]
 
-let omregningMeny = [
+const omregningMeny = [
   ['OMREGN_YTELSER', '/omregning/behandlinger', 'Behandlinger'],
   ['OMREGN_YTELSER', '/omregning', 'Omregn ytelser'],
   ['OMREGN_YTELSER', '/omregningStatistikk', 'Omregn statistikk'],
 ]
 
-let behandlingerMeny = [
+const behandlingerMeny = [
   ['SE_BEHANDLINGER', '/behandlinger', 'Alle behandlinger'],
   ['SE_BEHANDLINGER', '/behandlinger/DEBUG', 'I debug'],
   ['SE_BEHANDLINGER', '/behandlinger/FEILENDE', 'Feilende'],
@@ -60,7 +60,7 @@ let behandlingerMeny = [
 ]
 
 export default function VenstreMeny(props: Props) {
-  let me = props.me
+  const me = props.me
 
   function harRolle(rolle: string) {
     if (!me) {
@@ -100,7 +100,7 @@ export default function VenstreMeny(props: Props) {
   }
 
   function byggMeny(navn: string, menyElementer: string[][], idx: number, p0?: any) {
-    let harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
+    const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
     if (harTilgangTilMeny) {
       return (
         <li key={`meny-${navn}`} className={openIndex === idx ? 'open' : ''}

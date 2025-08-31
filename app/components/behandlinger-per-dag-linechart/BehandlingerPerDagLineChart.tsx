@@ -29,29 +29,29 @@ ChartJS.register(
 )
 
 export function BehandlingerPerDagLineChart(props: Props) {
-  let now = new Date()
-  let days: Date[] = []
-  let d = new Date()
+  const now = new Date()
+  const days: Date[] = []
+  const d = new Date()
   d.setDate(now.getDate() - props.antallDager)
   for (; d <= now; d.setDate(d.getDate() + 1)) {
     days.push(new Date(d))
   }
 
-  let labels = days.map((value) => {
+  const labels = days.map((value) => {
     return (
       value.getDate() + '.' + (value.getMonth() + 1) + '.' + value.getFullYear()
     )
   })
 
-  let data = days.map((value) => {
-    let dato =
+  const data = days.map((value) => {
+    const dato =
       value.getFullYear() +
       '-' +
       (value.getMonth() + 1).toString().padStart(2, '0') +
       '-' +
       value.getDate().toString().padStart(2, '0')
 
-    let datoAntall = props.opprettetPerDag.find((value) => value.dato === dato)
+    const datoAntall = props.opprettetPerDag.find((value) => value.dato === dato)
     return datoAntall ? datoAntall.antall : 0
   })
 

@@ -12,7 +12,7 @@ export interface Props {
 
 
 export default function SendTilManuellMedKontrollpunktModal(props: Props) {
-  let [valgtKontrollpunkt, setKontrollpunkt] = useState<KontrollpunktDecode | null>(null)
+  const [valgtKontrollpunkt, setKontrollpunkt] = useState<KontrollpunktDecode | null>(null)
 
   return (
     <>

@@ -3,7 +3,7 @@ export function formatIsoTimestamp(
   includeMillis: boolean = false,
 ) {
   if (isoDate) {
-    let date = new Date(isoDate)
+    const date = new Date(isoDate)
     if (includeMillis) {
       return date.toLocaleString('no-NO') + '.' + date.getMilliseconds()
     } else {
@@ -17,15 +17,15 @@ export function formatIsoDate(
   isoDate: string | undefined | null,
 ) {
   if (isoDate) {
-    let date = new Date(isoDate)
+    const date = new Date(isoDate)
       return date.toLocaleDateString('no-NO')
   }
 }
 
 // Basert på Wikipedia-artikkelen om Dato (ISO 8601), generert med Copilot
-export const getDato = function(year: number, weekNumber: number, weekday: number) {
+export const getDato = (year: number, weekNumber: number, weekday: number) => {
   // Step 1: Multiply the week number by 7 and add the weekday number
-  let sum = weekNumber * 7 + weekday;
+  const sum = weekNumber * 7 + weekday;
 
   // Step 2: Get the weekday of 4 January (0 = Sunday, 1 = Monday, ...)
   const jan4 = new Date(year, 0, 4);

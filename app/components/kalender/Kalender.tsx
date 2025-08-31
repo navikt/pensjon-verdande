@@ -14,8 +14,8 @@ const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
  * Returnerer første og siste dag som vil vises i kalenderen for en gitt dato
  */
 export function forsteOgSisteDatoForKalender(dato: Date): { forsteDato: Date, sisteDato: Date } {
-  let forsteUkeNr = getWeek(new Date(dato.getFullYear(), dato.getMonth(), 1))
-  let sisteUkeNr = forsteUkeNr + 5 // kalenderen viser alltid 6 uker i kalenderen
+  const forsteUkeNr = getWeek(new Date(dato.getFullYear(), dato.getMonth(), 1))
+  const sisteUkeNr = forsteUkeNr + 5 // kalenderen viser alltid 6 uker i kalenderen
 
   return {
     forsteDato: getDato(getWeekYear(dato), forsteUkeNr, 1),
@@ -39,10 +39,10 @@ function backgroundColorForDato(kalenderHendelser: KalenderHendelser, dato: Date
 }
 
 export default function Kalender(props: Props) {
-  let valgtDato = props.startDato;
+  const valgtDato = props.startDato;
   const [, setSearchParams] = useSearchParams()
-  let firstInThisMonth = new Date(valgtDato.getFullYear(), valgtDato.getMonth(), 1)
-  let forsteUkeNr = getWeek(firstInThisMonth)
+  const firstInThisMonth = new Date(valgtDato.getFullYear(), valgtDato.getMonth(), 1)
+  const forsteUkeNr = getWeek(firstInThisMonth)
 
   function day(ukenr: number, colIdx: number) {
     return getDato(getWeekYear(valgtDato), ukenr, colIdx + 1)
@@ -69,7 +69,7 @@ export default function Kalender(props: Props) {
   }
 
   function dag(colIdx: number, rowIdx: number) {
-    let dato = day(rowIdx + forsteUkeNr, colIdx)
+    const dato = day(rowIdx + forsteUkeNr, colIdx)
 
     return <td key={'col' + colIdx + 'row' + rowIdx}
                style={{

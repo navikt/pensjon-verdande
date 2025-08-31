@@ -4,7 +4,7 @@ import type { StartBatchResponse } from '~/types'
 export async function opprettAdhocBrevBehandling(
   accessToken: string,
   brevmal: string,
-  ekskluderAvdoed: Boolean,
+  ekskluderAvdoed: boolean,
 ): Promise<StartBatchResponse> {
 
   const body: any = {

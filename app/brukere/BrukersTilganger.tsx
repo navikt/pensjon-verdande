@@ -16,7 +16,7 @@ export default function BrukersTilganger(props: Props) {
   const [gitteTilganger, setTilganger] = useState<string[]>(props.bruker.tilganger || []);
 
   function toggleTilgang(oppgave: Tilgangsmeta) {
-    let eksisterendeTilgang = gitteTilganger.includes(oppgave.operasjonNavn)
+    const eksisterendeTilgang = gitteTilganger.includes(oppgave.operasjonNavn)
 
     setTilganger((list) =>
       list.includes(oppgave.operasjonNavn)

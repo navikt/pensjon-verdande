@@ -1,4 +1,4 @@
-import { Behandlingstatus } from '~/types'
+import type { Behandlingstatus } from '~/types'
 
 export type HentAlleResponse = {
   etteroppgjor: AfpEtteroppgjorResponse[]

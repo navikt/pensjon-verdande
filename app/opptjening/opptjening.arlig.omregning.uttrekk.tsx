@@ -6,7 +6,7 @@ import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/batch.opptje
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
-  let response = await opprettOpptjeningsendringArligUttrekk(accessToken)
+  const response = await opprettOpptjeningsendringArligUttrekk(accessToken)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

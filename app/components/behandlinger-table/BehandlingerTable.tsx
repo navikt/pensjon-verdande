@@ -19,19 +19,19 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
 
   const [searchParams, setSearchParams] = useSearchParams()
 
-  let sortParam = searchParams.get("sort")?.split(",")
-  let sortKey = sortParam?.[0] || "behandlingId"
-  let sortDecending = sortParam?.[1] || 'desc'
+  const sortParam = searchParams.get("sort")?.split(",")
+  const sortKey = sortParam?.[0] || "behandlingId"
+  const sortDecending = sortParam?.[1] || 'desc'
 
   const [valgteBehandlingIder, setValgteBehandlingIder] = useState<number[]>([]);
 
   const onSortChange = (value: string | undefined) => {
     if (value) {
       if (sortKey === value) {
-        let value1 = `${sortKey},${sortDecending === 'asc' ? 'desc' : 'asc'}`
+        const value1 = `${sortKey},${sortDecending === 'asc' ? 'desc' : 'asc'}`
         searchParams.set("sort", value1)
       } else {
-        let value2 = `${value},desc`
+        const value2 = `${value},desc`
         searchParams.set("sort", value2)
       }
     } else {
@@ -91,7 +91,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
 
   function behandlingtypeOptions() {
     let ekstraBehandlingType
-    let currentBehandlingType = searchParams.get('behandlingType')
+    const currentBehandlingType = searchParams.get('behandlingType')
     if (currentBehandlingType && !behandlingerResponse.behandlingTyper.includes(currentBehandlingType)) {
       ekstraBehandlingType = (<option value={currentBehandlingType}>{decodeBehandling(currentBehandlingType)}</option>)
     } else {

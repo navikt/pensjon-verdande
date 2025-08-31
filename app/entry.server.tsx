@@ -46,7 +46,7 @@ export default function handleRequest(
   reactRouterContext: EntryContext,
   loadContext: AppLoadContext
 ) {
-  let prohibitOutOfOrderStreaming =
+  const prohibitOutOfOrderStreaming =
     isBotRequest(request.headers.get("user-agent")) || reactRouterContext.isSpaMode;
 
   return prohibitOutOfOrderStreaming

@@ -12,7 +12,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const eps2g = formData.get('eps2g') === 'true'
   const gjenlevende = formData.get('gjenlevende') === 'true'
 
-  let response = await opprettBpen014(accessToken, + updates.aar,eps2g, gjenlevende)
+  const response = await opprettBpen014(accessToken, + updates.aar,eps2g, gjenlevende)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

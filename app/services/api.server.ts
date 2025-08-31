@@ -84,7 +84,7 @@ export async function normalizeAndThrow(
 ): Promise<never> {
     const ct = response.headers.get('content-type') || ''
 
-    let body: unknown = undefined
+    let body: unknown 
     try {
         if (ct.includes('application/json')) {
             body = await response.json()

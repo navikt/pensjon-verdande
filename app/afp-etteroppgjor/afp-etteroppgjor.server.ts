@@ -28,7 +28,7 @@ export async function startAfpEtteroppgjor(
   if (response.ok) {
     return (await response.json()) as StartEtteroppgjorResponse
   } else {
-    let text = await response.text()
+    const text = await response.text()
     throw data("Feil ved start av AFP Etteroppgjør. Feil var\n" + text, {
       status: response.status
     })

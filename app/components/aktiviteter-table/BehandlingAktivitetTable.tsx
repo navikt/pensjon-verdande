@@ -18,12 +18,12 @@ export default function BehandlingAktivitetTable(props: Props) {
     return props.behandling.aktiviteter.sort(sortFunc)
   }, [props.behandling.aktiviteter, sortFunc])
 
-  let typer: string[] = []
-  sortedAktiviteter.forEach(function (aktivitet) {
+  const typer: string[] = []
+  sortedAktiviteter.forEach((aktivitet) => {
     typer.push(aktivitet.type)
   })
 
-  let commonPrefix = findCommonAktivitetPrefixLength(typer)
+  const commonPrefix = findCommonAktivitetPrefixLength(typer)
 
   return (
     <Table

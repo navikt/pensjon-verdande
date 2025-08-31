@@ -44,7 +44,7 @@ export async function hentBrukere(
       brukere: BrukerResponse[]
     }).brukere
   } else {
-    let text = await response.text()
+    const text = await response.text()
     throw data("Feil ved henting av bruker fra pen. Feil var\n" + text, {
       status: response.status
     })

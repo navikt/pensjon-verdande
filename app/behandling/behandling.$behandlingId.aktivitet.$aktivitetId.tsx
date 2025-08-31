@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from 'react-router';
+import { type LoaderFunctionArgs, useLocation } from 'react-router'
 import { useLoaderData } from 'react-router';
 
 import { getBehandling } from '~/services/behandling.server'
@@ -29,6 +29,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 export default function Behandling() {
   const { behandling, aktivitet } = useLoaderData<typeof loader>()
+  const location = useLocation()
 
-  return <AktivitetCard behandling={behandling} aktivitet={aktivitet} />
+  return <AktivitetCard behandling={behandling} aktivitet={aktivitet} pathname={location.pathname} />
 }

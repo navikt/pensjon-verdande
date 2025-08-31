@@ -7,7 +7,7 @@ import {
 
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 import { Skeleton } from '@navikt/ds-react'
 import IkkeFullforteAktiviteter from '~/components/behandling/IkkeFullforteAktiviteter'
 
@@ -16,7 +16,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
   const accessToken = await requireAccessToken(request)
 
-  let ikkeFullforteAktiviteter = getIkkeFullforteAktiviteter(
+  const ikkeFullforteAktiviteter = getIkkeFullforteAktiviteter(
     accessToken,
     +params.behandlingId,
   )

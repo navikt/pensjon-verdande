@@ -9,7 +9,7 @@ import type { BehandlingerPage } from '~/types'
 
 export const loader = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.status, 'Missing status param')
-  let { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
 
   const size = searchParams.get('size')
   const page = searchParams.get('page')

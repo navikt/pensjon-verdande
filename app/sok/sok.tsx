@@ -7,16 +7,16 @@ import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable
 import type { BehandlingerPage } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  let { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
 
   let behandlinger: BehandlingerPage | null
 
-  let query = searchParams.get('query')
+  const query = searchParams.get('query')
   if (query) {
     const accessToken = await requireAccessToken(request)
 
-    let page = searchParams.get('page')
-    let size = searchParams.get('size')
+    const page = searchParams.get('page')
+    const size = searchParams.get('size')
 
     behandlinger = await search(
       accessToken,

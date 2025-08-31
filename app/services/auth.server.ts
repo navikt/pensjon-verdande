@@ -3,7 +3,7 @@ import { OAuth2Strategy } from 'remix-auth-oauth2'
 import { redirect, createCookieSessionStorage } from 'react-router';
 import { exchange } from '~/services/obo.server'
 import { env } from '~/services/env.server'
-import { type OAuth2Tokens, } from "arctic";
+import type { OAuth2Tokens, } from "arctic";
 
 
 type User = {
@@ -18,7 +18,7 @@ function getUser(tokens: OAuth2Tokens, request: Request): Promise<User> {
   })
 }
 
-export let sessionStorage = createCookieSessionStorage({
+export const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: '__verdande_session',
     httpOnly: true,
@@ -28,9 +28,9 @@ export let sessionStorage = createCookieSessionStorage({
   },
 })
 
-export let { getSession, commitSession, destroySession } = sessionStorage
+export const { getSession, commitSession, destroySession } = sessionStorage
 
-export let authenticator = new Authenticator<User>()
+export const authenticator = new Authenticator<User>()
 
 if (process.env.ENABLE_OAUTH20_CODE_FLOW && process.env.AZURE_CALLBACK_URL) {
   authenticator.use(
@@ -54,7 +54,7 @@ if (process.env.ENABLE_OAUTH20_CODE_FLOW && process.env.AZURE_CALLBACK_URL) {
 }
 
 function redirectUrl(request: Request) {
-  let searchParams = new URLSearchParams([
+  const searchParams = new URLSearchParams([
     ['redirectTo', new URL(request.url).pathname],
   ])
   return `/auth/microsoft?${searchParams}`
@@ -71,10 +71,10 @@ function redirectUrl(request: Request) {
  * å kalle API-er på vegne av brukeren.
  */
 export async function requireAccessToken(request: Request) {
-  let authorization = request.headers.get('authorization')
+  const authorization = request.headers.get('authorization')
 
   if (authorization && authorization.toLowerCase().startsWith('bearer')) {
-    let tokenResponse = await exchange(
+    const tokenResponse = await exchange(
       authorization.substring('bearer '.length),
       env.penScope,
     )
@@ -87,12 +87,12 @@ export async function requireAccessToken(request: Request) {
       // if there is no user session, redirect to login
       throw redirect(redirectUrl(request))
     } else {
-      let user = session.get('user') as User
+      const user = session.get('user') as User
       if (!user.accessToken || !user.accessTokenExpiresAt || new Date(user.accessTokenExpiresAt) < new Date()) {
         throw redirect(redirectUrl(request))
       }
 
-      let tokenResponse = await exchange(
+      const tokenResponse = await exchange(
         user.accessToken,
         env.penScope,
       )

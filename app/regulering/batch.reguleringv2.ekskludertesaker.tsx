@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { useFetcher, useLoaderData } from 'react-router';
 import { Alert, Button, Heading, Textarea, VStack } from '@navikt/ds-react'
 import { useActionData } from 'react-router'
-import { FileUpload, parseFormData } from '@mjackson/form-data-parser'
+import { type FileUpload, parseFormData } from '@mjackson/form-data-parser'
 import { hentEksluderteSaker, oppdaterEkskluderteSaker } from '~/regulering/regulering.server'
 
 

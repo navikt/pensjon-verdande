@@ -45,7 +45,7 @@ export default function Dag(props: Props) {
     textColor = 'var(--ax-neutral-600)'
   }
 
-  let offentligFridag = props.kalenderHendelser.offentligeFridager.find(it => isSameDay(it.dato, props.dato))?.navn
+  const offentligFridag = props.kalenderHendelser.offentligeFridager.find(it => isSameDay(it.dato, props.dato))?.navn
 
   function dayRow() {
     if (props.dato.getDay() === 1) {

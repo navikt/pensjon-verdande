@@ -1,4 +1,4 @@
-import React, { Suspense, useRef } from 'react'
+import { Suspense, useRef } from 'react'
 import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
 import { Entry } from '~/components/entry/Entry'
 import {
@@ -54,7 +54,7 @@ export default function BehandlingCard(props: Props) {
     if ((ferdig === totalt)) {
       return "100"
     } else {
-      let prosent = ((ferdig / totalt) * 100).toFixed(2)
+      const prosent = ((ferdig / totalt) * 100).toFixed(2)
       if (prosent === "100.00") {
         return "99.99"
       } else {
@@ -116,7 +116,7 @@ export default function BehandlingCard(props: Props) {
   }
 
   function hasLink(rel: string) {
-    return props.behandling._links && props.behandling._links[rel]
+    return props.behandling._links?.[rel]
   }
 
   function debugButton() {
@@ -370,8 +370,8 @@ export default function BehandlingCard(props: Props) {
 
 
   const getCurrentChild = () => {
-    let childPath = location.pathname.split('/').slice(-1)[0]
-    if (childPath === "" || !isNaN(+childPath)) {
+    const childPath = location.pathname.split('/').slice(-1)[0]
+    if (childPath === "" || !Number.isNaN(+childPath)) {
       return "kjoringer"
     } else {
       return childPath
@@ -596,7 +596,7 @@ export default function BehandlingCard(props: Props) {
               label='Aktiviteter'
               icon={<TasklistIcon />}
             />
-            {props.behandling._links && props.behandling._links['avhengigeBehandlinger'] ? (
+            {props.behandling._links?.['avhengigeBehandlinger'] ? (
               <Tabs.Tab
                 value='avhengigeBehandlinger'
                 label='Avhengige behandlinger'
@@ -610,7 +610,7 @@ export default function BehandlingCard(props: Props) {
               label='Uferdige aktiviteter'
               icon={<TasklistIcon />}
             />
-            {props.behandling._links && props.behandling._links['input'] ? (
+            {props.behandling._links?.['input'] ? (
               <Tabs.Tab
                 value='input'
                 label='Input'
@@ -619,7 +619,7 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
-            {props.behandling._links && props.behandling._links['output'] ? (
+            {props.behandling._links?.['output'] ? (
               <Tabs.Tab
                 value='output'
                 label='Output'
@@ -628,7 +628,7 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
-            {props.behandling._links && props.behandling._links['oppdragsmelding'] ? (
+            {props.behandling._links?.['oppdragsmelding'] ? (
               <Tabs.Tab
                 value='oppdragsmelding'
                 label='Oppdragsmelding'
@@ -637,7 +637,7 @@ export default function BehandlingCard(props: Props) {
             ) : (
               <></>
             )}
-            {props.behandling._links && props.behandling._links['oppdragskvittering'] ? (
+            {props.behandling._links?.['oppdragskvittering'] ? (
               <Tabs.Tab
                 value='oppdragskvittering'
                 label='Oppdragskvittering'

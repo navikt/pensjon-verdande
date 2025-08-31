@@ -1,6 +1,7 @@
 import type { HTMLFormMethod, LoaderFunctionArgs } from 'react-router'
 import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from 'react-router'
-import React, { useRef, useState } from 'react'
+import type React from 'react'
+import { useRef, useState } from 'react'
 import {
   Box,
   Button,
@@ -35,9 +36,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     accesstoken,
   ) as OmregningInit
 
-  let { searchParams } = new URL(request.url)
-  let page = searchParams.get('page') ?? '0'
-  let size = searchParams.get('size') ?? '10'
+  const { searchParams } = new URL(request.url)
+  const page = searchParams.get('page') ?? '0'
+  const size = searchParams.get('size') ?? '10'
 
   const omregningSakerPage = await hentOmregningInput(
     accesstoken,
@@ -93,15 +94,15 @@ export default function BatchOpprett_index() {
 
   const [hasError, setHasError] = useState(false)
   const fetcher = useFetcher()
-  let submit = useSubmit()
+  const submit = useSubmit()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (hasError) {
       return
     } else {
       event.preventDefault()
-      let $form = event.currentTarget
-      let formData = new FormData($form)
+      const $form = event.currentTarget
+      const formData = new FormData($form)
       submit(formData, {
         method: $form.getAttribute('method') as HTMLFormMethod ?? $form.method,
         action: $form.getAttribute('action') ?? $form.action,
