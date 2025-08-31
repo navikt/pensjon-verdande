@@ -13,9 +13,7 @@ export default [
     ]),
     route('adhocbrev/adhocbrev', 'adhocbrev/adhocbrev.adhocbrev.tsx'),
 
-    route('afp-etteroppgjor', 'afp-etteroppgjor/route.tsx', [
-      route('start', 'afp-etteroppgjor/start.tsx'),
-    ]),
+    route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
 
     route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx', [
       //index('aldersovergang/aldersovergang._index.tsx'),

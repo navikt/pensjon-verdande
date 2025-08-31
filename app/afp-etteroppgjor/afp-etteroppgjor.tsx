@@ -4,22 +4,22 @@ import {
   Button,
   ErrorMessage,
   Heading,
-  HGrid,
   HStack,
   Label, Link,
   Select,
-  Table,
   Tag,
   VStack,
 } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { ActionFunctionArgs, Form, NavLink, useLoaderData } from 'react-router'
+import { ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { Behandlingstatus } from '~/types'
 import { BugIcon, CheckmarkCircleIcon, ClockIcon, HourglassIcon, StopIcon } from '@navikt/aksel-icons'
+import { requireAccessToken } from '~/services/auth.server'
+import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const behandlinger = await apiGet<HentAlleResponse>(
@@ -32,6 +32,18 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   return {
     etteroppgjor: etteroppgjor,
   }
+}
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const accessToken = await requireAccessToken(request)
+
+  let formData = Object.fromEntries(await request.formData())
+
+  let response = await startAfpEtteroppgjor(accessToken, {
+    kjøreår: +(formData.kjorear as string),
+  })
+
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 function formaterTidspunkt(isoTid?: string): string {
@@ -111,7 +123,7 @@ export default function EtteroppgjorOversikt() {
       <p>Velkommen til AFP Etteroppgjør!</p>
 
       <div style={{ maxWidth: '20em' }}>
-        <Form action="start" method="post">
+        <Form method="post">
           <VStack gap="4">
 
             <Select
