@@ -5,7 +5,7 @@ import type {
   BehandlingManuellPage,
   DashboardResponse,
   DetaljertFremdriftDTO,
-  IkkeFullforteAktiviteterDTO,
+  IkkeFullforteAktiviteterDTO, PatchBehandlingDto,
   SchedulerStatusResponse,
 } from '~/types'
 import { env } from '~/services/env.server'
@@ -60,7 +60,7 @@ export async function getDashboardSummary(
     return (await response.json()) as DashboardResponse
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av dashboard oppsummering. Feil var\n" + text, {
+    throw data(`Feil ved henting av dashboard oppsummering. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -165,7 +165,7 @@ export async function getAvhengigeBehandlinger(
     return (await response.json()) as BehandlingerPage
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av avhengige behandlinger. Feil var\n" + text, {
+    throw data(`Feil ved henting av avhengige behandlinger. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -212,7 +212,7 @@ export async function search(
     return (await response.json()) as BehandlingerPage
   } else {
     const text = await response.text()
-    throw data("Feil ved søking etter behandlinger. Feil var\n" + text, {
+    throw data(`Feil ved søking etter behandlinger. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -248,7 +248,7 @@ export async function getOutputFromBehandling(
     return (await response.json()) as Output
   } else {
     const text = await response.text()
-    throw data("Feil ved hending av output fra behandling. Feil var\n" + text, {
+    throw data(`Feil ved hending av output fra behandling. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -272,7 +272,7 @@ export async function getDetaljertFremdrift(
     return (await response.json()) as DetaljertFremdriftDTO
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av detaljer fremdrift. Feil var\n" + text, {
+    throw data(`Feil ved henting av detaljer fremdrift. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -296,7 +296,7 @@ export async function getIkkeFullforteAktiviteter(
     return (await response.json()) as IkkeFullforteAktiviteterDTO
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av detaljer fremdrift. Feil var\n" + text, {
+    throw data(`Feil ved henting av detaljer fremdrift. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -322,7 +322,7 @@ export async function fortsettBehandling(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved forsetting av behandling. Feil var\n" + text, {
+    throw data(`Feil ved forsetting av behandling. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -345,7 +345,7 @@ export async function fortsettAvhengigeBehandlinger(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved forsetting av avhengige behandlinger. Feil var\n" + text, {
+    throw data(`Feil ved forsetting av avhengige behandlinger. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -368,7 +368,7 @@ export async function taTilDebug(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved sending til debug. Feil var\n" + text, {
+    throw data(`Feil ved sending til debug. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -391,7 +391,7 @@ export async function fjernFraDebug(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved fjerning av debug. Feil var\n" + text, {
+    throw data(`Feil ved fjerning av debug. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -400,7 +400,7 @@ export async function fjernFraDebug(
 export async function patchBehandling(
   accessToken: string,
   behandlingId: string,
-  patch: any,
+  patch: Partial<PatchBehandlingDto>,
 ): Promise<void> {
   const response = await fetch(
     `${env.penUrl}/api/behandling/${behandlingId}`,
@@ -417,7 +417,7 @@ export async function patchBehandling(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved oppdatering av behandling. Feil var\n" + text, {
+    throw data(`Feil ved oppdatering av behandling. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -440,7 +440,7 @@ export async function runBehandling(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved kjøring av behandling. Feil var\n" + text, {
+    throw data(`Feil ved kjøring av behandling. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -463,7 +463,7 @@ export async function stopp(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved stopping av behandling. Feil var\n" + text, {
+    throw data(`Feil ved stopping av behandling. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -489,7 +489,7 @@ export async function sendTilManuellMedKontrollpunkt(
 
   if (!response.ok) {
     const text = await response.text()
-    throw data("Feil ved sending til manuell behandling. Feil var\n" + text, {
+    throw data(`Feil ved sending til manuell behandling. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -513,7 +513,7 @@ export async function getOppdragsmelding(
     return await response.text()
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av oppdragsmelding. Feil var\n" + text, {
+    throw data(`Feil ved henting av oppdragsmelding. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -537,7 +537,7 @@ export async function getOppdragskvittering(
     return await response.text()
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av oppdragskvittering. Feil var\n" + text, {
+    throw data(`Feil ved henting av oppdragskvittering. Feil var\n${text}`, {
       status: response.status
     })
   }
@@ -577,7 +577,7 @@ export async function henBehandlingManuell(
     return (await response.json()) as BehandlingManuellPage
   } else {
     const text = await response.text()
-    throw data("Feil ved henting av manuelle behandlinger. Feil var\n" + text, {
+    throw data(`Feil ved henting av manuelle behandlinger. Feil var\n${text}`, {
       status: response.status
     })
   }

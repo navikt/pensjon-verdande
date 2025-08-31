@@ -64,7 +64,7 @@ export default function OmregningStatistikk() {
 
   const [downloadLink, setDownloadLink] = useState('')
   const makeTextFile = () => {
-    const data = new Blob(['[' + content + ']'], { type: 'application/json' })
+    const data = new Blob([`[${content}]`], { type: 'application/json' })
 
     // this part avoids memory leaks
     if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
@@ -107,7 +107,7 @@ export default function OmregningStatistikk() {
 
       <Box.New>
         <Link
-          style={{ padding: 1 + 'em', position: 'relative', right: 0, float: 'right' }}
+          style={{ padding: '1em', position: 'relative', right: 0, float: 'right' }}
           // this attribute sets the filename
           download='omregningTabell.csv'
           // link to the download URL
@@ -131,7 +131,7 @@ export default function OmregningStatistikk() {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {omregningsaker && omregningsaker?.content?.map((sak, i) => {
+            {omregningsaker?.content?.map((sak, i) => {
               return (
                 <Table.Row key={i + 1}>
                   <Table.DataCell scope='row'>{sak.behandlingsnoekkel}</Table.DataCell>

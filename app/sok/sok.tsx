@@ -44,9 +44,8 @@ export default function Sok() {
   return (
     <VStack gap="4">
       {
-        behandlinger ?
-          <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
-          : <></>
+        behandlinger &&
+        <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
       }
     </VStack>
   )

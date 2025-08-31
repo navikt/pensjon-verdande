@@ -184,12 +184,11 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.ColumnHeader sortable sortKey="planlagtStartet" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "12rem" }}>
                 Planlagt startet
               </Table.ColumnHeader>
-              {visStatusSoek ?
+              {visStatusSoek && (
                 <Table.ColumnHeader sortable sortKey="status" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "14rem" }}>
                   Status
                 </Table.ColumnHeader>
-                : <></>
-              }
+              )}
               <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>
                 Feilmelding
               </Table.ColumnHeader>
@@ -215,12 +214,10 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
-                {visBehandlingTypeSoek ? behandlingtypeOptions() : <></>}
+                {visBehandlingTypeSoek && behandlingtypeOptions()}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
-                {visAnsvarligTeamSoek ? ansvarligTeamOptions() : <></>}
-              </Table.DataCell>
-              <Table.DataCell style={{ paddingTop: 0 }}>
+                {visAnsvarligTeamSoek && ansvarligTeamOptions()}
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
@@ -228,11 +225,12 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
-              {visStatusSoek ?
+              <Table.DataCell style={{ paddingTop: 0 }}>
+              </Table.DataCell>
+              {visStatusSoek &&
                 <Table.DataCell style={{ paddingTop: 0 }}>
                   { statusOptions() }
                 </Table.DataCell>
-                : <></>
               }
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
@@ -275,11 +273,8 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   <Table.DataCell>
                     {formatIsoTimestamp(it.planlagtStartet)}
                   </Table.DataCell>
-                  {visStatusSoek ?
-                    <Table.DataCell>{it.status}</Table.DataCell>
-                    : <></>
-                  }
-                  <Table.DataCell title={ it.feilmelding ? it.behandlingId + '\n' + it.feilmelding : undefined}>
+                  {visStatusSoek && <Table.DataCell>{it.status}</Table.DataCell>}
+                  <Table.DataCell title={ it.feilmelding ? `${it.behandlingId}\n${it.feilmelding}` : undefined}>
                       <div className="feilmelding_kolonne">
                         {it.feilmelding}
                       </div>

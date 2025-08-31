@@ -15,7 +15,7 @@ import {
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type {
   LaasOppBehandlingSummary,
   LaasOppResultat,

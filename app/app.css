@@ -183,9 +183,6 @@ i {
   border-bottom: solid 1px rgb(50, 50, 50);
 }
 
-.submenu a {
-}
-
 .submenu a.active {
   background: var(--a-blue-700);
   color: white;

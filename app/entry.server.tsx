@@ -1,6 +1,6 @@
 import { PassThrough } from "node:stream";
 
-import type { ActionFunctionArgs, AppLoadContext, EntryContext, LoaderFunctionArgs } from "react-router";
+import type { ActionFunctionArgs, EntryContext, LoaderFunctionArgs } from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
 import * as isbotModule from "isbot";
@@ -8,8 +8,6 @@ import { renderToPipeableStream } from "react-dom/server";
 import { logger } from '~/services/logger.server'
 
 const ABORT_DELAY = 120_000;
-
-export const streamTimeout = 30_000;
 
 process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
   logger.error("Unhandled Rejection at:", p, "reason:", reason);
@@ -30,8 +28,6 @@ export function handleError(
   error: unknown,
   {
     request,
-    params,
-    context,
   }: LoaderFunctionArgs | ActionFunctionArgs
 ) {
   if (!request.signal.aborted) {
@@ -43,8 +39,7 @@ export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  reactRouterContext: EntryContext,
-  loadContext: AppLoadContext
+  reactRouterContext: EntryContext
 ) {
   const prohibitOutOfOrderStreaming =
     isBotRequest(request.headers.get("user-agent")) || reactRouterContext.isSpaMode;

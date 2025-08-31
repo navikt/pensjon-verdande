@@ -54,9 +54,9 @@ export default function Orkestrering() {
   })
 
   if (uttrekk === null) {
-    return <>
+    return (
       <Alert variant="info" inline>Uttrekk ikke kjørt enda.</Alert>
-    </>
+    )
   }
 
   return (

@@ -1,20 +1,5 @@
-import type { ActionFunctionArgs } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
-import { env } from '~/services/env.server'
 import EndretOpptjeningManedligUttrekk from '~/opptjening/opptjening.manedlig.uttrekk._index'
 import BatchOpprett_index from '~/opptjening/opptjening.kategoriserBruker._index'
-
-export const loader = async () => {
-  return {
-    env: env.env,
-  }
-}
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData()
-  const updates = Object.fromEntries(formData)
-  const accessToken = await requireAccessToken(request)
-}
 
 export default function OpprettEndretOpptjeningRoute() {
   return (

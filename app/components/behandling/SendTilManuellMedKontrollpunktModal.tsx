@@ -46,7 +46,7 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
                              }
                              shouldAutocomplete
                              options={
-                               Object.entries(props.behandling.muligeKontrollpunkt || []).map(([key, value]) => {
+                               Object.entries(props.behandling.muligeKontrollpunkt || []).map(([_key, value]) => {
                                  return ({
                                    label: `${value.decode} [${value.kontrollpunkt}]`,
                                    value: value.kontrollpunkt,

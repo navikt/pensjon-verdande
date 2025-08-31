@@ -21,35 +21,35 @@ import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 
 export const OPERATION = {
-  fjernFraDebug: "fjernFraDebug",
-  fortsett: "fortsett",
-  fortsettAvhengigeBehandlinger: "fortsettAvhengigeBehandlinger",
+  fjernFraDebug: 'fjernFraDebug',
+  fortsett: 'fortsett',
+  fortsettAvhengigeBehandlinger: 'fortsettAvhengigeBehandlinger',
   oppdaterAnsvarligTeam: 'oppdaterAnsvarligTeam',
-  runBehandling: "runBehandling",
-  sendTilManuellMedKontrollpunkt: "sendTilManuellMedKontrollpunkt",
-  sendTilOppdragPaNytt: "sendTilOppdragPaNytt",
-  stopp: "stopp",
-  taTilDebug: "taTilDebug",
+  runBehandling: 'runBehandling',
+  sendTilManuellMedKontrollpunkt: 'sendTilManuellMedKontrollpunkt',
+  sendTilOppdragPaNytt: 'sendTilOppdragPaNytt',
+  stopp: 'stopp',
+  taTilDebug: 'taTilDebug',
 } as const
 
 export type Operation = typeof OPERATION[keyof typeof OPERATION];
-export const OPERATIONS = Object.values(OPERATION) as Operation[];
+export const OPERATIONS = Object.values(OPERATION) as Operation[]
 export const OperationSet = new Set<string>(OPERATIONS)
 
 function isOperation(x: unknown): x is Operation {
-  return typeof x === "string" && OperationSet.has(x)
+  return typeof x === 'string' && OperationSet.has(x)
 }
 
 function requireField(form: FormData, name: string): string {
   const v = form.get(name)
-  if (typeof v !== "string" || v.length === 0) {
+  if (typeof v !== 'string' || v.length === 0) {
     throw new Error(`Påkrevd felt mangler: ${name}`)
   }
   return v
 }
 
 const getBool = (v: FormDataEntryValue | null) =>
-  v === "true" || v === "on" || v === "1"
+  v === 'true' || v === 'on' || v === '1'
 
 function operationHandlers(accessToken: string, behandlingId: string, form: FormData): Record<Operation, () => Promise<void>> {
   return {
@@ -68,7 +68,7 @@ function operationHandlers(accessToken: string, behandlingId: string, form: Form
         behandlingId,
         {
           ansvarligTeam: requireField(form, 'ansvarligTeam'),
-        }
+        },
       ),
 
     runBehandling: () =>
@@ -89,19 +89,19 @@ function operationHandlers(accessToken: string, behandlingId: string, form: Form
 }
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
-  invariant(params.behandlingId, "Mangler parameter: behandlingId")
+  invariant(params.behandlingId, 'Mangler parameter: behandlingId')
   const behandlingId = params.behandlingId
 
   const form = await request.formData()
-  const operation = form.get("operation")
+  const operation = form.get('operation')
   if (!isOperation(operation)) {
     throw new Error(`Operasjon mangler eller er ukjent: ${String(operation)}`)
   }
 
   const accessToken = await requireAccessToken(request)
 
-  const handlers = operationHandlers(accessToken, behandlingId, form);
-  await handlers[operation]();
+  const handlers = operationHandlers(accessToken, behandlingId, form)
+  await handlers[operation]()
 }
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -115,7 +115,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
   const avhengigeBehandlinger: Promise<BehandlingerPage | null> | null = null
   let detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null = null
-  if (behandling._links && behandling._links['avhengigeBehandlinger']) {
+  if (behandling._links?.avhengigeBehandlinger) {
     detaljertFremdrift = getDetaljertFremdrift(
       accessToken,
       behandling.behandlingId,
@@ -124,10 +124,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
   return {
     aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
-      behandling,
-      avhengigeBehandlinger: avhengigeBehandlinger,
-      detaljertFremdrift: detaljertFremdrift,
-    }
+    behandling,
+    avhengigeBehandlinger: avhengigeBehandlinger,
+    detaljertFremdrift: detaljertFremdrift,
+  }
 }
 
 export default function Behandling() {

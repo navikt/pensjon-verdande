@@ -94,7 +94,7 @@ export default function LaasteVedtakPage() {
               {laasteVedtakSummary.uttrekkStatus?.isFeilet &&
                 <Alert variant="error" size="small" inline>Uttrekk feilet. Sist
                   forsøkt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)} </Alert>}
-              {uttrekkStatus?.isFerdig == false &&
+              {uttrekkStatus?.isFerdig === false &&
                 <Alert variant="info" size="small" inline>Kjører
                   aktivitet: {uttrekkStatus?.aktivitet ?? 'Behandling starter...'}</Alert>}
               <RunUttrekk
@@ -146,7 +146,7 @@ export default function LaasteVedtakPage() {
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
-                    {sortedLaasteVedtak.map((vedtak, index) => (
+                    {sortedLaasteVedtak.map((vedtak) => (
                       <Table.Row key={vedtak.kravId}>
                         <Table.DataCell>{formatIsoDate(vedtak.datoRegistrert)}</Table.DataCell>
                         <Table.DataCell>
@@ -170,7 +170,7 @@ export default function LaasteVedtakPage() {
                         {avansertVisning && <Table.DataCell>{vedtak.kravGjelder}</Table.DataCell>}
                         {avansertVisning && <Table.DataCell>{vedtak.kravStatus}</Table.DataCell>}
                         {avansertVisning &&
-                          <Table.DataCell>{vedtak.opprettetAv} {vedtak.endretAv && '/' + vedtak.endretAv}</Table.DataCell>}
+                          <Table.DataCell>{vedtak.opprettetAv} {vedtak.endretAv && `/${vedtak.endretAv}`}</Table.DataCell>}
                         <Table.DataCell>{formatIsoDate(vedtak.opprettetDato)}</Table.DataCell>
                         <Table.DataCell>{formatIsoDate(vedtak.endretDato)}</Table.DataCell>
                         <Table.DataCell>

@@ -1,5 +1,4 @@
 import { Select } from '@navikt/ds-react'
-import React from 'react'
 import type { ActionFunctionArgs } from 'react-router'
 import { Form } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'

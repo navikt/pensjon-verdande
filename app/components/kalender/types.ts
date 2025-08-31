@@ -23,5 +23,5 @@ export type KalenderBehandlingDTO = {
     behandlingId: number;
     type: string;
     opprettet: string;
-    planlagtStartet: string;
+    planlagtStartet?: string;
 }

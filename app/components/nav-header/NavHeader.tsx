@@ -53,14 +53,13 @@ export default function NavHeader(props: Props) {
         }}
       >
         Verdande
-        {!props.erProduksjon ? (
+        {!props.erProduksjon && (
           <span className='header-environment-postscript'>
             {props.env.toUpperCase()}
           </span>
-        ) : (<></>)
-        }
+        )}
       </InternalHeader.Title>
-      {props.erProduksjon ? (
+      {props.erProduksjon && (
         <InternalHeader.Title
           style={{
             textDecoration: 'none',
@@ -69,8 +68,7 @@ export default function NavHeader(props: Props) {
         >
           P R O D U K S J O N !
         </InternalHeader.Title>
-      ) : (<></>)
-      }
+      )}
 
       <Spacer />
       {

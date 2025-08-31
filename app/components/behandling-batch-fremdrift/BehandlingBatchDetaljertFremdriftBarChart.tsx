@@ -11,7 +11,7 @@ export function BehandlingBatchDetaljertFremdriftBarChart(props: Props) {
   return (
     <Bar
       data={{
-        labels: props.detaljertFremdrift.behandlingerDetaljertFremdrift.map((it) => it.level + ' ' + it.behandlingCode),
+        labels: props.detaljertFremdrift.behandlingerDetaljertFremdrift.map((it) => `${it.level} ${it.behandlingCode}`),
         datasets: [
           {
             label: 'OPPRETTET',

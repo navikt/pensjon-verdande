@@ -78,12 +78,10 @@ function ManglendeForeignKeyIndexerTable({ manglendeForeignKeyIndexer }: {
           return (
             <Table.ExpandableRow
               content={
-                <>
-                  <BodyShort weight={'semibold'}>
-                    {indexDdl}
-                    <CopyButton copyText={indexDdl} />
-                  </BodyShort>
-                </>
+                <BodyShort weight={'semibold'}>
+                  {indexDdl}
+                  <CopyButton copyText={indexDdl} />
+                </BodyShort>
               }
               key={`${it.tableName}-${it.foreignKeyName}`}
               togglePlacement="right"

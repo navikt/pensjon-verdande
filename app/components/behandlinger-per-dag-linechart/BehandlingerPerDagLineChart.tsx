@@ -39,7 +39,7 @@ export function BehandlingerPerDagLineChart(props: Props) {
 
   const labels = days.map((value) => {
     return (
-      value.getDate() + '.' + (value.getMonth() + 1) + '.' + value.getFullYear()
+      `${value.getDate()}.${value.getMonth() + 1}.${value.getFullYear()}`
     )
   })
 

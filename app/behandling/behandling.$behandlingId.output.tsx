@@ -55,7 +55,7 @@ export default function BehandlingOutput() {
     <>
       <div style={{display: 'flex'}}>
         <Link
-          style={{padding: 1 + 'em'}}
+          style={{padding: '1em'}}
           // this attribute sets the filename
           download='liste.json'
           // link to the download URL
@@ -68,7 +68,7 @@ export default function BehandlingOutput() {
         <Accordion.Item>
           <Accordion.Header>Json liste</Accordion.Header>
           <Accordion.Content>
-            <CopyButton copyText={'[' + temp + ']'} />
+            <CopyButton copyText={`[${temp}]`} />
             <Box.New background={'raised'}>
               {output.str.map((verdi: string) => (<>
                   {JSON.stringify(JSON.parse(verdi), null, 4)},

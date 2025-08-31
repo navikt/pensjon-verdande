@@ -42,6 +42,10 @@ export type BehandlingDto = {
   _links?: HalLinks
 }
 
+export type PatchBehandlingDto = {
+  ansvarligTeam: string
+}
+
 export type KontrollpunktDecode = {
   kontrollpunkt: string
   decode: string

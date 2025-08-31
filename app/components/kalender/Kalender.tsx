@@ -70,7 +70,7 @@ export default function Kalender(props: Props) {
   function dag(colIdx: number, rowIdx: number) {
     const dato = day(rowIdx + forsteUkeNr, colIdx)
 
-    return <td key={'col' + colIdx + 'row' + rowIdx}
+    return <td key={`col:${colIdx} row:${rowIdx}`}
                style={{
                  border: '1px solid #ddd',
                  width: 'calc(100% / 7)',

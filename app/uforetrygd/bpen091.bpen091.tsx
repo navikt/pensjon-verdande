@@ -2,7 +2,7 @@ import { type ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 

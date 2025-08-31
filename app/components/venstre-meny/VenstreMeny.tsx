@@ -105,7 +105,7 @@ export default function VenstreMeny(props: Props) {
       return (
         <li key={`meny-${navn}`} className={openIndex === idx ? 'open' : ''}
             >
-          <Link id="filter-toggle" as="a" onClick={() => handleMenuClick(idx)} style={{display: 'flex', justifyContent: 'flex-start'}}>
+          <Link as="a" onClick={() => handleMenuClick(idx)} style={{display: 'flex', justifyContent: 'flex-start'}}>
             <span className="meny-ikon">{p0}</span>
             <span className="meny-tekst">{navn}</span>
             <ChevronDownIcon title='a11y-title' fontSize='1.5rem' style={{ marginLeft: 'auto', transition: 'transform 0.2s', transform: openIndex === idx ? 'rotate(180deg)' : 'rotate(0deg)' }} />
@@ -113,7 +113,7 @@ export default function VenstreMeny(props: Props) {
           <ul className='submenu'>
             {
               menyElementer
-                .filter(([operasjon, link, label]) => harTilgang(operasjon))
+                .filter(([operasjon]) => harTilgang(operasjon))
                 .map(([operasjon, link, label]) => (
                   createMenuItem(operasjon, link, label))
                 )
@@ -145,14 +145,14 @@ export default function VenstreMeny(props: Props) {
           </li>
 
           {
-            harRolle('VERDANDE_ADMIN') ?
-              (<li>
+            harRolle('VERDANDE_ADMIN') && (
+              <li>
                 <Link as={NavLink} to={`/brukere`} style={{display: 'flex', justifyContent: 'flex-start'}}>
                    <span className="meny-ikon"><PersonGroupIcon title='Brukere' fontSize='1.5rem' className={"meny-ikon"} /></span>
                   <span className="meny-tekst">Brukere</span>
                 </Link>
-              </li>)
-              : (<></>)
+              </li>
+            )
           }
 
           {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" className={"meny-ikon"} />)}

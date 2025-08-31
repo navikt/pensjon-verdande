@@ -1,5 +1,5 @@
 import { Form, useSubmit } from 'react-router';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Select } from '@navikt/ds-react'
 
 export default function BatchOpprett_index() {

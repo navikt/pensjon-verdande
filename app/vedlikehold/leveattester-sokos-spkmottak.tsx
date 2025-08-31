@@ -1,11 +1,12 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Form } from 'react-router';
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { useActionData } from 'react-router'
 import type { ActionData } from '~/vedlikehold/vedlikehold.types'
 import { hentMot } from '~/vedlikehold/vedlikehold.server'
+import invariant from 'tiny-invariant'
 
 export default function SokosSPKMottakPage() {
   const [fomYear, setFomYear] = useState('')
@@ -17,7 +18,7 @@ export default function SokosSPKMottakPage() {
   const error = actionData?.error
 
   return (
-    <div id="sokos-spk-mottak">
+    <div>
       <VStack gap="5">
         <HStack>
           <Heading size="large">Hent antall fra MOT</Heading>
@@ -49,5 +50,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const accessToken = await requireAccessToken(request)
 
-  return await hentMot(accessToken, formData.get('fomYear')!,formData.get('fomMonth')!)
+  const fomYear = formData.get('fomYear')
+  const fomMonth = formData.get('fomMonth')
+
+  invariant(typeof fomYear === "string" && fomYear.length > 0, "Parameteret 'fomYear' mangler");
+  invariant(typeof fomMonth === "string" && fomMonth.length > 0, "Parameteret 'fomMonth' mangler");
+
+  return await hentMot(accessToken, fomYear, fomMonth)
 }
