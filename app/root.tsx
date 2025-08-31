@@ -17,7 +17,6 @@ import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import React from 'react'
 import { Route } from '../.react-router/types/app/+types/root'
 import '@navikt/ds-css/darkside'
-import { VStack } from '@navikt/ds-react'
 
 export const links: LinksFunction = () => {
   return [

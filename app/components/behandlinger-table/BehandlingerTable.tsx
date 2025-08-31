@@ -146,10 +146,10 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
   return (
     <>
       <Box.New
-        background={'surface-default'}
+        background={'default'}
         style={{ padding: '6px' }}
         borderRadius="medium"
-        shadow="medium"
+        shadow="dialog"
       >
         <Table
           size={'medium'}

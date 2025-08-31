@@ -205,3 +205,19 @@ i {
   max-height: 0;
   -webkit-transition: all 0.5s ease-out;
 }
+
+.etteroppgjor-box {
+    border-top: 0;
+    border-right: 1px solid var(--ax-border-neutral-subtle);
+    border-bottom: 1px solid var(--ax-border-neutral-subtle);
+    border-left: 1px solid var(--ax-border-neutral-subtle);
+    border-spacing: 0;
+    border-collapse: separate;
+    &:first-of-type {
+        border-radius:var(--ax-border-radius-large) var(--ax-border-radius-large) 0 0;
+        border-top: 1px solid var(--ax-border-neutral-subtle);
+    }
+    &:last-of-type {
+        border-radius:0 0 var(--ax-border-radius-large) var(--ax-border-radius-large)
+    }
+}

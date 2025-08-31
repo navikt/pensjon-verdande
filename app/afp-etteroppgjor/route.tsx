@@ -1,79 +1,157 @@
-import { Button, Heading, Select, VStack } from '@navikt/ds-react'
-import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import {
+  BodyShort,
+  Box,
+  Button,
+  ErrorMessage,
+  Heading,
+  HGrid,
+  HStack,
+  Label, Link,
+  Select,
+  Table,
+  Tag,
+  VStack,
+} from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { ActionFunctionArgs, Form, useLoaderData } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
-import { getBehandlinger } from '~/services/behandling.server'
+import { ActionFunctionArgs, Form, NavLink, useLoaderData } from 'react-router'
+import { apiGet } from '~/services/api.server'
+import { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
+import { format } from 'date-fns'
+import { nb } from 'date-fns/locale'
+import { Behandlingstatus } from '~/types'
+import { BugIcon, CheckmarkCircleIcon, ClockIcon, HourglassIcon, StopIcon } from '@navikt/aksel-icons'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  let { searchParams } = new URL(request.url)
+  const behandlinger = await apiGet<HentAlleResponse>(
+    `/api/afpoffentlig/etteroppgjor/behandling`,
+    request,
+  )
 
-  const size = searchParams.get('size')
-  const page = searchParams.get('page')
-
-  const accessToken = await requireAccessToken(request)
-  const behandlinger = await getBehandlinger(accessToken, {
-    behandlingType: 'AfpEtteroppgjor',
-    page: page ? +page : 0,
-    size: size ? +size : 5,
-    sort: searchParams.get('sort'),
-  })
-  if (!behandlinger) {
-    throw new Response('Not Found', { status: 404 })
-  }
+  const etteroppgjor: AfpEtteroppgjorResponse[] = behandlinger.etteroppgjor
 
   return {
-    behandlinger: behandlinger,
+    etteroppgjor: etteroppgjor,
   }
 }
 
-export default function AfpEtteroppgjor() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+function formaterTidspunkt(isoTid?: string): string {
+  return isoTid ? format(new Date(isoTid), 'dd.MM.yyyy HH:mm', { locale: nb }) : '–'
+}
+
+function statusTag(status: Behandlingstatus) {
+  switch (status) {
+    case 'OPPRETTET':
+      return <Tag variant="info" icon={<ClockIcon aria-hidden />}>Opprettet</Tag>
+    case 'UNDER_BEHANDLING':
+      return <Tag variant="warning" icon={<HourglassIcon aria-hidden />}>Under behandling</Tag>
+    case 'FULLFORT':
+      return <Tag variant="success" icon={<CheckmarkCircleIcon aria-hidden />}>Fullført</Tag>
+    case 'STOPPET':
+      return <Tag variant="error" icon={<StopIcon aria-hidden />}>Stoppet</Tag>
+    case 'DEBUG':
+      return <Tag variant="neutral" icon={<BugIcon aria-hidden />}>Debug</Tag>
+    default:
+      return <Tag variant="neutral">{status}</Tag>
+  }
+}
+
+function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
+  return (
+    <Box className={'etteroppgjor-box'}
+         padding={'4'}
+    >
+      <VStack gap="2">
+        <HStack justify="space-between" align="center">
+          <Heading size="small">
+            <Link as={NavLink} to={`/behandling/${item.behandlingId}`}>
+              {item.kjorear}
+            </Link>
+          </Heading>
+          {statusTag(item.status)}
+        </HStack>
+
+        <HStack gap="6" wrap>
+          <Tidspunkt label="Opprettet" verdi={item.opprettet} />
+          <Tidspunkt label="Siste kjøring" verdi={item.sisteKjoring} />
+          <Tidspunkt label="Planlagt startet" verdi={item.planlagtStartet} />
+          <Tidspunkt label="Utsatt til" verdi={item.utsattTil} />
+          <Tidspunkt label="Stoppet" verdi={item.stoppet} />
+          <Tidspunkt label="Ferdig" verdi={item.ferdig} />
+        </HStack>
+      </VStack>
+    </Box>
+  )
+}
+
+function Tidspunkt({ label, verdi }: { label: string, verdi?: string }) {
+  return (
+    <VStack gap="1" style={{ minWidth: '10rem' }}>
+      <Label>{label}</Label>
+      <BodyShort>{formaterTidspunkt(verdi)}</BodyShort>
+    </VStack>
+  )
+}
+
+
+export default function EtteroppgjorOversikt() {
+  const { etteroppgjor } = useLoaderData<typeof loader>()
 
   const [kjøreår, setKjøreår] = useState<number | undefined>(undefined)
 
   const forrigeÅr = new Date().getFullYear() - 1
   const muligeKjøreår = Array.from({ length: 5 }, (_, i) => forrigeÅr - i)
 
+  const alleredeKjørtEtteroppgjør = etteroppgjor.find(it => it.kjorear === kjøreår) !== undefined
+
+  const submitDisabled = kjøreår === undefined || alleredeKjørtEtteroppgjør
+
   return (
     <div>
-      <Heading size="xlarge">AFP Etteroppgjør</Heading>
+      <Heading size="large">AFP Etteroppgjør</Heading>
       <p>Velkommen til AFP Etteroppgjør!</p>
 
-      <div style={{ maxWidth: '15em' }}>
-      <Form action="start" method="post">
-        <VStack gap="4">
+      <div style={{ maxWidth: '20em' }}>
+        <Form action="start" method="post">
+          <VStack gap="4">
 
-        <Select
-          name="kjorear"
-          label="Velg kjøreår"
-          onChange={(e) => setKjøreår(Number(e.target.value))}
-          value={kjøreår ?? ''}
-        >
-          <option value="" disabled>
-            Velg år
-          </option>
-          {muligeKjøreår.map((årstall) => (
-            <option key={årstall} value={årstall}>
-              {årstall}
-            </option>
-          ))}
-        </Select>
+            <Select
+              name="kjorear"
+              label="Velg kjøreår"
+              onChange={(e) => setKjøreår(Number(e.target.value))}
+              value={kjøreår ?? ''}
+            >
+              <option value="" disabled>
+                Velg år
+              </option>
+              {muligeKjøreår.map((årstall) => (
+                <option key={årstall} value={årstall}>
+                  {årstall}
+                </option>
+              ))}
+            </Select>
 
-        <Button type="submit">Start etteroppgjør</Button>
-        </VStack>
-      </Form>
+            <Button type="submit" disabled={submitDisabled}>Start etteroppgjør</Button>
+            {
+              alleredeKjørtEtteroppgjør &&   <ErrorMessage>Allerede startet etteroppgjør for {kjøreår}</ErrorMessage> || <BodyShort>&nbsp;</BodyShort>
+            }
+          </VStack>
+        </Form>
       </div>
 
       <div style={{ padding: '2rem' }}></div>
 
-      <Heading size="medium">Tidligere kjørte etteroppgjør</Heading>
-      <BehandlingerTable
-        visStatusSoek={true}
-        visBehandlingTypeSoek={false}
-        visAnsvarligTeamSoek={false}
-        behandlingerResponse={behandlinger}
-      />
+      <Heading size="medium">Eksisterende etteroppgjør</Heading>
+
+      <VStack gap="4">
+        <VStack>
+          {etteroppgjor.length > 0
+            ? etteroppgjor.map((item) => (
+            <EtteroppgjorRad key={item.behandlingId} item={item} />
+          ))
+            : <BodyShort>Ingen etteroppgjør funnet.</BodyShort>
+          }
+        </VStack>
+      </VStack>
     </div>
   )
 }
