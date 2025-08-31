@@ -60,7 +60,7 @@ export default [
     route('batcher', 'batcher/batcher.tsx'),
 
     ...prefix('behandling/:behandlingId', [
-      layout('behandling/behandling.$behandlingId.tsx', [
+      route('', 'behandling/behandling.$behandlingId.tsx', [
         index('behandling/behandling.$behandlingId._index.tsx'),
 
         route('behandlingManuellOpptelling', 'behandling/behandling.$behandlingId.behandlingManuellOpptelling.tsx'),
