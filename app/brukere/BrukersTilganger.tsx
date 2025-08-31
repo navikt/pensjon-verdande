@@ -35,10 +35,10 @@ export default function BrukersTilganger(props: Props) {
   return (
     props.tilgangskontrollmeta.sort((a, b) => a.omfangBeskrivelse.localeCompare(b.omfangBeskrivelse, 'nb', { sensitivity: 'base' })).map(it => it.omfangNavn).filter(uniqueFilter).map(omfangNavn => {
       return (
-          <CheckboxGroup legend={decodeOmfang(props.tilgangskontrollmeta, omfangNavn)} value={gitteTilganger} readOnly={props.readonly}>
+          <CheckboxGroup key={`omfang-${omfangNavn}`} legend={decodeOmfang(props.tilgangskontrollmeta, omfangNavn)} value={gitteTilganger} readOnly={props.readonly}>
             {
               props.tilgangskontrollmeta.filter(it => it.omfangNavn == omfangNavn).sort(tilgangsmetaSort).map((oppgave) => {
-                return (<Checkbox key={oppgave.operasjonNavn} value={oppgave.operasjonNavn} onChange={() => toggleTilgang(oppgave)}>
+                return (<Checkbox key={`${omfangNavn}:${oppgave.operasjonNavn}`} value={oppgave.operasjonNavn} onChange={() => toggleTilgang(oppgave)}>
                   {oppgave.operasjonBeskrivelse}
                 </Checkbox>)
               })
