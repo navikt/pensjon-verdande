@@ -1,4 +1,4 @@
-import { BehandlingAntall } from '~/types'
+import type { BehandlingAntall } from '~/types'
 import { Box } from '@navikt/ds-react'
 import { NumberListIcon } from '@navikt/aksel-icons'
 import BehandlingAntallTable from '~/components/behandling-antall-table/BehandlingAntallTable'

@@ -3,10 +3,9 @@ import Dag from '~/components/kalender/Dag'
 import { getWeek, getWeekYear } from '~/common/weeknumber'
 import { Box, Button, Heading, HStack, Spacer } from '@navikt/ds-react'
 import React from 'react'
-import { BehandlingDto } from '~/types'
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
 import { useSearchParams } from 'react-router'
-import { KalenderHendelser } from '~/components/kalender/types'
+import type { KalenderHendelser } from '~/components/kalender/types'
 
 const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
 

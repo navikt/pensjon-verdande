@@ -1,4 +1,4 @@
-import { DatoAntall } from '~/types'
+import type { DatoAntall } from '~/types'
 import { BehandlingerPerDagLineChart } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChart'
 import { Box, Button, HStack, Spacer } from '@navikt/ds-react'
 import { AreaChartFillIcon } from '@navikt/aksel-icons'

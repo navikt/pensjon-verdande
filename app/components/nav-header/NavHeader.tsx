@@ -7,7 +7,7 @@ import {
 } from '@navikt/aksel-icons'
 import { useEffect, useState } from 'react'
 import MeMenu from '~/components/nav-header/MeMenu'
-import { MeResponse } from '~/brukere/brukere'
+import type { MeResponse } from '~/brukere/brukere'
 
 export type Props = {
   erProduksjon: boolean,

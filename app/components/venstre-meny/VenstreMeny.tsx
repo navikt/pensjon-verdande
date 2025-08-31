@@ -4,12 +4,12 @@ import {
   CalendarIcon,
   ChevronDownIcon, CircleIcon, CurrencyExchangeIcon,
   HouseIcon,
-  MagnifyingGlassIcon, NumberListIcon,
+  NumberListIcon,
   PersonGroupIcon,
   SackPensionIcon, WrenchIcon,
 } from '@navikt/aksel-icons'
 import { Link } from '@navikt/ds-react'
-import { MeResponse } from '~/brukere/brukere'
+import type { MeResponse } from '~/brukere/brukere'
 
 export type Props = {
   me: MeResponse,

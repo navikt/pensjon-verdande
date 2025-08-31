@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, Await, useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, Await, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
 import { HGrid, Skeleton, VStack } from '@navikt/ds-react'

@@ -4,7 +4,7 @@ import { Form } from 'react-router';
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { useActionData } from 'react-router'
-import { ActionData } from '~/vedlikehold/vedlikehold.types'
+import type { ActionData } from '~/vedlikehold/vedlikehold.types'
 import { hentMot } from '~/vedlikehold/vedlikehold.server'
 
 export default function SokosSPKMottakPage() {

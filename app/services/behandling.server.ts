@@ -1,4 +1,4 @@
-import {
+import type {
   BehandlingDto,
   BehandlingerPage,
   BehandlingManuellOpptellingResponse,
@@ -12,8 +12,8 @@ import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
-import { KalenderHendelser, KalenderHendelserDTO } from '~/components/kalender/types'
-import { apiGet, RequestCtx } from '~/services/api.server'
+import type { KalenderHendelser, KalenderHendelserDTO } from '~/components/kalender/types'
+import { apiGet, type RequestCtx } from '~/services/api.server'
 
 export async function getSchedulerStatus(
   accessToken: string,

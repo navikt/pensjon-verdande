@@ -38,14 +38,14 @@ import { decodeBehandling } from '~/common/decodeBehandling'
 import { getEnumValueByKey } from '~/common/utils'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import {
-  LaasteVedtakBehandlingSummary,
-  LaasteVedtakRow,
-  LaasteVedtakUttrekkStatus,
-  LaasteVedtakUttrekkSummary, muligeAksjonspunkt,
-  VedtakYtelsekomponenter,
+  type LaasteVedtakBehandlingSummary,
+  type LaasteVedtakRow,
+  type LaasteVedtakUttrekkStatus,
+  type LaasteVedtakUttrekkSummary, muligeAksjonspunkt,
+  type VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'
 import { useSort } from '~/hooks/useSort'
-import { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
+import type { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import { getLaasteVedtakSummary } from '~/vedlikehold/vedlikehold.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {

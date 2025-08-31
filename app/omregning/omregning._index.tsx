@@ -28,7 +28,7 @@ import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
 import OmregningOppsummering from '~/components/omregning/OmregningOppsummering'
 import { hentOmregningInit, hentOmregningInput } from '~/omregning/batch.omregning.server'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   const omregningInit = await hentOmregningInit(
@@ -354,8 +354,8 @@ export default function BatchOpprett_index() {
                     <HGrid columns={2} gap='12'>
                       <Box.New
                         padding='4'
-                        background='surface-info-subtle'
-                        borderColor='border-info'
+                        background={'raised'}
+                        borderColor={'neutral-subtle'}
                         borderWidth='4'
                       >
                         <OmregningSelector label={"Bestill brev for"} navn={"skalBestilleBrev"} value={skalBestilleBrev} setSelectedValue={setSkalBestilleBrev} optionsmap={optionBestilleBrev} />
@@ -398,8 +398,8 @@ export default function BatchOpprett_index() {
                       </Box.New>
                       <Box.New
                         padding='4'
-                        background='surface-info-subtle'
-                        borderColor='border-info'
+                        background={'sunken'}
+                        borderColor={'neutral-subtleA'}
                         borderWidth='4'
                       >
 

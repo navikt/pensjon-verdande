@@ -4,7 +4,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
 import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { BehandlingerPage } from '~/types'
+import type { BehandlingerPage } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url)

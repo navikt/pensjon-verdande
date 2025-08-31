@@ -1,5 +1,5 @@
-import React, { ForwardedRef, forwardRef } from 'react'
-import { HelpText, Label, OverridableComponent } from '@navikt/ds-react'
+import React, { type ForwardedRef, forwardRef } from 'react'
+import { HelpText, Label, type OverridableComponent } from '@navikt/ds-react'
 
 interface Props extends React.HTMLAttributes<HTMLElement> {
   labelText?: string

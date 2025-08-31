@@ -1,6 +1,6 @@
 import { env } from '~/services/env.server'
 import { data } from 'react-router'
-import { BrukerResponse, MeResponse, Tilgangsmeta } from '~/brukere/brukere'
+import type { BrukerResponse, MeResponse, Tilgangsmeta } from '~/brukere/brukere'
 
 export async function hentTilgangskontrollMeta(
   accessToken: string,

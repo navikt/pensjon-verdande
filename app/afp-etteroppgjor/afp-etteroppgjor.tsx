@@ -11,9 +11,9 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
 import { apiGet } from '~/services/api.server'
-import { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
+import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { Behandlingstatus } from '~/types'

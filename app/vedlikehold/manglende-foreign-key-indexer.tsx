@@ -1,8 +1,8 @@
-import { LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
 
-import { BodyLong, BodyShort, Box, CopyButton, Heading, SortState, Table, VStack } from '@navikt/ds-react'
+import { BodyLong, BodyShort, Box, CopyButton, Heading, type SortState, Table, VStack } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse } from '~/vedlikehold/vedlikehold.types'
+import type { ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse } from '~/vedlikehold/vedlikehold.types'
 import { apiGet } from '~/services/api.server'
 
 interface ScopedSortState extends SortState {

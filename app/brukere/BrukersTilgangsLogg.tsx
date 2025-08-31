@@ -1,6 +1,6 @@
 import { Table } from '@navikt/ds-react'
 import { formatIsoTimestamp } from '~/common/date'
-import { BrukerResponse, decodeOperasjon, Tilgangsmeta } from '~/brukere/brukere'
+import { type BrukerResponse, decodeOperasjon, type Tilgangsmeta } from '~/brukere/brukere'
 
 export interface Props {
   tilgangskontrollmeta: Tilgangsmeta[],

@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
 import React from 'react'
 import { BodyLong, Button, Heading, Label } from '@navikt/ds-react'
 import { requireAccessToken } from '~/services/auth.server'

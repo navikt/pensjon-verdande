@@ -1,5 +1,5 @@
 import {
-  LoaderFunctionArgs,
+  type LoaderFunctionArgs,
   useLoaderData,
   useSubmit,
   Form,
@@ -19,7 +19,7 @@ import {
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { BehandlingerPage } from '~/types'
+import type { BehandlingerPage } from '~/types'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'

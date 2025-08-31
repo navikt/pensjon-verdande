@@ -30,7 +30,7 @@ import {
   ExclamationmarkTriangleIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
-import { VedtakYtelsekomponenter } from '~/vedlikehold/laaste-vedtak.types'
+import type { VedtakYtelsekomponenter } from '~/vedlikehold/laaste-vedtak.types'
 
 export default function LaasteVedtakPage() {
   const [sak, setSak] = useState<SakOppsummeringLaasOpp | undefined | null>(

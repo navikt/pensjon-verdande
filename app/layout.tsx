@@ -1,7 +1,7 @@
 import NavHeader from '~/components/nav-header/NavHeader'
 import { Alert, Box, HStack, Page, Theme } from '@navikt/ds-react'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
-import { createCookie, LoaderFunctionArgs, Outlet, useLoaderData, useNavigation } from 'react-router'
+import { createCookie, type LoaderFunctionArgs, Outlet, useLoaderData, useNavigation } from 'react-router'
 import React, { useState } from 'react'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentMe } from '~/brukere/brukere.server'

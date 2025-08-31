@@ -20,7 +20,7 @@ import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import { ExternalLinkIcon, FloppydiskIcon } from '@navikt/aksel-icons'
-import { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
+import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
 import { hentInfoBanner, oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {

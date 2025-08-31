@@ -1,12 +1,12 @@
-import {
+import type {
   AggregerteFeilmeldinger,
   AvviksGrense,
-  type EkskluderteSakerResponse,
-  type ReguleringDetaljer,
+  EkskluderteSakerResponse,
+  ReguleringDetaljer,
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
 import { env } from '~/services/env.server'
-import { DetaljertFremdriftDTO } from '~/types'
+import type { DetaljertFremdriftDTO } from '~/types'
 
 export async function avbrytBehandlinger(action: 'avbrytBehandlingerFeiletMotPOPP' | 'avbrytBehandlingerFeiletIBeregnYtelse' | null, accessToken: string) {
   let urlPostfix: string

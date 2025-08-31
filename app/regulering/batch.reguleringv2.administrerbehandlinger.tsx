@@ -6,12 +6,12 @@ import type {
   ReguleringDetaljer,
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
-import { ArbeidstabellStatistikk } from '~/regulering/regulering.types'
-import React, { useEffect, useRef, useState } from 'react'
+import type { ArbeidstabellStatistikk } from '~/regulering/regulering.types'
+import React, { useEffect, useState } from 'react'
 import { Link, useFetcher, useOutletContext } from 'react-router';
-import { Alert, Button, Dropdown, HStack, Loader, Modal, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
+import { Alert, Button, Dropdown, HStack, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
 import { Entry } from '~/components/entry/Entry'
-import { DetaljertFremdriftDTO } from '~/types'
+import type { DetaljertFremdriftDTO } from '~/types'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
@@ -453,47 +453,3 @@ export function TotaloversiktBehandlinger({ behandlingId }: {
     <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
   )
 }
-
-export function ConfirmationModal(props: {
-  text: string;
-  showModal: boolean;
-  onOk: () => void;
-  onCancel: () => void;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-
-  if (props.showModal) {
-    ref.current?.showModal();
-  } else {
-    ref.current?.close();
-  }
-
-  return (
-    <div>
-      <Modal
-        ref={ref}
-        header={{ heading: "Er du sikker?", closeButton: false }}
-        onClose={props.onCancel}
-      >
-        <Modal.Body>
-          {props.text}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button type="button" onClick={props.onOk} size="small">
-            Fortsett
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={props.onCancel}
-            size="small"
-          >
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
-  );
-}
-
-

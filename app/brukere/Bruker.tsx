@@ -2,7 +2,7 @@ import { BodyShort, Box, Heading, Tabs } from '@navikt/ds-react'
 import { ClockDashedIcon, KeyHorizontalIcon } from '@navikt/aksel-icons'
 import BrukersTilganger from '~/brukere/BrukersTilganger'
 import { BrukersTilgangsLogg } from '~/brukere/BrukersTilgangsLogg'
-import { BrukerResponse, Tilgangsmeta } from '~/brukere/brukere'
+import type { BrukerResponse, Tilgangsmeta } from '~/brukere/brukere'
 
 export interface Props {
   tilgangskontrollmeta: Tilgangsmeta[],

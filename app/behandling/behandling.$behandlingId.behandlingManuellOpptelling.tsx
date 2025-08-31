@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
 
 import { getBehandlingManuellOpptelling } from '~/services/behandling.server'
 

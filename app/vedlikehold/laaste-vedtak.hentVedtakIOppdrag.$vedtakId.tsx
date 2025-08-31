@@ -1,4 +1,4 @@
-import { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 
 import { requireAccessToken } from '~/services/auth.server'
 import invariant from 'tiny-invariant'

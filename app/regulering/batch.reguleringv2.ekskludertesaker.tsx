@@ -1,6 +1,6 @@
-import {
+import type {
   ActionFunctionArgs,
-} from 'react-router';
+} from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import React, { useEffect, useState } from 'react'

@@ -1,6 +1,6 @@
 import { env } from '~/services/env.server'
 import { data } from 'react-router'
-import { StartEtteroppgjorResponse } from '~/afp-etteroppgjor/types'
+import type { StartEtteroppgjorResponse } from '~/afp-etteroppgjor/types'
 
 export async function startAfpEtteroppgjor(
   accessToken: string,

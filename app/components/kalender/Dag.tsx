@@ -1,11 +1,10 @@
 import { isSameDay } from '~/common/date'
 import { getWeek } from '~/common/weeknumber'
 import { Link as ReactRouterLink } from 'react-router'
-import React from 'react'
+import React, { type JSX } from 'react'
 import { HStack, Link, Spacer } from '@navikt/ds-react'
 import { decodeBehandling } from '~/common/decodeBehandling'
-import { JSX } from 'react/jsx-runtime'
-import {KalenderBehandling, KalenderHendelser} from '~/components/kalender/types'
+import type { KalenderBehandling, KalenderHendelser } from '~/components/kalender/types'
 
 export type Props = {
   dato: Date,

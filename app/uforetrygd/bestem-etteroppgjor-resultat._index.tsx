@@ -1,6 +1,6 @@
 import { Select } from '@navikt/ds-react'
 import React from 'react'
-import { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 import { Form } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'

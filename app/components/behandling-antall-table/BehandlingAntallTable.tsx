@@ -1,5 +1,5 @@
 import { useSort } from '~/hooks/useSort'
-import { BehandlingAntall } from '~/types'
+import type { BehandlingAntall } from '~/types'
 import React from 'react'
 import { HelpText, HStack, Link, Table } from '@navikt/ds-react'
 import { formatNumber } from '~/common/number'

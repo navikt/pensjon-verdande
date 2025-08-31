@@ -1,9 +1,9 @@
-import { ActionFunctionArgs, useActionData, useSubmit } from 'react-router'
+import { type ActionFunctionArgs, useActionData, useSubmit } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { ConfirmationModal } from '~/regulering/batch.reguleringv2.administrerbehandlinger'
 import { avbrytBehandlinger } from '~/regulering/regulering.server'
+import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 
 
 export const loader = async () => {

@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, useLoaderData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentKalenderHendelser } from '~/services/behandling.server'
 import React from 'react'

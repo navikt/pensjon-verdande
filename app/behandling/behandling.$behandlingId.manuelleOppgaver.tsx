@@ -1,4 +1,4 @@
-import { Link, LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { Link, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 
 import { getBehandling, henBehandlingManuell } from '~/services/behandling.server'
 

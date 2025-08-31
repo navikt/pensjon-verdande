@@ -1,5 +1,5 @@
 import { env } from '~/services/env.server'
-import { EndreKjorelopIverksettVedtakResponse, FortsettBatchResponse, StartBatchResponse } from '~/types'
+import type { EndreKjorelopIverksettVedtakResponse, FortsettBatchResponse, StartBatchResponse } from '~/types'
 
 export async function startReguleringUttrekk(
   accessToken: string,

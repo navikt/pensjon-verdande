@@ -1,12 +1,12 @@
 import { env } from '~/services/env.server'
-import { LaasOppResultat, SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.types'
-import {
+import type { LaasOppResultat, SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.types'
+import type {
   ActionData,
   Infobanner,
   OppdaterInfoBannerResponse,
 } from '~/vedlikehold/vedlikehold.types'
-import {
-  type LaasteVedtakUttrekkStatus,
+import type {
+  LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary,
   VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'

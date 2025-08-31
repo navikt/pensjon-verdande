@@ -1,4 +1,4 @@
-import {ActionFunctionArgs, redirect} from 'react-router';
+import { type ActionFunctionArgs, redirect} from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { opprettOppdaterSakBehandlingPEN } from '~/oppdatersakstatus/oppdatersakstatus.server'

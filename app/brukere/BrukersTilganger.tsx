@@ -2,7 +2,7 @@ import { uniqueFilter } from '~/common/utils'
 import { Checkbox, CheckboxGroup } from '@navikt/ds-react'
 import { useFetcher } from 'react-router'
 import { useState } from 'react'
-import { BrukerResponse, decodeOmfang, Tilgangsmeta, tilgangsmetaSort } from '~/brukere/brukere'
+import { type BrukerResponse, decodeOmfang, type Tilgangsmeta, tilgangsmetaSort } from '~/brukere/brukere'
 
 export interface Props {
   bruker: BrukerResponse,

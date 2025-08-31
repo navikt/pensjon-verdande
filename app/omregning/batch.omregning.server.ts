@@ -4,7 +4,7 @@ import type {
   OmregningRequest,
   OmregningSakerPage,
   OmregningBehandlingsnoekler,
-  StartBatchResponse, OmregningStatistikkPage, OmregningStatistikk,
+  StartBatchResponse, OmregningStatistikkPage,
 } from '~/types'
 import { env } from '~/services/env.server'
 

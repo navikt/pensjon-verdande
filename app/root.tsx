@@ -1,4 +1,4 @@
-import { isRouteErrorResponse, LinksFunction } from 'react-router'
+import { isRouteErrorResponse, type LinksFunction } from 'react-router'
 
 import {
   Links,
@@ -15,7 +15,7 @@ import appStylesHref from './app.css?url'
 import { env } from '~/services/env.server'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import React from 'react'
-import { Route } from '../.react-router/types/app/+types/root'
+import type { Route } from '../.react-router/types/app/+types/root'
 import '@navikt/ds-css/darkside'
 
 export const links: LinksFunction = () => {

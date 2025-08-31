@@ -1,5 +1,5 @@
 import { FormSummary, HGrid } from '@navikt/ds-react'
-import { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types';
+import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
 import React from 'react'
 
 interface OmregningOppsummeringProps {

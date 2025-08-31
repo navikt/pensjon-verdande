@@ -2,7 +2,7 @@ import {
   BodyShort,
   Heading,
 } from '@navikt/ds-react'
-import { ErrorResponse } from 'react-router'
+import type { ErrorResponse } from 'react-router'
 
 export interface Props {
   error: ErrorResponse,

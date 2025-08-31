@@ -1,10 +1,10 @@
-import { ActionFunctionArgs, useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, useLoaderData } from 'react-router'
 
 import { getBehandlinger } from '~/services/behandling.server'
 
 import { requireAccessToken } from '~/services/auth.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { BehandlingerPage } from '~/types'
+import type { BehandlingerPage } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   let { searchParams } = new URL(request.url);

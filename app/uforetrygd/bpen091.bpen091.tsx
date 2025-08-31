@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from 'react-router';
+import { type ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
 

@@ -1,5 +1,5 @@
 import 'chart.js/auto'
-import { ReguleringDetaljer } from '~/regulering/regulering.types'
+import type { ReguleringDetaljer } from '~/regulering/regulering.types'
 import React, { useState } from 'react'
 import {
   Alert,

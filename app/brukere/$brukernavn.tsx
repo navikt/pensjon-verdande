@@ -1,5 +1,5 @@
 import { requireAccessToken } from '~/services/auth.server'
-import { ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import Bruker from '~/brukere/Bruker'
 import {

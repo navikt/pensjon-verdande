@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from 'react-router';
+import { type ActionFunctionArgs, redirect } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import { Outlet, useLoaderData, useLocation } from 'react-router';
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'

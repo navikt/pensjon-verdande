@@ -1,7 +1,11 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
-import { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering/regulering.types'
+import type {
+  AggregerteFeilmeldinger,
+  ReguleringDetaljer,
+  ReguleringOrkestrering,
+} from '~/regulering/regulering.types'
 import React, { useEffect, useState } from 'react'
 import { Form, Link, useFetcher, useNavigation, useOutletContext } from 'react-router';
 import {
@@ -17,7 +21,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { Entry } from '~/components/entry/Entry'
-import { Behandlingstatus, DetaljertFremdriftDTO } from '~/types'
+import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
 import { formatIsoTimestamp } from '~/common/date'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,

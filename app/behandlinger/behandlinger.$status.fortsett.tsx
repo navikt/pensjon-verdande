@@ -1,4 +1,4 @@
-import { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 import { fortsettBehandling } from '~/services/behandling.server'
 import { requireAccessToken } from '~/services/auth.server'
 

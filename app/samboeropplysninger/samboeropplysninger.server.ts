@@ -1,5 +1,5 @@
 import { env } from '~/services/env.server'
-import { StartBatchResponse } from '~/types'
+import type { StartBatchResponse } from '~/types'
 import { data } from 'react-router'
 
 export async function startVurderSamboereBatch(
