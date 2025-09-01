@@ -1,6 +1,6 @@
-import StartOmregningAvYtelseVedOppdaterteOpptjeningsopplysninger from '~/opptjening/opptjening.kategoriserBruker._index'
 import ManedligOmregningUttrekk from '~/opptjening/ManedligOmregningUttrekk'
 import { useLoaderData } from 'react-router'
+import ManedligOmregningKategoriserBruker from '~/opptjening/ManedligOmregningKategoriserBruker'
 
 export const loader = async () => {
   const now = new Date()
@@ -22,7 +22,7 @@ export default function OpprettEndretOpptjeningRoute() {
         <table width="100%">
           <tr>
             <td><ManedligOmregningUttrekk denneBehandlingsmaneden={denneBehandlingsmaneden}/></td>
-            <td><StartOmregningAvYtelseVedOppdaterteOpptjeningsopplysninger denneBehandlingsmaneden={denneBehandlingsmaneden}/></td>
+            <td><ManedligOmregningKategoriserBruker denneBehandlingsmaneden={denneBehandlingsmaneden}/></td>
           </tr>
         </table>
       </div>
