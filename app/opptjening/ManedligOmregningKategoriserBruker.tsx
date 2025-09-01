@@ -1,9 +1,7 @@
 import { Form, useSubmit } from 'react-router';
 import { useState } from 'react'
 
-export default function BatchOpprett_index() {
-  const now = new Date()
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
+export default function ManedligOmregningKategoriserBruker({denneBehandlingsmaneden} : { denneBehandlingsmaneden: number}) {
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}

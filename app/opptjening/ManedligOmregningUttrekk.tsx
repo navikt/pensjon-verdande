@@ -1,18 +1,7 @@
 import { Form, useLoaderData, useSubmit } from 'react-router'
 import { useState } from 'react'
 
-export const loader = async () => {
-  const now = new Date()
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
-
-  return {
-    denneBehandlingsmaneden,
-  }
-}
-
-export default function EndretOpptjeningManedligUttrekk() {
-  const { denneBehandlingsmaneden } = useLoaderData<typeof loader>()
-
+export default function ManedligOmregningUttrekk({denneBehandlingsmaneden}: { denneBehandlingsmaneden: number }) {
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}

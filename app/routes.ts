@@ -134,9 +134,7 @@ export default [
     route('oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus._index.tsx'),
     route('oppdatersakstatus/oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus.oppdatersakstatus.tsx'),
 
-    route('opptjening/kategoriserBruker', 'opptjening/opptjening.kategoriserBruker._index.tsx'),
     route('opptjening/arlig/omregning/uttrekk', 'opptjening/opptjening.arlig.omregning.uttrekk.tsx'),
-    route('opptjening/manedlig/uttrekk', 'opptjening/opptjening.manedlig.uttrekk._index.tsx'),
     route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx'),
     route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),
     route('opptjening/manedlig/omregning/kategoriserBruker', 'opptjening/opptjening.manedlig.omregning.kategoriserBruker.tsx'),

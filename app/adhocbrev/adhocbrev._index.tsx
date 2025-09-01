@@ -1,7 +1,6 @@
 import { Form, useSubmit } from 'react-router';
 import { useRef, useState } from 'react'
 import { BodyShort, Select, VStack } from '@navikt/ds-react'
-import { env } from '~/services/env.server'
 
 export default function BatchOpprett_index() {
   const [isClicked, setIsClicked] = useState(false)

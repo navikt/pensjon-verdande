@@ -1,15 +1,28 @@
-import EndretOpptjeningManedligUttrekk from '~/opptjening/opptjening.manedlig.uttrekk._index'
-import BatchOpprett_index from '~/opptjening/opptjening.kategoriserBruker._index'
+import StartOmregningAvYtelseVedOppdaterteOpptjeningsopplysninger from '~/opptjening/opptjening.kategoriserBruker._index'
+import ManedligOmregningUttrekk from '~/opptjening/ManedligOmregningUttrekk'
+import { useLoaderData } from 'react-router'
+
+export const loader = async () => {
+  const now = new Date()
+  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
+
+  return {
+    denneBehandlingsmaneden
+  }
+}
+
 
 export default function OpprettEndretOpptjeningRoute() {
+  const { denneBehandlingsmaneden } = useLoaderData<typeof loader>()
+
   return (
     <div>
       <h1>Månedlig omregning av ytelse ved oppdaterte opptjeningsopplysninger</h1>
       <div>
         <table width="100%">
           <tr>
-            <td><EndretOpptjeningManedligUttrekk /></td>
-            <td><BatchOpprett_index /></td>
+            <td><ManedligOmregningUttrekk denneBehandlingsmaneden={denneBehandlingsmaneden}/></td>
+            <td><StartOmregningAvYtelseVedOppdaterteOpptjeningsopplysninger denneBehandlingsmaneden={denneBehandlingsmaneden}/></td>
           </tr>
         </table>
       </div>
