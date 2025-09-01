@@ -23,6 +23,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         status: params.status,
         ansvarligTeam: searchParams.get('ansvarligTeam'),
         behandlingManuellKategori: params.behandlingManuellKategori,
+        forrigeBehandlingId: +params.behandlingId,
         page: page ? +page : 0,
         size: size ? +size : 100,
         sort: searchParams.get('sort'),
