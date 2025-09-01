@@ -91,12 +91,12 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
   }
 
   function behandlingtypeOptions() {
-    let ekstraBehandlingType: JSX.Element
+    let ekstraBehandlingType: JSX.Element | undefined
     const currentBehandlingType = searchParams.get('behandlingType')
     if (currentBehandlingType && !behandlingerResponse.behandlingTyper.includes(currentBehandlingType)) {
       ekstraBehandlingType = (<option value={currentBehandlingType}>{decodeBehandling(currentBehandlingType)}</option>)
     } else {
-      ekstraBehandlingType = (<></>)
+      ekstraBehandlingType = undefined
     }
 
     return <Select

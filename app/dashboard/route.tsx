@@ -67,8 +67,7 @@ export default function Dashboard() {
     }>
       <Await resolve={loadingDashboardResponse}>
         {(dashboardResponse) => {
-          if (!dashboardResponse) return (<></>)
-          return (
+          return dashboardResponse && (
             <VStack gap="6">
             <HGrid gap="6" columns={4}>
               <DashboardCard
@@ -114,9 +113,9 @@ export default function Dashboard() {
                 />
               </VStack>
             </HGrid>
-            </VStack>)
-        }
-        }
+            </VStack>
+          )
+        }}
       </Await>
     </React.Suspense>
   )

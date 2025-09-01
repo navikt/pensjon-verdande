@@ -1,7 +1,7 @@
 import NavHeader from '~/components/nav-header/NavHeader'
-import { Alert, Box, HStack, Page, Theme } from '@navikt/ds-react'
+import { Alert, Box, HStack, Page, Theme, } from '@navikt/ds-react'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
-import { createCookie, type LoaderFunctionArgs, Outlet, useLoaderData, useNavigation } from 'react-router'
+import { createCookie, type LoaderFunctionArgs, Outlet, useLoaderData } from 'react-router'
 import { useState } from 'react'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentMe } from '~/brukere/brukere.server'
@@ -28,8 +28,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 }
 
 export default function Layout() {
-  const navigation = useNavigation()
-
   const { env, me, schedulerStatus, darkmode } = useLoaderData<typeof loader>()
   const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
 
@@ -41,17 +39,17 @@ export default function Layout() {
 
   return (
     <Theme theme={isDarkmode ? 'dark' : 'light'}>
-      <Box.New asChild background={"default"}>
+      <Box.New asChild background={'default'}>
         <Page>
           <NavHeader erProduksjon={env === 'p'} env={env} me={me} darkmode={isDarkmode} setDarkmode={setIsDarkmode} />
 
           <HStack gap="0" wrap={false}>
             <VenstreMeny me={me}></VenstreMeny>
 
-            <div className={navigation.state === 'loading' ? 'loading' : ''} id="detail">
+            <Page.Block style={{paddingLeft: '12px', paddingRight: '12px'}}>
               {schedulerAlert}
               <Outlet />
-            </div>
+            </Page.Block>
           </HStack>
         </Page>
       </Box.New>

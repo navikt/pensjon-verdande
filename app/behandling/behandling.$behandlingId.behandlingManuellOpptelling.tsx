@@ -5,7 +5,6 @@ import { getBehandlingManuellOpptelling } from '~/services/behandling.server'
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { Link, Table } from '@navikt/ds-react'
-import React from 'react'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const { behandlingId } = params

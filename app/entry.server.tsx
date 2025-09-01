@@ -13,7 +13,7 @@ process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
   logger.error("Unhandled Rejection at:", p, "reason:", reason);
 
   let stack = '';
-  if (reason && reason.stack) {
+  if (reason?.stack) {
     stack = reason.stack;
   } else if (typeof reason === 'string') {
     stack = reason;

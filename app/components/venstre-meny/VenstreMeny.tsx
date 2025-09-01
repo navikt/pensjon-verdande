@@ -122,7 +122,7 @@ export default function VenstreMeny(props: Props) {
         </li>
       )
     } else {
-      return (<></>)
+      return undefined
     }
   }
 
