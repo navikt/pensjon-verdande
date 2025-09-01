@@ -21,6 +21,7 @@ import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgj
 import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { Behandlingstatus } from '~/types'
+import styles from './afp-etteroppgjor.module.css'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const behandlinger = await apiGet<HentAlleResponse>(`/api/afpoffentlig/etteroppgjor/behandling`, request)
@@ -87,7 +88,7 @@ function statusTag(status: Behandlingstatus) {
 
 function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
   return (
-    <Box className={'etteroppgjor-box'} padding={'4'}>
+    <Box className={styles.etteroppgjorBox} padding={'4'}>
       <VStack gap="2">
         <HStack justify="space-between" align="center">
           <Heading size="small">

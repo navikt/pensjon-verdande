@@ -1,20 +1,26 @@
-import { NavLink } from 'react-router'
-import { useState } from 'react'
 import {
   CalendarIcon,
-  ChevronDownIcon, CircleIcon, CurrencyExchangeIcon,
+  ChevronDownIcon,
+  CircleIcon,
+  CurrencyExchangeIcon,
   HouseIcon,
   NumberListIcon,
   PersonGroupIcon,
-  SackPensionIcon, WrenchIcon,
+  SackPensionIcon,
+  WrenchIcon,
 } from '@navikt/aksel-icons'
 import { Link } from '@navikt/ds-react'
+import type { JSX } from 'react'
+import { useState } from 'react'
+import { NavLink } from 'react-router'
 import type { MeResponse } from '~/brukere/brukere'
 
-export type Props = {
-  me: MeResponse,
-}
+import styles from './venstre-meny.module.css'
 
+export type Props = {
+  me: MeResponse
+  showIconMenu: boolean
+}
 
 const administrasjonMeny = [
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
@@ -66,29 +72,30 @@ export default function VenstreMeny(props: Props) {
     if (!me) {
       return false
     }
-    return me.verdandeRoller.find(it => it.toUpperCase() === rolle.toUpperCase())
+    return me.verdandeRoller.find((it) => it.toUpperCase() === rolle.toUpperCase())
   }
 
   function harTilgang(operasjon: string) {
     if (!me) {
       return false
     }
-    return me.tilganger.find(it => it === operasjon)
+    return me.tilganger.find((it) => it === operasjon)
   }
 
   function createMenuItem(operasjon: string, link: string, label: string) {
     return (
       <li key={operasjon + link + label}>
-        <Link
-          as={NavLink}
+        <NavLink
           to={link}
-          className="submenu-link"
           end
           style={{ display: 'flex', justifyContent: 'flex-start' }}
+          className={({ isActive }) => (isActive ? styles.active : '')}
         >
-          <span className="meny-ikon"><CircleIcon title={label} fontSize="1.5rem" /></span>
-          <span className="meny-tekst">{label}</span>
-        </Link>
+          <span className={styles.menyIkon}>
+            <CircleIcon title={label} fontSize="1.5rem" />
+          </span>
+          <span className={styles.menyTekst}>{label}</span>
+        </NavLink>
       </li>
     )
   }
@@ -99,25 +106,28 @@ export default function VenstreMeny(props: Props) {
     setOpenIndex(openIndex === index ? null : index)
   }
 
-  function byggMeny(navn: string, menyElementer: string[][], idx: number, p0?: any) {
+  function byggMeny(navn: string, menyElementer: string[][], idx: number, p0?: JSX.Element) {
     const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
     if (harTilgangTilMeny) {
       return (
-        <li key={`meny-${navn}`} className={openIndex === idx ? 'open' : ''}
-            >
-          <Link as="a" onClick={() => handleMenuClick(idx)} style={{display: 'flex', justifyContent: 'flex-start'}}>
-            <span className="meny-ikon">{p0}</span>
-            <span className="meny-tekst">{navn}</span>
-            <ChevronDownIcon title='a11y-title' fontSize='1.5rem' style={{ marginLeft: 'auto', transition: 'transform 0.2s', transform: openIndex === idx ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+        <li key={`meny-${navn}`} className={openIndex === idx ? styles.open : ''}>
+          <Link as="a" onClick={() => handleMenuClick(idx)} style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <span className={styles.menyIkon}>{p0}</span>
+            <span className={styles.menyTekst}>{navn}</span>
+            <ChevronDownIcon
+              title="a11y-title"
+              fontSize="1.5rem"
+              style={{
+                marginLeft: 'auto',
+                transition: 'transform 0.2s',
+                transform: openIndex === idx ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+            />
           </Link>
-          <ul className='submenu'>
-            {
-              menyElementer
-                .filter(([operasjon]) => harTilgang(operasjon))
-                .map(([operasjon, link, label]) => (
-                  createMenuItem(operasjon, link, label))
-                )
-            }
+          <ul className={styles.submenu}>
+            {menyElementer
+              .filter(([operasjon]) => harTilgang(operasjon))
+              .map(([operasjon, link, label]) => createMenuItem(operasjon, link, label))}
           </ul>
         </li>
       )
@@ -127,42 +137,76 @@ export default function VenstreMeny(props: Props) {
   }
 
   return (
-    <div id="venstre-meny">
-      <nav className="sticky-sidebar">
-        <ul className='mainmenu'>
+    <nav id={styles.venstreMeny} className={props.showIconMenu ? styles.kunIkoner : ''}>
+      <nav className={''}>
+        <ul className={styles.mainmenu}>
           <li>
-            <Link as={NavLink} to={`/dashboard`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-              <span className="meny-ikon"><HouseIcon title='Hjem' fontSize='1.5rem' /></span>
-              <span className="meny-tekst">Hjem</span>
-            </Link>
+            <NavLink
+              to={`/dashboard`}
+              style={{ display: 'flex', justifyContent: 'flex-start' }}
+              className={({ isActive }) => (isActive ? styles.active : '')}
+            >
+              <span className={styles.menyIkon}>
+                <HouseIcon title="Hjem" fontSize="1.5rem" />
+              </span>
+              <span className={styles.menyTekst}>Hjem</span>
+            </NavLink>
           </li>
 
           <li>
-            <Link as={NavLink} to={`/kalender`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-              <span className="meny-ikon"><CalendarIcon title='Kalender' fontSize='1.5rem' /></span>
-              <span className="meny-tekst">Kalender</span>
-            </Link>
+            <NavLink
+              to={`/kalender`}
+              style={{ display: 'flex', justifyContent: 'flex-start' }}
+              className={({ isActive }) => (isActive ? styles.active : '')}
+            >
+              <span className={styles.menyIkon}>
+                <CalendarIcon title="Kalender" fontSize="1.5rem" />
+              </span>
+              <span className={styles.menyTekst}>Kalender</span>
+            </NavLink>
           </li>
 
-          {
-            harRolle('VERDANDE_ADMIN') && (
-              <li>
-                <Link as={NavLink} to={`/brukere`} style={{display: 'flex', justifyContent: 'flex-start'}}>
-                   <span className="meny-ikon"><PersonGroupIcon title='Brukere' fontSize='1.5rem' className={"meny-ikon"} /></span>
-                  <span className="meny-tekst">Brukere</span>
-                </Link>
-              </li>
-            )
-          }
+          {harRolle('VERDANDE_ADMIN') && (
+            <li>
+              <NavLink
+                to={`/brukere`}
+                style={{ display: 'flex', justifyContent: 'flex-start' }}
+                className={({ isActive }) => (isActive ? styles.active : '')}
+              >
+                <span className={styles.menyIkon}>
+                  <PersonGroupIcon title="Brukere" fontSize="1.5rem" className={styles.menyIkon} />
+                </span>
+                <span className={styles.menyTekst}>Brukere</span>
+              </NavLink>
+            </li>
+          )}
 
-          {byggMeny('Større kjøringer', batcherMeny, 0, <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" className={"meny-ikon"} />)}
-          {byggMeny('Behandlinger', behandlingerMeny, 1, <NumberListIcon title="Behandlinger" fontSize="1.5rem" className={"meny-ikon"} />)}
-          {byggMeny('Omregning', omregningMeny, 2, <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" className={"meny-ikon"} />)}
-          {byggMeny('Vedlikehold', administrasjonMeny, 3, <WrenchIcon title="Vedlikehold" fontSize="1.5rem" className={"meny-ikon"} />)}
-
+          {byggMeny(
+            'Større kjøringer',
+            batcherMeny,
+            0,
+            <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" className={styles.menyIkon} />,
+          )}
+          {byggMeny(
+            'Behandlinger',
+            behandlingerMeny,
+            1,
+            <NumberListIcon title="Behandlinger" fontSize="1.5rem" className={styles.menyIkon} />,
+          )}
+          {byggMeny(
+            'Omregning',
+            omregningMeny,
+            2,
+            <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" className={styles.menyIkon} />,
+          )}
+          {byggMeny(
+            'Vedlikehold',
+            administrasjonMeny,
+            3,
+            <WrenchIcon title="Vedlikehold" fontSize="1.5rem" className={styles.menyIkon} />,
+          )}
         </ul>
-
       </nav>
-    </div>
+    </nav>
   )
 }

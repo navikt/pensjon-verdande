@@ -1,0 +1,83 @@
+#venstreMeny {
+  background-color: var(--a-surface-inverted);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow: auto;
+  transition: width 0.5s ease-in-out;
+  width: 22.5em;
+}
+
+#venstreMeny .menyTekst {
+  display: block;
+}
+#venstreMeny.kunIkoner {
+  width: 3em;
+  transition: width 0.5s ease-in-out;
+}
+
+#venstreMeny.kunIkoner .menyTekst {
+  display: none;
+}
+
+#venstreMeny.kunIkoner .menyIkon {
+  margin: 0;
+}
+
+#venstreMeny.kunIkoner:hover {
+  width: 20em;
+  transition: width 0.5s ease-in-out;
+}
+
+#venstreMeny.kunIkoner:hover .menyTekst {
+  display: inline;
+  transition: ease-out;
+}
+
+#venstreMeny .mainmenu,
+.submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 20em;
+}
+
+#venstreMeny .mainmenu a {
+  display: block;
+  text-decoration: none;
+  padding: 10px;
+
+  color: var(--a-text-on-inverted);
+  background-color: var(--a-surface-inverted);
+}
+
+#venstreMeny .mainmenu a:hover {
+  background-color: #1f4ca6;
+}
+
+#venstreMeny .mainmenu li.open .submenu {
+  display: block;
+  max-height: 1000px;
+  border-top: solid 1px rgb(50, 50, 50);
+  border-bottom: solid 1px rgb(50, 50, 50);
+}
+
+#venstreMeny .submenu a.active {
+  background: var(--a-blue-700);
+  color: white;
+}
+
+#venstreMeny .mainmenu li a.active {
+  background: var(--a-blue-700);
+  color: white;
+}
+
+#venstreMeny .submenu a:hover {
+  background-color: #1f4ca6;
+}
+
+#venstreMeny .submenu {
+  overflow: hidden;
+  max-height: 0;
+  -webkit-transition: all 0.5s ease-out;
+}

@@ -1,12 +1,13 @@
+import { Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useState } from 'react'
-import { Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
-import type { BehandlingDto, BehandlingerPage } from '~/types'
 import { Link, useFetcher, useSearchParams } from 'react-router';
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import { getEnumValueByKey } from '~/common/utils'
+import type { BehandlingDto, BehandlingerPage } from '~/types'
+import styles from './behandlinger-table.module.css'
 
 interface Props {
   visStatusSoek?: boolean | true,
@@ -275,7 +276,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   </Table.DataCell>
                   {visStatusSoek && <Table.DataCell>{it.status}</Table.DataCell>}
                   <Table.DataCell title={ it.feilmelding ? `${it.behandlingId}\n${it.feilmelding}` : undefined}>
-                      <div className="feilmelding_kolonne">
+                      <div className={styles.feilmeldingKolonne}>
                         {it.feilmelding}
                       </div>
                   </Table.DataCell>

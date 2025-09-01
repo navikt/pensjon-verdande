@@ -1,0 +1,10 @@
+.production {
+  background-color: rgb(195, 33, 33);
+}
+
+.environmentPostscript {
+  position: absolute;
+  top: 6px;
+  font-size: 16px;
+  color: var(--a-green-200);
+}
