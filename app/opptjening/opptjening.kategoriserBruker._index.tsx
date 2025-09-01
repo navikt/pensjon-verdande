@@ -1,12 +1,5 @@
 import { Form, useSubmit } from 'react-router';
-import { env } from '~/services/env.server'
-import { useEffect, useRef, useState } from 'react'
-
-export const loader = async () => {
-  return {
-    env: env.env,
-  }
-}
+import { useState } from 'react'
 
 export default function BatchOpprett_index() {
   const now = new Date()
@@ -14,18 +7,6 @@ export default function BatchOpprett_index() {
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
-
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-  useEffect(() => {
-    handleInput()
-  })
 
   return (
     <div>

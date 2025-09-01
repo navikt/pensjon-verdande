@@ -1,34 +1,24 @@
-import { Form, useSubmit } from 'react-router';
-import { useEffect, useRef, useState } from 'react'
+import { Form, useLoaderData, useSubmit } from 'react-router'
+import { useState } from 'react'
 import { Select } from '@navikt/ds-react'
-import { env } from '~/services/env.server'
 
 
 export const loader = async () => {
+  const now = new Date()
+
   return {
-    env: env.env,
+    now,
   }
 }
 
 export default function BatchOpprett_index() {
-  const now = new Date()
+  const { now } = useLoaderData<typeof loader>()
+
   const kjoremaaned = now.getFullYear() * 100 + now.getMonth() + 1
   const prioritet = 2
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
-
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-  useEffect(() => {
-    handleInput()
-  })
 
   return (
     <div>

@@ -1,6 +1,6 @@
 import { Form, useSubmit } from 'react-router';
-import { useEffect, useRef, useState } from 'react'
-import { Select } from '@navikt/ds-react'
+import { useRef, useState } from 'react'
+import { BodyShort, Select, VStack } from '@navikt/ds-react'
 import { env } from '~/services/env.server'
 
 export const loader = async () => {
@@ -19,24 +19,14 @@ export default function BatchOpprett_index() {
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-  useEffect(() => {
-    handleInput()
-  })
-
   return (
     <div>
       <h1>Opprett ADHOC Brevbestilling batchkjøring på brevmal for sak</h1>
-      <Form action="adhocBrev" method="POST">
-        <p style={{ fontWeight: 'bold' }}>
+      <Form action="adhocBrev" method="POST" style={{width: '25em'}}>
+        <VStack gap={"4"}>
+        <BodyShort style={{ fontWeight: 'bold' }}>
           Brevmal kode for Sak:
-        </p>
-        <p>
+        </BodyShort>
           <input
             ref={inputRef}
             defaultValue="ERSTATT MED BREVMAL KODE"
@@ -44,11 +34,8 @@ export default function BatchOpprett_index() {
             name="brevmal"
             type="text"
             placeholder="Brevmal"
-            onInput={handleInput}
             style={{ width: 'auto' }}
           />
-        </p>
-        <p>
           <Select
             label="Ekskluder avdøde"
             size={'small'}
@@ -59,12 +46,10 @@ export default function BatchOpprett_index() {
             <option value="true">Ja</option>
             <option value="false">Nei</option>
           </Select>
-        </p>
-        <p>
           <button type="submit" disabled={isClicked} onClick={handleSubmit}>
             Opprett
           </button>
-        </p>
+        </VStack>
       </Form>
     </div>
   )

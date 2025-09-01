@@ -1,24 +1,21 @@
-import { Form, useSubmit } from 'react-router';
-import { useEffect, useRef, useState } from 'react'
+import { Form, useLoaderData, useSubmit } from 'react-router'
+import { useState } from 'react'
+
+export const loader = async () => {
+  const now = new Date()
+
+  return {
+    now,
+  }
+}
 
 export default function EndretOpptjeningManedligUttrekk() {
-  const now = new Date()
+  const { now } = useLoaderData<typeof loader>()
+
   const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
-
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-  useEffect(() => {
-    handleInput()
-  })
 
   return (
     <div>
