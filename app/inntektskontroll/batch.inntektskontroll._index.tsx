@@ -1,78 +1,98 @@
-import { Form, useSubmit } from 'react-router';
-import { useEffect, useRef, useState } from 'react'
-import { Box, Checkbox, CheckboxGroup } from '@navikt/ds-react'
-import { env } from '~/services/env.server'
+import { Button, Checkbox, CheckboxGroup, Heading, Select, VStack } from '@navikt/ds-react'
+import { useState } from 'react'
+import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { z } from 'zod'
+import { zfd } from 'zod-form-data'
+import { opprettBpen014 } from '~/inntektskontroll/batch.bpen014.server'
+import { requireAccessToken } from '~/services/auth.server'
+
+export const FELTER = {
+  aar: 'aar',
+  eps2g: 'eps2g',
+  gjenlevende: 'gjenlevende',
+} as const
+
+const checkboxTrueValue = 'true' as const
 
 export const loader = async () => {
+  const detteÅret = new Date().getFullYear()
+
   return {
-    env: env.env,
+    detteÅret,
   }
+}
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const fd = await request.formData()
+  const accessToken = await requireAccessToken(request)
+
+  const detteÅret = new Date().getFullYear()
+  const skjema = zfd.formData({
+    [FELTER.aar]: zfd.numeric(
+      z
+        .number()
+        .int('År må være et heltall')
+        .min(2020, 'År kan ikke være før 2020')
+        .max(detteÅret, 'År kan ikke være i fremtiden'),
+    ),
+    [FELTER.eps2g]: zfd.checkbox({ trueValue: checkboxTrueValue }),
+    [FELTER.gjenlevende]: zfd.checkbox({ trueValue: checkboxTrueValue }),
+  })
+
+  const { [FELTER.aar]: aar, [FELTER.eps2g]: eps2g, [FELTER.gjenlevende]: gjenlevende } = skjema.parse(fd)
+
+  const response = await opprettBpen014(accessToken, aar, eps2g, gjenlevende)
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 export default function BatchOpprett_index() {
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
+  const { detteÅret } = useLoaderData<typeof loader>()
+  const navigation = useNavigation()
 
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [kjøreår, setKjøreår] = useState<number | ''>('')
+  const muligeÅr = Array.from({ length: 5 }, (_, i) => detteÅret - i)
 
-  const handleInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = `${inputRef.current.value.length + 1}ch`
-    }
-  }
-
-
-  const [eps2g, setEps2g] = useState(false)
-
-  const [gjenlevende, setGjenlevende] = useState(false)
-
-  useEffect(() => {
-    handleInput()
-  })
+  const isSubmitting = navigation.state === 'submitting'
 
   return (
     <div>
-      <h1>Start Inntektskontroll</h1>
-      <Form action="opprett" method="POST">
-        <div style={{ display: 'inline-block' }}>
-          <label>År</label>
-          <br />
-          <input
-            aria-label="Behandling År"
-            name="aar"
-            type="number"
-            placeholder="KontrollÅr"
-          />
-        </div>
-        <Box.New>
-          <CheckboxGroup legend={'Behandlingsparametere'} name={'behandlingsparametere'} onChange={() => {
-            console.log('change')
-          }}>
-            <Checkbox
-              name='eps2g'
-              value={eps2g}
-              onChange={(event) => setEps2g(event.target.checked)}
-            >
+      <Heading size="medium">Start inntektskontroll</Heading>
+
+      <Form method="post" style={{ maxWidth: '25em' }}>
+        <VStack gap="4">
+          <Select
+            name={FELTER.aar}
+            label="Velg år"
+            onChange={(e) => {
+              const v = e.currentTarget.value
+              setKjøreår(v === '' ? '' : Number(v))
+            }}
+            value={kjøreår}
+            required
+          >
+            <option value="" disabled>
+              Velg år
+            </option>
+            {muligeÅr.map((årstall) => (
+              <option key={årstall} value={årstall}>
+                {årstall}
+              </option>
+            ))}
+          </Select>
+
+          <CheckboxGroup legend="Behandlingsparametere" style={{ padding: 0 }}>
+            <Checkbox name={FELTER.eps2g} value={checkboxTrueValue}>
               Inntektskontroll for ektefelle/samboer (2G)
             </Checkbox>
 
-            <Checkbox
-              name='gjenlevende'
-              value={gjenlevende}
-              onChange={(event) => setGjenlevende(event.target.checked)}
-            >
+            <Checkbox name={FELTER.gjenlevende} value={checkboxTrueValue}>
               Inntektskontroll for gjenlevende
             </Checkbox>
-
           </CheckboxGroup>
-        </Box.New>
-            <br />
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Opprett
-          </button>
-        </p>
+
+          <Button type="submit" disabled={kjøreår === '' || isSubmitting}>
+            {isSubmitting ? 'Oppretter…' : 'Opprett'}
+          </Button>
+        </VStack>
       </Form>
     </div>
   )

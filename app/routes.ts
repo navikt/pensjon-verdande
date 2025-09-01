@@ -18,7 +18,6 @@ export default [
     route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),
 
     route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx'),
-    route('batch/inntektskontroll/opprett', 'inntektskontroll/batch.inntektskontroll.opprett.tsx'),
 
     route('batch/regulering', 'regulering/batch.regulering.tsx'),
 

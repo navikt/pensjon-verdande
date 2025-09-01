@@ -115,9 +115,9 @@ export default function Kalender(props: Props) {
         </tr>
         </thead>
         <tbody>
-        {[...Array(6)].map((_, rowIdx) => (
-            <tr key={rowIdx + 'dato'} style={{ height: '8em', verticalAlign: 'top' }}>
-              {[...Array(7)].map((_, colIdx) => dag(colIdx, rowIdx))}
+        {[0, 1, 2, 3, 4, 5, 6].map(row => (
+            <tr key={`rad:${row}`} style={{ height: '8em', verticalAlign: 'top' }}>
+              {[...Array(7)].map((_, colIdx) => dag(colIdx, row))}
             </tr>
         ))}
         </tbody>
