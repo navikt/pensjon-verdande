@@ -3,12 +3,6 @@ import { useRef, useState } from 'react'
 import { BodyShort, Select, VStack } from '@navikt/ds-react'
 import { env } from '~/services/env.server'
 
-export const loader = async () => {
-  return {
-    env: env.env,
-  }
-}
-
 export default function BatchOpprett_index() {
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()

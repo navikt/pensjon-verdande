@@ -2,19 +2,18 @@ import { Form, useLoaderData, useSubmit } from 'react-router'
 import { useState } from 'react'
 import { Select } from '@navikt/ds-react'
 
-
 export const loader = async () => {
   const now = new Date()
+  const kjoremaaned = now.getFullYear() * 100 + now.getMonth() + 1
 
   return {
-    now,
+    kjoremaaned,
   }
 }
 
 export default function BatchOpprett_index() {
-  const { now } = useLoaderData<typeof loader>()
+  const { kjoremaaned } = useLoaderData<typeof loader>()
 
-  const kjoremaaned = now.getFullYear() * 100 + now.getMonth() + 1
   const prioritet = 2
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()

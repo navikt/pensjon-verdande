@@ -1,20 +1,20 @@
-import { Form, useSubmit } from 'react-router';
-import { env } from '~/services/env.server'
+import { Form, useLoaderData, useSubmit } from 'react-router'
 import { useState } from 'react'
 
 export const loader = async () => {
+  const innevaerendeAar = new Date().getFullYear()
+
   return {
-    env: env.env,
+    innevaerendeAar
   }
 }
 
 export default function EndretOpptjeningArligUttrekk() {
+  const { innevaerendeAar } = useLoaderData<typeof loader>()
+
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
-
-  const now = new Date()
-  const innevaerendeAar = now.getFullYear()
 
   return (
     <div>

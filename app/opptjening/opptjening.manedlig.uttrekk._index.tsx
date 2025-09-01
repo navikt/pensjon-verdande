@@ -3,16 +3,16 @@ import { useState } from 'react'
 
 export const loader = async () => {
   const now = new Date()
+  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
 
   return {
-    now,
+    denneBehandlingsmaneden,
   }
 }
 
 export default function EndretOpptjeningManedligUttrekk() {
-  const { now } = useLoaderData<typeof loader>()
+  const { denneBehandlingsmaneden } = useLoaderData<typeof loader>()
 
-  const denneBehandlingsmaneden = now.getFullYear() * 100 + now.getMonth() + 1
   const [isClicked, setIsClicked] = useState(false)
   const submit = useSubmit()
   const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
