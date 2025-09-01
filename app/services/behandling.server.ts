@@ -620,14 +620,3 @@ export async function getBehandlingManuellOpptelling(
     ctx,
   )
 }
-
-export async function getBehandlingManuellKategori(
-  ctx: RequestCtx,
-  behandlingId: number,
-  behandlingManuellKategori: string,
-): Promise<BehandlingDto> {
-  return apiGet(
-    `/api/behandling/${behandlingId}?behandlingManuellKategori=${behandlingManuellKategori}`,
-    ctx,
-  )
-}
