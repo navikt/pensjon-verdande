@@ -39,7 +39,7 @@ code {
   top:0;
   overflow: auto;
   transition: width 0.5s ease-in-out;
-  width: 20em;
+  width: 22.5em;
 }
 
 #venstre-meny .meny-tekst {
