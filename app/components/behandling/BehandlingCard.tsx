@@ -17,7 +17,7 @@ import {
   BankNoteIcon,
   ClockDashedIcon,
   CogFillIcon, CogIcon, ExternalLinkIcon, InboxDownIcon, PersonIcon,
-  PlayIcon,
+  PlayIcon, PrinterSmallIcon,
   SandboxIcon,
   TasklistIcon,
   XMarkOctagonIcon,
@@ -594,6 +594,13 @@ export default function BehandlingCard(props: Props) {
                 value="output"
                 label="Output"
                 icon={<TasklistIcon />}
+              />
+            )}
+            {props.behandling._links?.uttrekk && (
+              <Tabs.Tab
+                value="uttrekk"
+                label="Uttrekk"
+                icon={<PrinterSmallIcon />}
               />
             )}
             {props.behandling._links?.oppdragsmelding && (

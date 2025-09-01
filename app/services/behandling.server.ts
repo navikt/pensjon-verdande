@@ -232,33 +232,6 @@ export async function getBehandling(
   return behandling
 }
 
-type Output = {
-  str: string[]
-}
-export async function getOutputFromBehandling(
-  accessToken: string,
-  behandlingId: string,
-) {
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/uttrekk/${behandlingId}/output`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return (await response.json()) as Output
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved hending av output fra behandling. Feil var\n${text}`, {
-      status: response.status
-    })
-  }
-}
-
 export async function getDetaljertFremdrift(
   accessToken: string,
   forrigeBehandlingId: number,
@@ -546,13 +519,6 @@ export async function getOppdragskvittering(
       status: response.status
     })
   }
-}
-
-export async function getBehandlingInput(
-  accessToken: string,
-  behandlingId: string,
-) {
-  return await apiGet<string>(`/api/behandling/uttrekk/${behandlingId}/input`, { accessToken: accessToken })
 }
 
 export async function henBehandlingManuell(
