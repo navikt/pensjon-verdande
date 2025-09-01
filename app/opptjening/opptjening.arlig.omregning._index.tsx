@@ -1,32 +1,38 @@
-import { Form, useLoaderData, useSubmit } from 'react-router'
-import { useState } from 'react'
+import { Button, Heading, Page } from '@navikt/ds-react'
+import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation, } from 'react-router'
+import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/batch.opptjeningsendringArligUttrekk.server'
+import { requireAccessToken } from '~/services/auth.server'
 
 export const loader = async () => {
   const innevaerendeAar = new Date().getFullYear()
 
   return {
-    innevaerendeAar
+    innevaerendeAar,
   }
+}
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const accessToken = await requireAccessToken(request)
+
+  const response = await opprettOpptjeningsendringArligUttrekk(accessToken)
+
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 export default function EndretOpptjeningArligUttrekk() {
   const { innevaerendeAar } = useLoaderData<typeof loader>()
+  const navigation = useNavigation()
 
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
+  const isSubmitting = navigation.state === 'submitting'
 
   return (
-    <div>
-      <h1>Årlig omregning av ytelse ved oppdaterte opptjeningsopplysninger</h1>
-      <Form action="uttrekk" method="POST">
-        <br />
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Opprett uttrekk for {innevaerendeAar}
-          </button>
-        </p>
+    <Page>
+      <Heading size={'medium'}>Årlig omregning av ytelse ved oppdaterte opptjeningsopplysninger</Heading>
+      <Form method="post">
+        <Button type="submit" disabled={isSubmitting}>
+          Opprett uttrekk for {innevaerendeAar}
+        </Button>
       </Form>
-    </div>
+    </Page>
   )
 }
