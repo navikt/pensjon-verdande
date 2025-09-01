@@ -1,10 +1,11 @@
-import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { type LoaderFunctionArgs, NavLink, useLoaderData } from 'react-router'
 
 import { getBehandlingManuellOpptelling } from '~/services/behandling.server'
 
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
-import { Table } from '@navikt/ds-react'
+import { Link, Table } from '@navikt/ds-react'
+import React from 'react'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const { behandlingId } = params
@@ -21,12 +22,13 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 
   return {
+    behandlingId: behandlingId,
     behandlingManuellOpptelling: behandlingManuellOpptelling,
   }
 }
 
 export default function BehandlingManuellOpptelling() {
-  const { behandlingManuellOpptelling } = useLoaderData<typeof loader>()
+  const { behandlingId, behandlingManuellOpptelling } = useLoaderData<typeof loader>()
 
   return (
     <Table>
@@ -44,7 +46,7 @@ export default function BehandlingManuellOpptelling() {
               key={`${it.behandlingType}:${it.kategori}`}
             >
               <Table.DataCell>{it.behandlingType}</Table.DataCell>
-              <Table.DataCell>{it.kategoriDecode}</Table.DataCell>
+              <Table.DataCell><Link as={NavLink} to={`/behandling/${behandlingId}/behandlingManuellKategori/${it.kategori}`}>{it.kategoriDecode}</Link></Table.DataCell>
               <Table.DataCell align={'right'}>{it.antall}</Table.DataCell>
             </Table.Row>)
         })}

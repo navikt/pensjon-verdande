@@ -53,6 +53,7 @@ export default [
       route('', 'behandling/behandling.$behandlingId.tsx', [
         index('behandling/behandling.$behandlingId._index.tsx'),
 
+        route('behandlingManuellKategori/:behandlingManuellKategori', 'behandling/behandling.$behandlingId.behandlingManuellKategori.$behandlingManuellKategori.tsx'),
         route('behandlingManuellOpptelling', 'behandling/behandling.$behandlingId.behandlingManuellOpptelling.tsx'),
         route('ikkeFullforteAktiviteter', 'behandling/behandling.$behandlingId.ikkeFullforteAktiviteter.tsx'),
         route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [

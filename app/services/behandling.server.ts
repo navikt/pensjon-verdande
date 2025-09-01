@@ -72,6 +72,7 @@ export async function getBehandlinger(
     behandlingType,
     status,
     ansvarligTeam,
+    behandlingManuellKategori,
     fom,
     tom,
     forrigeBehandlingId,
@@ -83,6 +84,7 @@ export async function getBehandlinger(
     behandlingType?: string | null,
     status?: string | null,
     ansvarligTeam?: string | null,
+    behandlingManuellKategori?: string | null,
     fom?: Date | null,
     tom?: Date | null,
     forrigeBehandlingId?: number | null,
@@ -101,6 +103,9 @@ export async function getBehandlinger(
   }
   if (ansvarligTeam) {
     request += `&ansvarligTeam=${ansvarligTeam}`
+  }
+  if (behandlingManuellKategori) {
+    request += `&behandlingManuellKategori=${behandlingManuellKategori}`
   }
   if (fom) {
     request += `&fom=${asLocalDateString(fom)}`
@@ -612,6 +617,17 @@ export async function getBehandlingManuellOpptelling(
 ): Promise<BehandlingManuellOpptellingResponse> {
   return apiGet(
     `/api/behandling/${behandlingId}/behandlingManuellOpptelling`,
+    ctx,
+  )
+}
+
+export async function getBehandlingManuellKategori(
+  ctx: RequestCtx,
+  behandlingId: number,
+  behandlingManuellKategori: string,
+): Promise<BehandlingDto> {
+  return apiGet(
+    `/api/behandling/${behandlingId}?behandlingManuellKategori=${behandlingManuellKategori}`,
     ctx,
   )
 }
