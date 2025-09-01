@@ -1,3 +1,4 @@
+import { BugIcon, CheckmarkCircleIcon, ClockIcon, HourglassIcon, StopIcon } from '@navikt/aksel-icons'
 import {
   BodyShort,
   Box,
@@ -5,27 +6,24 @@ import {
   ErrorMessage,
   Heading,
   HStack,
-  Label, Link,
+  Label,
+  Link,
   Select,
   Tag,
   VStack,
 } from '@navikt/ds-react'
-import { useState } from 'react'
-import { type ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
-import { apiGet } from '~/services/api.server'
-import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import type { Behandlingstatus } from '~/types'
-import { BugIcon, CheckmarkCircleIcon, ClockIcon, HourglassIcon, StopIcon } from '@navikt/aksel-icons'
-import { requireAccessToken } from '~/services/auth.server'
+import { useState } from 'react'
+import { type ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
 import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
+import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
+import { apiGet } from '~/services/api.server'
+import { requireAccessToken } from '~/services/auth.server'
+import type { Behandlingstatus } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const behandlinger = await apiGet<HentAlleResponse>(
-    `/api/afpoffentlig/etteroppgjor/behandling`,
-    request,
-  )
+  const behandlinger = await apiGet<HentAlleResponse>(`/api/afpoffentlig/etteroppgjor/behandling`, request)
 
   const etteroppgjor: AfpEtteroppgjorResponse[] = behandlinger.etteroppgjor
 
@@ -53,15 +51,35 @@ function formaterTidspunkt(isoTid?: string): string {
 function statusTag(status: Behandlingstatus) {
   switch (status) {
     case 'OPPRETTET':
-      return <Tag variant="info" icon={<ClockIcon aria-hidden />}>Opprettet</Tag>
+      return (
+        <Tag variant="info" icon={<ClockIcon aria-hidden />}>
+          Opprettet
+        </Tag>
+      )
     case 'UNDER_BEHANDLING':
-      return <Tag variant="warning" icon={<HourglassIcon aria-hidden />}>Under behandling</Tag>
+      return (
+        <Tag variant="warning" icon={<HourglassIcon aria-hidden />}>
+          Under behandling
+        </Tag>
+      )
     case 'FULLFORT':
-      return <Tag variant="success" icon={<CheckmarkCircleIcon aria-hidden />}>Fullført</Tag>
+      return (
+        <Tag variant="success" icon={<CheckmarkCircleIcon aria-hidden />}>
+          Fullført
+        </Tag>
+      )
     case 'STOPPET':
-      return <Tag variant="error" icon={<StopIcon aria-hidden />}>Stoppet</Tag>
+      return (
+        <Tag variant="error" icon={<StopIcon aria-hidden />}>
+          Stoppet
+        </Tag>
+      )
     case 'DEBUG':
-      return <Tag variant="neutral" icon={<BugIcon aria-hidden />}>Debug</Tag>
+      return (
+        <Tag variant="neutral" icon={<BugIcon aria-hidden />}>
+          Debug
+        </Tag>
+      )
     default:
       return <Tag variant="neutral">{status}</Tag>
   }
@@ -69,9 +87,7 @@ function statusTag(status: Behandlingstatus) {
 
 function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
   return (
-    <Box className={'etteroppgjor-box'}
-         padding={'4'}
-    >
+    <Box className={'etteroppgjor-box'} padding={'4'}>
       <VStack gap="2">
         <HStack justify="space-between" align="center">
           <Heading size="small">
@@ -95,7 +111,7 @@ function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
   )
 }
 
-function Tidspunkt({ label, verdi }: { label: string, verdi?: string }) {
+function Tidspunkt({ label, verdi }: { label: string; verdi?: string }) {
   return (
     <VStack gap="1" style={{ minWidth: '10rem' }}>
       <Label>{label}</Label>
@@ -103,7 +119,6 @@ function Tidspunkt({ label, verdi }: { label: string, verdi?: string }) {
     </VStack>
   )
 }
-
 
 export default function EtteroppgjorOversikt() {
   const { etteroppgjor } = useLoaderData<typeof loader>()
@@ -113,7 +128,7 @@ export default function EtteroppgjorOversikt() {
   const forrigeÅr = new Date().getFullYear() - 1
   const muligeKjøreår = Array.from({ length: 5 }, (_, i) => forrigeÅr - i)
 
-  const alleredeKjørtEtteroppgjør = etteroppgjor.find(it => it.kjorear === kjøreår) !== undefined
+  const alleredeKjørtEtteroppgjør = etteroppgjor.find((it) => it.kjorear === kjøreår) !== undefined
 
   const submitDisabled = kjøreår === undefined || alleredeKjørtEtteroppgjør
 
@@ -125,7 +140,6 @@ export default function EtteroppgjorOversikt() {
       <div style={{ maxWidth: '20em' }}>
         <Form method="post">
           <VStack gap="4">
-
             <Select
               name="kjorear"
               label="Velg kjøreår"
@@ -142,10 +156,12 @@ export default function EtteroppgjorOversikt() {
               ))}
             </Select>
 
-            <Button type="submit" disabled={submitDisabled}>Start etteroppgjør</Button>
-            {
-              alleredeKjørtEtteroppgjør &&   <ErrorMessage>Allerede startet etteroppgjør for {kjøreår}</ErrorMessage> || <BodyShort>&nbsp;</BodyShort>
-            }
+            <Button type="submit" disabled={submitDisabled}>
+              Start etteroppgjør
+            </Button>
+            {(alleredeKjørtEtteroppgjør && (
+              <ErrorMessage>Allerede startet etteroppgjør for {kjøreår}</ErrorMessage>
+            )) || <BodyShort>&nbsp;</BodyShort>}
           </VStack>
         </Form>
       </div>
@@ -156,12 +172,13 @@ export default function EtteroppgjorOversikt() {
 
       <VStack gap="4">
         <VStack>
-          {etteroppgjor.length > 0
-            ? etteroppgjor.map((item) => (
-            <EtteroppgjorRad key={item.behandlingId} item={item} />
-          ))
-            : <BodyShort>Ingen etteroppgjør funnet.</BodyShort>
-          }
+          {etteroppgjor.length > 0 ? (
+            etteroppgjor
+              .sort((a, b) => b.kjorear - a.kjorear)
+              .map((item) => <EtteroppgjorRad key={item.behandlingId} item={item} />)
+          ) : (
+            <BodyShort>Ingen etteroppgjør funnet.</BodyShort>
+          )}
         </VStack>
       </VStack>
     </div>
