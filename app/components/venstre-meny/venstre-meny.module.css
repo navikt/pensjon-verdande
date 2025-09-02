@@ -1,3 +1,8 @@
+:root {
+    --venstre-meny-expanded-width: 15em;
+    --venstre-meny-collapsed-width: 3em;
+}
+
 #venstreMeny {
   background-color: var(--ax-bg-raised);
   height: 100vh;
@@ -5,7 +10,8 @@
   top: 0;
   overflow: auto;
   transition: width 0.5s ease-in-out;
-  width: 22.5em;
+  width: var(--venstre-meny-expanded-width);
+  min-width: var(--venstre-meny-expanded-width);
   border-right: 1px solid var(--ax-border-neutral-subtle);
 }
 
@@ -13,7 +19,8 @@
   display: block;
 }
 #venstreMeny.kunIkoner {
-  width: 3em;
+  width: var(--venstre-meny-collapsed-width);
+  min-width: var(--venstre-meny-collapsed-width);
   transition: width 0.5s ease-in-out;
 }
 
@@ -40,7 +47,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  width: 20em;
+  width: var(--venstre-meny-expanded-width);
 }
 
 #venstreMeny .mainmenu a {
