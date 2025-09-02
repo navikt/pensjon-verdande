@@ -29,7 +29,7 @@ export default function BehandlingAntallTable(props: Props) {
       <Table.Body>
         {sortedOppsummering.map((it: BehandlingAntall, index) => {
           return (
-            <Table.Row key={it.navn} style={{backgroundColor: it.behandlingType === null ? 'var(--a-surface-warning-subtle)' : 'inherit'}}>
+            <Table.Row key={it.navn} style={{backgroundColor: it.behandlingType === null ? 'var(--ax-bg-warning-soft)' : 'inherit'}}>
               <Table.DataCell align={'right'}>{index + 1}</Table.DataCell>
               <Table.DataCell>
                 <HStack>

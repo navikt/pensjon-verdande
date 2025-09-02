@@ -42,7 +42,7 @@ export function DashboardCard(props: Props) {
               width: '100%',
               height: '100%',
               padding: '12px',
-              color: 'var(--a-icon-on-neutral)',
+              color: 'var(--ax-text-neutral)',
             }}
           />
         </Box.New>

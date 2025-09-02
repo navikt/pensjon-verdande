@@ -71,25 +71,25 @@ export default function Dashboard() {
             <VStack gap="6">
             <HGrid gap="6" columns={4}>
               <DashboardCard
-                iconBackgroundColor={'var(--a-green-400)'}
+                iconBackgroundColor={'var(--ax-bg-success-strong)'}
                 title="Totalt"
                 value={formatNumber(dashboardResponse.totaltAntallBehandlinger)}
                 icon={ClipboardFillIcon}
               />
               <DashboardCard
-                iconBackgroundColor={'var(--a-surface-action)'}
+                iconBackgroundColor={'var(--ax-bg-accent-strong)'}
                 title="Under behandling"
                 value={formatNumber(dashboardResponse.antallUferdigeBehandlinger)}
                 icon={CogFillIcon}
               />
               <DashboardCard
-                iconBackgroundColor={'var(--a-surface-danger)'}
+                iconBackgroundColor={'var(--ax-bg-danger-strong)'}
                 title="Feilende"
                 value={formatNumber(dashboardResponse.feilendeBehandlinger)}
                 icon={ExclamationmarkTriangleFillIcon}
               />
               <DashboardCard
-                iconBackgroundColor={'var(--a-surface-warning)'}
+                iconBackgroundColor={'var(--ax-bg-warning-strong)'}
                 title="Ukjente typer"
                 value={formatNumber(dashboardResponse.ukjenteBehandlingstyper.length)}
                 icon={QuestionmarkDiamondFillIcon}

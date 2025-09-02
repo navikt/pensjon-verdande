@@ -31,7 +31,7 @@ export type Props = {
 
 function backgroundColorForDato(kalenderHendelser: KalenderHendelser, dato: Date): string {
   if (erHelgedag(dato) || kalenderHendelser.offentligeFridager.find(it => isSameDay(it.dato, dato)) !== undefined) {
-    return 'var(--a-grayalpha-50)'
+    return 'var(--ax-bg-neutral-soft)'
   } else {
     return 'transparent'
   }
