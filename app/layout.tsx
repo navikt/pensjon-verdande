@@ -52,10 +52,10 @@ export default function Layout() {
           <HStack gap="0" wrap={false}>
             <VenstreMeny me={me} showIconMenu={showIconMenu}></VenstreMeny>
 
-            <Page.Block style={{ paddingLeft: '12px', paddingRight: '12px' }}>
+            <div style={{ paddingLeft: '12px', paddingRight: '12px', flex: 1 }}>
               {schedulerAlert}
               <Outlet />
-            </Page.Block>
+            </div>
           </HStack>
         </Page>
       </Box.New>
