@@ -48,7 +48,7 @@ export default function BehandlingOutput() {
 
   useEffect(() => {
     makeTextFile()
-  })
+  }, [output])
 
   return (
     <>
