@@ -137,7 +137,7 @@ export default function VenstreMeny(props: Props) {
   }
 
   return (
-    <nav id={styles.venstreMeny} className={props.showIconMenu ? styles.kunIkoner : ''}>
+    <nav id={styles.venstreMeny} className={`aksel-theme dark ${props.showIconMenu ? styles.kunIkoner : ''}`}>
       <nav className={''}>
         <ul className={styles.mainmenu}>
           <li>

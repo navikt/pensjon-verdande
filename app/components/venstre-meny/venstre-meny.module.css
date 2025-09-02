@@ -1,11 +1,12 @@
 #venstreMeny {
-  background-color: var(--a-surface-inverted);
+  background-color: var(--ax-bg-raised);
   height: 100vh;
   position: sticky;
   top: 0;
   overflow: auto;
   transition: width 0.5s ease-in-out;
   width: 22.5em;
+  border-right: 1px solid var(--ax-border-neutral-subtle);
 }
 
 #venstreMeny .menyTekst {
@@ -47,12 +48,12 @@
   text-decoration: none;
   padding: 10px;
 
-  color: var(--a-text-on-inverted);
-  background-color: var(--a-surface-inverted);
+  color: var(--ax-text-neutral);
+  background-color: var(--ax-bg-raised);
 }
 
 #venstreMeny .mainmenu a:hover {
-  background-color: #1f4ca6;
+  background-color: var(--ax-bg-accent-moderate-hover);
 }
 
 #venstreMeny .mainmenu li.open .submenu {
@@ -63,17 +64,17 @@
 }
 
 #venstreMeny .submenu a.active {
-  background: var(--a-blue-700);
+  background: var(--ax-bg-accent-moderate-pressed);
   color: white;
 }
 
 #venstreMeny .mainmenu li a.active {
-  background: var(--a-blue-700);
+  background: var(--ax-bg-accent-moderate-pressed);
   color: white;
 }
 
 #venstreMeny .submenu a:hover {
-  background-color: #1f4ca6;
+  background-color: var(--ax-bg-accent-moderate-hover);
 }
 
 #venstreMeny .submenu {
