@@ -80,9 +80,7 @@ export default [
 
     route('bestem-etteroppgjor-resultat', 'uforetrygd/bestem-etteroppgjor-resultat._index.tsx'),
 
-    route('bpen090', 'uforetrygd/bpen090._index.tsx'),
-
-    route('bpen090/bpen090', 'uforetrygd/bpen090.bpen090.tsx'),
+    route('bpen090', 'uforetrygd/bpen090.tsx'),
 
     route('bpen091', 'uforetrygd/bpen091.tsx'),
 

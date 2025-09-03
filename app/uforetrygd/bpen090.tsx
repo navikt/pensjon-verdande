@@ -1,6 +1,8 @@
-import { Form, useLoaderData, useSubmit } from 'react-router'
+import { type ActionFunctionArgs, Form, redirect, useLoaderData, useSubmit } from 'react-router'
 import { useState } from 'react'
 import { Select } from '@navikt/ds-react'
+import { requireAccessToken } from '~/services/auth.server'
+import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
 
 export const loader = async () => {
   const now = new Date()
@@ -9,6 +11,16 @@ export const loader = async () => {
   return {
     kjoremaaned,
   }
+}
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData()
+  const updates = Object.fromEntries(formData)
+  const accessToken = await requireAccessToken(request)
+
+  const response = await opprettBpen090(accessToken, +updates.kjoremaaned, updates.begrensUtplukk === 'true', updates.dryRun === 'true', +updates.prioritet)
+
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 export default function BatchOpprett_index() {
@@ -28,7 +40,7 @@ export default function BatchOpprett_index() {
       <p><b>Begrenset utplukk</b> krever oppføringer i tabellen T_BATCH_PERSON_FILTER med PERSON_ID for de personer man ønsker å kjøre behandlingen for</p>
       <p><b>DryRun</b> kjører batchen uten å sende videre til VurderOmregning</p>
       <p><b>Prioritet</b> angir om batchen skal kjøres mot Oppdrag som en BATCH (HPEN) eller ONLINE_BATCH</p>
-      <Form action="bpen090" method="POST">
+      <Form method="post">
         <div style={{ display: 'inline-block' }}>
           <label>Kjøremåned (yyyyMM)</label>
           <br/>
