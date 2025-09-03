@@ -88,8 +88,7 @@ export default [
 
     route('bpen091/bpen091', 'uforetrygd/bpen091.bpen091.tsx'),
 
-    route('bpen096', 'uforetrygd/bpen096._index.tsx'),
-    route('bpen096/bpen096', 'uforetrygd/bpen096.bpen096.tsx'),
+    route('bpen096', 'uforetrygd/bpen096.tsx'),
 
     route('brukere', 'brukere/index.tsx'),
     route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),
