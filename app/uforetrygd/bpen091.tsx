@@ -1,4 +1,17 @@
-import { Form } from 'react-router';
+import { type ActionFunctionArgs, Form, redirect } from 'react-router'
+import { requireAccessToken } from '~/services/auth.server'
+import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData()
+  const updates = Object.fromEntries(formData)
+
+  const accessToken = await requireAccessToken(request)
+
+  const response = await opprettBpen091(accessToken, +updates.behandlingsAr)
+
+  return redirect(`/behandling/${response.behandlingId}`)
+}
 
 export default function BatchOpprett_index() {
   const now = new Date()
@@ -10,7 +23,7 @@ export default function BatchOpprett_index() {
       <p>
         Fastsette neste års forventet inntekt for uføretrygd
       </p>
-      <Form action="bpen091" method="POST">
+      <Form method="post">
         <p>
           Behandlingsår
           <input
