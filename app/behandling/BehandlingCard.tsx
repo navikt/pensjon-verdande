@@ -386,7 +386,7 @@ export default function BehandlingCard(props: Props) {
               {props.behandling.forrigeBehandlingId && (
                 <Entry labelText={'Opprettet av behandling'}>
                   <Link as={NavLink}
-                    to={`/behandling/${props.behandling.forrigeBehandlingId}`}
+                        to={`/behandling/${props.behandling.forrigeBehandlingId}`}
                   >
                     {props.behandling.forrigeBehandlingId}
                   </Link>
@@ -627,6 +627,11 @@ export default function BehandlingCard(props: Props) {
               label="Oppgaveoppsummering"
               icon={<TasklistIcon />}
             />
+            {props.detaljertFremdrift && <Tabs.Tab
+              value="detaljertFremdrift"
+              label="Detaljert fremdrift"
+              icon={<TasklistIcon />}
+            />}
           </Tabs.List>
           <Outlet />
         </Tabs>

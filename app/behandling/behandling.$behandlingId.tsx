@@ -15,10 +15,10 @@ import {
 
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
-import BehandlingCard from '~/components/behandling/BehandlingCard'
-import type { BehandlingerPage, DetaljertFremdriftDTO } from '~/types'
+import type { DetaljertFremdriftDTO } from '~/types'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
+import BehandlingCard from '~/behandling/BehandlingCard'
 
 export const OPERATION = {
   fjernFraDebug: 'fjernFraDebug',
@@ -113,7 +113,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  const avhengigeBehandlinger: Promise<BehandlingerPage | null> | null = null
   let detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null = null
   if (behandling._links?.avhengigeBehandlinger) {
     detaljertFremdrift = getDetaljertFremdrift(
@@ -125,7 +124,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   return {
     aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
     behandling,
-    avhengigeBehandlinger: avhengigeBehandlinger,
     detaljertFremdrift: detaljertFremdrift,
   }
 }
