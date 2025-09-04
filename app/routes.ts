@@ -127,8 +127,7 @@ export default [
     route('omregning/omregningsaker', 'omregning/omregning.omregningsaker.tsx'),
     route('omregningStatistikk', 'omregning/omregningStatistikk._index.tsx'),
 
-    route('oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus._index.tsx'),
-    route('oppdatersakstatus/oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus.oppdatersakstatus.tsx'),
+    route('oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus.tsx'),
 
     route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx'),
     route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),

@@ -3,6 +3,18 @@ import { useState } from 'react'
 import {Button, DatePicker} from '@navikt/ds-react'
 import {formatISO} from "date-fns";
 
+import { type ActionFunctionArgs, redirect} from 'react-router';
+import { requireAccessToken } from '~/services/auth.server'
+import 'chart.js/auto'
+import { opprettOppdaterSakBehandlingPEN } from '~/oppdatersakstatus/oppdatersakstatus.server'
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const accessToken = await requireAccessToken(request)
+  const data = await request.json()
+  const response= await opprettOppdaterSakBehandlingPEN(accessToken, data.startDato)
+  return redirect(`/behandling/${response.behandlingId}`)
+}
+
 export default function BehandlingOpprett_index() {
   const year = new Date().getFullYear()
   const defaultStartdato = new Date(`1 May ${year}`)
@@ -15,7 +27,7 @@ export default function BehandlingOpprett_index() {
           startDato: formatISO(startDato ?? defaultStartdato),
         },
         {
-          action: 'oppdatersakstatus',
+          action: '',
           method: 'POST',
           encType: 'application/json',
         },
