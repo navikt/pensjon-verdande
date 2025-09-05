@@ -1,12 +1,12 @@
-import { requireAccessToken } from '~/services/auth.server'
-import { useEffect, useState } from 'react'
-import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
-import type { OmregningStatistikkPage } from '~/types'
+import {requireAccessToken} from '~/services/auth.server'
+import {useEffect, useState} from 'react'
+import {Box, Button, Link, Pagination, Select, Table} from '@navikt/ds-react'
+import {type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useSearchParams} from 'react-router'
+import type {OmregningStatistikkPage} from '~/types'
 import {
-  hentOmregningbehandlingsnokler,
-  hentOmregningStatistikk,
-  hentOmregningStatistikkCsv,
+    hentOmregningbehandlingsnokler,
+    hentOmregningStatistikk,
+    hentOmregningStatistikkCsv,
 } from '~/omregning/batch.omregning.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -63,19 +63,15 @@ export default function OmregningStatistikk() {
   const content = omregningStatistikkCsv
 
   const [downloadLink, setDownloadLink] = useState('')
-  const makeTextFile = () => {
-    const data = new Blob([`[${content}]`], { type: 'application/json' })
+    useEffect(() => {
+      const data = new Blob([`[${content}]`], {type: 'application/json'})
 
-    // this part avoids memory leaks
-    if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
+      // this part avoids memory leaks
+      if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
 
-    // update the download link state
-    setDownloadLink(window.URL.createObjectURL(data))
-  }
-
-  useEffect(() => {
-    makeTextFile()
-  }, [content])
+      // update the download link state
+      setDownloadLink(window.URL.createObjectURL(data))
+  }, [content, downloadLink])
 
   function setSearchParamsWithBehandlingsNoekler() {
     searchParams.set('behandlingsnoekler', behandlingsNoekler)
@@ -131,9 +127,9 @@ export default function OmregningStatistikk() {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {omregningsaker?.content?.map((sak, i) => {
+            {omregningsaker?.content?.map((sak) => {
               return (
-                <Table.Row key={i + 1}>
+                <Table.Row key={sak.sakId}>
                   <Table.DataCell scope='row'>{sak.behandlingsnoekkel}</Table.DataCell>
                   <Table.DataCell scope='row'>{sak.status}</Table.DataCell>
                   <Table.DataCell scope='row'>{sak.vedtakId}</Table.DataCell>

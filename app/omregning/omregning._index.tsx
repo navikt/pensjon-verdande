@@ -209,9 +209,9 @@ export default function BatchOpprett_index() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {omregningsaker?.content?.map((sak, i) => {
+              {omregningsaker?.content?.map((sak) => {
                 return (
-                  <Table.Row key={sak.sakId + i}>
+                  <Table.Row key={sak.sakId}>
                     <Table.DataCell scope='row'>{sak.sakId}</Table.DataCell>
                     <Table.DataCell scope='row'>{sak.sakType}</Table.DataCell>
                   </Table.Row>
@@ -316,35 +316,35 @@ export default function BatchOpprett_index() {
 
                       <OmregningCheckbox defaultChecked={behandleApneKrav} name={'behandleApneKrav'}
                                          value={behandleApneKrav} onChange={setBehandleApneKrav}
-                                         children={'Behandle åpne krav'} />
+                                         >Behandle åpne krav</OmregningCheckbox>
                       <OmregningCheckbox defaultChecked={brukFaktoromregning} name={'brukFaktoromregning'}
                                          value={brukFaktoromregning} onChange={setBrukFaktoromregning}
-                                         children={'Bruk faktoromregning'} />
+                                         >Bruk faktoromregning</OmregningCheckbox>
                       <OmregningCheckbox defaultChecked={opprettAlleOppgaver} name={'opprettAlleOppgaver'}
                                          value={opprettAlleOppgaver} onChange={setOpprettAlleOppgaver}
-                                         children={'Opprett alle oppgaver'} />
+                                         >Opprett alle oppgaver</OmregningCheckbox>
                       <OmregningCheckbox defaultChecked={sjekkYtelseFraAvtaleland} name={'sjekkYtelseFraAvtaleland'}
                                          value={sjekkYtelseFraAvtaleland} onChange={setSjekkYtelseFraAvtaleland}
-                                         children={'Sjekk ytelser fra avtaleland'} />
+                                        >Sjekk ytelser fra avtaleland</OmregningCheckbox>
                       <OmregningCheckbox defaultChecked={omregneAFP} name={'omregneAFP'} value={omregneAFP}
-                                         onChange={setOmregneAFP} children={'Omregne AFP'} />
+                                         onChange={setOmregneAFP}>Omregne AFP</OmregningCheckbox>
 
                     </CheckboxGroup>
                     <CheckboxGroup size={'medium'} legend={'Iverksetting parametere'}>
 
                       <OmregningCheckbox defaultChecked={skalIverksettOnline} name={'skalIverksettOnline'}
                                          value={skalIverksettOnline} onChange={setSkalIverksettOnline}
-                                         children={'Iverksett Online'} />
+                                         >Iverksett Online</OmregningCheckbox>
                       <OmregningCheckbox defaultChecked={skalSamordne} name={'skalSamordne'} value={skalSamordne}
-                                         onChange={setSkalSamordne} children={'Skal samordne'} />
+                                         onChange={setSkalSamordne}>Skal samordne</OmregningCheckbox>
                       <OmregningCheckbox defaultChecked={skalSletteIverksettingsoppgaver}
                                          name={'skalSletteIverksettingsoppgaver'}
                                          value={skalSletteIverksettingsoppgaver}
                                          onChange={setSkalSletteIverksettingsoppgaver}
-                                         children={'Skal slette iverksettingsoppgaver'} />
+                                         >Skal slette iverksettingsoppgaver</OmregningCheckbox>
                       <OmregningCheckbox defaultChecked={skalDistribuereUforevedtak} name={'skalDistribuereUforevedtak'}
                                          value={skalDistribuereUforevedtak} onChange={setSkalDistribuereUforevedtak}
-                                         children={'Skal distribuere uførevedtak'} />
+                                         >Skal distribuere uførevedtak</OmregningCheckbox>
 
                     </CheckboxGroup>
                   </VStack>
@@ -405,8 +405,9 @@ export default function BatchOpprett_index() {
                       >
 
                         <OmregningCheckbox defaultChecked={skalSendeBrevBerorteSaker} name={'sendBrevBerorteSaker'}
-                                           value={skalSendeBrevBerorteSaker} onChange={setSkalSendeBrevBerorteSaker}
-                                           children={'Bestille brev berørte saker'} />
+                                           value={skalSendeBrevBerorteSaker} onChange={setSkalSendeBrevBerorteSaker}>
+                            Bestille brev berørte saker
+                        </OmregningCheckbox>
 
                         <OmregningBrevCheckbox navn={'brevkodeBerorteSakerAlderGammeltRegelverk'}
                                                skalVises={skalSendeBrevBerorteSaker}
