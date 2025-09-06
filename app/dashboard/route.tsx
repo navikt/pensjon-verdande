@@ -1,21 +1,20 @@
-import { type ActionFunctionArgs, Await, useLoaderData } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
-import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
-import { HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import {
   ClipboardFillIcon,
   CogFillIcon,
   ExclamationmarkTriangleFillIcon,
   QuestionmarkDiamondFillIcon,
 } from '@navikt/aksel-icons'
-import { formatNumber } from '~/common/number'
-import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
-import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
-import {
-  BehandlingerPerDagLineChartCard,
-} from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
+import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
+import { type ActionFunctionArgs, Await, useLoaderData } from 'react-router'
+import { formatNumber } from '~/common/number'
+import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
+import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
+import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
+import { requireAccessToken } from '~/services/auth.server'
+import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
+import type { Route } from '../../.react-router/types/app/dashboard/+types/route'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -119,4 +118,17 @@ export default function Dashboard() {
       </Await>
     </React.Suspense>
   )
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  if (error instanceof Error && error.message === 'Server Timeout') {
+    return (
+      <Box.New style={{ paddingTop: '0.5em' }}>
+        <Heading size={'medium'}>Tidsavbrudd</Heading>
+        <BodyShort>Det tok for lang tid å laste dashboardet. Prøv igjen senere</BodyShort>
+      </Box.New>
+    )
+  } else {
+    throw error
+  }
 }
