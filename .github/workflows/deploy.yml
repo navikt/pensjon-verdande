@@ -112,6 +112,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    if: github.ref == 'refs/heads/main'
     needs: [build]
     runs-on: 'ubuntu-latest'
     steps:
