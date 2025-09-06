@@ -4,6 +4,7 @@ import {
   Button,
   Heading,
   HStack,
+  Link,
   ProgressBar,
   Select,
   Switch,
@@ -13,8 +14,9 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useMemo, useState } from 'react'
-import { type LoaderFunctionArgs, useLoaderData, useRevalidator } from 'react-router'
+import { type LoaderFunctionArgs, NavLink, useLoaderData, useRevalidator } from 'react-router'
 import invariant from 'tiny-invariant'
+import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
 import { requireAccessToken } from '~/services/auth.server'
 import { getDetaljertFremdrift } from '~/services/behandling.server'
 import type { BehandlingDetaljertFremdriftDTO } from '~/types'
@@ -47,22 +49,26 @@ const sorters: Record<SortKey, (a: BehandlingDetaljertFremdriftDTO, b: Behandlin
   errors: (a, b) => b.feilende - a.feilende,
 }
 
-const StatusTags: React.FC<{
-  fullfort: number
-  underBehandling: number
-  feilende: number
-  stoppet: number
-  debug: number
-  opprettet: number
-}> = ({ fullfort, underBehandling, feilende, stoppet, debug, opprettet }) => (
-  <HStack gap="2" wrap>
-    {fullfort > 0 && <Tag variant="success">Fullført: {fullfort}</Tag>}
-    {underBehandling > 0 && <Tag variant="info">Under behandling: {underBehandling}</Tag>}
-    {feilende > 0 && <Tag variant="error">Feilende: {feilende}</Tag>}
-    {stoppet > 0 && <Tag variant="warning">Stoppet: {stoppet}</Tag>}
-    {debug > 0 && <Tag variant="neutral">Debug: {debug}</Tag>}
-    {opprettet > 0 && <Tag variant="neutral">Opprettet: {opprettet}</Tag>}
-  </HStack>
+const StatusTag: React.FC<{
+  type: string
+  status: string
+  antall: number
+  level: number
+}> = ({ type, status, antall, level }) => (
+  <Tag variant={decodeBehandlingStatusToVariant(status)}>
+    {level > 1 ? (
+      <Link
+        as={NavLink}
+        to={`../avhengigeBehandlinger?behandlingType=${encodeURIComponent(type)}&status=${encodeURIComponent(status)}`}
+      >
+        {decodeBehandlingStatus(status)}: {antall}
+      </Link>
+    ) : (
+      <>
+        {decodeBehandlingStatus(status)}: {antall}
+      </>
+    )}
+  </Tag>
 )
 
 export default function FremdriftRoute() {
@@ -126,7 +132,7 @@ export default function FremdriftRoute() {
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value as SortKey)}
             >
-              <option value="level">Nivå (tre)</option>
+              <option value="level">Nivå</option>
               <option value="code">Navn A–Å</option>
               <option value="progress">Fremdrift høyest først</option>
               <option value="errors">Flest feil først</option>
@@ -160,6 +166,16 @@ export default function FremdriftRoute() {
             {rows.map((rad) => {
               const rowPct = pct(rad.ferdig, rad.totalt)
               const hasIssues = rad.feilende > 0 || rad.stoppet > 0
+
+              const antallEtterStatus = [
+                { status: 'DEBUG', antall: rad.debug },
+                { status: 'FULLFORT', antall: rad.fullfort },
+                { status: 'OPPRETTET', antall: rad.opprettet },
+                { status: 'STOPPET', antall: rad.stoppet },
+                { status: 'UNDER_BEHANDLING', antall: rad.underBehandling },
+                { status: 'FEILENDE', antall: rad.feilende },
+              ]
+
               return (
                 <Table.Row
                   key={`${rad.level}-${rad.behandlingCode}`}
@@ -177,6 +193,7 @@ export default function FremdriftRoute() {
                         <BodyShort as="span" style={{ fontWeight: 600 }}>
                           {rad.behandlingCode}
                         </BodyShort>
+                        {rad.level === 1 && <BodyShort size={'small'}>(Denne behandlingen)</BodyShort>}
                       </HStack>
                     </div>
                   </Table.DataCell>
@@ -193,14 +210,19 @@ export default function FremdriftRoute() {
                   </Table.DataCell>
 
                   <Table.DataCell>
-                    <StatusTags
-                      fullfort={rad.fullfort}
-                      underBehandling={rad.underBehandling}
-                      feilende={rad.feilende}
-                      stoppet={rad.stoppet}
-                      debug={rad.debug}
-                      opprettet={rad.opprettet}
-                    />
+                    <HStack gap="2" wrap>
+                      {antallEtterStatus
+                        .filter((it) => it.antall > 0 && rad.level > 1)
+                        .map((it) => (
+                          <StatusTag
+                            key={`${rad.behandlingCode}:${rad.level}:${it.status}`}
+                            type={rad.behandlingCode}
+                            status={it.status}
+                            antall={it.antall}
+                            level={rad.level}
+                          ></StatusTag>
+                        ))}
+                    </HStack>
                   </Table.DataCell>
                 </Table.Row>
               )
