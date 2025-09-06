@@ -121,14 +121,20 @@ export default function Dashboard() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  console.log({ error })
   if (error instanceof Error && error.message === 'Server Timeout') {
     return (
       <Box.New style={{ paddingTop: '0.5em' }}>
         <Heading size={'medium'}>Tidsavbrudd</Heading>
-        <BodyShort>Det tok for lang tid å laste dashboardet. Prøv igjen senere</BodyShort>
+        <BodyShort>Det tok for lang tid å laste dataene til dashboardet. Prøv igjen senere</BodyShort>
       </Box.New>
     )
   } else {
-    throw error
+    return (
+      <Box.New style={{ paddingTop: '0.5em' }}>
+        <Heading size={'medium'}>Feil ved lasting av data</Heading>
+        <BodyShort>Feil ved lasting av dataene til dashboardet. Prøv igjen senere</BodyShort>
+      </Box.New>
+    )
   }
 }
