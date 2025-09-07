@@ -6,24 +6,20 @@ export async function opprettAdhocBrevBehandling(
   brevmal: string,
   ekskluderAvdoed: boolean,
 ): Promise<StartBatchResponse> {
-
   const body = {
     brevmal: brevmal,
-    ekskluderAvdoed: ekskluderAvdoed
+    ekskluderAvdoed: ekskluderAvdoed,
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/brev/adhoc/start`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify(body),
+  const response = await fetch(`${env.penUrl}/api/brev/adhoc/start`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+    body: JSON.stringify(body),
+  })
 
   if (response.ok) {
     return (await response.json()) as StartBatchResponse
@@ -31,4 +27,3 @@ export async function opprettAdhocBrevBehandling(
     throw new Error()
   }
 }
-

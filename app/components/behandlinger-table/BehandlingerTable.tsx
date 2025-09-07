@@ -10,13 +10,14 @@ import type { BehandlingDto, BehandlingerPage } from '~/types'
 import styles from './behandlinger-table.module.css'
 
 interface Props {
+  inkluderFortsett?: boolean | true,
   visStatusSoek?: boolean | true,
   visBehandlingTypeSoek?: boolean | true,
   visAnsvarligTeamSoek?: boolean | true,
   behandlingerResponse: BehandlingerPage,
 }
 
-export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek = true, visAnsvarligTeamSoek = true, behandlingerResponse}: Props) {
+export default function BehandlingerTable({inkluderFortsett = true, visStatusSoek, visBehandlingTypeSoek = true, visAnsvarligTeamSoek = true, behandlingerResponse}: Props) {
   const fetcher = useFetcher()
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -161,9 +162,9 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
         >
           <Table.Header>
             <Table.Row>
-              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: "4rem" }}>
+              { inkluderFortsett && <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: "4rem" }}>
                 Velg
-              </Table.ColumnHeader>
+              </Table.ColumnHeader>}
               <Table.ColumnHeader sortable sortKey="behandlingId" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "7rem" }}>
                 Id
               </Table.ColumnHeader>
@@ -195,7 +196,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
               </Table.ColumnHeader>
             </Table.Row>
             <Table.Row>
-              <Table.DataCell style={{ paddingTop: 0 }}>
+              { inkluderFortsett && <Table.DataCell style={{ paddingTop: 0 }}>
                 <Checkbox
                   checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
                   disabled={behandlingerResponse.content.filter((it => it.utsattTil != null)).length === 0}
@@ -211,7 +212,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                 >
                   Velg alle rader
                 </Checkbox>
-              </Table.DataCell>
+              </Table.DataCell> }
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
@@ -244,7 +245,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                   key={it.behandlingId}
                   selected={valgteBehandlingIder.includes(it.behandlingId)}
                 >
-                  <Table.DataCell align='center'>
+                  { inkluderFortsett && <Table.DataCell align='center'>
                     <Checkbox
                       hideLabel
                       disabled={it.status === 'FULLFORT' || it.status === 'STOPPET' }
@@ -252,7 +253,7 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
                       onChange={() => toggleSelectedRow(it.behandlingId)}
                       aria-labelledby={`id-${it.behandlingId}`}
                     >Velg behandling</Checkbox>
-                  </Table.DataCell>
+                  </Table.DataCell> }
                   <Table.DataCell>
                     <Link to={`/behandling/${it.behandlingId}`}>
                       {it.behandlingId}
@@ -287,14 +288,14 @@ export default function BehandlingerTable({visStatusSoek, visBehandlingTypeSoek 
         </Table>
 
         <HStack align="center" marginBlock='4'>
-          <Button
+          { inkluderFortsett && <Button
             variant="primary"
             size="small"
             onClick={fortsettValgteBehandlinger}
             disabled={valgteBehandlingIder.length === 0}
           >
             Fortsett valgte behandlinger
-          </Button>
+          </Button> }
           <Spacer />
           <Pagination
             size="small"
