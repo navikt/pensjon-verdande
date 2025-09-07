@@ -1,7 +1,6 @@
 import type React from 'react'
 import { Team } from '~/common/decodeTeam'
 import { Select } from '@navikt/ds-react'
-import { getEnumValueByKey } from '~/common/utils'
 
 export interface Props {
   ansvarligTeam: Team | string | null
@@ -24,9 +23,9 @@ export default function AnsvarligTeamSelector(props: Props) {
         Velg et alternativ
       </option>
 
-      {Object.keys(Team).map((teamKey: string) => (
-        <option key={teamKey} value={teamKey}>
-          {getEnumValueByKey(Team, teamKey)}
+      {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
+        <option key={key} value={key}>
+          {label}
         </option>
       ))}
     </Select>

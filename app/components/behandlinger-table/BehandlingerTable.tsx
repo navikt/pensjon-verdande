@@ -5,7 +5,6 @@ import { Link, useFetcher, useSearchParams } from 'react-router';
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
-import { getEnumValueByKey } from '~/common/utils'
 import type { BehandlingDto, BehandlingerPage } from '~/types'
 import styles from './behandlinger-table.module.css'
 
@@ -84,9 +83,9 @@ export default function BehandlingerTable({inkluderFortsett = true, visStatusSoe
     >
       <option value=''>Alle team</option>
 
-      {Object.keys(Team).map((teamKey: string) => (
-        <option key={teamKey} value={teamKey}>
-          {getEnumValueByKey(Team, teamKey)}
+      {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
+        <option key={key} value={key}>
+          {label}
         </option>
       ))}
     </Select>

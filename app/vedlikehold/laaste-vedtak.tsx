@@ -35,7 +35,6 @@ import {
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import { decodeBehandling } from '~/common/decodeBehandling'
-import { getEnumValueByKey } from '~/common/utils'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import {
   type LaasteVedtakBehandlingSummary,
@@ -254,9 +253,9 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string, vedtak:
         <option value="" disabled>
           Velg et alternativ
         </option>
-        {Object.keys(Team).map((teamKey: string) => (
-          <option key={teamKey} value={teamKey}>
-            {getEnumValueByKey(Team, teamKey)}
+        {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
+          <option key={key} value={key}>
+            {label}
           </option>
         ))}
       </Select>
@@ -576,9 +575,9 @@ function VelgTeam() {
     }
     }>
       <option value="">Alle team</option>
-      {Object.keys(Team).map((teamKey) => (
-        <option key={teamKey} value={teamKey}>
-          {getEnumValueByKey(Team, teamKey)}
+      {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
+        <option key={key} value={key}>
+          {label}
         </option>
       ))}
     </Select>
