@@ -9,6 +9,10 @@ import { logger } from '~/services/logger.server'
 
 const ABORT_DELAY = 120_000;
 
+// Styrer hvor lenge Suspense/Await venter før de feiler. Suspense/Await brukes av Dashboardet, som bruker
+// endel tid på å laste inn
+export const streamTimeout = 10_000
+
 process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
   logger.error("Unhandled Rejection at:", p, "reason:", reason);
 
