@@ -1,21 +1,26 @@
-import { Form, useSubmit } from 'react-router';
-import { useRef, useState } from 'react'
+import { type ActionFunctionArgs, Form, redirect, } from 'react-router'
+import { useRef, } from 'react'
 import { BodyShort, Select, VStack } from '@navikt/ds-react'
+import { requireAccessToken } from '~/services/auth.server'
+import { opprettAdhocBrevBehandling } from '~/adhocbrev/adhoc-brev.server'
 
-export default function BatchOpprett_index() {
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = (e: any) => {
-    submit(e.target.form)
-    setIsClicked(true)
-  }
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData()
+  const updates = Object.fromEntries(formData)
+  const accessToken = await requireAccessToken(request)
 
+  const response = await opprettAdhocBrevBehandling(accessToken, updates.brevmal as string, updates.ekskluderAvdoed === 'true')
+
+  return redirect(`/behandling/${response.behandlingId}`)
+}
+
+export default function AdhocBrev() {
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
     <div>
       <h1>Opprett ADHOC Brevbestilling batchkjøring på brevmal for sak</h1>
-      <Form action="adhocBrev" method="POST" style={{width: '25em'}}>
+      <Form method="post" style={{width: '25em'}}>
         <VStack gap={"4"}>
         <BodyShort style={{ fontWeight: 'bold' }}>
           Brevmal kode for Sak:
@@ -39,7 +44,7 @@ export default function BatchOpprett_index() {
             <option value="true">Ja</option>
             <option value="false">Nei</option>
           </Select>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
+          <button type="submit">
             Opprett
           </button>
         </VStack>

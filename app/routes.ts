@@ -8,8 +8,7 @@ export default [
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
   layout('layout.tsx', [
-    route('adhocbrev', 'adhocbrev/adhocbrev._index.tsx'),
-    route('adhocbrev/adhocbrev', 'adhocbrev/adhocbrev.adhocbrev.tsx'),
+    route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
 
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
 
