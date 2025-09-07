@@ -125,8 +125,12 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content="Avslutt debugging slik at behandlingen forsetter automatisk">
           <fetcher.Form method="post">
-            <input hidden readOnly name="operation" value={OPERATION.fjernFraDebug} />
-            <Button variant={'secondary'} icon={<SandboxIcon aria-hidden />}>
+            <Button
+              variant={'secondary'}
+              icon={<SandboxIcon aria-hidden />}
+              name="operation"
+              value={OPERATION.fjernFraDebug}
+            >
               Fjern fra debug
             </Button>
           </fetcher.Form>
@@ -136,8 +140,12 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content="Pause automatisk behandling slik at behandlingen kan kjøres i debugger lokalt">
           <fetcher.Form method="post">
-            <input hidden readOnly name="operation" value={OPERATION.taTilDebug} />
-            <Button variant={'secondary'} icon={<SandboxIcon aria-hidden />}>
+            <Button
+              variant={'secondary'}
+              icon={<SandboxIcon aria-hidden />}
+              name="operation"
+              value={OPERATION.taTilDebug}
+            >
               Ta til debug
             </Button>
           </fetcher.Form>
@@ -241,11 +249,11 @@ export default function BehandlingCard(props: Props) {
             ) :
             <Tooltip content="Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart">
               <fetcher.Form method="post">
-                <input hidden readOnly name="operation" value={OPERATION.fortsett} />
                 <Button
                   variant={'secondary'}
                   icon={<PlayIcon aria-hidden />}
-                  name={'fortsett'}
+                  name="operation"
+                  value={OPERATION.fortsett}
                 >
                   Fortsett
                 </Button>
@@ -262,11 +270,11 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content="Fjerner utsatt tidspunkt på de avhengige behandlingene slik at de kan kjøres umiddelbart">
           <fetcher.Form method="post">
-            <input hidden readOnly name="operation" value={OPERATION.fortsettAvhengigeBehandlinger} />
             <Button
               variant={'secondary'}
               icon={<PlayIcon aria-hidden />}
-              name={'fortsettAvhengigeBehandlinger'}
+              name="operation"
+              value={OPERATION.fortsettAvhengigeBehandlinger}
             >
               Fortsett avhengige behandlinger
             </Button>
@@ -281,11 +289,11 @@ export default function BehandlingCard(props: Props) {
       return (
         <Tooltip content="Kjører behandlingen lokalt">
           <fetcher.Form method="post">
-            <input hidden readOnly name="operation" value={OPERATION.runBehandling} />
             <Button
               variant={'secondary'}
               icon={<CogFillIcon aria-hidden />}
-              name={'runBehandling'}
+              name="operation"
+              value={OPERATION.runBehandling}
             >
               Kjør lokalt
             </Button>
