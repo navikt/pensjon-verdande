@@ -1,7 +1,6 @@
-import { Form, useSubmit } from 'react-router';
+import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Select } from '@navikt/ds-react'
-import { type ActionFunctionArgs, redirect } from 'react-router';
+import { type ActionFunctionArgs, Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen096 } from '~/uforetrygd/batch.bpen096.server'
 
@@ -16,71 +15,72 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function BatchOpprett_index() {
+export default function HentOpplysningerFraSkatt() {
+  const navigation = useNavigation()
 
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
+  const isSubmitting = navigation.state === 'submitting'
+  const [dryRun, setDryRun] = useState<string | ''>('')
+  const [debug, setDebug] = useState<string>('')
 
   return (
-    <div>
-      <h1>Hent opplysninger fra Skatt (tidligere BPEN096)</h1>
-      <p>Batchkjøring for henting av opplysninger fra Skatteetaten for Uføretrygd Etteroppgjør</p>
-      <Form method="post">
-        <div style={{ display: 'inline-block' }}>
-          <label>Max antall sekvensnummer</label>
-          <br />
-          <input
+    <VStack gap={'4'} >
+      <Box.New className={'aksel-pageblock--lg'}>
+      <Heading size={'medium'} level={'1'}>Hent opplysninger fra Skatt (tidligere BPEN096)</Heading>
+      <BodyShort>Batchkjøring for henting av opplysninger fra Skatteetaten for Uføretrygd Etteroppgjør</BodyShort>
+      </Box.New>
+
+      <Form method="post" style={{width: '20em'}}>
+        <VStack gap={'4'}>
+          <TextField
+            label={'Max antall sekvensnummer'}
             defaultValue="10000"
             aria-label="maxSekvensnummer"
             name="maksAntallSekvensnummer"
             type="number"
             placeholder="maxSekvensnummer"
           />
-        </div>
-        <br />
-        <div style={{ display: 'inline-block' }}>
-          <label>Antall sekvensnummer per behandling</label>
-          <br />
-          <input
+
+          <TextField
+            label={'Antall sekvensnummer per behandling'}
             defaultValue="100"
             aria-label="sekvensnummerPerBehandling"
             name="sekvensnummerPerBehandling"
             type="number"
             placeholder="sekvensnummerPerBehandling"
           />
-        </div>
-        <br />
-        <div style={{ display: 'inline-block' }}>
-          <Select
-            label="dryRun"
-            size={'small'}
-            name={'dryRun'}
-            defaultValue={'true'}
-          >
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-        </div>
-        <br />
-        <div style={{ display: 'inline-block' }}>
-          <Select
-            label="debug"
-            size={'small'}
-            name={'debug'}
-            defaultValue={'false'}
-          >
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-        </div>
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Opprett
-          </button>
-        </p>
-      </Form>
 
-    </div>
+          <Select
+            label="Dry run"
+            size={'medium'}
+            name={'dryRun'}
+            onChange={(e) => setDryRun(e.target.value)}
+            value={dryRun ?? ''}
+          >
+            <option value="" disabled>Velg</option>
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+
+          <Select
+            label="Debug"
+            size={'medium'}
+            name={'debug'}
+            onChange={(e) => setDebug(e.target.value)}
+            value={debug ?? ''}
+          >
+            <option value="" disabled>Velg</option>
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+
+          <Button
+            type="submit"
+            disabled={isSubmitting || dryRun === '' || debug === ''}
+          >
+            {isSubmitting ? 'Oppretter…' : 'Opprett'}
+          </Button>
+        </VStack>
+      </Form>
+    </VStack>
   )
 }
