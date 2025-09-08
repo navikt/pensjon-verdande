@@ -65,7 +65,7 @@ export const getLaasteVedtakSummary = async(
   } else {
     const body = await response.json()
     logger.error(`Feil ved kall til pen ${response.status}`, body)
-    throw new Error()
+    throw new Error(body)
   }
 }
 

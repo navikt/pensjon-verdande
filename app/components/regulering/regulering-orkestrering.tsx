@@ -6,7 +6,13 @@ export default function ReguleringOrkestrering() {
 
   const [isClicked, setIsClicked] = useState(false);
   const submit = useSubmit();
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
+  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
+    const form = (e.target as HTMLButtonElement).form;
+    if (form) {
+      await submit(form);
+      setIsClicked(true);
+    }
+  };
 
   return <div><h2>Start Orkestrering</h2><Form method="POST">
     <input type="hidden" name="formType" value="startReguleringOrkestrering" />

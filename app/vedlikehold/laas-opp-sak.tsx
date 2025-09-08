@@ -1,4 +1,4 @@
-import { Link, useFetcher, useRevalidator, useSearchParams } from 'react-router';
+import { Link, useFetcher, useSearchParams } from 'react-router';
 import {
   Alert,
   BodyLong,
@@ -51,7 +51,7 @@ export default function LaasteVedtakPage() {
           <HentSakInput onLoad={setSak} />
         </HStack>
         <HStack>
-          {sak !== undefined && (
+          {sak !== undefined && sak !== null  && (
             <VStack gap="5">
               <HStack gap="4" align="end" justify="start">
                 <Entry labelText={'Saktype'}>{sak.sakType}</Entry>
@@ -144,7 +144,7 @@ export default function LaasteVedtakPage() {
                   </HStack>
                 </>
               )}
-              {sak.automatiskeKravUtenVedtak.length > 0 && (
+              {sak !== null && sak.automatiskeKravUtenVedtak.length > 0 && (
                 <>
                   <Heading size="medium">Automatiske krav uten vedtak</Heading>
                   <HStack>
@@ -221,9 +221,19 @@ function HentSakInput({ onLoad }: { onLoad: (sak: SakOppsummeringLaasOpp | null 
 
   useEffect(() => {
     if(sakIdParam !== null && fetcher.data === undefined && fetcher.state === 'idle') {
-    hentSak()
+      setSearchParams({sakId: sakId})
+      fetcher.submit(
+        {
+          sakId,
+        },
+        {
+          action: 'hentSak',
+          method: 'POST',
+          encType: 'application/json',
+        },
+      ).then()
     }
-  }, [fetcher.data, fetcher.state, hentSak, sakIdParam])
+  }, [fetcher.data, fetcher.state, sakIdParam, fetcher.submit, sakId, setSearchParams])
 
   useEffect(() => {
     onLoad(fetcher.data as SakOppsummeringLaasOpp | null | undefined)
@@ -240,7 +250,7 @@ function HentSakInput({ onLoad }: { onLoad: (sak: SakOppsummeringLaasOpp | null 
         method: 'POST',
         encType: 'application/json',
       },
-    )
+    ).then()
   }
 
   return (
@@ -279,7 +289,6 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string, behandlinger: 
 function SettTilManuellModal({ kravId, onClose }: { kravId: string, onClose: () => void }) {
 
   const fetcher = useFetcher()
-  const revalidator = useRevalidator()
 
   function settTilManuell() {
     fetcher.submit(
@@ -305,7 +314,7 @@ function SettTilManuellModal({ kravId, onClose }: { kravId: string, onClose: () 
     } else {
       alert('Kunne ikke låse opp, teknisk feil.')
     }
-  }, [fetcher?.data, onClose, revalidator])
+  }, [fetcher?.data, onClose])
 
  return ( <Modal header={{ heading: 'Sett til manuell' }} open={true} onClose={onClose}>
     <Modal.Body>

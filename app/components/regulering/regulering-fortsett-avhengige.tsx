@@ -5,9 +5,12 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
 
   const [isClicked, setIsClicked] = useState(false);
   const submit = useSubmit();
-  const handleSubmit = (e: any) => {
-    submit(e.target.form)
-    setIsClicked(true)
+  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
+    const form = (e.target as HTMLButtonElement).form;
+    if (form) {
+      await submit(form);
+      setIsClicked(true);
+    }
   }
   const status = [
     "FEILENDE",
