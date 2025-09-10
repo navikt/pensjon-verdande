@@ -36,7 +36,7 @@ const batcherMeny = [
   ['ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling'],
   ['AFP_ETTEROPPGJOR', '/afp-etteroppgjor', 'AFP Etteroppgjør'],
   ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
-  ['AVSLUTTIKKELOPENDESAKER', `/behandlingserie`, 'Avslutter ikke løpende saker'],
+  ['BEHANDLINGSERIE', `/behandlingserie`, 'Behandlingserie'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
