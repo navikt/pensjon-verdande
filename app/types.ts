@@ -8,7 +8,7 @@ export enum Behandlingstatus {
 
 export type BehandlingDto = {
   level: number | null
-  behandlingSerieId: number | null
+  behandlingSerieId: string | null
   behandlingId: number
   type: string
   uuid: string
