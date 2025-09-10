@@ -1,22 +1,47 @@
-import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { Alert, BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useNavigation } from 'react-router'
+import { type ActionFunctionArgs, Form, Link, redirect, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
-import { opprettBpen096 } from '~/uforetrygd/batch.bpen096.server'
+import { hentSkattehendelserManuelt, opprettBpen096 } from '~/uforetrygd/batch.bpen096.server'
 
+enum Action {
+  HentSkattehendelser = "HENT_SKATTEHENDELSER",
+  HentSkattehendelserManuelt = "HENT_SKATTEHENDELSER_MANUELT"
+}
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData()
-  const updates = Object.fromEntries(formData)
+  const formData = Object.fromEntries(await request.formData())
   const accessToken = await requireAccessToken(request)
 
-  const response = await opprettBpen096(accessToken, +updates.maksAntallSekvensnummer, +updates.sekvensnummerPerBehandling, updates.dryRun === 'true', updates.debug === 'true')
+  if (formData.action == Action.HentSkattehendelser) {
+    const response = await opprettBpen096(
+      accessToken,
+      +formData.maksAntallSekvensnummer,
+      +formData.sekvensnummerPerBehandling,
+      formData.dryRun === 'true',
+      formData.debug === 'true',
+    )
+    return redirect(`/behandling/${response.behandlingId}`)
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  } else if (formData.action === Action.HentSkattehendelserManuelt) {
+    const sekvensnr: number[] = formData.sekvensnr.toString()
+      .split(',')
+      .map(nr => nr.trim())
+      .map(nr => Number(nr))
+
+    const inneholderUgyldigSekvensnr = sekvensnr.some(nr => isNaN(nr))
+    if (inneholderUgyldigSekvensnr) {
+      return { error: "Fant ugyldig sekvensnr." }
+    }
+
+    const response = await hentSkattehendelserManuelt(sekvensnr, accessToken)
+    return { behandlingIder: response.behandlingIder }
+  }
 }
 
 export default function HentOpplysningerFraSkatt() {
   const navigation = useNavigation()
+  const actionData = useActionData()
 
   const isSubmitting = navigation.state === 'submitting'
   const [dryRun, setDryRun] = useState<string | ''>('')
@@ -75,12 +100,45 @@ export default function HentOpplysningerFraSkatt() {
 
           <Button
             type="submit"
+            name="action"
+            value={Action.HentSkattehendelser}
             disabled={isSubmitting || dryRun === '' || debug === ''}
           >
             {isSubmitting ? 'Oppretter…' : 'Opprett'}
           </Button>
+
         </VStack>
       </Form>
+
+      <Heading size="medium">Kjør hendelser manuelt</Heading>
+      <BodyShort>Angi sekvensnummer for å lagre inntektene på disse hendelsene manuelt.</BodyShort>
+
+      <Form method="post">
+        <VStack gap="4" width="20em">
+          <TextField label="Kommaseparert liste med sekvensnr." name="sekvensnr" />
+          <Button
+            type="submit"
+            name="action"
+            value={Action.HentSkattehendelserManuelt}
+            disabled={isSubmitting}
+          >
+            Kjør
+          </Button>
+
+          {actionData?.behandlingIder &&
+            (<>
+                Oppretta behandlinger
+                {actionData?.behandlingIder.map((behandlingId: number) => <Link to={`/behandling/${behandlingId}`}>{behandlingId}</Link>)}
+              </>)
+          }
+        </VStack>
+      </Form>
+
+      {actionData?.error &&
+        <Alert inline variant="error">
+          {actionData.error}
+        </Alert>
+      }
     </VStack>
   )
 }

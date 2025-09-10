@@ -206,9 +206,6 @@ export interface HalLinks {
   [s: string]: HalLink | HalLink[]
 }
 
-export type StartBatchResponse = {
-  behandlingId: number
-}
 export type FortsettBatchResponse = {
   behandlingId: number[]
 }

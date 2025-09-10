@@ -30,12 +30,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
-  console.log('formData', formData)
-  console.log('updates', updates)
-
   const response = await startBestemEtteroppgjorResultat(accessToken, updates)
-
-  console.log(response.status)
-
   return null;
 }
