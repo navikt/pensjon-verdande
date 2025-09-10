@@ -1,5 +1,4 @@
 import { env } from '~/services/env.server'
-import type { StartBatchResponse } from '~/types'
 
 export async function opprettBpen096(
   accessToken: string,
@@ -31,4 +30,35 @@ export async function opprettBpen096(
   } else {
     throw new Error()
   }
+}
+
+export async function hentSkattehendelserManuelt(sekvensnr: number[], accessToken: string): Promise<HentSkattehendelserManueltResponse> {
+  const response = await fetch(
+    `${env.penUrl}/api/kjor-hendelser-manuelt`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+      body: JSON.stringify({
+        sekvensnummer: sekvensnr,
+      }),
+    },
+  )
+
+  if (response.ok) {
+    return (await response.json()) as HentSkattehendelserManueltResponse
+  } else {
+    throw new Error()
+  }
+}
+
+type StartBatchResponse = {
+  behandlingId: number
+}
+
+type HentSkattehendelserManueltResponse = {
+  behandlingIder: number[]
 }
