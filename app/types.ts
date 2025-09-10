@@ -8,6 +8,7 @@ export enum Behandlingstatus {
 
 export type BehandlingDto = {
   level: number | null
+  behandlingSerieId: number | null
   behandlingId: number
   type: string
   uuid: string
@@ -306,4 +307,15 @@ export type BehandlingManuellOpptellingDto = {
 
 export type BehandlingManuellOpptellingResponse = {
   behandlingManuellOpptelling: BehandlingManuellOpptellingDto[]
+}
+
+export type BehandlingSerieDto = {
+    behandlingSerieId: string,
+    behandlingCode: string,
+    regelmessighet: string,
+    startDato: string,
+    sluttDato: string,
+    valgteDatoer: string[],
+    behandlingerOpprettet: boolean,
+    opprettetAv: string,
 }

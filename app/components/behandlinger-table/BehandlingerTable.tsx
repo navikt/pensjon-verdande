@@ -167,6 +167,9 @@ export default function BehandlingerTable({inkluderFortsett = true, visStatusSoe
               <Table.ColumnHeader sortable sortKey="behandlingId" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "7rem" }}>
                 Id
               </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="behandlingSerieId" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "7rem" }}>
+                SerieId
+              </Table.ColumnHeader>
               <Table.ColumnHeader sortable sortKey="class" style={{ borderBottomWidth: 0, paddingBottom: 0, width: "30rem"  }}>
                 Type
               </Table.ColumnHeader>
@@ -214,6 +217,8 @@ export default function BehandlingerTable({inkluderFortsett = true, visStatusSoe
               </Table.DataCell> }
               <Table.DataCell style={{ paddingTop: 0 }}>
               </Table.DataCell>
+                <Table.DataCell style={{ paddingTop: 0 }}>
+                </Table.DataCell>
               <Table.DataCell style={{ paddingTop: 0 }}>
                 {visBehandlingTypeSoek && behandlingtypeOptions()}
               </Table.DataCell>
@@ -257,6 +262,9 @@ export default function BehandlingerTable({inkluderFortsett = true, visStatusSoe
                     <Link to={`/behandling/${it.behandlingId}`}>
                       {it.behandlingId}
                     </Link>
+                  </Table.DataCell>
+                  <Table.DataCell>
+                     {it.behandlingSerieId}
                   </Table.DataCell>
                   <Table.DataCell>{decodeBehandling(it.type)}</Table.DataCell>
                   <Table.DataCell>
