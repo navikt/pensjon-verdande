@@ -27,6 +27,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const sekvensnr: number[] = formData.sekvensnr.toString()
       .split(',')
       .map(nr => nr.trim())
+      .filter(nr => nr !== '')
       .map(nr => Number(nr))
 
     const inneholderUgyldigSekvensnr = sekvensnr.some(nr => isNaN(nr))
