@@ -72,10 +72,11 @@ export default [
       ]),
     ]),
 
-    route('behandlinger', 'behandlinger/behandlinger._index.tsx'),
-    route('behandlinger/:status', 'behandlinger/behandlinger.$status.tsx', [
-      route('fortsett', 'behandlinger/behandlinger.$status.fortsett.tsx'),
-    ]),
+      route('behandlingserie', 'behandlingserie/behandlingserie.tsx'),
+      route('behandlinger', 'behandlinger/behandlinger._index.tsx'),
+      route('behandlinger/:status', 'behandlinger/behandlinger.$status.tsx', [
+          route('fortsett', 'behandlinger/behandlinger.$status.fortsett.tsx'),
+      ]),
 
     route('bestem-etteroppgjor-resultat', 'uforetrygd/bestem-etteroppgjor-resultat._index.tsx'),
 
@@ -125,8 +126,6 @@ export default [
     route('omregning/omregning', 'omregning/omregning.omregning.tsx'),
     route('omregning/omregningsaker', 'omregning/omregning.omregningsaker.tsx'),
     route('omregningStatistikk', 'omregning/omregningStatistikk._index.tsx'),
-
-    route('oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus.tsx'),
 
     route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx'),
     route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),
