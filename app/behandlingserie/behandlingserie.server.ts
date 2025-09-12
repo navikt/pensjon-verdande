@@ -1,5 +1,5 @@
 import { env } from '~/services/env.server'
-import type {BehandlingSerieDto, StartBatchResponse} from '~/types'
+import type {BehandlingDto, StartBatchResponse} from '~/types'
 
 export const opprettBehandlingSerie = async(
   accessToken: string,
@@ -36,7 +36,7 @@ export const opprettBehandlingSerie = async(
   )
 
   if (response.ok) {
-    return (await response.json()) as StartBatchResponse
+    return (await response.json()) as string
   } else {
     throw new Error()
   }
@@ -47,7 +47,7 @@ export const getBehandlingSerier = async (
     behandlingType: string,
 ) => {
     const response = await fetch(
-        `${env.penUrl}/api/behandling/serier?behandlingType=${behandlingType}`,
+        `${env.penUrl}/api/behandling/serier?behandlingCode=${behandlingType}`,
         { method: 'GET',
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -58,7 +58,7 @@ export const getBehandlingSerier = async (
       )
 
       if (response.ok) {
-        return (await response.json()) as BehandlingSerieDto[]
+        return (await response.json()) as BehandlingDto[]
       } else {
         return []
       }

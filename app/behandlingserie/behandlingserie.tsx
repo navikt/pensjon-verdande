@@ -1,13 +1,11 @@
-import {Await, type LoaderFunctionArgs, useFetcher, useLoaderData, useSearchParams} from 'react-router';
-import {Suspense, useState} from 'react';
+import { type LoaderFunctionArgs, useFetcher, useLoaderData, useSearchParams} from 'react-router';
+import {useState} from 'react';
 import {Button, DatePicker, RadioGroup, Radio, Checkbox, Select, Table, Heading, Skeleton} from '@navikt/ds-react';
 import {type ActionFunctionArgs, redirect} from 'react-router';
 import {requireAccessToken} from '~/services/auth.server';
 import 'chart.js/auto';
-import {getBehandlinger} from '~/services/behandling.server';
-import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable';
 import {getBehandlingSerier, opprettBehandlingSerie} from '~/behandlingserie/behandlingserie.server';
-import type {BehandlingSerieDto} from '~/types';
+import type {BehandlingDto} from "~/types";
 
 type Mode = 'single' | 'range' | 'multiple';
 type DateRange = { from?: Date; to?: Date };
@@ -15,23 +13,12 @@ type Selection = Date | DateRange | Date[] | undefined;
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
     const {searchParams} = new URL(request.url);
-    const size = searchParams.get('size');
-    const page = searchParams.get('page');
     const behandlingType = searchParams.get('behandlingType') ?? '';
-    const behandlingSerieId = searchParams.get('behandlingSerieId') ?? '';
 
     const accessToken = await requireAccessToken(request);
-
     const behandlingSerier = await getBehandlingSerier(accessToken, behandlingType);
-    const behandlinger = getBehandlinger(accessToken, {
-        behandlingType,
-        behandlingSerieId,
-        page: page ? +page : 0,
-        size: size ? +size : 3,
-        sort: searchParams.get('sort'),
-    });
 
-    return {behandlinger, behandlingSerier};
+    return {behandlingSerier};
 };
 
 export const action = async ({request}: ActionFunctionArgs) => {
@@ -50,7 +37,7 @@ export const action = async ({request}: ActionFunctionArgs) => {
         data.startTid,
         data.opprettetAv,
     );
-    return redirect(`/behandling/${response.behandlingId}`);
+    return redirect(`/behandlingserie?behandlingType=${data.behandlingCode}`);
 };
 
 export default function BehandlingOpprett_index() {
@@ -77,7 +64,7 @@ export default function BehandlingOpprett_index() {
         });
     };
 
-    const {behandlinger, behandlingSerier} = useLoaderData<typeof loader>();
+    const {behandlingSerier} = useLoaderData<typeof loader>();
 
     function sendBehandlingSerieTilAction() {
         fetcher.submit(
@@ -184,55 +171,28 @@ export default function BehandlingOpprett_index() {
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>Behandling</Table.HeaderCell>
-                        <Table.HeaderCell>Hyppighet</Table.HeaderCell>
                         <Table.HeaderCell>SerieId</Table.HeaderCell>
-                        <Table.HeaderCell>Fra dato</Table.HeaderCell>
-                        <Table.HeaderCell>Til dato</Table.HeaderCell>
-                        <Table.HeaderCell>Valgte datoer</Table.HeaderCell>
-                        <Table.HeaderCell>Finnes behandlinger</Table.HeaderCell>
-                        <Table.HeaderCell>Opprettet av</Table.HeaderCell>
-                        <Table.HeaderCell>Handling</Table.HeaderCell>
-                        <Table.HeaderCell>Behandlinger</Table.HeaderCell>
-                        <Table.HeaderCell>Slett serie</Table.HeaderCell>
+                        <Table.HeaderCell>Planlagt startet</Table.HeaderCell>
+                        <Table.HeaderCell>Endre planlagt startet</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 {behandlingSerier.length > 0 && (
                     <Table.Body>
                         {behandlingSerier.map((
                             {
-                                behandlingCode,
-                                regelmessighet,
+                                type,
                                 behandlingSerieId,
-                                startDato,
-                                sluttDato,
-                                valgteDatoer,
-                                behandlingerOpprettet,
-                                opprettetAv
-                            }: BehandlingSerieDto,
+                                planlagtStartet,
+                            }: BehandlingDto,
                             i: number
                         ) => (
                             <Table.Row key={behandlingSerieId || i} shadeOnHover={false}>
-                                <Table.HeaderCell scope="row">{behandlingCode}</Table.HeaderCell>
-                                <Table.DataCell>{regelmessighet}</Table.DataCell>
+                                <Table.HeaderCell scope="row">{type}</Table.HeaderCell>
                                 <Table.DataCell>{behandlingSerieId}</Table.DataCell>
-                                <Table.DataCell>{startDato}</Table.DataCell>
-                                <Table.DataCell>{sluttDato}</Table.DataCell>
-                                <Table.DataCell>{valgteDatoer.join(', ')}</Table.DataCell>
-                                <Table.DataCell>{behandlingerOpprettet ? 'true' : 'false'}</Table.DataCell>
-                                <Table.DataCell>{opprettetAv}</Table.DataCell>
+                                <Table.DataCell>{planlagtStartet}</Table.DataCell>
                                 <Table.DataCell>
-                                    <Button variant="primary" disabled={behandlingerOpprettet}>
-                                        Opprett behandlinger
-                                    </Button>
-                                </Table.DataCell>
-                                <Table.DataCell>
-                                    <Button variant="secondary" disabled={!behandlingerOpprettet}>
-                                        Vis behandlinger
-                                    </Button>
-                                </Table.DataCell>
-                                <Table.DataCell>
-                                    <Button variant="danger" disabled={behandlingerOpprettet}>
-                                        Slett serie
+                                    <Button variant="primary">
+                                        Endre planlagt startet
                                     </Button>
                                 </Table.DataCell>
                             </Table.Row>
@@ -240,31 +200,9 @@ export default function BehandlingOpprett_index() {
                     </Table.Body>
                 )}
             </Table>
-
-            <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407}/>}>
-                <Await resolve={behandlinger}>
-                    {it => (
-                        it.content && it.content.length > 0 ? (
-                            <>
-                                <Heading level="2" size="medium" style={{marginTop: '2em'}}>
-                                    Eksisterende behandlinger på serie
-                                </Heading>
-                                <BehandlingerTable
-                                    inkluderFortsett={false}
-                                    visStatusSoek={false}
-                                    visAnsvarligTeamSoek={false}
-                                    visBehandlingTypeSoek={false}
-                                    behandlingerResponse={it}
-                                />
-                            </>
-                        ) : null
-                    )}
-                </Await>
-            </Suspense>
         </div>
     );
 }
-
 
 function formatDate(d: Date): string {
     return d.toISOString().split('T')[0];
