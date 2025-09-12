@@ -157,7 +157,7 @@ export default function HentOpplysningerFraSkatt() {
             Hent
           </Button>
 
-          {actionData?.antall &&
+          {actionData?.antall !== undefined &&
             (<>
               Antall å hente: {actionData?.antall}
             </>)
