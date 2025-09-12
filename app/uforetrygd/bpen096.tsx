@@ -123,7 +123,6 @@ export default function HentOpplysningerFraSkatt() {
 
       <Heading size="medium">Kjør hendelser manuelt</Heading>
       <BodyShort>Angi sekvensnummer for å lagre inntektene på disse hendelsene manuelt.</BodyShort>
-
       <Form method="post">
         <VStack gap="4" width="20em">
           <TextField label="Kommaseparert liste med sekvensnr." name="sekvensnr" />
@@ -146,8 +145,7 @@ export default function HentOpplysningerFraSkatt() {
       </Form>
 
       <Heading size="medium">Antall hendelser å hente</Heading>
-      <BodyShort>Gjør et kall mot Sigrun for å se hvor mange hendelser en kjøring av HentSkattehendelser vil hente.</BodyShort>
-
+      <BodyShort>Gjør et kall mot Sigrun for å se hvor mange hendelser en faktisk kjøring vil hente.</BodyShort>
       <Form method="post">
         <VStack gap="4" width="20em">
           <Button
@@ -156,7 +154,7 @@ export default function HentOpplysningerFraSkatt() {
             value={Action.HentAntallSkattehendelser}
             disabled={isSubmitting}
           >
-            Kjør
+            Hent
           </Button>
 
           {actionData?.antall &&
