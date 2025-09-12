@@ -147,7 +147,7 @@ export default function BehandlingOpprett_index() {
                                 value={selectedTime}
                                 onChange={e => setSelectedTime(e.target.value)}
                             >
-                                <option value="">Select time</option>
+                                <option value="">Velg tid</option>
                                 {times.map(time => (
                                     <option key={time} value={time}>{time}</option>
                                 ))}
