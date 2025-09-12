@@ -50,7 +50,7 @@ export default function BehandlingOpprett_index() {
     const fetcher = useFetcher();
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const [behandlingType, setBehandlingType] = useState(searchParams.get('behandling') || '');
+    const [behandlingType, setBehandlingType] = useState(searchParams.get('behandlingType') || '');
     const behandlingTyper = ['FinnSakerSomSkalAvsluttes', 'ReguleringUttrekk'];
 
     const handleBehandlingType = (e: React.ChangeEvent<HTMLSelectElement>) => {
