@@ -2,11 +2,16 @@ import { Alert, BodyShort, Box, Button, Heading, Select, TextField, VStack } fro
 import { useState } from 'react'
 import { type ActionFunctionArgs, Form, Link, redirect, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
-import { hentSkattehendelserManuelt, opprettBpen096 } from '~/uforetrygd/batch.bpen096.server'
+import {
+  hentAntallSkattehendelser,
+  hentSkattehendelserManuelt,
+  opprettBpen096,
+} from '~/uforetrygd/batch.bpen096.server'
 
 enum Action {
   HentSkattehendelser = "HENT_SKATTEHENDELSER",
-  HentSkattehendelserManuelt = "HENT_SKATTEHENDELSER_MANUELT"
+  HentSkattehendelserManuelt = "HENT_SKATTEHENDELSER_MANUELT",
+  HentAntallSkattehendelser = "HENT_ANTALL_SKATTEHENDELSER"
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -37,6 +42,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     const response = await hentSkattehendelserManuelt(sekvensnr, accessToken)
     return { behandlingIder: response.behandlingIder }
+
+  } else if (formData.action === Action.HentAntallSkattehendelser) {
+
+    const response = await hentAntallSkattehendelser(accessToken)
+    return { antall: response.antall }
   }
 }
 
@@ -135,6 +145,27 @@ export default function HentOpplysningerFraSkatt() {
         </VStack>
       </Form>
 
+      <Heading size="medium">Antall hendelser å hente</Heading>
+      <BodyShort>Gjør et kall mot Sigrun for å se hvor mange hendelser en kjøring av HentSkattehendelser vil hente.</BodyShort>
+
+      <Form method="post">
+        <VStack gap="4" width="20em">
+          <Button
+            type="submit"
+            name="action"
+            value={Action.HentAntallSkattehendelser}
+            disabled={isSubmitting}
+          >
+            Kjør
+          </Button>
+
+          {actionData?.antall &&
+            (<>
+              Antall å hente: {actionData?.antall}
+            </>)
+          }
+        </VStack>
+      </Form>
       {actionData?.error &&
         <Alert inline variant="error">
           {actionData.error}

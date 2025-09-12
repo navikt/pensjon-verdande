@@ -55,10 +55,34 @@ export async function hentSkattehendelserManuelt(sekvensnr: number[], accessToke
   }
 }
 
+export async function hentAntallSkattehendelser(accessToken: string): Promise<HentAntallSkattehendelserResponse> {
+  const response = await fetch(
+    `${env.penUrl}/api/hentSkattehendelser/antall`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (response.ok) {
+    return (await response.json()) as HentAntallSkattehendelserResponse
+  } else {
+    throw new Error()
+  }
+}
+
 type StartBatchResponse = {
   behandlingId: number
 }
 
 type HentSkattehendelserManueltResponse = {
   behandlingIder: number[]
+}
+
+type HentAntallSkattehendelserResponse = {
+  antall: number
 }
