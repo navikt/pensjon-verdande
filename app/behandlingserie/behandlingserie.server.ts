@@ -38,7 +38,7 @@ export const opprettBehandlingSerie = async(
   if (response.ok) {
     return (await response.json()) as string
   } else {
-    throw new Error()
+    throw new Error(`Failed to create behandling serie: ${response.status} ${response.statusText}`)
   }
 }
 
