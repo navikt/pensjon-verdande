@@ -50,7 +50,7 @@
     "@biomejs/biome": "2.2.4",
     "@react-router/dev": "^7.7.1",
     "@types/node": "^24.3.1",
-    "@types/react": "^19.1.12",
+    "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "eslint": "^9.35.0",
     "react-router-devtools": "^5.1.3",
