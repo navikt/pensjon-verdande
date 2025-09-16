@@ -169,7 +169,6 @@ export default function BehandlingOpprett_index() {
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell>Behandling</Table.HeaderCell>
-                                <Table.HeaderCell>SerieId</Table.HeaderCell>
                                 <Table.HeaderCell>Planlagt startet</Table.HeaderCell>
                                 <Table.HeaderCell>Endre planlagt startet</Table.HeaderCell>
                             </Table.Row>
@@ -186,7 +185,6 @@ export default function BehandlingOpprett_index() {
                                 ) => (
                                     <Table.Row key={behandlingSerieId || i} shadeOnHover={false}>
                                         <Table.HeaderCell scope="row">{type}</Table.HeaderCell>
-                                        <Table.DataCell>{behandlingSerieId}</Table.DataCell>
                                         <Table.DataCell>{planlagtStartet}</Table.DataCell>
                                         <Table.DataCell>
                                             <Button variant="primary">
