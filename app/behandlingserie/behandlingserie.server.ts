@@ -8,25 +8,25 @@ export const opprettBehandlingSerie = async(
   valgteDatoer: string[],
   startTid: string,
   opprettetAv: string,
-
 ) => {
-    const planlagteKjoringer = valgteDatoer.map(d => ({
-        dato: d,
-        tidspunkt: startTid,
-    }));
+    const planlagteKjoringer = valgteDatoer.map(d =>
+        `${d}T${startTid}:00`
+    );
+
+    const body = {
+            behandlingCode: behandlingCode,
+            planlagteKjoringer: planlagteKjoringer,
+            regelmessighet: regelmessighet,
+            opprettetAv: opprettetAv,
+        }
+
+    console.log('Request body:', body); // Log the request body for debugging
+
   const response = await fetch(
     `${env.penUrl}/api/behandling/serier`,
     {
       method: 'POST',
-      body: JSON.stringify(
-        {
-            behandlingCode,
-            planlagteKjoringer,
-            regelmessighet,
-            opprettetAv,
-        }
-      )
-      ,
+      body: JSON.stringify(body),
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',

@@ -1,6 +1,16 @@
-import { type LoaderFunctionArgs, useFetcher, useLoaderData, useSearchParams} from 'react-router';
+import {type LoaderFunctionArgs, useFetcher, useLoaderData, useSearchParams} from 'react-router';
 import {useState} from 'react';
-import {Button, DatePicker, RadioGroup, Radio, Checkbox, Select, Table, Heading, Skeleton} from '@navikt/ds-react';
+import {
+    Button,
+    DatePicker,
+    RadioGroup,
+    Radio,
+    Checkbox,
+    Select,
+    Table,
+    Heading,
+    VStack, HStack
+} from '@navikt/ds-react';
 import {type ActionFunctionArgs, redirect} from 'react-router';
 import {requireAccessToken} from '~/services/auth.server';
 import 'chart.js/auto';
@@ -23,21 +33,25 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
 
 export const action = async ({request}: ActionFunctionArgs) => {
     const accessToken = await requireAccessToken(request);
-    const data = await request.json();
+    const formData = await request.formData();
 
-    const valgteDatoer: string[] = Array.isArray(data.valgteDatoer)
-        ? data.valgteDatoer.map((s: string) => s.split('T')[0])
-        : [];
+    const behandlingCode = String(formData.get('behandlingCode') ?? '');
+    const regelmessighet = String(formData.get('regelmessighet') ?? 'VILKÅRLIG');
+    const startTid = String(formData.get('startTid') ?? '');
+    const opprettetAv = String(formData.get('opprettetAv') ?? 'VERDANDE');
 
-    const response = await opprettBehandlingSerie(
+    const valgteDatoerRaw = String(formData.get('valgteDatoer') ?? '[]');
+    const valgteDatoer = JSON.parse(valgteDatoerRaw) as string[]; // forventer ["2025-09-16", ...]
+
+    await opprettBehandlingSerie(
         accessToken,
-        data.behandlingCode,
-        data.regelmessighet,
+        behandlingCode,
+        regelmessighet,
         valgteDatoer,
-        data.startTid,
-        data.opprettetAv,
+        startTid,
+        opprettetAv,
     );
-    return redirect(`/behandlingserie?behandlingType=${data.behandlingCode}`);
+    return redirect(`/behandlingserie?behandlingType=${behandlingCode}`);
 };
 
 export default function BehandlingOpprett_index() {
@@ -67,146 +81,133 @@ export default function BehandlingOpprett_index() {
     const {behandlingSerier} = useLoaderData<typeof loader>();
 
     function sendBehandlingSerieTilAction() {
-        fetcher.submit(
-            {
-                behandlingCode: behandlingType ?? '',
-                regelmessighet: 'daglig',
-                valgteDatoer: selectionToDateStrings(selection),
-                startTid: selectedTime,
-                opprettetAv: 'VERDANDE'
-            },
-            {
-                action: '',
-                method: 'POST',
-                encType: 'application/json',
-            },
-        );
+        const formData = new FormData();
+        formData.set('behandlingCode', behandlingType ?? '');
+        formData.set('regelmessighet', 'VILKÅRLIG');
+        formData.set('valgteDatoer', JSON.stringify(selectionToDateStrings(selection)));
+        formData.set('startTid', selectedTime);
+        formData.set('opprettetAv', 'VERDANDE');
+
+        fetcher.submit(formData, {method: 'post'});
     }
 
     return (
-        <div>
-            <h1>Opprett behandling i serie</h1>
-            <Table size="small" style={{maxWidth: '1000px'}}>
-                <Table.Body>
-                    <Table.Row shadeOnHover={false}>
-                        <Table.DataCell colSpan={1}>
-                            <Select label="Velg behandling" onChange={handleBehandlingType}>
-                                <option value="">Velg behandlingCode</option>
-                                {behandlingTyper.map(type => (
-                                    <option key={type} value={type}>{type}</option>
-                                ))}
-                            </Select>
-                        </Table.DataCell>
-                    </Table.Row>
-                    <Table.Row shadeOnHover={false}>
-                        <Table.DataCell colSpan={2}>
-                            <Checkbox
-                                value="true"
-                                checked={ekskluderHelg}
-                                onChange={e => setEkskluderHelg(e.target.checked)}
-                            >
-                                Ekskluder helg
-                            </Checkbox>
-                        </Table.DataCell>
-                    </Table.Row>
-                    <Table.Row shadeOnHover={false}>
-                        <Table.DataCell>
-                            <RadioGroup
-                                legend="Velg hyppighet"
-                                value={hyppighet}
-                                onChange={value => {
-                                    const v = value as Mode;
-                                    setHyppighet(v);
-                                    if (v === 'single') setSelection(defaultStartdato);
-                                    if (v === 'range') setSelection(undefined);
-                                    if (v === 'multiple') setSelection([]);
-                                }}
-                            >
-                                <Radio value="range">Hver ukedag fra og til</Radio>
-                                <Radio value="multiple">Velg diverse datoer</Radio>
-                            </RadioGroup>
-                        </Table.DataCell>
-                        <Table.DataCell>
-                            <DatePicker.Standalone
-                                key={hyppighet}
-                                mode={hyppighet}
-                                min={1}
-                                max={100}
-                                fromDate={new Date()}
-                                dropdownCaption
-                                showWeekNumber
-                                disableWeekends={ekskluderHelg}
-                                onSelect={(value: any) => setSelection(value as Selection)}
-                            />
-                        </Table.DataCell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.DataCell colSpan={1}>
-                            <Select
-                                label="Velg når på døgnet behandlingen skal kjøres"
-                                value={selectedTime}
-                                onChange={e => setSelectedTime(e.target.value)}
-                            >
-                                <option value="">Velg tid</option>
-                                {times.map(time => (
-                                    <option key={time} value={time}>{time}</option>
-                                ))}
-                            </Select>
-                        </Table.DataCell>
-                    </Table.Row>
-                </Table.Body>
-            </Table>
-            <p>
-                <Button
-                    type="button"
-                    onClick={sendBehandlingSerieTilAction}
-                    loading={fetcher.state === 'submitting'}
-                >
-                    Lagre serie
-                </Button>
-            </p>
+        <VStack gap={'6'}>
+            <Heading size={'medium'} level={'1'}>Opprett behandling i serie</Heading>
+            <HStack>
+                <Select label="Velg behandling" value={behandlingType} onChange={handleBehandlingType}>
+                    <option value="">Velg behandlingCode</option>
+                    {behandlingTyper.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                    ))}
+                </Select>
+            </HStack>
+            {behandlingType !== '' && (
+                <>
+                    <VStack>
+                        <RadioGroup
+                            legend="Velg hyppighet"
+                            value={hyppighet}
+                            onChange={value => {
+                                const v = value as Mode;
+                                setHyppighet(v);
+                                if (v === 'single') setSelection(defaultStartdato);
+                                if (v === 'range') setSelection(undefined);
+                                if (v === 'multiple') setSelection([]);
+                            }}
+                        >
+                            <Radio value="range">Hver ukedag fra og til</Radio>
+                            <Radio value="multiple">Velg diverse datoer</Radio>
+                        </RadioGroup>
+                    </VStack>
 
-            <h2>Lagrede serier for denne behandlingstypen</h2>
-            <Table size="large" zebraStripes>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Behandling</Table.HeaderCell>
-                        <Table.HeaderCell>SerieId</Table.HeaderCell>
-                        <Table.HeaderCell>Planlagt startet</Table.HeaderCell>
-                        <Table.HeaderCell>Endre planlagt startet</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                {behandlingSerier.length > 0 && (
-                    <Table.Body>
-                        {behandlingSerier.map((
-                            {
-                                type,
-                                behandlingSerieId,
-                                planlagtStartet,
-                            }: BehandlingDto,
-                            i: number
-                        ) => (
-                            <Table.Row key={behandlingSerieId || i} shadeOnHover={false}>
-                                <Table.HeaderCell scope="row">{type}</Table.HeaderCell>
-                                <Table.DataCell>{behandlingSerieId}</Table.DataCell>
-                                <Table.DataCell>{planlagtStartet}</Table.DataCell>
-                                <Table.DataCell>
-                                    <Button variant="primary">
-                                        Endre planlagt startet
-                                    </Button>
-                                </Table.DataCell>
+                    <VStack>
+                        <DatePicker.Standalone
+                            key={hyppighet}
+                            mode={hyppighet}
+                            min={1}
+                            max={100}
+                            fromDate={new Date()}
+                            dropdownCaption
+                            showWeekNumber
+                            disableWeekends={ekskluderHelg}
+                            onSelect={(value: any) => setSelection(value as Selection)}
+                        />
+                        <Checkbox
+                            value="true"
+                            checked={ekskluderHelg}
+                            onChange={e => setEkskluderHelg(e.target.checked)}
+                        >
+                            Ekskluder helg
+                        </Checkbox>
+
+                    </VStack>
+                    <HStack>
+                        <Select
+                            label="Velg når på døgnet behandlingen skal kjøres"
+                            value={selectedTime}
+                            onChange={e => setSelectedTime(e.target.value)}
+                        >
+                            <option value="">Velg tid</option>
+                            {times.map(time => (
+                                <option key={time} value={time}>{time}</option>
+                            ))}
+                        </Select>
+                    </HStack>
+                    <HStack>
+                        <Button
+                            type="button"
+                            onClick={sendBehandlingSerieTilAction}
+                            loading={fetcher.state === 'submitting'}
+                        >
+                            Lagre serie
+                        </Button>
+                    </HStack>
+
+                    <Heading size={'small'}>Lagrede serier for denne behandlingstypen</Heading>
+                    <Table size="large" zebraStripes>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell>Behandling</Table.HeaderCell>
+                                <Table.HeaderCell>SerieId</Table.HeaderCell>
+                                <Table.HeaderCell>Planlagt startet</Table.HeaderCell>
+                                <Table.HeaderCell>Endre planlagt startet</Table.HeaderCell>
                             </Table.Row>
-                        ))}
-                    </Table.Body>
-                )}
-            </Table>
-        </div>
-    );
+                        </Table.Header>
+                        {behandlingSerier.length > 0 && (
+                            <Table.Body>
+                                {behandlingSerier.map((
+                                    {
+                                        type,
+                                        behandlingSerieId,
+                                        planlagtStartet,
+                                    }: BehandlingDto,
+                                    i: number
+                                ) => (
+                                    <Table.Row key={behandlingSerieId || i} shadeOnHover={false}>
+                                        <Table.HeaderCell scope="row">{type}</Table.HeaderCell>
+                                        <Table.DataCell>{behandlingSerieId}</Table.DataCell>
+                                        <Table.DataCell>{planlagtStartet}</Table.DataCell>
+                                        <Table.DataCell>
+                                            <Button variant="primary">
+                                                Endre planlagt startet
+                                            </Button>
+                                        </Table.DataCell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        )}
+                    </Table>
+                </>
+            )}
+        </VStack>
+    )
 }
 
 function formatDate(d: Date): string {
     return d.toISOString().split('T')[0];
 }
+
 function selectionToDateStrings(selection: Selection): string[] {
     if (!selection) return [];
     if (selection instanceof Date) return [formatDate(selection)];
