@@ -374,6 +374,8 @@ export const startOrkestrering = async(
   accessToken: string,
   antallFamilier: string | undefined,
   kjorOnline: boolean,
+  brukKjoreplan: boolean,
+  skalSamordne: boolean,
 ) => {
 
   const response = await fetch(
@@ -383,7 +385,9 @@ export const startOrkestrering = async(
       body: JSON.stringify(
         {
           antallFamilier,
-          kjorOnline
+          kjorOnline,
+          brukKjoreplan,
+          skalSamordne
         },
       )
       ,

@@ -37,7 +37,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const antallFamilier = formData.get('antallFamilier') as string
   const kjorOnline = formData.get('kjorOnline') as string === 'true'
-  return await startOrkestrering(accessToken, antallFamilier, kjorOnline)
+  const brukKjoreplan = formData.get('brukKjoreplan') as string === 'true'
+  const skalSamordne = formData.get('skalSamordne') as string === 'true'
+  return await startOrkestrering(accessToken, antallFamilier, kjorOnline, brukKjoreplan, skalSamordne)
 }
 
 
@@ -46,6 +48,8 @@ export default function Orkestrering() {
   const { uttrekk, orkestreringer } = useOutletContext<ReguleringDetaljer>()
   const [antallFamilier, setAntallFamilier] = useState('100000')
   const [kjorOnlineState, setKjorOnlineState] = useState(['']);
+  const [brukKjoreplanState, setBrukKjoreplanState] = useState(['']);
+  const [skalSamordneState, setSkalSamordneState] = useState(['']);
   const navigation = useNavigation()
 
   useRevalidateOnInterval({
@@ -72,9 +76,17 @@ export default function Orkestrering() {
               <TextField label="Antall familier" name="antallFamilier"
                          onChange={(e) => setAntallFamilier(e.target.value)}
                          value={antallFamilier} />
-              <CheckboxGroup legend="Kjør online kø" hideLegend={true} onChange={setKjorOnlineState} value={kjorOnlineState}>
-                <Checkbox  name={'kjorOnline'} value={'true'}>Kjør online kø mot oppdrag</Checkbox>
-              </CheckboxGroup>
+              <HStack gap="3" align="center">
+                <CheckboxGroup legend="Kjør online kø" hideLegend={true} onChange={setKjorOnlineState} value={kjorOnlineState}>
+                  <Checkbox  name={'kjorOnline'} value={'true'}>Kjør online kø mot oppdrag</Checkbox>
+                </CheckboxGroup>
+                <CheckboxGroup legend="Bruk kjøreplan" hideLegend={true} onChange={setBrukKjoreplanState} value={brukKjoreplanState}>
+                  <Checkbox  name={'brukKjoreplan'} value={'true'}>Bruk kjøreplan</Checkbox>
+                </CheckboxGroup>
+                <CheckboxGroup legend="Send til samordning" hideLegend={true} onChange={setSkalSamordneState} value={skalSamordneState}>
+                  <Checkbox  name={'skalSamordne'} value={'true'}>Send til samordning</Checkbox>
+                </CheckboxGroup>
+              </HStack>
               <HStack gap="3" align="center">
                 <div><Button loading={navigation.state === 'submitting'} type="submit">Start orkestrering</Button></div>
                 {orkestreringer.length > 0 &&
