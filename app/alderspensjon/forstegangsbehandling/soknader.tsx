@@ -1,15 +1,4 @@
-import {
-  BugIcon,
-  CalendarIcon,
-  CheckmarkCircleIcon,
-  ClockDashedIcon,
-  ExclamationmarkTriangleIcon,
-  ExternalLinkIcon,
-  FilterIcon,
-  HourglassIcon,
-  PlayIcon,
-  XMarkOctagonIcon,
-} from '@navikt/aksel-icons'
+import { CalendarIcon, ClockDashedIcon, ExternalLinkIcon, FilterIcon } from '@navikt/aksel-icons'
 import {
   Bleed,
   BodyShort,
@@ -18,6 +7,7 @@ import {
   Chips,
   CopyButton,
   Detail,
+  ErrorMessage,
   Heading,
   HStack,
   Link,
@@ -103,15 +93,14 @@ const statusConfig: Record<
   {
     label: string
     variant: React.ComponentProps<typeof Tag>['variant']
-    Icon: React.ElementType
   }
 > = {
-  OPPRETTET: { label: 'Opprettet', variant: 'info', Icon: PlayIcon },
-  UNDER_BEHANDLING: { label: 'Under behandling', variant: 'alt1', Icon: HourglassIcon },
-  FULLFORT: { label: 'Fullført', variant: 'success', Icon: CheckmarkCircleIcon },
-  STOPPET: { label: 'Stoppet', variant: 'warning', Icon: XMarkOctagonIcon },
-  DEBUG: { label: 'Debug', variant: 'neutral', Icon: BugIcon },
-  FEILENDE: { label: 'Feilende', variant: 'error', Icon: ExclamationmarkTriangleIcon },
+  OPPRETTET: { label: 'Opprettet', variant: 'info' },
+  UNDER_BEHANDLING: { label: 'Under behandling', variant: 'alt1' },
+  FULLFORT: { label: 'Fullført', variant: 'success' },
+  STOPPET: { label: 'Stoppet', variant: 'warning' },
+  DEBUG: { label: 'Debug', variant: 'neutral' },
+  FEILENDE: { label: 'Feilende', variant: 'error' },
 }
 
 function activeFilterSummary(sp: URLSearchParams) {
@@ -416,7 +405,6 @@ function BehandlingCard({
       <VStack gap="3">
         <HStack justify="space-between" wrap>
           <HStack gap="2" align="center">
-            <C.Icon aria-hidden />
             <Heading level="3" size="small">
               <Link as={NavLink} to={`/behandling/${b.behandlingId}`}>
                 Behandling #{b.behandlingId}
@@ -471,23 +459,27 @@ function BehandlingCard({
 
         {b.feilmelding && (
           <VStack gap="2">
-            <KV label="Feilmelding" value={b.feilmelding} />
+            <KV label="Feilmelding" value={<ErrorMessage size="small">{b.feilmelding}</ErrorMessage>} />
 
             {b.stackTrace && (
-              <ReadMore header="Vis stack trace">
+              <ReadMore size={'small'} header="Vis stack trace">
+                <HStack align="center" style={{ marginBottom: 8 }}>
+                  <Detail>Stack trace</Detail>
+                  <CopyButton size="small" copyText={b.stackTrace} />
+                </HStack>
                 <pre className={css.pre}>{b.stackTrace}</pre>
               </ReadMore>
             )}
           </VStack>
         )}
 
-        {aldeBehandlingUrlTemplate && (b.erAldeBehandling || b.erMuligAldeBehandling) && (
-          <HStack justify="space-between" wrap>
-            <BodyShort size="small">
-              Sak {b.sakId}
-              <CopyButton copyText={`${b.sakId}`} />
-            </BodyShort>
-            <HStack gap="2">
+        <HStack justify="space-between" wrap>
+          <HStack align="center">
+            <Detail>Sak {b.sakId}</Detail>
+            <CopyButton size={'small'} copyText={`${b.sakId}`} />
+          </HStack>
+          <HStack gap="2">
+            {aldeBehandlingUrlTemplate && (b.erAldeBehandling || b.erMuligAldeBehandling) && (
               <Button size="small" variant="tertiary">
                 <Link
                   href={buildUrl(aldeBehandlingUrlTemplate, { behandlingId: b.behandlingId })}
@@ -498,9 +490,9 @@ function BehandlingCard({
                   <ExternalLinkIcon title={'Åpne i Alde'} />
                 </Link>
               </Button>
-            </HStack>
+            )}
           </HStack>
-        )}
+        </HStack>
       </VStack>
     </Box.New>
   )
