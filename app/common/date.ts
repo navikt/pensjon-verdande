@@ -109,11 +109,15 @@ export function relativeFromNow(iso?: string | null) {
   return `${days} d`
 }
 
-export function formatBehandlingstid(fromIso?: string | null, toIso?: string | null) {
+export function formatBehandlingstid(
+  fromIso?: string | null,
+  toIso?: string | null,
+  nowIso?: string,
+) {
   if (!fromIso) return { display: '–', title: '' }
 
   const start = new Date(fromIso)
-  const end = toIso ? new Date(toIso) : new Date()
+  const end = toIso ? new Date(toIso) : new Date(nowIso ?? Date.now())
   const diffMs = Math.max(0, end.getTime() - start.getTime())
 
   const totalSeconds = Math.floor(diffMs / 1000)
@@ -125,7 +129,6 @@ export function formatBehandlingstid(fromIso?: string | null, toIso?: string | n
   const remMinutes = totalMinutes % 60
   const remSeconds = totalSeconds % 60
 
-  // Grov måneds/års-inndeling: 365/30 (til oversiktsvisning – nøyaktig info i title)
   const years = Math.floor(totalDays / 365)
   const daysAfterYears = totalDays % 365
   const months = Math.floor(daysAfterYears / 30)
@@ -133,14 +136,12 @@ export function formatBehandlingstid(fromIso?: string | null, toIso?: string | n
 
   let display: string
   if (totalDays >= 365) {
-    const parts = []
+    const parts: string[] = []
     if (years > 0) parts.push(`${years} år`)
     if (months > 0) parts.push(`${months} mnd`)
     if (remDays > 0) parts.push(`${remDays} d`)
-    display = parts.join(' ')
-    if (display.length === 0) display = '0 d'
+    display = parts.join(' ') || '0 d'
   } else if (totalDays >= 1) {
-    // D d H t
     display = `${totalDays} d${remHours > 0 ? ` ${remHours} t` : ''}`
   } else if (totalHours >= 1) {
     display = `${totalHours} t${remMinutes > 0 ? ` ${remMinutes} min` : ''}`
@@ -148,14 +149,10 @@ export function formatBehandlingstid(fromIso?: string | null, toIso?: string | n
     display = `${Math.max(1, remMinutes)} min`
   }
 
-  // Nøyaktig i title (god for hover og lesbarhet)
   const hh = String(remHours).padStart(2, '0')
   const mm = String(remMinutes).padStart(2, '0')
   const ss = String(remSeconds).padStart(2, '0')
-  const exact =
-    totalDays > 0
-      ? `${totalDays} dager, ${hh}:${mm}:${ss}`
-      : `${hh}:${mm}:${ss}`
+  const exact = totalDays > 0 ? `${totalDays} dager, ${hh}:${mm}:${ss}` : `${hh}:${mm}:${ss}`
 
   return { display, title: exact }
 }

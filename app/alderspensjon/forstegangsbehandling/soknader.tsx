@@ -5,11 +5,13 @@ import {
   ClockDashedIcon,
   ExclamationmarkTriangleIcon,
   ExternalLinkIcon,
+  FilterIcon,
   HourglassIcon,
   PlayIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import {
+  Bleed,
   BodyShort,
   Box,
   Button,
@@ -21,6 +23,7 @@ import {
   Link,
   List,
   Loader,
+  Modal,
   Page,
   Pagination,
   ReadMore,
@@ -29,6 +32,7 @@ import {
   ToggleGroup,
   VStack,
 } from '@navikt/ds-react'
+import { useMemo, useRef } from 'react'
 import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
 import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
 import { buildUrl } from '~/common/build-url'
@@ -61,8 +65,11 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
+  const nowIso = new Date().toISOString()
+
   return {
     aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
+    nowIso,
     page: data,
     pageIndex: page,
     pageSize: size,
@@ -107,11 +114,24 @@ const statusConfig: Record<
   FEILENDE: { label: 'Feilende', variant: 'error', Icon: ExclamationmarkTriangleIcon },
 }
 
+function activeFilterSummary(sp: URLSearchParams) {
+  const parts: string[] = []
+  const ferdig = sp.get('ferdig')
+  if (ferdig && ferdig !== 'alle') {
+    parts.push(ferdig === 'ferdige' ? 'Ferdige' : 'Uferdige')
+  }
+  const status = (sp.get('status') ?? '').split(',').filter(Boolean)
+  if (status.length > 0) parts.push(`Status: ${status.join(', ')}`)
+  return parts
+}
+
 export default function Alderspensjonssoknader() {
-  const { aldeBehandlingUrlTemplate, page, pageIndex, pageSize } = useLoaderData<typeof loader>()
+  const { aldeBehandlingUrlTemplate, nowIso, page, pageIndex, pageSize } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
   const { field: sortField, dir: sortDir } = parseSortParam(searchParams)
+  const summary = useMemo(() => activeFilterSummary(searchParams), [searchParams])
+  const ref = useRef<HTMLDialogElement>(null)
 
   const totalPages = page.totalPages
 
@@ -172,24 +192,52 @@ export default function Alderspensjonssoknader() {
 
   return (
     <Page.Block>
+      <Bleed marginInline={'12 12'} asChild>
+        <Box>
+          <Heading className={css.topBanner} level={'1'} size={'large'} style={{ marginTop: 0 }}>
+            <div className={css.topBannerContent}>
+              <div className={css.topBannerText}>Alderspensjonssøknader</div>
+              <div className={css.topBannerImgContainer}>
+                <img src="/alderspensjon.svg" className={css.illustration} alt="" />
+              </div>
+            </div>
+          </Heading>
+        </Box>
+      </Bleed>{' '}
       <VStack gap="6">
-        <Heading level="1" size="large">
-          Alderspensjonssøknader
-        </Heading>
+        <HStack justify="space-between" wrap>
+          {summary.length > 0 ? (
+            <Chips size="small">
+              {summary.map((s) => (
+                <Chips.Removable
+                  key={s}
+                  onClick={() => {
+                    // enkel “nullstill alt”-handling når en chip fjernes:
+                    // (juster om du vil fjerne bare en bestemt del)
+                    updateParams((p) => {
+                      p.delete('status')
+                      p.set('ferdig', 'alle')
+                      p.set('page', '0')
+                    })
+                  }}
+                >
+                  {s}
+                </Chips.Removable>
+              ))}
+            </Chips>
+          ) : (
+            <div></div>
+          )}
 
-        <FilterBar
-          ferdig={clampFerdig(searchParams.get('ferdig') ?? 'alle')}
-          status={(searchParams.get('status')?.split(',').filter(Boolean) as BehandlingStatus[]) ?? []}
-          onToggleFerdig={onToggleFerdig}
-          onToggleStatus={onToggleStatus}
-          pageSize={pageSize}
-          onChangeSize={onChangeSize}
-          totalElements={page.totalElements}
-          sortField={sortField}
-          sortDir={sortDir}
-          onChangeSortField={onChangeSortField}
-          onChangeSortDir={onChangeSortDir}
-        />
+          <Button
+            icon={<FilterIcon aria-hidden />}
+            size="small"
+            variant="secondary"
+            onClick={() => ref.current?.showModal()}
+          >
+            Søkefilter
+          </Button>
+        </HStack>
 
         {navigation.state === 'loading' ? (
           <HStack justify="center">
@@ -200,7 +248,12 @@ export default function Alderspensjonssoknader() {
         ) : (
           <VStack gap="3">
             {page.content.map((b) => (
-              <BehandlingCard key={b.uuid} b={b} aldeBehandlingUrlTemplate={aldeBehandlingUrlTemplate} />
+              <BehandlingCard
+                key={b.uuid}
+                b={b}
+                aldeBehandlingUrlTemplate={aldeBehandlingUrlTemplate}
+                nowIso={nowIso}
+              />
             ))}
           </VStack>
         )}
@@ -209,6 +262,36 @@ export default function Alderspensjonssoknader() {
           <Pagination page={(pageIndex ?? 0) + 1} count={totalPages} onPageChange={onChangePage} prevNextTexts />
         </HStack>
       </VStack>
+      <Modal ref={ref} header={{ heading: 'Søkefilter' }}>
+        <Modal.Body>
+          {' '}
+          <VStack gap="6">
+            <FilterBar
+              ferdig={clampFerdig(searchParams.get('ferdig') ?? 'alle')}
+              status={(searchParams.get('status')?.split(',').filter(Boolean) as BehandlingStatus[]) ?? []}
+              onToggleFerdig={(val) => {
+                onToggleFerdig(val) /* setFiltersOpen(false) om ønskelig */
+              }}
+              onToggleStatus={(s, checked) => {
+                onToggleStatus(s, checked) /* setFiltersOpen(false) */
+              }}
+              pageSize={pageSize}
+              onChangeSize={(sz) => {
+                onChangeSize(sz) /* setFiltersOpen(false) */
+              }}
+              totalElements={page.totalElements}
+              sortField={sortField}
+              sortDir={sortDir}
+              onChangeSortField={(f) => {
+                onChangeSortField(f) /* setFiltersOpen(false) */
+              }}
+              onChangeSortDir={(d) => {
+                onChangeSortDir(d) /* setFiltersOpen(false) */
+              }}
+            />
+          </VStack>
+        </Modal.Body>
+      </Modal>
     </Page.Block>
   )
 }
@@ -220,7 +303,6 @@ function FilterBar({
   onToggleStatus,
   pageSize,
   onChangeSize,
-  totalElements,
   sortField,
   sortDir,
   onChangeSortField,
@@ -241,102 +323,87 @@ function FilterBar({
   const allStatuses: BehandlingStatus[] = ['OPPRETTET', 'UNDER_BEHANDLING', 'FULLFORT', 'STOPPET', 'DEBUG', 'FEILENDE']
 
   return (
-    <Box.New
-      as="section"
-      borderWidth="1"
-      padding={{ xs: '4', md: '6' }}
-      borderRadius={'large'}
-      borderColor={'neutral-subtleA'}
-    >
-      <VStack gap="4">
-        <HStack justify="space-between" wrap>
-          <Heading level="2" size="small">
-            Filtre
-          </Heading>
-          <Detail>{Intl.NumberFormat('nb-NO').format(totalElements)} totalt</Detail>
+    <VStack gap="3">
+      <div>
+        <Detail style={{ marginBottom: 8 }}>Fullføringsgrad</Detail>
+        <ToggleGroup size="small" onChange={(val) => onToggleFerdig(clampFerdig(val))} value={ferdig}>
+          <ToggleGroup.Item value="alle">Alle</ToggleGroup.Item>
+          <ToggleGroup.Item value="uferdige">Uferdige</ToggleGroup.Item>
+          <ToggleGroup.Item value="ferdige">Ferdige</ToggleGroup.Item>
+        </ToggleGroup>
+      </div>
+
+      <div>
+        <Detail style={{ marginBottom: 8 }}>Status</Detail>
+        <Chips size="small">
+          {allStatuses.map((s) => {
+            const checked = status.includes(s)
+            const { label } = statusConfig[s]
+            return (
+              <Chips.Toggle key={s} selected={checked} onClick={() => onToggleStatus(s, !checked)}>
+                {label}
+              </Chips.Toggle>
+            )
+          })}
+        </Chips>
+      </div>
+
+      <div>
+        <Detail style={{ marginBottom: 8 }}>Sortering</Detail>
+
+        <HStack gap="2" wrap>
+          <Select
+            label="Felt"
+            size="small"
+            value={sortField}
+            onChange={(e) => onChangeSortField(e.target.value as SortField)}
+          >
+            <option value="opprettet">Opprettet</option>
+            <option value="sisteKjoring">Siste kjøring</option>
+            <option value="ferdig">Ferdig</option>
+          </Select>
+
+          <ToggleGroup
+            label="Retning"
+            size="small"
+            value={sortDir}
+            onChange={(val) => onChangeSortDir((val as SortDir) ?? 'desc')}
+          >
+            <ToggleGroup.Item value="asc">Stigende</ToggleGroup.Item>
+            <ToggleGroup.Item value="desc">Synkende</ToggleGroup.Item>
+          </ToggleGroup>
         </HStack>
+      </div>
 
-        <VStack gap="3">
-          <div>
-            <Detail style={{ marginBottom: 8 }}>Fullføringsgrad</Detail>
-            <ToggleGroup size="small" onChange={(val) => onToggleFerdig(clampFerdig(val))} value={ferdig}>
-              <ToggleGroup.Item value="alle">Alle</ToggleGroup.Item>
-              <ToggleGroup.Item value="uferdige">Uferdige</ToggleGroup.Item>
-              <ToggleGroup.Item value="ferdige">Ferdige</ToggleGroup.Item>
-            </ToggleGroup>
-          </div>
-
-          <div>
-            <Detail style={{ marginBottom: 8 }}>Status</Detail>
-            <Chips size="small">
-              {allStatuses.map((s) => {
-                const checked = status.includes(s)
-                const { label } = statusConfig[s]
-                return (
-                  <Chips.Toggle key={s} selected={checked} onClick={() => onToggleStatus(s, !checked)}>
-                    {label}
-                  </Chips.Toggle>
-                )
-              })}
-            </Chips>
-          </div>
-
-          <div>
-            <Detail style={{ marginBottom: 8 }}>Sortering</Detail>
-
-            <HStack gap="2" wrap>
-              <Select
-                label="Felt"
-                size="small"
-                value={sortField}
-                onChange={(e) => onChangeSortField(e.target.value as SortField)}
-              >
-                <option value="opprettet">Opprettet</option>
-                <option value="sisteKjoring">Siste kjøring</option>
-                <option value="ferdig">Ferdig</option>
-              </Select>
-
-              <ToggleGroup
-                label="Retning"
-                size="small"
-                value={sortDir}
-                onChange={(val) => onChangeSortDir((val as SortDir) ?? 'desc')}
-              >
-                <ToggleGroup.Item value="asc">Stigende</ToggleGroup.Item>
-                <ToggleGroup.Item value="desc">Synkende</ToggleGroup.Item>
-              </ToggleGroup>
-            </HStack>
-          </div>
-
-          <HStack gap="4" wrap>
-            <Select
-              label="Elementer per side"
-              size="small"
-              value={String(pageSize)}
-              onChange={(e) => onChangeSize(Number(e.target.value))}
-            >
-              {[10, 20, 50, 100].map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </Select>
-          </HStack>
-        </VStack>
-      </VStack>
-    </Box.New>
+      <HStack gap="4" wrap>
+        <Select
+          label="Elementer per side"
+          size="small"
+          value={String(pageSize)}
+          onChange={(e) => onChangeSize(Number(e.target.value))}
+        >
+          {[10, 20, 50, 100].map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </Select>
+      </HStack>
+    </VStack>
   )
 }
 
 function BehandlingCard({
   aldeBehandlingUrlTemplate,
   b,
+  nowIso,
 }: {
   aldeBehandlingUrlTemplate?: string
   b: AlderspensjonssoknadDto
+  nowIso: string
 }) {
   const C = statusConfig[b.status]
-  const tid = formatBehandlingstid(b.opprettet, b.ferdig)
+  const tid = formatBehandlingstid(b.opprettet, b.ferdig, nowIso)
 
   return (
     <Box.New
@@ -417,7 +484,8 @@ function BehandlingCard({
         {aldeBehandlingUrlTemplate && (b.erAldeBehandling || b.erMuligAldeBehandling) && (
           <HStack justify="space-between" wrap>
             <BodyShort size="small">
-              Sak {b.sakId}<CopyButton copyText={`${b.sakId}`} />
+              Sak {b.sakId}
+              <CopyButton copyText={`${b.sakId}`} />
             </BodyShort>
             <HStack gap="2">
               <Button size="small" variant="tertiary">
