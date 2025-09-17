@@ -23,6 +23,12 @@ const AKTIVITET_STATUS_MAP = {
   UNDER_BEHANDLING: 'Under behandling',
 }
 
+const BEHANDLING_TYPES_MAP = {
+  MAN: 'Manuell',
+  DEL_AUTO: 'Del-automatisk',
+  AUTO: 'Automatisk',
+}
+
 function makeDecoder<M extends Record<string, string>>(map: M) {
   return (key: string) => map[key as keyof M] ?? key
 }
@@ -31,3 +37,5 @@ export const decodeBehandlingStatus = makeDecoder(BEHANDLING_STATUS_MAP)
 export const decodeAktivitetStatus = makeDecoder(AKTIVITET_STATUS_MAP)
 
 export const decodeBehandlingStatusToVariant = makeDecoder(BEHANDLING_STATUS_VARIANT_MAP)
+
+export const decodeBehandlingstype = makeDecoder(BEHANDLING_TYPES_MAP)

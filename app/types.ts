@@ -1,3 +1,18 @@
+export interface PageResponse<T> {
+  content: T[]
+  pageable: {
+    pageNumber: number
+    pageSize: number
+  }
+  last: boolean
+  totalElements: number
+  totalPages: number
+  first: boolean
+  size: number
+  number: number
+  numberOfElements: number
+}
+
 export enum Behandlingstatus {
   OPPRETTET= 'OPPRETTET',
   UNDER_BEHANDLING="UNDER_BEHANDLING",

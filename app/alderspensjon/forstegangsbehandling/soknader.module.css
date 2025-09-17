@@ -1,0 +1,23 @@
+.kv {
+    min-width: 12ch;
+}
+
+.iconAlign {
+    display: inline-block;
+    vertical-align: -2px;
+}
+
+.pre {
+    white-space: pre-wrap;      /* bryt linjer i stacktrace */
+    word-break: break-word;     /* bryt lange ord */
+    max-height: 320px;          /* ikke la det spise hele siden */
+    overflow: auto;             /* scroll når det blir langt */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.875rem;        /* litt kompakt */
+    margin: 0;                  /* fjern default margin på pre */
+}
+
+.kvFixed {
+    display: inline-block;
+    min-width: 14ch; /* reserver plass til ~14 tegn */
+}

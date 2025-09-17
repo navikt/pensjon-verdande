@@ -77,3 +77,85 @@ export function asLocalDateString(date: Date): string {
 export function erHelgedag(dato: Date): boolean {
   return dato.getDay() === 0 || dato.getDay() === 6
 }
+
+
+/**
+ * Utility formatters
+ */
+const dtf = new Intl.DateTimeFormat('nb-NO', {
+  dateStyle: 'short',
+  timeStyle: 'short',
+})
+
+export function fmtDateTime(iso?: string | null) {
+  if (!iso) return '–'
+  try {
+    return dtf.format(new Date(iso))
+  } catch {
+    return iso ?? '–'
+  }
+}
+
+export function relativeFromNow(iso?: string | null) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const diffMs = Date.now() - d.getTime()
+  const minutes = Math.round(Math.abs(diffMs) / 60000)
+  if (minutes < 1) return 'nå'
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.round(minutes / 60)
+  if (hours < 24) return `${hours} t`
+  const days = Math.round(hours / 24)
+  return `${days} d`
+}
+
+export function formatBehandlingstid(fromIso?: string | null, toIso?: string | null) {
+  if (!fromIso) return { display: '–', title: '' }
+
+  const start = new Date(fromIso)
+  const end = toIso ? new Date(toIso) : new Date()
+  const diffMs = Math.max(0, end.getTime() - start.getTime())
+
+  const totalSeconds = Math.floor(diffMs / 1000)
+  const totalMinutes = Math.floor(totalSeconds / 60)
+  const totalHours = Math.floor(totalMinutes / 60)
+  const totalDays = Math.floor(totalHours / 24)
+
+  const remHours = totalHours % 24
+  const remMinutes = totalMinutes % 60
+  const remSeconds = totalSeconds % 60
+
+  // Grov måneds/års-inndeling: 365/30 (til oversiktsvisning – nøyaktig info i title)
+  const years = Math.floor(totalDays / 365)
+  const daysAfterYears = totalDays % 365
+  const months = Math.floor(daysAfterYears / 30)
+  const remDays = daysAfterYears % 30
+
+  let display: string
+  if (totalDays >= 365) {
+    const parts = []
+    if (years > 0) parts.push(`${years} år`)
+    if (months > 0) parts.push(`${months} mnd`)
+    if (remDays > 0) parts.push(`${remDays} d`)
+    display = parts.join(' ')
+    if (display.length === 0) display = '0 d'
+  } else if (totalDays >= 1) {
+    // D d H t
+    display = `${totalDays} d${remHours > 0 ? ` ${remHours} t` : ''}`
+  } else if (totalHours >= 1) {
+    display = `${totalHours} t${remMinutes > 0 ? ` ${remMinutes} min` : ''}`
+  } else {
+    display = `${Math.max(1, remMinutes)} min`
+  }
+
+  // Nøyaktig i title (god for hover og lesbarhet)
+  const hh = String(remHours).padStart(2, '0')
+  const mm = String(remMinutes).padStart(2, '0')
+  const ss = String(remSeconds).padStart(2, '0')
+  const exact =
+    totalDays > 0
+      ? `${totalDays} dager, ${hh}:${mm}:${ss}`
+      : `${hh}:${mm}:${ss}`
+
+  return { display, title: exact }
+}

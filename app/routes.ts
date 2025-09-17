@@ -15,6 +15,7 @@ export default [
     route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx'),
 
     route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),
+    route('alderspensjon/forstegangsbehandling/soknader', 'alderspensjon/forstegangsbehandling/soknader.tsx'),
 
     route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx'),
 

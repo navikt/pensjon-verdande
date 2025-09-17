@@ -1,0 +1,497 @@
+import {
+  BugIcon,
+  CalendarIcon,
+  CheckmarkCircleIcon,
+  ClockDashedIcon,
+  ExclamationmarkTriangleIcon,
+  ExternalLinkIcon,
+  HourglassIcon,
+  PlayIcon,
+  XMarkOctagonIcon,
+} from '@navikt/aksel-icons'
+import {
+  BodyShort,
+  Box,
+  Button,
+  Chips,
+  CopyButton,
+  Detail,
+  Heading,
+  HStack,
+  Link,
+  List,
+  Loader,
+  Page,
+  Pagination,
+  ReadMore,
+  Select,
+  Tag,
+  ToggleGroup,
+  VStack,
+} from '@navikt/ds-react'
+import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
+import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
+import { buildUrl } from '~/common/build-url'
+import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow } from '~/common/date'
+import { decodeBehandlingstype } from '~/common/decode'
+import { apiGet } from '~/services/api.server'
+import { env, isAldeLinkEnabled } from '~/services/env.server'
+import type { PageResponse } from '~/types'
+import css from './soknader.module.css'
+
+export async function loader({ request }: { request: Request }) {
+  const url = new URL(request.url)
+  const page = Number(url.searchParams.get('page') ?? 0)
+  const size = Number(url.searchParams.get('size') ?? 20)
+
+  const ferdig = (url.searchParams.get('ferdig') ?? 'alle') as 'alle' | 'uferdige' | 'ferdige'
+  const statusCsv = url.searchParams.get('status') ?? ''
+  const sort = url.searchParams.get('sort') ?? 'opprettet,desc'
+
+  const qs = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+    ferdig,
+    status: statusCsv,
+    sort,
+  })
+
+  const data = await apiGet<PageResponse<AlderspensjonssoknadDto>>(
+    `/api/alderspensjon/forstegangsbehandling/behandling?${qs.toString()}`,
+    request,
+  )
+
+  return {
+    aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
+    page: data,
+    pageIndex: page,
+    pageSize: size,
+  }
+}
+
+type SortField = 'opprettet' | 'sisteKjoring' | 'ferdig'
+type SortDir = 'asc' | 'desc'
+
+function parseSortParam(sp: URLSearchParams): { field: SortField; dir: SortDir } {
+  const raw = sp.get('sort') ?? 'opprettet,desc'
+  const [field, dir] = raw.split(',')
+  const f: SortField = (['opprettet', 'sisteKjoring', 'ferdig'].includes(field) ? field : 'opprettet') as SortField
+  const d: SortDir = dir === 'asc' || dir === 'desc' ? dir : 'desc'
+  return { field: f, dir: d }
+}
+
+function buildSortParam(field: SortField, dir: SortDir) {
+  return `${field},${dir}`
+}
+
+function clampFerdig(val: string): 'alle' | 'uferdige' | 'ferdige' {
+  if (val === 'alle' || val === 'uferdige' || val === 'ferdige') {
+    return val
+  }
+  return 'alle'
+}
+
+const statusConfig: Record<
+  BehandlingStatus,
+  {
+    label: string
+    variant: React.ComponentProps<typeof Tag>['variant']
+    Icon: React.ElementType
+  }
+> = {
+  OPPRETTET: { label: 'Opprettet', variant: 'info', Icon: PlayIcon },
+  UNDER_BEHANDLING: { label: 'Under behandling', variant: 'alt1', Icon: HourglassIcon },
+  FULLFORT: { label: 'Fullført', variant: 'success', Icon: CheckmarkCircleIcon },
+  STOPPET: { label: 'Stoppet', variant: 'warning', Icon: XMarkOctagonIcon },
+  DEBUG: { label: 'Debug', variant: 'neutral', Icon: BugIcon },
+  FEILENDE: { label: 'Feilende', variant: 'error', Icon: ExclamationmarkTriangleIcon },
+}
+
+export default function Alderspensjonssoknader() {
+  const { aldeBehandlingUrlTemplate, page, pageIndex, pageSize } = useLoaderData<typeof loader>()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigation = useNavigation()
+  const { field: sortField, dir: sortDir } = parseSortParam(searchParams)
+
+  const totalPages = page.totalPages
+
+  function updateParams(mutator: (p: URLSearchParams) => void) {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        mutator(next)
+        return next
+      },
+      { preventScrollReset: true },
+    )
+  }
+
+  function updateParam(key: string, value?: string) {
+    updateParams((p) => {
+      if (!value) p.delete(key)
+      else p.set(key, value)
+    })
+  }
+
+  function onToggleFerdig(next: 'alle' | 'uferdige' | 'ferdige') {
+    updateParam('ferdig', next)
+  }
+
+  function onToggleStatus(next: BehandlingStatus, checked: boolean) {
+    const current = new Set((searchParams.get('status')?.split(',') ?? []).filter(Boolean))
+    if (checked) current.add(next)
+    else current.delete(next)
+    updateParam('status', Array.from(current).join(','))
+  }
+
+  function onChangePage(p: number) {
+    // Aksel teller fra 1, Spring teller fra 0
+    updateParam('page', String(p - 1))
+  }
+
+  function onChangeSortField(field: SortField) {
+    updateParams((p) => {
+      p.set('sort', buildSortParam(field, sortDir))
+      p.set('page', '0')
+    })
+  }
+
+  function onChangeSortDir(dir: SortDir) {
+    updateParams((p) => {
+      p.set('sort', buildSortParam(sortField, dir))
+      p.set('page', '0')
+    })
+  }
+
+  function onChangeSize(sz: number) {
+    updateParams((p) => {
+      p.set('size', String(sz))
+      p.set('page', '0')
+    })
+  }
+
+  return (
+    <Page.Block>
+      <VStack gap="6">
+        <Heading level="1" size="large">
+          Alderspensjonssøknader
+        </Heading>
+
+        <FilterBar
+          ferdig={clampFerdig(searchParams.get('ferdig') ?? 'alle')}
+          status={(searchParams.get('status')?.split(',').filter(Boolean) as BehandlingStatus[]) ?? []}
+          onToggleFerdig={onToggleFerdig}
+          onToggleStatus={onToggleStatus}
+          pageSize={pageSize}
+          onChangeSize={onChangeSize}
+          totalElements={page.totalElements}
+          sortField={sortField}
+          sortDir={sortDir}
+          onChangeSortField={onChangeSortField}
+          onChangeSortDir={onChangeSortDir}
+        />
+
+        {navigation.state === 'loading' ? (
+          <HStack justify="center">
+            <Loader size="xlarge" />
+          </HStack>
+        ) : page.content.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <VStack gap="3">
+            {page.content.map((b) => (
+              <BehandlingCard key={b.uuid} b={b} aldeBehandlingUrlTemplate={aldeBehandlingUrlTemplate} />
+            ))}
+          </VStack>
+        )}
+
+        <HStack justify="center" style={{ paddingTop: 16 }}>
+          <Pagination page={(pageIndex ?? 0) + 1} count={totalPages} onPageChange={onChangePage} prevNextTexts />
+        </HStack>
+      </VStack>
+    </Page.Block>
+  )
+}
+
+function FilterBar({
+  ferdig,
+  status,
+  onToggleFerdig,
+  onToggleStatus,
+  pageSize,
+  onChangeSize,
+  totalElements,
+  sortField,
+  sortDir,
+  onChangeSortField,
+  onChangeSortDir,
+}: {
+  ferdig: 'alle' | 'uferdige' | 'ferdige'
+  status: BehandlingStatus[]
+  onToggleFerdig: (next: 'alle' | 'uferdige' | 'ferdige') => void
+  onToggleStatus: (next: BehandlingStatus, checked: boolean) => void
+  pageSize: number
+  onChangeSize: (size: number) => void
+  totalElements: number
+  sortField: SortField
+  sortDir: SortDir
+  onChangeSortField: (field: SortField) => void
+  onChangeSortDir: (dir: SortDir) => void
+}) {
+  const allStatuses: BehandlingStatus[] = ['OPPRETTET', 'UNDER_BEHANDLING', 'FULLFORT', 'STOPPET', 'DEBUG', 'FEILENDE']
+
+  return (
+    <Box.New
+      as="section"
+      borderWidth="1"
+      padding={{ xs: '4', md: '6' }}
+      borderRadius={'large'}
+      borderColor={'neutral-subtleA'}
+    >
+      <VStack gap="4">
+        <HStack justify="space-between" wrap>
+          <Heading level="2" size="small">
+            Filtre
+          </Heading>
+          <Detail>{Intl.NumberFormat('nb-NO').format(totalElements)} totalt</Detail>
+        </HStack>
+
+        <VStack gap="3">
+          <div>
+            <Detail style={{ marginBottom: 8 }}>Fullføringsgrad</Detail>
+            <ToggleGroup size="small" onChange={(val) => onToggleFerdig(clampFerdig(val))} value={ferdig}>
+              <ToggleGroup.Item value="alle">Alle</ToggleGroup.Item>
+              <ToggleGroup.Item value="uferdige">Uferdige</ToggleGroup.Item>
+              <ToggleGroup.Item value="ferdige">Ferdige</ToggleGroup.Item>
+            </ToggleGroup>
+          </div>
+
+          <div>
+            <Detail style={{ marginBottom: 8 }}>Status</Detail>
+            <Chips size="small">
+              {allStatuses.map((s) => {
+                const checked = status.includes(s)
+                const { label } = statusConfig[s]
+                return (
+                  <Chips.Toggle key={s} selected={checked} onClick={() => onToggleStatus(s, !checked)}>
+                    {label}
+                  </Chips.Toggle>
+                )
+              })}
+            </Chips>
+          </div>
+
+          <div>
+            <Detail style={{ marginBottom: 8 }}>Sortering</Detail>
+
+            <HStack gap="2" wrap>
+              <Select
+                label="Felt"
+                size="small"
+                value={sortField}
+                onChange={(e) => onChangeSortField(e.target.value as SortField)}
+              >
+                <option value="opprettet">Opprettet</option>
+                <option value="sisteKjoring">Siste kjøring</option>
+                <option value="ferdig">Ferdig</option>
+              </Select>
+
+              <ToggleGroup
+                label="Retning"
+                size="small"
+                value={sortDir}
+                onChange={(val) => onChangeSortDir((val as SortDir) ?? 'desc')}
+              >
+                <ToggleGroup.Item value="asc">Stigende</ToggleGroup.Item>
+                <ToggleGroup.Item value="desc">Synkende</ToggleGroup.Item>
+              </ToggleGroup>
+            </HStack>
+          </div>
+
+          <HStack gap="4" wrap>
+            <Select
+              label="Elementer per side"
+              size="small"
+              value={String(pageSize)}
+              onChange={(e) => onChangeSize(Number(e.target.value))}
+            >
+              {[10, 20, 50, 100].map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </Select>
+          </HStack>
+        </VStack>
+      </VStack>
+    </Box.New>
+  )
+}
+
+function BehandlingCard({
+  aldeBehandlingUrlTemplate,
+  b,
+}: {
+  aldeBehandlingUrlTemplate?: string
+  b: AlderspensjonssoknadDto
+}) {
+  const C = statusConfig[b.status]
+  const tid = formatBehandlingstid(b.opprettet, b.ferdig)
+
+  return (
+    <Box.New
+      as="article"
+      borderWidth="1"
+      padding={{ xs: '4', md: '5' }}
+      borderRadius={'large'}
+      borderColor={'neutral-subtleA'}
+    >
+      <VStack gap="3">
+        <HStack justify="space-between" wrap>
+          <HStack gap="2" align="center">
+            <C.Icon aria-hidden />
+            <Heading level="3" size="small">
+              <Link as={NavLink} to={`/behandling/${b.behandlingId}`}>
+                Behandling #{b.behandlingId}
+              </Link>
+            </Heading>
+            <Tag size="small" variant={C.variant}>
+              {C.label}
+            </Tag>
+          </HStack>
+          <HStack gap="2" align="center">
+            <CalendarIcon aria-hidden />
+            <Detail title={b.onsketVirkningsdato}>Ønsket virkningsdato: {formatIsoDate(b.onsketVirkningsdato)}</Detail>
+          </HStack>
+        </HStack>
+
+        <HStack wrap gap="6">
+          <KV
+            label="Siste kjøring"
+            value={fmtDateTime(b.sisteKjoring)}
+            hint={relativeFromNow(b.sisteKjoring)}
+            fixedWidthCh={20}
+            noWrap
+          />
+          <KV label="Opprettet" value={fmtDateTime(b.opprettet)} fixedWidthCh={18} noWrap />
+          <KV label="Utsatt til" value={fmtDateTime(b.utsattTil)} fixedWidthCh={18} noWrap />
+          <KV label="Ferdig" value={fmtDateTime(b.ferdig)} fixedWidthCh={18} noWrap />
+          <KV
+            label="Behandlingstid"
+            value={<span title={tid.title}>{tid.display}</span>}
+            hint={b.ferdig ? undefined : 'pågår'}
+            fixedWidthCh={20}
+            noWrap
+          />
+          <KV label="Behandlingstype" value={decodeBehandlingstype(b.behandlingstype)} />
+        </HStack>
+
+        {b.nesteAktiviteter.length === 1 ? (
+          <div>
+            <Detail style={{ marginBottom: 4 }}>Neste aktivitet</Detail>
+            <BodyShort size="small">{b.nesteAktiviteter[0]}</BodyShort>
+          </div>
+        ) : b.nesteAktiviteter.length > 1 ? (
+          <div>
+            <Detail style={{ marginBottom: 4 }}>Neste aktiviteter</Detail>
+            <List as="ul" size="small">
+              {b.nesteAktiviteter.map((a) => (
+                <List.Item key={a}>{a}</List.Item>
+              ))}
+            </List>
+          </div>
+        ) : null}
+
+        {b.feilmelding && (
+          <VStack gap="2">
+            <KV label="Feilmelding" value={b.feilmelding} />
+
+            {b.stackTrace && (
+              <ReadMore header="Vis stack trace">
+                <pre className={css.pre}>{b.stackTrace}</pre>
+              </ReadMore>
+            )}
+          </VStack>
+        )}
+
+        {aldeBehandlingUrlTemplate && (b.erAldeBehandling || b.erMuligAldeBehandling) && (
+          <HStack justify="space-between" wrap>
+            <BodyShort size="small">
+              Sak {b.sakId}<CopyButton copyText={`${b.sakId}`} />
+            </BodyShort>
+            <HStack gap="2">
+              <Button size="small" variant="tertiary">
+                <Link
+                  href={buildUrl(aldeBehandlingUrlTemplate, { behandlingId: b.behandlingId })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Åpne i Alde
+                  <ExternalLinkIcon title={'Åpne i Alde'} />
+                </Link>
+              </Button>
+            </HStack>
+          </HStack>
+        )}
+      </VStack>
+    </Box.New>
+  )
+}
+
+function KV({
+  label,
+  value,
+  hint,
+  fixedWidthCh,
+  noWrap,
+}: {
+  label: string
+  value: React.ReactNode
+  hint?: string
+  fixedWidthCh?: number
+  noWrap?: boolean
+}) {
+  const style =
+    fixedWidthCh != null
+      ? {
+          display: 'inline-flex',
+          alignItems: 'center',
+          width: `${fixedWidthCh}ch`,
+          whiteSpace: noWrap ? 'nowrap' : undefined,
+        }
+      : undefined
+
+  return (
+    <VStack gap="1" className={css.kv}>
+      <Detail>{label}</Detail>
+      <HStack gap="2" style={style}>
+        <BodyShort>{value}</BodyShort>
+        {hint && (
+          <Detail className={css.hint}>
+            <ClockDashedIcon aria-hidden className={css.iconAlign} />
+            {hint}
+          </Detail>
+        )}
+      </HStack>
+    </VStack>
+  )
+}
+
+function EmptyState() {
+  return (
+    <Box.New
+      borderWidth="1"
+      padding={{ xs: '8' }}
+      borderRadius={'large'}
+      style={{ textAlign: 'center' }}
+      borderColor={'neutral-subtleA'}
+    >
+      <VStack gap="2" align="center">
+        <Heading level="2" size="small">
+          Ingen søknader matcher filtrene
+        </Heading>
+        <BodyShort>Juster filtrene eller tilbakestill for å se flere.</BodyShort>
+      </VStack>
+    </Box.New>
+  )
+}
