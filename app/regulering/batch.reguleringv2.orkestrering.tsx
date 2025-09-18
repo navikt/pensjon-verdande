@@ -47,9 +47,7 @@ export default function Orkestrering() {
 
   const { uttrekk, orkestreringer } = useOutletContext<ReguleringDetaljer>()
   const [antallFamilier, setAntallFamilier] = useState('100000')
-  const [kjorOnlineState, setKjorOnlineState] = useState(['']);
-  const [brukKjoreplanState, setBrukKjoreplanState] = useState(['']);
-  const [skalSamordneState, setSkalSamordneState] = useState(['']);
+  const setKjoreparametreState = (val: string[]) => useState(val);
   const navigation = useNavigation()
 
   useRevalidateOnInterval({
@@ -76,17 +74,11 @@ export default function Orkestrering() {
               <TextField label="Antall familier" name="antallFamilier"
                          onChange={(e) => setAntallFamilier(e.target.value)}
                          value={antallFamilier} />
-              <HStack gap="3" align="center">
-                <CheckboxGroup legend="Kjør online kø" hideLegend={true} onChange={setKjorOnlineState} value={kjorOnlineState}>
-                  <Checkbox  name={'kjorOnline'} value={'true'}>Kjør online kø mot oppdrag</Checkbox>
+                <CheckboxGroup legend="Kjøreparametre" hideLegend={true} onChange={setKjoreparametreState}>
+                  <Checkbox name={'kjorOnline'} value={'true'}>Kjør online kø mot oppdrag</Checkbox>
+                  <Checkbox name={'brukKjoreplan'} value={'true'}>Bruk kjøreplan</Checkbox>
+                  <Checkbox name={'skalSamordne'} value={'true'}>Send til samordning</Checkbox>
                 </CheckboxGroup>
-                <CheckboxGroup legend="Bruk kjøreplan" hideLegend={true} onChange={setBrukKjoreplanState} value={brukKjoreplanState}>
-                  <Checkbox  name={'brukKjoreplan'} value={'true'}>Bruk kjøreplan</Checkbox>
-                </CheckboxGroup>
-                <CheckboxGroup legend="Send til samordning" hideLegend={true} onChange={setSkalSamordneState} value={skalSamordneState}>
-                  <Checkbox  name={'skalSamordne'} value={'true'}>Send til samordning</Checkbox>
-                </CheckboxGroup>
-              </HStack>
               <HStack gap="3" align="center">
                 <div><Button loading={navigation.state === 'submitting'} type="submit">Start orkestrering</Button></div>
                 {orkestreringer.length > 0 &&
