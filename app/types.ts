@@ -45,6 +45,22 @@ export type BehandlingDto = {
   _links?: HalLinks
 }
 
+export type BehandlingSerieDTO = {
+    behandlingSerieId: string
+    behandlingCode: string
+    startDato: string | null
+    sluttDato: string | null
+    behandlinger: BehandlingInfoDTO[]
+}
+
+export type BehandlingInfoDTO = {
+    behandlingId: number
+    status: string
+    behandlingSerieId: string
+    behandlingCode: string
+    planlagtStartet: string
+}
+
 export type PatchBehandlingDto = {
   ansvarligTeam: string
 }

@@ -1,5 +1,5 @@
 import { env } from '~/services/env.server'
-import type {BehandlingDto, StartBatchResponse} from '~/types'
+import type {BehandlingDto, BehandlingSerieDTO, StartBatchResponse} from '~/types'
 
 export const opprettBehandlingSerie = async(
   accessToken: string,
@@ -58,7 +58,7 @@ export const getBehandlingSerier = async (
       )
 
       if (response.ok) {
-        return (await response.json()) as BehandlingDto[]
+        return (await response.json()) as BehandlingSerieDTO[]
       } else {
         return []
       }

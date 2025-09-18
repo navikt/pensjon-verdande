@@ -9,13 +9,14 @@ import {
     Select,
     Table,
     Heading,
-    VStack, HStack
+    VStack, HStack,
 } from '@navikt/ds-react';
 import {type ActionFunctionArgs, redirect} from 'react-router';
 import {requireAccessToken} from '~/services/auth.server';
 import 'chart.js/auto';
 import {getBehandlingSerier, opprettBehandlingSerie} from '~/behandlingserie/behandlingserie.server';
-import type {BehandlingDto} from "~/types";
+import {BehandlingerGruppertTabell} from "~/behandlingserie/behandlingserietabell";
+
 
 type Mode = 'single' | 'range' | 'multiple';
 type DateRange = { from?: Date; to?: Date };
@@ -79,6 +80,8 @@ export default function BehandlingOpprett_index() {
     };
 
     const {behandlingSerier} = useLoaderData<typeof loader>();
+
+    console.log(behandlingSerier)
 
     function sendBehandlingSerieTilAction() {
         const formData = new FormData();
@@ -165,37 +168,11 @@ export default function BehandlingOpprett_index() {
                     </HStack>
 
                     <Heading size={'small'}>Lagrede serier for denne behandlingstypen</Heading>
-                    <Table size="large" zebraStripes>
-                        <Table.Header>
-                            <Table.Row>
-                                <Table.HeaderCell>Behandling</Table.HeaderCell>
-                                <Table.HeaderCell>Planlagt startet</Table.HeaderCell>
-                                <Table.HeaderCell>Endre planlagt startet</Table.HeaderCell>
-                            </Table.Row>
-                        </Table.Header>
-                        {behandlingSerier.length > 0 && (
-                            <Table.Body>
-                                {behandlingSerier.map((
-                                    {
-                                        type,
-                                        behandlingSerieId,
-                                        planlagtStartet,
-                                    }: BehandlingDto,
-                                    i: number
-                                ) => (
-                                    <Table.Row key={behandlingSerieId || i} shadeOnHover={false}>
-                                        <Table.HeaderCell scope="row">{type}</Table.HeaderCell>
-                                        <Table.DataCell>{planlagtStartet}</Table.DataCell>
-                                        <Table.DataCell>
-                                            <Button variant="primary">
-                                                Endre planlagt startet
-                                            </Button>
-                                        </Table.DataCell>
-                                    </Table.Row>
-                                ))}
-                            </Table.Body>
-                        )}
-                    </Table>
+                    <BehandlingerGruppertTabell
+                        behandlingSerier={behandlingSerier}
+                        onEndrePlanlagtStartet={(behandlingId) => {/* åpne dialog e.l. */}}
+                        onFjernFraSerie={(behandlingId) => {/* kall server */}}
+                    />
                 </>
             )}
         </VStack>
