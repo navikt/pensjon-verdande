@@ -125,17 +125,19 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
     behandling,
     detaljertFremdrift: detaljertFremdrift,
+    psakSakUrlTemplate: env.psakSakUrlTemplate,
   }
 }
 
 export default function Behandling() {
-  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift } = useLoaderData<typeof loader>()
+  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } = useLoaderData<typeof loader>()
 
   return (
     <BehandlingCard
       aldeBehandlingUrlTemplate={aldeBehandlingUrlTemplate}
       behandling={behandling}
       detaljertFremdrift={detaljertFremdrift}
+      psakSakUrlTemplate={psakSakUrlTemplate}
     />
   )
 }

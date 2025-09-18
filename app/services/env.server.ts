@@ -13,6 +13,8 @@ export const env = ensureEnv({
 
   aldeLinkEnabled: 'ALDE_LINK_ENABLED',
   aldeBehandlingUrlTemplate: 'ALDE_BEHANDLING_URL_TEMPLATE',
+
+  psakSakUrlTemplate: 'PSAK_SAK_URL_TEMPLATE',
 })
 
 export const isAldeLinkEnabled = env.aldeLinkEnabled === 'true'

@@ -36,9 +36,10 @@ import { buildUrl } from '~/common/build-url'
 import { decodeBehandlingStatus } from '~/common/decode'
 
 export interface Props {
-  aldeBehandlingUrlTemplate?: string,
+  aldeBehandlingUrlTemplate?: string
   behandling: BehandlingDto
   detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null
+  psakSakUrlTemplate: string
 }
 
 export default function BehandlingCard(props: Props) {
@@ -504,6 +505,8 @@ export default function BehandlingCard(props: Props) {
           </HStack>
         </HGrid>
         <HStack gap="space-16">
+          <Button size="small" variant="tertiary">
+
           <Link
             href={props.behandling.kibanaUrl}
             target="_blank"
@@ -512,15 +515,30 @@ export default function BehandlingCard(props: Props) {
             Se logger i Kibana
             <ExternalLinkIcon title={'Se logger i Kibana'} />
           </Link>
+          </Button>
+          {props.behandling.sakId &&
+            <Button size="small" variant="tertiary">
+              <Link
+                href={buildUrl(props.psakSakUrlTemplate, { sakId: props.behandling.sakId })}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Åpne i Psak
+                <ExternalLinkIcon title={'Åpne i Psak'} />
+              </Link>
+            </Button>
+          }
           {props.aldeBehandlingUrlTemplate !== undefined && props.behandling.erAldeBehandling === true &&
-            <Link
-              href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Åpne i Alde
-              <ExternalLinkIcon title={'Åpne i Alde'} />
-            </Link>
+            <Button size="small" variant="tertiary">
+              <Link
+                href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Åpne i Alde
+                <ExternalLinkIcon title={'Åpne i Alde'} />
+              </Link>
+            </Button>
           }
         </HStack>
 

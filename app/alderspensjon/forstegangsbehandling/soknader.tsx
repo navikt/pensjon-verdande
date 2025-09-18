@@ -63,6 +63,7 @@ export async function loader({ request }: { request: Request }) {
     page: data,
     pageIndex: page,
     pageSize: size,
+    psakSakUrlTemplate: env.psakSakUrlTemplate,
   }
 }
 
@@ -115,7 +116,8 @@ function activeFilterSummary(sp: URLSearchParams) {
 }
 
 export default function Alderspensjonssoknader() {
-  const { aldeBehandlingUrlTemplate, nowIso, page, pageIndex, pageSize } = useLoaderData<typeof loader>()
+  const { aldeBehandlingUrlTemplate, nowIso, page, pageIndex, pageSize, psakSakUrlTemplate } =
+    useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
   const { field: sortField, dir: sortDir } = parseSortParam(searchParams)
@@ -242,6 +244,7 @@ export default function Alderspensjonssoknader() {
                 b={b}
                 aldeBehandlingUrlTemplate={aldeBehandlingUrlTemplate}
                 nowIso={nowIso}
+                psakSakUrlTemplate={psakSakUrlTemplate}
               />
             ))}
           </VStack>
@@ -386,10 +389,12 @@ function BehandlingCard({
   aldeBehandlingUrlTemplate,
   b,
   nowIso,
+  psakSakUrlTemplate,
 }: {
   aldeBehandlingUrlTemplate?: string
   b: AlderspensjonssoknadDto
   nowIso: string
+  psakSakUrlTemplate: string
 }) {
   const C = statusConfig[b.status]
   const tid = formatBehandlingstid(b.opprettet, b.ferdig, nowIso)
@@ -479,6 +484,12 @@ function BehandlingCard({
             <CopyButton size={'small'} copyText={`${b.sakId}`} />
           </HStack>
           <HStack gap="2">
+            <Button size="small" variant="tertiary">
+              <Link href={buildUrl(psakSakUrlTemplate, { sakId: b.sakId })} target="_blank" rel="noopener noreferrer">
+                Åpne i Psak
+                <ExternalLinkIcon title={'Åpne i Psak'} />
+              </Link>
+            </Button>
             {aldeBehandlingUrlTemplate && (b.erAldeBehandling || b.erMuligAldeBehandling) && (
               <Button size="small" variant="tertiary">
                 <Link
