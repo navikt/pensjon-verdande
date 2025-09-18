@@ -125,6 +125,8 @@ export default [
 
     route('kalender', 'kalender/route.tsx'),
 
+    route("etteroppgjor-historikk-ufore", "vedlikehold/etteroppgjor-historikk-ufore.tsx"),
+
     route('laas-opp-sak', 'vedlikehold/laas-opp-sak.tsx', [
       route('settTilManuell', 'vedlikehold/laas-opp-sak.settTilManuell.tsx'),
       route('hentSak', 'vedlikehold/laas-opp-sak.hentSak.tsx'),
