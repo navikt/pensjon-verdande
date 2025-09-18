@@ -23,6 +23,7 @@ export type Props = {
 }
 
 const administrasjonMeny = [
+  ['UGYLDIGGJOR_ETTEROPPGJOR_HISTORIKK_UFORE', `/etteroppgjor-historikk-ufore`, 'Etteroppgjørhistorikk Uføre'],
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
   ['MANGLENDE_FOREIGN_KEY_INDEXER', `/manglende-foreign-key-indexer`, 'Manglende indekser for fjernnøkler'],
   ['LAAS_OPP_SAK', `/laas-opp-sak`, 'Lås opp sak'],

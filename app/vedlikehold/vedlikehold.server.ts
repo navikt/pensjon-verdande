@@ -132,6 +132,29 @@ export const hentInfoBanner = async (accessToken: string): Promise<Infobanner> =
   }
 }
 
+export const ugyldiggjorEtteroppgjorHistorikkUfore = async (
+  accessToken: string,
+  sakId: number,
+  etteroppgjortAr: number,
+)=> {
+
+  const response = await fetch(
+    `${env.penUrl}/api/uforetrygd/etteroppgjor/historikk/vedlikehold/ugyldiggjor?sakId=${sakId}&etteroppgjortAr=${etteroppgjortAr}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  return {
+    success: response.ok,
+  }
+}
+
 export const hentMot = async(
   accessToken: string,
   fomYear: FormDataEntryValue,
