@@ -48,6 +48,9 @@ export type BehandlingDto = {
 export type BehandlingSerieDTO = {
     behandlingSerieId: string
     behandlingCode: string
+    regelmessighet: string
+    opprettetAv: string
+    opprettet: string
     startDato: string | null
     sluttDato: string | null
     behandlinger: BehandlingInfoDTO[]

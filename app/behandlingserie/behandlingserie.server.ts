@@ -16,7 +16,7 @@ export const opprettBehandlingSerie = async(
     const body = {
             behandlingCode: behandlingCode,
             planlagteKjoringer: planlagteKjoringer,
-            regelmessighet: regelmessighet,
+            regelmessighet: regelmessighet.toUpperCase(),
             opprettetAv: opprettetAv,
         }
 

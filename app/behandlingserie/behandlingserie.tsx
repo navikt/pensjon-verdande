@@ -7,7 +7,6 @@ import {
     Radio,
     Checkbox,
     Select,
-    Table,
     Heading,
     VStack, HStack,
 } from '@navikt/ds-react';
@@ -18,7 +17,7 @@ import {getBehandlingSerier, opprettBehandlingSerie} from '~/behandlingserie/beh
 import {BehandlingerGruppertTabell} from "~/behandlingserie/behandlingserietabell";
 
 
-type Mode = 'single' | 'range' | 'multiple';
+type RegelmessighetMode = 'single' | 'range' | 'multiple';
 type DateRange = { from?: Date; to?: Date };
 type Selection = Date | DateRange | Date[] | undefined;
 
@@ -37,7 +36,7 @@ export const action = async ({request}: ActionFunctionArgs) => {
     const formData = await request.formData();
 
     const behandlingCode = String(formData.get('behandlingCode') ?? '');
-    const regelmessighet = String(formData.get('regelmessighet') ?? 'VILKÅRLIG');
+    const regelmessighet = String(formData.get('regelmessighet'));
     const startTid = String(formData.get('startTid') ?? '');
     const opprettetAv = String(formData.get('opprettetAv') ?? 'VERDANDE');
 
@@ -60,7 +59,7 @@ export default function BehandlingOpprett_index() {
     const defaultStartdato = new Date(`1 May ${year}`);
     const [selection, setSelection] = useState<Selection>(defaultStartdato);
     const [selectedTime, setSelectedTime] = useState('');
-    const [hyppighet, setHyppighet] = useState<Mode>('single');
+    const [regelmessighet, setRegelmessighet] = useState<RegelmessighetMode>('single');
     const [ekskluderHelg, setEkskluderHelg] = useState<boolean | undefined>(true);
     const fetcher = useFetcher();
 
@@ -86,7 +85,7 @@ export default function BehandlingOpprett_index() {
     function sendBehandlingSerieTilAction() {
         const formData = new FormData();
         formData.set('behandlingCode', behandlingType ?? '');
-        formData.set('regelmessighet', 'VILKÅRLIG');
+        formData.set('regelmessighet', regelmessighet);
         formData.set('valgteDatoer', JSON.stringify(selectionToDateStrings(selection)));
         formData.set('startTid', selectedTime);
         formData.set('opprettetAv', 'VERDANDE');
@@ -109,11 +108,11 @@ export default function BehandlingOpprett_index() {
                 <>
                     <VStack>
                         <RadioGroup
-                            legend="Velg hyppighet"
-                            value={hyppighet}
+                            legend="Velg regelmessighet"
+                            value={regelmessighet}
                             onChange={value => {
-                                const v = value as Mode;
-                                setHyppighet(v);
+                                const v = value as RegelmessighetMode;
+                                setRegelmessighet(v);
                                 if (v === 'single') setSelection(defaultStartdato);
                                 if (v === 'range') setSelection(undefined);
                                 if (v === 'multiple') setSelection([]);
@@ -126,8 +125,8 @@ export default function BehandlingOpprett_index() {
 
                     <VStack>
                         <DatePicker.Standalone
-                            key={hyppighet}
-                            mode={hyppighet}
+                            key={regelmessighet}
+                            mode={regelmessighet}
                             min={1}
                             max={100}
                             fromDate={new Date()}
