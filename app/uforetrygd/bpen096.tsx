@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { type ActionFunctionArgs, Form, Link, redirect, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
@@ -35,9 +35,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       .filter(nr => nr !== '')
       .map(nr => Number(nr))
 
-    const inneholderUgyldigSekvensnr = sekvensnr.some(nr => isNaN(nr))
+    const inneholderUgyldigSekvensnr = sekvensnr.some(nr => Number.isNaN(nr))
     if (inneholderUgyldigSekvensnr) {
-      return { error: "Fant ugyldig sekvensnr." }
+      return {
+        action: formData.action,
+        error: "Ugyldig sekvensnr"
+      }
     }
 
     const response = await hentSkattehendelserManuelt(sekvensnr, accessToken)
@@ -125,7 +128,13 @@ export default function HentOpplysningerFraSkatt() {
       <BodyShort>Angi sekvensnummer for å lagre inntektene på disse hendelsene manuelt.</BodyShort>
       <Form method="post">
         <VStack gap="4" width="20em">
-          <TextField label="Kommaseparert liste med sekvensnr." name="sekvensnr" />
+          <TextField
+            label="Kommaseparert liste med sekvensnr."
+            name="sekvensnr"
+            error={
+              actionData?.error && actionData.error
+            }
+          />
           <Button
             type="submit"
             name="action"
@@ -164,11 +173,6 @@ export default function HentOpplysningerFraSkatt() {
           }
         </VStack>
       </Form>
-      {actionData?.error &&
-        <Alert inline variant="error">
-          {actionData.error}
-        </Alert>
-      }
     </VStack>
   )
 }
