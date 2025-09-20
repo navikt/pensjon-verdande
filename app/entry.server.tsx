@@ -6,6 +6,7 @@ import { ServerRouter } from "react-router";
 import * as isbotModule from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import { logger } from '~/services/logger.server'
+import { inspect } from 'node:util';
 
 const ABORT_DELAY = 120_000;
 
@@ -13,19 +14,32 @@ const ABORT_DELAY = 120_000;
 // endel tid på å laste inn
 export const streamTimeout = 30_000
 
-process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
-  logger.error("Unhandled Rejection at:", p, "reason:", reason);
+process.on('unhandledRejection', (reason: unknown) => {
+  let stack: string;
 
-  let stack = '';
-  if (reason?.stack) {
-    stack = reason.stack;
+  if (reason instanceof Error) {
+    stack = `${reason.name}: ${reason.message}\n${reason.stack ?? ''}`;
   } else if (typeof reason === 'string') {
     stack = reason;
   } else {
-    stack = JSON.stringify(reason);
+    stack = inspect(reason, { depth: 2, breakLength: 120 });
   }
 
-  logger.error("Unhandled Promise Rejection", { reason, stack, promise: p });
+  console.error('Unhandled rejection', {
+    reason,
+    stack,
+  });
+});
+
+process.on('uncaughtException', (error: Error) => {
+  const stack = `${error.name}: ${error.message}\n${error.stack ?? ''}`;
+
+  console.error('Uncaught exception', {
+    error,
+    stack,
+  });
+
+  process.exit(1);
 });
 
 export function handleError(

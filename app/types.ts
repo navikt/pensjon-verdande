@@ -50,7 +50,7 @@ export type BehandlingDto = {
   kibanaUrl?: string
   feilmelding: string | null
 
-  parametere: any | null
+  parametere: Record<string, string | null>
 
   debugJson: string | null
 

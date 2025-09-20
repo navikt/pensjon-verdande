@@ -20,6 +20,7 @@ export default function MeMenu({
 }) {
   function setDarkmode(darkmode: boolean) {
     setIsDarkmode(darkmode)
+    // biome-ignore lint/suspicious/noDocumentCookie: Ønsker å sette en cookie, har foreløpig valgt å ikke bruke et tredjepartsbibliotek
     document.cookie = `darkmode=${encodeURIComponent(btoa(darkmode.toString()))}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
   }
 
