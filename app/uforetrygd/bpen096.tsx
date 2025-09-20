@@ -18,7 +18,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = Object.fromEntries(await request.formData())
   const accessToken = await requireAccessToken(request)
 
-  if (formData.action == Action.HentSkattehendelser) {
+  if (formData.action === Action.HentSkattehendelser) {
     const response = await opprettBpen096(
       accessToken,
       +formData.maksAntallSekvensnummer,
@@ -138,7 +138,7 @@ export default function HentOpplysningerFraSkatt() {
           {actionData?.behandlingIder &&
             (<>
                 Oppretta behandlinger
-                {actionData?.behandlingIder.map((behandlingId: number) => <Link to={`/behandling/${behandlingId}`}>{behandlingId}</Link>)}
+                {actionData?.behandlingIder.map((behandlingId: number) => <Link key={`behandling-link:${behandlingId}`} to={`/behandling/${behandlingId}`}>{behandlingId}</Link>)}
               </>)
           }
         </VStack>
