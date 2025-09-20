@@ -1,13 +1,7 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
-import type {
-  AggregerteFeilmeldinger,
-  ReguleringDetaljer,
-  ReguleringOrkestrering,
-} from '~/regulering/regulering.types'
-import { useEffect, useState } from 'react'
-import { Form, Link, useFetcher, useNavigation, useOutletContext } from 'react-router';
+import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
 import {
   Alert,
   Button,
@@ -20,15 +14,21 @@ import {
   TextField,
   VStack,
 } from '@navikt/ds-react'
-import { Entry } from '~/components/entry/Entry'
-import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
+import { useEffect, useState } from 'react'
+import { Form, Link, useFetcher, useNavigation, useOutletContext } from 'react-router';
 import { formatIsoTimestamp } from '~/common/date'
+import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
 import {
   BehandlingBatchDetaljertFremdriftBarChart,
 } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
-import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
-import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
+import { Entry } from '~/components/entry/Entry'
 import { startOrkestrering } from '~/regulering/regulering.server'
+import type {
+  AggregerteFeilmeldinger,
+  ReguleringDetaljer,
+  ReguleringOrkestrering,
+} from '~/regulering/regulering.types'
+import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
 
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -47,7 +47,6 @@ export default function Orkestrering() {
 
   const { uttrekk, orkestreringer } = useOutletContext<ReguleringDetaljer>()
   const [antallFamilier, setAntallFamilier] = useState('100000')
-  const setKjoreparametreState = (val: string[]) => useState(val);
   const navigation = useNavigation()
 
   useRevalidateOnInterval({
@@ -74,7 +73,7 @@ export default function Orkestrering() {
               <TextField label="Antall familier" name="antallFamilier"
                          onChange={(e) => setAntallFamilier(e.target.value)}
                          value={antallFamilier} />
-                <CheckboxGroup legend="Kjøreparametre" hideLegend={true} onChange={setKjoreparametreState}>
+                <CheckboxGroup legend="Kjøreparametre" hideLegend={true}>
                   <Checkbox name={'kjorOnline'} value={'true'}>Kjør online kø mot oppdrag</Checkbox>
                   <Checkbox name={'brukKjoreplan'} value={'true'}>Bruk kjøreplan</Checkbox>
                   <Checkbox name={'skalSamordne'} value={'true'}>Send til samordning</Checkbox>
