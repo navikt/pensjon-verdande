@@ -1,99 +1,165 @@
-import { type ActionFunctionArgs, Form, redirect, useLoaderData, useSubmit } from 'react-router'
-import { useState } from 'react'
-import { Select } from '@navikt/ds-react'
+import { BodyShort, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
 
-export const loader = async () => {
-  const now = new Date()
-  const kjoremaaned = now.getFullYear() * 100 + now.getMonth() + 1
+type ActionErrors = {
+  kjoremaaned?: string
+  prioritet?: string
+}
 
-  return {
-    kjoremaaned,
-  }
+const toYyyyMM = (d = new Date()) => {
+  const y = d.getFullYear()
+  const m = d.getMonth() + 1
+  return y * 100 + m
+}
+
+export const loader = async () => {
+  return { kjoremaaned: toYyyyMM() }
+}
+
+const isValidYyyyMM = (n: number) => {
+  if (!Number.isInteger(n)) return false
+  const mm = n % 100
+  return n >= 190001 && mm >= 1 && mm <= 12
+}
+
+const isBetweenAprilAndOctober = (n: number) => {
+  const mm = n % 100
+  return mm >= 4 && mm <= 10
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
-  const updates = Object.fromEntries(formData)
-  const accessToken = await requireAccessToken(request)
 
-  const response = await opprettBpen090(accessToken, +updates.kjoremaaned, updates.begrensUtplukk === 'true', updates.dryRun === 'true', +updates.prioritet)
+  const kjoremaanedStr = String(formData.get('kjoremaaned') ?? '')
+  const begrensUtplukkStr = String(formData.get('begrensUtplukk') ?? 'false')
+  const dryRunStr = String(formData.get('dryRun') ?? 'true')
+  const prioritetStr = String(formData.get('prioritet') ?? '')
+
+  const kjoremaaned = Number(kjoremaanedStr)
+  const begrensUtplukk = begrensUtplukkStr === 'true'
+  const dryRun = dryRunStr === 'true'
+  const prioritet = Number(prioritetStr)
+
+  const errors: ActionErrors = {}
+  if (!isValidYyyyMM(kjoremaaned)) {
+    errors.kjoremaaned = 'Ugyldig format. Bruk yyyyMM (f.eks. 202510).'
+  } else if (!isBetweenAprilAndOctober(kjoremaaned)) {
+    errors.kjoremaaned = 'Kjøremåned må være mellom april og oktober.'
+  }
+  if (!Number.isInteger(prioritet) || (prioritet !== 1 && prioritet !== 2)) {
+    errors.prioritet = 'Velg Online eller Batch.'
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return errors
+  }
+
+  const accessToken = await requireAccessToken(request)
+  const response = await opprettBpen090(accessToken, kjoremaaned, begrensUtplukk, dryRun, prioritet)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function BatchOpprett_index() {
-  const { kjoremaaned } = useLoaderData<typeof loader>()
+enum OppdragsPrioritet {
+  Online = 1,
+  Batch = 2,
+}
 
-  const prioritet = 2
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = (e:any)=> {submit(e.target.form); setIsClicked(true)}
+export default function LopendeInntektsavkorting() {
+  const { kjoremaaned } = useLoaderData<typeof loader>()
+  const navigation = useNavigation()
+  const errors = useActionData() as ActionErrors | undefined
+
+  const isSubmitting = navigation.state === 'submitting'
 
   return (
-    <div>
-      <h1>Løpende inntektsavkorting (tidligere BPEN090)</h1>
-      <p>Batchkjøring for løpende inntektsavkorting av uføretrygd</p>
-      <p><b>Kjøremåned</b> er måneden du starter kjøringen. Inntekter hentes da til og med måneden <i>før</i> kjøremåned mens virkningsdato blir satt til den første i måneden <i>etter</i> kjøremåned.</p>
-      <p>Gyldige verdier for kjøremåned er april til oktober.</p>
-      <p><b>Begrenset utplukk</b> krever oppføringer i tabellen T_BATCH_PERSON_FILTER med PERSON_ID for de personer man ønsker å kjøre behandlingen for</p>
-      <p><b>DryRun</b> kjører batchen uten å sende videre til VurderOmregning</p>
-      <p><b>Prioritet</b> angir om batchen skal kjøres mot Oppdrag som en BATCH (HPEN) eller ONLINE_BATCH</p>
-      <Form method="post">
-        <div style={{ display: 'inline-block' }}>
-          <label>Kjøremåned (yyyyMM)</label>
-          <br/>
-          <input
-              defaultValue={kjoremaaned}
-              aria-label="kjoremaaned"
-              name="kjoremaaned"
-              type="number"
-              placeholder="kjoremaaned"
-          />
-        </div>
-        <br/>
-        <div style={{ display: 'inline-block' }}>
-          <Select
-            label="Begrenset utplukk"
-            size={'small'}
-            name={'begrensUtplukk'}
-            defaultValue={'false'}
-          >
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-        </div>
-        <br />
-        <div style={{ display: 'inline-block' }}>
-          <Select
-            label="DryRun"
-            size={'small'}
-            name={'dryRun'}
-            defaultValue={'true'}
-          >
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-        </div>
-        <br />
-        <div style={{ display: 'inline-block' }}>
-          <label>Prioritet (1 = ONLINE_BATCH, 2 = BATCH)</label>
-          <br/>
-          <input
-            defaultValue={prioritet}
-            aria-label="prioritet"
-            name="prioritet"
+    <VStack gap="4">
+      <Heading size="small" level="1">
+        Løpende inntektsavkorting (tidligere BPEN090)
+      </Heading>
+      <BodyShort>Batchkjøring for løpende inntektsavkorting av uføretrygd.</BodyShort>
+
+      <Form method="post" style={{ width: '30em' }}>
+        <VStack gap="8">
+          <TextField
+            label="Kjøremåned (yyyyMM)"
+            size="small"
+            description={
+              <VStack gap={'2'}>
+                <BodyShort>
+                  Måneden du starter kjøringen. Inntekter hentes til og med måneden <em>før</em> kjøremåned, mens
+                  virkningsdato settes til den første i måneden <em>etter</em> kjøremåned.
+                </BodyShort>
+                <BodyShort>Gyldig kjøremåned er april–oktober.</BodyShort>
+              </VStack>
+            }
+            name="kjoremaaned"
             type="number"
-            placeholder="prioritet"
+            inputMode="numeric"
+            placeholder="yyyyMM"
+            defaultValue={kjoremaaned}
+            error={errors?.kjoremaaned}
           />
-        </div>
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
+
+          <Select
+            label="Begrens utplukk"
+            description={
+              <BodyShort as="div">
+                Krever oppføringer i <code>T_BATCH_PERSON_FILTER</code> med <code>PERSON_ID</code> for de personene som
+                skal kjøres.
+              </BodyShort>
+            }
+            size="small"
+            name="begrensUtplukk"
+            defaultValue="false"
+          >
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+
+          <Select
+            label="Prøvekjøring (dry run)"
+            description={<BodyShort as="div">Kjører uten å sende videre til VurderOmregning.</BodyShort>}
+            size="small"
+            name="dryRun"
+            defaultValue="true"
+          >
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+
+          <Select
+            label="Oppdragskø"
+            size="small"
+            description={
+              <VStack gap={'2'}>
+                <BodyShort>Angir hvilken kø som skal benyttes mot Oppdrag.</BodyShort>
+                <BodyShort>
+                  <strong>Batch:</strong> Sender oppdragsmeldinger til Oppdrags batch-kø (HPEN). Behandles av
+                  batchkjøringer, typisk om natten.
+                </BodyShort>
+                <BodyShort>
+                  <strong>Online:</strong> Sender oppdragsmeldinger til Oppdrags online-kø med lav prioritet. Behandles
+                  i Oppdrags åpningstid.
+                </BodyShort>
+              </VStack>
+            }
+            name="prioritet"
+            aria-label="prioritet"
+            defaultValue={String(OppdragsPrioritet.Batch)}
+            error={errors?.prioritet}
+          >
+            <option value={String(OppdragsPrioritet.Batch)}>Batch</option>
+            <option value={String(OppdragsPrioritet.Online)}>Online</option>
+          </Select>
+
+          <Button type="submit" disabled={isSubmitting} size="small" loading={isSubmitting}>
             Opprett
-          </button>
-        </p>
+          </Button>
+        </VStack>
       </Form>
-    </div>
+    </VStack>
   )
 }
