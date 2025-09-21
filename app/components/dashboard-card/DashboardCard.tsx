@@ -11,21 +11,12 @@ type Props = {
   title: string
   value: string
   iconBackgroundColor: Property.BackgroundColor
-  icon: React.ForwardRefExoticComponent<
-    React.SVGProps<SVGSVGElement> &
-      SVGRProps &
-      React.RefAttributes<SVGSVGElement>
-  >
+  icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & SVGRProps & React.RefAttributes<SVGSVGElement>>
 }
 
 export function DashboardCard(props: Props) {
   return (
-    <Box.New
-      background={"raised"}
-      borderRadius="medium"
-      shadow="dialog"
-      style={{ padding: '6px' }}
-    >
+    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
       <HStack>
         <Box.New
           style={{

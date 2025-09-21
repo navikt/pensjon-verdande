@@ -1,4 +1,3 @@
-import { requireAccessToken } from '~/services/auth.server'
 import { type ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import Bruker from '~/brukere/Bruker'
@@ -9,10 +8,9 @@ import {
   hentMe,
   hentTilgangskontrollMeta,
 } from '~/brukere/brukere.server'
+import { requireAccessToken } from '~/services/auth.server'
 
-export async function action({ params,
-                               request,
-                             }: ActionFunctionArgs) {
+export async function action({ params, request }: ActionFunctionArgs) {
   const accesstoken = await requireAccessToken(request)
 
   invariant(params.brukernavn, 'Missing brukernavn param')
@@ -20,17 +18,9 @@ export async function action({ params,
   const formData = await request.formData()
 
   if (request.method === 'PUT') {
-    await giBrukerTilgang(
-      accesstoken,
-      params.brukernavn,
-      formData.get('operasjon') as string,
-    )
+    await giBrukerTilgang(accesstoken, params.brukernavn, formData.get('operasjon') as string)
   } else if (request.method === 'DELETE') {
-    await fjernBrukertilgang(
-      accesstoken,
-      params.brukernavn,
-      formData.get('operasjon') as string
-    )
+    await fjernBrukertilgang(accesstoken, params.brukernavn, formData.get('operasjon') as string)
   } else {
     throw new Error(`Ugyldig HTTP-metode: ${request.method}`)
   }
@@ -44,16 +34,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   return {
-    bruker: params.brukernavn === "me" ? await hentMe(accesstoken) : await hentBruker(accesstoken, params.brukernavn),
+    bruker: params.brukernavn === 'me' ? await hentMe(accesstoken) : await hentBruker(accesstoken, params.brukernavn),
     tilgangskontrollmeta: await hentTilgangskontrollMeta(accesstoken),
-    readOnly: params.brukernavn === "me", // hack -- må styres av pen
+    readOnly: params.brukernavn === 'me', // hack -- må styres av pen
   }
 }
 
 export default function Foo() {
   const { bruker, tilgangskontrollmeta, readOnly } = useLoaderData<typeof loader>()
 
-  return (
-    <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta} readOnly={readOnly}></Bruker>
-  )
+  return <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta} readOnly={readOnly}></Bruker>
 }

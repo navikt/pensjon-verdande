@@ -1,9 +1,9 @@
 import { Table } from '@navikt/ds-react'
-import { formatIsoTimestamp } from '~/common/date'
 import { type BrukerResponse, decodeOperasjon, type Tilgangsmeta } from '~/brukere/brukere'
+import { formatIsoTimestamp } from '~/common/date'
 
 export interface Props {
-  tilgangskontrollmeta: Tilgangsmeta[],
+  tilgangskontrollmeta: Tilgangsmeta[]
   bruker: BrukerResponse
 }
 
@@ -20,15 +20,17 @@ export const BrukersTilgangsLogg = (props: Props) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {props.bruker.tilgangsHistorikk.sort((a, b) => Date.parse(b.fra) - Date.parse(a.fra)).map((endring) => (
-          <Table.Row key={`tilgang:${endring.operasjon}:${endring.fra}:${endring.til}`}>
-            <Table.DataCell>{decodeOperasjon(props.tilgangskontrollmeta, endring.operasjon)}</Table.DataCell>
-            <Table.DataCell>{formatIsoTimestamp(endring.fra)}</Table.DataCell>
-            <Table.DataCell>{endring.til ? formatIsoTimestamp(endring.til) : 'Nåværende'}</Table.DataCell>
-            <Table.DataCell>{endring.gittAvBruker}</Table.DataCell>
-            <Table.DataCell>{endring.fjernetAvBruker}</Table.DataCell>
-          </Table.Row>
-        ))}
+        {props.bruker.tilgangsHistorikk
+          .sort((a, b) => Date.parse(b.fra) - Date.parse(a.fra))
+          .map((endring) => (
+            <Table.Row key={`tilgang:${endring.operasjon}:${endring.fra}:${endring.til}`}>
+              <Table.DataCell>{decodeOperasjon(props.tilgangskontrollmeta, endring.operasjon)}</Table.DataCell>
+              <Table.DataCell>{formatIsoTimestamp(endring.fra)}</Table.DataCell>
+              <Table.DataCell>{endring.til ? formatIsoTimestamp(endring.til) : 'Nåværende'}</Table.DataCell>
+              <Table.DataCell>{endring.gittAvBruker}</Table.DataCell>
+              <Table.DataCell>{endring.fjernetAvBruker}</Table.DataCell>
+            </Table.Row>
+          ))}
       </Table.Body>
     </Table>
   )

@@ -14,24 +14,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function BestemEtteroppgjorResultat() {
-  return <VStack gap="4">
-
-    <Heading size="small" level="1">Bestem etteroppgjørsresultat</Heading>
-    <Form method="post" style={{ width: '20em' }}>
-      <VStack gap="4">
-        <Select
-          label="DryRun"
-          size="small"
-          name="dryRun"
-          defaultValue="true"
-        >
-          <option value="true">Ja</option>
-          <option value="false">Nei</option>
-        </Select>
-        <Button type="submit" size="small">
-          Opprett
-        </Button>
-      </VStack>
-    </Form>
-  </VStack>
+  return (
+    <VStack gap="4">
+      <Heading size="small" level="1">
+        Bestem etteroppgjørsresultat
+      </Heading>
+      <Form method="post" style={{ width: '20em' }}>
+        <VStack gap="4">
+          <Select label="DryRun" size="small" name="dryRun" defaultValue="true">
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+          <Button type="submit" size="small">
+            Opprett
+          </Button>
+        </VStack>
+      </Form>
+    </VStack>
+  )
 }

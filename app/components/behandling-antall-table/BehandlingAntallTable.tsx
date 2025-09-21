@@ -1,10 +1,10 @@
+import { HelpText, HStack, Link, Table } from '@navikt/ds-react'
+import React from 'react'
+import { NavLink } from 'react-router'
+import { decodeBehandling } from '~/common/decodeBehandling'
+import { formatNumber } from '~/common/number'
 import { useSort } from '~/hooks/useSort'
 import type { BehandlingAntall } from '~/types'
-import React from 'react'
-import { HelpText, HStack, Link, Table } from '@navikt/ds-react'
-import { formatNumber } from '~/common/number'
-import { decodeBehandling } from '~/common/decodeBehandling'
-import { NavLink } from 'react-router';
 
 type Props = {
   oppsummering: BehandlingAntall[]
@@ -29,24 +29,25 @@ export default function BehandlingAntallTable(props: Props) {
       <Table.Body>
         {sortedOppsummering.map((it: BehandlingAntall, index) => {
           return (
-            <Table.Row key={it.navn} style={{backgroundColor: it.behandlingType === null ? 'var(--ax-bg-warning-soft)' : 'inherit'}}>
+            <Table.Row
+              key={it.navn}
+              style={{ backgroundColor: it.behandlingType === null ? 'var(--ax-bg-warning-soft)' : 'inherit' }}
+            >
               <Table.DataCell align={'right'}>{index + 1}</Table.DataCell>
               <Table.DataCell>
                 <HStack>
-                  <Link as={NavLink} to={`/behandlinger?behandlingType=${it.behandlingType ?? it.navn}`}>{decodeBehandling(it.behandlingType ?? it.navn)}</Link>
-                  {
-                    it.behandlingType === null && (
-                        <HelpText title="Ukjent behandlingstype">
-                          Behandlingstypen er ukjent. Det kan være fordi den er fjernet fra systemet,
-                          eller fordi navnet er endret uten at databasen er oppdatert.
-                        </HelpText>
-                      )
-                  }
+                  <Link as={NavLink} to={`/behandlinger?behandlingType=${it.behandlingType ?? it.navn}`}>
+                    {decodeBehandling(it.behandlingType ?? it.navn)}
+                  </Link>
+                  {it.behandlingType === null && (
+                    <HelpText title="Ukjent behandlingstype">
+                      Behandlingstypen er ukjent. Det kan være fordi den er fjernet fra systemet, eller fordi navnet er
+                      endret uten at databasen er oppdatert.
+                    </HelpText>
+                  )}
                 </HStack>
               </Table.DataCell>
-              <Table.DataCell align={'right'}>
-                {formatNumber(it.antall)}
-              </Table.DataCell>
+              <Table.DataCell align={'right'}>{formatNumber(it.antall)}</Table.DataCell>
             </Table.Row>
           )
         })}

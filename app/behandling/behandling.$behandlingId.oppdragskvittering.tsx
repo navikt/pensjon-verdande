@@ -1,19 +1,14 @@
-import type { LoaderFunctionArgs } from 'react-router';
-import { useLoaderData } from 'react-router';
-import xmlFormat from 'xml-formatter'
-
-import { getOppdragskvittering } from '~/services/behandling.server'
-
+import type { LoaderFunctionArgs } from 'react-router'
+import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
+import xmlFormat from 'xml-formatter'
 import { requireAccessToken } from '~/services/auth.server'
+import { getOppdragskvittering } from '~/services/behandling.server'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
-  const output = await getOppdragskvittering(
-    await requireAccessToken(request),
-    params.behandlingId,
-  )
+  const output = await getOppdragskvittering(await requireAccessToken(request), params.behandlingId)
 
   if (!output) {
     throw new Response('Not Found', { status: 404 })
@@ -27,9 +22,5 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 export default function Oppdragskvittering() {
   const { output } = useLoaderData<typeof loader>()
 
-  return (
-    <pre>
-      {xmlFormat(output)}
-    </pre>
-  )
+  return <pre>{xmlFormat(output)}</pre>
 }

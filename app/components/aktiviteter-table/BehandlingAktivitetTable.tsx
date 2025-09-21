@@ -1,18 +1,17 @@
-import { useMemo } from 'react'
 import { Table } from '@navikt/ds-react'
+import { useMemo } from 'react'
+import { Link } from 'react-router'
+import { formatIsoTimestamp } from '~/common/date'
+import { findCommonAktivitetPrefixLength } from '~/common/string'
 import { useSort } from '~/hooks/useSort'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
-import { findCommonAktivitetPrefixLength } from '~/common/string'
-import { formatIsoTimestamp } from '~/common/date'
-import { Link } from 'react-router';
 
 interface Props {
   behandling: BehandlingDto
 }
 
 export default function BehandlingAktivitetTable(props: Props) {
-  const { sortKey, onSort, sortFunc, sortDecending } =
-    useSort<AktivitetDTO>('aktivitetId')
+  const { sortKey, onSort, sortFunc, sortDecending } = useSort<AktivitetDTO>('aktivitetId')
 
   const sortedAktiviteter: AktivitetDTO[] = useMemo(() => {
     return props.behandling.aktiviteter.sort(sortFunc)
@@ -68,31 +67,17 @@ export default function BehandlingAktivitetTable(props: Props) {
           return (
             <Table.Row key={aktivitet.uuid}>
               <Table.DataCell>
-                <Link
-                  to={`/behandling/${props.behandling.behandlingId}/aktivitet/${aktivitet.aktivitetId}`}
-                >
+                <Link to={`/behandling/${props.behandling.behandlingId}/aktivitet/${aktivitet.aktivitetId}`}>
                   {aktivitet.aktivitetId}
                 </Link>
               </Table.DataCell>
-              <Table.DataCell>
-                {aktivitet.type.substring(commonPrefix)}
-              </Table.DataCell>
-              <Table.DataCell>
-                {formatIsoTimestamp(aktivitet.opprettet)}
-              </Table.DataCell>
-              <Table.DataCell>
-                {formatIsoTimestamp(aktivitet.sisteAktiveringsdato)}
-              </Table.DataCell>
-              <Table.DataCell>
-                {formatIsoTimestamp(aktivitet.utsattTil)}
-              </Table.DataCell>
-              <Table.DataCell align={'right'}>
-                {aktivitet.antallGangerKjort}
-              </Table.DataCell>
+              <Table.DataCell>{aktivitet.type.substring(commonPrefix)}</Table.DataCell>
+              <Table.DataCell>{formatIsoTimestamp(aktivitet.opprettet)}</Table.DataCell>
+              <Table.DataCell>{formatIsoTimestamp(aktivitet.sisteAktiveringsdato)}</Table.DataCell>
+              <Table.DataCell>{formatIsoTimestamp(aktivitet.utsattTil)}</Table.DataCell>
+              <Table.DataCell align={'right'}>{aktivitet.antallGangerKjort}</Table.DataCell>
               <Table.DataCell>{aktivitet.status}</Table.DataCell>
-              <Table.DataCell>
-                {aktivitet.ventPaForegaendeAktiviteter ? 'ja' : 'nei'}
-              </Table.DataCell>
+              <Table.DataCell>{aktivitet.ventPaForegaendeAktiviteter ? 'ja' : 'nei'}</Table.DataCell>
             </Table.Row>
           )
         })}

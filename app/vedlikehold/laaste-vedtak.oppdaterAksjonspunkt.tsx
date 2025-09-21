@@ -1,5 +1,4 @@
-import type { ActionFunctionArgs } from 'react-router';
-
+import type { ActionFunctionArgs } from 'react-router'
 
 import { requireAccessToken } from '~/services/auth.server'
 import { oppdaterAksjonspunkt } from '~/vedlikehold/vedlikehold.server'

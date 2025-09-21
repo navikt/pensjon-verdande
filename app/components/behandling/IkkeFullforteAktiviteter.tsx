@@ -18,19 +18,11 @@ export default function IkkeFullforteAktiviteter(props: Props) {
       </Table.Header>
       <Table.Body>
         {props.ikkeFullforteAktiviteter.aktivitetOppsummering.map((it) => (
-          <Table.Row key={it.behandling+it.aktivitet+it.status}>
-            <Table.DataCell>
-              {it.behandling}
-            </Table.DataCell>
-            <Table.DataCell>
-              {it.aktivitet}
-            </Table.DataCell>
-            <Table.DataCell>
-              {it.status}
-            </Table.DataCell>
-            <Table.DataCell>
-              {it.antall}
-            </Table.DataCell>
+          <Table.Row key={it.behandling + it.aktivitet + it.status}>
+            <Table.DataCell>{it.behandling}</Table.DataCell>
+            <Table.DataCell>{it.aktivitet}</Table.DataCell>
+            <Table.DataCell>{it.status}</Table.DataCell>
+            <Table.DataCell>{it.antall}</Table.DataCell>
           </Table.Row>
         ))}
       </Table.Body>

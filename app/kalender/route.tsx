@@ -1,7 +1,7 @@
 import { type ActionFunctionArgs, useLoaderData } from 'react-router'
+import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentKalenderHendelser } from '~/services/behandling.server'
-import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -15,10 +15,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
 
   return {
-    kalenderHendelser: await hentKalenderHendelser({accessToken: accessToken}, {
-      fom: forsteDato,
-      tom: sisteDato,
-    }),
+    kalenderHendelser: await hentKalenderHendelser(
+      { accessToken: accessToken },
+      {
+        fom: forsteDato,
+        tom: sisteDato,
+      },
+    ),
     startDato: startDato,
   }
 }
@@ -28,10 +31,10 @@ export default function KalenderVisning() {
 
   return (
     <Kalender
-        kalenderHendelser={kalenderHendelser}
-        maksAntallPerDag={6}
-        startDato={startDato}
-        visKlokkeSlett={true}
-      ></Kalender>
+      kalenderHendelser={kalenderHendelser}
+      maksAntallPerDag={6}
+      startDato={startDato}
+      visKlokkeSlett={true}
+    ></Kalender>
   )
 }

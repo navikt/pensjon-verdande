@@ -1,26 +1,18 @@
 import { useState } from 'react'
-import { Form, useSubmit } from 'react-router';
+import { Form, useSubmit } from 'react-router'
 
 export default function FortsettAvhengigeReguleringBehandlinger() {
-
-  const [isClicked, setIsClicked] = useState(false);
-  const submit = useSubmit();
+  const [isClicked, setIsClicked] = useState(false)
+  const submit = useSubmit()
   const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
-    const form = (e.target as HTMLButtonElement).form;
+    const form = (e.target as HTMLButtonElement).form
     if (form) {
-      await submit(form);
-      setIsClicked(true);
+      await submit(form)
+      setIsClicked(true)
     }
   }
-  const status = [
-    "FEILENDE",
-    "UTSATTE",
-    "ALLE",
-  ];
-  const reguleringTyper = [
-    "FAMILIE",
-    "IVERKSETT_VEDTAK",
-  ];
+  const status = ['FEILENDE', 'UTSATTE', 'ALLE']
+  const reguleringTyper = ['FAMILIE', 'IVERKSETT_VEDTAK']
 
   return (
     <div>
@@ -55,7 +47,7 @@ export default function FortsettAvhengigeReguleringBehandlinger() {
           />
         </p>
         <p>
-        Behandlingsstatus &nbsp;
+          Behandlingsstatus &nbsp;
           <select name="behandlingStatusType">
             <option value={status[0]}>{status[0]}</option>
             <option value={status[1]}>{status[1]}</option>

@@ -1,13 +1,9 @@
-import type { LoaderFunctionArgs } from 'react-router';
-import { useLoaderData } from 'react-router';
-
-import {
-  getBehandling,
-} from '~/services/behandling.server'
-
+import type { LoaderFunctionArgs } from 'react-router'
+import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
 import { BehandlingKjoringerTable } from '~/components/kjoringer-table/BehandlingKjoringerTable'
+import { requireAccessToken } from '~/services/auth.server'
+import { getBehandling } from '~/services/behandling.server'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
@@ -19,14 +15,12 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 
   return {
-      behandling,
-    }
+    behandling,
+  }
 }
 
 export default function BehandlingKjoringer() {
   const { behandling } = useLoaderData<typeof loader>()
 
-  return (
-    <BehandlingKjoringerTable behandling={behandling} visAktivitetId={true} />
-  )
+  return <BehandlingKjoringerTable behandling={behandling} visAktivitetId={true} />
 }

@@ -1,6 +1,6 @@
 :root {
-    --venstre-meny-expanded-width: 15em;
-    --venstre-meny-collapsed-width: 3em;
+  --venstre-meny-expanded-width: 15em;
+  --venstre-meny-collapsed-width: 3em;
 }
 
 #venstreMeny {

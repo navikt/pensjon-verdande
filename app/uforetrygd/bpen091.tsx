@@ -29,10 +29,10 @@ export default function FastsettForventetInntekt() {
   return (
     <VStack gap={'4'}>
       <Box.New className={'aksel-pageblock--lg'}>
-        <Heading size={'medium'} level={'1'}>Fastsett forventet inntekt (BPEN091)</Heading>
-        <BodyLong>
-          Fastsette neste års forventet inntekt for uføretrygd
-        </BodyLong>
+        <Heading size={'medium'} level={'1'}>
+          Fastsett forventet inntekt (BPEN091)
+        </Heading>
+        <BodyLong>Fastsette neste års forventet inntekt for uføretrygd</BodyLong>
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
@@ -45,10 +45,7 @@ export default function FastsettForventetInntekt() {
             type="number"
             placeholder="År"
           />
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Oppretter…' : 'Opprett'}
           </Button>
         </VStack>

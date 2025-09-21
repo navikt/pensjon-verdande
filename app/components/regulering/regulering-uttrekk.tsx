@@ -1,6 +1,6 @@
+import { Checkbox } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, useSubmit } from 'react-router'
-import { Checkbox } from '@navikt/ds-react'
 
 export default function ReguleringUttrekk() {
   const [isClicked, setIsClicked] = useState(false)
@@ -20,13 +20,7 @@ export default function ReguleringUttrekk() {
         <input type="hidden" name="formType" value="startReguleringUttrekk" />
         <p>
           Satsdato &nbsp;
-          <input
-            defaultValue="2025-05-01"
-            aria-label="Satsdato"
-            name="satsDato"
-            type="text"
-            placeholder="Satsdato"
-          />
+          <input defaultValue="2025-05-01" aria-label="Satsdato" name="satsDato" type="text" placeholder="Satsdato" />
         </p>
         <p>
           Reguleringsdato &nbsp;

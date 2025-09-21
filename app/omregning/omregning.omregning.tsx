@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs } from 'react-router';
-import { redirect } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
+import { redirect } from 'react-router'
+import { opprettOmregningbehandling } from '~/omregning/batch.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningRequest } from '~/types'
-import { opprettOmregningbehandling } from '~/omregning/batch.omregning.server'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
@@ -49,7 +49,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     brevkoderSoker: brevkoderSoker,
     brevkoderBerorteSaker: brevkoderBerorteSaker,
     skalIverksettOnline: updates.skalIverksettOnline === 'true',
-  }  as OmregningRequest
+  } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
 

@@ -1,4 +1,9 @@
-import { Link, useFetcher, useSearchParams } from 'react-router';
+import {
+  CheckmarkCircleIcon,
+  CogRotationIcon,
+  ExclamationmarkTriangleIcon,
+  XMarkOctagonIcon,
+} from '@navikt/aksel-icons'
 import {
   Alert,
   BodyLong,
@@ -16,30 +21,22 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
+import { Link, useFetcher, useSearchParams } from 'react-router'
+import { decodeBehandling } from '~/common/decodeBehandling'
+import { Entry } from '~/components/entry/Entry'
 import type {
   LaasOppBehandlingSummary,
   LaasOppResultat,
   SakOppsummeringLaasOpp,
   VedtakLaasOpp,
 } from '~/vedlikehold/laas-opp.types'
-import { Entry } from '~/components/entry/Entry'
-import { decodeBehandling } from '~/common/decodeBehandling'
-import {
-  CheckmarkCircleIcon,
-  CogRotationIcon,
-  ExclamationmarkTriangleIcon,
-  XMarkOctagonIcon,
-} from '@navikt/aksel-icons'
 import type { VedtakYtelsekomponenter } from '~/vedlikehold/laaste-vedtak.types'
 
 export default function LaasteVedtakPage() {
-  const [sak, setSak] = useState<SakOppsummeringLaasOpp | undefined | null>(
-    undefined,
-  )
+  const [sak, setSak] = useState<SakOppsummeringLaasOpp | undefined | null>(undefined)
   const [laasOppVedtak, setLaasOppVedtak] = useState<VedtakLaasOpp | null>(null)
   const [kravTilManuell, setKravTilManuell] = useState<string | null>(null)
-  const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] =
-    useState<VedtakLaasOpp | null>(null)
+  const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] = useState<VedtakLaasOpp | null>(null)
 
   return (
     <div>
@@ -51,18 +48,17 @@ export default function LaasteVedtakPage() {
           <HentSakInput onLoad={setSak} />
         </HStack>
         <HStack>
-          {sak !== undefined && sak !== null  && (
+          {sak !== undefined && sak !== null && (
             <VStack gap="5">
               <HStack gap="4" align="end" justify="start">
                 <Entry labelText={'Saktype'}>{sak.sakType}</Entry>
                 <Entry labelText={'Sakstatus'}>{sak.sakStatus}</Entry>
               </HStack>
-              {sak.vedtak.length === 0 &&
-                sak.automatiskeKravUtenVedtak.length === 0 && (
-                  <HStack>
-                    <Alert variant="info">Ingenting å låse opp</Alert>
-                  </HStack>
-                )}
+              {sak.vedtak.length === 0 && sak.automatiskeKravUtenVedtak.length === 0 && (
+                <HStack>
+                  <Alert variant="info">Ingenting å låse opp</Alert>
+                </HStack>
+              )}
               {sak.vedtak.length > 0 && (
                 <>
                   <Heading size="medium">Vedtak til behandling</Heading>
@@ -84,29 +80,17 @@ export default function LaasteVedtakPage() {
                           <Table.Row key={vedtak.vedtakId}>
                             <Table.DataCell>{vedtak.vedtakId}</Table.DataCell>
                             <Table.DataCell>{vedtak.kravId}</Table.DataCell>
+                            <Table.DataCell>{vedtak.kravGjelder}</Table.DataCell>
+                            <Table.DataCell>{vedtak.vedtaksType}</Table.DataCell>
+                            <Table.DataCell>{vedtak.vedtakStatus}</Table.DataCell>
                             <Table.DataCell>
-                              {vedtak.kravGjelder}
-                            </Table.DataCell>
-                            <Table.DataCell>
-                              {vedtak.vedtaksType}
-                            </Table.DataCell>
-                            <Table.DataCell>
-                              {vedtak.vedtakStatus}
-                            </Table.DataCell>
-                            <Table.DataCell>
-                              <Behandlinger
-                                kravid={vedtak.kravId}
-                                behandlinger={vedtak.behandlinger}
-                              />
+                              <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />
                             </Table.DataCell>
                             <Table.DataCell>
                               <HStack gap="3">
-                                {vedtak.opplaasVedtakInformasjon
-                                  ?.erAutomatisk && (
+                                {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
                                   <Button
-                                    onClick={() =>
-                                      setKravTilManuell(vedtak.kravId)
-                                    }
+                                    onClick={() => setKravTilManuell(vedtak.kravId)}
                                     variant="secondary"
                                     size="small"
                                   >
@@ -114,21 +98,14 @@ export default function LaasteVedtakPage() {
                                   </Button>
                                 )}
                                 {vedtak.isLaast && (
-                                  <Button
-                                    onClick={() => setLaasOppVedtak(vedtak)}
-                                    variant="secondary"
-                                    size="small"
-                                  >
+                                  <Button onClick={() => setLaasOppVedtak(vedtak)} variant="secondary" size="small">
                                     Lås opp
                                   </Button>
                                 )}
                                 {(vedtak.vedtakStatus === 'Samordnet' ||
-                                  vedtak.vedtaksType ===
-                                    'Regulering av pensjon') && (
+                                  vedtak.vedtaksType === 'Regulering av pensjon') && (
                                   <Button
-                                    onClick={() =>
-                                      setVerifiserOppdragsmeldingManuelt(vedtak)
-                                    }
+                                    onClick={() => setVerifiserOppdragsmeldingManuelt(vedtak)}
                                     variant="secondary"
                                     size="small"
                                   >
@@ -165,17 +142,10 @@ export default function LaasteVedtakPage() {
                             <Table.DataCell>{krav.kravGjelder}</Table.DataCell>
                             <Table.DataCell>{krav.kravStatus}</Table.DataCell>
                             <Table.DataCell>
-                              <Behandlinger
-                                kravid={krav.kravId}
-                                behandlinger={krav.behandlinger}
-                              />
+                              <Behandlinger kravid={krav.kravId} behandlinger={krav.behandlinger} />
                             </Table.DataCell>
                             <Table.DataCell>
-                              <Button
-                                onClick={() => setKravTilManuell(krav.kravId)}
-                                variant="secondary"
-                                size="small"
-                              >
+                              <Button onClick={() => setKravTilManuell(krav.kravId)} variant="secondary" size="small">
                                 Sett til manuell
                               </Button>
                             </Table.DataCell>
@@ -190,17 +160,9 @@ export default function LaasteVedtakPage() {
           )}
         </HStack>
       </VStack>
-      {laasOppVedtak !== null && (
-        <LaasOppVedtakModal
-          vedtak={laasOppVedtak}
-          onClose={() => setLaasOppVedtak(null)}
-        />
-      )}
+      {laasOppVedtak !== null && <LaasOppVedtakModal vedtak={laasOppVedtak} onClose={() => setLaasOppVedtak(null)} />}
       {kravTilManuell !== null && (
-        <SettTilManuellModal
-          kravId={kravTilManuell}
-          onClose={() => setKravTilManuell(null)}
-        />
+        <SettTilManuellModal kravId={kravTilManuell} onClose={() => setKravTilManuell(null)} />
       )}
       {verifiserOppdragsmeldingManuelt !== null && (
         <VerifiserOppdragsmeldingManueltModal
@@ -213,25 +175,26 @@ export default function LaasteVedtakPage() {
 }
 
 function HentSakInput({ onLoad }: { onLoad: (sak: SakOppsummeringLaasOpp | null | undefined) => void }) {
-
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams()
   const sakIdParam = searchParams.get('sakId')
   const [sakId, setSakId] = useState<string>(sakIdParam ?? '')
   const fetcher = useFetcher()
 
   useEffect(() => {
-    if(sakIdParam !== null && fetcher.data === undefined && fetcher.state === 'idle') {
-      setSearchParams({sakId: sakId})
-      fetcher.submit(
-        {
-          sakId,
-        },
-        {
-          action: 'hentSak',
-          method: 'POST',
-          encType: 'application/json',
-        },
-      ).then()
+    if (sakIdParam !== null && fetcher.data === undefined && fetcher.state === 'idle') {
+      setSearchParams({ sakId: sakId })
+      fetcher
+        .submit(
+          {
+            sakId,
+          },
+          {
+            action: 'hentSak',
+            method: 'POST',
+            encType: 'application/json',
+          },
+        )
+        .then()
     }
   }, [fetcher.data, fetcher.state, sakIdParam, fetcher.submit, sakId, setSearchParams])
 
@@ -240,54 +203,79 @@ function HentSakInput({ onLoad }: { onLoad: (sak: SakOppsummeringLaasOpp | null 
   }, [fetcher.data, onLoad])
 
   function hentSak() {
-    setSearchParams({sakId: sakId})
-    fetcher.submit(
-      {
-        sakId,
-      },
-      {
-        action: 'hentSak',
-        method: 'POST',
-        encType: 'application/json',
-      },
-    ).then()
+    setSearchParams({ sakId: sakId })
+    fetcher
+      .submit(
+        {
+          sakId,
+        },
+        {
+          action: 'hentSak',
+          method: 'POST',
+          encType: 'application/json',
+        },
+      )
+      .then()
   }
 
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault()
-    }}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+      }}
+    >
       <HStack gap="2" align="end">
-
-        <TextField error={fetcher.data === null ? 'Fant ikke sak' : undefined} label="Sak ID" value={sakId}
-                   onChange={(e) => setSakId(e.target.value)} />
-        <div><Button loading={fetcher.state === 'submitting'} onClick={hentSak}>Hent sak</Button></div>
-
+        <TextField
+          error={fetcher.data === null ? 'Fant ikke sak' : undefined}
+          label="Sak ID"
+          value={sakId}
+          onChange={(e) => setSakId(e.target.value)}
+        />
+        <div>
+          <Button loading={fetcher.state === 'submitting'} onClick={hentSak}>
+            Hent sak
+          </Button>
+        </div>
       </HStack>
     </form>
   )
 }
 
-function Behandlinger({ kravid, behandlinger }: { kravid: string, behandlinger: LaasOppBehandlingSummary[] }) {
+function Behandlinger({ kravid, behandlinger }: { kravid: string; behandlinger: LaasOppBehandlingSummary[] }) {
   return (
     <VStack>
       {behandlinger.map((behandling) => (
         <HStack key={kravid + behandling.behandlingId} gap="1" align="center">
-          <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">{decodeBehandling(behandling.type)}</Link>
-          {behandling.isUnderBehandling && <Tooltip content="Under behandling"><CogRotationIcon /></Tooltip>}
-          {behandling.isFerdig && <Tooltip content="Ferdig"><CheckmarkCircleIcon color="green" /></Tooltip>}
-          {behandling.isFeilet && <Tooltip content="Feilet"><ExclamationmarkTriangleIcon color="orange" /></Tooltip>}
-          {behandling.isStoppet &&
-            <Tooltip content="Stoppet manuelt. Krav må låses opp"><XMarkOctagonIcon color="red" /></Tooltip>}
+          <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">
+            {decodeBehandling(behandling.type)}
+          </Link>
+          {behandling.isUnderBehandling && (
+            <Tooltip content="Under behandling">
+              <CogRotationIcon />
+            </Tooltip>
+          )}
+          {behandling.isFerdig && (
+            <Tooltip content="Ferdig">
+              <CheckmarkCircleIcon color="green" />
+            </Tooltip>
+          )}
+          {behandling.isFeilet && (
+            <Tooltip content="Feilet">
+              <ExclamationmarkTriangleIcon color="orange" />
+            </Tooltip>
+          )}
+          {behandling.isStoppet && (
+            <Tooltip content="Stoppet manuelt. Krav må låses opp">
+              <XMarkOctagonIcon color="red" />
+            </Tooltip>
+          )}
         </HStack>
       ))}
     </VStack>
   )
 }
 
-
-function SettTilManuellModal({ kravId, onClose }: { kravId: string, onClose: () => void }) {
-
+function SettTilManuellModal({ kravId, onClose }: { kravId: string; onClose: () => void }) {
   const fetcher = useFetcher()
 
   function settTilManuell() {
@@ -316,41 +304,34 @@ function SettTilManuellModal({ kravId, onClose }: { kravId: string, onClose: () 
     }
   }, [fetcher?.data, onClose])
 
- return ( <Modal header={{ heading: 'Sett til manuell' }} open={true} onClose={onClose}>
-    <Modal.Body>
-      <VStack gap="5">
-        <BodyLong>
-          Er du sikker på at du vil sette kravet til manuell? Dette fører til merarbeid for saksbehandler, sørg for at fag er
-          innvolvert og at saksbehandler får nødvendig
-          informasjon.
-        </BodyLong>
-        <Heading size="small">Dette vil skje:</Heading>
-        <List as="ul">
-         <List.Item title="Behandling">
-              Behandlinger vil bli stoppet.
-            </List.Item>
-          <List.Item title="Endring av behandlingstype">
-            Kravet vil bli endret til manuell behandling.
-          </List.Item>
-        </List>
-      </VStack>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={settTilManuell}>
-        Sett til manuell
-      </Button>
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={onClose}
-      >
-        Avbryt
-      </Button>
-    </Modal.Footer>
-  </Modal>)
+  return (
+    <Modal header={{ heading: 'Sett til manuell' }} open={true} onClose={onClose}>
+      <Modal.Body>
+        <VStack gap="5">
+          <BodyLong>
+            Er du sikker på at du vil sette kravet til manuell? Dette fører til merarbeid for saksbehandler, sørg for at
+            fag er innvolvert og at saksbehandler får nødvendig informasjon.
+          </BodyLong>
+          <Heading size="small">Dette vil skje:</Heading>
+          <List as="ul">
+            <List.Item title="Behandling">Behandlinger vil bli stoppet.</List.Item>
+            <List.Item title="Endring av behandlingstype">Kravet vil bli endret til manuell behandling.</List.Item>
+          </List>
+        </VStack>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={settTilManuell}>
+          Sett til manuell
+        </Button>
+        <Button type="button" variant="secondary" onClick={onClose}>
+          Avbryt
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
 }
 
-function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp, onClose: () => void }) {
+function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClose: () => void }) {
   const fetcher = useFetcher()
 
   function laasOppVedtak() {
@@ -385,8 +366,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp, onClos
         <VStack gap="5">
           <BodyLong>
             Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
-            innvolvert og at saksbehandler får nødvendig
-            informasjon.
+            innvolvert og at saksbehandler får nødvendig informasjon.
           </BodyLong>
           <Heading size="small">Dette vil skje:</Heading>
           <List as="ul">
@@ -397,47 +377,42 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp, onClos
               </List.Item>
             )}
             {vedtak.opplaasVedtakInformasjon?.harBehandling && (
-              <List.Item title="Behandling">
-                Vedtaket har en pågående behandling. Denne vil bli stoppet.
-              </List.Item>
+              <List.Item title="Behandling">Vedtaket har en pågående behandling. Denne vil bli stoppet.</List.Item>
             )}
             {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
               <List.Item title="Automatisk vedtak">
                 Kravet har behandlings type automatisk. Det vil endret til manuell, oppgave blir opprettet.
               </List.Item>
             )}
-            <List.Item title="Endring av vedtakstatus">
-              Vedtakstatus vil bli endret til "Til Attestering"
-            </List.Item>
+            <List.Item title="Endring av vedtakstatus">Vedtakstatus vil bli endret til "Til Attestering"</List.Item>
           </List>
-          {vedtak.behandlinger.some(b => b.isFeilet) && (
+          {vedtak.behandlinger.some((b) => b.isFeilet) && (
             <Alert variant="warning">
-              Obs!!! Denne saken har en behandling som har feilet teknisk, og det er derfor ikke sikkert det er riktig løsning å låse opp saken! En utvikler bør se på saken før du låser opp.
+              Obs!!! Denne saken har en behandling som har feilet teknisk, og det er derfor ikke sikkert det er riktig
+              løsning å låse opp saken! En utvikler bør se på saken før du låser opp.
             </Alert>
           )}
-          {vedtak.behandlinger.some(b => b.type === "IverksettVedtakBehandling") && <Alert variant="warning">
-            Det er en Iverksett Vedtak behandling på dette vedtaket. Dersom du låser opp, så må kravet feilregistreres og nytt krav må opprettes.
-          </Alert>}
+          {vedtak.behandlinger.some((b) => b.type === 'IverksettVedtakBehandling') && (
+            <Alert variant="warning">
+              Det er en Iverksett Vedtak behandling på dette vedtaket. Dersom du låser opp, så må kravet feilregistreres
+              og nytt krav må opprettes.
+            </Alert>
+          )}
         </VStack>
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={laasOppVedtak}>
           Lås opp
         </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onClose}
-        >
+        <Button type="button" variant="secondary" onClick={onClose}>
           Avbryt
         </Button>
       </Modal.Footer>
     </Modal>
   )
-
 }
 
-function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp, onClose: () => void }) {
+function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClose: () => void }) {
   const submitFetcher = useFetcher()
   const [oppdragsmeldingOk, setOppdragsmeldingOk] = useState(false)
 
@@ -456,7 +431,8 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
 
   const fetcher = useFetcher()
   useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data === undefined) fetcher.load(`/laaste-vedtak/hentVedtakIOppdrag/${vedtak.vedtakId}`)
+    if (fetcher.state === 'idle' && fetcher.data === undefined)
+      fetcher.load(`/laaste-vedtak/hentVedtakIOppdrag/${vedtak.vedtakId}`)
   }, [fetcher, vedtak.vedtakId])
 
   useEffect(() => {
@@ -476,8 +452,11 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
             Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>
 
-          {fetcher.state === 'loading' &&
-            <HStack gap="2"><Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail></HStack>}
+          {fetcher.state === 'loading' && (
+            <HStack gap="2">
+              <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
+            </HStack>
+          )}
 
           {vedtakIOppdrag !== undefined && (
             <Table size="small" zebraStripes>
@@ -494,34 +473,33 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
                     <Table.DataCell>{ytelse.ytelseKomponentType}</Table.DataCell>
                     <Table.DataCell>{ytelse.belop}</Table.DataCell>
                     <Table.DataCell>{ytelse.ytelsekomponentId}</Table.DataCell>
-                  </Table.Row>))}
+                  </Table.Row>
+                ))}
               </Table.Body>
             </Table>
           )}
-
         </VStack>
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" loading={submitFetcher.state === 'submitting'}
-                disabled={fetcher.state === 'loading' || !oppdragsmeldingOk}
-                onClick={verifiserOppdragsmeldingManuelt}>
-          Iverksett vedtak
-        </Button>
         <Button
           type="button"
-          variant="secondary"
-          onClick={onClose}
+          loading={submitFetcher.state === 'submitting'}
+          disabled={fetcher.state === 'loading' || !oppdragsmeldingOk}
+          onClick={verifiserOppdragsmeldingManuelt}
         >
+          Iverksett vedtak
+        </Button>
+        <Button type="button" variant="secondary" onClick={onClose}>
           Avbryt
         </Button>
-        <Checkbox value={oppdragsmeldingOk} onChange={() => setOppdragsmeldingOk(!oppdragsmeldingOk)}
-                  disabled={fetcher.state === 'loading'}>Oppdragsmelding er verifisert manuelt</Checkbox>
+        <Checkbox
+          value={oppdragsmeldingOk}
+          onChange={() => setOppdragsmeldingOk(!oppdragsmeldingOk)}
+          disabled={fetcher.state === 'loading'}
+        >
+          Oppdragsmelding er verifisert manuelt
+        </Checkbox>
       </Modal.Footer>
     </Modal>
   )
 }
-
-
-
-
-

@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { oppdaterKanIverksettes } from '~/vedlikehold/vedlikehold.server'
 

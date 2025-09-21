@@ -1,4 +1,4 @@
-import { index, layout, prefix, route, type RouteConfig } from '@react-router/dev/routes'
+import { index, layout, prefix, type RouteConfig, route } from '@react-router/dev/routes'
 
 export default [
   index('index.tsx'),
@@ -23,21 +23,51 @@ export default [
 
     route('batch/reguleringv2', 'regulering/batch.reguleringv2.tsx', [
       route('administrerbehandlinger', 'regulering/batch.reguleringv2.administrerbehandlinger.tsx', [
-        route('hentTotaloversiktBehandlinger/:behandlingId', 'regulering/batch.reguleringv2.administrerbehandlinger.hentTotaloversiktBehandlinger.$behandlingId.tsx'),
-        route('fortsettFamilieReguleringerTilBehandling', 'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFamilieReguleringerTilBehandling.tsx'),
-        route('fortsettFeilendeFamilieReguleringer', 'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFeilendeFamilieReguleringer.tsx'),
-        route('fortsettFeilendeIverksettVedtak', 'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFeilendeIverksettVedtak.tsx'),
-        route('fortsettFaktoromregningsmodus', 'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFaktoromregningsmodus.tsx'),
-        route('fortsettFeilhandteringmodus', 'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFeilhandteringmodus.tsx'),
-        route('fortsettNyAvviksgrenser', 'regulering/batch.reguleringv2.administrerbehandlinger.fortsettNyAvviksgrenser.tsx'),
-        route('oppdaterAvviksgrenser', 'regulering/batch.reguleringv2.administrerbehandlinger.oppdaterAvviksgrenser.tsx'),
+        route(
+          'hentTotaloversiktBehandlinger/:behandlingId',
+          'regulering/batch.reguleringv2.administrerbehandlinger.hentTotaloversiktBehandlinger.$behandlingId.tsx',
+        ),
+        route(
+          'fortsettFamilieReguleringerTilBehandling',
+          'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFamilieReguleringerTilBehandling.tsx',
+        ),
+        route(
+          'fortsettFeilendeFamilieReguleringer',
+          'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFeilendeFamilieReguleringer.tsx',
+        ),
+        route(
+          'fortsettFeilendeIverksettVedtak',
+          'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFeilendeIverksettVedtak.tsx',
+        ),
+        route(
+          'fortsettFaktoromregningsmodus',
+          'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFaktoromregningsmodus.tsx',
+        ),
+        route(
+          'fortsettFeilhandteringmodus',
+          'regulering/batch.reguleringv2.administrerbehandlinger.fortsettFeilhandteringmodus.tsx',
+        ),
+        route(
+          'fortsettNyAvviksgrenser',
+          'regulering/batch.reguleringv2.administrerbehandlinger.fortsettNyAvviksgrenser.tsx',
+        ),
+        route(
+          'oppdaterAvviksgrenser',
+          'regulering/batch.reguleringv2.administrerbehandlinger.oppdaterAvviksgrenser.tsx',
+        ),
         route('hentStatistikk', 'regulering/batch.reguleringv2.administrerbehandlinger.hentStatistikk.tsx'),
       ]),
       route('avsluttendeaktiviteter', 'regulering/batch.reguleringv2.avsluttendeaktiviteter.tsx'),
       route('ekskludertesaker', 'regulering/batch.reguleringv2.ekskludertesaker.tsx'),
       route('orkestrering', 'regulering/batch.reguleringv2.orkestrering.tsx', [
-        route('hentOrkestreringStatistikk/:behandlingId', 'regulering/batch.reguleringv2.orkestrering.hentOrkestreringStatistikk.$behandlingId.tsx'),
-        route('hentAggregerteFeilmeldinger', 'regulering/batch.reguleringv2.orkestrering.hentAggregerteFeilmeldinger.tsx'),
+        route(
+          'hentOrkestreringStatistikk/:behandlingId',
+          'regulering/batch.reguleringv2.orkestrering.hentOrkestreringStatistikk.$behandlingId.tsx',
+        ),
+        route(
+          'hentAggregerteFeilmeldinger',
+          'regulering/batch.reguleringv2.orkestrering.hentAggregerteFeilmeldinger.tsx',
+        ),
         route('fortsett/:behandlingId', 'regulering/batch.reguleringv2.orkestrering.fortsett.$behandlingId.tsx'),
         route('pause/:behandlingId', 'regulering/batch.reguleringv2.orkestrering.pause.$behandlingId.tsx'),
       ]),
@@ -52,7 +82,10 @@ export default [
       route('', 'behandling/behandling.$behandlingId.tsx', [
         index('behandling/behandling.$behandlingId._index.tsx'),
 
-        route('behandlingManuellKategori/:behandlingManuellKategori', 'behandling/behandling.$behandlingId.behandlingManuellKategori.$behandlingManuellKategori.tsx'),
+        route(
+          'behandlingManuellKategori/:behandlingManuellKategori',
+          'behandling/behandling.$behandlingId.behandlingManuellKategori.$behandlingManuellKategori.tsx',
+        ),
         route('behandlingManuellOpptelling', 'behandling/behandling.$behandlingId.behandlingManuellOpptelling.tsx'),
         route('ikkeFullforteAktiviteter', 'behandling/behandling.$behandlingId.ikkeFullforteAktiviteter.tsx'),
         route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [
@@ -131,7 +164,10 @@ export default [
 
     route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx'),
     route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),
-    route('opptjening/manedlig/omregning/kategoriserBruker', 'opptjening/opptjening.manedlig.omregning.kategoriserBruker.tsx'),
+    route(
+      'opptjening/manedlig/omregning/kategoriserBruker',
+      'opptjening/opptjening.manedlig.omregning.kategoriserBruker.tsx',
+    ),
     route('opptjening/manedlig/omregning/uttrekk', 'opptjening/opptjening.manedlig.omregning.uttrekk.tsx'),
 
     route('sok', 'sok/sok.tsx'),

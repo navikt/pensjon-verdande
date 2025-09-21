@@ -1,4 +1,11 @@
 import 'chart.js/auto'
+import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
+import { Alert, Button, Dropdown, HStack, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
+import { useEffect, useState } from 'react'
+import { Link, useFetcher, useOutletContext } from 'react-router'
+import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
+import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
+import { Entry } from '~/components/entry/Entry'
 import type {
   ArbeidstabellStatistikk,
   AvviksGrense,
@@ -7,24 +14,7 @@ import type {
   ReguleringDetaljer,
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
-import { useEffect, useState } from 'react'
-import { Link, useFetcher, useOutletContext } from 'react-router'
-import {
-  Alert,
-  Button,
-  Dropdown,
-  HStack,
-  Loader,
-  Table,
-  Tabs,
-  TextField,
-  VStack,
-} from '@navikt/ds-react'
-import { Entry } from '~/components/entry/Entry'
 import type { DetaljertFremdriftDTO } from '~/types'
-import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
-import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
-import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 
 type OpenConfirmationModalType =
   | 'fortsettFeilendeFamiliereguleringer'
@@ -68,21 +58,15 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   const reguleringStatistikk = fetcher.data as ReguleringStatistikk | undefined
 
   const arbeidstabellStatistikk = reguleringStatistikk?.arbeidstabellStatistikk
-  const faktoromregningerMedAarsak =
-    reguleringStatistikk?.faktoromregningerMedAarsak
+  const faktoromregningerMedAarsak = reguleringStatistikk?.faktoromregningerMedAarsak
 
-  const beregningsavvikStatistikk =
-    reguleringStatistikk?.beregningsavvikStatistikk
+  const beregningsavvikStatistikk = reguleringStatistikk?.beregningsavvikStatistikk
   const antallVenterPaaRune = reguleringStatistikk?.antallVenterPaaRune
-  const antallFeilendeBeregnytelser =
-    reguleringStatistikk?.antallFeilendeBeregnytelser
-  const antallFeilendeFamiliebehandlinger =
-    reguleringStatistikk?.antallFeilendeFamiliebehandlinger
-  const antallFeilendeverksettVedtak =
-    reguleringStatistikk?.antallFeilendeIverksettVedtak
+  const antallFeilendeBeregnytelser = reguleringStatistikk?.antallFeilendeBeregnytelser
+  const antallFeilendeFamiliebehandlinger = reguleringStatistikk?.antallFeilendeFamiliebehandlinger
+  const antallFeilendeverksettVedtak = reguleringStatistikk?.antallFeilendeIverksettVedtak
 
-  const [openConfirmationModal, setOpenConfirmationModal] =
-    useState<OpenConfirmationModalType | null>(null)
+  const [openConfirmationModal, setOpenConfirmationModal] = useState<OpenConfirmationModalType | null>(null)
 
   function fortsettFeilendeFamilieReguleringer() {
     setOpenConfirmationModal(null)
@@ -165,10 +149,8 @@ export default function AdministrerTilknyttetdeBehandlinger() {
             as={Dropdown.Toggle}
             size="small"
             loading={
-              fetcherFortsettFeilendeFamilieReguleringer.state ===
-                'submitting' ||
-              fetcherFortsettFamilieReguleringerTilBehandling.state ===
-                'submitting'
+              fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting' ||
+              fetcherFortsettFamilieReguleringerTilBehandling.state === 'submitting'
             }
           >
             Fortsett familie reguleringer ({antallFeilendeFamiliebehandlinger})
@@ -177,22 +159,13 @@ export default function AdministrerTilknyttetdeBehandlinger() {
             <Dropdown.Menu.List>
               <Dropdown.Menu.List.Item
                 as={Button}
-                onClick={() =>
-                  setOpenConfirmationModal(
-                    'fortsettFeilendeFamiliereguleringer',
-                  )
-                }
+                onClick={() => setOpenConfirmationModal('fortsettFeilendeFamiliereguleringer')}
               >
-                Fortsett feilende behandlinger (
-                {antallFeilendeFamiliebehandlinger})
+                Fortsett feilende behandlinger ({antallFeilendeFamiliebehandlinger})
               </Dropdown.Menu.List.Item>
               <Dropdown.Menu.List.Item
                 as={Button}
-                onClick={() =>
-                  setOpenConfirmationModal(
-                    'fortsettFamilieReguleringerTilBehandling',
-                  )
-                }
+                onClick={() => setOpenConfirmationModal('fortsettFamilieReguleringerTilBehandling')}
               >
                 Fortsett utsatte behandlinger
               </Dropdown.Menu.List.Item>
@@ -202,12 +175,8 @@ export default function AdministrerTilknyttetdeBehandlinger() {
         <Button
           icon={<PlayFillIcon />}
           size="small"
-          onClick={() =>
-            setOpenConfirmationModal('fortsettFeilendeIverksettVedtak')
-          }
-          loading={
-            fetcherFortsettFeilendeIverksettVedtak.state === 'submitting'
-          }
+          onClick={() => setOpenConfirmationModal('fortsettFeilendeIverksettVedtak')}
+          loading={fetcherFortsettFeilendeIverksettVedtak.state === 'submitting'}
         >
           Fortsett feilende iverksett vedtak ({antallFeilendeverksettVedtak})
         </Button>
@@ -228,27 +197,18 @@ export default function AdministrerTilknyttetdeBehandlinger() {
           </Button>
           <Dropdown.Menu>
             <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item
-                as={Button}
-                onClick={() =>
-                  setOpenConfirmationModal('fortsettNyAvviksgrenser')
-                }
-              >
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('fortsettNyAvviksgrenser')}>
                 Prøv på nytt med nye avviksgrenser ({antallVenterPaaRune})
               </Dropdown.Menu.List.Item>
               <Dropdown.Menu.List.Item
                 as={Button}
-                onClick={() =>
-                  setOpenConfirmationModal('fortsettFaktoromregningsmodus')
-                }
+                onClick={() => setOpenConfirmationModal('fortsettFaktoromregningsmodus')}
               >
                 Kjør i faktoromregningsmodus ({antallVenterPaaRune})
               </Dropdown.Menu.List.Item>
               <Dropdown.Menu.List.Item
                 as={Button}
-                onClick={() =>
-                  setOpenConfirmationModal('fortsettFeilhandteringmodus')
-                }
+                onClick={() => setOpenConfirmationModal('fortsettFeilhandteringmodus')}
               >
                 Kjør i feilhåndteringsmodus ({antallFeilendeBeregnytelser})
               </Dropdown.Menu.List.Item>
@@ -259,31 +219,19 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       <HStack>
         <Tabs defaultValue="totaloversiktbehandlinger">
           <Tabs.List>
-            <Tabs.Tab
-              value="totaloversiktbehandlinger"
-              label="Totaloversikt Behandlinger"
-            />
+            <Tabs.Tab value="totaloversiktbehandlinger" label="Totaloversikt Behandlinger" />
             <Tabs.Tab value="arbeidstabell" label="Arbeidstabell statistikk" />
 
-            <Tabs.Tab
-              value="faktomregningArsak"
-              label="Faktoromregninger Årsak"
-            />
+            <Tabs.Tab value="faktomregningArsak" label="Faktoromregninger Årsak" />
             <Tabs.Tab value="beregningsavvik" label="Beregningsavvik" />
             <Tabs.Tab value="avviksgrenser" label="Avviksgrenser" />
           </Tabs.List>
-          <Tabs.Panel
-            value="totaloversiktbehandlinger"
-            style={{ paddingTop: '2em' }}
-          >
+          <Tabs.Panel value="totaloversiktbehandlinger" style={{ paddingTop: '2em' }}>
             {uttrekkBehandlingId !== undefined ? (
               <VStack gap="5">
                 <TotaloversiktBehandlinger behandlingId={uttrekkBehandlingId} />
                 <Entry labelText={'Behandling'}>
-                  <Link
-                    to={`/behandling/${uttrekkBehandlingId}`}
-                    target="_blank"
-                  >
+                  <Link to={`/behandling/${uttrekkBehandlingId}`} target="_blank">
                     Gå til behandling
                   </Link>
                 </Entry>
@@ -296,27 +244,21 @@ export default function AdministrerTilknyttetdeBehandlinger() {
           </Tabs.Panel>
           <Tabs.Panel value="arbeidstabell" style={{ paddingTop: '2em' }}>
             {arbeidstabellStatistikk !== undefined ? (
-              <ArbeidstabellStatistikkTable
-                arbeidstabellStatistikk={arbeidstabellStatistikk}
-              />
+              <ArbeidstabellStatistikkTable arbeidstabellStatistikk={arbeidstabellStatistikk} />
             ) : (
               <Loader />
             )}
           </Tabs.Panel>
           <Tabs.Panel value="faktomregningArsak" style={{ paddingTop: '2em' }}>
             {faktoromregningerMedAarsak !== undefined ? (
-              <FaktoromregningArsakTable
-                faktoromregningerMedAarsak={faktoromregningerMedAarsak}
-              />
+              <FaktoromregningArsakTable faktoromregningerMedAarsak={faktoromregningerMedAarsak} />
             ) : (
               <Loader />
             )}
           </Tabs.Panel>
           <Tabs.Panel value="beregningsavvik" style={{ paddingTop: '2em' }}>
             {beregningsavvikStatistikk !== undefined ? (
-              <BeregningsavvikStatistikkTable
-                beregningsavvikStatistikk={beregningsavvikStatistikk}
-              />
+              <BeregningsavvikStatistikkTable beregningsavvikStatistikk={beregningsavvikStatistikk} />
             ) : (
               <Loader />
             )}
@@ -328,9 +270,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       </HStack>
       <ConfirmationModal
         text="Er du sikker på at du vil fortsette familiebehandlinger som er utsatt? Dette vil nullstille utsattTil-tidspunkt for alle ikke-feilende familiebehandlinger."
-        showModal={
-          openConfirmationModal === 'fortsettFamilieReguleringerTilBehandling'
-        }
+        showModal={openConfirmationModal === 'fortsettFamilieReguleringerTilBehandling'}
         onOk={() => {
           fortsettFamilieReguleringerTilBehandling()
         }}
@@ -338,9 +278,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du vil fortsette feilende familiebehandlinger? Dette vil nullstille utsattTil-tidspunkt for alle feilende familiebehandlinger."
-        showModal={
-          openConfirmationModal === 'fortsettFeilendeFamiliereguleringer'
-        }
+        showModal={openConfirmationModal === 'fortsettFeilendeFamiliereguleringer'}
         onOk={() => {
           fortsettFeilendeFamilieReguleringer()
         }}
@@ -387,11 +325,7 @@ function ArbeidstabellStatistikkTable({
 }: {
   arbeidstabellStatistikk: ArbeidstabellStatistikk
 }) {
-  const {
-    antallOversendesOppdrag,
-    antallFaktoromregnet,
-    antallFaktoromregnetDirekte,
-  } = arbeidstabellStatistikk
+  const { antallOversendesOppdrag, antallFaktoromregnet, antallFaktoromregnetDirekte } = arbeidstabellStatistikk
 
   return (
     <Table zebraStripes>
@@ -409,9 +343,7 @@ function ArbeidstabellStatistikkTable({
       </Table.Row>
       <Table.Row>
         <Table.DataCell>Antall faktoromregnet direkte</Table.DataCell>
-        <Table.DataCell align="right">
-          {antallFaktoromregnetDirekte}
-        </Table.DataCell>
+        <Table.DataCell align="right">{antallFaktoromregnetDirekte}</Table.DataCell>
       </Table.Row>
     </Table>
   )
@@ -461,21 +393,13 @@ function BeregningsavvikStatistikkTable({
   )
 }
 
-function EndreAvviksgrenser({
-  avviksgrenser,
-}: {
-  avviksgrenser: AvviksGrense[]
-}) {
+function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }) {
   const fetcher = useFetcher()
   const response = fetcher.data as { success: boolean } | undefined
 
   const [newAvviksgrenser, setAvviksgrenser] = useState(avviksgrenser)
 
-  function onAvviksgrenseChange(
-    avvikParamId: number,
-    key: string,
-    value: string,
-  ) {
+  function onAvviksgrenseChange(avvikParamId: number, key: string, value: string) {
     if (Number.isNaN(Number(value))) {
       return
     }
@@ -504,8 +428,7 @@ function EndreAvviksgrenser({
     )
   }
 
-  const [toggleEndreAvviksgrenser, setToggleEndreAvviksgrenser] =
-    useState(false)
+  const [toggleEndreAvviksgrenser, setToggleEndreAvviksgrenser] = useState(false)
   return (
     <VStack gap="5">
       {response?.success === true && (
@@ -535,11 +458,7 @@ function EndreAvviksgrenser({
                   hideLabel
                   value={avviksgrense.positivLavProsent}
                   onChange={(event) =>
-                    onAvviksgrenseChange(
-                      avviksgrense.avvikParamId,
-                      'positivLavProsent',
-                      event.target.value,
-                    )
+                    onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivLavProsent', event.target.value)
                   }
                 />
               ) : (
@@ -554,11 +473,7 @@ function EndreAvviksgrenser({
                   hideLabel
                   value={avviksgrense.negativLavProsent}
                   onChange={(event) =>
-                    onAvviksgrenseChange(
-                      avviksgrense.avvikParamId,
-                      'negativLavProsent',
-                      event.target.value,
-                    )
+                    onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativLavProsent', event.target.value)
                   }
                 />
               ) : (
@@ -573,11 +488,7 @@ function EndreAvviksgrenser({
                   hideLabel
                   value={avviksgrense.positivHoyProsent}
                   onChange={(event) =>
-                    onAvviksgrenseChange(
-                      avviksgrense.avvikParamId,
-                      'positivHoyProsent',
-                      event.target.value,
-                    )
+                    onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivHoyProsent', event.target.value)
                   }
                 />
               ) : (
@@ -592,11 +503,7 @@ function EndreAvviksgrenser({
                   hideLabel
                   value={avviksgrense.negativHoyProsent}
                   onChange={(event) =>
-                    onAvviksgrenseChange(
-                      avviksgrense.avvikParamId,
-                      'negativHoyProsent',
-                      event.target.value,
-                    )
+                    onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativHoyProsent', event.target.value)
                   }
                 />
               ) : (
@@ -611,11 +518,7 @@ function EndreAvviksgrenser({
                   hideLabel
                   value={avviksgrense.positivBelop}
                   onChange={(event) =>
-                    onAvviksgrenseChange(
-                      avviksgrense.avvikParamId,
-                      'positivBelop',
-                      event.target.value,
-                    )
+                    onAvviksgrenseChange(avviksgrense.avvikParamId, 'positivBelop', event.target.value)
                   }
                 />
               ) : (
@@ -630,44 +533,29 @@ function EndreAvviksgrenser({
                   hideLabel
                   value={avviksgrense.negativBelop}
                   onChange={(event) =>
-                    onAvviksgrenseChange(
-                      avviksgrense.avvikParamId,
-                      'negativBelop',
-                      event.target.value,
-                    )
+                    onAvviksgrenseChange(avviksgrense.avvikParamId, 'negativBelop', event.target.value)
                   }
                 />
               ) : (
                 avviksgrense.negativBelop
               )}
             </Table.DataCell>
-            <Table.DataCell align={'right'}>
-              {avviksgrense.underkategori}
-            </Table.DataCell>
+            <Table.DataCell align={'right'}>{avviksgrense.underkategori}</Table.DataCell>
           </Table.Row>
         ))}
       </Table>
       <div>
         {toggleEndreAvviksgrenser ? (
           <HStack gap="3">
-            <Button
-              variant="secondary"
-              onClick={() => setToggleEndreAvviksgrenser(false)}
-            >
+            <Button variant="secondary" onClick={() => setToggleEndreAvviksgrenser(false)}>
               Avbryt
             </Button>
-            <Button
-              onClick={() => updateAvviksgrenser()}
-              loading={fetcher.state === 'submitting'}
-            >
+            <Button onClick={() => updateAvviksgrenser()} loading={fetcher.state === 'submitting'}>
               Oppdater avviksgrenser
             </Button>
           </HStack>
         ) : (
-          <Button
-            variant="secondary"
-            onClick={() => setToggleEndreAvviksgrenser(true)}
-          >
+          <Button variant="secondary" onClick={() => setToggleEndreAvviksgrenser(true)}>
             Endre avviksgrenser
           </Button>
         )}
@@ -676,11 +564,7 @@ function EndreAvviksgrenser({
   )
 }
 
-export function TotaloversiktBehandlinger({
-  behandlingId,
-}: {
-  behandlingId: string
-}) {
+export function TotaloversiktBehandlinger({ behandlingId }: { behandlingId: string }) {
   const fetcher = useFetcher()
 
   // On Mount
@@ -701,16 +585,10 @@ export function TotaloversiktBehandlinger({
     return () => clearInterval(interval)
   }, [fetcher, behandlingId])
 
-  const orkestreringStatistikk = fetcher.data as
-    | DetaljertFremdriftDTO
-    | undefined
+  const orkestreringStatistikk = fetcher.data as DetaljertFremdriftDTO | undefined
 
   if (orkestreringStatistikk === undefined) {
     return null
   }
-  return (
-    <BehandlingBatchDetaljertFremdriftBarChart
-      detaljertFremdrift={orkestreringStatistikk}
-    />
-  )
+  return <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
 }

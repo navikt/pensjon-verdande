@@ -1,9 +1,7 @@
-import {useFetcher, } from 'react-router';
+import { Button, DatePicker } from '@navikt/ds-react'
+import { formatISO } from 'date-fns'
 import { useState } from 'react'
-import {Button, DatePicker} from '@navikt/ds-react'
-import {formatISO} from "date-fns";
-
-import { type ActionFunctionArgs, redirect} from 'react-router';
+import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { opprettOppdaterSakBehandlingPEN } from '~/oppdatersakstatus/oppdatersakstatus.server'
@@ -11,7 +9,7 @@ import { opprettOppdaterSakBehandlingPEN } from '~/oppdatersakstatus/oppdatersak
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   const data = await request.json()
-  const response= await opprettOppdaterSakBehandlingPEN(accessToken, data.startDato)
+  const response = await opprettOppdaterSakBehandlingPEN(accessToken, data.startDato)
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
@@ -23,38 +21,36 @@ export default function BehandlingOpprett_index() {
 
   function startOppdaterSakstatusBehandling() {
     fetcher.submit(
-        {
-          startDato: formatISO(startDato ?? defaultStartdato),
-        },
-        {
-          action: '',
-          method: 'POST',
-          encType: 'application/json',
-        },
+      {
+        startDato: formatISO(startDato ?? defaultStartdato),
+      },
+      {
+        action: '',
+        method: 'POST',
+        encType: 'application/json',
+      },
     )
   }
 
   return (
-      <div>
-        <h1>Opprett FinnSakerSomSkalAvsluttes behandling</h1>
-        Behandlingen finner alle ikke løpende saker som må oppdateres til avsluttet status.
-          <p style={{ fontWeight: 'bold' }}>
-            Startdato for behandling:
-          </p>
-          <p>
-            <DatePicker.Standalone
-                selected={startDato}
-                today={defaultStartdato}
-                onSelect={setStartDato}
-                fromDate={new Date()}
-                dropdownCaption
-            />
-          </p>
-          <p>
-            <Button type="button" onClick={startOppdaterSakstatusBehandling} loading={fetcher.state === 'submitting'}>
-              Start behandling
-            </Button>
-          </p>
-      </div>
+    <div>
+      <h1>Opprett FinnSakerSomSkalAvsluttes behandling</h1>
+      Behandlingen finner alle ikke løpende saker som må oppdateres til avsluttet status.
+      <p style={{ fontWeight: 'bold' }}>Startdato for behandling:</p>
+      <p>
+        <DatePicker.Standalone
+          selected={startDato}
+          today={defaultStartdato}
+          onSelect={setStartDato}
+          fromDate={new Date()}
+          dropdownCaption
+        />
+      </p>
+      <p>
+        <Button type="button" onClick={startOppdaterSakstatusBehandling} loading={fetcher.state === 'submitting'}>
+          Start behandling
+        </Button>
+      </p>
+    </div>
   )
 }

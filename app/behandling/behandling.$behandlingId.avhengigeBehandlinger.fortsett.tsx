@@ -1,21 +1,15 @@
 import type { ActionFunctionArgs } from 'react-router'
-import { fortsettBehandling } from '~/services/behandling.server'
 import { requireAccessToken } from '~/services/auth.server'
+import { fortsettBehandling } from '~/services/behandling.server'
 
-export async function action({
-                               request,
-                             }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const accessToken = await requireAccessToken(request)
 
   const body = await request.formData()
   const behandlingIder = body.get('behandlingIder') as string
 
   await Promise.all(
-    behandlingIder
-      .split(',')
-      .map((behandlingId) =>
-        fortsettBehandling(accessToken, behandlingId, false)
-      )
+    behandlingIder.split(',').map((behandlingId) => fortsettBehandling(accessToken, behandlingId, false)),
   )
 
   return null

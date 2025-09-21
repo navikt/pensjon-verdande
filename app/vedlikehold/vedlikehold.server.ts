@@ -1,48 +1,35 @@
 import { env } from '~/services/env.server'
+import { logger } from '~/services/logger.server'
 import type { LaasOppResultat, SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.types'
-import type {
-  ActionData,
-  Infobanner,
-  OppdaterInfoBannerResponse,
-} from '~/vedlikehold/vedlikehold.types'
 import type {
   LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary,
   VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'
-import { logger } from '~/services/logger.server'
+import type { ActionData, Infobanner, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
 
-
-export const bekreftOppdragsmeldingManuelt = async(
-  accessToken: string,
-  vedtakId: string,
-) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/bekreftOppdragsmeldingManuelt/${vedtakId}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const bekreftOppdragsmeldingManuelt = async (accessToken: string, vedtakId: string) => {
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/bekreftOppdragsmeldingManuelt/${vedtakId}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
     return true
   } else {
     const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
+    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
 }
 
-export const getLaasteVedtakSummary = async(
+export const getLaasteVedtakSummary = async (
   accessToken: string,
   team: string | null,
   aksjonspunkt: string | null,
 ): Promise<LaasteVedtakUttrekkSummary> => {
-
   const url = new URL(`${env.penUrl}/api/laaste-vedtak`)
   if (team !== null) {
     url.searchParams.append('team', team)
@@ -50,15 +37,12 @@ export const getLaasteVedtakSummary = async(
   if (aksjonspunkt !== null) {
     url.searchParams.append('aksjonspunkt', aksjonspunkt)
   }
-  const response = await fetch(
-    url.toString(),
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
     return (await response.json()) as LaasteVedtakUttrekkSummary
@@ -69,20 +53,13 @@ export const getLaasteVedtakSummary = async(
   }
 }
 
-export const getUttrekkStatus = async(
-  accessToken: string,
-  behandlingId: string,
-) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/status/${behandlingId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const getUttrekkStatus = async (accessToken: string, behandlingId: string) => {
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/status/${behandlingId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
     return (await response.json()) as LaasteVedtakUttrekkStatus
@@ -93,26 +70,19 @@ export const getUttrekkStatus = async(
   }
 }
 
-export const getVedtakIOppdrag = async(
-  accessToken: string,
-  vedtakId: string,
-): Promise<VedtakYtelsekomponenter> => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/hentVedtakIOppdrag/${vedtakId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const getVedtakIOppdrag = async (accessToken: string, vedtakId: string): Promise<VedtakYtelsekomponenter> => {
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/hentVedtakIOppdrag/${vedtakId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
     return (await response.json()) as VedtakYtelsekomponenter
   } else {
     const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
+    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
 }
 
@@ -132,12 +102,11 @@ export const hentInfoBanner = async (accessToken: string): Promise<Infobanner> =
   }
 }
 
-export const hentMot = async(
+export const hentMot = async (
   accessToken: string,
   fomYear: FormDataEntryValue,
   fomMonth: FormDataEntryValue,
 ): Promise<ActionData> => {
-
   const response = await fetch(
     `${env.penUrl}/api/utbetaling/spkmottak/antall?fomYear=${fomYear}&fomMonth=${fomMonth}`,
     {
@@ -163,101 +132,77 @@ export const hentMot = async(
   }
 }
 
-export const hentSak = async(
-  accessToken: string,
-  sakId: string,
-) => {
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/laas-opp/hentSak`,
-    {
-      method: 'POST',
-      body: JSON.stringify({ sakId }),
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-        'Content-Type': 'application/json',
-      },
+export const hentSak = async (accessToken: string, sakId: string) => {
+  const response = await fetch(`${env.penUrl}/api/behandling/laas-opp/hentSak`, {
+    method: 'POST',
+    body: JSON.stringify({ sakId }),
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
+      'Content-Type': 'application/json',
     },
-  )
+  })
 
-  if(response.status === 404) {
+  if (response.status === 404) {
     return null
   }
   if (response.ok) {
-    return await response.json() as SakOppsummeringLaasOpp
+    return (await response.json()) as SakOppsummeringLaasOpp
   } else {
     const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
+    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
 }
 
-export const laasOpp = async(
-  accessToken: string,
-  vedtakId: string,
-) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/laas-opp/${vedtakId}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const laasOpp = async (accessToken: string, vedtakId: string) => {
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/laas-opp/${vedtakId}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   return {
     success: response.ok,
   }
 }
 
-export const laasOppVedtak = async(
-  accessToken: string,
-  vedtakId: string,
-) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/laas-opp/laasOppVedtak/${vedtakId}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const laasOppVedtak = async (accessToken: string, vedtakId: string) => {
+  const response = await fetch(`${env.penUrl}/api/behandling/laas-opp/laasOppVedtak/${vedtakId}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
-    return {success: true}
+    return { success: true }
   } else {
     const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
+    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
 }
 
-export const linkDnrFnr = async(
+export const linkDnrFnr = async (
   accessToken: string,
   gammelIdent: FormDataEntryValue | null,
   nyIdent: FormDataEntryValue | null,
 ) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/saksbehandling/person/oppdaterFodselsnummer`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        gammelIdent: gammelIdent,
-        nyIdent: nyIdent,
-      }),
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
+  const response = await fetch(`${env.penUrl}/api/saksbehandling/person/oppdaterFodselsnummer`, {
+    method: 'POST',
+    body: JSON.stringify({
+      gammelIdent: gammelIdent,
+      nyIdent: nyIdent,
+    }),
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
     return {
@@ -272,32 +217,28 @@ export const linkDnrFnr = async(
   }
 }
 
-export const oppdaterAksjonspunkt = async(
+export const oppdaterAksjonspunkt = async (
   accessToken: string,
   behandlingId: string,
   kravId: string,
   aksjonspunkt: string,
 ) => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/aksjonspunkt/${behandlingId}/${kravId}`,
-    {
-      method: 'PUT',
-      body: aksjonspunkt,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/aksjonspunkt/${behandlingId}/${kravId}`, {
+    method: 'PUT',
+    body: aksjonspunkt,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (!response.ok) {
     throw new Error()
   }
 }
 
-export const oppdaterInfoBanner = async(
+export const oppdaterInfoBanner = async (
   infoBanner: Infobanner,
   accessToken: string,
 ): Promise<OppdaterInfoBannerResponse> => {
@@ -323,7 +264,7 @@ export const oppdaterInfoBanner = async(
   return { erOppdatert: true }
 }
 
-export const oppdaterKanIverksettes = async(
+export const oppdaterKanIverksettes = async (
   accessToken: string,
   behandlingId: string,
   kravId: string,
@@ -346,95 +287,70 @@ export const oppdaterKanIverksettes = async(
   }
 }
 
-export const oppdaterKommentar = async(
+export const oppdaterKommentar = async (
   accessToken: string,
   behandlingId: string,
   kravId: string,
   kommentar: string,
 ) => {
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/kommentar/${behandlingId}/${kravId}`,
-    {
-      method: 'PUT',
-      body: kommentar,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/kommentar/${behandlingId}/${kravId}`, {
+    method: 'PUT',
+    body: kommentar,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (!response.ok) {
     throw new Error()
   }
 }
 
-export const oppdaterTeam = async(
-  accessToken: string,
-  behandlingId: string,
-  kravId: string,
-  team: string,
-) => {
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/team/${behandlingId}/${kravId}?team=${team}`,
-    {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const oppdaterTeam = async (accessToken: string, behandlingId: string, kravId: string, team: string) => {
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/team/${behandlingId}/${kravId}?team=${team}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (!response.ok) {
     throw new Error()
   }
 }
 
-export const runUttrekk = async (
-  accessToken: string,
-  nullstill: boolean,
-)=> {
-
-  const response = await fetch(
-    `${env.penUrl}/api/laaste-vedtak/run?nullstill=${nullstill}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const runUttrekk = async (accessToken: string, nullstill: boolean) => {
+  const response = await fetch(`${env.penUrl}/api/laaste-vedtak/run?nullstill=${nullstill}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (!response.ok) {
     throw new Error()
   }
 }
 
-export const settTilManuell = async(
-  accessToken: string,
-  kravId: string,
-): Promise<LaasOppResultat> => {
-
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/laas-opp/settTilManuell/${kravId}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
+export const settTilManuell = async (accessToken: string, kravId: string): Promise<LaasOppResultat> => {
+  const response = await fetch(`${env.penUrl}/api/behandling/laas-opp/settTilManuell/${kravId}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
-    return {success: true}
+    return { success: true }
   } else {
     const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`, )
+    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
 }

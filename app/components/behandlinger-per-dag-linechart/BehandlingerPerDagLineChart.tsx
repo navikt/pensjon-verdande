@@ -1,4 +1,3 @@
-import type { DatoAntall } from '~/types'
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -11,22 +10,14 @@ import {
   Tooltip,
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
+import type { DatoAntall } from '~/types'
 
 type Props = {
   opprettetPerDag: DatoAntall[]
   antallDager: number
 }
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 export function BehandlingerPerDagLineChart(props: Props) {
   const now = new Date()
@@ -38,9 +29,7 @@ export function BehandlingerPerDagLineChart(props: Props) {
   }
 
   const labels = days.map((value) => {
-    return (
-      `${value.getDate()}.${value.getMonth() + 1}.${value.getFullYear()}`
-    )
+    return `${value.getDate()}.${value.getMonth() + 1}.${value.getFullYear()}`
   })
 
   const data = days.map((value) => {

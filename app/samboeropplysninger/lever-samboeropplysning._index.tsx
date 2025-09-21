@@ -1,9 +1,9 @@
-import { type ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
 import { BodyLong, Button, Heading, Label } from '@navikt/ds-react'
-import { requireAccessToken } from '~/services/auth.server'
+import { type ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { getBehandlinger } from '~/services/behandling.server'
 import { startVurderSamboereBatch } from '~/samboeropplysninger/samboeropplysninger.server'
+import { requireAccessToken } from '~/services/auth.server'
+import { getBehandlinger } from '~/services/behandling.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const { searchParams } = new URL(request.url)
@@ -43,25 +43,21 @@ export default function BatchOpprett_index() {
   const now = new Date()
   const lastYear = now.getFullYear() - 1
 
-
   return (
     <div>
-      <Heading size="large" spacing>Lever samboeropplysning til Skattedirektoratet</Heading>
+      <Heading size="large" spacing>
+        Lever samboeropplysning til Skattedirektoratet
+      </Heading>
       <BodyLong spacing>
-        Finner personer som har vært samboere i behandlingsåret og oppretter data som kan overleveres til Skattedirektoratet.
+        Finner personer som har vært samboere i behandlingsåret og oppretter data som kan overleveres til
+        Skattedirektoratet.
       </BodyLong>
       <Form action="." method="POST">
         <Label as="p" spacing>
           Behandlingsår
         </Label>
         <p>
-          <input
-            defaultValue={lastYear}
-            aria-label="År"
-            name="behandlingsAr"
-            type="number"
-            placeholder="År"
-          />
+          <input defaultValue={lastYear} aria-label="År" name="behandlingsAr" type="number" placeholder="År" />
         </p>
 
         <p>
@@ -75,7 +71,6 @@ export default function BatchOpprett_index() {
         visAnsvarligTeamSoek={false}
         behandlingerResponse={behandlinger}
       />
-
     </div>
   )
 }

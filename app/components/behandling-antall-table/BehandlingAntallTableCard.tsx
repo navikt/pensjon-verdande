@@ -1,7 +1,7 @@
-import type { BehandlingAntall } from '~/types'
-import { Box } from '@navikt/ds-react'
 import { NumberListIcon } from '@navikt/aksel-icons'
+import { Box } from '@navikt/ds-react'
 import BehandlingAntallTable from '~/components/behandling-antall-table/BehandlingAntallTable'
+import type { BehandlingAntall } from '~/types'
 
 type Props = {
   behandlingAntall: BehandlingAntall[]
@@ -9,12 +9,7 @@ type Props = {
 
 export function BehandlingAntallTableCard(props: Props) {
   return (
-    <Box.New
-      background={"raised"}
-      borderRadius="medium"
-      shadow="dialog"
-      style={{ padding: '6px' }}
-    >
+    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
       <Box.New>
         <div style={{ float: 'left', textAlign: 'center' }}>
           <NumberListIcon

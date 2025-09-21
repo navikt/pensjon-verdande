@@ -1,9 +1,8 @@
 import { type ActionFunctionArgs, useLoaderData } from 'react-router'
-
-import { getBehandlinger } from '~/services/behandling.server'
+import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 import { requireAccessToken } from '~/services/auth.server'
-import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -31,6 +30,10 @@ export default function BehandlingerStatus() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
   return (
-    <BehandlingerTable visStatusSoek={true} visBehandlingTypeSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
+    <BehandlingerTable
+      visStatusSoek={true}
+      visBehandlingTypeSoek={false}
+      behandlingerResponse={behandlinger as BehandlingerPage}
+    />
   )
 }
