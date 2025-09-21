@@ -17,16 +17,13 @@ import { useMemo, useState } from 'react'
 import { type LoaderFunctionArgs, NavLink, useLoaderData, useRevalidator } from 'react-router'
 import invariant from 'tiny-invariant'
 import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
-import { requireAccessToken } from '~/services/auth.server'
 import { getDetaljertFremdrift } from '~/services/behandling.server'
 import type { BehandlingDetaljertFremdriftDTO } from '~/types'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
-  const accessToken = await requireAccessToken(request)
-
-  const detaljertFremdrift = await getDetaljertFremdrift(accessToken, +params.behandlingId)
+  const detaljertFremdrift = await getDetaljertFremdrift(request, +params.behandlingId)
 
   invariant(detaljertFremdrift, 'Behandlingen hadde ikke en detaljertFremdrift')
 

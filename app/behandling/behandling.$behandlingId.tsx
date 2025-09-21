@@ -104,9 +104,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  let detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null = null
+  let detaljertFremdrift: Promise<DetaljertFremdriftDTO | undefined> | undefined
   if (behandling._links?.avhengigeBehandlinger) {
-    detaljertFremdrift = getDetaljertFremdrift(accessToken, behandling.behandlingId)
+    detaljertFremdrift = getDetaljertFremdrift(request, behandling.behandlingId)
   }
 
   return {

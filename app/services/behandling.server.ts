@@ -1,7 +1,7 @@
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
 import type { KalenderHendelser, KalenderHendelserDTO } from '~/components/kalender/types'
-import { apiGet, type RequestCtx } from '~/services/api.server'
+import { apiGet, apiGetOrUndefined, type RequestCtx } from '~/services/api.server'
 import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
 import type {
@@ -16,45 +16,12 @@ import type {
   SchedulerStatusResponse,
 } from '~/types'
 
-export async function getSchedulerStatus(accessToken: string): Promise<SchedulerStatusResponse | null> {
-  const response = await fetch(`${env.penUrl}/api/behandling/scheduler-status`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    throw data(
-      {
-        message: 'Feil ved henting av schedulerstatus',
-        detail: await response.text(),
-      },
-      {
-        status: response.status,
-      },
-    )
-  } else {
-    return (await response.json()) as SchedulerStatusResponse
-  }
+export async function getSchedulerStatus(request: Request): Promise<SchedulerStatusResponse> {
+  return await apiGet<SchedulerStatusResponse>('/api/behandling/scheduler-status', request)
 }
 
-export async function getDashboardSummary(accessToken: string): Promise<DashboardResponse | null> {
-  const response = await fetch(`${env.penUrl}/api/behandling/dashboard-summary`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as DashboardResponse
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av dashboard oppsummering. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+export async function getDashboardSummary(request: Request): Promise<DashboardResponse> {
+  return apiGet<DashboardResponse>('/api/behandling/dashboard-summary', request)
 }
 
 export async function getBehandlinger(
@@ -217,42 +184,17 @@ export async function getBehandling(accessToken: string, behandlingId: string): 
 }
 
 export async function getDetaljertFremdrift(
-  accessToken: string,
+  request: Request,
   forrigeBehandlingId: number,
-): Promise<DetaljertFremdriftDTO | null> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${forrigeBehandlingId}/detaljertfremdrift`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as DetaljertFremdriftDTO
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av detaljer fremdrift. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+): Promise<DetaljertFremdriftDTO | undefined> {
+  return await apiGetOrUndefined<DetaljertFremdriftDTO>(
+    `/api/behandling/${forrigeBehandlingId}/detaljertfremdrift`,
+    request,
+  )
 }
 
-export async function getIkkeFullforteAktiviteter(accessToken: string, behandlingId: number) {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as IkkeFullforteAktiviteterDTO
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av detaljer fremdrift. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+export async function getIkkeFullforteAktiviteter(request: Request, behandlingId: number) {
+  return await apiGet<IkkeFullforteAktiviteterDTO>(`/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`, request)
 }
 
 export async function fortsettBehandling(
@@ -479,12 +421,12 @@ export async function henBehandlingManuell(
 }
 
 export async function hentKalenderHendelser(
-  ctx: RequestCtx,
+  request: Request,
   { fom, tom }: { fom: Date; tom: Date },
 ): Promise<KalenderHendelser> {
   const dto = await apiGet<KalenderHendelserDTO>(
     `/api/behandling/kalender-hendelser?fom=${asLocalDateString(fom)}&tom=${asLocalDateString(tom)}`,
-    ctx,
+    request,
   )
 
   return mapKalenderHendelser(dto)

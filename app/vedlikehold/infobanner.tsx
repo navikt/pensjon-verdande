@@ -19,13 +19,13 @@ import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 import type { ActionFunctionArgs } from 'react-router'
 import { Form, useFetcher, useLoaderData } from 'react-router'
+import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
-import { hentInfoBanner, oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
+import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-  return await hentInfoBanner(accessToken)
+  return await apiGet<Infobanner>('/api/verdande/infobanner', request)
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {

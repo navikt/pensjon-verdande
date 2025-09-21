@@ -86,22 +86,6 @@ export const getVedtakIOppdrag = async (accessToken: string, vedtakId: string): 
   }
 }
 
-export const hentInfoBanner = async (accessToken: string): Promise<Infobanner> => {
-  const response = await fetch(`${env.penUrl}/api/verdande/infobanner`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as Infobanner
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
-  }
-}
-
 export const hentMot = async (
   accessToken: string,
   fomYear: FormDataEntryValue,

@@ -46,7 +46,7 @@ import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
 export interface Props {
   aldeBehandlingUrlTemplate?: string
   behandling: BehandlingDto
-  detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null
+  detaljertFremdrift?: Promise<DetaljertFremdriftDTO | undefined | null> | null
   psakSakUrlTemplate: string
 }
 

@@ -12,13 +12,11 @@ import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
-import { requireAccessToken } from '~/services/auth.server'
 import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
 import type { Route } from '../../.react-router/types/app/dashboard/+types/route'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-  const dashboardResponse = getDashboardSummary(accessToken)
+  const dashboardResponse = getDashboardSummary(request)
   if (!dashboardResponse) {
     throw new Response('Not Found', { status: 404 })
   }
@@ -33,13 +31,10 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
   return {
     loadingDashboardResponse: dashboardResponse,
-    kalenderHendelser: await hentKalenderHendelser(
-      { accessToken: accessToken },
-      {
-        fom: forsteDato,
-        tom: sisteDato,
-      },
-    ),
+    kalenderHendelser: await hentKalenderHendelser(request, {
+      fom: forsteDato,
+      tom: sisteDato,
+    }),
     startDato: startDato,
   }
 }

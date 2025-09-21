@@ -1,25 +1,10 @@
 import { data } from 'react-router'
 import type { BrukerResponse, MeResponse, Tilgangsmeta } from '~/brukere/brukere'
+import { apiGet } from '~/services/api.server'
 import { env } from '~/services/env.server'
 
-export async function hentTilgangskontrollMeta(accessToken: string) {
-  const response = await fetch(`${env.penUrl}/api/behandling/brukere/tilgangsmeta`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (
-      (await response.json()) as {
-        tilgangsmeta: Tilgangsmeta[]
-      }
-    ).tilgangsmeta
-  } else {
-    throw new Error(`Feil ved henting av tilgangsmeta fra pen. Feil var\n${await response.text()}`)
-  }
+export async function hentTilgangskontrollMeta(request: Request) {
+  return apiGet<Tilgangsmeta[]>('/api/behandling/brukere/tilgangsmeta', request)
 }
 
 export async function hentBrukere(accessToken: string) {
@@ -45,44 +30,12 @@ export async function hentBrukere(accessToken: string) {
   }
 }
 
-export async function hentMe(accessToken: string) {
-  const response = await fetch(`${env.penUrl}/api/behandling/brukere/me`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    throw data(
-      {
-        message: "Feil ved henting av 'me' bruker fra pen",
-        detail: await response.text(),
-      },
-      {
-        status: response.status,
-      },
-    )
-  } else {
-    return (await response.json()) as MeResponse
-  }
+export async function hentMe(request: Request) {
+  return apiGet<MeResponse>('/api/behandling/brukere/me', request)
 }
 
-export async function hentBruker(accessToken: string, brukerIdent: string) {
-  const response = await fetch(`${env.penUrl}/api/behandling/brukere?brukernavn=${encodeURI(brukerIdent)}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as BrukerResponse
-  } else {
-    throw new Error(`Feil ved henting av bruker fra pen. Feil var\n${await response.text()}`)
-  }
+export async function hentBruker(request: Request, brukerIdent: string) {
+  return apiGet<BrukerResponse>(`/api/behandling/brukere?brukernavn=${encodeURI(brukerIdent)}`, request)
 }
 
 export async function giBrukerTilgang(accessToken: string, brukernavn: string, operasjon: string) {

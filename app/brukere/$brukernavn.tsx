@@ -31,11 +31,9 @@ export async function action({ params, request }: ActionFunctionArgs) {
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.brukernavn, 'Missing brukernavn param')
 
-  const accesstoken = await requireAccessToken(request)
-
   return {
-    bruker: params.brukernavn === 'me' ? await hentMe(accesstoken) : await hentBruker(accesstoken, params.brukernavn),
-    tilgangskontrollmeta: await hentTilgangskontrollMeta(accesstoken),
+    bruker: params.brukernavn === 'me' ? await hentMe(request) : await hentBruker(request, params.brukernavn),
+    tilgangskontrollmeta: await hentTilgangskontrollMeta(request),
     readOnly: params.brukernavn === 'me', // hack -- må styres av pen
   }
 }
