@@ -1,5 +1,4 @@
 import { env } from '~/services/env.server'
-import type { StartBatchResponse } from '~/types'
 
 export async function opprettOpptjeningsendringArligUttrekk(accessToken: string): Promise<StartBatchResponse> {
   const response = await fetch(`${env.penUrl}/api/opptjening/arliguttrekk/opprett`, {
@@ -16,4 +15,8 @@ export async function opprettOpptjeningsendringArligUttrekk(accessToken: string)
   } else {
     throw new Error()
   }
+}
+
+type StartBatchResponse = {
+  behandlingId: number
 }

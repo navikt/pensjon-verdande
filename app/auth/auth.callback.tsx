@@ -15,7 +15,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       headers: { 'Set-Cookie': await commitSession(session) },
     })
   } catch (error) {
-    logger.error('Feil ved autentisering', error)
+    logger.error({ err: error }, 'Feil ved autentisering')
 
     if (error instanceof Response) {
       throw error

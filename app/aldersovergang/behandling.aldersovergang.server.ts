@@ -1,6 +1,5 @@
 import { data } from 'react-router'
 import { env } from '~/services/env.server'
-import type { StartBatchResponse } from '~/types'
 
 export async function opprettAldersovergang(
   accessToken: string,
@@ -55,4 +54,8 @@ export type MuligeAldersovergangerResponse = {
   maneder: string[]
   erBegrensUtplukkLovlig: boolean
   kanOverstyreBehandlingsmaned: boolean
+}
+
+type StartBatchResponse = {
+  behandlingId: number
 }

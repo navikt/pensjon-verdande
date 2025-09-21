@@ -1,6 +1,5 @@
 import { data } from 'react-router'
 import { env } from '~/services/env.server'
-import type { StartBatchResponse } from '~/types'
 
 export async function startVurderSamboereBatch(accessToken: string, beregningsAr: number): Promise<StartBatchResponse> {
   const response = await fetch(`${env.penUrl}/api/samboer/vurder-samboere/batch`, {
@@ -23,4 +22,8 @@ export async function startVurderSamboereBatch(accessToken: string, beregningsAr
       status: response.status,
     })
   }
+}
+
+type StartBatchResponse = {
+  behandlingId: number
 }

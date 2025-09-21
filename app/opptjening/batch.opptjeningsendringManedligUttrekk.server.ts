@@ -1,5 +1,4 @@
 import { env } from '~/services/env.server'
-import type { StartBatchResponse } from '~/types'
 
 export async function opprettOpptjeningsendringMandeligUttrekk(
   accessToken: string,
@@ -22,4 +21,8 @@ export async function opprettOpptjeningsendringMandeligUttrekk(
   } else {
     throw new Error()
   }
+}
+
+type StartBatchResponse = {
+  behandlingId: number
 }

@@ -1,5 +1,4 @@
 import { env } from '~/services/env.server'
-import type { StartBatchResponse } from '~/types'
 
 export const opprettOppdaterSakBehandlingPEN = async (accessToken: string, startDato: string) => {
   const response = await fetch(`${env.penUrl}/api/oppdatersakstatus/behandling`, {
@@ -19,4 +18,8 @@ export const opprettOppdaterSakBehandlingPEN = async (accessToken: string, start
   } else {
     throw new Error()
   }
+}
+
+type StartBatchResponse = {
+  behandlingId: number
 }

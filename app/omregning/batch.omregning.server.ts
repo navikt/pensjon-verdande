@@ -6,8 +6,11 @@ import type {
   OmregningRequest,
   OmregningSakerPage,
   OmregningStatistikkPage,
-  StartBatchResponse,
 } from '~/types'
+
+type StartBatchResponse = {
+  behandlingId: number
+}
 
 export async function opprettOmregningbehandling(
   accessToken: string,

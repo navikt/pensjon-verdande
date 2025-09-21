@@ -1,5 +1,8 @@
 import { env } from '~/services/env.server'
-import type { StartBatchResponse } from '~/types'
+
+type StartBatchResponse = {
+  behandlingId: number
+}
 
 export async function opprettBpen014(
   accessToken: string,

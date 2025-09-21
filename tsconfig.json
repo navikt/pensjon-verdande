@@ -1,5 +1,5 @@
 {
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [".react-router/types/**/*", "**/*.ts", "**/*.tsx", "types/**/*.d.ts"],
   "compilerOptions": {
     "target": "ES2022",
     "module": "ES2022",
@@ -11,7 +11,8 @@
 
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "#server-build": ["types/build-server.d.ts"]
     },
 
     "strict": true,
@@ -22,6 +23,8 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-    "noEmit": true
+    "noEmit": true,
+
+    "rootDirs": [".", "./.react-router/types"]
   }
 }
