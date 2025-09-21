@@ -2,10 +2,6 @@ import { Heading, HGrid, VStack } from '@navikt/ds-react'
 import type { ActionFunctionArgs } from 'react-router'
 import { redirect, useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import EndreKjoreLopTilBehandlinger from '~/components/regulering/regulering-endre-kjore-lop'
-import FortsettAvhengigeReguleringBehandlinger from '~/components/regulering/regulering-fortsett-avhengige'
-import ReguleringOrkestrering from '~/components/regulering/regulering-orkestrering'
-import ReguleringUttrekk from '~/components/regulering/regulering-uttrekk'
 import {
   endreKjorelopIverksettVedtakBehandlinger,
   fortsettAvhengigeBehandling,
@@ -15,6 +11,10 @@ import {
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import EndreKjoreLopTilBehandlinger from './regulering-endre-kjore-lop'
+import FortsettAvhengigeReguleringBehandlinger from './regulering-fortsett-avhengige'
+import ReguleringOrkestrering from './regulering-orkestrering'
+import ReguleringUttrekk from './regulering-uttrekk'
 
 export const startReguleringUttrekkFormAction = 'startReguleringUttrekk'
 export const startReguleringOrkestreringFormAction = 'startReguleringOrkestrering'
