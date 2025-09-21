@@ -1,65 +1,58 @@
-import { useState } from 'react'
-import { Form, useSubmit } from 'react-router'
+import { Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { Form, useNavigation } from 'react-router'
+import { fortsettAvhengigeFormAction } from '~/regulering/batch.regulering'
 
 export default function FortsettAvhengigeReguleringBehandlinger() {
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
-    const form = (e.target as HTMLButtonElement).form
-    if (form) {
-      await submit(form)
-      setIsClicked(true)
-    }
-  }
+  const formAction = fortsettAvhengigeFormAction
+
+  const navigation = useNavigation()
+  const isSubmitting =
+    navigation.state === 'submitting' && (navigation.formData?.get('formType') as string | null) === formAction
+
   const status = ['FEILENDE', 'UTSATTE', 'ALLE']
   const reguleringTyper = ['FAMILIE', 'IVERKSETT_VEDTAK']
 
   return (
-    <div>
-      <h2>Fortsett Regulering behandling(er)</h2>
-      <Form method="POST">
-        <input type="hidden" name="formType" value="fortsettAvhengige" />
-        <p>
-          OrkestreringsId &nbsp;
-          <input
-            defaultValue=""
-            aria-label="BehandlingIdRegulering"
-            name="behandlingIdRegulering"
-            type="text"
-            placeholder="BehandlingId for Orkestreringsbehandling"
-          />
-        </p>
-        <p>
-          Behandlingstype &nbsp;
-          <select name="reguleringBehandlingType">
-            <option value={reguleringTyper[0]}>{reguleringTyper[0]}</option>
-            <option value={reguleringTyper[1]}>{reguleringTyper[1]}</option>
-          </select>
-        </p>
-        <p>
-          Antall &nbsp;
-          <input
-            defaultValue="10"
-            aria-label="AntallBehandlinger"
-            name="antallBehandlinger"
-            type="text"
-            placeholder="Maks antall behandlinger (-1 for alle)"
-          />
-        </p>
-        <p>
-          Behandlingsstatus &nbsp;
-          <select name="behandlingStatusType">
-            <option value={status[0]}>{status[0]}</option>
-            <option value={status[1]}>{status[1]}</option>
-            <option value={status[2]}>{status[2]}</option>
-          </select>
-        </p>
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Fortsett
-          </button>
-        </p>
-      </Form>
-    </div>
+    <Form method="post" style={{ width: '25em' }}>
+      <VStack gap="4">
+        <Heading level="2" size="medium">
+          Fortsett Regulering behandling(er)
+        </Heading>
+
+        <TextField
+          aria-label="BehandlingIdRegulering"
+          defaultValue=""
+          label="OrkestreringsId"
+          name="behandlingIdRegulering"
+          placeholder="BehandlingId for Orkestreringsbehandling"
+          size="medium"
+          type="text"
+        />
+
+        <Select name="reguleringBehandlingType" label="Behandlingstype" size="medium">
+          <option value={reguleringTyper[0]}>{reguleringTyper[0]}</option>
+          <option value={reguleringTyper[1]}>{reguleringTyper[1]}</option>
+        </Select>
+
+        <TextField
+          aria-label="AntallBehandlinger"
+          defaultValue="10"
+          label="Antall"
+          name="antallBehandlinger"
+          placeholder="Maks antall behandlinger (-1 for alle)"
+          size="medium"
+          type="text"
+        />
+
+        <Select label="Behandlingsstatus" name="behandlingStatusType" size="medium">
+          <option value={status[0]}>{status[0]}</option>
+          <option value={status[1]}>{status[1]}</option>
+          <option value={status[2]}>{status[2]}</option>
+        </Select>
+        <Button loading={isSubmitting} name="formType" size="medium" type="submit" value={formAction}>
+          Fortsett
+        </Button>
+      </VStack>
+    </Form>
   )
 }

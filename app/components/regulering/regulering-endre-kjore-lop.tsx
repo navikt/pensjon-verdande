@@ -1,46 +1,42 @@
-import { useState } from 'react'
-import { Form, useSubmit } from 'react-router'
+import { Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { Form, useNavigation } from 'react-router'
+import { endreKjorelopFormAction } from '~/regulering/batch.regulering'
 
 export default function EndreKjoreLopTilBehandlinger() {
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
-    const form = (e.target as HTMLButtonElement).form
-    if (form) {
-      await submit(form)
-      setIsClicked(true)
-    }
-  }
+  const formAction = endreKjorelopFormAction
+
+  const navigation = useNavigation()
+  const isSubmitting =
+    navigation.state === 'submitting' && (navigation.formData?.get('formType') as string | null) === formAction
+
   const iverksettVedtaksmodus = ['ONLINE', 'HPEN']
 
   return (
-    <div>
-      <h2>Endre kjøreløpet til resterende vedtak</h2>
-      <Form method="POST">
-        <input type="hidden" name="formType" value="endreKjorelop" />
-        <p>
-          OrkestreringsId &nbsp;
-          <input
-            defaultValue=""
-            aria-label="BehandlingIdRegulering"
-            name="behandlingIdRegulering"
-            type="text"
-            placeholder="BehandlingId for Orkestreringsbehandling"
-          />
-        </p>
-        <p>
-          Velg kjøreløp &nbsp;
-          <select name="velgKjoreLop">
-            <option value={iverksettVedtaksmodus[0]}>{iverksettVedtaksmodus[0]}</option>
-            <option value={iverksettVedtaksmodus[1]}>{iverksettVedtaksmodus[1]}</option>
-          </select>
-        </p>
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Endre
-          </button>
-        </p>
-      </Form>
-    </div>
+    <Form method="post" style={{ width: '25em' }}>
+      <VStack gap="4">
+        <Heading level="2" size="medium">
+          Endre kjøreløpet til resterende vedtak
+        </Heading>
+
+        <TextField
+          aria-label="BehandlingIdRegulering"
+          defaultValue=""
+          label="OrkestreringsId"
+          name="behandlingIdRegulering"
+          placeholder="BehandlingId for Orkestreringsbehandling"
+          size="medium"
+          type="text"
+        />
+
+        <Select label="Velg kjøreløp" name="velgKjoreLop" size="medium">
+          <option value={iverksettVedtaksmodus[0]}>{iverksettVedtaksmodus[0]}</option>
+          <option value={iverksettVedtaksmodus[1]}>{iverksettVedtaksmodus[1]}</option>
+        </Select>
+
+        <Button loading={isSubmitting} name="formType" size="medium" type="submit" value={formAction}>
+          Endre
+        </Button>
+      </VStack>
+    </Form>
   )
 }

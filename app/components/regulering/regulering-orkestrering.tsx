@@ -1,52 +1,55 @@
-import { useState } from 'react'
-import { Form, useSubmit } from 'react-router'
+import { Button, Heading, TextField, VStack } from '@navikt/ds-react'
+import { Form, useNavigation } from 'react-router'
+import { startReguleringOrkestreringFormAction } from '~/regulering/batch.regulering'
 
 export default function ReguleringOrkestrering() {
-  const [isClicked, setIsClicked] = useState(false)
-  const submit = useSubmit()
-  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
-    const form = (e.target as HTMLButtonElement).form
-    if (form) {
-      await submit(form)
-      setIsClicked(true)
-    }
-  }
+  const formAction = startReguleringOrkestreringFormAction
+
+  const navigation = useNavigation()
+  const isSubmitting =
+    navigation.state === 'submitting' && (navigation.formData?.get('formType') as string | null) === formAction
 
   return (
-    <div>
-      <h2>Start Orkestrering</h2>
-      <Form method="POST">
-        <input type="hidden" name="formType" value="startReguleringOrkestrering" />
-        <p>
-          Satsdato &nbsp;
-          <input defaultValue="2025-05-01" aria-label="Satsdato" name="satsDato" type="text" placeholder="Satsdato" />
-        </p>
-        <p>
-          Reguleringsdato &nbsp;
-          <input
-            defaultValue="2025-05-01"
-            aria-label="Reguleringsdato"
-            name="reguleringsDato"
-            type="text"
-            placeholder="Reguleringsdato"
-          />
-        </p>
-        <p>
-          Opprett maks antall familiebehandlinger &nbsp;
-          <input
-            defaultValue="10"
-            aria-label="MaxFamiliebehandlinger"
-            name="maxFamiliebehandlinger"
-            type="text"
-            placeholder="Maks antall familiebehandlinger (-1 for alle)"
-          />
-        </p>
-        <p>
-          <button type="submit" disabled={isClicked} onClick={handleSubmit}>
-            Start
-          </button>
-        </p>
-      </Form>
-    </div>
+    <Form method="post" style={{ width: '25em' }}>
+      <VStack gap="4">
+        <Heading level="2" size="medium">
+          Start Orkestrering
+        </Heading>
+
+        <TextField
+          aria-label="Satsdato"
+          defaultValue="2025-05-01"
+          label="Satsdato"
+          name="satsDato"
+          placeholder="Satsdato"
+          size="medium"
+          type="text"
+        />
+
+        <TextField
+          aria-label="Reguleringsdato"
+          defaultValue="2025-05-01"
+          label="Reguleringsdato"
+          name="reguleringsDato"
+          placeholder="Reguleringsdato"
+          size="medium"
+          type="text"
+        />
+
+        <TextField
+          aria-label="MaxFamiliebehandlinger"
+          defaultValue="10"
+          label="Opprett maks antall familiebehandlinger"
+          name="maxFamiliebehandlinger"
+          placeholder="Maks antall familiebehandlinger (-1 for alle)"
+          size="medium"
+          type="text"
+        />
+
+        <Button loading={isSubmitting} type="submit" name="formType" value={formAction} size="medium">
+          Start
+        </Button>
+      </VStack>
+    </Form>
   )
 }
