@@ -11,8 +11,7 @@
 
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"],
-      "#server-build": ["types/build-server.d.ts"]
+      "~/*": ["./app/*"]
     },
 
     "strict": true,

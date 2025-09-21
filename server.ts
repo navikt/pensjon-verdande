@@ -1,7 +1,7 @@
 import { createRequestHandler } from '@react-router/express'
 import compression from 'compression'
 import express, { type Request, type Response } from 'express'
-import build from '#server-build'
+import * as build from "./build/server/index.js"
 
 const app = express();
 
