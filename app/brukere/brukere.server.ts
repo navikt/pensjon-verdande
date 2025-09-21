@@ -4,7 +4,11 @@ import { apiGet } from '~/services/api.server'
 import { env } from '~/services/env.server'
 
 export async function hentTilgangskontrollMeta(request: Request) {
-  return apiGet<Tilgangsmeta[]>('/api/behandling/brukere/tilgangsmeta', request)
+  return (
+    await apiGet<{
+      tilgangsmeta: Tilgangsmeta[]
+    }>('/api/behandling/brukere/tilgangsmeta', request)
+  ).tilgangsmeta
 }
 
 export async function hentBrukere(accessToken: string) {

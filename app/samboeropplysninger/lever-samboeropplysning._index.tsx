@@ -1,5 +1,5 @@
-import { BodyLong, Button, Heading, Label } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, redirect, useLoaderData } from 'react-router'
+import { BodyShort, Button, Heading, TextField, VStack } from '@navikt/ds-react'
+import { type ActionFunctionArgs, Form, useLoaderData, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { startVurderSamboereBatch } from '~/samboeropplysninger/samboeropplysninger.server'
 import { requireAccessToken } from '~/services/auth.server'
@@ -30,39 +30,46 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
-  console.log('formData', formData)
 
   const accessToken = await requireAccessToken(request)
   await startVurderSamboereBatch(accessToken, +updates.behandlingsAr)
-  return redirect('.')
 }
 
 export default function BatchOpprett_index() {
   const { behandlinger } = useLoaderData<typeof loader>()
+  const navigation = useNavigation()
+  const isSubmitting = navigation.state === 'submitting'
 
   const now = new Date()
   const lastYear = now.getFullYear() - 1
 
   return (
-    <div>
-      <Heading size="large" spacing>
-        Lever samboeropplysning til Skattedirektoratet
-      </Heading>
-      <BodyLong spacing>
-        Finner personer som har vært samboere i behandlingsåret og oppretter data som kan overleveres til
-        Skattedirektoratet.
-      </BodyLong>
-      <Form action="." method="POST">
-        <Label as="p" spacing>
-          Behandlingsår
-        </Label>
-        <p>
-          <input defaultValue={lastYear} aria-label="År" name="behandlingsAr" type="number" placeholder="År" />
-        </p>
+    <VStack gap="8">
+      <VStack gap="4">
+        <Heading size="medium">Lever samboeropplysning til Skattedirektoratet</Heading>
 
-        <p>
-          <Button type="submit">Opprett</Button>
-        </p>
+        <BodyShort>
+          Finner personer som har vært samboere i behandlingsåret og oppretter data som kan overleveres til
+          Skattedirektoratet.
+        </BodyShort>
+      </VStack>
+
+      <Form method="post" style={{ width: '20em' }}>
+        <VStack gap="4">
+          <TextField
+            label="Behandlingsår"
+            defaultValue={lastYear}
+            aria-label="År"
+            name="behandlingsAr"
+            size="medium"
+            type="number"
+            placeholder="År"
+          />
+
+          <Button loading={isSubmitting} size="medium" type="submit">
+            Opprett
+          </Button>
+        </VStack>
       </Form>
 
       <BehandlingerTable
@@ -71,6 +78,6 @@ export default function BatchOpprett_index() {
         visAnsvarligTeamSoek={false}
         behandlingerResponse={behandlinger}
       />
-    </div>
+    </VStack>
   )
 }
