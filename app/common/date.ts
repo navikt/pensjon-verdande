@@ -90,10 +90,10 @@ export function fmtDateTime(iso?: string | null) {
   }
 }
 
-export function relativeFromNow(iso?: string | null) {
+export function relativeFromNow(iso: string | null, nowIso: string) {
   if (!iso) return ''
   const d = new Date(iso)
-  const diffMs = Date.now() - d.getTime()
+  const diffMs = new Date(nowIso).getTime() - d.getTime()
   const minutes = Math.round(Math.abs(diffMs) / 60000)
   if (minutes < 1) return 'nå'
   if (minutes < 60) return `${minutes} min`
@@ -103,11 +103,11 @@ export function relativeFromNow(iso?: string | null) {
   return `${days} d`
 }
 
-export function formatBehandlingstid(fromIso?: string | null, toIso?: string | null, nowIso?: string) {
+export function formatBehandlingstid(fromIso: string | null, toIso: string | null, nowIso: string) {
   if (!fromIso) return { display: '–', title: '' }
 
   const start = new Date(fromIso)
-  const end = toIso ? new Date(toIso) : new Date(nowIso ?? Date.now())
+  const end = toIso ? new Date(toIso) : new Date(nowIso)
   const diffMs = Math.max(0, end.getTime() - start.getTime())
 
   const totalSeconds = Math.floor(diffMs / 1000)
@@ -135,8 +135,10 @@ export function formatBehandlingstid(fromIso?: string | null, toIso?: string | n
     display = `${totalDays} d${remHours > 0 ? ` ${remHours} t` : ''}`
   } else if (totalHours >= 1) {
     display = `${totalHours} t${remMinutes > 0 ? ` ${remMinutes} min` : ''}`
+  } else if (totalMinutes >= 1) {
+    display = `${totalMinutes} min${remSeconds > 0 ? ` ${remSeconds} s` : ''}`
   } else {
-    display = `${Math.max(1, remMinutes)} min`
+    display = `${totalSeconds} s`
   }
 
   const hh = String(remHours).padStart(2, '0')

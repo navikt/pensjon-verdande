@@ -429,7 +429,7 @@ function BehandlingCard({
           <KV
             label="Siste kjøring"
             value={fmtDateTime(b.sisteKjoring)}
-            hint={relativeFromNow(b.sisteKjoring)}
+            hint={relativeFromNow(b.sisteKjoring, nowIso)}
             fixedWidthCh={20}
             noWrap
           />
@@ -536,7 +536,7 @@ function KV({
     <VStack gap="1" className={css.kv}>
       <Detail>{label}</Detail>
       <HStack gap="2" style={style}>
-        <BodyShort>{value}</BodyShort>
+        <BodyShort as={'div'}>{value}</BodyShort>
         {hint && (
           <Detail className={css.hint}>
             <ClockDashedIcon aria-hidden className={css.iconAlign} />
