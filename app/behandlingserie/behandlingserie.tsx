@@ -65,7 +65,7 @@ export default function BehandlingOpprett_index() {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [behandlingType, setBehandlingType] = useState(searchParams.get('behandlingType') || '');
-    const behandlingTyper = ['FinnSakerSomSkalAvsluttes', 'ReguleringUttrekk'];
+    const behandlingTyper = ['AvsluttSaker', 'ReguleringUttrekk'];
 
     const handleBehandlingType = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value;
