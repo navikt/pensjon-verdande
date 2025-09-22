@@ -33,6 +33,8 @@ type OpenConfirmationModalType =
   | 'fortsettNyAvviksgrenser'
   | 'fortsettFaktoromregningsmodus'
   | 'fortsettFeilhandteringmodus'
+  | 'endrePrioritetTilOnline'
+  | 'endrePrioritetTilBatch'
 
 export default function AdministrerTilknyttetdeBehandlinger() {
   const { uttrekk, avviksgrenser } = useOutletContext<ReguleringDetaljer>()
@@ -46,6 +48,8 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   const fetcherNyAvviksgrenser = useFetcher()
   const fetcherFaktoromregningsmodus = useFetcher()
   const fetcherFeilhandteringmodus = useFetcher()
+  const fetcherEndrePrioritetTilOnline = useFetcher()
+  const fetcherEndrePrioritetTilBatch = useFetcher()
 
   // On Mount
   useEffect(() => {
@@ -156,6 +160,30 @@ export default function AdministrerTilknyttetdeBehandlinger() {
     )
   }
 
+  function endrePrioritetTilOnline() {
+    setOpenConfirmationModal(null)
+    fetcherEndrePrioritetTilOnline.submit(
+      {},
+      {
+        action: 'endrePrioritetOnline',
+        method: 'PUT',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  function endrePrioritetTilBatch() {
+    setOpenConfirmationModal(null)
+    fetcherEndrePrioritetTilBatch.submit(
+      {},
+      {
+        action: 'endrePrioritetBatch',
+        method: 'PUT',
+        encType: 'application/json',
+      },
+    )
+  }
+
   return (
     <VStack gap="5">
       <HStack gap="3">
@@ -251,6 +279,41 @@ export default function AdministrerTilknyttetdeBehandlinger() {
                 }
               >
                 Kjør i feilhåndteringsmodus ({antallFeilendeBeregnytelser})
+              </Dropdown.Menu.List.Item>
+            </Dropdown.Menu.List>
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown>
+          <Button
+            icon={<ChevronDownIcon />}
+            iconPosition="right"
+            as={Dropdown.Toggle}
+            variant="secondary"
+            size="small"
+            loading={
+              fetcherEndrePrioritetTilOnline.state === 'submitting' ||
+              fetcherEndrePrioritetTilBatch.state === 'submitting'
+            }
+          >
+            Endre prioritet
+          </Button>
+          <Dropdown.Menu>
+            <Dropdown.Menu.List>
+              <Dropdown.Menu.List.Item
+                as={Button}
+                onClick={() =>
+                  setOpenConfirmationModal('endrePrioritetTilOnline')
+                }
+              >
+                Endre til ONLINE
+              </Dropdown.Menu.List.Item>
+              <Dropdown.Menu.List.Item
+                as={Button}
+                onClick={() =>
+                  setOpenConfirmationModal('endrePrioritetTilBatch')
+                }
+              >
+                Endre til BATCH
               </Dropdown.Menu.List.Item>
             </Dropdown.Menu.List>
           </Dropdown.Menu>
@@ -375,6 +438,22 @@ export default function AdministrerTilknyttetdeBehandlinger() {
         showModal={openConfirmationModal === 'fortsettFeilhandteringmodus'}
         onOk={() => {
           fortsettFeilhandteringmodus()
+        }}
+        onCancel={() => setOpenConfirmationModal(null)}
+      />
+      <ConfirmationModal
+        text="Er du sikker på at du endre prioritet til ONLINE? Dette vil endre på prioriteten til alle familiebehandlinger som ikke er fullført, og medføre at resterende vedtak blir iverksatt på ONLINE-kø hos Oppdrag."
+        showModal={openConfirmationModal === 'endrePrioritetTilOnline'}
+        onOk={() => {
+          endrePrioritetTilOnline()
+        }}
+        onCancel={() => setOpenConfirmationModal(null)}
+      />
+      <ConfirmationModal
+        text="Er du sikker på at du endre prioritet til BATCH? Dette vil endre på prioriteten til alle familiebehandlinger som ikke er fullført, og medføre at resterende vedtak blir iverksatt på BATCH-kø hos Oppdrag (HPEN)."
+        showModal={openConfirmationModal === 'endrePrioritetTilBatch'}
+        onOk={() => {
+          endrePrioritetTilBatch()
         }}
         onCancel={() => setOpenConfirmationModal(null)}
       />

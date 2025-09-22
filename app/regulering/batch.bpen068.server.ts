@@ -109,12 +109,9 @@ export async function fortsettAvhengigeBehandling(
 }
 export async function endreKjorelopIverksettVedtakBehandlinger(
   accessToken: string,
-  behandlingIdRegulering: string,
   velgKjoreLop: string,
 ): Promise<FortsettBatchResponse> {
-
   const requestBody = {
-    behandlingId: behandlingIdRegulering,
     velgKjoreLop: velgKjoreLop,
   }
 

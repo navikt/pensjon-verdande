@@ -6,7 +6,11 @@ import type {
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
 import { env } from '~/services/env.server'
-import type { DetaljertFremdriftDTO } from '~/types'
+import type {
+  DetaljertFremdriftDTO,
+  EndreKjorelopIverksettVedtakResponse,
+  FortsettBatchResponse,
+} from '~/types'
 
 export async function avbrytBehandlinger(action: 'avbrytBehandlingerFeiletMotPOPP' | 'avbrytBehandlingerFeiletIBeregnYtelse' | null, accessToken: string) {
   let urlPostfix: string
@@ -173,6 +177,46 @@ export const fortsettNyeavviksgrenser = async(
   )
 
   return true
+}
+
+export const endrePrioritetTilOnline = async (
+  accessToken: string,
+) => {
+  const response = await fetch(
+    `${env.penUrl}/api/vedtak/regulering/endre/prioritet/online`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  return {
+    success: response.ok,
+  }
+}
+
+export const endrePrioritetTilBatch = async (
+  accessToken: string,
+) => {
+  const response = await fetch(
+    `${env.penUrl}/api/vedtak/regulering/endre/prioritet/batch`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  return {
+    success: response.ok,
+  }
 }
 
 export const getReguleringDetaljer = async (
