@@ -33,7 +33,7 @@ export async function hentSkattehendelserManuelt(
   sekvensnr: number[],
   accessToken: string,
 ): Promise<HentSkattehendelserManueltResponse> {
-  const response = await fetch(`${env.penUrl}/api/kjor-hendelser-manuelt`, {
+  const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser/kjor-hendelser-manuelt`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
