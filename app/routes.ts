@@ -23,6 +23,8 @@ export default [
 
     route('batch/reguleringv2', 'regulering/batch.reguleringv2.tsx', [
       route('administrerbehandlinger', 'regulering/batch.reguleringv2.administrerbehandlinger.tsx', [
+        route('endrePrioritetBatch', 'regulering/batch.reguleringv2.administrerbehandlinger.endrePrioritetBatch.tsx'),
+        route('endrePrioritetOnline', 'regulering/batch.reguleringv2.administrerbehandlinger.endrePrioritetOnline.tsx'),
         route(
           'hentTotaloversiktBehandlinger/:behandlingId',
           'regulering/batch.reguleringv2.administrerbehandlinger.hentTotaloversiktBehandlinger.$behandlingId.tsx',

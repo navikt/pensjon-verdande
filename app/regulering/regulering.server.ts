@@ -133,6 +133,36 @@ export const fortsettNyeavviksgrenser = async (accessToken: string) => {
   return true
 }
 
+export const endrePrioritetTilBatch = async (accessToken: string) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/endre/prioritet/batch`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  return {
+    success: response.ok,
+  }
+}
+
+export const endrePrioritetTilOnline = async (accessToken: string) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/endre/prioritet/online`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  return {
+    success: response.ok,
+  }
+}
+
 export const getReguleringDetaljer = async (accessToken: string): Promise<ReguleringDetaljer> => {
   const url = new URL(`${env.penUrl}/api/vedtak/regulering/detaljer`)
   const response = await fetch(url.toString(), {

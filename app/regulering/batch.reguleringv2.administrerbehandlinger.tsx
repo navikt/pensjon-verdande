@@ -17,6 +17,8 @@ import type {
 import type { DetaljertFremdriftDTO } from '~/types'
 
 type OpenConfirmationModalType =
+  | 'endrePrioritetTilBatch'
+  | 'endrePrioritetTilOnline'
   | 'fortsettFeilendeFamiliereguleringer'
   | 'fortsettFamilieReguleringerTilBehandling'
   | 'fortsettFeilendeIverksettVedtak'
@@ -30,6 +32,8 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   const uttrekkBehandlingId = uttrekk?.behandlingId
 
   const fetcher = useFetcher()
+  const fetcherEndrePrioritetTilBatch = useFetcher()
+  const fetcherEndrePrioritetTilOnline = useFetcher()
   const fetcherFortsettFeilendeFamilieReguleringer = useFetcher()
   const fetcherFortsettFamilieReguleringerTilBehandling = useFetcher()
   const fetcherFortsettFeilendeIverksettVedtak = useFetcher()
@@ -140,6 +144,30 @@ export default function AdministrerTilknyttetdeBehandlinger() {
     )
   }
 
+  function endrePrioritetTilOnline() {
+    setOpenConfirmationModal(null)
+    fetcherEndrePrioritetTilOnline.submit(
+      {},
+      {
+        action: 'endrePrioritetOnline',
+        method: 'PUT',
+        encType: 'application/json',
+      },
+    )
+  }
+
+  function endrePrioritetTilBatch() {
+    setOpenConfirmationModal(null)
+    fetcherEndrePrioritetTilBatch.submit(
+      {},
+      {
+        action: 'endrePrioritetBatch',
+        method: 'PUT',
+        encType: 'application/json',
+      },
+    )
+  }
+
   return (
     <VStack gap="5">
       <HStack gap="3">
@@ -211,6 +239,31 @@ export default function AdministrerTilknyttetdeBehandlinger() {
                 onClick={() => setOpenConfirmationModal('fortsettFeilhandteringmodus')}
               >
                 Kjør i feilhåndteringsmodus ({antallFeilendeBeregnytelser})
+              </Dropdown.Menu.List.Item>
+            </Dropdown.Menu.List>
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown>
+          <Button
+            icon={<ChevronDownIcon />}
+            iconPosition="right"
+            as={Dropdown.Toggle}
+            variant="secondary"
+            size="small"
+            loading={
+              fetcherEndrePrioritetTilOnline.state === 'submitting' ||
+              fetcherEndrePrioritetTilBatch.state === 'submitting'
+            }
+          >
+            Endre prioritet
+          </Button>
+          <Dropdown.Menu>
+            <Dropdown.Menu.List>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('endrePrioritetTilOnline')}>
+                Endre til ONLINE
+              </Dropdown.Menu.List.Item>
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('endrePrioritetTilBatch')}>
+                Endre til BATCH
               </Dropdown.Menu.List.Item>
             </Dropdown.Menu.List>
           </Dropdown.Menu>
@@ -313,6 +366,22 @@ export default function AdministrerTilknyttetdeBehandlinger() {
         showModal={openConfirmationModal === 'fortsettFeilhandteringmodus'}
         onOk={() => {
           fortsettFeilhandteringmodus()
+        }}
+        onCancel={() => setOpenConfirmationModal(null)}
+      />
+      <ConfirmationModal
+        text="Er du sikker på at du endre prioritet til ONLINE? Dette vil endre på prioriteten til alle familiebehandlinger som ikke er fullført, og medføre at resterende vedtak blir iverksatt på ONLINE-kø hos Oppdrag."
+        showModal={openConfirmationModal === 'endrePrioritetTilOnline'}
+        onOk={() => {
+          endrePrioritetTilOnline()
+        }}
+        onCancel={() => setOpenConfirmationModal(null)}
+      />
+      <ConfirmationModal
+        text="Er du sikker på at du endre prioritet til BATCH? Dette vil endre på prioriteten til alle familiebehandlinger som ikke er fullført, og medføre at resterende vedtak blir iverksatt på BATCH-kø hos Oppdrag (HPEN)."
+        showModal={openConfirmationModal === 'endrePrioritetTilBatch'}
+        onOk={() => {
+          endrePrioritetTilBatch()
         }}
         onCancel={() => setOpenConfirmationModal(null)}
       />

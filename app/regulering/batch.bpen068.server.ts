@@ -1,5 +1,5 @@
 import { env } from '~/services/env.server'
-import type { EndreKjorelopIverksettVedtakResponse, FortsettBatchResponse } from '~/types'
+import type { FortsettBatchResponse } from '~/types'
 
 export async function startReguleringUttrekk(
   accessToken: string,
@@ -95,33 +95,6 @@ export async function fortsettAvhengigeBehandling(
     throw new Error()
   }
 }
-export async function endreKjorelopIverksettVedtakBehandlinger(
-  accessToken: string,
-  behandlingIdRegulering: string,
-  velgKjoreLop: string,
-): Promise<FortsettBatchResponse> {
-  const requestBody = {
-    behandlingId: behandlingIdRegulering,
-    velgKjoreLop: velgKjoreLop,
-  }
-
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/endre/iverksettvedtak`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify(requestBody),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as EndreKjorelopIverksettVedtakResponse
-  } else {
-    throw new Error()
-  }
-}
-
 type StartBatchResponse = {
   behandlingId: number
 }
