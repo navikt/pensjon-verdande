@@ -40,8 +40,8 @@ const indentPx = (level: number) => Math.max(0, (level - 1) * 16)
 
 type SortKey = 'level' | 'code' | 'progress' | 'errors'
 const sorters: Record<SortKey, (a: BehandlingDetaljertFremdriftDTO, b: BehandlingDetaljertFremdriftDTO) => number> = {
-  level: (a, b) => a.level - b.level || a.behandlingCode.localeCompare(b.behandlingCode),
-  code: (a, b) => a.behandlingCode.localeCompare(b.behandlingCode),
+  level: (a, b) => a.level - b.level || a.behandlingCode.localeCompare(b.behandlingCode, 'nb', { sensitivity: 'base' }),
+  code: (a, b) => a.behandlingCode.localeCompare(b.behandlingCode, 'nb', { sensitivity: 'base' }),
   progress: (a, b) => pct(b.ferdig, b.totalt) - pct(a.ferdig, a.totalt),
   errors: (a, b) => b.feilende - a.feilende,
 }

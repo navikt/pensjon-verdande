@@ -47,7 +47,7 @@ function ManglendeForeignKeyIndexerTable({
     if (aVal == null && bVal != null) return -1
     if (aVal != null && bVal == null) return 1
     if (aVal == null && bVal == null) return 0
-    return String(aVal).localeCompare(String(bVal))
+    return String(aVal).localeCompare(String(bVal), 'nb', { sensitivity: 'base' })
   }
 
   const sortedData = [...manglendeForeignKeyIndexer].sort((a, b) => {

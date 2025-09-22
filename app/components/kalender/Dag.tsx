@@ -118,7 +118,7 @@ export default function Dag(props: Props) {
   function visDagensBehandlingerMedBegrensning(maksAntall: number = 5) {
     const dagens = props.kalenderHendelser.kalenderBehandlinger
       .filter((b) => isSameDay(new Date(b.kjoreDato), props.dato))
-      .sort((a, b) => a.kjoreDato.localeCompare(b.kjoreDato))
+      .sort((a, b) => a.kjoreDato.localeCompare(b.kjoreDato, 'nb', { sensitivity: 'base' }))
 
     const behandlingerSomVises = dagens.length > maksAntall ? dagens.slice(0, maksAntall - 1) : dagens
 

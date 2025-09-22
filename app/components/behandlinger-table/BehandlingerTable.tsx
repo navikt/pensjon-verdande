@@ -126,7 +126,7 @@ export default function BehandlingerTable({
         {ekstraBehandlingType}
 
         {behandlingerResponse.behandlingTyper
-          ?.sort((a, b) => decodeBehandling(a).localeCompare(decodeBehandling(b)))
+          ?.sort((a, b) => decodeBehandling(a).localeCompare(decodeBehandling(b), 'nb', { sensitivity: 'base' }))
           .map((type) => {
             return (
               <option key={type} value={type}>
