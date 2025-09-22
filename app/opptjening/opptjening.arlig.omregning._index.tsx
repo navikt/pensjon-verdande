@@ -1,5 +1,5 @@
 import { Button, Heading, Page } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation, } from 'react-router'
+import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/batch.opptjeningsendringArligUttrekk.server'
 import { requireAccessToken } from '~/services/auth.server'
 

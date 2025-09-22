@@ -7,23 +7,20 @@ export async function opprettBpen096(
   dryRun: boolean,
   debug: boolean,
 ): Promise<StartBatchResponse> {
-  const response = await fetch(
-    `${env.penUrl}/api/hentSkattehendelser`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify({
-        maksAntallSekvensnummer: maksAntallSekvensnummer,
-        sekvensnummerPerBehandling: sekvensnummerPerBehandling,
-        dryRun: dryRun,
-        debug: debug
-      }),
+  const response = await fetch(`${env.penUrl}/api/hentSkattehendelser`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+    body: JSON.stringify({
+      maksAntallSekvensnummer: maksAntallSekvensnummer,
+      sekvensnummerPerBehandling: sekvensnummerPerBehandling,
+      dryRun: dryRun,
+      debug: debug,
+    }),
+  })
 
   if (response.ok) {
     return (await response.json()) as StartBatchResponse
@@ -32,21 +29,21 @@ export async function opprettBpen096(
   }
 }
 
-export async function hentSkattehendelserManuelt(sekvensnr: number[], accessToken: string): Promise<HentSkattehendelserManueltResponse> {
-  const response = await fetch(
-    `${env.penUrl}/api/kjor-hendelser-manuelt`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify({
-        sekvensnummer: sekvensnr,
-      }),
+export async function hentSkattehendelserManuelt(
+  sekvensnr: number[],
+  accessToken: string,
+): Promise<HentSkattehendelserManueltResponse> {
+  const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser/kjor-hendelser-manuelt`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+    body: JSON.stringify({
+      sekvensnummer: sekvensnr,
+    }),
+  })
 
   if (response.ok) {
     return (await response.json()) as HentSkattehendelserManueltResponse
@@ -56,17 +53,14 @@ export async function hentSkattehendelserManuelt(sekvensnr: number[], accessToke
 }
 
 export async function hentAntallSkattehendelser(accessToken: string): Promise<HentAntallSkattehendelserResponse> {
-  const response = await fetch(
-    `${env.penUrl}/api/hentSkattehendelser/antall`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
+  const response = await fetch(`${env.penUrl}/api/hentSkattehendelser/antall`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+  })
 
   if (response.ok) {
     return (await response.json()) as HentAntallSkattehendelserResponse

@@ -4,17 +4,14 @@ import { createCookie, type LoaderFunctionArgs, Outlet, useLoaderData } from 're
 import { hentMe } from '~/brukere/brukere.server'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
-import { requireAccessToken } from '~/services/auth.server'
 import { getSchedulerStatus } from '~/services/behandling.server'
 import { env } from '~/services/env.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
   const darkmodeCookie = await createCookie('darkmode').parse(request.headers.get('cookie'))
   const darkmode = darkmodeCookie === 'true' || darkmodeCookie === true
 
-  const [me, schedulerStatus] = await Promise.all([hentMe(accessToken), getSchedulerStatus(accessToken)])
+  const [me, schedulerStatus] = await Promise.all([hentMe(request), getSchedulerStatus(request)])
 
   return {
     env: env.env,

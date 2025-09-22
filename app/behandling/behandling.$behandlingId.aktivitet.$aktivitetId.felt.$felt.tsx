@@ -2,8 +2,8 @@ import type { LoaderFunctionArgs } from 'react-router'
 import { useLoaderData } from 'react-router'
 
 import invariant from 'tiny-invariant'
-import { apiGetOrUndefined } from '~/services/api.server'
 import { buildUrl } from '~/common/build-url'
+import { apiGetOrUndefined } from '~/services/api.server'
 
 const AKSEPTERTE_FELTER = ['input', 'message', 'output'] as const
 
@@ -21,10 +21,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Error(`Ukjent felt '${String(felt)}'`)
   }
 
-  const url = buildUrl(
-    '/api/behandling/{behandlingId}/aktivitet/{aktivitetId}/{felt}' as const,
-    { behandlingId, aktivitetId, felt },
-  )
+  const url = buildUrl('/api/behandling/{behandlingId}/aktivitet/{aktivitetId}/{felt}' as const, {
+    behandlingId,
+    aktivitetId,
+    felt,
+  })
 
   const value = await apiGetOrUndefined<string>(url, request)
 
@@ -36,9 +37,5 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 export default function Felt() {
   const { value } = useLoaderData<typeof loader>()
 
-  return (
-    <pre>
-      {JSON.stringify(value, null, 2)}
-    </pre>
-  )
+  return <pre>{JSON.stringify(value, null, 2)}</pre>
 }

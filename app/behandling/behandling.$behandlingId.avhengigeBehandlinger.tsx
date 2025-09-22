@@ -1,18 +1,16 @@
-import type { LoaderFunctionArgs } from 'react-router';
-import { Await, useLoaderData } from 'react-router';
-
-import { getAvhengigeBehandlinger } from '~/services/behandling.server'
-
-import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
-import AvhengigeBehandlingerElement from '~/components/behandling/avhengige-behandlinger/AvhengigeBehandlingerElement'
-import { Suspense } from 'react'
 import { Skeleton } from '@navikt/ds-react'
+import { Suspense } from 'react'
+import type { LoaderFunctionArgs } from 'react-router'
+import { Await, useLoaderData } from 'react-router'
+import invariant from 'tiny-invariant'
+import AvhengigeBehandlingerElement from '~/components/behandling/avhengige-behandlinger/AvhengigeBehandlingerElement'
+import { requireAccessToken } from '~/services/auth.server'
+import { getAvhengigeBehandlinger } from '~/services/behandling.server'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
-  const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url)
 
   const accessToken = await requireAccessToken(request)
 
@@ -30,8 +28,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   )
 
   return {
-      avhengigeBehandlinger,
-    }
+    avhengigeBehandlinger,
+  }
 }
 
 export default function AvhengigeBehandlinger() {
@@ -40,7 +38,7 @@ export default function AvhengigeBehandlinger() {
   return (
     <Suspense fallback={<Skeleton variant="text" width="100%" />}>
       <Await resolve={avhengigeBehandlinger}>
-        {(it) => <AvhengigeBehandlingerElement avhengigeBehandlinger={it}/>}
+        {(it) => <AvhengigeBehandlingerElement avhengigeBehandlinger={it} />}
       </Await>
     </Suspense>
   )

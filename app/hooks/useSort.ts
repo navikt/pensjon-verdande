@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
 import { isAfter } from 'date-fns'
+import { useMemo, useState } from 'react'
 
 type OverrideSortFunc<T extends object> = Record<string, (a: T, b: T) => number>
 
@@ -7,10 +7,7 @@ interface Options {
   sortDecending?: boolean
 }
 
-function getA<Object extends object, Key extends keyof Object>(
-  object: Object,
-  path: Key,
-) {
+function getA<Object extends object, Key extends keyof Object>(object: Object, path: Key) {
   return object[path]
 }
 export const defaultSortFunc =
@@ -37,11 +34,7 @@ export const defaultSortFunc =
   }
 
 export const getSortFunc =
-  <T extends object>(
-    sortKey: keyof T,
-    sortDecending: boolean,
-    overrides: OverrideSortFunc<T>,
-  ) =>
+  <T extends object>(sortKey: keyof T, sortDecending: boolean, overrides: OverrideSortFunc<T>) =>
   (a: T, b: T) => {
     if (Object.keys(overrides).includes(sortKey as string)) {
       return getA(overrides, sortKey as string)(a, b) * (sortDecending ? -1 : 1)
@@ -86,14 +79,9 @@ export const useSort = <T extends object>(
   options: Options = {},
 ) => {
   const [sortKey, setSortKey] = useState<keyof T>(initialSortKey)
-  const [sortDecending, setSortDecending] = useState<boolean>(
-    options.sortDecending ?? true,
-  )
+  const [sortDecending, setSortDecending] = useState<boolean>(options.sortDecending ?? true)
 
-  const sortFunc = useMemo(
-    () => getSortFunc<T>(sortKey, sortDecending, overrides),
-    [sortKey, sortDecending, overrides],
-  )
+  const sortFunc = useMemo(() => getSortFunc<T>(sortKey, sortDecending, overrides), [sortKey, sortDecending, overrides])
 
   const onSort = (newSortKey?: string) => {
     if (!newSortKey) return

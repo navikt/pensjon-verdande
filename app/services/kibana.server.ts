@@ -1,5 +1,5 @@
-import type { BehandlingDto } from '~/types'
 import { env } from '~/services/env.server'
+import type { BehandlingDto } from '~/types'
 
 export function kibanaLink(behandling: BehandlingDto) {
   const application = env.penApplication

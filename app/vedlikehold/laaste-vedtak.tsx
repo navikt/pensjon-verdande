@@ -1,7 +1,12 @@
-import type { ActionFunctionArgs } from 'react-router'
-import { Link, useFetcher, useLoaderData, useSearchParams } from 'react-router'
-
-import { requireAccessToken } from '~/services/auth.server'
+import {
+  CheckmarkCircleIcon,
+  CogRotationIcon,
+  ExclamationmarkTriangleIcon,
+  HeadCloudIcon,
+  MenuElipsisVerticalIcon,
+  PersonSuitIcon,
+  XMarkOctagonIcon,
+} from '@navikt/aksel-icons'
 import {
   Alert,
   BodyLong,
@@ -22,19 +27,15 @@ import {
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
-import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import React, { useEffect, useState } from 'react'
-import {
-  CheckmarkCircleIcon,
-  CogRotationIcon,
-  ExclamationmarkTriangleIcon,
-  HeadCloudIcon,
-  MenuElipsisVerticalIcon,
-  PersonSuitIcon,
-  XMarkOctagonIcon,
-} from '@navikt/aksel-icons'
+import type { ActionFunctionArgs } from 'react-router'
+import { Link, useFetcher, useLoaderData, useSearchParams } from 'react-router'
+import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
+import { useSort } from '~/hooks/useSort'
+import { requireAccessToken } from '~/services/auth.server'
+import type { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import {
   type LaasteVedtakBehandlingSummary,
   type LaasteVedtakRow,
@@ -43,8 +44,6 @@ import {
   muligeAksjonspunkt,
   type VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'
-import { useSort } from '~/hooks/useSort'
-import type { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import { getLaasteVedtakSummary } from '~/vedlikehold/vedlikehold.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -53,11 +52,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const aksjonspunkt = searchParams.get('aksjonspunkt')
 
   const accessToken = await requireAccessToken(request)
-  const laasteVedtakSummary = await getLaasteVedtakSummary(
-    accessToken,
-    team,
-    aksjonspunkt,
-  )
+  const laasteVedtakSummary = await getLaasteVedtakSummary(accessToken, team, aksjonspunkt)
   if (!laasteVedtakSummary) {
     throw new Response('Not Found', { status: 404 })
   }
@@ -66,19 +61,14 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
 export default function LaasteVedtakPage() {
   const laasteVedtakSummary = useLoaderData() as LaasteVedtakUttrekkSummary
-  const [uttrekkStatus, setUttrekkStatus] =
-    useState<LaasteVedtakUttrekkStatus | null>(
-      laasteVedtakSummary.uttrekkStatus,
-    )
-  const [avansertVisning, setAvansertVisning] = useState(false)
-  const [laasOppVedtak, setLaasOppVedtak] = useState<LaasteVedtakRow | null>(
-    null,
+  const [uttrekkStatus, setUttrekkStatus] = useState<LaasteVedtakUttrekkStatus | null>(
+    laasteVedtakSummary.uttrekkStatus,
   )
-  const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] =
-    useState<LaasteVedtakRow | null>(null)
+  const [avansertVisning, setAvansertVisning] = useState(false)
+  const [laasOppVedtak, setLaasOppVedtak] = useState<LaasteVedtakRow | null>(null)
+  const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] = useState<LaasteVedtakRow | null>(null)
 
-  const { sortKey, onSort, sortFunc, sortDecending } =
-    useSort<LaasteVedtakRow>('endretDato')
+  const { sortKey, onSort, sortFunc, sortDecending } = useSort<LaasteVedtakRow>('endretDato')
   const sortedLaasteVedtak: LaasteVedtakRow[] = React.useMemo(() => {
     return laasteVedtakSummary.laasteVedtak.sort(sortFunc)
   }, [laasteVedtakSummary.laasteVedtak, sortFunc])
@@ -89,29 +79,24 @@ export default function LaasteVedtakPage() {
         <HStack align="center" justify="center" gap="2">
           <Heading size="large">Låste vedtak</Heading>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
-            <Detail>
-              Antall låst: {laasteVedtakSummary.laasteVedtak.length}
-            </Detail>
+            <Detail>Antall låst: {laasteVedtakSummary.laasteVedtak.length}</Detail>
           )}
 
           <div style={{ marginLeft: 'auto' }}>
             <HStack gap="4" align="center">
               {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
                 <Alert variant="success" size="small" inline>
-                  Sist kjørt:{' '}
-                  {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}
+                  Sist kjørt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}
                 </Alert>
               )}
               {laasteVedtakSummary.uttrekkStatus?.isFeilet && (
                 <Alert variant="error" size="small" inline>
-                  Uttrekk feilet. Sist forsøkt:{' '}
-                  {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}{' '}
+                  Uttrekk feilet. Sist forsøkt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}{' '}
                 </Alert>
               )}
               {uttrekkStatus?.isFerdig === false && (
                 <Alert variant="info" size="small" inline>
-                  Kjører aktivitet:{' '}
-                  {uttrekkStatus?.aktivitet ?? 'Behandling starter...'}
+                  Kjører aktivitet: {uttrekkStatus?.aktivitet ?? 'Behandling starter...'}
                 </Alert>
               )}
               <RunUttrekk
@@ -130,10 +115,7 @@ export default function LaasteVedtakPage() {
               <HStack gap="4" align="end" justify="start">
                 <VelgTeam />
                 <VelgAksjonspunkt />
-                <Switch
-                  checked={avansertVisning}
-                  onChange={() => setAvansertVisning(!avansertVisning)}
-                >
+                <Switch checked={avansertVisning} onChange={() => setAvansertVisning(!avansertVisning)}>
                   Avansert visning
                 </Switch>
               </HStack>
@@ -210,32 +192,19 @@ export default function LaasteVedtakPage() {
                   <Table.Body>
                     {sortedLaasteVedtak.map((vedtak) => (
                       <Table.Row key={vedtak.kravId}>
-                        <Table.DataCell>
-                          {formatIsoDate(vedtak.datoRegistrert)}
-                        </Table.DataCell>
+                        <Table.DataCell>{formatIsoDate(vedtak.datoRegistrert)}</Table.DataCell>
                         <Table.DataCell>
                           {laasteVedtakSummary.behandlingId && (
-                            <AnsvarligTeam
-                              behandlingId={laasteVedtakSummary.behandlingId}
-                              vedtak={vedtak}
-                            />
+                            <AnsvarligTeam behandlingId={laasteVedtakSummary.behandlingId} vedtak={vedtak} />
                           )}
                         </Table.DataCell>
                         <Table.DataCell>
-                          <CopyButton
-                            copyText={vedtak.sakId}
-                            text={vedtak.sakId}
-                            size="small"
-                          />
+                          <CopyButton copyText={vedtak.sakId} text={vedtak.sakId} size="small" />
                         </Table.DataCell>
                         {avansertVisning && (
                           <Table.DataCell>
                             {vedtak.vedtakId !== null && (
-                              <CopyButton
-                                copyText={vedtak.vedtakId}
-                                text={vedtak.vedtakId}
-                                size="small"
-                              />
+                              <CopyButton copyText={vedtak.vedtakId} text={vedtak.vedtakId} size="small" />
                             )}
                           </Table.DataCell>
                         )}
@@ -244,10 +213,7 @@ export default function LaasteVedtakPage() {
                             {vedtak.sakType}{' '}
                             {vedtak.isAutomatisk ? (
                               <Tooltip content="Automatisk krav">
-                                <HeadCloudIcon
-                                  color="DeepSkyBlue"
-                                  fontSize="16"
-                                />
+                                <HeadCloudIcon color="DeepSkyBlue" fontSize="16" />
                               </Tooltip>
                             ) : (
                               <Tooltip content="Manuelt krav">
@@ -258,53 +224,29 @@ export default function LaasteVedtakPage() {
                         </Table.DataCell>
                         <Table.DataCell>
                           {vedtak.behandlinger.length > 0 && (
-                            <Behandlinger
-                              kravid={vedtak.kravId}
-                              behandlinger={vedtak.behandlinger}
-                            />
+                            <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />
                           )}
                         </Table.DataCell>
                         <Table.DataCell>{vedtak.vedtakStatus}</Table.DataCell>
-                        {avansertVisning && (
-                          <Table.DataCell>{vedtak.vedtaksType}</Table.DataCell>
-                        )}
-                        {avansertVisning && (
-                          <Table.DataCell>
-                            {formatIsoDate(vedtak.virkFom)}
-                          </Table.DataCell>
-                        )}
-                        {avansertVisning && (
-                          <Table.DataCell>{vedtak.kravGjelder}</Table.DataCell>
-                        )}
-                        {avansertVisning && (
-                          <Table.DataCell>{vedtak.kravStatus}</Table.DataCell>
-                        )}
+                        {avansertVisning && <Table.DataCell>{vedtak.vedtaksType}</Table.DataCell>}
+                        {avansertVisning && <Table.DataCell>{formatIsoDate(vedtak.virkFom)}</Table.DataCell>}
+                        {avansertVisning && <Table.DataCell>{vedtak.kravGjelder}</Table.DataCell>}
+                        {avansertVisning && <Table.DataCell>{vedtak.kravStatus}</Table.DataCell>}
                         {avansertVisning && (
                           <Table.DataCell>
-                            {vedtak.opprettetAv}{' '}
-                            {vedtak.endretAv && `/${vedtak.endretAv}`}
+                            {vedtak.opprettetAv} {vedtak.endretAv && `/${vedtak.endretAv}`}
                           </Table.DataCell>
                         )}
-                        <Table.DataCell>
-                          {formatIsoDate(vedtak.opprettetDato)}
-                        </Table.DataCell>
-                        <Table.DataCell>
-                          {formatIsoDate(vedtak.endretDato)}
-                        </Table.DataCell>
+                        <Table.DataCell>{formatIsoDate(vedtak.opprettetDato)}</Table.DataCell>
+                        <Table.DataCell>{formatIsoDate(vedtak.endretDato)}</Table.DataCell>
                         <Table.DataCell>
                           {laasteVedtakSummary.behandlingId !== null && (
-                            <Kommentar
-                              behandlingId={laasteVedtakSummary.behandlingId}
-                              vedtak={vedtak}
-                            />
+                            <Kommentar behandlingId={laasteVedtakSummary.behandlingId} vedtak={vedtak} />
                           )}
                         </Table.DataCell>
                         <Table.DataCell>
                           {laasteVedtakSummary.behandlingId !== null && (
-                            <Aksjonspunkt
-                              behandlingId={laasteVedtakSummary.behandlingId}
-                              vedtak={vedtak}
-                            />
+                            <Aksjonspunkt behandlingId={laasteVedtakSummary.behandlingId} vedtak={vedtak} />
                           )}
                         </Table.DataCell>
                         <Table.DataCell>
@@ -312,9 +254,7 @@ export default function LaasteVedtakPage() {
                             <VedtakDropdown
                               vedtak={vedtak}
                               onAapneLaasVedtak={() => setLaasOppVedtak(vedtak)}
-                              onAapneVerifiserOppdragsmeldingManuelt={() =>
-                                setVerifiserOppdragsmeldingManuelt(vedtak)
-                              }
+                              onAapneVerifiserOppdragsmeldingManuelt={() => setVerifiserOppdragsmeldingManuelt(vedtak)}
                             />
                           )}
                         </Table.DataCell>
@@ -327,20 +267,13 @@ export default function LaasteVedtakPage() {
           )}
           {laasteVedtakSummary.uttrekkStatus?.isFeilet === true && (
             <VStack>
-              <Heading size="medium">
-                {laasteVedtakSummary.uttrekkStatus?.feilmelding}
-              </Heading>
+              <Heading size="medium">{laasteVedtakSummary.uttrekkStatus?.feilmelding}</Heading>
               <Detail>{laasteVedtakSummary.uttrekkStatus?.stackTrace}</Detail>
             </VStack>
           )}
         </HStack>
       </VStack>
-      {laasOppVedtak !== null && (
-        <LaasOppVedtakModal
-          vedtak={laasOppVedtak}
-          onClose={() => setLaasOppVedtak(null)}
-        />
-      )}
+      {laasOppVedtak !== null && <LaasOppVedtakModal vedtak={laasOppVedtak} onClose={() => setLaasOppVedtak(null)} />}
       {verifiserOppdragsmeldingManuelt !== null && (
         <VerifiserOppdragsmeldingManueltModal
           vedtak={verifiserOppdragsmeldingManuelt}
@@ -351,10 +284,7 @@ export default function LaasteVedtakPage() {
         behandlingId={laasteVedtakSummary.behandlingId}
         uttrekkStatus={uttrekkStatus}
         setUttrekkStatus={setUttrekkStatus}
-        shouldAutoReload={
-          !laasteVedtakSummary?.uttrekkStatus?.isFerdig &&
-          !laasteVedtakSummary.uttrekkStatus?.isFeilet
-        }
+        shouldAutoReload={!laasteVedtakSummary?.uttrekkStatus?.isFerdig && !laasteVedtakSummary.uttrekkStatus?.isFeilet}
       />
     </div>
   )
@@ -372,13 +302,7 @@ function RunUttrekk({ isFerdig }: { isFerdig: boolean }) {
   )
 }
 
-function AnsvarligTeam({
-  behandlingId,
-  vedtak,
-}: {
-  behandlingId: string
-  vedtak: LaasteVedtakRow
-}) {
+function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string; vedtak: LaasteVedtakRow }) {
   const fetcher = useFetcher()
 
   function oppdaterTeam(nyttTeam: string) {
@@ -410,26 +334,18 @@ function AnsvarligTeam({
         <option value="" disabled>
           Velg et alternativ
         </option>
-        {(Object.entries(Team) as [keyof typeof Team, string][]).map(
-          ([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ),
-        )}
+        {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
+          <option key={key} value={key}>
+            {label}
+          </option>
+        ))}
       </Select>
       {fetcher.state === 'submitting' && <Loader size="xsmall" />}
     </HStack>
   )
 }
 
-function Aksjonspunkt({
-  behandlingId,
-  vedtak,
-}: {
-  behandlingId: string
-  vedtak: LaasteVedtakRow
-}) {
+function Aksjonspunkt({ behandlingId, vedtak }: { behandlingId: string; vedtak: LaasteVedtakRow }) {
   const fetcher = useFetcher()
 
   function oppdaterAksjonspunkt(nyttAksjonspunkt: string) {
@@ -483,25 +399,15 @@ function VedtakDropdown({
 }) {
   return (
     <Dropdown>
-      <Button
-        size="small"
-        variant="tertiary"
-        icon={<MenuElipsisVerticalIcon />}
-        as={Dropdown.Toggle}
-      />
+      <Button size="small" variant="tertiary" icon={<MenuElipsisVerticalIcon />} as={Dropdown.Toggle} />
       <Dropdown.Menu>
         <Dropdown.Menu.GroupedList>
           {vedtak.opplaasVedtakInformasjon !== null && (
-            <Dropdown.Menu.GroupedList.Item onClick={onAapneLaasVedtak}>
-              Lås opp
-            </Dropdown.Menu.GroupedList.Item>
+            <Dropdown.Menu.GroupedList.Item onClick={onAapneLaasVedtak}>Lås opp</Dropdown.Menu.GroupedList.Item>
           )}
           {(vedtak.vedtakStatus === 'Samordnet' ||
-            (vedtak.vedtakStatus === 'Til iverksettelse' &&
-              vedtak.opprettetAv === 'REGULERING')) && (
-            <Dropdown.Menu.GroupedList.Item
-              onClick={onAapneVerifiserOppdragsmeldingManuelt}
-            >
+            (vedtak.vedtakStatus === 'Til iverksettelse' && vedtak.opprettetAv === 'REGULERING')) && (
+            <Dropdown.Menu.GroupedList.Item onClick={onAapneVerifiserOppdragsmeldingManuelt}>
               Verifiser oppdragsmelding manuelt
             </Dropdown.Menu.GroupedList.Item>
           )}
@@ -511,13 +417,7 @@ function VedtakDropdown({
   )
 }
 
-function LaasOppVedtakModal({
-  vedtak,
-  onClose,
-}: {
-  vedtak: LaasteVedtakRow
-  onClose: () => void
-}) {
+function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow; onClose: () => void }) {
   const fetcher = useFetcher()
 
   function laasOppVedtak() {
@@ -550,47 +450,34 @@ function LaasOppVedtakModal({
       <Modal.Body>
         <VStack gap="5">
           <BodyLong>
-            Er du sikker på at du vil låse opp vedtaket? Dette fører til
-            merarbeid for saksbehandler, sørg for at fag er innvolvert og at
-            saksbehandler får nødvendig informasjon.
+            Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
+            innvolvert og at saksbehandler får nødvendig informasjon.
           </BodyLong>
           <BodyLong weight="semibold">
-            Team {decodeTeam(vedtak.team)} må gjøre vurdering på hva som skal
-            til for å unngå dette i fremtiden.
+            Team {decodeTeam(vedtak.team)} må gjøre vurdering på hva som skal til for å unngå dette i fremtiden.
           </BodyLong>
           <Heading size="small">Dette vil skje:</Heading>
           <List as="ul">
             {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak !== null && (
               <List.Item title="Sammenstøtende vedtak">
-                Vedtaket har sammenstøtende vedtak i sak{' '}
-                {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak.sakId}.
+                Vedtaket har sammenstøtende vedtak i sak {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak.sakId}.
                 Dette vedtaket må også låses opp.
               </List.Item>
             )}
             {vedtak.opplaasVedtakInformasjon?.harBehandling && (
-              <List.Item title="Behandling">
-                Vedtaket har en pågående behandling. Denne vil bli stoppet.
-              </List.Item>
+              <List.Item title="Behandling">Vedtaket har en pågående behandling. Denne vil bli stoppet.</List.Item>
             )}
             {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
               <List.Item title="Automatisk vedtak">
-                Kravet har behandlings type automatisk. Det vil endret til
-                manuell, oppgave blir opprettet.
+                Kravet har behandlings type automatisk. Det vil endret til manuell, oppgave blir opprettet.
               </List.Item>
             )}
-            <List.Item title="Endring av vedtakstatus">
-              Vedtakstatus vil bli endret til "Til Attestering"
-            </List.Item>
+            <List.Item title="Endring av vedtakstatus">Vedtakstatus vil bli endret til "Til Attestering"</List.Item>
           </List>
         </VStack>
       </Modal.Body>
       <Modal.Footer>
-        <Button
-          type="button"
-          loading={fetcher.state === 'submitting'}
-          variant="danger"
-          onClick={laasOppVedtak}
-        >
+        <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={laasOppVedtak}>
           Lås opp
         </Button>
         <Button type="button" variant="secondary" onClick={onClose}>
@@ -601,13 +488,7 @@ function LaasOppVedtakModal({
   )
 }
 
-function VerifiserOppdragsmeldingManueltModal({
-  vedtak,
-  onClose,
-}: {
-  vedtak: LaasteVedtakRow
-  onClose: () => void
-}) {
+function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow; onClose: () => void }) {
   const submitFetcher = useFetcher()
   const [oppdragsmeldingOk, setOppdragsmeldingOk] = useState(false)
 
@@ -639,23 +520,16 @@ function VerifiserOppdragsmeldingManueltModal({
   const vedtakIOppdrag = fetcher.data as VedtakYtelsekomponenter | undefined
 
   return (
-    <Modal
-      header={{ heading: 'Verifiser oppdragsmelding manuelt' }}
-      open={true}
-      onClose={onClose}
-      width={1000}
-    >
+    <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
       <Modal.Body>
         <VStack gap="5">
           <BodyLong>
-            Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er
-            oppdatert. Må verifiseres manuelt.
+            Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>
 
           {fetcher.state === 'loading' && (
             <HStack gap="2">
-              <Loader size="small" />{' '}
-              <Detail>Henter ytelsekomponenter...</Detail>
+              <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
             </HStack>
           )}
 
@@ -669,19 +543,13 @@ function VerifiserOppdragsmeldingManueltModal({
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {vedtakIOppdrag?.ytelsekomponenterOversendtOppdrag.map(
-                  (ytelse) => (
-                    <Table.Row key={ytelse.ytelsekomponentId}>
-                      <Table.DataCell>
-                        {ytelse.ytelseKomponentType}
-                      </Table.DataCell>
-                      <Table.DataCell>{ytelse.belop}</Table.DataCell>
-                      <Table.DataCell>
-                        {ytelse.ytelsekomponentId}
-                      </Table.DataCell>
-                    </Table.Row>
-                  ),
-                )}
+                {vedtakIOppdrag?.ytelsekomponenterOversendtOppdrag.map((ytelse) => (
+                  <Table.Row key={ytelse.ytelsekomponentId}>
+                    <Table.DataCell>{ytelse.ytelseKomponentType}</Table.DataCell>
+                    <Table.DataCell>{ytelse.belop}</Table.DataCell>
+                    <Table.DataCell>{ytelse.ytelsekomponentId}</Table.DataCell>
+                  </Table.Row>
+                ))}
               </Table.Body>
             </Table>
           )}
@@ -711,13 +579,7 @@ function VerifiserOppdragsmeldingManueltModal({
   )
 }
 
-function Kommentar({
-  behandlingId,
-  vedtak,
-}: {
-  behandlingId: string
-  vedtak: LaasteVedtakRow
-}) {
+function Kommentar({ behandlingId, vedtak }: { behandlingId: string; vedtak: LaasteVedtakRow }) {
   const fetcher = useFetcher()
   const [kommentar, setKommentar] = useState(vedtak.kommentar ?? '')
   const [expanded, setExpanded] = useState(false)
@@ -762,13 +624,7 @@ function Kommentar({
   )
 }
 
-function Behandlinger({
-  kravid,
-  behandlinger,
-}: {
-  kravid: string
-  behandlinger: LaasteVedtakBehandlingSummary[]
-}) {
+function Behandlinger({ kravid, behandlinger }: { kravid: string; behandlinger: LaasteVedtakBehandlingSummary[] }) {
   return (
     <VStack>
       {behandlinger.map((behandling) => (
@@ -825,13 +681,11 @@ function VelgTeam() {
       }}
     >
       <option value="">Alle team</option>
-      {(Object.entries(Team) as [keyof typeof Team, string][]).map(
-        ([key, label]) => (
-          <option key={key} value={key}>
-            {label}
-          </option>
-        ),
-      )}
+      {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
+        <option key={key} value={key}>
+          {label}
+        </option>
+      ))}
     </Select>
   )
 }
@@ -898,10 +752,7 @@ function AutoReloadUttrekkStatus({
         clearInterval(interval)
         location.reload()
       } else {
-        if (fetcher.state === 'idle')
-          fetcher.load(
-            `/laaste-vedtak/uttrekkStatus?behandlingId=${behandlingId}`,
-          )
+        if (fetcher.state === 'idle') fetcher.load(`/laaste-vedtak/uttrekkStatus?behandlingId=${behandlingId}`)
       }
     }
 

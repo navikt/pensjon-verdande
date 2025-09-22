@@ -6,7 +6,5 @@ export interface Props {
 }
 
 export default function AvhengigeBehandlingerElement(props: Props) {
-  return (
-    <BehandlingerTable visStatusSoek={true} behandlingerResponse={props.avhengigeBehandlinger} />
-  )
+  return <BehandlingerTable visStatusSoek={true} behandlingerResponse={props.avhengigeBehandlinger} />
 }

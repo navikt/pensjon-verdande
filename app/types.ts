@@ -14,11 +14,11 @@ export interface PageResponse<T> {
 }
 
 export enum Behandlingstatus {
-  OPPRETTET= 'OPPRETTET',
-  UNDER_BEHANDLING="UNDER_BEHANDLING",
-  FULLFORT="FULLFORT",
-  STOPPET="STOPPET",
-  DEBUG="DEBUG",
+  OPPRETTET = 'OPPRETTET',
+  UNDER_BEHANDLING = 'UNDER_BEHANDLING',
+  FULLFORT = 'FULLFORT',
+  STOPPET = 'STOPPET',
+  DEBUG = 'DEBUG',
 }
 
 export type BehandlingDto = {
@@ -34,7 +34,7 @@ export type BehandlingDto = {
   slettes: string | null
   stoppet: string | null
   opprettet: string
-  planlagtStartet: string | null,
+  planlagtStartet: string | null
   ansvarligTeam: string | null
   status: string
   prioritet: number
@@ -50,7 +50,7 @@ export type BehandlingDto = {
   kibanaUrl?: string
   feilmelding: string | null
 
-  parametere: any | null
+  parametere: Record<string, string | null>
 
   debugJson: string | null
 
@@ -71,7 +71,7 @@ export type KontrollpunktDecode = {
 export type DetaljertFremdriftDTO = {
   ferdig: number
   totalt: number
-  behandlingerDetaljertFremdrift: BehandlingDetaljertFremdriftDTO[],
+  behandlingerDetaljertFremdrift: BehandlingDetaljertFremdriftDTO[]
 }
 
 export type BehandlingDetaljertFremdriftDTO = {
@@ -88,15 +88,15 @@ export type BehandlingDetaljertFremdriftDTO = {
 }
 
 export type IkkeFullforteAktiviteterDTO = {
-  aktivitetOppsummering: GjenværendeAktivitetOppsummering[];
-};
+  aktivitetOppsummering: GjenværendeAktivitetOppsummering[]
+}
 
 export type GjenværendeAktivitetOppsummering = {
-  behandling: string;
-  aktivitet: string;
-  status: string;
-  antall: number;
-};
+  behandling: string
+  aktivitet: string
+  status: string
+  antall: number
+}
 export type BehandlingKjoringDTO = {
   behandlingKjoringId: number
   behandlingId: number
@@ -136,8 +136,8 @@ export type BehandlingerPage = {
   size: number
   empty: boolean
 
-  behandlingStatuser: string[],
-  behandlingTyper: string[],
+  behandlingStatuser: string[]
+  behandlingTyper: string[]
 
   sort: PageSort
 }
@@ -149,27 +149,27 @@ export type PageSort = {
 }
 
 export type BehandlingManuellDto = {
-  id: string; // UUID
-  aktivitetId: number;
-  opprettet: string;
+  id: string // UUID
+  aktivitetId: number
+  opprettet: string
 
-  sakId: number;
-  kravId?: number | null;
-  kategori: string;
-  beskrivelse: string;
+  sakId: number
+  kravId?: number | null
+  kategori: string
+  beskrivelse: string
 
-  fagomrade: string;
-  fagomradeDekode: string;
-  oppgavekode: string;
-  oppgavekodeDekode: string;
+  fagomrade: string
+  fagomradeDekode: string
+  oppgavekode: string
+  oppgavekodeDekode: string
 
-  aktivFra: string;
+  aktivFra: string
 
-  oppgaveId?: number | null;
-  oppgaveOpprettet: string | null;
+  oppgaveId?: number | null
+  oppgaveOpprettet: string | null
 
-  isFerdig: boolean;
-};
+  isFerdig: boolean
+}
 
 export type BehandlingManuellPage = {
   content: BehandlingManuellDto[]
@@ -248,13 +248,13 @@ export type OmregningRequest = {
   skalDistribuereUforevedtak: boolean
   sendBrevBerorteSaker: boolean
 
-  brevkoderSoker: {[key: string]: string}
-  brevkoderBerorteSaker: {[key: string]: string}
+  brevkoderSoker: { [key: string]: string }
+  brevkoderBerorteSaker: { [key: string]: string }
 }
 export type OmregningInit = {
-  toleransegrenser: string[],
-  oppgaveSett: string[],
-  batchbrevtyper: string[],
+  toleransegrenser: string[]
+  oppgaveSett: string[]
+  batchbrevtyper: string[]
 }
 export type OmregningInput = {
   saker: string[]
@@ -263,7 +263,7 @@ export type OmregningSakerPage = {
   content: OmregningInputSaker[] | null
   pageable: {
     pageNumber: number
-  },
+  }
   last: boolean
   totalPages: number
   totalElements: number
@@ -274,29 +274,29 @@ export type OmregningSakerPage = {
   empty: boolean
 }
 export type OmregningInputSaker = {
-  sakId: string,
-  sakType: string,
+  sakId: string
+  sakType: string
 }
 export type OmregningBehandlingsnoekler = {
   behandlingsnoekkel: string[]
 }
 export type OmregningStatistikk = {
-  behandlingsnoekkel: string,
-  vedtakId: number | undefined,
-  behandlingsrekkefolge: number | undefined,
-  behandlingstype: string | undefined,
-  berortSakBegrunnelser: string | undefined,
-  status: string,
-  sorteringsregel: string | undefined,
-  kontrollpunkter: string,
-  sakId: string,
-  familieId: string,
+  behandlingsnoekkel: string
+  vedtakId: number | undefined
+  behandlingsrekkefolge: number | undefined
+  behandlingstype: string | undefined
+  berortSakBegrunnelser: string | undefined
+  status: string
+  sorteringsregel: string | undefined
+  kontrollpunkter: string
+  sakId: string
+  familieId: string
 }
 export type OmregningStatistikkPage = {
   content: OmregningStatistikk[] | null
   pageable: {
     pageNumber: number
-  },
+  }
   last: boolean
   totalPages: number
   totalElements: number
@@ -307,14 +307,12 @@ export type OmregningStatistikkPage = {
   empty: boolean
 }
 
-
 export type BehandlingManuellOpptellingDto = {
-  behandlingType: string,
-  kategori: string,
-  kategoriDecode: string,
-  antall: number,
+  behandlingType: string
+  kategori: string
+  kategoriDecode: string
+  antall: number
 }
-
 
 export type BehandlingManuellOpptellingResponse = {
   behandlingManuellOpptelling: BehandlingManuellOpptellingDto[]

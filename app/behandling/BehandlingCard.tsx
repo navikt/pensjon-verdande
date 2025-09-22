@@ -1,44 +1,52 @@
-import { Suspense, useRef } from 'react'
-import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
-import { Entry } from '~/components/entry/Entry'
-import {
-  BodyLong, Box,
-  Button,
-  CopyButton, Heading,
-  HGrid,
-  HStack, Link,
-  Loader,
-  Modal,
-  Page, ProgressBar,
-  Tabs, Tooltip,
-  VStack,
-} from '@navikt/ds-react'
 import {
   BankNoteIcon,
   ClockDashedIcon,
-  CogFillIcon, CogIcon, ExternalLinkIcon, InboxDownIcon, PersonIcon,
-  PlayIcon, PrinterSmallIcon,
+  CogFillIcon,
+  CogIcon,
+  ExternalLinkIcon,
+  InboxDownIcon,
+  PersonIcon,
+  PlayIcon,
+  PrinterSmallIcon,
   SandboxIcon,
   TasklistIcon,
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
-import { formatIsoTimestamp } from '~/common/date'
-import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
-import { decodeBehandling } from '~/common/decodeBehandling'
 import {
-  BehandlingBatchDetaljertFremdriftBarChart,
-} from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
+  BodyLong,
+  Box,
+  Button,
+  CopyButton,
+  Heading,
+  HGrid,
+  HStack,
+  Link,
+  Loader,
+  Modal,
+  Page,
+  ProgressBar,
+  Tabs,
+  Tooltip,
+  VStack,
+} from '@navikt/ds-react'
+import { Suspense, useRef } from 'react'
+import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
+import { OPERATION } from '~/behandling/behandling.$behandlingId'
+import { buildUrl } from '~/common/build-url'
+import { formatIsoTimestamp } from '~/common/date'
+import { decodeBehandlingStatus } from '~/common/decode'
+import { decodeBehandling } from '~/common/decodeBehandling'
 import type { Team } from '~/common/decodeTeam'
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
-import { OPERATION } from '~/behandling/behandling.$behandlingId'
-import { buildUrl } from '~/common/build-url'
-import { decodeBehandlingStatus } from '~/common/decode'
+import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
+import { Entry } from '~/components/entry/Entry'
+import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
 
 export interface Props {
   aldeBehandlingUrlTemplate?: string
   behandling: BehandlingDto
-  detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null
+  detaljertFremdrift?: Promise<DetaljertFremdriftDTO | undefined | null> | null
   psakSakUrlTemplate: string
 }
 
@@ -53,7 +61,7 @@ export default function BehandlingCard(props: Props) {
   const sendTilOppdragPaNyttModal = useRef<HTMLDialogElement>(null)
 
   function beregnFremdriftProsent(ferdig: number, totalt: number): string {
-    if ((ferdig === totalt)) {
+    if (ferdig === totalt) {
       return '100'
     } else {
       const prosent = ((ferdig / totalt) * 100).toFixed(2)
@@ -171,10 +179,8 @@ export default function BehandlingCard(props: Props) {
           <Modal ref={sendTilOppdragPaNyttModal} header={{ heading: 'Send melding til oppdrag på nytt' }}>
             <Modal.Body>
               <BodyLong>
-                Ønsker du virkerlig å sende melding til oppdrag på nytt?
-                Dette skal kun gjøres når man har bekreftet med
-                #utbetaling at meldingen fra Pen til Oppdragssystemet er
-                borte
+                Ønsker du virkerlig å sende melding til oppdrag på nytt? Dette skal kun gjøres når man har bekreftet med
+                #utbetaling at meldingen fra Pen til Oppdragssystemet er borte
               </BodyLong>
             </Modal.Body>
             <Modal.Footer>
@@ -183,11 +189,7 @@ export default function BehandlingCard(props: Props) {
                   Send til oppdrag på nytt
                 </Button>
               </fetcher.Form>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => sendTilOppdragPaNyttModal.current?.close()}
-              >
+              <Button type="button" variant="secondary" onClick={() => sendTilOppdragPaNyttModal.current?.close()}>
                 Avbryt
               </Button>
             </Modal.Footer>
@@ -202,52 +204,39 @@ export default function BehandlingCard(props: Props) {
       return (
         <>
           {planlagtStartet ? (
-              <>
-                <Tooltip
-                  content="Fjerner utsatt tidspunkt og planlagt startet tidspunkt slik at behandling kan kjøres umiddelbart">
-                  <Button
-                    variant={'secondary'}
-                    icon={<PlayIcon aria-hidden />}
-                    onClick={() => fortsettModal.current?.showModal()}
-                  >
-                    Fortsett
-                  </Button>
-                </Tooltip>
-                <Modal ref={fortsettModal} header={{ heading: 'Fortsett behandling' }}>
-                  <Modal.Body>
-                    <BodyLong>
-                      Dette er en behandling planlagt kjørt <strong>{formatIsoTimestamp(planlagtStartet)}</strong>.
-                      Vil du kjøre den nå med en gang? Denne handlingen kan ikke angres.
-                    </BodyLong>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <fetcher.Form method="post">
-                      <input hidden readOnly name="operation" value={OPERATION.fortsett} />
+            <>
+              <Tooltip content="Fjerner utsatt tidspunkt og planlagt startet tidspunkt slik at behandling kan kjøres umiddelbart">
+                <Button
+                  variant={'secondary'}
+                  icon={<PlayIcon aria-hidden />}
+                  onClick={() => fortsettModal.current?.showModal()}
+                >
+                  Fortsett
+                </Button>
+              </Tooltip>
+              <Modal ref={fortsettModal} header={{ heading: 'Fortsett behandling' }}>
+                <Modal.Body>
+                  <BodyLong>
+                    Dette er en behandling planlagt kjørt <strong>{formatIsoTimestamp(planlagtStartet)}</strong>. Vil du
+                    kjøre den nå med en gang? Denne handlingen kan ikke angres.
+                  </BodyLong>
+                </Modal.Body>
+                <Modal.Footer>
+                  <fetcher.Form method="post">
+                    <input hidden readOnly name="operation" value={OPERATION.fortsett} />
 
-                      <input
-                        type="hidden"
-                        name="nullstillPlanlagtStartet"
-                        value="true"
-                      />
-                      <Button
-                        variant={'primary'}
-                        icon={<PlayIcon aria-hidden />}
-                        name={'fortsett'}
-                      >
-                        Kjør planlagt startet behandling nå
-                      </Button>
-                    </fetcher.Form>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => fortsettModal.current?.close()}
-                    >
-                      Avbryt
+                    <input type="hidden" name="nullstillPlanlagtStartet" value="true" />
+                    <Button variant={'primary'} icon={<PlayIcon aria-hidden />} name={'fortsett'}>
+                      Kjør planlagt startet behandling nå
                     </Button>
-                  </Modal.Footer>
-                </Modal>
-              </>
-            ) :
+                  </fetcher.Form>
+                  <Button type="button" variant="secondary" onClick={() => fortsettModal.current?.close()}>
+                    Avbryt
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            </>
+          ) : (
             <Tooltip content="Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart">
               <fetcher.Form method="post">
                 <Button
@@ -260,7 +249,7 @@ export default function BehandlingCard(props: Props) {
                 </Button>
               </fetcher.Form>
             </Tooltip>
-          }
+          )}
         </>
       )
     }
@@ -321,11 +310,9 @@ export default function BehandlingCard(props: Props) {
           <Modal ref={stopModal} header={{ heading: 'Stopp behandling' }}>
             <Modal.Body>
               <BodyLong>
-                Ønsker du virkerlig å stoppe denne behandlingen. Saken, kravet,
-                vedtaket eller liknende, som behandlinger er knyttet til må mest
-                sannsynlig rapporteres til linja. Stopping av en behandling skal
-                kun gjøres om feil ikke kan løses på annen måte. Denne
-                handlingen kan ikke angres
+                Ønsker du virkerlig å stoppe denne behandlingen. Saken, kravet, vedtaket eller liknende, som
+                behandlinger er knyttet til må mest sannsynlig rapporteres til linja. Stopping av en behandling skal kun
+                gjøres om feil ikke kan løses på annen måte. Denne handlingen kan ikke angres
               </BodyLong>
             </Modal.Body>
             <Modal.Footer>
@@ -334,11 +321,7 @@ export default function BehandlingCard(props: Props) {
                   Stopp behandling
                 </Button>
               </fetcher.Form>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => stopModal.current?.close()}
-              >
+              <Button type="button" variant="secondary" onClick={() => stopModal.current?.close()}>
                 Avbryt
               </Button>
             </Modal.Footer>
@@ -363,7 +346,6 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
-
   const getCurrentChild = () => {
     const childPath = location.pathname.split('/').slice(-1)[0]
     if (childPath === '' || !Number.isNaN(+childPath)) {
@@ -375,9 +357,7 @@ export default function BehandlingCard(props: Props) {
 
   return (
     <Page>
-      <Heading size={'large'}>
-        {decodeBehandling(props.behandling.type)}
-      </Heading>
+      <Heading size={'large'}>{decodeBehandling(props.behandling.type)}</Heading>
       <VStack gap={'4'}>
         <HGrid
           gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
@@ -394,27 +374,25 @@ export default function BehandlingCard(props: Props) {
               {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
               {props.behandling.forrigeBehandlingId && (
                 <Entry labelText={'Opprettet av behandling'}>
-                  <Link as={NavLink}
-                        to={`/behandling/${props.behandling.forrigeBehandlingId}`}
-                  >
+                  <Link as={NavLink} to={`/behandling/${props.behandling.forrigeBehandlingId}`}>
                     {props.behandling.forrigeBehandlingId}
                   </Link>
                 </Entry>
               )}
               <Entry labelText={'Status'}>{decodeBehandlingStatus(props.behandling.status)}</Entry>
               <Await resolve={props.detaljertFremdrift}>
-                {detaljertFremdrift =>
+                {(detaljertFremdrift) =>
                   detaljertFremdrift && (
                     <Entry labelText={'Fremdrift'}>
                       <Tooltip
-                        content={`${beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)} % ferdig`}>
+                        content={`${beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)} % ferdig`}
+                      >
                         <ProgressBar
                           value={+beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}
                           valueMax={100}
                           size={'large'}
                           aria-labelledby="progress-bar-fremdrift"
-                        >
-                        </ProgressBar>
+                        ></ProgressBar>
                       </Tooltip>
                     </Entry>
                   )
@@ -427,45 +405,28 @@ export default function BehandlingCard(props: Props) {
                   onAnsvarligTeamChange={oppdaterAnsvarligTeam}
                 />
               </Entry>
-              <Entry labelText={'Funksjonell identifikator'}>
-                {props.behandling.funksjonellIdentifikator}
-              </Entry>
+              <Entry labelText={'Funksjonell identifikator'}>{props.behandling.funksjonellIdentifikator}</Entry>
 
               {props.behandling.stoppet && (
-                <Entry labelText={'Stoppet'}>
-                  {formatIsoTimestamp(props.behandling.stoppet)}
-                </Entry>
+                <Entry labelText={'Stoppet'}>{formatIsoTimestamp(props.behandling.stoppet)}</Entry>
               )}
-              <Entry labelText={'Prioritet'}>
-                {props.behandling.prioritet}
-              </Entry>
+              <Entry labelText={'Prioritet'}>{props.behandling.prioritet}</Entry>
 
-              <Entry labelText={'Opprettet'}>
-                {formatIsoTimestamp(props.behandling.opprettet)}
-              </Entry>
-              <Entry labelText={'Siste kjøring'}>
-                {formatIsoTimestamp(props.behandling.sisteKjoring)}
-              </Entry>
+              <Entry labelText={'Opprettet'}>{formatIsoTimestamp(props.behandling.opprettet)}</Entry>
+              <Entry labelText={'Siste kjøring'}>{formatIsoTimestamp(props.behandling.sisteKjoring)}</Entry>
               {props.behandling.ferdig ? (
-                <Entry labelText={'Ferdig'}>
-                  {formatIsoTimestamp(props.behandling.ferdig)}
-                </Entry>
+                <Entry labelText={'Ferdig'}>{formatIsoTimestamp(props.behandling.ferdig)}</Entry>
               ) : (
-                <Entry labelText={'Utsatt til'}>
-                  {formatIsoTimestamp(props.behandling.utsattTil)}
-                </Entry>
+                <Entry labelText={'Utsatt til'}>{formatIsoTimestamp(props.behandling.utsattTil)}</Entry>
               )}
               {props.behandling.slettes && (
-                <Entry labelText={'Slettes'}>
-                  {formatIsoTimestamp(props.behandling.slettes)}
-                </Entry>
+                <Entry labelText={'Slettes'}>{formatIsoTimestamp(props.behandling.slettes)}</Entry>
               )}
               {props.behandling.planlagtStartet && (
                 <Entry labelText={'Planlagt kjøring frem i tid'}>
                   {formatIsoTimestamp(props.behandling.planlagtStartet)}
                 </Entry>
-              )
-              }
+              )}
 
               {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
               {copyPasteEntry('SakId', props.behandling.sakId)}
@@ -475,9 +436,12 @@ export default function BehandlingCard(props: Props) {
 
               {props.behandling.parametere &&
                 Object.entries(props.behandling.parametere).map(([key, value]) => {
-                  return (<Entry key={key} labelText={`${key}`}>{value as string}</Entry>)
-                })
-              }
+                  return (
+                    <Entry key={key} labelText={`${key}`}>
+                      {value as string}
+                    </Entry>
+                  )
+                })}
             </HGrid>
           </Box.New>
           <HStack gap="space-16">
@@ -492,7 +456,7 @@ export default function BehandlingCard(props: Props) {
                 >
                   <Suspense fallback={<Loader size="3xlarge" title="Venter..." />}>
                     <Await resolve={props.detaljertFremdrift}>
-                      {detaljertFremdrift =>
+                      {(detaljertFremdrift) =>
                         detaljertFremdrift && (
                           <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={detaljertFremdrift} />
                         )
@@ -506,17 +470,12 @@ export default function BehandlingCard(props: Props) {
         </HGrid>
         <HStack gap="space-16">
           <Button size="small" variant="tertiary">
-
-          <Link
-            href={props.behandling.kibanaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Se logger i Kibana
-            <ExternalLinkIcon title={'Se logger i Kibana'} />
-          </Link>
+            <Link href={props.behandling.kibanaUrl} target="_blank" rel="noopener noreferrer">
+              Se logger i Kibana
+              <ExternalLinkIcon title={'Se logger i Kibana'} />
+            </Link>
           </Button>
-          {props.behandling.sakId &&
+          {props.behandling.sakId && (
             <Button size="small" variant="tertiary">
               <Link
                 href={buildUrl(props.psakSakUrlTemplate, { sakId: props.behandling.sakId })}
@@ -527,8 +486,8 @@ export default function BehandlingCard(props: Props) {
                 <ExternalLinkIcon title={'Åpne i Psak'} />
               </Link>
             </Button>
-          }
-          {props.aldeBehandlingUrlTemplate !== undefined && props.behandling.erAldeBehandling === true &&
+          )}
+          {props.aldeBehandlingUrlTemplate !== undefined && props.behandling.erAldeBehandling === true && (
             <Button size="small" variant="tertiary">
               <Link
                 href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
@@ -539,7 +498,7 @@ export default function BehandlingCard(props: Props) {
                 <ExternalLinkIcon title={'Åpne i Alde'} />
               </Link>
             </Button>
-          }
+          )}
         </HStack>
 
         <HStack gap="space-16">
@@ -553,14 +512,13 @@ export default function BehandlingCard(props: Props) {
 
           {stoppButton()}
 
-          {
-            hasLink('sendTilManuellMedKontrollpunkt') &&
+          {hasLink('sendTilManuellMedKontrollpunkt') && (
             <SendTilManuellMedKontrollpunktModal
               sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
               modalRef={sendTilManuellMedKontrollpunktModal}
-              behandling={props.behandling}>
-            </SendTilManuellMedKontrollpunktModal>
-          }
+              behandling={props.behandling}
+            ></SendTilManuellMedKontrollpunktModal>
+          )}
 
           {runButton()}
         </HStack>
@@ -586,78 +544,28 @@ export default function BehandlingCard(props: Props) {
           }}
         >
           <Tabs.List>
-            <Tabs.Tab
-              value="kjoringer"
-              label="Kjøringer"
-              icon={<CogIcon />}
-            />
-            <Tabs.Tab
-              value="aktiviteter"
-              label="Aktiviteter"
-              icon={<TasklistIcon />}
-            />
+            <Tabs.Tab value="kjoringer" label="Kjøringer" icon={<CogIcon />} />
+            <Tabs.Tab value="aktiviteter" label="Aktiviteter" icon={<TasklistIcon />} />
             {props.behandling._links?.avhengigeBehandlinger && (
-              <Tabs.Tab
-                value="avhengigeBehandlinger"
-                label="Avhengige behandlinger"
-                icon={<ClockDashedIcon />}
-              />
+              <Tabs.Tab value="avhengigeBehandlinger" label="Avhengige behandlinger" icon={<ClockDashedIcon />} />
             )}
-            <Tabs.Tab
-              value="ikkeFullforteAktiviteter"
-              label="Uferdige aktiviteter"
-              icon={<TasklistIcon />}
-            />
-            {props.behandling._links?.input && (
-              <Tabs.Tab
-                value="input"
-                label="Input"
-                icon={<InboxDownIcon />}
-              />
-            )}
-            {props.behandling._links?.output && (
-              <Tabs.Tab
-                value="output"
-                label="Output"
-                icon={<TasklistIcon />}
-              />
-            )}
+            <Tabs.Tab value="ikkeFullforteAktiviteter" label="Uferdige aktiviteter" icon={<TasklistIcon />} />
+            {props.behandling._links?.input && <Tabs.Tab value="input" label="Input" icon={<InboxDownIcon />} />}
+            {props.behandling._links?.output && <Tabs.Tab value="output" label="Output" icon={<TasklistIcon />} />}
             {props.behandling._links?.uttrekk && (
-              <Tabs.Tab
-                value="uttrekk"
-                label="Uttrekk"
-                icon={<PrinterSmallIcon />}
-              />
+              <Tabs.Tab value="uttrekk" label="Uttrekk" icon={<PrinterSmallIcon />} />
             )}
             {props.behandling._links?.oppdragsmelding && (
-              <Tabs.Tab
-                value="oppdragsmelding"
-                label="Oppdragsmelding"
-                icon={<TasklistIcon />}
-              />
+              <Tabs.Tab value="oppdragsmelding" label="Oppdragsmelding" icon={<TasklistIcon />} />
             )}
             {props.behandling._links?.oppdragskvittering && (
-              <Tabs.Tab
-                value="oppdragskvittering"
-                label="Oppdragskvittering"
-                icon={<TasklistIcon />}
-              />
+              <Tabs.Tab value="oppdragskvittering" label="Oppdragskvittering" icon={<TasklistIcon />} />
             )}
-            <Tabs.Tab
-              value="manuelleOppgaver"
-              label="Manuelle oppgaver"
-              icon={<PersonIcon />}
-            />
-            <Tabs.Tab
-              value="behandlingManuellOpptelling"
-              label="Oppgaveoppsummering"
-              icon={<TasklistIcon />}
-            />
-            {props.detaljertFremdrift && <Tabs.Tab
-              value="detaljertFremdrift"
-              label="Detaljert fremdrift"
-              icon={<TasklistIcon />}
-            />}
+            <Tabs.Tab value="manuelleOppgaver" label="Manuelle oppgaver" icon={<PersonIcon />} />
+            <Tabs.Tab value="behandlingManuellOpptelling" label="Oppgaveoppsummering" icon={<TasklistIcon />} />
+            {props.detaljertFremdrift && (
+              <Tabs.Tab value="detaljertFremdrift" label="Detaljert fremdrift" icon={<TasklistIcon />} />
+            )}
           </Tabs.List>
           <Outlet />
         </Tabs>

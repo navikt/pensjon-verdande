@@ -1,9 +1,8 @@
 import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
-
-import { getBehandlinger } from '~/services/behandling.server'
+import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 import { requireAccessToken } from '~/services/auth.server'
-import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { getBehandlinger } from '~/services/behandling.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url)
@@ -26,13 +25,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 
   return { behandlinger }
-
 }
 
 export default function AvhengigeBehandlinger() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
-  return (
-    <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
-  )
+  return <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
 }

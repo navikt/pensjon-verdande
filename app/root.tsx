@@ -1,20 +1,19 @@
-import { isRouteErrorResponse, type LinksFunction } from 'react-router'
-
+import navStyles from '@navikt/ds-css/dist/index.css?url'
 import {
+  isRouteErrorResponse,
   Links,
+  type LinksFunction,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
 } from 'react-router'
-import navStyles from '@navikt/ds-css/dist/index.css?url'
-
-import appStylesHref from './app.css?url'
+import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 
 import { env } from '~/services/env.server'
-import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import type { Route } from '../.react-router/types/app/+types/root'
+import appStylesHref from './app.css?url'
 import '@navikt/ds-css/darkside'
 
 export const links: LinksFunction = () => {
@@ -39,20 +38,20 @@ export default function App() {
 
   return (
     <html lang="en">
-    <head>
-      <title>{title}</title>
-      <meta charSet="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <Meta />
-      <Links />
-    </head>
-    <body>
-    <div style={{ width: '100%' }}>
-      <Outlet />
-    </div>
-    <ScrollRestoration />
-    <Scripts />
-    </body>
+      <head>
+        <title>{title}</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div style={{ width: '100%' }}>
+          <Outlet />
+        </div>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
     </html>
   )
 }
@@ -61,14 +60,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
     const data = error.data as
       | Partial<{
-      status: number
-      title?: string
-      message?: string
-      detail?: string
-      path?: string
-      timestamp?: string
-      trace?: string
-    }>
+          status: number
+          title?: string
+          message?: string
+          detail?: string
+          path?: string
+          timestamp?: string
+          trace?: string
+        }>
       | string
       | undefined
 
@@ -76,7 +75,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const str = typeof data === 'string' ? data : undefined
 
     if (error.status === 403) {
-      return (<IkkeTilgang error={error}></IkkeTilgang>)
+      return <IkkeTilgang error={error}></IkkeTilgang>
     }
 
     return (
@@ -86,9 +85,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         </h1>
 
         {obj?.message && <p>{obj.message}</p>}
-        {obj?.detail && (
-          <pre className="whitespace-pre-wrap">{obj.detail}</pre>
-        )}
+        {obj?.detail && <pre className="whitespace-pre-wrap">{obj.detail}</pre>}
         {str && <pre className="whitespace-pre-wrap">{str}</pre>}
 
         <div className="text-sm opacity-70 space-y-1">

@@ -1,5 +1,5 @@
 import { env } from '~/services/env.server'
-import type { EndreKjorelopIverksettVedtakResponse, FortsettBatchResponse, StartBatchResponse } from '~/types'
+import type { EndreKjorelopIverksettVedtakResponse, FortsettBatchResponse } from '~/types'
 
 export async function startReguleringUttrekk(
   accessToken: string,
@@ -7,25 +7,21 @@ export async function startReguleringUttrekk(
   reguleringsDato: string,
   iDebug: boolean,
 ): Promise<StartBatchResponse> {
-
   const body = {
-      satsDato: satsDato,
-      reguleringsDato: reguleringsDato,
-      iDebug: iDebug,
+    satsDato: satsDato,
+    reguleringsDato: reguleringsDato,
+    iDebug: iDebug,
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/uttrekk/start`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify(body),
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/uttrekk/start`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+    body: JSON.stringify(body),
+  })
 
   if (response.ok) {
     return (await response.json()) as StartBatchResponse
@@ -40,31 +36,27 @@ export async function startReguleringOrkestrering(
   reguleringsDato: string,
   maxFamiliebehandlinger: string,
 ): Promise<StartBatchResponse> {
-
   type Body = {
-    satsDato: string;
-    reguleringsDato: string;
-    maxFamiliebehandlinger?: string;
-  };
+    satsDato: string
+    reguleringsDato: string
+    maxFamiliebehandlinger?: string
+  }
 
   const body: Body = {
     satsDato: satsDato,
     reguleringsDato: reguleringsDato,
-    maxFamiliebehandlinger: maxFamiliebehandlinger !== "" ? maxFamiliebehandlinger : undefined,
+    maxFamiliebehandlinger: maxFamiliebehandlinger !== '' ? maxFamiliebehandlinger : undefined,
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/orkestrering/start`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify(body),
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/orkestrering/start`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+    body: JSON.stringify(body),
+  })
 
   if (response.ok) {
     return (await response.json()) as StartBatchResponse
@@ -80,7 +72,6 @@ export async function fortsettAvhengigeBehandling(
   antallBehandlinger: string,
   behandlingStatusType: string,
 ): Promise<FortsettBatchResponse> {
-
   const requestBody = {
     behandlingId: behandlingIdRegulering,
     reguleringBehandlingType: reguleringBehandlingType,
@@ -88,18 +79,15 @@ export async function fortsettAvhengigeBehandling(
     behandlingStatusType: behandlingStatusType,
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/fortsett/avhengige`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify(requestBody),
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/fortsett/avhengige`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+    body: JSON.stringify(requestBody),
+  })
 
   if (response.ok) {
     return (await response.json()) as FortsettBatchResponse
@@ -115,22 +103,23 @@ export async function endreKjorelopIverksettVedtakBehandlinger(
     velgKjoreLop: velgKjoreLop,
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/vedtak/regulering/endre/iverksettvedtak`,
-    {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-      body: JSON.stringify(requestBody),
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/endre/iverksettvedtak`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
     },
-  )
+    body: JSON.stringify(requestBody),
+  })
 
   if (response.ok) {
     return (await response.json()) as EndreKjorelopIverksettVedtakResponse
   } else {
     throw new Error()
   }
+}
+
+type StartBatchResponse = {
+  behandlingId: number
 }

@@ -1,30 +1,15 @@
-import {
-  type LoaderFunctionArgs,
-  useLoaderData,
-  useSubmit,
-  Form,
-} from 'react-router'
-import type React from 'react'
-import { useMemo, useState } from 'react'
-import {
-  Alert,
-  BodyShort,
-  Button,
-  Heading,
-  Label,
-  Radio,
-  RadioGroup,
-  Select,
-  VStack,
-} from '@navikt/ds-react'
-import { requireAccessToken } from '~/services/auth.server'
-import { getBehandlinger } from '~/services/behandling.server'
-import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import type { BehandlingerPage } from '~/types'
-import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import { Alert, BodyShort, Button, Heading, Label, Radio, RadioGroup, Select, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
+import type React from 'react'
+import { useMemo, useState } from 'react'
+import { Form, type LoaderFunctionArgs, useLoaderData, useSubmit } from 'react-router'
 import { hentMuligeAldersoverganger } from '~/aldersovergang/behandling.aldersovergang.server'
+import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import { requireAccessToken } from '~/services/auth.server'
+import { getBehandlinger } from '~/services/behandling.server'
+import type { BehandlingerPage } from '~/types'
 
 type LoaderData = {
   behandlinger: BehandlingerPage
@@ -51,9 +36,7 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
   const aldersoverganger = await hentMuligeAldersoverganger(accessToken)
 
   const currentMonth = format(new Date(), 'yyyy-MM')
-  const defaultMonth = aldersoverganger.maneder.includes(currentMonth)
-    ? currentMonth
-    : aldersoverganger.maneder[0]
+  const defaultMonth = aldersoverganger.maneder.includes(currentMonth) ? currentMonth : aldersoverganger.maneder[0]
 
   return {
     behandlinger,
@@ -65,19 +48,11 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
 }
 
 export default function BatchOpprett_index() {
-  const {
-    behandlinger,
-    maneder,
-    erBegrensUtplukkLovlig,
-    kanOverstyreBehandlingsmaned,
-    defaultMonth,
-  } = useLoaderData<typeof loader>()
+  const { behandlinger, maneder, erBegrensUtplukkLovlig, kanOverstyreBehandlingsmaned, defaultMonth } =
+    useLoaderData<typeof loader>()
 
   const [selectedMonthStr, setSelectedMonthStr] = useState(defaultMonth)
-  const selectedMonthDate = useMemo(
-    () => parse(selectedMonthStr, 'yyyy-MM', new Date()),
-    [selectedMonthStr]
-  )
+  const selectedMonthDate = useMemo(() => parse(selectedMonthStr, 'yyyy-MM', new Date()), [selectedMonthStr])
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const submit = useSubmit()
 
@@ -94,9 +69,7 @@ export default function BatchOpprett_index() {
         Aldersovergang
       </Heading>
 
-      <BodyShort spacing>
-        Velg behandlingsmåned og tidspunkt for kjøring.
-      </BodyShort>
+      <BodyShort spacing>Velg behandlingsmåned og tidspunkt for kjøring.</BodyShort>
 
       {!kanOverstyreBehandlingsmaned && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
@@ -176,12 +149,7 @@ export default function BatchOpprett_index() {
               <BodyShort size="small" style={{ marginBottom: '0.5rem' }}>
                 Behandler kun personer som ligger i utplukkstabellen.
               </BodyShort>
-              <RadioGroup
-                name="begrensetUtplukk"
-                defaultValue="false"
-                legend=""
-                size="small"
-              >
+              <RadioGroup name="begrensetUtplukk" defaultValue="false" legend="" size="small">
                 <Radio value="true">Ja</Radio>
                 <Radio value="false">Nei</Radio>
               </RadioGroup>
@@ -190,11 +158,7 @@ export default function BatchOpprett_index() {
 
           {selectedMonthDate && (kanOverstyreBehandlingsmaned || selectedDate) && (
             <div style={{ marginTop: '1rem' }}>
-              <Button
-                type="submit"
-                onClick={handleSubmit}
-                variant="primary"
-              >
+              <Button type="submit" onClick={handleSubmit} variant="primary">
                 Opprett
               </Button>
             </div>

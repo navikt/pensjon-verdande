@@ -1,7 +1,7 @@
-import { requireAccessToken } from '~/services/auth.server'
-import { Link, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import { Box, Table } from '@navikt/ds-react'
+import { Link, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import { hentBrukere } from '~/brukere/brukere.server'
+import { requireAccessToken } from '~/services/auth.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
@@ -15,10 +15,7 @@ export default function Brukere() {
   const { brukere } = useLoaderData<typeof loader>()
 
   return (
-    <Box.New
-      style={{ padding: '6px' }}
-      borderRadius="medium"
-    >
+    <Box.New style={{ padding: '6px' }} borderRadius="medium">
       <Table>
         <Table.Header>
           <Table.Row>
@@ -31,9 +28,7 @@ export default function Brukere() {
           {brukere.map((bruker) => (
             <Table.Row key={bruker.brukernavn}>
               <Table.DataCell>
-                <Link to={`/brukere/${encodeURI(bruker.brukernavn)}`}>
-                  {bruker.brukernavn}
-                </Link>
+                <Link to={`/brukere/${encodeURI(bruker.brukernavn)}`}>{bruker.brukernavn}</Link>
               </Table.DataCell>
               <Table.DataCell>{bruker.fornavn}</Table.DataCell>
               <Table.DataCell>{bruker.etternavn}</Table.DataCell>

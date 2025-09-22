@@ -1,5 +1,5 @@
-import React, { type ForwardedRef, forwardRef } from 'react'
 import { HelpText, Label, type OverridableComponent } from '@navikt/ds-react'
+import React, { type ForwardedRef, forwardRef } from 'react'
 
 interface Props extends React.HTMLAttributes<HTMLElement> {
   labelText?: string
@@ -8,16 +8,11 @@ interface Props extends React.HTMLAttributes<HTMLElement> {
 }
 
 export const Entry: OverridableComponent<Props, HTMLElement> = forwardRef(
-  (
-    { labelText, helpText, children, as: Component = 'div', ...rest },
-    ref: ForwardedRef<HTMLElement>,
-  ) => {
+  ({ labelText, helpText, children, as: Component = 'div', ...rest }, ref: ForwardedRef<HTMLElement>) => {
     return (
       <div className={'entry'}>
         {labelText && <Label size={'small'}>{labelText}</Label>}
-        {helpText && (
-          <HelpText style={{ fontSize: '1.1em' }}>{helpText}</HelpText>
-        )}
+        {helpText && <HelpText style={{ fontSize: '1.1em' }}>{helpText}</HelpText>}
         <Component ref={ref} {...rest}>
           {children}
         </Component>

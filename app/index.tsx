@@ -1,5 +1,5 @@
-import { redirect } from 'react-router';
+import { redirect } from 'react-router'
 
 export const loader = async () => {
-  return redirect("/dashboard");
+  return redirect('/dashboard')
 }

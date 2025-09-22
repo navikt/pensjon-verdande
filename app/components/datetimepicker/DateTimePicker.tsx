@@ -4,40 +4,38 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { nb } from 'date-fns/locale'
 
 interface DateTimePickerProps {
-  selectedDate: Date | null;
-  setSelectedDate: (date: Date | null) => void;
-  id?: string;
-  dateFormat?: string;
-  timeFormat?: string;
-  timeIntervals?: number;
-  timeCaption?: string;
-  placeholderText?: string;
-  ariaLabel?: string;
-  labelText?: string;
-  tabIndex?: number;
-  name?: string;
-  minDate?: Date;
-  maxDate?: Date;
+  selectedDate: Date | null
+  setSelectedDate: (date: Date | null) => void
+  id?: string
+  dateFormat?: string
+  timeFormat?: string
+  timeIntervals?: number
+  timeCaption?: string
+  placeholderText?: string
+  ariaLabel?: string
+  labelText?: string
+  tabIndex?: number
+  name?: string
+  minDate?: Date
+  maxDate?: Date
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
-                                                         selectedDate,
-                                                         setSelectedDate,
-                                                         id = 'date-picker',
-                                                         labelText = 'Dato',
-                                                         dateFormat = 'yyyy-MM-dd HH:mm',
-                                                         timeFormat = 'HH:mm',
-                                                         timeIntervals = 15,
-                                                         timeCaption = 'Klokkeslett',
-                                                         placeholderText = 'Velg dato',
-                                                         ariaLabel = 'Velg dato',
-                                                         tabIndex,
-                                                         name,
-                                                         minDate,
-                                                         maxDate,
-                                                       }) => {
-
-
+  selectedDate,
+  setSelectedDate,
+  id = 'date-picker',
+  labelText = 'Dato',
+  dateFormat = 'yyyy-MM-dd HH:mm',
+  timeFormat = 'HH:mm',
+  timeIntervals = 15,
+  timeCaption = 'Klokkeslett',
+  placeholderText = 'Velg dato',
+  ariaLabel = 'Velg dato',
+  tabIndex,
+  name,
+  minDate,
+  maxDate,
+}) => {
   return (
     <div className="flex items-center flex-row gap-x-2 min-w-[100px]">
       <label htmlFor={id} className="block text-white mb-1">

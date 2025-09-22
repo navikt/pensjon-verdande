@@ -1,9 +1,9 @@
-import {Accordion, Box, CopyButton, Link} from '@navikt/ds-react'
-import {useEffect, useState} from 'react'
-import type {LoaderFunctionArgs} from 'react-router'
-import {useLoaderData} from 'react-router'
+import { Accordion, Box, CopyButton, Link } from '@navikt/ds-react'
+import { useEffect, useState } from 'react'
+import type { LoaderFunctionArgs } from 'react-router'
+import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
-import {apiGet} from '~/services/api.server'
+import { apiGet } from '~/services/api.server'
 
 type BehandlingUttrekk = {
   str: string[]
@@ -28,21 +28,21 @@ export default function BehandlingOutput() {
   const [downloadLink, setDownloadLink] = useState('')
 
   useEffect(() => {
-      if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
-      setDownloadLink(
-          window.URL.createObjectURL(
-              new Blob(
-                  [
-                      JSON.stringify(
-                          output.str.map((it) => JSON.parse(it)),
-                          null,
-                          4,
-                      ),
-                  ],
-                  {type: 'application/json'},
-              ),
-          ),
-      )
+    if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
+    setDownloadLink(
+      window.URL.createObjectURL(
+        new Blob(
+          [
+            JSON.stringify(
+              output.str.map((it) => JSON.parse(it)),
+              null,
+              4,
+            ),
+          ],
+          { type: 'application/json' },
+        ),
+      ),
+    )
   }, [output, downloadLink])
 
   return (

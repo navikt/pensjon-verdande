@@ -1,24 +1,23 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
 import { useLoaderData } from 'react-router'
-
+import invariant from 'tiny-invariant'
+import BehandlingCard from '~/behandling/BehandlingCard'
+import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
+import { requireAccessToken } from '~/services/auth.server'
 import {
   fjernFraDebug,
   fortsettAvhengigeBehandlinger,
   fortsettBehandling,
   getBehandling,
-  getDetaljertFremdrift, patchBehandling,
+  getDetaljertFremdrift,
+  patchBehandling,
   runBehandling,
   sendTilManuellMedKontrollpunkt,
   stopp,
   taTilDebug,
 } from '~/services/behandling.server'
-
-import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
-import type { DetaljertFremdriftDTO } from '~/types'
-import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
-import BehandlingCard from '~/behandling/BehandlingCard'
+import type { DetaljertFremdriftDTO } from '~/types'
 
 export const OPERATION = {
   fjernFraDebug: 'fjernFraDebug',
@@ -32,7 +31,7 @@ export const OPERATION = {
   taTilDebug: 'taTilDebug',
 } as const
 
-export type Operation = typeof OPERATION[keyof typeof OPERATION];
+export type Operation = (typeof OPERATION)[keyof typeof OPERATION]
 export const OPERATIONS = Object.values(OPERATION) as Operation[]
 export const OperationSet = new Set<string>(OPERATIONS)
 
@@ -48,43 +47,35 @@ function requireField(form: FormData, name: string): string {
   return v
 }
 
-const getBool = (v: FormDataEntryValue | null) =>
-  v === 'true' || v === 'on' || v === '1'
+const getBool = (v: FormDataEntryValue | null) => v === 'true' || v === 'on' || v === '1'
 
-function operationHandlers(accessToken: string, behandlingId: string, form: FormData): Record<Operation, () => Promise<void>> {
+function operationHandlers(
+  accessToken: string,
+  behandlingId: string,
+  form: FormData,
+): Record<Operation, () => Promise<void>> {
   return {
-    fjernFraDebug: () =>
-      fjernFraDebug(accessToken, behandlingId),
+    fjernFraDebug: () => fjernFraDebug(accessToken, behandlingId),
 
-    fortsett: () =>
-      fortsettBehandling(accessToken, behandlingId, getBool(form.get('nullstillPlanlagtStartet'))),
+    fortsett: () => fortsettBehandling(accessToken, behandlingId, getBool(form.get('nullstillPlanlagtStartet'))),
 
-    fortsettAvhengigeBehandlinger: () =>
-      fortsettAvhengigeBehandlinger(accessToken, behandlingId),
+    fortsettAvhengigeBehandlinger: () => fortsettAvhengigeBehandlinger(accessToken, behandlingId),
 
     oppdaterAnsvarligTeam: () =>
-      patchBehandling(
-        accessToken,
-        behandlingId,
-        {
-          ansvarligTeam: requireField(form, 'ansvarligTeam'),
-        },
-      ),
+      patchBehandling(accessToken, behandlingId, {
+        ansvarligTeam: requireField(form, 'ansvarligTeam'),
+      }),
 
-    runBehandling: () =>
-      runBehandling(accessToken, behandlingId),
+    runBehandling: () => runBehandling(accessToken, behandlingId),
 
     sendTilManuellMedKontrollpunkt: () =>
       sendTilManuellMedKontrollpunkt(accessToken, behandlingId, requireField(form, 'kontrollpunkt')),
 
-    sendTilOppdragPaNytt: () =>
-      sendTilOppdragPaNytt(accessToken, behandlingId),
+    sendTilOppdragPaNytt: () => sendTilOppdragPaNytt(accessToken, behandlingId),
 
-    stopp: () =>
-      stopp(accessToken, behandlingId),
+    stopp: () => stopp(accessToken, behandlingId),
 
-    taTilDebug: () =>
-      taTilDebug(accessToken, behandlingId),
+    taTilDebug: () => taTilDebug(accessToken, behandlingId),
   } satisfies Record<Operation, () => Promise<void>>
 }
 
@@ -113,12 +104,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  let detaljertFremdrift: Promise<DetaljertFremdriftDTO | null> | null = null
+  let detaljertFremdrift: Promise<DetaljertFremdriftDTO | undefined> | undefined
   if (behandling._links?.avhengigeBehandlinger) {
-    detaljertFremdrift = getDetaljertFremdrift(
-      accessToken,
-      behandling.behandlingId,
-    )
+    detaljertFremdrift = getDetaljertFremdrift(request, behandling.behandlingId)
   }
 
   return {
@@ -130,7 +118,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 }
 
 export default function Behandling() {
-  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } = useLoaderData<typeof loader>()
+  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } =
+    useLoaderData<typeof loader>()
 
   return (
     <BehandlingCard

@@ -1,13 +1,7 @@
-import type { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
-import type {
-  AggregerteFeilmeldinger,
-  ReguleringDetaljer,
-  ReguleringOrkestrering,
-} from '~/regulering/regulering.types'
-import { useEffect, useState } from 'react'
-import { Form, Link, useFetcher, useNavigation, useOutletContext } from 'react-router';
+import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
 import {
   Alert,
   Button,
@@ -20,34 +14,29 @@ import {
   TextField,
   VStack,
 } from '@navikt/ds-react'
-import { Entry } from '~/components/entry/Entry'
-import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
+import { useEffect, useState } from 'react'
+import { Form, Link, useFetcher, useNavigation, useOutletContext } from 'react-router'
 import { formatIsoTimestamp } from '~/common/date'
-import {
-  BehandlingBatchDetaljertFremdriftBarChart,
-} from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
-import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
+import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
+import { Entry } from '~/components/entry/Entry'
 import { startOrkestrering } from '~/regulering/regulering.server'
-
+import type { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering/regulering.types'
+import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const antallFamilier = formData.get('antallFamilier') as string
-  const kjorOnline = formData.get('kjorOnline') as string === 'true'
-  const brukKjoreplan = formData.get('brukKjoreplan') as string === 'true'
-  const skalSamordne = formData.get('skalSamordne') as string === 'true'
+  const kjorOnline = (formData.get('kjorOnline') as string) === 'true'
+  const brukKjoreplan = (formData.get('brukKjoreplan') as string) === 'true'
+  const skalSamordne = (formData.get('skalSamordne') as string) === 'true'
   return await startOrkestrering(accessToken, antallFamilier, kjorOnline, brukKjoreplan, skalSamordne)
 }
 
-
 export default function Orkestrering() {
-
   const { uttrekk, orkestreringer } = useOutletContext<ReguleringDetaljer>()
   const [antallFamilier, setAntallFamilier] = useState('100000')
-  const setKjoreparametreState = (val: string[]) => useState(val);
   const navigation = useNavigation()
 
   useRevalidateOnInterval({
@@ -57,7 +46,9 @@ export default function Orkestrering() {
 
   if (uttrekk === null) {
     return (
-      <Alert variant="info" inline>Uttrekk ikke kjørt enda.</Alert>
+      <Alert variant="info" inline>
+        Uttrekk ikke kjørt enda.
+      </Alert>
     )
   }
 
@@ -65,59 +56,76 @@ export default function Orkestrering() {
     <>
       <HStack gap="5">
         <VStack gap="5">
-          <Heading level="2" size="medium">Start orkestrering</Heading>
-          <Entry labelText="Antall ubehandlende familier">
-            {uttrekk.antallUbehandlende}
-          </Entry>
+          <Heading level="2" size="medium">
+            Start orkestrering
+          </Heading>
+          <Entry labelText="Antall ubehandlende familier">{uttrekk.antallUbehandlende}</Entry>
           <Form method="post">
             <VStack gap="3">
-              <TextField label="Antall familier" name="antallFamilier"
-                         onChange={(e) => setAntallFamilier(e.target.value)}
-                         value={antallFamilier} />
-                <CheckboxGroup legend="Kjøreparametre" hideLegend={true} onChange={setKjoreparametreState}>
-                  <Checkbox name={'kjorOnline'} value={'true'}>Kjør online kø mot oppdrag</Checkbox>
-                  <Checkbox name={'brukKjoreplan'} value={'true'}>Bruk kjøreplan</Checkbox>
-                  <Checkbox name={'skalSamordne'} value={'true'}>Send til samordning</Checkbox>
-                </CheckboxGroup>
+              <TextField
+                label="Antall familier"
+                name="antallFamilier"
+                onChange={(e) => setAntallFamilier(e.target.value)}
+                value={antallFamilier}
+              />
+              <CheckboxGroup legend="Kjøreparametre" hideLegend={true}>
+                <Checkbox name={'kjorOnline'} value={'true'}>
+                  Kjør online kø mot oppdrag
+                </Checkbox>
+                <Checkbox name={'brukKjoreplan'} value={'true'}>
+                  Bruk kjøreplan
+                </Checkbox>
+                <Checkbox name={'skalSamordne'} value={'true'}>
+                  Send til samordning
+                </Checkbox>
+              </CheckboxGroup>
               <HStack gap="3" align="center">
-                <div><Button loading={navigation.state === 'submitting'} type="submit">Start orkestrering</Button></div>
-                {orkestreringer.length > 0 &&
+                <div>
+                  <Button loading={navigation.state === 'submitting'} type="submit">
+                    Start orkestrering
+                  </Button>
+                </div>
+                {orkestreringer.length > 0 && (
                   <Link to="/batch/reguleringv2/administrerbehandlinger">Administrer tilknyttede behandlinger</Link>
-                }
+                )}
               </HStack>
             </VStack>
           </Form>
-
         </VStack>
       </HStack>
       <VStack gap="5">
         <HStack gap="10">
           <VStack gap="4" style={{ paddingRight: '5rem' }}>
-            <Heading level="2" size="medium">Orkestreringer</Heading>
-            {orkestreringer.length === 0 &&
-              <Alert variant="info" inline>Ingen kjøringer enda</Alert>
-            }
+            <Heading level="2" size="medium">
+              Orkestreringer
+            </Heading>
+            {orkestreringer.length === 0 && (
+              <Alert variant="info" inline>
+                Ingen kjøringer enda
+              </Alert>
+            )}
             {orkestreringer.map((orkestrering, idx) => (
-              <OrkestreringDetaljer key={orkestrering.behandlingId} visStatistikk={idx === 0}
-                                    orkestrering={orkestrering} />
+              <OrkestreringDetaljer
+                key={orkestrering.behandlingId}
+                visStatistikk={idx === 0}
+                orkestrering={orkestrering}
+              />
             ))}
           </VStack>
-          <VStack gap="5">
-            {orkestreringer.length !== 0 && <AggregerteFeilmeldingerTabell />}
-
-          </VStack>
+          <VStack gap="5">{orkestreringer.length !== 0 && <AggregerteFeilmeldingerTabell />}</VStack>
         </HStack>
       </VStack>
-
     </>
   )
 }
 
-export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
-  orkestrering: ReguleringOrkestrering,
+export function OrkestreringDetaljer({
+  orkestrering,
+  visStatistikk,
+}: {
+  orkestrering: ReguleringOrkestrering
   visStatistikk: boolean
 }) {
-
   const fetcher = useFetcher()
 
   function pauseOrkestrering() {
@@ -144,42 +152,72 @@ export function OrkestreringDetaljer({ orkestrering, visStatistikk }: {
     <VStack gap="5">
       <HStack gap="5" align="end">
         <Entry labelText="Status">
-          {orkestrering.status === Behandlingstatus.OPPRETTET &&
-            <Alert variant="info" size="small" inline>Opprettet</Alert>}
-          {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING &&
-            <Alert variant="info" size="small" inline><HStack gap="2">Under behandling <Loader size="small" /></HStack></Alert>}
-          {orkestrering.status === Behandlingstatus.FULLFORT &&
-            <Alert variant="success" size="small" inline>Fullført</Alert>}
-          {orkestrering.status === Behandlingstatus.STOPPET &&
-            <Alert variant="error" size="small" inline>Stoppet</Alert>}
-          {orkestrering.status === Behandlingstatus.DEBUG &&
-            <Alert variant="error" size="small" inline>Debug</Alert>}
+          {orkestrering.status === Behandlingstatus.OPPRETTET && (
+            <Alert variant="info" size="small" inline>
+              Opprettet
+            </Alert>
+          )}
+          {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
+            <Alert variant="info" size="small" inline>
+              <HStack gap="2">
+                Under behandling <Loader size="small" />
+              </HStack>
+            </Alert>
+          )}
+          {orkestrering.status === Behandlingstatus.FULLFORT && (
+            <Alert variant="success" size="small" inline>
+              Fullført
+            </Alert>
+          )}
+          {orkestrering.status === Behandlingstatus.STOPPET && (
+            <Alert variant="error" size="small" inline>
+              Stoppet
+            </Alert>
+          )}
+          {orkestrering.status === Behandlingstatus.DEBUG && (
+            <Alert variant="error" size="small" inline>
+              Debug
+            </Alert>
+          )}
         </Entry>
-        <Entry labelText="Kjøringstidspunkt">
-          {formatIsoTimestamp(orkestrering.kjoringsdato)}
-        </Entry>
+        <Entry labelText="Kjøringstidspunkt">{formatIsoTimestamp(orkestrering.kjoringsdato)}</Entry>
         <Entry labelText="Antall familier">
           {orkestrering.opprettAntallFamilier === -1 ? 'Alle' : orkestrering.opprettAntallFamilier}
         </Entry>
         <Entry labelText="Behandling">
-          <Link to={`/behandling/${orkestrering.behandlingId}`} target="_blank">Gå til behandling</Link>
+          <Link to={`/behandling/${orkestrering.behandlingId}`} target="_blank">
+            Gå til behandling
+          </Link>
         </Entry>
-        {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && <div><Button size="xsmall" variant="secondary-neutral" loading={fetcher.state === "submitting"} icon={<PauseIcon/>} onClick={() => pauseOrkestrering()}>Pause</Button></div>}
-        {orkestrering.status === Behandlingstatus.DEBUG && <Button size="xsmall" variant="secondary" icon={<PlayIcon/>} onClick={() => fortsettOrkestrering()}>Fortsett</Button>}
+        {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
+          <div>
+            <Button
+              size="xsmall"
+              variant="secondary-neutral"
+              loading={fetcher.state === 'submitting'}
+              icon={<PauseIcon />}
+              onClick={() => pauseOrkestrering()}
+            >
+              Pause
+            </Button>
+          </div>
+        )}
+        {orkestrering.status === Behandlingstatus.DEBUG && (
+          <Button size="xsmall" variant="secondary" icon={<PlayIcon />} onClick={() => fortsettOrkestrering()}>
+            Fortsett
+          </Button>
+        )}
       </HStack>
       <HStack>
-        {visStatistikk &&
-          <OrkestreringStatistikk behandlingId={orkestrering.behandlingId} behandlingStatus={orkestrering.status} />}
+        {visStatistikk && (
+          <OrkestreringStatistikk behandlingId={orkestrering.behandlingId} behandlingStatus={orkestrering.status} />
+        )}
       </HStack>
     </VStack>
   )
 }
 
-export function OrkestreringStatistikk({ behandlingId }: {
-  behandlingId: string,
-  behandlingStatus: Behandlingstatus
-}) {
-
+export function OrkestreringStatistikk({ behandlingId }: { behandlingId: string; behandlingStatus: Behandlingstatus }) {
   const fetcher = useFetcher()
 
   // On Mount
@@ -205,14 +243,10 @@ export function OrkestreringStatistikk({ behandlingId }: {
   if (orkestreringStatistikk === undefined) {
     return null
   }
-  return (
-    <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
-  )
+  return <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={orkestreringStatistikk} />
 }
 
-
 export function AggregerteFeilmeldingerTabell() {
-
   const fetcher = useFetcher()
 
   // On Mount
@@ -243,10 +277,7 @@ export function AggregerteFeilmeldingerTabell() {
     return null
   }
 
-  const {
-    aggregerteFeilmeldinger,
-  } = aggregerteFeilmeldingerWrapper
-
+  const { aggregerteFeilmeldinger } = aggregerteFeilmeldingerWrapper
 
   return (
     <VStack gap="5">
@@ -268,19 +299,17 @@ export function AggregerteFeilmeldingerTabell() {
                 <Table.DataCell>{feilmelding.aktivitet}</Table.DataCell>
               </Table.Row>
             ))}
-          </Table>)}
+          </Table>
+        )}
         {aggregerteFeilmeldinger.length === 0 && (
-          <Alert variant="success" inline>Ingen feilmeldinger enda</Alert>
-        )
-        }
+          <Alert variant="success" inline>
+            Ingen feilmeldinger enda
+          </Alert>
+        )}
       </HStack>
       <HStack>
-        <Entry labelText="Antall venter på Rune">
-          {aggregerteFeilmeldingerWrapper.antallVenterPaaRune}
-        </Entry>
+        <Entry labelText="Antall venter på Rune">{aggregerteFeilmeldingerWrapper.antallVenterPaaRune}</Entry>
       </HStack>
     </VStack>
   )
 }
-
-

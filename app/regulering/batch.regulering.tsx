@@ -1,26 +1,32 @@
+import { Heading, HGrid, VStack } from '@navikt/ds-react'
 import type { ActionFunctionArgs } from 'react-router'
 import { redirect, useLoaderData } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
-import ReguleringUttrekk from '~/components/regulering/regulering-uttrekk'
-import FortsettAvhengigeReguleringBehandlinger from '~/components/regulering/regulering-fortsett-avhengige'
-import { getBehandlinger } from '~/services/behandling.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import type { BehandlingerPage } from '~/types'
-import ReguleringOrkestrering from '~/components/regulering/regulering-orkestrering'
-import EndreKjoreLopTilBehandlinger from '~/components/regulering/regulering-endre-kjore-lop'
 import {
   endreKjorelopIverksettVedtakBehandlinger,
   fortsettAvhengigeBehandling,
   startReguleringOrkestrering,
   startReguleringUttrekk,
 } from '~/regulering/batch.bpen068.server'
+import { requireAccessToken } from '~/services/auth.server'
+import { getBehandlinger } from '~/services/behandling.server'
+import type { BehandlingerPage } from '~/types'
+import EndreKjoreLopTilBehandlinger from './regulering-endre-kjore-lop'
+import FortsettAvhengigeReguleringBehandlinger from './regulering-fortsett-avhengige'
+import ReguleringOrkestrering from './regulering-orkestrering'
+import ReguleringUttrekk from './regulering-uttrekk'
+
+export const startReguleringUttrekkFormAction = 'startReguleringUttrekk'
+export const startReguleringOrkestreringFormAction = 'startReguleringOrkestrering'
+export const fortsettAvhengigeFormAction = 'fortsettAvhengige'
+export const endreKjorelopFormAction = 'endreKjorelop'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
 
-  if (updates.formType === 'startReguleringUttrekk') {
+  if (updates.formType === startReguleringUttrekkFormAction) {
     await startReguleringUttrekk(
       accessToken,
       updates.satsDato as string,
@@ -28,8 +34,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       updates.iDebug === 'on',
     )
     return redirect(`/batch/regulering`)
-
-  } else if (updates.formType === 'startReguleringOrkestrering') {
+  } else if (updates.formType === startReguleringOrkestreringFormAction) {
     await startReguleringOrkestrering(
       accessToken,
       updates.satsDato as string,
@@ -37,8 +42,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       updates.maxFamiliebehandlinger as string,
     )
     return redirect(`/batch/regulering`)
-  } else if (updates.formType === 'fortsettAvhengige') {
-
+  } else if (updates.formType === fortsettAvhengigeFormAction) {
     await fortsettAvhengigeBehandling(
       accessToken,
       updates.behandlingIdRegulering as string,
@@ -48,7 +52,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     )
 
     return redirect(`/behandling/${updates.behandlingIdRegulering}`)
-  } else if (updates.formType === 'endreKjorelop') {
+  } else if (updates.formType === endreKjorelopFormAction) {
     await endreKjorelopIverksettVedtakBehandlinger(
       accessToken,
       updates.behandlingIdRegulering as string,
@@ -57,17 +61,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return redirect(`/batch/regulering`)
   }
 
-  return redirect('/error');
+  return redirect('/error')
 }
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
   const accessToken = await requireAccessToken(request)
   const behandlingerUttrekk = await getBehandlinger(accessToken, {
-    behandlingType: "ReguleringUttrekk",
+    behandlingType: 'ReguleringUttrekk',
     status: searchParams.get('status'),
     ansvarligTeam: searchParams.get('ansvarligTeam'),
     isBatch: true,
@@ -76,7 +80,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     sort: null,
   })
   const behandlingerOrkestrering = await getBehandlinger(accessToken, {
-    behandlingType: "ReguleringOrkestrering",
+    behandlingType: 'ReguleringOrkestrering',
     status: searchParams.get('status'),
     ansvarligTeam: searchParams.get('ansvarligTeam'),
     isBatch: true,
@@ -91,39 +95,42 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function OpprettReguleringBatchRoute() {
-  const { behandlingerUttrekk, behandlingerOrkestrering } =
-    useLoaderData<typeof loader>()
+  const { behandlingerUttrekk, behandlingerOrkestrering } = useLoaderData<typeof loader>()
 
   return (
-    <div>
-      <h1>Regulering</h1>
-      <div>
-        <table width="100%">
-          <tr>
-            <td><ReguleringUttrekk /></td>
-            <td><ReguleringOrkestrering /></td>
-          </tr>
-          <tr>
-            <td><EndreKjoreLopTilBehandlinger /></td>
-            <td><FortsettAvhengigeReguleringBehandlinger /></td>
-          </tr>
-        </table>
-      </div>
+    <VStack gap="8">
+      <Heading level="1" size="medium">
+        Regulering
+      </Heading>
 
-      <div>
-        <h2>Orkestrering</h2>
+      <HGrid columns={2} gap="8">
+        <ReguleringUttrekk />
+        <ReguleringOrkestrering />
+        <EndreKjoreLopTilBehandlinger />
+        <FortsettAvhengigeReguleringBehandlinger />
+      </HGrid>
+
+      <VStack>
+        <Heading size="medium" level="2">
+          Orkestrering
+        </Heading>
         <BehandlingerTable
           visStatusSoek={true}
           visBehandlingTypeSoek={false}
           behandlingerResponse={behandlingerOrkestrering as BehandlingerPage}
         />
-        <h2>Uttrekk</h2>
+      </VStack>
+
+      <VStack>
+        <Heading size="medium" level="2">
+          Uttrekk
+        </Heading>
         <BehandlingerTable
           visStatusSoek={true}
           visBehandlingTypeSoek={false}
           behandlingerResponse={behandlingerUttrekk as BehandlingerPage}
         />
-      </div>
-    </div>
+      </VStack>
+    </VStack>
   )
 }
