@@ -224,9 +224,6 @@ export interface HalLinks {
 export type FortsettBatchResponse = {
   behandlingId: number[]
 }
-export type EndreKjorelopIverksettVedtakResponse = {
-  behandlingId: number[]
-}
 
 export type OmregningRequest = {
   behandlingsnokkel: string

@@ -3,7 +3,6 @@ import type { ActionFunctionArgs } from 'react-router'
 import { redirect, useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import {
-  endreKjorelopIverksettVedtakBehandlinger,
   fortsettAvhengigeBehandling,
   startReguleringOrkestrering,
   startReguleringUttrekk,
@@ -11,7 +10,6 @@ import {
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
-import EndreKjoreLopTilBehandlinger from './regulering-endre-kjore-lop'
 import FortsettAvhengigeReguleringBehandlinger from './regulering-fortsett-avhengige'
 import ReguleringOrkestrering from './regulering-orkestrering'
 import ReguleringUttrekk from './regulering-uttrekk'
@@ -19,7 +17,6 @@ import ReguleringUttrekk from './regulering-uttrekk'
 export const startReguleringUttrekkFormAction = 'startReguleringUttrekk'
 export const startReguleringOrkestreringFormAction = 'startReguleringOrkestrering'
 export const fortsettAvhengigeFormAction = 'fortsettAvhengige'
-export const endreKjorelopFormAction = 'endreKjorelop'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
@@ -52,13 +49,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     )
 
     return redirect(`/behandling/${updates.behandlingIdRegulering}`)
-  } else if (updates.formType === endreKjorelopFormAction) {
-    await endreKjorelopIverksettVedtakBehandlinger(
-      accessToken,
-      updates.behandlingIdRegulering as string,
-      updates.velgKjoreLop as string,
-    )
-    return redirect(`/batch/regulering`)
   }
 
   return redirect('/error')
@@ -106,7 +96,6 @@ export default function OpprettReguleringBatchRoute() {
       <HGrid columns={2} gap="8">
         <ReguleringUttrekk />
         <ReguleringOrkestrering />
-        <EndreKjoreLopTilBehandlinger />
         <FortsettAvhengigeReguleringBehandlinger />
       </HGrid>
 

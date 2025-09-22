@@ -17,14 +17,14 @@ import type {
 import type { DetaljertFremdriftDTO } from '~/types'
 
 type OpenConfirmationModalType =
+  | 'endrePrioritetTilBatch'
+  | 'endrePrioritetTilOnline'
   | 'fortsettFeilendeFamiliereguleringer'
   | 'fortsettFamilieReguleringerTilBehandling'
   | 'fortsettFeilendeIverksettVedtak'
   | 'fortsettNyAvviksgrenser'
   | 'fortsettFaktoromregningsmodus'
   | 'fortsettFeilhandteringmodus'
-  | 'endrePrioritetTilOnline'
-  | 'endrePrioritetTilBatch'
 
 export default function AdministrerTilknyttetdeBehandlinger() {
   const { uttrekk, avviksgrenser } = useOutletContext<ReguleringDetaljer>()
@@ -32,14 +32,14 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   const uttrekkBehandlingId = uttrekk?.behandlingId
 
   const fetcher = useFetcher()
+  const fetcherEndrePrioritetTilBatch = useFetcher()
+  const fetcherEndrePrioritetTilOnline = useFetcher()
   const fetcherFortsettFeilendeFamilieReguleringer = useFetcher()
   const fetcherFortsettFamilieReguleringerTilBehandling = useFetcher()
   const fetcherFortsettFeilendeIverksettVedtak = useFetcher()
   const fetcherNyAvviksgrenser = useFetcher()
   const fetcherFaktoromregningsmodus = useFetcher()
   const fetcherFeilhandteringmodus = useFetcher()
-  const fetcherEndrePrioritetTilOnline = useFetcher()
-  const fetcherEndrePrioritetTilBatch = useFetcher()
 
   // On Mount
   useEffect(() => {
@@ -259,20 +259,10 @@ export default function AdministrerTilknyttetdeBehandlinger() {
           </Button>
           <Dropdown.Menu>
             <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item
-                as={Button}
-                onClick={() =>
-                  setOpenConfirmationModal('endrePrioritetTilOnline')
-                }
-              >
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('endrePrioritetTilOnline')}>
                 Endre til ONLINE
               </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item
-                as={Button}
-                onClick={() =>
-                  setOpenConfirmationModal('endrePrioritetTilBatch')
-                }
-              >
+              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('endrePrioritetTilBatch')}>
                 Endre til BATCH
               </Dropdown.Menu.List.Item>
             </Dropdown.Menu.List>
