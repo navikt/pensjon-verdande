@@ -7,7 +7,7 @@ export async function opprettBpen096(
   dryRun: boolean,
   debug: boolean,
 ): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/api/hentSkattehendelser`, {
+  const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -53,7 +53,7 @@ export async function hentSkattehendelserManuelt(
 }
 
 export async function hentAntallSkattehendelser(accessToken: string): Promise<HentAntallSkattehendelserResponse> {
-  const response = await fetch(`${env.penUrl}/api/hentSkattehendelser/antall`, {
+  const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser/antall`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,
