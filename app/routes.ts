@@ -19,8 +19,6 @@ export default [
 
     route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx'),
 
-    route('batch/regulering', 'regulering/batch.regulering.tsx'),
-
     route('batch/reguleringv2', 'regulering/batch.reguleringv2.tsx', [
       route('administrerbehandlinger', 'regulering/batch.reguleringv2.administrerbehandlinger.tsx', [
         route('endrePrioritetBatch', 'regulering/batch.reguleringv2.administrerbehandlinger.endrePrioritetBatch.tsx'),
