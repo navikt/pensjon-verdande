@@ -1,10 +1,9 @@
-import type { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
-import { endrePrioritetTilOnline } from '~/regulering/regulering.server'
-
+import { endrePrioritetTilBatch } from '~/regulering/regulering.server'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
-  return await endrePrioritetTilOnline(accessToken)
+  return await endrePrioritetTilBatch(accessToken)
 }
