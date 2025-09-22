@@ -287,18 +287,22 @@ export function AggregerteFeilmeldingerTabell() {
       <HStack style={{ marginLeft: 'auto' }} gap="3">
         {aggregerteFeilmeldinger.length > 0 && (
           <Table>
-            <Table.Row>
-              <Table.HeaderCell>Antall</Table.HeaderCell>
-              <Table.HeaderCell>Feilmelding</Table.HeaderCell>
-              <Table.HeaderCell>Aktivitet</Table.HeaderCell>
-            </Table.Row>
-            {aggregerteFeilmeldinger.map((feilmelding) => (
-              <Table.Row key={feilmelding.aktivitet + feilmelding.feilmelding}>
-                <Table.DataCell>{feilmelding.antall}</Table.DataCell>
-                <Table.DataCell>{feilmelding.feilmelding}</Table.DataCell>
-                <Table.DataCell>{feilmelding.aktivitet}</Table.DataCell>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Antall</Table.HeaderCell>
+                <Table.HeaderCell>Feilmelding</Table.HeaderCell>
+                <Table.HeaderCell>Aktivitet</Table.HeaderCell>
               </Table.Row>
-            ))}
+            </Table.Header>
+            <Table.Body>
+              {aggregerteFeilmeldinger.map((feilmelding) => (
+                <Table.Row key={feilmelding.aktivitet + feilmelding.feilmelding}>
+                  <Table.DataCell>{feilmelding.antall}</Table.DataCell>
+                  <Table.DataCell>{feilmelding.feilmelding}</Table.DataCell>
+                  <Table.DataCell>{feilmelding.aktivitet}</Table.DataCell>
+                </Table.Row>
+              ))}
+            </Table.Body>
           </Table>
         )}
         {aggregerteFeilmeldinger.length === 0 && (
