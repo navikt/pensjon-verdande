@@ -97,7 +97,7 @@ export default function Uttrekk() {
           uttrekk.status === Behandlingstatus.FULLFORT ||
           uttrekk.status === Behandlingstatus.STOPPET) && <Button onClick={() => setIsOpen(true)}>Kjør uttrekk</Button>}
         {uttrekk?.status === Behandlingstatus.FULLFORT && (
-          <Link to="/batch/reguleringv2/orkestrering">Gå til Orkestrering</Link>
+          <Link to="/batch/regulering/orkestrering">Gå til Orkestrering</Link>
         )}
       </HStack>
       <StartUttrekkModal isOpen={isOpen} onClose={() => setIsOpen(false)} />

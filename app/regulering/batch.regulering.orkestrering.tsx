@@ -86,7 +86,7 @@ export default function Orkestrering() {
                   </Button>
                 </div>
                 {orkestreringer.length > 0 && (
-                  <Link to="/batch/reguleringv2/administrerbehandlinger">Administrer tilknyttede behandlinger</Link>
+                  <Link to="/batch/regulering/administrerbehandlinger">Administrer tilknyttede behandlinger</Link>
                 )}
               </HStack>
             </VStack>

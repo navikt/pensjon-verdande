@@ -11,7 +11,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
   const url = new URL(request.url)
   const pathname = url.pathname
-  if (pathname.endsWith('reguleringv2')) {
+  if (pathname.endsWith('regulering')) {
     return redirect(stepToPath(regulering.steg))
   }
 
@@ -37,27 +37,24 @@ export default function OpprettReguleringBatchRoute() {
       <HStack>
         <Stepper aria-labelledby="stepper-heading" activeStep={currentStep} orientation="horizontal">
           <Stepper.Step
-            href="/batch/reguleringv2/uttrekk"
+            href="/batch/regulering/uttrekk"
             completed={regulering.uttrekk?.status === Behandlingstatus.FULLFORT}
           >
             Uttrekk
           </Stepper.Step>
           <Stepper.Step
-            href="/batch/reguleringv2/ekskludertesaker"
+            href="/batch/regulering/ekskludertesaker"
             completed={regulering.uttrekk?.antallUbehandlende === 0}
           >
             Ekskluder saker
           </Stepper.Step>
-          <Stepper.Step
-            href="/batch/reguleringv2/orkestrering"
-            completed={regulering.uttrekk?.antallUbehandlende === 0}
-          >
+          <Stepper.Step href="/batch/regulering/orkestrering" completed={regulering.uttrekk?.antallUbehandlende === 0}>
             Orkestrering
           </Stepper.Step>
-          <Stepper.Step href="/batch/reguleringv2/administrerbehandlinger">
+          <Stepper.Step href="/batch/regulering/administrerbehandlinger">
             Administrer tilknyttede behandlinger
           </Stepper.Step>
-          <Stepper.Step href="/batch/reguleringv2/avsluttendeaktiviteter">Avsluttende aktiviteter</Stepper.Step>
+          <Stepper.Step href="/batch/regulering/avsluttendeaktiviteter">Avsluttende aktiviteter</Stepper.Step>
         </Stepper>
       </HStack>
       <Outlet context={regulering} />
@@ -84,15 +81,15 @@ function getCurrentStep(currentPathName: string) {
 function stepToPath(step: number) {
   switch (step) {
     case 1:
-      return '/batch/reguleringv2/uttrekk'
+      return '/batch/regulering/uttrekk'
     case 2:
-      return '/batch/reguleringv2/ekskludertesaker'
+      return '/batch/regulering/ekskludertesaker'
     case 3:
-      return '/batch/reguleringv2/orkestrering'
+      return '/batch/regulering/orkestrering'
     case 4:
-      return '/batch/reguleringv2/administrerbehandlinger'
+      return '/batch/regulering/administrerbehandlinger'
     case 5:
-      return '/batch/reguleringv2/avsluttendeaktiviteter'
+      return '/batch/regulering/avsluttendeaktiviteter'
   }
   throw new Error(`Unrecognized step: ${step}`)
 }
