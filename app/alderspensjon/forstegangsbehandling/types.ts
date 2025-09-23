@@ -4,6 +4,11 @@ export type BehandlingTypeCode = 'AUTO' | 'DEL_AUTO' | 'MAN'
 
 export type AldeBehandlingStatus = 'VENTER_SAKSBEHANDLER' | 'VENTER_MASKINELL' | 'VENTER_ATTESTERING' | 'FULLFORT'
 
+export type Kontrollpunkt = {
+  type: string
+  status: string
+}
+
 export interface AlderspensjonssoknadDto {
   behandlingId: number
   uuid: string
@@ -15,6 +20,7 @@ export interface AlderspensjonssoknadDto {
   status: BehandlingStatus
   aldeStatus: AldeBehandlingStatus
   nesteAktiviteter: string[]
+  kontrollpunkter: Kontrollpunkt[]
   feilmelding: string | null
   stackTrace: string | null
   sakId: number
