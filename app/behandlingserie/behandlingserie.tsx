@@ -115,11 +115,30 @@ export default function BehandlingOpprett_index() {
     // Horisont
     const now = new Date();
     const [includeNextYear, setIncludeNextYear] = useState(false);
+
     const endOfHorizon = useMemo(() => {
         const now = new Date();
         const endYear = now.getFullYear() + (includeNextYear ? 1 : 0);
         return new Date(endYear, 11, 31);
     }, [includeNextYear]);
+
+    const sundaysInRange = useMemo(() => {
+        const out: Date[] = [];
+        const start = new Date();                 // fra i dag
+        start.setHours(0, 0, 0, 0);
+
+        // finn første søndag >= i dag
+        const firstSunday = new Date(start);
+        const day = firstSunday.getDay();         // 0 = søndag
+        const delta = (7 - day) % 7;
+        firstSunday.setDate(firstSunday.getDate() + delta);
+
+        // push alle søndager t.o.m. endOfHorizon
+        for (let d = firstSunday; d <= endOfHorizon; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 7)) {
+            out.push(new Date(d));
+        }
+        return out;
+    }, [endOfHorizon]);
 
     // State
     const [regelmessighet, setRegelmessighet] = useState<RegelmessighetMode>('range'); // ⬅️ start i range
@@ -242,10 +261,16 @@ export default function BehandlingOpprett_index() {
 
     const disabledDatesForCalendar = useMemo(() => {
         const out: Date[] = [];
-        if (ekskluderHelligdager) out.push(...holidayData.dates);
+        if (ekskluderHelligdager) {
+            out.push(...holidayData.dates);     // røde dager (nasjonale helligdager)
+            if (!ekskluderHelg) {
+                // Når vi ikke ekskluderer helg, skal lørdag være lov – men søndag er fortsatt helligdag i Norge
+                out.push(...sundaysInRange);
+            }
+        }
         out.push(...bookedData.dates);
         return out;
-    }, [ekskluderHelligdager, holidayData.dates, bookedData.dates]);
+    }, [ekskluderHelligdager, ekskluderHelg, holidayData.dates, bookedData.dates, sundaysInRange]);
 
     /* --- Flatten planlagte datoer til boble-preview --- */
     const plannedItems: PlannedItem[] = useMemo(() => {
@@ -437,7 +462,7 @@ export default function BehandlingOpprett_index() {
                                     Inkluder neste år
                                 </Checkbox>
                                 <Checkbox checked={ekskluderHelligdager} onChange={e => setEkskluderHelligdager(e.target.checked)}>
-                                    Ekskluder helligdager (NO)
+                                    Ekskluder helligdager
                                 </Checkbox>
                                 <Checkbox checked={!!ekskluderHelg} onChange={e => setEkskluderHelg(e.target.checked)}>
                                     Ekskluder helg
