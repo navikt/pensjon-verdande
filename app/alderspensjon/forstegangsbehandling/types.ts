@@ -2,6 +2,8 @@ export type BehandlingStatus = 'OPPRETTET' | 'UNDER_BEHANDLING' | 'FULLFORT' | '
 
 export type BehandlingTypeCode = 'AUTO' | 'DEL_AUTO' | 'MAN'
 
+export type AldeBehandlingStatus = 'VENTER_SAKSBEHANDLER' | 'VENTER_MASKINELL' | 'VENTER_ATTESTERING' | 'FULLFORT'
+
 export interface AlderspensjonssoknadDto {
   behandlingId: number
   uuid: string
@@ -11,6 +13,7 @@ export interface AlderspensjonssoknadDto {
   stoppet: string | null
   ferdig: string | null
   status: BehandlingStatus
+  aldeStatus: AldeBehandlingStatus
   nesteAktiviteter: string[]
   feilmelding: string | null
   stackTrace: string | null

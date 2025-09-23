@@ -27,7 +27,7 @@ import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-ro
 import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
 import { buildUrl } from '~/common/build-url'
 import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow } from '~/common/date'
-import { decodeBehandlingstype } from '~/common/decode'
+import { decodeAldeBehandlingStatus, decodeBehandlingstype } from '~/common/decode'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { PageResponse } from '~/types'
@@ -444,6 +444,7 @@ function BehandlingCard({
             noWrap
           />
           <KV label="Behandlingstype" value={decodeBehandlingstype(b.behandlingstype)} />
+          <KV label="Alde status" value={decodeAldeBehandlingStatus(b.aldeStatus)} />
         </HStack>
 
         {b.nesteAktiviteter.length === 1 ? (
