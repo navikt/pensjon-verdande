@@ -1,65 +1,73 @@
-import { env } from '~/services/env.server'
-import type {BehandlingDto, BehandlingSerieDTO, StartBatchResponse} from '~/types'
+import type {BehandlingSerieDTO} from '~/types';
+import {env} from '~/services/env.server'
 
-export const opprettBehandlingSerie = async(
-  accessToken: string,
-  behandlingCode: string,
-  regelmessighet: string,
-  valgteDatoer: string[],
-  startTid: string,
-  opprettetAv: string,
-) => {
-    const planlagteKjoringer = valgteDatoer.map(d =>
-        `${d}T${startTid}:00`
-    );
+const BASE = env.penUrl;
 
-    const body = {
-            behandlingCode: behandlingCode,
-            planlagteKjoringer: planlagteKjoringer,
-            regelmessighet: regelmessighet.toUpperCase(),
-            opprettetAv: opprettetAv,
-        }
-
-    console.log('Request body:', body); // Log the request body for debugging
-
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/serier`,
-    {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
-  )
-
-  if (response.ok) {
-    return (await response.json()) as string
-  } else {
-    throw new Error(`Failed to create behandling serie: ${response.status} ${response.statusText}`)
-  }
+async function req(url: string, init: RequestInit & { accessToken: string }) {
+    const {accessToken, ...rest} = init;
+    const res = await fetch(`${BASE}${url}`, {
+        ...rest,
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+            ...(rest.headers || {}),
+        },
+    });
+    if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status} ${res.statusText}: ${text}`);
+    }
+    return res;
 }
 
-export const getBehandlingSerier = async (
-    accessToken: string,
-    behandlingType: string,
-) => {
-    const response = await fetch(
-        `${env.penUrl}/api/behandling/serier?behandlingCode=${behandlingType}`,
-        { method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'X-Request-ID': crypto.randomUUID(),
-          },
-        },
-      )
+export async function getBehandlingSerier(accessToken: string, behandlingCode: string): Promise<BehandlingSerieDTO[]> {
+    if (!behandlingCode) return [];
+    const res = await req(`/api/behandling/serier?behandlingCode=${encodeURIComponent(behandlingCode)}`, {
+        method: 'GET',
+        accessToken,
+    });
+    return res.json();
+}
 
-      if (response.ok) {
-        return (await response.json()) as BehandlingSerieDTO[]
-      } else {
-        return []
-      }
-    }
+export async function opprettBehandlingSerie(
+    accessToken: string,
+    behandlingCode: string,
+    regelmessighet: string,
+    ymdDates: string[],
+    time: string,
+    opprettetAv?: string
+): Promise<string> {
+    const planlagteKjoringer = ymdDates.map(d => `${d}T${time}:00`);
+    const body = {
+        behandlingCode,
+        planlagteKjoringer,
+        regelmessighet: regelmessighet.toUpperCase(),
+        opprettetAv: opprettetAv ?? 'VERDANDE',
+    };
+    const res = await req(`/api/behandling/serier`, {
+        method: 'POST',
+        accessToken,
+        body: JSON.stringify(body),
+    });
+    return res.json();
+}
+
+export async function endrePlanlagtStartet(
+    accessToken: string,
+    behandlingId: string | number,
+    planlagtStartetIsoLocal: string,
+    fjernFraSerie = false
+): Promise<void> {
+    await req(
+        `/api/behandling/serier/${behandlingId}/endrePlanlagtStartet?planlagtStartet=${encodeURIComponent(planlagtStartetIsoLocal)}&fjernFraSerie=${fjernFraSerie}`,
+        {method: 'PUT', accessToken}
+    );
+}
+
+export async function fjernFraSerie(
+    accessToken: string,
+    behandlingId: string | number,
+    originalPlanlagtStartetIsoLocal: string
+): Promise<void> {
+    await endrePlanlagtStartet(accessToken, behandlingId, originalPlanlagtStartetIsoLocal, true);
+}

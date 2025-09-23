@@ -1,0 +1,64 @@
+.previewContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.previewBubble {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    min-width: 74px;
+    background: #f4f4f4;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.previewBubble:hover {
+    background: #ececec;
+}
+
+.previewBubble:active {
+    transform: translateY(1px);
+}
+
+.dayLabel {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.dateLabel {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.timeLabel {
+    font-size: 0.8rem;
+    color: #333;
+    margin-top: 2px;
+}
+
+.serieTag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    background: #eee;
+    border-radius: 6px;
+    padding: 0 6px;
+    margin-top: 4px;
+}
+
+/* Ulike bakgrunnsfarger per ukedag */
+.day-1 { background: #e6f4ea; } /* man */
+.day-2 { background: #e6f0ff; } /* tir */
+.day-3 { background: #f3f3f3; } /* ons */
+.day-4 { background: #fff4e5; } /* tor */
+.day-5 { background: #eaf7ff; } /* fre */
+.day-6 { background: #f9e6ff; } /* lør */
+.day-0 { background: #ffe6e6; } /* søn */
