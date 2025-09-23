@@ -1,6 +1,4 @@
 import 'chart.js/auto'
-import type { ReguleringDetaljer } from '~/regulering/regulering.types'
-import { useState } from 'react'
 import {
   Alert,
   BodyLong,
@@ -13,15 +11,16 @@ import {
   ReadMore,
   VStack,
 } from '@navikt/ds-react'
-import { Behandlingstatus } from '~/types'
-import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
-import { Entry } from '~/components/entry/Entry'
-import { Link, useFetcher, useOutletContext } from 'react-router';
 import { format, formatISO } from 'date-fns'
+import { useState } from 'react'
+import { Link, useFetcher, useOutletContext } from 'react-router'
+import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
+import { Entry } from '~/components/entry/Entry'
+import type { ReguleringDetaljer } from '~/regulering/regulering.types'
+import { Behandlingstatus } from '~/types'
 
 export default function Uttrekk() {
-
   const { uttrekk } = useOutletContext<ReguleringDetaljer>()
 
   useRevalidateOnInterval({
@@ -33,14 +32,15 @@ export default function Uttrekk() {
   return (
     <>
       <HStack>
-        {uttrekk !== null && uttrekk.behandlingId !== null &&
+        {uttrekk !== null && uttrekk.behandlingId !== null && (
           <VStack gap="3">
             {uttrekk.status === Behandlingstatus.UNDER_BEHANDLING && (
               <Alert variant="info" inline>
                 <VStack gap="2">
                   <HStack gap="2">
                     <div>Uttrekk er under behandling: {uttrekk.steg}</div>
-                    <Loader /></HStack>
+                    <Loader />
+                  </HStack>
                   <ProgressBar
                     title={uttrekk.steg}
                     value={uttrekk.progresjon}
@@ -52,22 +52,27 @@ export default function Uttrekk() {
               </Alert>
             )}
             {uttrekk.status === Behandlingstatus.STOPPET && (
-              <Alert variant="error" inline>Uttrekk er stoppet manuelt</Alert>
+              <Alert variant="error" inline>
+                Uttrekk er stoppet manuelt
+              </Alert>
             )}
             {uttrekk.feilmelding !== null && (
-              <Alert variant="warning" inline>{uttrekk.feilmelding}</Alert>
+              <Alert variant="warning" inline>
+                {uttrekk.feilmelding}
+              </Alert>
             )}
             {uttrekk.status === Behandlingstatus.FULLFORT && (
-              <Alert variant="success" inline><VStack gap="2">Uttrekk er
-                fullført {formatIsoTimestamp(uttrekk.uttrekkDato)}</VStack></Alert>
+              <Alert variant="success" inline>
+                <VStack gap="2">Uttrekk er fullført {formatIsoTimestamp(uttrekk.uttrekkDato)}</VStack>
+              </Alert>
             )}
             <HStack gap="3">
               <ReadMore header="Vis kjøretid for aktiviteter">
                 <VStack>
                   {uttrekk?.kjoretidAktiviteter.map((aktivitet) => (
-                    <Alert variant="success" inline size="small"
-                           key={aktivitet.aktivitet}>{aktivitet.minutter}min {aktivitet.sekunder}s
-                      - {aktivitet.aktivitet}</Alert>
+                    <Alert variant="success" inline size="small" key={aktivitet.aktivitet}>
+                      {aktivitet.minutter}min {aktivitet.sekunder}s - {aktivitet.aktivitet}
+                    </Alert>
                   ))}
                 </VStack>
               </ReadMore>
@@ -77,30 +82,30 @@ export default function Uttrekk() {
               <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>
               <Entry labelText={'Antall familier'}>{uttrekk?.familierTabellSize}</Entry>
 
-                <Entry labelText={'Behandling'}>
-                  <Link to={`/behandling/${uttrekk.behandlingId}`} target="_blank">Gå til
-                    behandling</Link>
-                </Entry>
+              <Entry labelText={'Behandling'}>
+                <Link to={`/behandling/${uttrekk.behandlingId}`} target="_blank">
+                  Gå til behandling
+                </Link>
+              </Entry>
             </HStack>
           </VStack>
-        }
+        )}
       </HStack>
       <HStack gap="3" align="center">
-        {(uttrekk === null || uttrekk.behandlingId == null || (uttrekk.status === Behandlingstatus.FULLFORT || uttrekk.status === Behandlingstatus.STOPPET))
-          && <Button onClick={() => setIsOpen(true)}>Kjør uttrekk</Button>
-        }
-        {uttrekk?.status === Behandlingstatus.FULLFORT &&
-          <Link to="/batch/reguleringv2/orkestrering">Gå til Orkestrering</Link>
-        }
+        {(uttrekk === null ||
+          uttrekk.behandlingId == null ||
+          uttrekk.status === Behandlingstatus.FULLFORT ||
+          uttrekk.status === Behandlingstatus.STOPPET) && <Button onClick={() => setIsOpen(true)}>Kjør uttrekk</Button>}
+        {uttrekk?.status === Behandlingstatus.FULLFORT && (
+          <Link to="/batch/regulering/orkestrering">Gå til Orkestrering</Link>
+        )}
       </HStack>
       <StartUttrekkModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   )
-
 }
 
-function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
-
+function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const year = new Date().getFullYear()
   const defaultSatsdato = new Date(`1 May ${year}`)
   const [satsDato, setSatsDato] = useState<Date | undefined>(defaultSatsdato)
@@ -125,9 +130,7 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
     <Modal header={{ heading: 'Start uttrekk' }} open={isOpen} onClose={() => onClose()}>
       <Modal.Body>
         <VStack gap="5">
-          <BodyLong>
-            Velg satsdato
-          </BodyLong>
+          <BodyLong>Velg satsdato</BodyLong>
           <DatePicker.Standalone
             selected={satsDato}
             today={defaultSatsdato}
@@ -142,21 +145,10 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean, onClose: () =
         <Button onClick={startUttrekk} loading={fetcher.state === 'submitting'}>
           Start uttrekk
         </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => onClose()}
-        >
+        <Button type="button" variant="secondary" onClick={() => onClose()}>
           Avbryt
         </Button>
       </Modal.Footer>
-    </Modal>)
+    </Modal>
+  )
 }
-
-
-
-
-
-
-
-

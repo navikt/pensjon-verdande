@@ -1,41 +1,49 @@
-import { PassThrough } from "node:stream";
-
-import type { ActionFunctionArgs, EntryContext, LoaderFunctionArgs } from "react-router";
-import { createReadableStreamFromReadable } from "@react-router/node";
-import { ServerRouter } from "react-router";
-import * as isbotModule from "isbot";
-import { renderToPipeableStream } from "react-dom/server";
+import { PassThrough } from 'node:stream'
+import { inspect } from 'node:util'
+import { createReadableStreamFromReadable } from '@react-router/node'
+import * as isbotModule from 'isbot'
+import { renderToPipeableStream } from 'react-dom/server'
+import type { ActionFunctionArgs, EntryContext, LoaderFunctionArgs } from 'react-router'
+import { ServerRouter } from 'react-router'
 import { logger } from '~/services/logger.server'
 
-const ABORT_DELAY = 120_000;
+const ABORT_DELAY = 120_000
 
 // Styrer hvor lenge Suspense/Await venter før de feiler. Suspense/Await brukes av Dashboardet, som bruker
 // endel tid på å laste inn
-export const streamTimeout = 10_000
+export const streamTimeout = 30_000
 
-process.on("unhandledRejection", (reason: any, p: Promise<any>) => {
-  logger.error("Unhandled Rejection at:", p, "reason:", reason);
+process.on('unhandledRejection', (reason: unknown) => {
+  let stack: string
 
-  let stack = '';
-  if (reason?.stack) {
-    stack = reason.stack;
+  if (reason instanceof Error) {
+    stack = `${reason.name}: ${reason.message}\n${reason.stack ?? ''}`
   } else if (typeof reason === 'string') {
-    stack = reason;
+    stack = reason
   } else {
-    stack = JSON.stringify(reason);
+    stack = inspect(reason, { depth: 2, breakLength: 120 })
   }
 
-  logger.error("Unhandled Promise Rejection", { reason, stack, promise: p });
-});
+  console.error('Unhandled rejection', {
+    reason,
+    stack,
+  })
+})
 
-export function handleError(
-  error: unknown,
-  {
-    request,
-  }: LoaderFunctionArgs | ActionFunctionArgs
-) {
+process.on('uncaughtException', (error: Error) => {
+  const stack = `${error.name}: ${error.message}\n${error.stack ?? ''}`
+
+  console.error('Uncaught exception', {
+    error,
+    stack,
+  })
+
+  process.exit(1)
+})
+
+export function handleError(error: unknown, { request }: LoaderFunctionArgs | ActionFunctionArgs) {
   if (!request.signal.aborted) {
-    logger.error({ err: error }, "Unhandled error");
+    logger.error({ err: error }, 'Unhandled error')
   }
 }
 
@@ -43,134 +51,109 @@ export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  reactRouterContext: EntryContext
+  reactRouterContext: EntryContext,
 ) {
-  const prohibitOutOfOrderStreaming =
-    isBotRequest(request.headers.get("user-agent")) || reactRouterContext.isSpaMode;
+  const prohibitOutOfOrderStreaming = isBotRequest(request.headers.get('user-agent')) || reactRouterContext.isSpaMode
 
   return prohibitOutOfOrderStreaming
-    ? handleBotRequest(
-        request,
-        responseStatusCode,
-        responseHeaders,
-        reactRouterContext
-      )
-    : handleBrowserRequest(
-        request,
-        responseStatusCode,
-        responseHeaders,
-        reactRouterContext
-      );
+    ? handleBotRequest(request, responseStatusCode, responseHeaders, reactRouterContext)
+    : handleBrowserRequest(request, responseStatusCode, responseHeaders, reactRouterContext)
 }
 
 function isBotRequest(userAgent: string | null) {
   if (!userAgent) {
-    return false;
+    return false
   }
 
-  if ("isbot" in isbotModule && typeof isbotModule.isbot === "function") {
-    return isbotModule.isbot(userAgent);
+  if ('isbot' in isbotModule && typeof isbotModule.isbot === 'function') {
+    return isbotModule.isbot(userAgent)
   }
 
-  return false;
+  return false
 }
 
 function handleBotRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  reactRouterContext: EntryContext
+  reactRouterContext: EntryContext,
 ) {
   return new Promise((resolve, reject) => {
-    let shellRendered = false;
-    const { pipe, abort } = renderToPipeableStream(
-      <ServerRouter
-        context={reactRouterContext}
-        url={request.url}
-        abortDelay={ABORT_DELAY}
-      />,
-      {
-        onAllReady() {
-          shellRendered = true;
-          const body = new PassThrough();
-          const stream = createReadableStreamFromReadable(body);
+    let shellRendered = false
+    const { pipe, abort } = renderToPipeableStream(<ServerRouter context={reactRouterContext} url={request.url} />, {
+      onAllReady() {
+        shellRendered = true
+        const body = new PassThrough()
+        const stream = createReadableStreamFromReadable(body)
 
-          responseHeaders.set("Content-Type", "text/html");
+        responseHeaders.set('Content-Type', 'text/html')
 
-          resolve(
-            new Response(stream, {
-              headers: responseHeaders,
-              status: responseStatusCode,
-            })
-          );
+        resolve(
+          new Response(stream, {
+            headers: responseHeaders,
+            status: responseStatusCode,
+          }),
+        )
 
-          pipe(body);
-        },
-        onShellError(error: unknown) {
-          reject(error);
-        },
-        onError(error: unknown) {
-          responseStatusCode = 500;
-          // Log streaming rendering errors from inside the shell.  Don't log
-          // errors encountered during initial shell rendering since they'll
-          // reject and get logged in handleDocumentRequest.
-          if (shellRendered) {
-            console.error(error);
-          }
-        },
-      }
-    );
+        pipe(body)
+      },
+      onShellError(error: unknown) {
+        reject(error)
+      },
+      onError(error: unknown) {
+        responseStatusCode = 500
+        // Log streaming rendering errors from inside the shell.  Don't log
+        // errors encountered during initial shell rendering since they'll
+        // reject and get logged in handleDocumentRequest.
+        if (shellRendered) {
+          console.error(error)
+        }
+      },
+    })
 
-    setTimeout(abort, ABORT_DELAY);
-  });
+    setTimeout(abort, ABORT_DELAY)
+  })
 }
 
 function handleBrowserRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  reactRouterContext: EntryContext
+  reactRouterContext: EntryContext,
 ) {
   return new Promise((resolve, reject) => {
-    let shellRendered = false;
-    const { pipe, abort } = renderToPipeableStream(
-      <ServerRouter
-        context={reactRouterContext}
-        url={request.url}
-        abortDelay={ABORT_DELAY}
-      />,
-      {
-        onShellReady() {
-          shellRendered = true;
-          const body = new PassThrough();
-          const stream = createReadableStreamFromReadable(body);
+    let shellRendered = false
+    const { pipe, abort } = renderToPipeableStream(<ServerRouter context={reactRouterContext} url={request.url} />, {
+      onShellReady() {
+        shellRendered = true
+        const body = new PassThrough()
+        const stream = createReadableStreamFromReadable(body)
 
-          responseHeaders.set("Content-Type", "text/html");
+        responseHeaders.set('Content-Type', 'text/html')
 
-          resolve(
-            new Response(stream, {
-              headers: responseHeaders,
-              status: responseStatusCode,
-            })
-          );
+        resolve(
+          new Response(stream, {
+            headers: responseHeaders,
+            status: responseStatusCode,
+          }),
+        )
 
-          pipe(body);
-        },
-        onShellError(error: unknown) {
-          reject(error);
-        },
-        onError(error: unknown) {
-          responseStatusCode = 500;
-          // Log streaming rendering errors from inside the shell.  Don't log
-          // errors encountered during initial shell rendering since they'll
-          // reject and get logged in handleDocumentRequest.
-          if (shellRendered) {
-            console.error(error);
-          }
-        },
-      }
-    );
+        pipe(body)
+      },
+      onShellError(error: unknown) {
+        reject(error)
+      },
+      onError(error: unknown) {
+        responseStatusCode = 500
+        // Log streaming rendering errors from inside the shell.  Don't log
+        // errors encountered during initial shell rendering since they'll
+        // reject and get logged in handleDocumentRequest.
+        if (shellRendered) {
+          console.error(error)
+        }
+      },
+    })
 
-    setTimeout(abort, ABORT_DELAY);
-  });
+    setTimeout(abort, ABORT_DELAY)
+  })
 }

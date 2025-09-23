@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs } from 'react-router';
-import { requireAccessToken } from '~/services/auth.server'
+import type { ActionFunctionArgs } from 'react-router'
 import { oppdaterOmregningInput } from '~/omregning/batch.omregning.server'
+import { requireAccessToken } from '~/services/auth.server'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -11,7 +11,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     .map((t: string) => t.trim())
     .filter((t: string) => t !== '')
     .map(Number)
-  console.log("Saker", omregnedeSaker)
+  console.log('Saker', omregnedeSaker)
 
   const requestPen: { saker: number[] } = {
     saker: omregnedeSaker,

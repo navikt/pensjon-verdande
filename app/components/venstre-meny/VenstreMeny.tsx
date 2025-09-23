@@ -46,7 +46,6 @@ const batcherMeny = [
   ['OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/manedlig/omregning`, 'Månedlig omregning ved opptjeningsendring'],
   ['OMREGNING_VED_ARLIG_OPPTJENINGSENDRING', `/opptjening/arlig/omregning`, 'Årlig omregning ved opptjeningsendring'],
   ['REGULERING', `/batch/regulering`, 'Regulering'],
-  ['REGULERING', `/batch/reguleringv2`, 'Regulering Next'],
 ]
 
 const omregningMeny = [
@@ -57,6 +56,7 @@ const omregningMeny = [
 
 const behandlingerMeny = [
   ['SE_BEHANDLINGER', '/behandlinger', 'Alle behandlinger'],
+  ['SE_BEHANDLINGER', '/alderspensjon/forstegangsbehandling/soknader', 'Alderspensjonssøknader'],
   ['SE_BEHANDLINGER', '/behandlinger/DEBUG', 'I debug'],
   ['SE_BEHANDLINGER', '/behandlinger/FEILENDE', 'Feilende'],
   ['SE_BEHANDLINGER', '/behandlinger/FULLFORT', 'Fullførte'],

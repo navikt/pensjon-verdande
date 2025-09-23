@@ -1,9 +1,9 @@
-import type { ActionFunctionArgs } from 'react-router'
 import { VStack } from '@navikt/ds-react'
-import { requireAccessToken } from '~/services/auth.server'
-import { search } from '~/services/behandling.server'
+import type { ActionFunctionArgs } from 'react-router'
 import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { requireAccessToken } from '~/services/auth.server'
+import { search } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -28,7 +28,6 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       size ? +size : 10,
       searchParams.get('sort'),
     )
-
   } else {
     behandlinger = null
   }
@@ -43,10 +42,7 @@ export default function Sok() {
 
   return (
     <VStack gap="4">
-      {
-        behandlinger &&
-        <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
-      }
+      {behandlinger && <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />}
     </VStack>
   )
 }

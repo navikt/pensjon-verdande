@@ -1,12 +1,16 @@
+import { env } from '~/services/env.server'
 import type {
+  OmregningBehandlingsnoekler,
   OmregningInit,
   OmregningInput,
   OmregningRequest,
   OmregningSakerPage,
-  OmregningBehandlingsnoekler,
-  StartBatchResponse, OmregningStatistikkPage,
+  OmregningStatistikkPage,
 } from '~/types'
-import { env } from '~/services/env.server'
+
+type StartBatchResponse = {
+  behandlingId: number
+}
 
 export async function opprettOmregningbehandling(
   accessToken: string,
@@ -23,15 +27,13 @@ export async function opprettOmregningbehandling(
   })
 
   if (response.ok) {
-    return await response.json() as StartBatchResponse
+    return (await response.json()) as StartBatchResponse
   } else {
     throw new Error()
   }
 }
 
-export async function hentOmregningInit(
-  accessToken: string,
-): Promise<OmregningInit> {
+export async function hentOmregningInit(accessToken: string): Promise<OmregningInit> {
   const response = await fetch(`${env.penUrl}/api/behandling/omregning/init`, {
     method: 'GET',
     headers: {
@@ -42,17 +44,13 @@ export async function hentOmregningInit(
   })
 
   if (response.ok) {
-    return await response.json() as OmregningInit
+    return (await response.json()) as OmregningInit
   } else {
     throw new Error()
   }
 }
 
-export async function hentOmregningInput(
-  accessToken: string,
-  page: number,
-  size: number,
-): Promise<OmregningSakerPage> {
+export async function hentOmregningInput(accessToken: string, page: number, size: number): Promise<OmregningSakerPage> {
   const response = await fetch(`${env.penUrl}/api/behandling/omregning/input?page=${page}&size=${size}`, {
     method: 'GET',
     headers: {
@@ -63,7 +61,7 @@ export async function hentOmregningInput(
   })
 
   if (response.ok) {
-    return await response.json() as OmregningSakerPage
+    return (await response.json()) as OmregningSakerPage
   } else {
     throw new Error()
   }
@@ -84,15 +82,13 @@ export async function oppdaterOmregningInput(
   })
 
   if (response.ok) {
-    return await response.json() as OmregningInput
+    return (await response.json()) as OmregningInput
   } else {
     throw new Error()
   }
 }
 
-export async function hentOmregningbehandlingsnokler(
-  accessToken: string,
-): Promise<OmregningBehandlingsnoekler> {
+export async function hentOmregningbehandlingsnokler(accessToken: string): Promise<OmregningBehandlingsnoekler> {
   const response = await fetch(`${env.penUrl}/api/behandling/omregning/statistikk/behandlingsnoekler`, {
     method: 'GET',
     headers: {
@@ -115,34 +111,37 @@ export async function hentOmregningStatistikk(
   page: number,
   size: number,
 ): Promise<OmregningStatistikkPage> {
-  const response = await fetch(`${env.penUrl}/api/behandling/omregning/statistikk?behandlingsnoekkel=${behandlingsnoekkel}&page=${page}&size=${size}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/omregning/statistikk?behandlingsnoekkel=${behandlingsnoekkel}&page=${page}&size=${size}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
     },
-  })
+  )
 
   if (response.ok) {
-    return await response.json() as OmregningStatistikkPage
+    return (await response.json()) as OmregningStatistikkPage
   } else {
     throw new Error()
   }
 }
 
-export async function hentOmregningStatistikkCsv(
-  accessToken: string,
-  behandlingsnoekkel: string,
-): Promise<string> {
-  const response = await fetch(`${env.penUrl}/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsnoekkel}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
+export async function hentOmregningStatistikkCsv(accessToken: string, behandlingsnoekkel: string): Promise<string> {
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsnoekkel}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
     },
-  })
+  )
 
   if (response.ok) {
     return await response.text()

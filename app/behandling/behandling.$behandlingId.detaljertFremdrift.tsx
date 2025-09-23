@@ -17,16 +17,13 @@ import { useMemo, useState } from 'react'
 import { type LoaderFunctionArgs, NavLink, useLoaderData, useRevalidator } from 'react-router'
 import invariant from 'tiny-invariant'
 import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
-import { requireAccessToken } from '~/services/auth.server'
 import { getDetaljertFremdrift } from '~/services/behandling.server'
 import type { BehandlingDetaljertFremdriftDTO } from '~/types'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
-  const accessToken = await requireAccessToken(request)
-
-  const detaljertFremdrift = await getDetaljertFremdrift(accessToken, +params.behandlingId)
+  const detaljertFremdrift = await getDetaljertFremdrift(request, +params.behandlingId)
 
   invariant(detaljertFremdrift, 'Behandlingen hadde ikke en detaljertFremdrift')
 
@@ -43,8 +40,8 @@ const indentPx = (level: number) => Math.max(0, (level - 1) * 16)
 
 type SortKey = 'level' | 'code' | 'progress' | 'errors'
 const sorters: Record<SortKey, (a: BehandlingDetaljertFremdriftDTO, b: BehandlingDetaljertFremdriftDTO) => number> = {
-  level: (a, b) => a.level - b.level || a.behandlingCode.localeCompare(b.behandlingCode),
-  code: (a, b) => a.behandlingCode.localeCompare(b.behandlingCode),
+  level: (a, b) => a.level - b.level || a.behandlingCode.localeCompare(b.behandlingCode, 'nb', { sensitivity: 'base' }),
+  code: (a, b) => a.behandlingCode.localeCompare(b.behandlingCode, 'nb', { sensitivity: 'base' }),
   progress: (a, b) => pct(b.ferdig, b.totalt) - pct(a.ferdig, a.totalt),
   errors: (a, b) => b.feilende - a.feilende,
 }

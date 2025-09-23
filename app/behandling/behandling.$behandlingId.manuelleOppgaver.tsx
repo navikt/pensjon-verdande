@@ -1,12 +1,11 @@
+import { Table } from '@navikt/ds-react'
 import { Link, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 
-import { getBehandling, henBehandlingManuell } from '~/services/behandling.server'
-
 import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
-import { Table } from '@navikt/ds-react'
-import type { BehandlingManuellDto } from '~/types'
 import { formatIsoTimestamp } from '~/common/date'
+import { requireAccessToken } from '~/services/auth.server'
+import { getBehandling, henBehandlingManuell } from '~/services/behandling.server'
+import type { BehandlingManuellDto } from '~/types'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const { behandlingId } = params
@@ -51,9 +50,7 @@ export default function ManuelleBehandlinger() {
       <Table.Body>
         {behandlingManuellPage.content?.map((it: BehandlingManuellDto) => {
           return (
-            <Table.Row
-              key={it.id}
-            >
+            <Table.Row key={it.id}>
               <Table.DataCell>
                 <Link to={`/behandling/${behandling.behandlingId}/aktivitet/${it.aktivitetId}`}>
                   {behandling.aktiviteter.find((a) => a.aktivitetId === it.aktivitetId)?.type || 'Ukjent aktivitet'}
@@ -68,7 +65,8 @@ export default function ManuelleBehandlinger() {
               <Table.DataCell>{it.oppgavekodeDekode}</Table.DataCell>
               <Table.DataCell>{it.aktivFra}</Table.DataCell>
               <Table.DataCell>{it.oppgaveId}</Table.DataCell>
-            </Table.Row>)
+            </Table.Row>
+          )
         })}
       </Table.Body>
     </Table>

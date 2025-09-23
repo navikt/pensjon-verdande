@@ -1,6 +1,4 @@
-import type { ActionFunctionArgs } from 'react-router';
-import { requireAccessToken } from '~/services/auth.server'
-import { Form, useFetcher, useLoaderData } from 'react-router';
+import { ExternalLinkIcon, FloppydiskIcon } from '@navikt/aksel-icons'
 import {
   Alert,
   BodyLong,
@@ -16,16 +14,18 @@ import {
   TextField,
   VStack,
 } from '@navikt/ds-react'
+import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import type { ChangeEvent } from 'react'
 import { useState } from 'react'
-import { isFuture, isToday, parseISO, setHours } from 'date-fns'
-import { ExternalLinkIcon, FloppydiskIcon } from '@navikt/aksel-icons'
+import type { ActionFunctionArgs } from 'react-router'
+import { Form, useFetcher, useLoaderData } from 'react-router'
+import { apiGet } from '~/services/api.server'
+import { requireAccessToken } from '~/services/auth.server'
+import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
-import { hentInfoBanner, oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-  return await hentInfoBanner(accessToken)
+  return await apiGet<Infobanner>('/api/verdande/infobanner', request)
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -40,28 +40,17 @@ export default function InfoBannerPage() {
   const response = fecher.data as OppdaterInfoBannerResponse | undefined
 
   const [validToDate, setValidToDate] = useState<Date | undefined>(
-    infobanner.validToDate !== null
-      ? parseISO(infobanner.validToDate)
-      : undefined,
+    infobanner.validToDate !== null ? parseISO(infobanner.validToDate) : undefined,
   )
 
-  const [beskrivelse, setBeskrivelse] = useState<string>(
-    infobanner.description ?? '',
-  )
-  const [valgtVariant, setValgtVariant] = useState<InfobannerVariant>(
-    infobanner.variant ?? 'INFO',
-  )
-  const [url, setUrl] = useState<string | undefined>(
-    infobanner.url ?? undefined,
-  )
-  const [urlText, setUrlText] = useState<string | undefined>(
-    infobanner.urlText ?? undefined,
-  )
+  const [beskrivelse, setBeskrivelse] = useState<string>(infobanner.description ?? '')
+  const [valgtVariant, setValgtVariant] = useState<InfobannerVariant>(infobanner.variant ?? 'INFO')
+  const [url, setUrl] = useState<string | undefined>(infobanner.url ?? undefined)
+  const [urlText, setUrlText] = useState<string | undefined>(infobanner.urlText ?? undefined)
 
   const brukUrl = url !== undefined && urlText !== undefined
 
-  const enabled =
-    validToDate !== undefined && (isFuture(validToDate) || isToday(validToDate))
+  const enabled = validToDate !== undefined && (isFuture(validToDate) || isToday(validToDate))
 
   return (
     <HGrid columns={{ xs: 1, md: 1, xl: 2 }} gap="5">
@@ -79,9 +68,7 @@ export default function InfoBannerPage() {
           <Select
             label="Variant"
             value={valgtVariant}
-            onChange={(event) =>
-              setValgtVariant(event.target.value as InfobannerVariant)
-            }
+            onChange={(event) => setValgtVariant(event.target.value as InfobannerVariant)}
           >
             <option value="INFO">Informasjon</option>
             <option value="WARNING">Advarsel</option>
@@ -93,16 +80,8 @@ export default function InfoBannerPage() {
           </Switch>
           {brukUrl && (
             <>
-              <TextField
-                label="URL"
-                value={url}
-                onChange={(event) => setUrl(event.target.value)}
-              />
-              <TextField
-                label="Lenketekst"
-                value={urlText}
-                onChange={(event) => setUrlText(event.target.value)}
-              />
+              <TextField label="URL" value={url} onChange={(event) => setUrl(event.target.value)} />
+              <TextField label="Lenketekst" value={urlText} onChange={(event) => setUrlText(event.target.value)} />
             </>
           )}
 
@@ -117,9 +96,7 @@ export default function InfoBannerPage() {
               <DatePicker.Standalone
                 fromDate={new Date()}
                 selected={validToDate}
-                onSelect={(date) =>
-                  date ? setValidToDate(setHours(date, 12)) : undefined
-                }
+                onSelect={(date) => (date ? setValidToDate(setHours(date, 12)) : undefined)}
               ></DatePicker.Standalone>
             </VStack>
           )}
@@ -129,11 +106,7 @@ export default function InfoBannerPage() {
             </Alert>
           )}
 
-          <Button
-            icon={<FloppydiskIcon />}
-            loading={fecher.state === 'submitting'}
-            onClick={(event) => submit(event)}
-          >
+          <Button icon={<FloppydiskIcon />} loading={fecher.state === 'submitting'} onClick={(event) => submit(event)}>
             Lagre
           </Button>
         </VStack>
@@ -192,13 +165,10 @@ export default function InfoBannerPage() {
         encType: 'application/json',
       },
     )
-
   }
 }
 
-function toAkselVariant(
-  variant: InfobannerVariant,
-): 'info' | 'warning' | 'error' {
+function toAkselVariant(variant: InfobannerVariant): 'info' | 'warning' | 'error' {
   switch (variant) {
     case 'INFO':
       return 'info'

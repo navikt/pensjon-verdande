@@ -43,6 +43,8 @@ spec:
       value: {{ pen.scope }}
     - name: PEN_URL
       value: {{ pen.url }}
+    - name: PSAK_SAK_URL_TEMPLATE
+      value: "{{ psak.sak_url_template }}"
   accessPolicy:
     outbound:
       external:

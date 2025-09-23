@@ -1,19 +1,19 @@
-import { uniqueFilter } from '~/common/utils'
 import { Checkbox, CheckboxGroup } from '@navikt/ds-react'
-import { useFetcher } from 'react-router'
 import { useState } from 'react'
+import { useFetcher } from 'react-router'
 import { type BrukerResponse, decodeOmfang, type Tilgangsmeta, tilgangsmetaSort } from '~/brukere/brukere'
+import { uniqueFilter } from '~/common/utils'
 
 export interface Props {
-  bruker: BrukerResponse,
-  readonly: boolean,
-  tilgangskontrollmeta: Tilgangsmeta[],
+  bruker: BrukerResponse
+  readonly: boolean
+  tilgangskontrollmeta: Tilgangsmeta[]
 }
 
 export default function BrukersTilganger(props: Props) {
   const fetcher = useFetcher()
 
-  const [gitteTilganger, setTilganger] = useState<string[]>(props.bruker.tilganger || []);
+  const [gitteTilganger, setTilganger] = useState<string[]>(props.bruker.tilganger || [])
 
   function toggleTilgang(oppgave: Tilgangsmeta) {
     const eksisterendeTilgang = gitteTilganger.includes(oppgave.operasjonNavn)
@@ -24,27 +24,44 @@ export default function BrukersTilganger(props: Props) {
         : [...list, oppgave.operasjonNavn],
     )
 
-    fetcher.submit({
-      operasjon: oppgave.operasjonNavn,
-    }, {
-      method: eksisterendeTilgang ? 'delete' : 'put',
-      action: `/brukere/${encodeURI(props.bruker.brukernavn)}`,
-    })
+    fetcher.submit(
+      {
+        operasjon: oppgave.operasjonNavn,
+      },
+      {
+        method: eksisterendeTilgang ? 'delete' : 'put',
+        action: `/brukere/${encodeURI(props.bruker.brukernavn)}`,
+      },
+    )
   }
 
-  return (
-    props.tilgangskontrollmeta.sort((a, b) => a.omfangBeskrivelse.localeCompare(b.omfangBeskrivelse, 'nb', { sensitivity: 'base' })).map(it => it.omfangNavn).filter(uniqueFilter).map(omfangNavn => {
+  return props.tilgangskontrollmeta
+    .sort((a, b) => a.omfangBeskrivelse.localeCompare(b.omfangBeskrivelse, 'nb', { sensitivity: 'base' }))
+    .map((it) => it.omfangNavn)
+    .filter(uniqueFilter)
+    .map((omfangNavn) => {
       return (
-          <CheckboxGroup key={`omfang-${omfangNavn}`} legend={decodeOmfang(props.tilgangskontrollmeta, omfangNavn)} value={gitteTilganger} readOnly={props.readonly}>
-            {
-              props.tilgangskontrollmeta.filter(it => it.omfangNavn === omfangNavn).sort(tilgangsmetaSort).map((oppgave) => {
-                return (<Checkbox key={`${omfangNavn}:${oppgave.operasjonNavn}`} value={oppgave.operasjonNavn} onChange={() => toggleTilgang(oppgave)}>
+        <CheckboxGroup
+          key={`omfang-${omfangNavn}`}
+          legend={decodeOmfang(props.tilgangskontrollmeta, omfangNavn)}
+          value={gitteTilganger}
+          readOnly={props.readonly}
+        >
+          {props.tilgangskontrollmeta
+            .filter((it) => it.omfangNavn === omfangNavn)
+            .sort(tilgangsmetaSort)
+            .map((oppgave) => {
+              return (
+                <Checkbox
+                  key={`${omfangNavn}:${oppgave.operasjonNavn}`}
+                  value={oppgave.operasjonNavn}
+                  onChange={() => toggleTilgang(oppgave)}
+                >
                   {oppgave.operasjonBeskrivelse}
-                </Checkbox>)
-              })
-            }
-          </CheckboxGroup>
+                </Checkbox>
+              )
+            })}
+        </CheckboxGroup>
       )
     })
-  );
 }

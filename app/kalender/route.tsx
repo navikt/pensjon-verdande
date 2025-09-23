@@ -1,11 +1,8 @@
 import { type ActionFunctionArgs, useLoaderData } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
-import { hentKalenderHendelser } from '~/services/behandling.server'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
+import { hentKalenderHendelser } from '~/services/behandling.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
   const { searchParams } = new URL(request.url)
 
   const dato = searchParams.get('dato')
@@ -15,7 +12,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
 
   return {
-    kalenderHendelser: await hentKalenderHendelser({accessToken: accessToken}, {
+    kalenderHendelser: await hentKalenderHendelser(request, {
       fom: forsteDato,
       tom: sisteDato,
     }),
@@ -28,10 +25,10 @@ export default function KalenderVisning() {
 
   return (
     <Kalender
-        kalenderHendelser={kalenderHendelser}
-        maksAntallPerDag={6}
-        startDato={startDato}
-        visKlokkeSlett={true}
-      ></Kalender>
+      kalenderHendelser={kalenderHendelser}
+      maksAntallPerDag={6}
+      startDato={startDato}
+      visKlokkeSlett={true}
+    ></Kalender>
   )
 }

@@ -1,5 +1,5 @@
 import { Box, Button, Heading, TextField, VStack } from '@navikt/ds-react'
-import { Form, useNavigation, } from 'react-router'
+import { Form, useNavigation } from 'react-router'
 
 export default function ManedligOmregningUttrekk({ denneBehandlingsmaneden }: { denneBehandlingsmaneden: number }) {
   const navigation = useNavigation()
@@ -8,21 +8,24 @@ export default function ManedligOmregningUttrekk({ denneBehandlingsmaneden }: { 
 
   return (
     <Box.New
-      style={{ width: '35em'}}
+      style={{ width: '35em' }}
       borderWidth={'1'}
       borderColor={'neutral-subtleA'}
       padding={'4'}
       borderRadius={'medium'}
     >
-      <Heading level={"2"} size={'medium'}>Start uttrekk</Heading>
+      <Heading level={'2'} size={'medium'}>
+        Start uttrekk
+      </Heading>
       <Form action="uttrekk" method="post">
         <VStack gap={'4'}>
-          <TextField label={'Behandlingsmåned'}
-                     defaultValue={denneBehandlingsmaneden}
-                     aria-label="Behandlingsmåned"
-                     name="behandlingsmaned"
-                     type="number"
-                     placeholder="Behandlingsmåned"
+          <TextField
+            label={'Behandlingsmåned'}
+            defaultValue={denneBehandlingsmaneden}
+            aria-label="Behandlingsmåned"
+            name="behandlingsmaned"
+            type="number"
+            placeholder="Behandlingsmåned"
           />
           <Button type="submit" disabled={isSubmitting}>
             Opprett

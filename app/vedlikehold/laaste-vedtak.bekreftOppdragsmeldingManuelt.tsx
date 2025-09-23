@@ -1,8 +1,7 @@
-import type { ActionFunctionArgs } from 'react-router';
+import type { ActionFunctionArgs } from 'react-router'
 
 import { requireAccessToken } from '~/services/auth.server'
 import { bekreftOppdragsmeldingManuelt } from '~/vedlikehold/vedlikehold.server'
-
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)

@@ -1,5 +1,3 @@
 export default function AuthFailed() {
-  return (
-    <div>Autentisering feilet</div>
-  )
+  return <div>Autentisering feilet</div>
 }

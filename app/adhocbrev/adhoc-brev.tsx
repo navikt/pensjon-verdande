@@ -1,5 +1,5 @@
 import { BodyLong, Box, Button, Heading, Select, Skeleton, TextField, VStack } from '@navikt/ds-react'
-import { Suspense, useRef, useState } from 'react'
+import { Suspense, useState } from 'react'
 import {
   type ActionFunctionArgs,
   Await,
@@ -52,7 +52,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function AdhocBrev() {
   const { behandlinger } = useLoaderData<typeof loader>()
-  const inputRef = useRef<HTMLInputElement>(null)
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
@@ -65,25 +64,22 @@ export default function AdhocBrev() {
         <Heading size={'medium'} level={'1'}>
           Opprett ad-hoc brevbestilling
         </Heading>
-        <BodyLong>
-          <p>
+        <VStack gap="2">
+          <BodyLong>
             Oppretter brevbestillinger med oppgitt brevmal for verdiene angitt i tabellen{' '}
             <code>PEN.T_ADHOC_BREVBESTILLING</code>.
-          </p>
-
-          <p>
+          </BodyLong>
+          <BodyLong>
             Det er viktig at man ikke endrer innholdet i tabellen før uttrekksteget i{' '}
             <i>{decodeBehandling(behandlingType)} behandlingen</i> er gjennomført
-          </p>
-        </BodyLong>
+          </BodyLong>
+        </VStack>
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'4'}>
           <TextField
-            label={'Brevmal kode for Sak:'}
-            ref={inputRef}
-            defaultValue=""
+            label="Brevmal kode for Sak:"
             name="brevmal"
             type="text"
             placeholder="Brevmal"
@@ -95,8 +91,7 @@ export default function AdhocBrev() {
           />
           <Select
             label="Ekskluder avdøde"
-            name={'ekskluderAvdoed'}
-            defaultValue={'true'}
+            name="ekskluderAvdoed"
             onChange={(e) => setEksluderAvdod(e.target.value)}
             value={eksluderAvdod ?? ''}
           >
@@ -106,15 +101,16 @@ export default function AdhocBrev() {
             <option value="true">Ja</option>
             <option value="false">Nei</option>
           </Select>
-          <Button type="submit" disabled={brevmal === '' || eksluderAvdod === '' || isSubmitting}>
-            {isSubmitting ? 'Oppretter…' : 'Opprett'}
+          <Button type="submit" disabled={brevmal === '' || eksluderAvdod === ''} loading={isSubmitting}>
+            Opprett adhoc-brevbestilling
           </Button>
         </VStack>
       </Form>
 
-      <Heading level={'2'} size={'medium'} style={{ marginTop: '2em' }}>
+      <Heading level="2" size="medium" style={{ marginTop: '2em' }}>
         Eksisterende ad-hoc brevbestillinger
       </Heading>
+
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
         <Await resolve={behandlinger}>
           {(it) => (

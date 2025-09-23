@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
       - run: |
-          npm ci && npm run build && npm prune --omit=dev
+          npm ci && npm run typecheck && npm run build && npm prune --omit=dev
 
       - name: Set version
         id: version

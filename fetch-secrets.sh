@@ -103,6 +103,7 @@ fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-verda
   echo PEN_APPLICATION=pensjon-pen-q2
   echo ALDE_LINK_ENABLED='true'
   echo ALDE_BEHANDLING_URL_TEMPLATE='http://localhost:3001/behandling/{behandlingId}'
+  echo PSAK_SAK_URL_TEMPLATE='http://localhost:9080/psak/sak/sakId={sakId}'
 } >> ${envfile}
 
 echo

@@ -1,11 +1,8 @@
-import { type LoaderFunctionArgs, useLocation } from 'react-router'
-import { useLoaderData } from 'react-router';
-
-import { getBehandling } from '~/services/behandling.server'
-
+import { type LoaderFunctionArgs, useLoaderData, useLocation } from 'react-router'
 import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
 import AktivitetCard from '~/behandling/AktivitetCard'
+import { requireAccessToken } from '~/services/auth.server'
+import { getBehandling } from '~/services/behandling.server'
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
@@ -17,9 +14,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  const aktivitet = behandling.aktiviteter.find(
-    (it) => it.aktivitetId.toString() === params.aktivitetId,
-  )
+  const aktivitet = behandling.aktiviteter.find((it) => it.aktivitetId.toString() === params.aktivitetId)
   if (!aktivitet) {
     throw new Response('Not Found', { status: 404 })
   }

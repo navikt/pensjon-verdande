@@ -1,6 +1,6 @@
+import { Select } from '@navikt/ds-react'
 import type React from 'react'
 import { Team } from '~/common/decodeTeam'
-import { Select } from '@navikt/ds-react'
 
 export interface Props {
   ansvarligTeam: Team | string | null
@@ -13,12 +13,7 @@ export default function AnsvarligTeamSelector(props: Props) {
   }
 
   return (
-    <Select
-      label="Velg ansvarlig team"
-      hideLabel
-      value={props.ansvarligTeam || ''}
-      onChange={handleChange}
-    >
+    <Select label="Velg ansvarlig team" hideLabel value={props.ansvarligTeam || ''} onChange={handleChange}>
       <option value="" disabled>
         Velg et alternativ
       </option>

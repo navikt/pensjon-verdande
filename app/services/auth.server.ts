@@ -1,20 +1,19 @@
+import type { OAuth2Tokens } from 'arctic'
+import { createCookieSessionStorage, redirect } from 'react-router'
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
-import { redirect, createCookieSessionStorage } from 'react-router';
-import { exchange } from '~/services/obo.server'
 import { env } from '~/services/env.server'
-import type { OAuth2Tokens, } from "arctic";
-
+import { exchange } from '~/services/obo.server'
 
 type User = {
-  accessToken: string,
-  accessTokenExpiresAt: string,
+  accessToken: string
+  accessTokenExpiresAt: string
 }
 
 function getUser(tokens: OAuth2Tokens): Promise<User> {
   return Promise.resolve({
     accessToken: tokens.accessToken(),
-    accessTokenExpiresAt: tokens.accessTokenExpiresAt().toISOString()
+    accessTokenExpiresAt: tokens.accessTokenExpiresAt().toISOString(),
   })
 }
 
@@ -43,10 +42,10 @@ if (process.env.ENABLE_OAUTH20_CODE_FLOW && process.env.AZURE_CALLBACK_URL) {
         tokenEndpoint: env.tokenEnpoint,
         redirectURI: process.env.AZURE_CALLBACK_URL,
 
-        scopes: ["openid", "offline_access", `api://${env.clientId}/.default`],
+        scopes: ['openid', 'offline_access', `api://${env.clientId}/.default`],
       },
       async ({ tokens }) => {
-        return await getUser(tokens);
+        return await getUser(tokens)
       },
     ),
     'entra-id',
@@ -54,9 +53,7 @@ if (process.env.ENABLE_OAUTH20_CODE_FLOW && process.env.AZURE_CALLBACK_URL) {
 }
 
 function redirectUrl(request: Request) {
-  const searchParams = new URLSearchParams([
-    ['redirectTo', new URL(request.url).pathname],
-  ])
+  const searchParams = new URLSearchParams([['redirectTo', new URL(request.url).pathname]])
   return `/auth/microsoft?${searchParams}`
 }
 
@@ -74,12 +71,8 @@ export async function requireAccessToken(request: Request) {
   const authorization = request.headers.get('authorization')
 
   if (authorization?.toLowerCase().startsWith('bearer')) {
-    const tokenResponse = await exchange(
-      authorization.substring('bearer '.length),
-      env.penScope,
-    )
+    const tokenResponse = await exchange(authorization.substring('bearer '.length), env.penScope)
     return tokenResponse.access_token
-
   } else {
     const session = await getSession(request.headers.get('cookie'))
 
@@ -92,10 +85,7 @@ export async function requireAccessToken(request: Request) {
         throw redirect(redirectUrl(request))
       }
 
-      const tokenResponse = await exchange(
-        user.accessToken,
-        env.penScope,
-      )
+      const tokenResponse = await exchange(user.accessToken, env.penScope)
       return tokenResponse.access_token
     }
   }

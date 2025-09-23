@@ -11,6 +11,9 @@ pen:
   scope: 'api://dev-fss.pensjon-q1.pensjon-pen-q1/.default'
   url: 'https://pensjon-pen-q1.dev-fss-pub.nais.io'
 
+psak:
+  sak_url_template: 'https://pensjon-psak-q1.nais.preprod.local/psak/sak/sakId={sakId}'
+
 alde:
   link_enabled: false
   behandling_url_template: 'https://pensjon-alde-q1.intern.dev.nav.no/behandling/{behandlingId}'

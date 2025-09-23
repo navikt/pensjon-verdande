@@ -1,13 +1,13 @@
-import {requireAccessToken} from '~/services/auth.server'
-import {useEffect, useState} from 'react'
-import {Box, Button, Link, Pagination, Select, Table} from '@navikt/ds-react'
-import {type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useSearchParams} from 'react-router'
-import type {OmregningStatistikkPage} from '~/types'
+import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
+import { useEffect, useState } from 'react'
+import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
 import {
-    hentOmregningbehandlingsnokler,
-    hentOmregningStatistikk,
-    hentOmregningStatistikkCsv,
+  hentOmregningbehandlingsnokler,
+  hentOmregningStatistikk,
+  hentOmregningStatistikkCsv,
 } from '~/omregning/batch.omregning.server'
+import { requireAccessToken } from '~/services/auth.server'
+import type { OmregningStatistikkPage } from '~/types'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accesstoken = await requireAccessToken(request)
@@ -16,7 +16,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
-  const omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
+  const omregningStatistikkPage = (await hentOmregningStatistikk(
+    accesstoken,
+    behandlingsNoekkel,
+    Number(page),
+    Number(size),
+  )) as OmregningStatistikkPage
   const content = await hentOmregningStatistikkCsv(accesstoken, behandlingsNoekkel)
 
   const omregningStatistikkInit = await hentOmregningbehandlingsnokler(accesstoken)
@@ -33,16 +38,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
-  const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? formData.get('behandlingsnoekler') as string
+  const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string)
 
-  const omregningStatistikkPage = await hentOmregningStatistikk(accesstoken, behandlingsNoekkel, Number(page), Number(size)) as OmregningStatistikkPage
+  const omregningStatistikkPage = (await hentOmregningStatistikk(
+    accesstoken,
+    behandlingsNoekkel,
+    Number(page),
+    Number(size),
+  )) as OmregningStatistikkPage
   return { omregningStatistikkPage }
 }
 
 export default function OmregningStatistikk() {
   const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkCsv } = useLoaderData<typeof loader>()
 
-  const optionBehandlingsNoekler: { value: string, label: string }[] = []
+  const optionBehandlingsNoekler: { value: string; label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })
   omregningStatistikkInit.behandlingsnoekkel.forEach((value: string) => {
     optionBehandlingsNoekler.push({ value: value, label: value })
@@ -63,14 +73,14 @@ export default function OmregningStatistikk() {
   const content = omregningStatistikkCsv
 
   const [downloadLink, setDownloadLink] = useState('')
-    useEffect(() => {
-      const data = new Blob([`[${content}]`], {type: 'application/json'})
+  useEffect(() => {
+    const data = new Blob([`[${content}]`], { type: 'application/json' })
 
-      // this part avoids memory leaks
-      if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
+    // this part avoids memory leaks
+    if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
 
-      // update the download link state
-      setDownloadLink(window.URL.createObjectURL(data))
+    // update the download link state
+    setDownloadLink(window.URL.createObjectURL(data))
   }, [content, downloadLink])
 
   function setSearchParamsWithBehandlingsNoekler() {
@@ -89,7 +99,8 @@ export default function OmregningStatistikk() {
           label={'Behandlingsnøkler'}
           name={'behandlingsnoekler'}
           value={behandlingsNoekler}
-          onChange={(event) => setBehandlingsNoekler(event.target.value)}>
+          onChange={(event) => setBehandlingsNoekler(event.target.value)}
+        >
           {optionBehandlingsNoekler.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -97,49 +108,52 @@ export default function OmregningStatistikk() {
           ))}
         </Select>
         <br />
-        <Button variant='primary' onClick={setSearchParamsWithBehandlingsNoekler}>Hent statistikk for
-          nøkkel</Button>
+        <Button variant="primary" onClick={setSearchParamsWithBehandlingsNoekler}>
+          Hent statistikk for nøkkel
+        </Button>
       </Form>
 
       <Box.New>
         <Link
           style={{ padding: '1em', position: 'relative', right: 0, float: 'right' }}
           // this attribute sets the filename
-          download='omregningTabell.csv'
+          download="omregningTabell.csv"
           // link to the download URL
           href={downloadLink}
-        >Last ned tabell</Link>
+        >
+          Last ned tabell
+        </Link>
       </Box.New>
       <Box.New>
-        <Table size='small' zebraStripes>
+        <Table size="small" zebraStripes>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell scope='col'>Behandlingsnøkkel</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>Status</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>VedtakId</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>SakId</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>FamilieId</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>Behandlingsrekkefølge</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>Behandlingstype</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>Sorteringsregel</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>BerørtSakBegrunnelse</Table.HeaderCell>
-              <Table.HeaderCell scope='col'>Kontrollpunkter</Table.HeaderCell>
+              <Table.HeaderCell scope="col">Behandlingsnøkkel</Table.HeaderCell>
+              <Table.HeaderCell scope="col">Status</Table.HeaderCell>
+              <Table.HeaderCell scope="col">VedtakId</Table.HeaderCell>
+              <Table.HeaderCell scope="col">SakId</Table.HeaderCell>
+              <Table.HeaderCell scope="col">FamilieId</Table.HeaderCell>
+              <Table.HeaderCell scope="col">Behandlingsrekkefølge</Table.HeaderCell>
+              <Table.HeaderCell scope="col">Behandlingstype</Table.HeaderCell>
+              <Table.HeaderCell scope="col">Sorteringsregel</Table.HeaderCell>
+              <Table.HeaderCell scope="col">BerørtSakBegrunnelse</Table.HeaderCell>
+              <Table.HeaderCell scope="col">Kontrollpunkter</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {omregningsaker?.content?.map((sak) => {
               return (
                 <Table.Row key={sak.sakId}>
-                  <Table.DataCell scope='row'>{sak.behandlingsnoekkel}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.status}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.vedtakId}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.sakId}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.familieId}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.behandlingsrekkefolge}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.behandlingstype}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.sorteringsregel}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.berortSakBegrunnelser}</Table.DataCell>
-                  <Table.DataCell scope='row'>{sak.kontrollpunkter}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.behandlingsnoekkel}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.status}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.vedtakId}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.sakId}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.familieId}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.behandlingsrekkefolge}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.behandlingstype}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.sorteringsregel}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.berortSakBegrunnelser}</Table.DataCell>
+                  <Table.DataCell scope="row">{sak.kontrollpunkter}</Table.DataCell>
                 </Table.Row>
               )
             })}
@@ -153,7 +167,6 @@ export default function OmregningStatistikk() {
           siblingCount={1}
         />
       </Box.New>
-
     </div>
   )
 }

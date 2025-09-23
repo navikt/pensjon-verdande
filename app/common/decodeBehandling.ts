@@ -1,13 +1,15 @@
 function splitOnCapitals(string: string) {
   const match = string.match(/([A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+)/g)
   if (match) {
-    return match.map((value, index) => {
-      if (index === 0) {
-        return value
-      } else {
-        return value.toLocaleLowerCase('no-NO')
-      }
-    }) .join(' ')
+    return match
+      .map((value, index) => {
+        if (index === 0) {
+          return value
+        } else {
+          return value.toLocaleLowerCase('no-NO')
+        }
+      })
+      .join(' ')
   } else {
     return string
   }
@@ -39,17 +41,12 @@ const oversettinger = [
   ['OppdaterFodselsnummerBehandling', 'Oppdater fødselsnummer'],
   ['OverforOmsorgspoengBehandling', 'Overfør omsorgspoeng'],
   ['RekonverterUpTilUtBehandling', 'Rekonverter uførepensjon til uføretrygd'],
-  [
-    'TilbakekrevingEtteroppgjorUTBehandling',
-    'Tilbakekreving etteroppgjør uføretrygd',
-  ],
+  ['TilbakekrevingEtteroppgjorUTBehandling', 'Tilbakekreving etteroppgjør uføretrygd'],
   ['TilbakekrevingshendelseBehandling', 'Tilbakekrevingshendelse'],
   ['UtvandringAnnulleringMeldingBehandling', 'Annulert utvandringsmelding'],
   ['UtvandringMeldingBehandling', 'Utvandringsmelding'],
 ]
 export function decodeBehandling(string: string) {
   const oversetting = oversettinger.find((value) => value[0] === string)
-  return oversetting
-    ? oversetting[1]
-    : splitOnCapitals(string.replace(/Behandling$/, ''));
+  return oversetting ? oversetting[1] : splitOnCapitals(string.replace(/Behandling$/, ''))
 }
