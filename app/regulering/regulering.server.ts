@@ -311,7 +311,7 @@ export const startOrkestrering = async (
   brukKjoreplan: boolean,
   skalSamordne: boolean,
 ) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/orkestrering/startv2`, {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/orkestrering/start`, {
     method: 'POST',
     body: JSON.stringify({
       antallFamilier,
