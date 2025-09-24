@@ -28,6 +28,7 @@ export async function getBehandlinger(
   accessToken: string,
   {
     behandlingType,
+    behandlingSerieId,
     status,
     ansvarligTeam,
     behandlingManuellKategori,
@@ -40,6 +41,7 @@ export async function getBehandlinger(
     sort,
   }: {
     behandlingType?: string | null
+    behandlingSerieId?: string | null,
     status?: string | null
     ansvarligTeam?: string | null
     behandlingManuellKategori?: string | null
@@ -55,6 +57,9 @@ export async function getBehandlinger(
   let request = ''
   if (behandlingType) {
     request += `&behandlingType=${behandlingType}`
+  }
+  if (behandlingSerieId) {
+      request += `&behandlingSerieId=${behandlingSerieId}`
   }
   if (status) {
     request += `&status=${status}`

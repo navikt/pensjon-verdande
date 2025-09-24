@@ -23,6 +23,7 @@ export type Props = {
 }
 
 const administrasjonMeny = [
+  ['BEHANDLINGSERIE', `/behandlingserie`, 'Behandlingserie'],
   ['UGYLDIGGJOR_ETTEROPPGJOR_HISTORIKK_UFORE', `/etteroppgjor-historikk-ufore`, 'Etteroppgjørhistorikk Uføre'],
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
   ['MANGLENDE_FOREIGN_KEY_INDEXER', `/manglende-foreign-key-indexer`, 'Manglende indekser for fjernnøkler'],
@@ -37,7 +38,6 @@ const batcherMeny = [
   ['ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling'],
   ['AFP_ETTEROPPGJOR', '/afp-etteroppgjor', 'AFP Etteroppgjør'],
   ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
-  ['AVSLUTTIKKELOPENDESAKER', `/oppdatersakstatus`, 'Avslutter ikke løpende saker'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],

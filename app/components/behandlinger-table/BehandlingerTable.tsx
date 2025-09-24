@@ -252,9 +252,9 @@ export default function BehandlingerTable({
                   Velg alle rader
                 </Checkbox>
               </Table.DataCell>
-            )}
+              )}
             <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}>
+              <Table.DataCell style={{ paddingTop: 0 }}>
               {visBehandlingTypeSoek && behandlingtypeOptions()}
             </Table.DataCell>
             <Table.DataCell style={{ paddingTop: 0 }}>{visAnsvarligTeamSoek && ansvarligTeamOptions()}</Table.DataCell>
