@@ -116,6 +116,29 @@ export const hentMot = async (
   }
 }
 
+export const ugyldiggjorEtteroppgjorHistorikkUfore = async (
+  accessToken: string,
+  sakId: number,
+  etteroppgjortAr: number,
+)=> {
+
+  const response = await fetch(
+    `${env.penUrl}/api/uforetrygd/etteroppgjor/historikk/vedlikehold/ugyldiggjor?sakId=${sakId}&etteroppgjortAr=${etteroppgjortAr}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  return {
+    success: response.ok,
+  }
+}
+
 export const hentSak = async (accessToken: string, sakId: string) => {
   const response = await fetch(`${env.penUrl}/api/behandling/laas-opp/hentSak`, {
     method: 'POST',

@@ -463,6 +463,22 @@ function BehandlingCard({
           </div>
         ) : null}
 
+        {b.kontrollpunkter.length === 1 ? (
+          <div>
+            <Detail style={{ marginBottom: 4 }}>Kontrollpunkt</Detail>
+            <BodyShort size="small">{b.kontrollpunkter[0].type}</BodyShort>
+          </div>
+        ) : b.kontrollpunkter.length > 1 ? (
+          <div>
+            <Detail style={{ marginBottom: 4 }}>Kontrollpunkter</Detail>
+            <List as="ul" size="small">
+              {b.kontrollpunkter.map((a) => (
+                <List.Item key={a.type}>{a.type}</List.Item>
+              ))}
+            </List>
+          </div>
+        ) : null}
+
         {b.feilmelding && (
           <VStack gap="2">
             <KV label="Feilmelding" value={<ErrorMessage size="small">{b.feilmelding}</ErrorMessage>} />
