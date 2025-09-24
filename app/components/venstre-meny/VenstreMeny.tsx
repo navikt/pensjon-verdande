@@ -68,6 +68,13 @@ const behandlingerMeny = [
 export default function VenstreMeny(props: Props) {
   const me = props.me
 
+  let currentIndex = 0
+
+  function indexSupplier() {
+    currentIndex += 1
+    return currentIndex
+  }
+
   function harRolle(rolle: string) {
     if (!me) {
       return false
@@ -106,9 +113,11 @@ export default function VenstreMeny(props: Props) {
     setOpenIndex(openIndex === index ? null : index)
   }
 
-  function byggMeny(navn: string, menyElementer: string[][], idx: number, p0?: JSX.Element) {
+  function byggMeny(navn: string, menyElementer: string[][], indexSupplier: () => number, p0?: JSX.Element) {
     const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
     if (harTilgangTilMeny) {
+      const idx: number = indexSupplier()
+
       return (
         <li key={`meny-${navn}`} className={openIndex === idx ? styles.open : ''}>
           <Link as="a" onClick={() => handleMenuClick(idx)} style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -184,25 +193,25 @@ export default function VenstreMeny(props: Props) {
           {byggMeny(
             'Større kjøringer',
             batcherMeny,
-            0,
+            indexSupplier,
             <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" className={styles.menyIkon} />,
           )}
           {byggMeny(
             'Behandlinger',
             behandlingerMeny,
-            1,
+            indexSupplier,
             <NumberListIcon title="Behandlinger" fontSize="1.5rem" className={styles.menyIkon} />,
           )}
           {byggMeny(
             'Omregning',
             omregningMeny,
-            2,
+            indexSupplier,
             <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" className={styles.menyIkon} />,
           )}
           {byggMeny(
             'Vedlikehold',
             administrasjonMeny,
-            3,
+            indexSupplier,
             <WrenchIcon title="Vedlikehold" fontSize="1.5rem" className={styles.menyIkon} />,
           )}
         </ul>
