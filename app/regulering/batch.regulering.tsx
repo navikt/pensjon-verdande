@@ -44,11 +44,11 @@ export default function OpprettReguleringBatchRoute() {
           </Stepper.Step>
           <Stepper.Step
             href="/batch/regulering/ekskludertesaker"
-            completed={regulering.uttrekk?.antallUbehandlende === 0}
+            completed={regulering.uttrekk?.antallUbehandlede === 0}
           >
             Ekskluder saker
           </Stepper.Step>
-          <Stepper.Step href="/batch/regulering/orkestrering" completed={regulering.uttrekk?.antallUbehandlende === 0}>
+          <Stepper.Step href="/batch/regulering/orkestrering" completed={regulering.uttrekk?.antallUbehandlede === 0}>
             Orkestrering
           </Stepper.Step>
           <Stepper.Step href="/batch/regulering/administrerbehandlinger">
