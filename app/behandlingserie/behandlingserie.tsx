@@ -1,5 +1,3 @@
-// app/routes/behandlingserie.tsx
-
 import { type LoaderFunctionArgs, useFetcher, useLoaderData, useNavigate, useSearchParams } from 'react-router';
 import { type ActionFunctionArgs, redirect } from 'react-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -39,7 +37,7 @@ import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview';
 import PlanlagteDatoerPreview, { type PlannedItem } from '~/behandlingserie/planlagteDatoerPreview';
 
 /* -------------------- Typer -------------------- */
-type RegelmessighetMode = 'range' | 'multiple';       // ⬅️ single droppet
+type RegelmessighetMode = 'range' | 'multiple';
 type DateRange = { from?: Date; to?: Date };
 type Selection = DateRange | Date[] | undefined;
 type IntervalMode = '' | 'quarterly' | 'tertial';
@@ -141,8 +139,8 @@ export default function BehandlingOpprett_index() {
     }, [endOfHorizon]);
 
     // State
-    const [regelmessighet, setRegelmessighet] = useState<RegelmessighetMode>('range'); // ⬅️ start i range
-    const [selection, setSelection] = useState<Selection>(undefined);                  // ⬅️ tomt i range
+    const [regelmessighet, setRegelmessighet] = useState<RegelmessighetMode>('range');
+    const [selection, setSelection] = useState<Selection>(undefined);
     const [selectedTime, setSelectedTime] = useState('');
     const [dayMode, setDayMode] = useState<DayMode>('fixed-weekday');
     const [selectedUkedag, setSelectedUkedag] = useState('');
@@ -154,7 +152,7 @@ export default function BehandlingOpprett_index() {
     const fetcher = useFetcher();
     const [searchParams, setSearchParams] = useSearchParams();
     const [behandlingType, setBehandlingType] = useState(searchParams.get('behandlingType') || '');
-    const behandlingTyper = ['AvsluttSaker', 'ReguleringUttrekk'];
+    const behandlingTyper = ['AvsluttSaker'];
 
     const { behandlingSerier } = useLoaderData<{ behandlingSerier: BehandlingSerieDTO[] }>();
     const holidayData = useMemo(() => buildHolidayData(includeNextYear), [includeNextYear]);
@@ -392,16 +390,13 @@ export default function BehandlingOpprett_index() {
                             onChange={v => {
                                 const mode = v as RegelmessighetMode;
                                 setRegelmessighet(mode);
-                                // hold selection i korrekt form
-                                if (mode === 'multiple') setSelection([]);      // Date[]
-                                else setSelection(undefined);                   // range: undefined | {from,to}
+                                if (mode === 'multiple') setSelection([]);
+                                else setSelection(undefined);
                             }}
                         >
                             <Radio value="range">Velg en range fra og til</Radio>
                             <Radio value="multiple">Velg diverse datoer</Radio>
                         </RadioGroup>
-
-                        {/* Ekstra valg for multiple (ukedag/intervall) */}
                         {regelmessighet === 'multiple' && (
                             <HStack wrap gap="4">
                                 <Select
