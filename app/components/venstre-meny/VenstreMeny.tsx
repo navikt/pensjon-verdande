@@ -6,6 +6,7 @@ import {
   HouseIcon,
   NumberListIcon,
   PersonGroupIcon,
+  PersonRectangleIcon,
   SackPensionIcon,
   WrenchIcon,
 } from '@navikt/aksel-icons'
@@ -187,6 +188,21 @@ export default function VenstreMeny(props: Props) {
                   <PersonGroupIcon title="Brukere" fontSize="1.5rem" className={styles.menyIkon} />
                 </span>
                 <span className={styles.menyTekst}>Brukere</span>
+              </NavLink>
+            </li>
+          )}
+
+          {harTilgang('SE_BEHANDLINGER') && (
+            <li>
+              <NavLink
+                to={`/manuell-behandling`}
+                style={{ display: 'flex', justifyContent: 'flex-start' }}
+                className={({ isActive }) => (isActive ? styles.active : '')}
+              >
+                <span className={styles.menyIkon}>
+                  <PersonRectangleIcon title="Manuell behandling" fontSize="1.5rem" className={styles.menyIkon} />
+                </span>
+                <span className={styles.menyTekst}>Manuell behandling</span>
               </NavLink>
             </li>
           )}

@@ -59,7 +59,7 @@ export default function ManuelleBehandlinger() {
               <Table.DataCell>{formatIsoTimestamp(it.opprettet)}</Table.DataCell>
               <Table.DataCell>{it.sakId}</Table.DataCell>
               <Table.DataCell>{it.kravId}</Table.DataCell>
-              <Table.DataCell>{it.kategori}</Table.DataCell>
+              <Table.DataCell>{it.kategoriDekode}</Table.DataCell>
               <Table.DataCell>{it.beskrivelse}</Table.DataCell>
               <Table.DataCell>{it.fagomradeDekode}</Table.DataCell>
               <Table.DataCell>{it.oppgavekodeDekode}</Table.DataCell>

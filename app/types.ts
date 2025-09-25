@@ -61,22 +61,22 @@ export type BehandlingDto = {
 }
 
 export type BehandlingSerieDTO = {
-    behandlingSerieId: string
-    behandlingCode: string
-    regelmessighet: string
-    opprettetAv: string
-    opprettet: string
-    startDato: string | null
-    sluttDato: string | null
-    behandlinger: BehandlingInfoDTO[]
+  behandlingSerieId: string
+  behandlingCode: string
+  regelmessighet: string
+  opprettetAv: string
+  opprettet: string
+  startDato: string | null
+  sluttDato: string | null
+  behandlinger: BehandlingInfoDTO[]
 }
 
 export type BehandlingInfoDTO = {
-    behandlingId: number
-    status: string
-    behandlingSerieId: string
-    behandlingCode: string
-    planlagtStartet: string
+  behandlingId: number
+  status: string
+  behandlingSerieId: string
+  behandlingCode: string
+  planlagtStartet: string
 }
 
 export type PatchBehandlingDto = {
@@ -176,6 +176,7 @@ export type BehandlingManuellDto = {
   sakId: number
   kravId?: number | null
   kategori: string
+  kategoriDekode: string
   beskrivelse: string
 
   fagomrade: string

@@ -14,6 +14,7 @@ import {
 } from '@navikt/ds-react'
 import { useMemo } from 'react'
 import { type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import { decodeBehandling } from '~/common/decodeBehandling'
 import { apiGet } from '~/services/api.server'
 
 export type ManuellBehandlingOppsummering = {
@@ -220,9 +221,9 @@ export default function ManuellBehandlingOppsummeringRoute() {
                   .sort((a, b) => b.antall - a.antall)
                   .map((r, idx) => (
                     <Table.Row
-                      key={`${r.behandlingType}-${r.kategori}-${r.fagomrade}-${r.oppgaveKode}-${r.underkategoriKode}-${r.prioritetKode}-${idx}`}
+                      key={`${decodeBehandling(r.behandlingType)}-${r.kategori}-${r.fagomrade}-${r.oppgaveKode}-${r.underkategoriKode}-${r.prioritetKode}-${idx}`}
                     >
-                      <Table.DataCell>{r.behandlingType}</Table.DataCell>
+                      <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
                       <Table.DataCell>
                         <VStack gap="1">
                           <span>{r.kategoriDecode}</span>
