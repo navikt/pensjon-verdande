@@ -4,7 +4,7 @@ import styles from './css/previewBubbles.module.css';
 
 export type PlannedItem = {
     id: string;
-    ymd: string;                // YYYY-MM-DD
+    yearMonthDay: string;                // YYYY-MM-DD
     time?: string;              // HH:mm
     status?: string;
     behandlingId?: string;
@@ -23,8 +23,8 @@ function shortSerieId(id?: string) {
     return `••••-${id.slice(-4)}`;
 }
 
-function weekdayFromYmd(ymd: string): number {
-    const [y, m, d] = ymd.split('-').map(Number);
+function weekdayFromyearMonthDay(yearMonthDay: string): number {
+    const [y, m, d] = yearMonthDay.split('-').map(Number);
     return new Date(y, (m ?? 1) - 1, d ?? 1).getDay();
 }
 function dayLabel(weekday: number) {
@@ -43,7 +43,7 @@ export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Pr
 
     // grupper per måned (YYYY-MM)
     const groups = items.reduce<Record<string, PlannedItem[]>>((acc, it) => {
-        const key = it.ymd.slice(0, 7);
+        const key = it.yearMonthDay.slice(0, 7);
         (acc[key] ??= []).push(it);
         return acc;
     }, {});
@@ -64,13 +64,13 @@ export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Pr
                 }}>
             {title && <Heading size="medium">{title}</Heading>}
             {keys.map(key => {
-                const list = groups[key].slice().sort((a, b) => (a.ymd + (a.time ?? '')) < (b.ymd + (b.time ?? '')) ? -1 : 1);
+                const list = groups[key].slice().sort((a, b) => (a.yearMonthDay + (a.time ?? '')) < (b.yearMonthDay + (b.time ?? '')) ? -1 : 1);
                 return (
                     <VStack key={key} gap="1">
                         <strong style={{ textTransform: 'capitalize' }}>{monthLabel(key)}</strong>
                         <div className={styles.previewContainer}>
                             {list.map(item => {
-                                const w = weekdayFromYmd(item.ymd);
+                                const w = weekdayFromyearMonthDay(item.yearMonthDay);
                                 return (
                                     <button
                                         key={item.id}
@@ -80,7 +80,7 @@ export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Pr
                                         title={`Behandling ${item.behandlingId ?? ''}${item.status ? ` • ${item.status}` : ''}`}
                                     >
                                         <span className={styles.dayLabel}>{dayLabel(w)}</span>
-                                        <span className={styles.dateLabel}>{item.ymd}</span>
+                                        <span className={styles.dateLabel}>{item.yearMonthDay}</span>
                                         {item.time && <span className={styles.timeLabel}>{item.time}</span>}
                                         {item.serieId && <span className={styles.serieTag}>{shortSerieId(item.serieId)}</span>}
                                     </button>

@@ -2,13 +2,13 @@ import { HStack, VStack, Heading } from '@navikt/ds-react';
 import React from 'react';
 
 export default function ValgteDatoerPreview({
-                                                 ymdDates,
+                                                 yearMonthDayDates,
                                                  time,
                                              }: {
-    ymdDates: string[];
+    yearMonthDayDates: string[];
     time?: string;
 }) {
-    if (!ymdDates.length) {
+    if (!yearMonthDayDates.length) {
         return (
             <VStack
                 gap="1"
@@ -35,17 +35,17 @@ export default function ValgteDatoerPreview({
     };
     const weekdayLabels = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
 
-    const parseDate = (ymd: string) => {
-        const [y, m, d] = ymd.split('-').map(Number);
+    const parseDate = (yearMonthDay: string) => {
+        const [y, m, d] = yearMonthDay.split('-').map(Number);
         return new Date(y, (m ?? 1) - 1, d ?? 1);
     };
     const fmtNO = (date: Date) =>
         new Intl.DateTimeFormat('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
 
-    const groups = ymdDates.reduce<Record<string, string[]>>((acc, ymd) => {
-        const [y, m] = ymd.split('-');
+    const groups = yearMonthDayDates.reduce<Record<string, string[]>>((acc, yearMonthDay) => {
+        const [y, m] = yearMonthDay.split('-');
         const key = `${y}-${m}`;
-        (acc[key] ??= []).push(ymd);
+        (acc[key] ??= []).push(yearMonthDay);
         return acc;
     }, {});
     const orderedKeys = Object.keys(groups).sort();
@@ -67,7 +67,7 @@ export default function ValgteDatoerPreview({
         >
             <HStack justify="space-between" align="center">
                 <Heading size="xsmall" level="3">Valgte datoer</Heading>
-                <span style={{ opacity: 0.7 }}>{ymdDates.length} stk</span>
+                <span style={{ opacity: 0.7 }}>{yearMonthDayDates.length} stk</span>
             </HStack>
 
             <VStack gap="3">
@@ -75,13 +75,13 @@ export default function ValgteDatoerPreview({
                     <VStack key={key} gap="1">
                         <strong style={{ textTransform: 'capitalize' }}>{monthLabel(key)}</strong>
                         <HStack gap="1" wrap>
-                            {groups[key].map(ymd => {
-                                const date = parseDate(ymd);
+                            {groups[key].map(yearMonthDay => {
+                                const date = parseDate(yearMonthDay);
                                 const weekday = date.getDay();
 
                                 return (
                                     <div
-                                        key={ymd}
+                                        key={yearMonthDay}
                                         style={{
                                             background: dayColors[weekday],
                                             padding: '0.4rem 0.6rem',

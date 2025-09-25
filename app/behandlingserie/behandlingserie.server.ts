@@ -33,11 +33,11 @@ export async function opprettBehandlingSerie(
     accessToken: string,
     behandlingCode: string,
     regelmessighet: string,
-    ymdDates: string[],
+    yearMonthDayDates: string[],
     time: string,
     opprettetAv?: string
 ): Promise<string> {
-    const planlagteKjoringer = ymdDates.map(d => `${d}T${time}:00`);
+    const planlagteKjoringer = yearMonthDayDates.map(d => `${d}T${time}:00`);
     const body = {
         behandlingCode,
         planlagteKjoringer,

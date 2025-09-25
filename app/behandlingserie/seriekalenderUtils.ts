@@ -1,80 +1,38 @@
+export type DateRange = { from?: Date; to?: Date };
 
-export function toYmd(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+
+export function toYearMonthDay(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
 }
 
-export function addMonths(d: Date, months: number): Date {
-    const out = new Date(d);
-    out.setMonth(out.getMonth() + months);
-    return new Date(out.getFullYear(), out.getMonth(), out.getDate());
+function startOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
-export function startOfDay(d: Date): Date {
-    const x = new Date(d);
-    x.setHours(0, 0, 0, 0);
-    return x;
+function addDays(date: Date, days: number): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 }
 
-export function isWeekend(d: Date): boolean {
-    const day = d.getDay();
-    return day === 0 || day === 6;
+export function addMonths(date: Date, months: number): Date {
+    const year = date.getFullYear();
+    const monthIndex = date.getMonth() + months;
+    const targetYear = Math.floor(year + monthIndex / 12);
+    const targetMonth = ((monthIndex % 12) + 12) % 12;
+    const lastDayOfTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+    const day = Math.min(date.getDate(), lastDayOfTargetMonth);
+    return new Date(targetYear, targetMonth, day);
 }
 
-/* ============== Helligdager (NO, enkel modell) ============== */
-/** Returnerer alle (anslåtte) helligdager for inneværende år (+ ev. neste år) som Date[] og Set<YYYY-MM-DD> */
-export function buildHolidayData(includeNextYear: boolean) {
-    const now = new Date();
-    const years = [now.getFullYear(), includeNextYear ? now.getFullYear() + 1 : undefined].filter(
-        Boolean,
-    ) as number[];
-
-    const dates: Date[] = [];
-    for (const y of years) {
-        // Minimum sett: 1. nyttårsdag, skjærtorsdag, langfredag, 1. påskedag, 2. påskedag,
-        // arbeidets dag, Kristi himmelfartsdag, 1./2. pinsedag, 1./17. mai, 1./2. juledag
-        // (Påskeberegning)
-        const easter = computeEaster(y); // søndag
-        const skjærtorsdag = addDays(easter, -3);
-        const langfredag = addDays(easter, -2);
-        const andrePåskedag = addDays(easter, 1);
-        const kristiHimmelfart = addDays(easter, 39);
-        const pinseaften = addDays(easter, 48);
-        const førstePinsedag = addDays(easter, 49);
-        const andrePinsedag = addDays(easter, 50);
-
-        dates.push(
-            new Date(y, 0, 1), // 1. nyttårsdag
-            skjærtorsdag,
-            langfredag,
-            easter,
-            andrePåskedag,
-            new Date(y, 4, 1), // 1. mai
-            new Date(y, 4, 17), // 17. mai
-            kristiHimmelfart,
-            førstePinsedag,
-            andrePinsedag,
-            new Date(y, 11, 25), // 1. juledag
-            new Date(y, 11, 26), // 2. juledag
-        );
-    }
-
-    // normaliser til startOfDay og bygg set
-    const norm = dates.map(d => new Date(d.getFullYear(), d.getMonth(), d.getDate()));
-    const ymdSet = new Set(norm.map(toYmd));
-    return { dates: norm, ymdSet };
+export function isWeekend(date: Date): boolean {
+    const weekday = date.getDay();
+    return weekday === 0 || weekday === 6;
 }
 
-function addDays(d: Date, days: number): Date {
-    const out = new Date(d);
-    out.setDate(out.getDate() + days);
-    return new Date(out.getFullYear(), out.getMonth(), out.getDate());
-}
-
-// Gauss (påske) – returnerer 1. påskedag (søndag)
-function computeEaster(year: number): Date {
+function beregnPaaske(year: number): Date {
     const a = year % 19;
     const b = Math.floor(year / 100);
     const c = year % 100;
@@ -87,148 +45,200 @@ function computeEaster(year: number): Date {
     const k = c % 4;
     const l = (32 + 2 * e + 2 * i - h - k) % 7;
     const m = Math.floor((a + 11 * h + 22 * l) / 451);
-    const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=Mar, 4=Apr
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
     const day = ((h + l - 7 * m + 114) % 31) + 1;
     return new Date(year, month - 1, day);
 }
 
-/* ============== Ukedager / serielogikk ============== */
+export function byggHelligdagsdata(includeNextYear: boolean) {
+    const now = new Date();
+    const yearsToInclude: number[] = [now.getFullYear()];
+    if (includeNextYear) yearsToInclude.push(now.getFullYear() + 1);
 
-export function getWeekdayNumber(weekday: string): number | undefined {
-    const map: Record<string, number> = {
-        monday: 1,
-        tuesday: 2,
-        wednesday: 3,
-        thursday: 4,
-        friday: 5,
-        saturday: 6,
-        sunday: 0,
-    };
-    return map[weekday.toLowerCase()];
+    const rawHolidayDates: Date[] = [];
+    for (const year of yearsToInclude) {
+        const paaske = beregnPaaske(year);
+        const skjaertorsdag = addDays(paaske, -3);
+        const langfredag = addDays(paaske, -2);
+        const forstePaaskedag = paaske;
+        const andrePaaskedag = addDays(paaske, 1);
+        const kristiHimmelfartsdag = addDays(paaske, 39);
+        const forstePinsedag = addDays(paaske, 49);
+        const andrePinsedag = addDays(paaske, 50);
+
+        rawHolidayDates.push(
+            new Date(year, 0, 1),
+            skjaertorsdag,
+            langfredag,
+            forstePaaskedag,
+            andrePaaskedag,
+            new Date(year, 4, 1),
+            new Date(year, 4, 17),
+            kristiHimmelfartsdag,
+            forstePinsedag,
+            andrePinsedag,
+            new Date(year, 11, 25),
+            new Date(year, 11, 26)
+        );
+    }
+
+    const holidayDates = rawHolidayDates.map(startOfDay);
+    const yearMonthDaySet = new Set(holidayDates.map(toYearMonthDay));
+    return { holidayDates, yearMonthDaySet };
 }
 
-/** Alle forekomster av gitt ukedag i [from, to] (inkluderende), klippet på dag-nivå */
-export function allWeekdaysInRange(weekday: number, from: Date, to: Date): Date[] {
-    const start = startOfDay(from);
-    const end = startOfDay(to);
+export function firstBusinessDayOnOrAfter(anchorDate: Date): Date {
+    let currentDate = startOfDay(anchorDate);
+    while (isWeekend(currentDate)) currentDate = addDays(currentDate, 1);
+    return currentDate;
+}
+
+export function firstWeekdayOnOrAfter(anchorDate: Date, weekdayNumber: number): Date {
+    let currentDate = startOfDay(anchorDate);
+    while (currentDate.getDay() !== weekdayNumber) currentDate = addDays(currentDate, 1);
+    return currentDate;
+}
+
+export function allWeekdaysInRange(weekdayNumber: number, startDate: Date, endDate: Date): Date[] {
+    const start = startOfDay(startDate);
+    const end = startOfDay(endDate);
+    const first = firstWeekdayOnOrAfter(start, weekdayNumber);
     const out: Date[] = [];
+    for (let d = first; d.getTime() <= end.getTime(); d = addDays(d, 7)) out.push(startOfDay(d));
+    return out;
+}
 
-    // Finn første forekomst av ukedagen
-    const cur = new Date(start);
-    while (cur.getDay() !== weekday) cur.setDate(cur.getDate() + 1);
-
-    while (cur <= end) {
-        out.push(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()));
-        cur.setDate(cur.getDate() + 7);
+export function monthlyAnchoredStartDates(startDate: Date, monthInterval: number, horizonDate: Date): Date[] {
+    if (!Number.isFinite(monthInterval) || monthInterval <= 0) return [];
+    const startIndex = startDate.getFullYear() * 12 + startDate.getMonth();
+    const endIndex = horizonDate.getFullYear() * 12 + horizonDate.getMonth();
+    const out: Date[] = [];
+    for (let index = startIndex; index <= endIndex; index += monthInterval) {
+        const year = Math.floor(index / 12);
+        const month = index % 12;
+        out.push(new Date(year, month, 1));
     }
     return out;
 }
 
-/** Første ukedag >= anchor (0=søn..6=lør) */
-export function firstWeekdayOnOrAfter(anchor: Date, weekday: number): Date {
-    const d = startOfDay(anchor);
-    while (d.getDay() !== weekday) d.setDate(d.getDate() + 1);
-    return d;
-}
-
-/** Første virkedag (man–fre, og ikke helligdag) >= anchor */
-export function firstBusinessDayOnOrAfter(anchor: Date, holidaySet?: Set<string>): Date {
-    const d = startOfDay(anchor);
-    while (true) {
-        const isHol = holidaySet?.has(toYmd(d));
-        if (!isWeekend(d) && !isHol) return d;
-        d.setDate(d.getDate() + 1);
-    }
-}
-
-/** For "første virkedag i n måneder": for hver måned fra start (inkl.) i `months`, returner 1. i måneden */
-export function monthlyAnchoredStartDates(start: Date, months: number, horizon: Date): Date[] {
-    const base = new Date(start.getFullYear(), start.getMonth(), 1); // månedens 1.
+export function quarterlyStartDates(startDate: Date, horizonDate: Date): Date[] {
+    const startIndex = startDate.getFullYear() * 12;
+    const endIndex = horizonDate.getFullYear() * 12 + horizonDate.getMonth();
     const out: Date[] = [];
-    for (let i = 0; i < months; i++) {
-        const d = addMonths(base, i);
-        if (d > horizon) break;
-        out.push(d);
+    for (let index = startIndex; index <= endIndex; index += 3) {
+        const year = Math.floor(index / 12);
+        const month = index % 12;
+        const date = new Date(year, month, 1);
+        if (date >= new Date(startDate.getFullYear(), startDate.getMonth(), 1) && date <= horizonDate) out.push(date);
     }
     return out;
 }
 
-/** Alle anker-måneder mellom start og slutt (inkludert), gitt som 0-baserte månedsindekser. */
-function anchoredMonthsBetween(start: Date, end: Date, anchorMonths: number[]): Date[] {
-    const res: Date[] = [];
-    const startMonth = new Date(start.getFullYear(), start.getMonth(), 1);
-    const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
-
-    for (let y = startMonth.getFullYear(); y <= endMonth.getFullYear(); y++) {
-        for (const m of anchorMonths) {
-            const d = new Date(y, m, 1);
-            if (d < startMonth) continue;
-            if (d > endMonth) break;
-            res.push(d);
+export function tertialStartDates(startDate: Date, horizonDate: Date): Date[] {
+    const tertialMonths = [0, 4, 8];
+    const out: Date[] = [];
+    for (let year = startDate.getFullYear(); year <= horizonDate.getFullYear(); year++) {
+        for (const month of tertialMonths) {
+            const date = new Date(year, month, 1);
+            if (date >= new Date(startDate.getFullYear(), startDate.getMonth(), 1) && date <= horizonDate) out.push(date);
         }
     }
-    return res;
+    return out;
 }
 
-/** Kvartal: jan, apr, jul, okt */
-export function quarterlyStartDates(start: Date, end: Date): Date[] {
-    return anchoredMonthsBetween(start, end, [0, 3, 6, 9]);
+export function getWeekdayNumber(weekdayKey: string): number | undefined {
+    const map: Record<string, number> = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+    return map[weekdayKey];
 }
 
-/** Tertial: jan, mai, sep */
-export function tertialStartDates(start: Date, end: Date): Date[] {
-    return anchoredMonthsBetween(start, end, [0, 4, 8]);
+function isDateRange(value: unknown): value is DateRange {
+    if (!value || typeof value !== "object") return false;
+    const obj = value as Record<string, unknown>;
+    return "from" in obj || "to" in obj;
 }
 
-/* ============== Bygg visnings/lagrings-lister ============== */
+type ByggValgteDatoerOptions = {
+    ekskluderHelg: boolean;
+    ekskluderHelligdager: boolean;
+    ekskluderSondag: boolean;
+    endOfHorizon: Date;
+    helligdagerYearMonthDaySet: Set<string>;
+};
 
-/**
- * Bygger ymd-liste fra UI-selection:
- * - range: alle dager i intervallet (ev. ekskluder helg + helligdager)
- * - multiple: tolkes som Date[] direkte
- */
 export function buildValgteDatoer(
-    selection: { from?: Date; to?: Date } | Date[] | undefined,
-    mode: 'range' | 'multiple',
-    ekskluderHelg: boolean,
-    horizon: Date,
-    holidaySet?: Set<string>,
-    ekskluderHelligdager?: boolean,
+    selection: DateRange | Date[] | undefined,
+    mode: "range" | "multiple",
+    options: ByggValgteDatoerOptions
 ): string[] {
     if (!selection) return [];
+    const { ekskluderHelg, ekskluderHelligdager, ekskluderSondag, endOfHorizon, helligdagerYearMonthDaySet } = options;
 
-    const dates: Date[] = [];
+    const collectedDates: Date[] = [];
+    const horizon = startOfDay(endOfHorizon);
 
-    if (mode === 'multiple') {
-        const arr = Array.isArray(selection) ? selection : [];
-        for (const d of arr) {
-            if (!d) continue;
-            const dd = startOfDay(d);
-            if (dd > horizon) continue;
-            dates.push(dd);
-        }
+    const pushIfInHorizon = (date: Date) => {
+        const d = startOfDay(date);
+        if (d.getTime() <= horizon.getTime()) collectedDates.push(d);
+    };
+
+    if (mode === "multiple") {
+        const dates = Array.isArray(selection) ? (selection as Date[]) : [];
+        for (const date of dates) pushIfInHorizon(date);
     } else {
-        // range
-        if (!('from' in selection)) return [];
+        if (!isDateRange(selection)) return [];
         const from = selection.from ? startOfDay(selection.from) : undefined;
         const to = selection.to ? startOfDay(selection.to) : undefined;
-        if (!from || !to || from > to) return [];
-
-        const cur = new Date(from);
-        const end = to > horizon ? startOfDay(horizon) : to;
-        while (cur <= end) {
-            const isHol = holidaySet?.has(toYmd(cur));
-            if (
-                (!ekskluderHelg || !isWeekend(cur)) &&
-                (!ekskluderHelligdager || !isHol)
-            ) {
-                dates.push(new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()));
-            }
-            cur.setDate(cur.getDate() + 1);
+        if (from && to && from.getTime() <= to.getTime()) {
+            const end = to.getTime() <= horizon.getTime() ? to : horizon;
+            for (let d = from; d.getTime() <= end.getTime(); d = addDays(d, 1)) pushIfInHorizon(d);
         }
     }
 
-    // sorter og returner som ymd
-    dates.sort((a, b) => a.getTime() - b.getTime());
-    return dates.map(toYmd);
+    const yearMonthDays = Array.from(new Set(collectedDates.map(toYearMonthDay))).sort();
+    return yearMonthDays.filter((yearMonthDay) => {
+        const parts = yearMonthDay.split("-");
+        if (parts.length !== 3) return false;
+        const [year, month, day] = parts.map(Number);
+        if ([year, month, day].some((n) => Number.isNaN(n))) return false;
+        const date = new Date(year, month - 1, day);
+        if (ekskluderHelg && isWeekend(date)) return false;
+        if (!ekskluderHelg && ekskluderSondag && date.getDay() === 0) return false;
+        if (ekskluderHelligdager && helligdagerYearMonthDaySet.has(yearMonthDay)) return false;
+        return true;
+    });
+}
+
+type DeaktiverteDatoerOptions = {
+    fromDate: Date;
+    toDate: Date;
+    bookedDates: Date[];
+    helligdagsdatoer: Date[];
+    ekskluderHelg: boolean;
+    ekskluderHelligdager: boolean;
+    ekskluderSondag: boolean;
+};
+
+export function buildDisabledDates({
+                                       fromDate,
+                                       toDate,
+                                       bookedDates,
+                                       helligdagsdatoer,
+                                       ekskluderHelg,
+                                       ekskluderHelligdager,
+                                       ekskluderSondag,
+                                   }: DeaktiverteDatoerOptions): Date[] {
+    const disabledSet = new Set<number>();
+    const addDisabled = (date: Date) => disabledSet.add(startOfDay(date).getTime());
+
+    const start = startOfDay(fromDate);
+    const end = startOfDay(toDate);
+    for (let d = start; d.getTime() <= end.getTime(); d = addDays(d, 1)) {
+        if (ekskluderHelg && isWeekend(d)) addDisabled(d);
+        else if (!ekskluderHelg && ekskluderSondag && d.getDay() === 0) addDisabled(d);
+    }
+
+    if (ekskluderHelligdager) for (const date of helligdagsdatoer) addDisabled(date);
+    for (const date of bookedDates) addDisabled(date);
+
+    return Array.from(disabledSet).map((time) => new Date(time)).sort((a, b) => a.getTime() - b.getTime());
 }
