@@ -1,4 +1,4 @@
-import { FilterIcon } from '@navikt/aksel-icons'
+import { ChevronDownIcon, ChevronUpIcon, Density2Icon, FilterIcon } from '@navikt/aksel-icons'
 import {
   BodyShort,
   Box,
@@ -178,6 +178,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
   const { now, rows } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const sokeModalRef = useRef<HTMLDialogElement>(null)
+  const grupperModalRef = useRef<HTMLDialogElement>(null)
 
   const searchParamsFomDato = searchParams.get('fomDato')
   const searchParamsTomDato = searchParams.get('tomDato')
@@ -295,8 +296,16 @@ export default function ManuellBehandlingOppsummeringRoute() {
 
   const total = useMemo(() => sumAntall(filtered), [filtered])
 
-  function clearAll() {
-    setSearchParams({})
+  function clearFacetFilters() {
+    const next = new URLSearchParams(searchParams)
+    for (const f of FACETS) next.delete(f)
+    setSearchParams(next)
+  }
+
+  function clearGrouping() {
+    const next = new URLSearchParams(searchParams)
+    next.delete(GROUP_PARAM)
+    setSearchParams(next)
   }
 
   function onToggle(facet: FacetKey, rawValue: string | null) {
@@ -326,6 +335,24 @@ export default function ManuellBehandlingOppsummeringRoute() {
     setSearchParams(nextParams)
   }
 
+  function updateGroupBy(nextOrder: FacetKey[]) {
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.delete(GROUP_PARAM)
+    for (const v of nextOrder) {
+      nextParams.append(GROUP_PARAM, v)
+    }
+    setSearchParams(nextParams)
+  }
+
+  function moveGroupBy(idx: number, delta: number) {
+    const to = idx + delta
+    if (to < 0 || to >= groupBy.length) return
+    const next = [...groupBy]
+    const [moved] = next.splice(idx, 1)
+    next.splice(to, 0, moved)
+    updateGroupBy(next)
+  }
+
   return (
     <Box paddingBlock="6" paddingInline="6">
       <VStack gap="6">
@@ -337,12 +364,12 @@ export default function ManuellBehandlingOppsummeringRoute() {
 
         <HStack gap="6" align="start" wrap>
           <VStack gap="4" style={{ flex: 1, minWidth: 420 }}>
-            <Box.New padding="3" borderRadius={'large'} borderWidth="1" borderColor={'neutral-subtleA'}>
+            <Box.New padding="3" borderRadius="large" borderWidth="1" borderColor="neutral-subtleA">
               <HStack gap="3" align="end" wrap>
                 <DatePicker {...datepickerProps}>
                   <HStack wrap gap="space-16" justify="center">
-                    <DatePicker.Input size={'small'} {...fromInputProps} label="Fra" />
-                    <DatePicker.Input size={'small'} {...toInputProps} label="Til" />
+                    <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
+                    <DatePicker.Input size="small" {...toInputProps} label="Til" />
                   </HStack>
                 </DatePicker>
 
@@ -367,14 +394,24 @@ export default function ManuellBehandlingOppsummeringRoute() {
               <Tag size="small" variant="alt1">
                 Sum antall: {total.toLocaleString('nb-NO')}
               </Tag>
-              <Button
-                icon={<FilterIcon aria-hidden />}
-                onClick={() => sokeModalRef.current?.showModal()}
-                variant="secondary"
-                size="small"
-              >
-                Søkefilter
-              </Button>
+              <HStack gap="2">
+                <Button
+                  icon={<FilterIcon aria-hidden />}
+                  onClick={() => sokeModalRef.current?.showModal()}
+                  variant="secondary"
+                  size="small"
+                >
+                  Søkefilter
+                </Button>
+                <Button
+                  icon={<Density2Icon aria-hidden />}
+                  onClick={() => grupperModalRef.current?.showModal()}
+                  variant="secondary"
+                  size="small"
+                >
+                  Gruppering
+                </Button>
+              </HStack>
             </HStack>
 
             {groupBy.length === 0 ? (
@@ -422,11 +459,11 @@ export default function ManuellBehandlingOppsummeringRoute() {
                             <span>{manglendeVerdi}</span>
                           )}
                         </Table.DataCell>
-                        <Table.DataCell style={{ textAlign: 'right' }}>
+                        <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                           {r.antall.toLocaleString('nb-NO')}
                         </Table.DataCell>
-                        <Table.DataCell style={{ textAlign: 'right' }}>
-                          {((r.antall * 100) / total).toFixed(1)}%
+                        <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                          {((r.antall * 100) / total).toFixed(1)} %
                         </Table.DataCell>
                       </Table.Row>
                     ))}
@@ -445,9 +482,15 @@ export default function ManuellBehandlingOppsummeringRoute() {
                 </Table.Header>
                 <Table.Body>
                   {grouped.map((gr) => (
-                    <Table.Row key={`gr-${gr.labels}`}>
+                    <Table.Row
+                      key={`gr-${gr.labels.behandlingType}-${gr.labels.oppgaveKode}-${gr.labels.prioritetKode}-${gr.labels.fagomrade}-${gr.labels.underkategoriKode}-${gr.labels.kategori}`}
+                    >
                       {groupBy.map((g) => (
-                        <Table.DataCell key={`c-${gr.labels}-${g}`}>{gr.labels[g] ?? manglendeVerdi}</Table.DataCell>
+                        <Table.DataCell
+                          key={`c-gr-${gr.labels.behandlingType}-${gr.labels.oppgaveKode}-${gr.labels.prioritetKode}-${gr.labels.fagomrade}-${gr.labels.underkategoriKode}-${gr.labels.kategori}-${g}`}
+                        >
+                          {gr.labels[g] ?? manglendeVerdi}
+                        </Table.DataCell>
                       ))}
                       <Table.DataCell style={{ textAlign: 'right' }}>
                         {gr.antall.toLocaleString('nb-NO')}
@@ -486,32 +529,101 @@ export default function ManuellBehandlingOppsummeringRoute() {
                 ))}
               </div>
             </div>
-            <Box>
-              <Label size="small">Grupper etter</Label>
-              <CheckboxGroup legend="" hideLegend size="small">
-                {FACETS.map((f) => (
-                  <Checkbox
-                    key={`gb-${f}`}
-                    checked={searchParams.getAll(GROUP_PARAM).includes(f)}
-                    onChange={() => onToggleGroupBy(f)}
-                  >
-                    {facetLabel(f)}
-                  </Checkbox>
-                ))}
-              </CheckboxGroup>
-            </Box>
           </Modal.Body>
           <Modal.Footer>
             <HStack gap="3">
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  clearAll()
-                }}
-              >
+              <Button variant="secondary" onClick={clearFacetFilters}>
                 Nullstill
               </Button>
               <Button variant="primary" onClick={() => sokeModalRef.current?.close()}>
+                Lukk
+              </Button>
+            </HStack>
+          </Modal.Footer>
+        </Modal>
+        <Modal ref={grupperModalRef} header={{ heading: 'Gruppering' }} width={720}>
+          <Modal.Body>
+            <VStack gap="4">
+              <Box>
+                <Label size="small">Grupper etter</Label>
+                <CheckboxGroup legend="" hideLegend size="small">
+                  {FACETS.map((f) => (
+                    <Checkbox
+                      key={`gb-${f}`}
+                      checked={searchParams.getAll(GROUP_PARAM).includes(f)}
+                      onChange={() => onToggleGroupBy(f)}
+                    >
+                      {facetLabel(f)}
+                    </Checkbox>
+                  ))}
+                </CheckboxGroup>
+              </Box>
+
+              <Box.New padding="3" borderRadius="large" borderColor="warning">
+                <Label size="small">Rekkefølge</Label>
+                {groupBy.length === 0 ? (
+                  <BodyShort size="small" textColor="subtle">
+                    Ingen dimensjoner valgt ennå.
+                  </BodyShort>
+                ) : (
+                  <ol style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
+                    {groupBy.map((g, idx) => (
+                      <li
+                        key={`order-${g}`}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 8,
+                          padding: '6px 10px',
+                          marginBottom: 6,
+                          border: '1px solid var(--a-border-subtle)',
+                          borderRadius: 6,
+                          background: 'var(--a-surface-subtle)',
+                          userSelect: 'none',
+                        }}
+                      >
+                        <span aria-hidden style={{ fontFamily: 'monospace' }}>
+                          ≡
+                        </span>
+                        <span style={{ flex: 1 }}>{facetLabel(g)}</span>
+                        <HStack gap="1" align="center">
+                          <Button
+                            size="xsmall"
+                            variant="tertiary"
+                            icon={<ChevronUpIcon aria-hidden />}
+                            aria-label={`Flytt ${facetLabel(g)} opp`}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              moveGroupBy(idx, -1)
+                            }}
+                            disabled={idx === 0}
+                          />
+                          <Button
+                            size="xsmall"
+                            variant="tertiary"
+                            icon={<ChevronDownIcon aria-hidden />}
+                            aria-label={`Flytt ${facetLabel(g)} ned`}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              moveGroupBy(idx, 1)
+                            }}
+                            disabled={idx === groupBy.length - 1}
+                          />
+                        </HStack>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </Box.New>
+            </VStack>
+          </Modal.Body>
+          <Modal.Footer>
+            <HStack gap="3">
+              <Button variant="secondary" onClick={clearGrouping}>
+                Nullstill gruppering
+              </Button>
+              <Button variant="primary" onClick={() => grupperModalRef.current?.close()}>
                 Lukk
               </Button>
             </HStack>
