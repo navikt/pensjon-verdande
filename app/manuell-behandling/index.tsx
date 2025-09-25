@@ -5,16 +5,20 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
+  DatePicker,
   Heading,
   HStack,
   Label,
   Modal,
   Table,
   Tag,
+  useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
+import { toIsoDate } from '~/common/date'
 import { decodeFagomrade } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeOppgaveKode, decodeOppgavePrioritet } from '~/common/decodeOppgave'
@@ -46,13 +50,26 @@ const facetValueTranslator: Partial<Record<FacetKey, (key: string) => string>> =
   underkategoriKode: decodeUnderkategoriKode,
 }
 
-type LoaderData = {
-  rows: ManuellBehandlingOppsummering[]
-}
-
 export async function loader({ request }: LoaderFunctionArgs) {
-  const rows = await apiGet<ManuellBehandlingOppsummering[]>('/api/behandling/manuell-behandling/oppsummering', request)
-  return { rows }
+  const url = new URL(request.url)
+
+  const fomDato = url.searchParams.get('fomDato')
+  const tomDato = url.searchParams.get('tomDato')
+
+  const qs = new URLSearchParams()
+  if (fomDato) qs.set('fomDato', fomDato)
+  if (tomDato) qs.set('tomDato', tomDato)
+
+  const path = qs.toString()
+    ? `/api/behandling/manuell-behandling/oppsummering?${qs.toString()}`
+    : '/api/behandling/manuell-behandling/oppsummering'
+
+  const rows = await apiGet<ManuellBehandlingOppsummering[]>(path, request)
+
+  return {
+    rows,
+    now: new Date(),
+  }
 }
 
 const NULL_TOKEN = '__NULL__' // representerer null i URL
@@ -120,9 +137,59 @@ function toggleParam(current: string[] | null, value: string): string[] | null {
 const manglendeVerdi = '–'
 
 export default function ManuellBehandlingOppsummeringRoute() {
-  const { rows } = useLoaderData() as LoaderData
+  const { now, rows } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const sokeModalRef = useRef<HTMLDialogElement>(null)
+
+  const searchParamsFomDato = searchParams.get('fomDato')
+  const searchParamsTomDato = searchParams.get('tomDato')
+
+  function updateSearchParams(nextFrom: string, nextTo: string) {
+    const next = new URLSearchParams(searchParams)
+
+    next.set('fomDato', nextFrom)
+    next.set('tomDato', nextTo)
+
+    setSearchParams(next)
+  }
+
+  function onRangeChange(val?: DateRange) {
+    if (val?.from && val.to) {
+      updateSearchParams(toIsoDate(val.from), toIsoDate(val.to))
+    }
+  }
+
+  const { datepickerProps, fromInputProps, toInputProps, setSelected } = useRangeDatepicker({
+    defaultSelected:
+      searchParamsFomDato && searchParamsTomDato
+        ? {
+            from: new Date(searchParamsFomDato),
+            to: new Date(searchParamsTomDato),
+          }
+        : undefined,
+    required: true,
+    onRangeChange: onRangeChange,
+  })
+
+  function applyPeriod(nextFrom: string, nextTo: string) {
+    setSelected({
+      from: new Date(nextFrom),
+      to: new Date(nextTo),
+    })
+    updateSearchParams(nextFrom, nextTo)
+  }
+
+  function presetLastNDays(n: number) {
+    const to = toIsoDate(now)
+    const from = toIsoDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - (n - 1)))
+    applyPeriod(from, to)
+  }
+
+  function presetThisYear() {
+    const from = `${now.getFullYear()}-01-01`
+    const to = toIsoDate(new Date())
+    applyPeriod(from, to)
+  }
 
   const columnsWrapperRef = useRef<HTMLDivElement>(null)
   const [columnCount, setColumnCount] = useState(2)
@@ -132,7 +199,6 @@ export default function ManuellBehandlingOppsummeringRoute() {
     if (!el) return
 
     const update = () => {
-      // Bruk bredde som heuristikk: >= 1100px => 3 kolonner, ellers 2
       const w = el.clientWidth
       setColumnCount(w >= 1100 ? 3 : 2)
     }
@@ -202,15 +268,42 @@ export default function ManuellBehandlingOppsummeringRoute() {
   return (
     <Box paddingBlock="6" paddingInline="6">
       <VStack gap="6">
-        <Heading level="1" size="large">
+        <Heading level="1" size="small">
           Manuell saksbehandling
         </Heading>
+
         <BodyShort>Tabellen viser opptelling av antall oppgaver som er opprettet av behandlingene</BodyShort>
 
         <HStack gap="6" align="start" wrap>
           <VStack gap="4" style={{ flex: 1, minWidth: 420 }}>
+            <Box.New padding="3" borderRadius={'large'} borderWidth="1" borderColor={'neutral-subtleA'}>
+              <HStack gap="3" align="end" wrap>
+                <DatePicker {...datepickerProps}>
+                  <HStack wrap gap="space-16" justify="center">
+                    <DatePicker.Input size={'small'} {...fromInputProps} label="Fra" />
+                    <DatePicker.Input size={'small'} {...toInputProps} label="Til" />
+                  </HStack>
+                </DatePicker>
+
+                <VStack gap="space-8">
+                  <Label size="small">Periode</Label>
+                  <HStack gap="1" wrap>
+                    <Button size="small" variant="secondary" onClick={() => presetLastNDays(7)}>
+                      7 d
+                    </Button>
+                    <Button size="small" variant="secondary" onClick={() => presetLastNDays(30)}>
+                      30 d
+                    </Button>
+                    <Button size="small" variant="secondary" onClick={presetThisYear}>
+                      I år
+                    </Button>
+                  </HStack>
+                </VStack>
+              </HStack>
+            </Box.New>
+
             <HStack justify="space-between" align="center">
-              <Tag size="medium" variant="alt1">
+              <Tag size="small" variant="alt1">
                 Sum antall: {total.toLocaleString('nb-NO')}
               </Tag>
               <Button
