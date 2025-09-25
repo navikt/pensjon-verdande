@@ -1,18 +1,7 @@
 import { type LoaderFunctionArgs, useFetcher, useLoaderData, useNavigate, useSearchParams } from 'react-router';
 import { type ActionFunctionArgs, redirect } from 'react-router';
-import { useEffect, useMemo, useState } from 'react';
-import {
-    Button,
-    DatePicker,
-    RadioGroup,
-    Radio,
-    Checkbox,
-    Select,
-    Heading,
-    VStack,
-    HStack,
-    Modal,
-} from '@navikt/ds-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, DatePicker, RadioGroup, Radio, Checkbox, Select, Heading, VStack, HStack, Modal } from '@navikt/ds-react';
 import 'chart.js/auto';
 import { requireAccessToken } from '~/services/auth.server';
 import { getBehandlingSerier, opprettBehandlingSerie, endrePlanlagtStartet } from '~/behandlingserie/behandlingserie.server';
@@ -20,7 +9,7 @@ import type { BehandlingSerieDTO, BehandlingInfoDTO } from '~/types';
 import {
     addMonths,
     allWeekdaysInRange,
-    buildHolidayData,
+    byggHelligdagsdata,
     buildValgteDatoer,
     firstBusinessDayOnOrAfter,
     firstWeekdayOnOrAfter,
@@ -40,6 +29,26 @@ type Selection = DateRange | Date[] | undefined;
 type IntervalMode = '' | 'quarterly' | 'tertial';
 type DayMode = 'fixed-weekday' | 'first-weekday';
 
+type RulesValue = {
+    regelmessighet: RegelmessighetMode;
+    dayMode: DayMode;
+    selectedUkedag: string;
+    selectAntallMaaneder: string;
+    intervalMode: IntervalMode;
+};
+type RulesPatch = Partial<RulesValue>;
+
+type OptionsValue = {
+    includeNextYear: boolean;
+    ekskluderHelligdager: boolean;
+    ekskluderHelg: boolean;
+    ekskluderSondag: boolean;
+};
+type OptionsPatch = Partial<OptionsValue>;
+
+const TIMES: string[] = Array.from({ length: 24 }, (_, hour) => `${String(hour).padStart(2, '0')}:00`);
+const BEHANDLING_TYPER = ['AvsluttSaker'];
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     const { searchParams } = new URL(request.url);
     const behandlingType = searchParams.get('behandlingType') ?? '';
@@ -55,9 +64,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (intent === 'updatePlanlagtStartet') {
         const behandlingId = String(formData.get('behandlingId') ?? '');
         const behandlingCode = String(formData.get('behandlingCode') ?? '');
-        const yearMonthDay = String(formData.get('yearMonthDay') ?? '');
-        const time = String(formData.get('time') ?? '');
-        const isoLocalDatetimeString = `${yearMonthDay}T${time}:00`;
+        const yearMonthDay = String(formData.get('ymd') ?? '');
+        const timeOfDay = String(formData.get('time') ?? '');
+        const isoLocalDatetimeString = `${yearMonthDay}T${timeOfDay}:00`;
         await endrePlanlagtStartet(accessToken, behandlingId, isoLocalDatetimeString);
         return redirect(`/behandlingserie?behandlingType=${behandlingCode}`);
     }
@@ -67,43 +76,313 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const opprettetAv = String(formData.get('opprettetAv') ?? 'VERDANDE');
     const valgteDatoerRaw = String(formData.get('valgteDatoer') ?? '[]');
     const valgteDatoer = JSON.parse(valgteDatoerRaw) as string[];
-    await opprettBehandlingSerie(
-        accessToken,
-        behandlingCode,
-        regelmessighet,
-        valgteDatoer,
-        startTid,
-        opprettetAv,
-    );
+    await opprettBehandlingSerie(accessToken, behandlingCode, regelmessighet, valgteDatoer, startTid, opprettetAv);
     return redirect(`/behandlingserie?behandlingType=${behandlingCode}`);
 };
 
 function buildBookedFromSerier(serier: BehandlingSerieDTO[]) {
-    const dates: Date[] = [];
+    const bookedDates: Date[] = [];
     const yearMonthDaySet = new Set<string>();
     for (const serie of serier || []) {
-        for (const b of (serie.behandlinger || []) as BehandlingInfoDTO[]) {
-            if (!b?.planlagtStartet) continue;
-            const dt = new Date(b.planlagtStartet);
-            const d = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-            dates.push(d);
-            yearMonthDaySet.add(toYearMonthDay(d));
+        for (const behandling of (serie.behandlinger || []) as BehandlingInfoDTO[]) {
+            if (!behandling?.planlagtStartet) continue;
+            const dateTime = new Date(behandling.planlagtStartet);
+            const dateOnly = new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate());
+            bookedDates.push(dateOnly);
+            yearMonthDaySet.add(toYearMonthDay(dateOnly));
         }
     }
-    return { dates, yearMonthDaySet };
+    return { bookedDates, yearMonthDaySet };
 }
 
-function isDateRange(x: any): x is DateRange {
-    return x && typeof x === 'object' && ('from' in x || 'to' in x);
+function isDateRange(value: any): value is DateRange {
+    return value && typeof value === 'object' && ('from' in value || 'to' in value);
+}
+
+function SeriesHeader({
+                          behandlingType,
+                          onChange,
+                      }: {
+    behandlingType: string;
+    onChange: (value: string) => void;
+}) {
+    return (
+        <HStack>
+            <Select label="Velg behandling" value={behandlingType} onChange={(e) => onChange(e.target.value)}>
+                <option value="">Velg behandlingCode</option>
+                {BEHANDLING_TYPER.map((type) => (
+                    <option key={type} value={type}>
+                        {type}
+                    </option>
+                ))}
+            </Select>
+        </HStack>
+    );
+}
+
+function RuleControls({
+                          value,
+                          onChange,
+                      }: {
+    value: RulesValue;
+    onChange: (patch: RulesPatch) => void;
+}) {
+    return (
+        <VStack>
+            <RadioGroup
+                legend="Velg regelmessighet"
+                value={value.regelmessighet}
+                onChange={(v) => onChange({ regelmessighet: v as RegelmessighetMode })}
+            >
+                <Radio value="range">Velg en range fra og til</Radio>
+                <Radio value="multiple">Velg diverse datoer</Radio>
+            </RadioGroup>
+
+            {value.regelmessighet === 'multiple' && (
+                <HStack wrap gap="4">
+                    <Select
+                        label="Dagvalg"
+                        value={value.dayMode}
+                        onChange={(e) => {
+                            const next = e.target.value as DayMode;
+                            onChange({
+                                dayMode: next,
+                                selectedUkedag: next === 'first-weekday' ? '' : value.selectedUkedag,
+                            });
+                        }}
+                    >
+                        <option value="fixed-weekday">Fast ukedag</option>
+                        <option value="first-weekday">Første virkedag i periode</option>
+                    </Select>
+
+                    <Select
+                        label="Velg fast ukedag"
+                        value={value.selectedUkedag}
+                        onChange={(event) => onChange({ selectedUkedag: event.target.value })}
+                        disabled={value.dayMode === 'first-weekday'}
+                    >
+                        <option value="">Velg ukedag</option>
+                        <option value="monday">Mandager</option>
+                        <option value="tuesday">Tirsdager</option>
+                        <option value="wednesday">Onsdager</option>
+                        <option value="thursday">Torsdager</option>
+                        <option value="friday">Fredager</option>
+                    </Select>
+
+                    <Select
+                        label="i antall måneder"
+                        value={value.selectAntallMaaneder}
+                        onChange={(event) => onChange({ selectAntallMaaneder: event.target.value })}
+                        disabled={value.intervalMode !== ''}
+                    >
+                        <option value="">Velg</option>
+                        <option value="1">1 måned</option>
+                        <option value="3">3 måneder</option>
+                        <option value="6">6 måneder</option>
+                        <option value="12">12 måneder</option>
+                    </Select>
+
+                    <Select
+                        label="Intervall"
+                        value={value.intervalMode}
+                        onChange={(e) => onChange({ intervalMode: e.target.value as IntervalMode })}
+                    >
+                        <option value="">Ingen</option>
+                        <option value="quarterly">Hvert kvartal</option>
+                        <option value="tertial">Hvert tertial</option>
+                    </Select>
+                </HStack>
+            )}
+        </VStack>
+    );
+}
+
+function OptionsRow({
+                        value,
+                        onChange,
+                        visible,
+                    }: {
+    value: OptionsValue;
+    onChange: (patch: OptionsPatch) => void;
+    visible: boolean;
+}) {
+    if (!visible) return null;
+    return (
+        <HStack gap="6">
+            <Checkbox checked={value.includeNextYear} onChange={(e) => onChange({ includeNextYear: e.target.checked })}>
+                Inkluder neste år
+            </Checkbox>
+            <Checkbox checked={value.ekskluderHelligdager} onChange={(e) => onChange({ ekskluderHelligdager: e.target.checked })}>
+                Ekskluder helligdager
+            </Checkbox>
+            <Checkbox checked={!!value.ekskluderHelg} onChange={(e) => onChange({ ekskluderHelg: e.target.checked })}>
+                Ekskluder helg
+            </Checkbox>
+            <Checkbox checked={value.ekskluderSondag} onChange={(e) => onChange({ ekskluderSondag: e.target.checked })}>
+                Ekskluder søndager
+            </Checkbox>
+        </HStack>
+    );
+}
+
+function CalendarSection({
+                             regelmessighet,
+                             selectedForPicker,
+                             now,
+                             endOfHorizon,
+                             ekskluderHelg,
+                             disabledDates,
+                             onSelect,
+                             onClear,
+                             canClear,
+                         }: {
+    regelmessighet: RegelmessighetMode;
+    selectedForPicker: any;
+    now: Date;
+    endOfHorizon: Date;
+    ekskluderHelg: boolean;
+    disabledDates: Date[];
+    onSelect: (v: Selection) => void;
+    onClear: () => void;
+    canClear: boolean;
+}) {
+    return (
+        <VStack>
+            <DatePicker.Standalone
+                key={regelmessighet + String(endOfHorizon.getFullYear())}
+                mode={regelmessighet}
+                selected={selectedForPicker}
+                fromDate={now}
+                toDate={endOfHorizon}
+                dropdownCaption
+                showWeekNumber
+                disableWeekends={ekskluderHelg}
+                disabled={disabledDates}
+                onSelect={(v: any) => onSelect(v as Selection)}
+            />
+            <Button variant="secondary" size="small" onClick={onClear} disabled={!canClear} style={{ alignSelf: 'flex-start' }}>
+                Avvelg alle datoer
+            </Button>
+        </VStack>
+    );
+}
+
+function EditDialog({
+                        open,
+                        onClose,
+                        item,
+                        endOfHorizon,
+                        ekskluderHelg,
+                        disabledDates,
+                        onSave,
+                    }: {
+    open: boolean;
+    onClose: () => void;
+    item: PlannedItem | null;
+    endOfHorizon: Date;
+    ekskluderHelg: boolean;
+    disabledDates: Date[];
+    onSave: (yearMonthDay: string, timeOfDay: string) => void;
+}) {
+    const [editDate, setEditDate] = useState<Date | undefined>();
+    const [editTime, setEditTime] = useState<string>('');
+    const [editInput, setEditInput] = useState('');
+
+    useEffect(() => {
+        if (!item) return;
+        const [year, month, day] = item.yearMonthDay.split('-').map(Number);
+        const date = new Date(year, (month ?? 1) - 1, day ?? 1);
+        setEditDate(date);
+        setEditTime(item.time ?? '10:00');
+    }, [item]);
+
+    useEffect(() => {
+        setEditInput(editDate ? new Intl.DateTimeFormat('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(editDate) : '');
+    }, [editDate]);
+
+    function parseNoDate(value: string): Date | undefined {
+        const match = value.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+        if (!match) return undefined;
+        const day = Number(match[1]), month = Number(match[2]), year = Number(match[3]);
+        const date = new Date(year, month - 1, day);
+        if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return undefined;
+        return date;
+    }
+
+    return (
+        <Modal open={open} onClose={onClose} aria-labelledby="edit-planlagt-modal">
+            <Modal.Header>
+                <Heading size="small" level="2" id="edit-planlagt-modal">
+                    {(() => {
+                        if (!item) return 'Endre planlagt kjøring';
+                        const [year, month, day] = item.yearMonthDay.split('-').map(Number);
+                        const originalDate = new Date(year, (month ?? 1) - 1, day ?? 1);
+                        const dateStr = new Intl.DateTimeFormat('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(originalDate);
+                        const timeStr = item.time ? ` kl ${item.time}` : '';
+                        return `Planlagt kjøring ${dateStr}${timeStr}`;
+                    })()}
+                </Heading>
+            </Modal.Header>
+
+            <Modal.Body>
+                <VStack gap="4">
+                    <HStack gap="4" wrap>
+                        <DatePicker
+                            mode="single"
+                            selected={editDate}
+                            fromDate={new Date()}
+                            toDate={endOfHorizon}
+                            disableWeekends={ekskluderHelg}
+                            disabled={disabledDates}
+                            onSelect={(date) => setEditDate(date as Date | undefined)}
+                        >
+                            <DatePicker.Input
+                                label="Ny dato"
+                                placeholder="dd.mm.åååå"
+                                value={editInput}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    setEditInput(v);
+                                    setEditDate(parseNoDate(v));
+                                }}
+                            />
+                        </DatePicker>
+
+                        <Select label="Tid" value={editTime} onChange={(e) => setEditTime(e.target.value)}>
+                            {TIMES.map((t) => (
+                                <option key={t} value={t}>
+                                    {t}
+                                </option>
+                            ))}
+                        </Select>
+                    </HStack>
+
+                    <div style={{ fontSize: 12, opacity: 0.7 }}>
+                        {item?.behandlingId} {item?.behandlingCode ? `• ${item?.behandlingCode}` : ''} {item?.serieId ? ` • Serie ${item.serieId}` : ''}
+                    </div>
+                </VStack>
+            </Modal.Body>
+
+            <Modal.Footer>
+                <HStack gap="2">
+                    <Button onClick={() => editDate && editTime && onSave(toYearMonthDay(editDate), editTime)} disabled={!editDate || !editTime}>
+                        Lagre dato
+                    </Button>
+                    <Button variant="secondary" onClick={onClose}>
+                        Lukk
+                    </Button>
+                </HStack>
+            </Modal.Footer>
+        </Modal>
+    );
 }
 
 export default function BehandlingOpprett_index() {
     const now = new Date();
     const [includeNextYear, setIncludeNextYear] = useState(false);
     const endOfHorizon = useMemo(() => {
-        const now = new Date();
-        const endYear = now.getFullYear() + (includeNextYear ? 1 : 0);
-        return new Date(endYear, 11, 31);
+        const year = new Date().getFullYear() + (includeNextYear ? 1 : 0);
+        return new Date(year, 11, 31);
     }, [includeNextYear]);
 
     const [regelmessighet, setRegelmessighet] = useState<RegelmessighetMode>('range');
@@ -117,133 +396,130 @@ export default function BehandlingOpprett_index() {
     const [ekskluderHelligdager, setEkskluderHelligdager] = useState(true);
     const [ekskluderSondag, setEkskluderSondag] = useState(true);
 
-    const fetcher = useFetcher();
+    const createFetcher = useFetcher();
     const [searchParams, setSearchParams] = useSearchParams();
     const [behandlingType, setBehandlingType] = useState(searchParams.get('behandlingType') || '');
-    const behandlingTyper = ['AvsluttSaker'];
-
     const { behandlingSerier } = useLoaderData<{ behandlingSerier: BehandlingSerieDTO[] }>();
-    const holidayData = useMemo(() => buildHolidayData(includeNextYear), [includeNextYear]);
+
+    const helligdagsdata = useMemo(() => byggHelligdagsdata(includeNextYear), [includeNextYear]);
     const bookedData = useMemo(() => buildBookedFromSerier(behandlingSerier || []), [behandlingSerier]);
 
     useEffect(() => {
         if (regelmessighet !== 'multiple') return;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        let dates: Date[] = [];
+        let generatedDates: Date[] = [];
         if (dayMode === 'first-weekday') {
             if (intervalMode === 'quarterly') {
-                dates = quarterlyStartDates(today, endOfHorizon).map(s => firstBusinessDayOnOrAfter(s));
+                generatedDates = quarterlyStartDates(today, endOfHorizon).map((start) => firstBusinessDayOnOrAfter(start));
             } else if (intervalMode === 'tertial') {
-                dates = tertialStartDates(today, endOfHorizon).map(s => firstBusinessDayOnOrAfter(s));
+                generatedDates = tertialStartDates(today, endOfHorizon).map((start) => firstBusinessDayOnOrAfter(start));
             } else if (selectAntallMaaneder) {
                 const months = parseInt(selectAntallMaaneder, 10);
                 if (months > 0) {
                     const starts = monthlyAnchoredStartDates(today, months, endOfHorizon);
-                    dates = starts.map(s => firstBusinessDayOnOrAfter(s));
+                    generatedDates = starts.map((start) => firstBusinessDayOnOrAfter(start));
                 }
             }
         } else {
             if (!selectedUkedag) return;
-            const weekdayNum = getWeekdayNumber(selectedUkedag);
-            if (weekdayNum == null) return;
+            const weekdayNumber = getWeekdayNumber(selectedUkedag);
+            if (weekdayNumber == null) return;
             if (intervalMode === 'quarterly') {
-                dates = quarterlyStartDates(today, endOfHorizon).map(s => firstWeekdayOnOrAfter(s, weekdayNum));
+                generatedDates = quarterlyStartDates(today, endOfHorizon).map((start) => firstWeekdayOnOrAfter(start, weekdayNumber));
             } else if (intervalMode === 'tertial') {
-                dates = tertialStartDates(today, endOfHorizon).map(s => firstWeekdayOnOrAfter(s, weekdayNum));
+                generatedDates = tertialStartDates(today, endOfHorizon).map((start) => firstWeekdayOnOrAfter(start, weekdayNumber));
             } else if (selectAntallMaaneder) {
                 const months = parseInt(selectAntallMaaneder, 10);
                 if (months > 0) {
                     const end = addMonths(today, months);
                     const clippedEnd = end > endOfHorizon ? endOfHorizon : end;
-                    dates = allWeekdaysInRange(weekdayNum, today, clippedEnd);
+                    generatedDates = allWeekdaysInRange(weekdayNumber, today, clippedEnd);
                 }
             }
         }
         const finalDates =
             dayMode === 'fixed-weekday' && !intervalMode && ekskluderHelg
-                ? dates.filter(d => d.getDay() !== 0 && d.getDay() !== 6)
-                : dates;
+                ? generatedDates.filter((d) => d.getDay() !== 0 && d.getDay() !== 6)
+                : generatedDates;
         setSelection(finalDates);
     }, [regelmessighet, dayMode, selectedUkedag, selectAntallMaaneder, intervalMode, ekskluderHelg, endOfHorizon]);
 
-    function handleBehandlingType(e: React.ChangeEvent<HTMLSelectElement>) {
-        const value = e.target.value;
-        setBehandlingType(value);
-        setSearchParams(prev => {
-            const params = new URLSearchParams(prev);
-            if (value) params.set('behandlingType', value);
-            else params.delete('behandlingType');
-            return params;
-        });
-    }
+    const handleBehandlingType = useCallback(
+        (value: string) => {
+            setBehandlingType(value);
+            setSearchParams((prev) => {
+                const params = new URLSearchParams(prev);
+                if (value) params.set('behandlingType', value);
+                else params.delete('behandlingType');
+                return params;
+            });
+        },
+        [setSearchParams]
+    );
 
     const selectedForPicker = useMemo(() => {
-        if (regelmessighet === 'multiple') {
-            return Array.isArray(selection) ? selection : [];
-        }
+        if (regelmessighet === 'multiple') return Array.isArray(selection) ? selection : [];
         return isDateRange(selection) ? selection : undefined;
     }, [regelmessighet, selection]);
 
     const previewDatoer = useMemo(() => {
-        const base = buildValgteDatoer(
-            selection as any,
-            regelmessighet as any,
-            {
-                ekskluderHelg,
-                ekskluderHelligdager,
-                ekskluderSondag,
-                endOfHorizon,
-                holidayyearMonthDaySet: holidayData.yearMonthDaySet,
-            }
-        );
-        return base.filter(yearMonthDay => !bookedData.yearMonthDaySet.has(yearMonthDay));
-    }, [selection, regelmessighet, ekskluderHelg, endOfHorizon, holidayData.yearMonthDaySet, ekskluderHelligdager, bookedData.yearMonthDaySet, ekskluderSondag]);
+        const base = buildValgteDatoer(selection as any, regelmessighet as any, {
+            ekskluderHelg,
+            ekskluderHelligdager,
+            ekskluderSondag,
+            endOfHorizon,
+            helligdagerYearMonthDaySet: helligdagsdata.yearMonthDaySet,
+        });
+        return base.filter((yearMonthDay) => !bookedData.yearMonthDaySet.has(yearMonthDay));
+    }, [selection, regelmessighet, ekskluderHelg, endOfHorizon, helligdagsdata.yearMonthDaySet, ekskluderHelligdager, bookedData.yearMonthDaySet, ekskluderSondag]);
 
     const canSave = Boolean(behandlingType && selectedTime && previewDatoer.length > 0);
 
-    function sendBehandlingSerieTilAction() {
+    const sendBehandlingSerieTilAction = useCallback(() => {
         const formData = new FormData();
         formData.set('behandlingCode', behandlingType ?? '');
         formData.set('regelmessighet', regelmessighet);
         formData.set('valgteDatoer', JSON.stringify(previewDatoer));
         formData.set('startTid', selectedTime);
         formData.set('opprettetAv', 'VERDANDE');
-        fetcher.submit(formData, { method: 'post' });
-    }
+        createFetcher.submit(formData, { method: 'post' });
+    }, [behandlingType, regelmessighet, previewDatoer, selectedTime, createFetcher]);
 
-    const handleClearAll = () => {
+    const handleClearAll = useCallback(() => {
         if (regelmessighet === 'multiple') setSelection([]);
         else setSelection(undefined);
-    };
+    }, [regelmessighet]);
 
-    const disabledDatesForCalendar = useMemo(() => {
-        return buildDisabledDates({
-            fromDate: now,
-            toDate: endOfHorizon,
-            bookedDates: bookedData.dates,
-            holidayDates: holidayData.dates,
-            ekskluderHelg,
-            ekskluderHelligdager,
-            ekskluderSondag,
-        });
-    }, [now, endOfHorizon, bookedData.dates, holidayData.dates, ekskluderHelg, ekskluderHelligdager, ekskluderSondag]);
+    const disabledDatesForCalendar = useMemo(
+        () =>
+            buildDisabledDates({
+                fromDate: now,
+                toDate: endOfHorizon,
+                bookedDates: bookedData.bookedDates,
+                helligdagsdatoer: helligdagsdata.holidayDates,
+                ekskluderHelg,
+                ekskluderHelligdager,
+                ekskluderSondag,
+            }),
+        [now, endOfHorizon, bookedData.bookedDates, helligdagsdata.holidayDates, ekskluderHelg, ekskluderHelligdager, ekskluderSondag]
+    );
 
     const plannedItems: PlannedItem[] = useMemo(() => {
         const items: PlannedItem[] = [];
-        for (const serie of (behandlingSerier ?? [])) {
-            for (const b of (serie.behandlinger ?? [])) {
-                if (!b?.planlagtStartet) continue;
-                const d = new Date(b.planlagtStartet);
-                const yearMonthDay = toYearMonthDay(d);
-                const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        for (const serie of behandlingSerier ?? []) {
+            for (const behandling of serie.behandlinger ?? []) {
+                if (!behandling?.planlagtStartet) continue;
+                const dateTime = new Date(behandling.planlagtStartet);
+                const yearMonthDay = toYearMonthDay(dateTime);
+                const time = `${String(dateTime.getHours()).padStart(2, '0')}:${String(dateTime.getMinutes()).padStart(2, '0')}`;
                 items.push({
-                    id: b.behandlingId?.toString() ?? `${yearMonthDay}-${time}`,
+                    id: behandling.behandlingId?.toString() ?? `${yearMonthDay}-${time}`,
                     yearMonthDay,
                     time,
-                    status: b.status,
-                    behandlingId: b.behandlingId?.toString(),
-                    behandlingCode: b.behandlingCode,
+                    status: behandling.status,
+                    behandlingId: behandling.behandlingId?.toString(),
+                    behandlingCode: behandling.behandlingCode,
                     serieId: serie.behandlingSerieId,
                 });
             }
@@ -253,295 +529,122 @@ export default function BehandlingOpprett_index() {
 
     const [editOpen, setEditOpen] = useState(false);
     const [editing, setEditing] = useState<PlannedItem | null>(null);
-    const [editDate, setEditDate] = useState<Date | undefined>();
-    const [editTime, setEditTime] = useState<string>('');
-    const [editInput, setEditInput] = useState('');
-
-    useEffect(() => {
-        setEditInput(editDate ? new Intl.DateTimeFormat('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(editDate) : '');
-    }, [editDate]);
-
-    function parseNoDate(s: string): Date | undefined {
-        const m = s.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-        if (!m) return undefined;
-        const dd = Number(m[1]), mm = Number(m[2]), yyyy = Number(m[3]);
-        const d = new Date(yyyy, mm - 1, dd);
-        if (d.getFullYear() !== yyyy || d.getMonth() !== mm - 1 || d.getDate() !== dd) return undefined;
-        return d;
-    }
-
-    function handleOpenEdit(item: PlannedItem) {
-        setEditing(item);
-        const [y, m, d] = item.yearMonthDay.split('-').map(Number);
-        setEditDate(new Date(y, (m ?? 1) - 1, d ?? 1));
-        setEditTime(item.time ?? '10:00');
-        setEditOpen(true);
-    }
-
-    function handleCloseEdit() {
-        setEditOpen(false);
-        setEditing(null);
-    }
-
-    function handleSaveEdit() {
-        if (!editing || !editDate || !editTime) return;
-        const formData = new FormData();
-        formData.set('_intent', 'updatePlanlagtStartet');
-        formData.set('behandlingId', editing.behandlingId ?? '');
-        formData.set('behandlingCode', editing.behandlingCode ?? '');
-        formData.set('yearMonthDay', toYearMonthDay(editDate));
-        formData.set('time', editTime);
-        fetcher.submit(formData, { method: 'post' });
-        setEditOpen(false);
-    }
-
+    const updateFetcher = useFetcher();
     const navigate = useNavigate();
 
-    function handleOpen() {
-        if (editing?.behandlingId) {
-            navigate(`/behandling/${editing.behandlingId}`);
-        }
-    }
+    const openEdit = useCallback((item: PlannedItem) => {
+        setEditing(item);
+        setEditOpen(true);
+    }, []);
+
+    const saveEdit = useCallback(
+        (yearMonthDay: string, timeOfDay: string) => {
+            if (!editing) return;
+            const formData = new FormData();
+            formData.set('_intent', 'updatePlanlagtStartet');
+            formData.set('behandlingId', editing.behandlingId ?? '');
+            formData.set('behandlingCode', editing.behandlingCode ?? '');
+            formData.set('ymd', yearMonthDay);
+            formData.set('time', timeOfDay);
+            updateFetcher.submit(formData, { method: 'post' });
+            setEditOpen(false);
+        },
+        [editing, updateFetcher]
+    );
+
+    const openBehandling = useCallback(() => {
+        if (editing?.behandlingId) navigate(`/behandling/${editing.behandlingId}`);
+    }, [editing, navigate]);
 
     return (
         <VStack gap="6">
             <Heading size="medium" level="1">Behandlingserie</Heading>
 
-            <HStack>
-                <Select label="Velg behandling" value={behandlingType} onChange={handleBehandlingType}>
-                    <option value="">Velg behandlingCode</option>
-                    {behandlingTyper.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                    ))}
-                </Select>
-            </HStack>
+            <SeriesHeader behandlingType={behandlingType} onChange={handleBehandlingType} />
 
             {behandlingType !== '' && (
                 <>
                     <Heading size="medium" level="1">Eksisterende planlagte behandlinger</Heading>
-                    <PlanlagteDatoerPreview
-                        items={plannedItems}
-                        onClickItem={handleOpenEdit}
-                    />
+                    <PlanlagteDatoerPreview items={plannedItems} onClickItem={openEdit} />
 
                     <Heading size="medium" level="1">Opprett ny serie</Heading>
+
                     <HStack>
-                        <Select
-                            label="Velg når på døgnet behandlingen skal kjøres"
-                            value={selectedTime}
-                            onChange={e => setSelectedTime(e.target.value)}
-                        >
+                        <Select label="Velg når på døgnet behandlingen skal kjøres" value={selectedTime} onChange={(e) => setSelectedTime(e.target.value)}>
                             <option value="">Velg tid</option>
-                            {times.map(time => (
-                                <option key={time} value={time}>{time}</option>
+                            {TIMES.map((t) => (
+                                <option key={t} value={t}>
+                                    {t}
+                                </option>
                             ))}
                         </Select>
                     </HStack>
 
-                    <VStack>
-                        <RadioGroup
-                            legend="Velg regelmessighet"
-                            value={regelmessighet}
-                            onChange={v => {
-                                const mode = v as RegelmessighetMode;
-                                setRegelmessighet(mode);
-                                if (mode === 'multiple') setSelection([]);
-                                else setSelection(undefined);
-                            }}
-                        >
-                            <Radio value="range">Velg en range fra og til</Radio>
-                            <Radio value="multiple">Velg diverse datoer</Radio>
-                        </RadioGroup>
-
-                        {regelmessighet === 'multiple' && (
-                            <HStack wrap gap="4">
-                                <Select
-                                    label="Dagvalg"
-                                    value={dayMode}
-                                    onChange={e => {
-                                        const v = e.target.value as DayMode;
-                                        setDayMode(v);
-                                        if (v === 'first-weekday') setSelectedUkedag('');
-                                    }}
-                                >
-                                    <option value="fixed-weekday">Fast ukedag</option>
-                                    <option value="first-weekday">Første virkedag i periode</option>
-                                </Select>
-
-                                <Select
-                                    label="Velg fast ukedag"
-                                    value={selectedUkedag}
-                                    onChange={event => setSelectedUkedag(event.target.value)}
-                                    disabled={dayMode === 'first-weekday'}
-                                >
-                                    <option value="">Velg ukedag</option>
-                                    <option value="monday">Mandager</option>
-                                    <option value="tuesday">Tirsdager</option>
-                                    <option value="wednesday">Onsdager</option>
-                                    <option value="thursday">Torsdager</option>
-                                    <option value="friday">Fredager</option>
-                                </Select>
-
-                                <Select
-                                    label="i antall måneder"
-                                    value={selectAntallMaaneder}
-                                    onChange={event => setSelectAntallMaaneder(event.target.value)}
-                                    disabled={intervalMode !== ''}
-                                >
-                                    <option value="">Velg</option>
-                                    <option value="1">1 måned</option>
-                                    <option value="3">3 måneder</option>
-                                    <option value="6">6 måneder</option>
-                                    <option value="12">12 måneder</option>
-                                </Select>
-
-                                <Select
-                                    label="Intervall"
-                                    value={intervalMode}
-                                    onChange={e => setIntervalMode(e.target.value as IntervalMode)}
-                                >
-                                    <option value="">Ingen</option>
-                                    <option value="quarterly">Hvert kvartal</option>
-                                    <option value="tertial">Hvert tertial</option>
-                                </Select>
-                            </HStack>
-                        )}
-
-                        {(regelmessighet === 'range' || regelmessighet === 'multiple') && (
-                            <HStack gap="6">
-                                <Checkbox checked={includeNextYear} onChange={e => setIncludeNextYear(e.target.checked)}>
-                                    Inkluder neste år
-                                </Checkbox>
-                                <Checkbox checked={ekskluderHelligdager} onChange={e => setEkskluderHelligdager(e.target.checked)}>
-                                    Ekskluder helligdager
-                                </Checkbox>
-                                <Checkbox checked={!!ekskluderHelg} onChange={e => setEkskluderHelg(e.target.checked)}>
-                                    Ekskluder helg
-                                </Checkbox>
-                                <Checkbox checked={ekskluderSondag} onChange={e => setEkskluderSondag(e.target.checked)}>
-                                    Ekskluder søndager
-                                </Checkbox>
-                            </HStack>
-                        )}
-                    </VStack>
-
-                    <VStack>
-                        <DatePicker.Standalone
-                            key={regelmessighet + String(includeNextYear)}
-                            mode={regelmessighet}
-                            selected={selectedForPicker as any}
-                            fromDate={now}
-                            toDate={endOfHorizon}
-                            dropdownCaption
-                            showWeekNumber
-                            disableWeekends={ekskluderHelg}
-                            disabled={disabledDatesForCalendar}
-                            onSelect={(v: any) => setSelection(v as Selection)}
-                        />
-                        <Button
-                            variant="secondary"
-                            size="small"
-                            onClick={handleClearAll}
-                            disabled={
-                                (regelmessighet === 'multiple' && Array.isArray(selection) && selection.length === 0) ||
-                                (regelmessighet === 'range' && !isDateRange(selection))
+                    <RuleControls
+                        value={{ regelmessighet, dayMode, selectedUkedag, selectAntallMaaneder, intervalMode }}
+                        onChange={(patch) => {
+                            if (patch.regelmessighet !== undefined) {
+                                setRegelmessighet(patch.regelmessighet);
+                                setSelection(patch.regelmessighet === 'multiple' ? [] : undefined);
                             }
-                            style={{ alignSelf: 'flex-start' }}
-                        >
-                            Avvelg alle datoer
-                        </Button>
-                    </VStack>
+                            if (patch.dayMode !== undefined) setDayMode(patch.dayMode);
+                            if (patch.selectedUkedag !== undefined) setSelectedUkedag(patch.selectedUkedag);
+                            if (patch.selectAntallMaaneder !== undefined) setSelectAntallMaaneder(patch.selectAntallMaaneder);
+                            if (patch.intervalMode !== undefined) setIntervalMode(patch.intervalMode);
+                        }}
+                    />
+
+                    <OptionsRow
+                        value={{ includeNextYear, ekskluderHelligdager, ekskluderHelg, ekskluderSondag }}
+                        onChange={(patch) => {
+                            if (patch.includeNextYear !== undefined) setIncludeNextYear(patch.includeNextYear);
+                            if (patch.ekskluderHelligdager !== undefined) setEkskluderHelligdager(patch.ekskluderHelligdager);
+                            if (patch.ekskluderHelg !== undefined) setEkskluderHelg(patch.ekskluderHelg);
+                            if (patch.ekskluderSondag !== undefined) setEkskluderSondag(patch.ekskluderSondag);
+                        }}
+                        visible={regelmessighet === 'range' || regelmessighet === 'multiple'}
+                    />
+
+                    <CalendarSection
+                        regelmessighet={regelmessighet}
+                        selectedForPicker={selectedForPicker as any}
+                        now={now}
+                        endOfHorizon={endOfHorizon}
+                        ekskluderHelg={ekskluderHelg}
+                        disabledDates={disabledDatesForCalendar}
+                        onSelect={setSelection}
+                        onClear={handleClearAll}
+                        canClear={
+                            (regelmessighet === 'multiple' && Array.isArray(selection) && selection.length > 0) ||
+                            (regelmessighet === 'range' && isDateRange(selection))
+                        }
+                    />
 
                     <ValgteDatoerPreview yearMonthDayDates={previewDatoer} time={selectedTime} />
 
                     <HStack>
-                        <Button
-                            type="button"
-                            onClick={sendBehandlingSerieTilAction}
-                            loading={fetcher.state === 'submitting'}
-                            disabled={!canSave}
-                        >
+                        <Button type="button" onClick={sendBehandlingSerieTilAction} loading={createFetcher.state === 'submitting'} disabled={!canSave}>
                             Lagre serie
                         </Button>
                     </HStack>
 
-                    <Modal open={editOpen} onClose={handleCloseEdit} aria-labelledby="edit-planlagt-modal">
-                        <Modal.Header>
-                            <Heading size="small" level="2" id="edit-planlagt-modal">
-                                {(() => {
-                                    if (!editing) return 'Endre planlagt kjøring';
-                                    const [y, m, d] = editing.yearMonthDay.split('-').map(Number);
-                                    const origDate = new Date(y, (m ?? 1) - 1, d ?? 1);
-                                    const dateStr = new Intl.DateTimeFormat('no-NO', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                    }).format(origDate);
-                                    const timeStr = editing.time ? ` kl ${editing.time}` : '';
-                                    return `Planlagt kjøring ${dateStr}${timeStr}`;
-                                })()}
-                            </Heading>
-                        </Modal.Header>
+                    <EditDialog
+                        open={editOpen}
+                        onClose={() => setEditOpen(false)}
+                        item={editing}
+                        endOfHorizon={endOfHorizon}
+                        ekskluderHelg={ekskluderHelg}
+                        disabledDates={disabledDatesForCalendar}
+                        onSave={saveEdit}
+                    />
 
-                        <Modal.Body>
-                            <VStack gap="4">
-                                <HStack gap="4" wrap>
-                                    <DatePicker
-                                        mode="single"
-                                        selected={editDate}
-                                        fromDate={new Date()}
-                                        toDate={endOfHorizon}
-                                        disableWeekends={ekskluderHelg}
-                                        disabled={disabledDatesForCalendar}
-                                        onSelect={(d) => setEditDate(d as Date | undefined)}
-                                    >
-                                        <DatePicker.Input
-                                            label="Ny dato"
-                                            placeholder="dd.mm.åååå"
-                                            value={editInput}
-                                            onChange={(e) => {
-                                                const v = e.target.value;
-                                                setEditInput(v);
-                                                const parsed = parseNoDate(v);
-                                                setEditDate(parsed);
-                                            }}
-                                        />
-                                    </DatePicker>
-
-                                    <Select
-                                        label="Tid"
-                                        value={editTime}
-                                        onChange={(e) => setEditTime(e.target.value)}
-                                    >
-                                        {times.map(t => <option key={t} value={t}>{t}</option>)}
-                                    </Select>
-                                </HStack>
-
-                                <div style={{ fontSize: 12, opacity: 0.7 }}>
-                                    Behandling: {editing?.behandlingId} {editing?.behandlingCode ? `• ${editing?.behandlingCode}` : ''}
-                                    {editing?.serieId ? ` • Serie ${editing.serieId}` : ''}
-                                </div>
-                            </VStack>
-                        </Modal.Body>
-
-                        <Modal.Footer>
-                            <HStack gap="2">
-                                <Button onClick={handleSaveEdit} disabled={!editDate || !editTime}>Lagre dato</Button>
-                                <Button variant="secondary" onClick={handleOpen}>
-                                    Åpne behandling
-                                </Button>
-                            </HStack>
-                        </Modal.Footer>
-                    </Modal>
+                    {editing?.behandlingId && (
+                        <Button variant="secondary" onClick={openBehandling}>
+                            Åpne behandling
+                        </Button>
+                    )}
                 </>
             )}
         </VStack>
     );
-}
-
-const times: string[] = [];
-for (let minutes = 0; minutes < 24 * 60; minutes += 60) {
-    const hrs = Math.floor(minutes / 60).toString().padStart(2, '0');
-    const mins = (minutes % 60).toString().padStart(2, '0');
-    times.push(`${hrs}:${mins}`);
 }
