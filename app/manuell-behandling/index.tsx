@@ -1,3 +1,4 @@
+import { FilterIcon } from '@navikt/aksel-icons'
 import {
   BodyShort,
   Box,
@@ -7,14 +8,17 @@ import {
   Heading,
   HStack,
   Label,
-  ReadMore,
+  Modal,
   Table,
   Tag,
   VStack,
 } from '@navikt/ds-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import { decodeFagomrade } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
+import { decodeOppgaveKode, decodeOppgavePrioritet } from '~/common/decodeOppgave'
+import { decodeUnderkategoriKode } from '~/common/decodeUnderkategori'
 import { apiGet } from '~/services/api.server'
 
 export type ManuellBehandlingOppsummering = {
@@ -31,6 +35,16 @@ export type ManuellBehandlingOppsummering = {
 const FACETS = ['behandlingType', 'kategori', 'fagomrade', 'oppgaveKode', 'underkategoriKode', 'prioritetKode'] as const
 
 type FacetKey = (typeof FACETS)[number]
+
+const identity = (s: string) => s
+
+const facetValueTranslator: Partial<Record<FacetKey, (key: string) => string>> = {
+  behandlingType: decodeBehandling,
+  fagomrade: decodeFagomrade,
+  oppgaveKode: decodeOppgaveKode,
+  prioritetKode: decodeOppgavePrioritet,
+  underkategoriKode: decodeUnderkategoriKode,
+}
 
 type LoaderData = {
   rows: ManuellBehandlingOppsummering[]
@@ -49,10 +63,6 @@ function encodeValue(v: string | null): string {
 
 function decodeValue(v: string): string | null {
   return v === NULL_TOKEN ? null : v
-}
-
-function valueLabel(v: string | null): string {
-  return v ?? '(tom)'
 }
 
 function sumAntall(rows: ManuellBehandlingOppsummering[]): number {
@@ -76,16 +86,24 @@ function applyFilters(
 function distinctValuesWithCounts(
   rows: ManuellBehandlingOppsummering[],
   facet: FacetKey,
-): { value: string | null; count: number }[] {
-  const map = new Map<string, number>()
+  decodeForFacet: (row: ManuellBehandlingOppsummering) => string | null,
+): { value: string | null; label: string; count: number }[] {
+  const map = new Map<string, { label: string; count: number }>()
   for (const r of rows) {
     const raw = r[facet]
     const key = encodeValue(raw)
-    map.set(key, (map.get(key) ?? 0) + r.antall)
+    const decoded = decodeForFacet(r)
+    const label = decoded == null ? manglendeVerdi : decoded
+    const prev = map.get(key)
+    if (prev) {
+      prev.count += r.antall
+    } else {
+      map.set(key, { label, count: r.antall })
+    }
   }
   return [...map.entries()]
-    .map(([k, count]) => ({ value: decodeValue(k), count }))
-    .sort((a, b) => b.count - a.count || valueLabel(a.value).localeCompare(valueLabel(b.value)))
+    .map(([k, v]) => ({ value: decodeValue(k), label: v.label, count: v.count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
 }
 
 function toggleParam(current: string[] | null, value: string): string[] | null {
@@ -99,9 +117,31 @@ function toggleParam(current: string[] | null, value: string): string[] | null {
   return arr.length ? arr : null
 }
 
+const manglendeVerdi = '–'
+
 export default function ManuellBehandlingOppsummeringRoute() {
   const { rows } = useLoaderData() as LoaderData
   const [searchParams, setSearchParams] = useSearchParams()
+  const sokeModalRef = useRef<HTMLDialogElement>(null)
+
+  const columnsWrapperRef = useRef<HTMLDivElement>(null)
+  const [columnCount, setColumnCount] = useState(2)
+
+  useEffect(() => {
+    const el = columnsWrapperRef.current
+    if (!el) return
+
+    const update = () => {
+      // Bruk bredde som heuristikk: >= 1100px => 3 kolonner, ellers 2
+      const w = el.clientWidth
+      setColumnCount(w >= 1100 ? 3 : 2)
+    }
+    update()
+
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const filters = useMemo(() => {
     const f: Partial<Record<FacetKey, string[]>> = {}
@@ -115,14 +155,26 @@ export default function ManuellBehandlingOppsummeringRoute() {
   const filtered = useMemo(() => applyFilters(rows, filters), [rows, filters])
 
   const facetOptions = useMemo(() => {
-    const result: Record<FacetKey, { value: string | null; count: number }[]> = {} as Record<
+    const result: Record<FacetKey, { value: string | null; label: string; count: number }[]> = {} as Record<
       FacetKey,
-      { value: string | null; count: number }[]
+      { value: string | null; label: string; count: number }[]
     >
+
     for (const facet of FACETS) {
       const { [facet]: _omit, ...rest } = filters
       const base = applyFilters(rows, rest)
-      result[facet] = distinctValuesWithCounts(base, facet)
+
+      const decodeForFacet = (row: ManuellBehandlingOppsummering): string | null => {
+        if (facet === 'kategori') return row.kategoriDecode
+
+        const raw = row[facet]
+        if (raw == null) return null
+
+        const translator = facetValueTranslator[facet] ?? identity
+        return translator(raw)
+      }
+
+      result[facet] = distinctValuesWithCounts(base, facet, decodeForFacet)
     }
     return result
   }, [rows, filters])
@@ -151,56 +203,24 @@ export default function ManuellBehandlingOppsummeringRoute() {
     <Box paddingBlock="6" paddingInline="6">
       <VStack gap="6">
         <Heading level="1" size="large">
-          Manuell saksbehandling – oppsummering
+          Manuell saksbehandling
         </Heading>
-        <BodyShort>
-          Filtrer på én eller flere verdier. Antall i parentes viser hvor mange rader (summert antall) som matcher gitt
-          øvrige filter.
-        </BodyShort>
+        <BodyShort>Tabellen viser opptelling av antall oppgaver som er opprettet av behandlingene</BodyShort>
 
         <HStack gap="6" align="start" wrap>
-          {/* Sidebar: Facets */}
-          <Box
-            className="rounded-2xl shadow-sm"
-            padding="4"
-            style={{ minWidth: 320, maxWidth: 420, border: '1px solid var(--a-border-subtle)' }}
-          >
-            <VStack gap="6">
-              <HStack justify="space-between" align="center">
-                <Heading level="2" size="small">
-                  Filtre
-                </Heading>
-                <Button variant="secondary" size="small" onClick={clearAll}>
-                  Nullstill
-                </Button>
-              </HStack>
-
-              {FACETS.map((facet) => (
-                <FacetSection
-                  key={facet}
-                  title={facetLabel(facet)}
-                  facet={facet}
-                  options={facetOptions[facet]}
-                  selected={new Set(searchParams.getAll(facet))}
-                  onToggle={onToggle}
-                />
-              ))}
-
-              <ReadMore header="Hva betyr (tom)?">
-                Verdien er ikke satt i kilden (NULL). Du kan filtrere på disse ved å velge «(tom)».
-              </ReadMore>
-            </VStack>
-          </Box>
-
-          {/* Main: Results */}
           <VStack gap="4" style={{ flex: 1, minWidth: 420 }}>
             <HStack justify="space-between" align="center">
-              <Heading level="2" size="small">
-                Treff
-              </Heading>
               <Tag size="medium" variant="alt1">
                 Sum antall: {total.toLocaleString('nb-NO')}
               </Tag>
+              <Button
+                icon={<FilterIcon aria-hidden />}
+                onClick={() => sokeModalRef.current?.showModal()}
+                variant="secondary"
+                size="small"
+              >
+                Søkefilter
+              </Button>
             </HStack>
 
             <Table size="small" zebraStripes>
@@ -233,15 +253,17 @@ export default function ManuellBehandlingOppsummeringRoute() {
                         </VStack>
                       </Table.DataCell>
                       <Table.DataCell>{r.fagomrade}</Table.DataCell>
-                      <Table.DataCell>{r.oppgaveKode}</Table.DataCell>
-                      <Table.DataCell>{valueLabel(r.underkategoriKode)}</Table.DataCell>
+                      <Table.DataCell>{decodeOppgaveKode(r.oppgaveKode)}</Table.DataCell>
+                      <Table.DataCell>
+                        {r.underkategoriKode ? decodeUnderkategoriKode(r.underkategoriKode) : manglendeVerdi}
+                      </Table.DataCell>
                       <Table.DataCell>
                         {r.prioritetKode ? (
                           <Tag size="small" variant={priorityVariant(r.prioritetKode)}>
-                            {r.prioritetKode}
+                            {decodeOppgavePrioritet(r.prioritetKode)}
                           </Tag>
                         ) : (
-                          <span>(tom)</span>
+                          <span>{manglendeVerdi}</span>
                         )}
                       </Table.DataCell>
                       <Table.DataCell style={{ textAlign: 'right' }}>{r.antall.toLocaleString('nb-NO')}</Table.DataCell>
@@ -251,6 +273,48 @@ export default function ManuellBehandlingOppsummeringRoute() {
             </Table>
           </VStack>
         </HStack>
+
+        <Modal ref={sokeModalRef} header={{ heading: 'Søkefilter' }} width={1440}>
+          <Modal.Body>
+            <div ref={columnsWrapperRef} style={{ overflow: 'auto', paddingRight: 8 }}>
+              <div
+                style={{
+                  columnCount: columnCount,
+                  columnGap: 24,
+                  columnFill: 'balance',
+                }}
+              >
+                {FACETS.map((facet) => (
+                  <div key={facet} style={{ breakInside: 'avoid' }}>
+                    <FacetSection
+                      title={facetLabel(facet)}
+                      facet={facet}
+                      options={facetOptions[facet]}
+                      selected={new Set(searchParams.getAll(facet))}
+                      onToggle={onToggle}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <HStack gap="3">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  clearAll()
+                  sokeModalRef.current?.close()
+                }}
+              >
+                Nullstill
+              </Button>
+              <Button variant="primary" onClick={() => sokeModalRef.current?.close()}>
+                Lukk
+              </Button>
+            </HStack>
+          </Modal.Footer>
+        </Modal>
       </VStack>
     </Box>
   )
@@ -265,7 +329,7 @@ function FacetSection({
 }: {
   title: string
   facet: FacetKey
-  options: { value: string | null; count: number }[]
+  options: { value: string | null; label: string; count: number }[]
   selected: Set<string>
   onToggle: (facet: FacetKey, value: string | null) => void
 }) {
@@ -278,9 +342,15 @@ function FacetSection({
           const isChecked = selected.has(enc)
           const isDisabled = opt.count === 0
           return (
-            <Checkbox key={enc} checked={isChecked} disabled={isDisabled} onChange={() => onToggle(facet, opt.value)}>
+            <Checkbox
+              key={enc}
+              checked={isChecked}
+              disabled={isDisabled}
+              value={opt.value}
+              onChange={() => onToggle(facet, opt.value)}
+            >
               <HStack gap="2" align="center">
-                <span>{valueLabel(opt.value)}</span>
+                <span>{opt.label}</span>
                 <Tag size="xsmall" variant="neutral">
                   {opt.count.toLocaleString('nb-NO')}
                 </Tag>

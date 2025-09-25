@@ -36,7 +36,12 @@ const ALDE_BEHANDLING_STATUS_MAP = {
   FULLFORT: 'Fullført',
 }
 
-function makeDecoder<M extends Record<string, string>>(map: M) {
+const FAGOMRADE_MAP = {
+  PEN: 'Pensjon',
+  OKO: 'Økonomi',
+}
+
+export function makeDecoder<M extends Record<string, string>>(map: M) {
   return (key: string) => map[key as keyof M] ?? key
 }
 
@@ -46,5 +51,6 @@ export const decodeAktivitetStatus = makeDecoder(AKTIVITET_STATUS_MAP)
 export const decodeBehandlingStatusToVariant = makeDecoder(BEHANDLING_STATUS_VARIANT_MAP)
 
 export const decodeBehandlingstype = makeDecoder(BEHANDLING_TYPES_MAP)
+export const decodeFagomrade = makeDecoder(FAGOMRADE_MAP)
 
 export const decodeAldeBehandlingStatus = makeDecoder(ALDE_BEHANDLING_STATUS_MAP)
