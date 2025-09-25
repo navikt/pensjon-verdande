@@ -11,14 +11,12 @@ import {
     Heading,
     VStack,
     HStack,
-    Modal, Link,
+    Modal,
 } from '@navikt/ds-react';
 import 'chart.js/auto';
-
 import { requireAccessToken } from '~/services/auth.server';
 import { getBehandlingSerier, opprettBehandlingSerie, endrePlanlagtStartet } from '~/behandlingserie/behandlingserie.server';
 import type { BehandlingSerieDTO, BehandlingInfoDTO } from '~/types';
-
 import {
     addMonths,
     allWeekdaysInRange,
@@ -31,19 +29,17 @@ import {
     tertialStartDates,
     getWeekdayNumber,
     toYmd,
+    buildDisabledDates,
 } from './seriekalenderUtils';
-
 import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview';
 import PlanlagteDatoerPreview, { type PlannedItem } from '~/behandlingserie/planlagteDatoerPreview';
 
-/* -------------------- Typer -------------------- */
 type RegelmessighetMode = 'range' | 'multiple';
 type DateRange = { from?: Date; to?: Date };
 type Selection = DateRange | Date[] | undefined;
 type IntervalMode = '' | 'quarterly' | 'tertial';
 type DayMode = 'fixed-weekday' | 'first-weekday';
 
-/* -------------------- Loader / Action -------------------- */
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     const { searchParams } = new URL(request.url);
     const behandlingType = searchParams.get('behandlingType') ?? '';
@@ -55,27 +51,22 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
     const accessToken = await requireAccessToken(request);
     const formData = await request.formData();
-
     const intent = String(formData.get('_intent') ?? '');
     if (intent === 'updatePlanlagtStartet') {
         const behandlingId = String(formData.get('behandlingId') ?? '');
         const behandlingCode = String(formData.get('behandlingCode') ?? '');
-        const ymd = String(formData.get('ymd') ?? '');   // YYYY-MM-DD
-        const time = String(formData.get('time') ?? ''); // HH:mm
+        const ymd = String(formData.get('ymd') ?? '');
+        const time = String(formData.get('time') ?? '');
         const isoLocalDatetimeString = `${ymd}T${time}:00`;
-
         await endrePlanlagtStartet(accessToken, behandlingId, isoLocalDatetimeString);
         return redirect(`/behandlingserie?behandlingType=${behandlingCode}`);
     }
-
     const behandlingCode = String(formData.get('behandlingCode') ?? '');
     const regelmessighet = String(formData.get('regelmessighet') ?? '');
     const startTid = String(formData.get('startTid') ?? '');
     const opprettetAv = String(formData.get('opprettetAv') ?? 'VERDANDE');
-
     const valgteDatoerRaw = String(formData.get('valgteDatoer') ?? '[]');
     const valgteDatoer = JSON.parse(valgteDatoerRaw) as string[];
-
     await opprettBehandlingSerie(
         accessToken,
         behandlingCode,
@@ -87,11 +78,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return redirect(`/behandlingserie?behandlingType=${behandlingCode}`);
 };
 
-/* -------------------- Hjelpere -------------------- */
 function buildBookedFromSerier(serier: BehandlingSerieDTO[]) {
     const dates: Date[] = [];
     const ymdSet = new Set<string>();
-
     for (const serie of serier || []) {
         for (const b of (serie.behandlinger || []) as BehandlingInfoDTO[]) {
             if (!b?.planlagtStartet) continue;
@@ -108,37 +97,15 @@ function isDateRange(x: any): x is DateRange {
     return x && typeof x === 'object' && ('from' in x || 'to' in x);
 }
 
-/* -------------------- Komponent -------------------- */
 export default function BehandlingOpprett_index() {
-    // Horisont
     const now = new Date();
     const [includeNextYear, setIncludeNextYear] = useState(false);
-
     const endOfHorizon = useMemo(() => {
         const now = new Date();
         const endYear = now.getFullYear() + (includeNextYear ? 1 : 0);
         return new Date(endYear, 11, 31);
     }, [includeNextYear]);
 
-    const sundaysInRange = useMemo(() => {
-        const out: Date[] = [];
-        const start = new Date();                 // fra i dag
-        start.setHours(0, 0, 0, 0);
-
-        // finn første søndag >= i dag
-        const firstSunday = new Date(start);
-        const day = firstSunday.getDay();         // 0 = søndag
-        const delta = (7 - day) % 7;
-        firstSunday.setDate(firstSunday.getDate() + delta);
-
-        // push alle søndager t.o.m. endOfHorizon
-        for (let d = firstSunday; d <= endOfHorizon; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 7)) {
-            out.push(new Date(d));
-        }
-        return out;
-    }, [endOfHorizon]);
-
-    // State
     const [regelmessighet, setRegelmessighet] = useState<RegelmessighetMode>('range');
     const [selection, setSelection] = useState<Selection>(undefined);
     const [selectedTime, setSelectedTime] = useState('');
@@ -148,6 +115,7 @@ export default function BehandlingOpprett_index() {
     const [intervalMode, setIntervalMode] = useState<IntervalMode>('');
     const [ekskluderHelg, setEkskluderHelg] = useState(true);
     const [ekskluderHelligdager, setEkskluderHelligdager] = useState(true);
+    const [ekskluderSondag, setEkskluderSondag] = useState(true);
 
     const fetcher = useFetcher();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -158,15 +126,11 @@ export default function BehandlingOpprett_index() {
     const holidayData = useMemo(() => buildHolidayData(includeNextYear), [includeNextYear]);
     const bookedData = useMemo(() => buildBookedFromSerier(behandlingSerier || []), [behandlingSerier]);
 
-    /* --- Auto-generering for multiple --- */
     useEffect(() => {
         if (regelmessighet !== 'multiple') return;
-
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
         let dates: Date[] = [];
-
         if (dayMode === 'first-weekday') {
             if (intervalMode === 'quarterly') {
                 dates = quarterlyStartDates(today, endOfHorizon).map(s => firstBusinessDayOnOrAfter(s));
@@ -183,7 +147,6 @@ export default function BehandlingOpprett_index() {
             if (!selectedUkedag) return;
             const weekdayNum = getWeekdayNumber(selectedUkedag);
             if (weekdayNum == null) return;
-
             if (intervalMode === 'quarterly') {
                 dates = quarterlyStartDates(today, endOfHorizon).map(s => firstWeekdayOnOrAfter(s, weekdayNum));
             } else if (intervalMode === 'tertial') {
@@ -197,13 +160,11 @@ export default function BehandlingOpprett_index() {
                 }
             }
         }
-
         const finalDates =
             dayMode === 'fixed-weekday' && !intervalMode && ekskluderHelg
                 ? dates.filter(d => d.getDay() !== 0 && d.getDay() !== 6)
                 : dates;
-
-        setSelection(finalDates); // ⬅️ Date[]
+        setSelection(finalDates);
     }, [regelmessighet, dayMode, selectedUkedag, selectAntallMaaneder, intervalMode, ekskluderHelg, endOfHorizon]);
 
     function handleBehandlingType(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -217,28 +178,27 @@ export default function BehandlingOpprett_index() {
         });
     }
 
-    /* --- Normaliser selected for DatePicker etter mode --- */
     const selectedForPicker = useMemo(() => {
         if (regelmessighet === 'multiple') {
-            return Array.isArray(selection) ? selection : [];       // Date[]
+            return Array.isArray(selection) ? selection : [];
         }
-        // range
-        return isDateRange(selection) ? selection : undefined;    // DateRange | undefined
+        return isDateRange(selection) ? selection : undefined;
     }, [regelmessighet, selection]);
 
-    /* --- Preview bygg --- */
     const previewDatoer = useMemo(() => {
         const base = buildValgteDatoer(
-            selection as any,              // utils håndterer begge former
+            selection as any,
             regelmessighet as any,
-            ekskluderHelg,
-            endOfHorizon,
-            holidayData.ymdSet,
-            ekskluderHelligdager
+            {
+                ekskluderHelg,
+                ekskluderHelligdager,
+                ekskluderSondag,
+                endOfHorizon,
+                holidayYmdSet: holidayData.ymdSet,
+            }
         );
-        // fjern kolliderende datoer (allerede planlagt)
-        return base.filter((ymd) => !bookedData.ymdSet.has(ymd));
-    }, [selection, regelmessighet, ekskluderHelg, endOfHorizon, holidayData.ymdSet, ekskluderHelligdager, bookedData.ymdSet]);
+        return base.filter(ymd => !bookedData.ymdSet.has(ymd));
+    }, [selection, regelmessighet, ekskluderHelg, endOfHorizon, holidayData.ymdSet, ekskluderHelligdager, bookedData.ymdSet, ekskluderSondag]);
 
     const canSave = Boolean(behandlingType && selectedTime && previewDatoer.length > 0);
 
@@ -258,19 +218,17 @@ export default function BehandlingOpprett_index() {
     };
 
     const disabledDatesForCalendar = useMemo(() => {
-        const out: Date[] = [];
-        if (ekskluderHelligdager) {
-            out.push(...holidayData.dates);     // røde dager (nasjonale helligdager)
-            if (!ekskluderHelg) {
-                // Når vi ikke ekskluderer helg, skal lørdag være lov – men søndag er fortsatt helligdag i Norge
-                out.push(...sundaysInRange);
-            }
-        }
-        out.push(...bookedData.dates);
-        return out;
-    }, [ekskluderHelligdager, ekskluderHelg, holidayData.dates, bookedData.dates, sundaysInRange]);
+        return buildDisabledDates({
+            fromDate: now,
+            toDate: endOfHorizon,
+            bookedDates: bookedData.dates,
+            holidayDates: holidayData.dates,
+            ekskluderHelg,
+            ekskluderHelligdager,
+            ekskluderSondag,
+        });
+    }, [now, endOfHorizon, bookedData.dates, holidayData.dates, ekskluderHelg, ekskluderHelligdager, ekskluderSondag]);
 
-    /* --- Flatten planlagte datoer til boble-preview --- */
     const plannedItems: PlannedItem[] = useMemo(() => {
         const items: PlannedItem[] = [];
         for (const serie of (behandlingSerier ?? [])) {
@@ -293,13 +251,12 @@ export default function BehandlingOpprett_index() {
         return items.sort((a, b) => (a.ymd + (a.time ?? '')) < (b.ymd + (b.time ?? '')) ? -1 : 1);
     }, [behandlingSerier]);
 
-    /* --- Modal state --- */
     const [editOpen, setEditOpen] = useState(false);
     const [editing, setEditing] = useState<PlannedItem | null>(null);
     const [editDate, setEditDate] = useState<Date | undefined>();
     const [editTime, setEditTime] = useState<string>('');
-
     const [editInput, setEditInput] = useState('');
+
     useEffect(() => {
         setEditInput(editDate ? new Intl.DateTimeFormat('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(editDate) : '');
     }, [editDate]);
@@ -320,6 +277,7 @@ export default function BehandlingOpprett_index() {
         setEditTime(item.time ?? '10:00');
         setEditOpen(true);
     }
+
     function handleCloseEdit() {
         setEditOpen(false);
         setEditing(null);
@@ -331,12 +289,12 @@ export default function BehandlingOpprett_index() {
         formData.set('_intent', 'updatePlanlagtStartet');
         formData.set('behandlingId', editing.behandlingId ?? '');
         formData.set('behandlingCode', editing.behandlingCode ?? '');
-        formData.set('ymd', toYmd(editDate));   // YYYY-MM-DD
-        formData.set('time', editTime);         // HH:mm
+        formData.set('ymd', toYmd(editDate));
+        formData.set('time', editTime);
         fetcher.submit(formData, { method: 'post' });
-
         setEditOpen(false);
     }
+
     const navigate = useNavigate();
 
     function handleOpen() {
@@ -349,7 +307,6 @@ export default function BehandlingOpprett_index() {
         <VStack gap="6">
             <Heading size="medium" level="1">Behandlingserie</Heading>
 
-            {/* 1) Behandlingstype */}
             <HStack>
                 <Select label="Velg behandling" value={behandlingType} onChange={handleBehandlingType}>
                     <option value="">Velg behandlingCode</option>
@@ -368,7 +325,6 @@ export default function BehandlingOpprett_index() {
                     />
 
                     <Heading size="medium" level="1">Opprett ny serie</Heading>
-                    {/* 2) Tid */}
                     <HStack>
                         <Select
                             label="Velg når på døgnet behandlingen skal kjøres"
@@ -382,7 +338,6 @@ export default function BehandlingOpprett_index() {
                         </Select>
                     </HStack>
 
-                    {/* 3) Regelmessighet */}
                     <VStack>
                         <RadioGroup
                             legend="Velg regelmessighet"
@@ -397,6 +352,7 @@ export default function BehandlingOpprett_index() {
                             <Radio value="range">Velg en range fra og til</Radio>
                             <Radio value="multiple">Velg diverse datoer</Radio>
                         </RadioGroup>
+
                         {regelmessighet === 'multiple' && (
                             <HStack wrap gap="4">
                                 <Select
@@ -462,14 +418,16 @@ export default function BehandlingOpprett_index() {
                                 <Checkbox checked={!!ekskluderHelg} onChange={e => setEkskluderHelg(e.target.checked)}>
                                     Ekskluder helg
                                 </Checkbox>
+                                <Checkbox checked={ekskluderSondag} onChange={e => setEkskluderSondag(e.target.checked)}>
+                                    Ekskluder søndager
+                                </Checkbox>
                             </HStack>
                         )}
                     </VStack>
 
-                    {/* 4) Kalender */}
                     <VStack>
                         <DatePicker.Standalone
-                            key={regelmessighet + String(includeNextYear)} // re-mount ved mode/år
+                            key={regelmessighet + String(includeNextYear)}
                             mode={regelmessighet}
                             selected={selectedForPicker as any}
                             fromDate={now}
@@ -494,10 +452,8 @@ export default function BehandlingOpprett_index() {
                         </Button>
                     </VStack>
 
-                    {/* 5) Preview av valgte datoer (frontend) */}
                     <ValgteDatoerPreview ymdDates={previewDatoer} time={selectedTime} />
 
-                    {/* 6) Lagre */}
                     <HStack>
                         <Button
                             type="button"
@@ -509,7 +465,6 @@ export default function BehandlingOpprett_index() {
                         </Button>
                     </HStack>
 
-                    {/* 7) Modal for endring/fjerning/stopp */}
                     <Modal open={editOpen} onClose={handleCloseEdit} aria-labelledby="edit-planlagt-modal">
                         <Modal.Header>
                             <Heading size="small" level="2" id="edit-planlagt-modal">
@@ -531,7 +486,6 @@ export default function BehandlingOpprett_index() {
                         <Modal.Body>
                             <VStack gap="4">
                                 <HStack gap="4" wrap>
-                                    {/* --- Kontrollerte hjelpere --- */}
                                     <DatePicker
                                         mode="single"
                                         selected={editDate}
@@ -585,7 +539,6 @@ export default function BehandlingOpprett_index() {
     );
 }
 
-/* -------------------- Tider (00:00 – 23:00 hver time) -------------------- */
 const times: string[] = [];
 for (let minutes = 0; minutes < 24 * 60; minutes += 60) {
     const hrs = Math.floor(minutes / 60).toString().padStart(2, '0');
