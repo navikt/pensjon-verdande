@@ -1,29 +1,24 @@
-
 export type DateRange = { from?: Date; to?: Date };
+
+const DAY = 24 * 60 * 60 * 1000;
 
 export function toYmd(d: Date): string {
     const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
 }
 
 function startOfDay(d: Date): Date {
-    const x = new Date(d);
-    x.setHours(0, 0, 0, 0);
-    return x;
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
 function addDays(d: Date, days: number): Date {
-    const out = new Date(d);
-    out.setDate(out.getDate() + days);
-    return new Date(out.getFullYear(), out.getMonth(), out.getDate());
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + days);
 }
 
 export function addMonths(d: Date, months: number): Date {
-    const out = new Date(d);
-    out.setMonth(out.getMonth() + months);
-    return new Date(out.getFullYear(), out.getMonth(), out.getDate());
+    return new Date(d.getFullYear(), d.getMonth() + months, d.getDate());
 }
 
 export function isWeekend(d: Date): boolean {
@@ -80,81 +75,75 @@ export function buildHolidayData(includeNextYear: boolean) {
         );
     }
 
-    const dates = raw.map(d => new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dates = raw.map(startOfDay);
     const ymdSet = new Set(dates.map(toYmd));
     return { dates, ymdSet };
 }
 
 export function firstBusinessDayOnOrAfter(anchor: Date): Date {
-    const d = startOfDay(anchor);
-    while (isWeekend(d)) d.setDate(d.getDate() + 1);
+    let d = startOfDay(anchor);
+    while (isWeekend(d)) d = addDays(d, 1);
     return d;
 }
 
 export function firstWeekdayOnOrAfter(anchor: Date, weekday: number): Date {
-    const d = startOfDay(anchor);
-    while (d.getDay() !== weekday) d.setDate(d.getDate() + 1);
+    let d = startOfDay(anchor);
+    while (d.getDay() !== weekday) d = addDays(d, 1);
     return d;
 }
 
 export function allWeekdaysInRange(weekday: number, start: Date, end: Date): Date[] {
-    const out: Date[] = [];
     const s0 = startOfDay(start);
     const e0 = startOfDay(end);
-    const cur = new Date(s0);
-    while (cur.getDay() !== weekday) cur.setDate(cur.getDate() + 1);
-    for (let d = new Date(cur); d <= e0; d.setDate(d.getDate() + 7)) {
-        out.push(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+    let first = s0;
+    const delta = (weekday - s0.getDay() + 7) % 7;
+    first = addDays(first, delta);
+    const out: Date[] = [];
+    for (let t = first.getTime(); t <= e0.getTime(); t += 7 * DAY) {
+        out.push(new Date(t));
     }
     return out;
 }
 
 export function monthlyAnchoredStartDates(start: Date, months: number, horizon: Date): Date[] {
+    if (!Number.isFinite(months) || months <= 0) return [];
     const base = new Date(start.getFullYear(), start.getMonth(), 1);
     const out: Date[] = [];
-    let d = new Date(base);
-    while (d <= horizon) {
+    for (let d = new Date(base); d.getTime() <= startOfDay(horizon).getTime(); d.setMonth(d.getMonth() + months)) {
         out.push(new Date(d));
-        d.setMonth(d.getMonth() + months);
     }
     return out;
 }
 
 export function quarterlyStartDates(start: Date, horizon: Date): Date[] {
-    const dates: Date[] = [];
-    let d = new Date(start.getFullYear(), 0, 1);
-    while (d <= horizon) {
-        dates.push(new Date(d));
-        d.setMonth(d.getMonth() + 3);
+    const out: Date[] = [];
+    for (let d = new Date(start.getFullYear(), 0, 1); d.getTime() <= startOfDay(horizon).getTime(); d.setMonth(d.getMonth() + 3)) {
+        out.push(new Date(d));
     }
-    return dates;
+    return out;
 }
 
 export function tertialStartDates(start: Date, horizon: Date): Date[] {
     const months = [0, 4, 8];
-    const dates: Date[] = [];
+    const out: Date[] = [];
     for (let y = start.getFullYear(); y <= horizon.getFullYear(); y++) {
         for (const m of months) {
             const d = new Date(y, m, 1);
-            if (d >= new Date(start.getFullYear(), start.getMonth(), 1) && d <= horizon) {
-                dates.push(d);
-            }
+            if (d >= new Date(start.getFullYear(), start.getMonth(), 1) && d <= horizon) out.push(d);
         }
     }
-    return dates;
+    return out;
 }
 
 export function getWeekdayNumber(ukedag: string): number | null {
-    const map: Record<string, number> = {
-        sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6
-    };
+    const map: Record<string, number> = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
     return map[ukedag] ?? null;
 }
 
 function isDateRange(x: unknown): x is DateRange {
-    if (!x || typeof x !== 'object') return false;
+    if (!x || typeof x !== "object") return false;
     const obj = x as Record<string, unknown>;
-    return ('from' in obj) || ('to' in obj);
+    return "from" in obj || "to" in obj;
 }
 
 type BuildValgteDatoerOpts = {
@@ -167,35 +156,36 @@ type BuildValgteDatoerOpts = {
 
 export function buildValgteDatoer(
     selection: DateRange | Date[] | undefined,
-    mode: 'range' | 'multiple',
+    mode: "range" | "multiple",
     opts: BuildValgteDatoerOpts
 ): string[] {
     if (!selection) return [];
     const { ekskluderHelg, ekskluderHelligdager, ekskluderSondag, endOfHorizon, holidayYmdSet } = opts;
-    const list: Date[] = [];
 
+    const list: Date[] = [];
     const pushIfInHorizon = (d: Date) => {
         const dd = startOfDay(d);
-        if (dd <= endOfHorizon) list.push(dd);
+        if (dd.getTime() <= startOfDay(endOfHorizon).getTime()) list.push(dd);
     };
 
-    if (mode === 'multiple') {
-        const arr = Array.isArray(selection) ? selection as Date[] : [];
+    if (mode === "multiple") {
+        const arr = Array.isArray(selection) ? (selection as Date[]) : [];
         for (const d of arr) pushIfInHorizon(d);
     } else {
         if (!isDateRange(selection)) return [];
         const from = selection.from ? startOfDay(selection.from) : undefined;
         const to = selection.to ? startOfDay(selection.to) : undefined;
-        if (from && to && from <= to) {
-            for (let d = new Date(from); d <= to && d <= endOfHorizon; d.setDate(d.getDate() + 1)) {
-                pushIfInHorizon(d);
+        if (from && to && from.getTime() <= to.getTime()) {
+            const endT = Math.min(to.getTime(), startOfDay(endOfHorizon).getTime());
+            for (let t = from.getTime(); t <= endT; t += DAY) {
+                pushIfInHorizon(new Date(t));
             }
         }
     }
 
     const ymd = Array.from(new Set(list.map(toYmd))).sort();
-    return ymd.filter(s => {
-        const [y, m, d] = s.split('-').map(Number);
+    return ymd.filter((s) => {
+        const [y, m, d] = s.split("-").map(Number);
         const dt = new Date(y, (m ?? 1) - 1, d ?? 1);
         if (ekskluderHelg && isWeekend(dt)) return false;
         if (!ekskluderHelg && ekskluderSondag && dt.getDay() === 0) return false;
@@ -215,21 +205,27 @@ type DisabledDatesOpts = {
 };
 
 export function buildDisabledDates({
-                                       fromDate, toDate, bookedDates, holidayDates, ekskluderHelg, ekskluderHelligdager, ekskluderSondag
+                                       fromDate,
+                                       toDate,
+                                       bookedDates,
+                                       holidayDates,
+                                       ekskluderHelg,
+                                       ekskluderHelligdager,
+                                       ekskluderSondag,
                                    }: DisabledDatesOpts): Date[] {
     const set = new Set<number>();
-    const add = (d: Date) => set.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
+    const add = (d: Date) => set.add(startOfDay(d).getTime());
 
-    for (let d = startOfDay(fromDate); d <= startOfDay(toDate); d.setDate(d.getDate() + 1)) {
+    const startT = startOfDay(fromDate).getTime();
+    const endT = startOfDay(toDate).getTime();
+    for (let t = startT; t <= endT; t += DAY) {
+        const d = new Date(t);
         if (ekskluderHelg && isWeekend(d)) add(d);
         else if (!ekskluderHelg && ekskluderSondag && d.getDay() === 0) add(d);
     }
 
-    if (ekskluderHelligdager) {
-        for (const d of holidayDates) add(d);
-    }
-
+    if (ekskluderHelligdager) for (const d of holidayDates) add(d);
     for (const d of bookedDates) add(d);
 
-    return Array.from(set).map(t => new Date(t)).sort((a, b) => a.getTime() - b.getTime());
+    return Array.from(set).map((t) => new Date(t)).sort((a, b) => a.getTime() - b.getTime());
 }
