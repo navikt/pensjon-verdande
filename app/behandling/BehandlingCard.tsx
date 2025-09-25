@@ -17,6 +17,7 @@ import {
   Box,
   Button,
   CopyButton,
+  Detail,
   Heading,
   HGrid,
   HStack,
@@ -357,7 +358,10 @@ export default function BehandlingCard(props: Props) {
 
   return (
     <Page>
-      <Heading size={'large'}>{decodeBehandling(props.behandling.type)}</Heading>
+      <Heading size={'large'}>
+        {decodeBehandling(props.behandling.type)}
+        <Detail>{props.behandling.type}</Detail>
+      </Heading>
       <VStack gap={'4'}>
         <HGrid
           gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
