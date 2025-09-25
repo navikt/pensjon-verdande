@@ -103,11 +103,11 @@ export default [
       ]),
     ]),
 
-      route('behandlingserie', 'behandlingserie/behandlingserie.tsx'),
-      route('behandlinger', 'behandlinger/behandlinger._index.tsx'),
-      route('behandlinger/:status', 'behandlinger/behandlinger.$status.tsx', [
-          route('fortsett', 'behandlinger/behandlinger.$status.fortsett.tsx'),
-      ]),
+    route('behandlingserie', 'behandlingserie/behandlingserie.tsx'),
+    route('behandlinger', 'behandlinger/behandlinger._index.tsx'),
+    route('behandlinger/:status', 'behandlinger/behandlinger.$status.tsx', [
+      route('fortsett', 'behandlinger/behandlinger.$status.fortsett.tsx'),
+    ]),
 
     route('bestem-etteroppgjor-resultat', 'uforetrygd/bestem-etteroppgjor-resultat._index.tsx'),
 
@@ -126,7 +126,7 @@ export default [
 
     route('kalender', 'kalender/route.tsx'),
 
-    route("etteroppgjor-historikk-ufore", "vedlikehold/etteroppgjor-historikk-ufore.tsx"),
+    route('etteroppgjor-historikk-ufore', 'vedlikehold/etteroppgjor-historikk-ufore.tsx'),
 
     route('laas-opp-sak', 'vedlikehold/laas-opp-sak.tsx', [
       route('settTilManuell', 'vedlikehold/laas-opp-sak.settTilManuell.tsx'),
@@ -153,6 +153,8 @@ export default [
     route('linke-dnr-fnr', 'vedlikehold/linke-dnr-fnr.tsx'),
 
     route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
+
+    route('manuell-behandling', 'manuell-behandling/index.tsx'),
 
     route('omregning', 'omregning/omregning._index.tsx'),
     route('omregning/behandlinger', 'omregning/omregning.behandlinger.tsx'),
