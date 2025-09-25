@@ -2,7 +2,7 @@ export type DateRange = { from?: Date; to?: Date };
 
 const DAY = 24 * 60 * 60 * 1000;
 
-export function toYmd(d: Date): string {
+export function toYearMonthDay(d: Date): string {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
@@ -82,8 +82,8 @@ export function buildHolidayData(includeNextYear: boolean) {
     }
 
     const dates = raw.map(startOfDay);
-    const ymdSet = new Set(dates.map(toYmd));
-    return { dates, ymdSet };
+    const yearMonthDaySet = new Set(dates.map(toYearMonthDay));
+    return { dates, yearMonthDaySet };
 }
 
 export function firstBusinessDayOnOrAfter(anchor: Date): Date {
@@ -162,7 +162,7 @@ type BuildValgteDatoerOpts = {
     ekskluderHelligdager: boolean;
     ekskluderSondag: boolean;
     endOfHorizon: Date;
-    holidayYmdSet: Set<string>;
+    holidayyearMonthDaySet: Set<string>;
 };
 
 export function buildValgteDatoer(
@@ -171,7 +171,7 @@ export function buildValgteDatoer(
     opts: BuildValgteDatoerOpts
 ): string[] {
     if (!selection) return [];
-    const { ekskluderHelg, ekskluderHelligdager, ekskluderSondag, endOfHorizon, holidayYmdSet } = opts;
+    const { ekskluderHelg, ekskluderHelligdager, ekskluderSondag, endOfHorizon, holidayyearMonthDaySet } = opts;
 
     const list: Date[] = [];
     const horizonT = startOfDay(endOfHorizon).getTime();
@@ -194,8 +194,8 @@ export function buildValgteDatoer(
         }
     }
 
-    const ymd = Array.from(new Set(list.map(toYmd))).sort();
-    return ymd.filter((s) => {
+    const yearMonthDay = Array.from(new Set(list.map(toYearMonthDay))).sort();
+    return yearMonthDay.filter((s) => {
         const parts = s.split("-");
         if (parts.length !== 3) return false;
         const [y, m, d] = parts.map(Number);
@@ -203,7 +203,7 @@ export function buildValgteDatoer(
         const dt = new Date(y, m - 1, d);
         if (ekskluderHelg && isWeekend(dt)) return false;
         if (!ekskluderHelg && ekskluderSondag && dt.getDay() === 0) return false;
-        if (ekskluderHelligdager && holidayYmdSet.has(s)) return false;
+        if (ekskluderHelligdager && holidayyearMonthDaySet.has(s)) return false;
         return true;
     });
 }

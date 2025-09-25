@@ -28,7 +28,7 @@ import {
     quarterlyStartDates,
     tertialStartDates,
     getWeekdayNumber,
-    toYmd,
+    toYearMonthDay,
     buildDisabledDates,
 } from './seriekalenderUtils';
 import type { DateRange } from './seriekalenderUtils';
@@ -55,9 +55,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (intent === 'updatePlanlagtStartet') {
         const behandlingId = String(formData.get('behandlingId') ?? '');
         const behandlingCode = String(formData.get('behandlingCode') ?? '');
-        const ymd = String(formData.get('ymd') ?? '');
+        const yearMonthDay = String(formData.get('yearMonthDay') ?? '');
         const time = String(formData.get('time') ?? '');
-        const isoLocalDatetimeString = `${ymd}T${time}:00`;
+        const isoLocalDatetimeString = `${yearMonthDay}T${time}:00`;
         await endrePlanlagtStartet(accessToken, behandlingId, isoLocalDatetimeString);
         return redirect(`/behandlingserie?behandlingType=${behandlingCode}`);
     }
@@ -80,17 +80,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 function buildBookedFromSerier(serier: BehandlingSerieDTO[]) {
     const dates: Date[] = [];
-    const ymdSet = new Set<string>();
+    const yearMonthDaySet = new Set<string>();
     for (const serie of serier || []) {
         for (const b of (serie.behandlinger || []) as BehandlingInfoDTO[]) {
             if (!b?.planlagtStartet) continue;
             const dt = new Date(b.planlagtStartet);
             const d = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
             dates.push(d);
-            ymdSet.add(toYmd(d));
+            yearMonthDaySet.add(toYearMonthDay(d));
         }
     }
-    return { dates, ymdSet };
+    return { dates, yearMonthDaySet };
 }
 
 function isDateRange(x: any): x is DateRange {
@@ -194,11 +194,11 @@ export default function BehandlingOpprett_index() {
                 ekskluderHelligdager,
                 ekskluderSondag,
                 endOfHorizon,
-                holidayYmdSet: holidayData.ymdSet,
+                holidayyearMonthDaySet: holidayData.yearMonthDaySet,
             }
         );
-        return base.filter(ymd => !bookedData.ymdSet.has(ymd));
-    }, [selection, regelmessighet, ekskluderHelg, endOfHorizon, holidayData.ymdSet, ekskluderHelligdager, bookedData.ymdSet, ekskluderSondag]);
+        return base.filter(yearMonthDay => !bookedData.yearMonthDaySet.has(yearMonthDay));
+    }, [selection, regelmessighet, ekskluderHelg, endOfHorizon, holidayData.yearMonthDaySet, ekskluderHelligdager, bookedData.yearMonthDaySet, ekskluderSondag]);
 
     const canSave = Boolean(behandlingType && selectedTime && previewDatoer.length > 0);
 
@@ -235,11 +235,11 @@ export default function BehandlingOpprett_index() {
             for (const b of (serie.behandlinger ?? [])) {
                 if (!b?.planlagtStartet) continue;
                 const d = new Date(b.planlagtStartet);
-                const ymd = toYmd(d);
+                const yearMonthDay = toYearMonthDay(d);
                 const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
                 items.push({
-                    id: b.behandlingId?.toString() ?? `${ymd}-${time}`,
-                    ymd,
+                    id: b.behandlingId?.toString() ?? `${yearMonthDay}-${time}`,
+                    yearMonthDay,
                     time,
                     status: b.status,
                     behandlingId: b.behandlingId?.toString(),
@@ -248,7 +248,7 @@ export default function BehandlingOpprett_index() {
                 });
             }
         }
-        return items.sort((a, b) => (a.ymd + (a.time ?? '')) < (b.ymd + (b.time ?? '')) ? -1 : 1);
+        return items.sort((a, b) => (a.yearMonthDay + (a.time ?? '')) < (b.yearMonthDay + (b.time ?? '')) ? -1 : 1);
     }, [behandlingSerier]);
 
     const [editOpen, setEditOpen] = useState(false);
@@ -272,7 +272,7 @@ export default function BehandlingOpprett_index() {
 
     function handleOpenEdit(item: PlannedItem) {
         setEditing(item);
-        const [y, m, d] = item.ymd.split('-').map(Number);
+        const [y, m, d] = item.yearMonthDay.split('-').map(Number);
         setEditDate(new Date(y, (m ?? 1) - 1, d ?? 1));
         setEditTime(item.time ?? '10:00');
         setEditOpen(true);
@@ -289,7 +289,7 @@ export default function BehandlingOpprett_index() {
         formData.set('_intent', 'updatePlanlagtStartet');
         formData.set('behandlingId', editing.behandlingId ?? '');
         formData.set('behandlingCode', editing.behandlingCode ?? '');
-        formData.set('ymd', toYmd(editDate));
+        formData.set('yearMonthDay', toYearMonthDay(editDate));
         formData.set('time', editTime);
         fetcher.submit(formData, { method: 'post' });
         setEditOpen(false);
@@ -452,7 +452,7 @@ export default function BehandlingOpprett_index() {
                         </Button>
                     </VStack>
 
-                    <ValgteDatoerPreview ymdDates={previewDatoer} time={selectedTime} />
+                    <ValgteDatoerPreview yearMonthDayDates={previewDatoer} time={selectedTime} />
 
                     <HStack>
                         <Button
@@ -470,7 +470,7 @@ export default function BehandlingOpprett_index() {
                             <Heading size="small" level="2" id="edit-planlagt-modal">
                                 {(() => {
                                     if (!editing) return 'Endre planlagt kjøring';
-                                    const [y, m, d] = editing.ymd.split('-').map(Number);
+                                    const [y, m, d] = editing.yearMonthDay.split('-').map(Number);
                                     const origDate = new Date(y, (m ?? 1) - 1, d ?? 1);
                                     const dateStr = new Intl.DateTimeFormat('no-NO', {
                                         day: '2-digit',
