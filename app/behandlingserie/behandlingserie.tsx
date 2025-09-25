@@ -31,11 +31,11 @@ import {
     toYmd,
     buildDisabledDates,
 } from './seriekalenderUtils';
+import type { DateRange } from './seriekalenderUtils';
 import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview';
 import PlanlagteDatoerPreview, { type PlannedItem } from '~/behandlingserie/planlagteDatoerPreview';
 
 type RegelmessighetMode = 'range' | 'multiple';
-type DateRange = { from?: Date; to?: Date };
 type Selection = DateRange | Date[] | undefined;
 type IntervalMode = '' | 'quarterly' | 'tertial';
 type DayMode = 'fixed-weekday' | 'first-weekday';

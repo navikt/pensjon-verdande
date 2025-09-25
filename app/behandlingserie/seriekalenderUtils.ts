@@ -196,8 +196,11 @@ export function buildValgteDatoer(
 
     const ymd = Array.from(new Set(list.map(toYmd))).sort();
     return ymd.filter((s) => {
-        const [y, m, d] = s.split("-").map(Number);
-        const dt = new Date(y, (m ?? 1) - 1, d ?? 1);
+        const parts = s.split("-");
+        if (parts.length !== 3) return false;
+        const [y, m, d] = parts.map(Number);
+        if ([y, m, d].some((n) => Number.isNaN(n))) return false;
+        const dt = new Date(y, m - 1, d);
         if (ekskluderHelg && isWeekend(dt)) return false;
         if (!ekskluderHelg && ekskluderSondag && dt.getDay() === 0) return false;
         if (ekskluderHelligdager && holidayYmdSet.has(s)) return false;
