@@ -492,11 +492,11 @@ export default function ManuellBehandlingOppsummeringRoute() {
                           {gr.labels[g] ?? manglendeVerdi}
                         </Table.DataCell>
                       ))}
-                      <Table.DataCell style={{ textAlign: 'right' }}>
+                      <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                         {gr.antall.toLocaleString('nb-NO')}
                       </Table.DataCell>
-                      <Table.DataCell style={{ textAlign: 'right' }}>
-                        {((gr.antall * 100) / total).toFixed(1)}%
+                      <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                        {((gr.antall * 100) / total).toFixed(1)} %
                       </Table.DataCell>
                     </Table.Row>
                   ))}
