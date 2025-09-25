@@ -18,7 +18,13 @@ function addDays(d: Date, days: number): Date {
 }
 
 export function addMonths(d: Date, months: number): Date {
-    return new Date(d.getFullYear(), d.getMonth() + months, d.getDate());
+    const year = d.getFullYear();
+    const monthIndex = d.getMonth() + months;
+    const targetYear = Math.floor(year + monthIndex / 12);
+    const targetMonth = ((monthIndex % 12) + 12) % 12;
+    const lastDayOfTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+    const day = Math.min(d.getDate(), lastDayOfTargetMonth);
+    return new Date(targetYear, targetMonth, day);
 }
 
 export function isWeekend(d: Date): boolean {
@@ -93,32 +99,37 @@ export function firstWeekdayOnOrAfter(anchor: Date, weekday: number): Date {
 }
 
 export function allWeekdaysInRange(weekday: number, start: Date, end: Date): Date[] {
-    const s0 = startOfDay(start);
-    const e0 = startOfDay(end);
-    let first = s0;
-    const delta = (weekday - s0.getDay() + 7) % 7;
-    first = addDays(first, delta);
+    const s0 = startOfDay(start).getTime();
+    const e0 = startOfDay(end).getTime();
+    const firstDelta = (weekday - new Date(s0).getDay() + 7) % 7;
+    const first = s0 + firstDelta * DAY;
     const out: Date[] = [];
-    for (let t = first.getTime(); t <= e0.getTime(); t += 7 * DAY) {
-        out.push(new Date(t));
-    }
+    for (let t = first; t <= e0; t += 7 * DAY) out.push(new Date(t));
     return out;
 }
 
 export function monthlyAnchoredStartDates(start: Date, months: number, horizon: Date): Date[] {
     if (!Number.isFinite(months) || months <= 0) return [];
-    const base = new Date(start.getFullYear(), start.getMonth(), 1);
+    const startIdx = start.getFullYear() * 12 + start.getMonth();
+    const endIdx = horizon.getFullYear() * 12 + horizon.getMonth();
     const out: Date[] = [];
-    for (let d = new Date(base); d.getTime() <= startOfDay(horizon).getTime(); d.setMonth(d.getMonth() + months)) {
-        out.push(new Date(d));
+    for (let idx = startIdx; idx <= endIdx; idx += months) {
+        const y = Math.floor(idx / 12);
+        const m = idx % 12;
+        out.push(new Date(y, m, 1));
     }
     return out;
 }
 
 export function quarterlyStartDates(start: Date, horizon: Date): Date[] {
+    const startIdx = start.getFullYear() * 12 + 0;
+    const endIdx = horizon.getFullYear() * 12 + horizon.getMonth();
     const out: Date[] = [];
-    for (let d = new Date(start.getFullYear(), 0, 1); d.getTime() <= startOfDay(horizon).getTime(); d.setMonth(d.getMonth() + 3)) {
-        out.push(new Date(d));
+    for (let idx = startIdx; idx <= endIdx; idx += 3) {
+        const y = Math.floor(idx / 12);
+        const m = idx % 12;
+        const d = new Date(y, m, 1);
+        if (d >= new Date(start.getFullYear(), start.getMonth(), 1) && d <= horizon) out.push(d);
     }
     return out;
 }
@@ -135,9 +146,9 @@ export function tertialStartDates(start: Date, horizon: Date): Date[] {
     return out;
 }
 
-export function getWeekdayNumber(ukedag: string): number | null {
+export function getWeekdayNumber(ukedag: string): number | undefined {
     const map: Record<string, number> = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
-    return map[ukedag] ?? null;
+    return map[ukedag];
 }
 
 function isDateRange(x: unknown): x is DateRange {
@@ -163,9 +174,11 @@ export function buildValgteDatoer(
     const { ekskluderHelg, ekskluderHelligdager, ekskluderSondag, endOfHorizon, holidayYmdSet } = opts;
 
     const list: Date[] = [];
+    const horizonT = startOfDay(endOfHorizon).getTime();
+
     const pushIfInHorizon = (d: Date) => {
-        const dd = startOfDay(d);
-        if (dd.getTime() <= startOfDay(endOfHorizon).getTime()) list.push(dd);
+        const t = startOfDay(d).getTime();
+        if (t <= horizonT) list.push(new Date(t));
     };
 
     if (mode === "multiple") {
@@ -173,13 +186,11 @@ export function buildValgteDatoer(
         for (const d of arr) pushIfInHorizon(d);
     } else {
         if (!isDateRange(selection)) return [];
-        const from = selection.from ? startOfDay(selection.from) : undefined;
-        const to = selection.to ? startOfDay(selection.to) : undefined;
-        if (from && to && from.getTime() <= to.getTime()) {
-            const endT = Math.min(to.getTime(), startOfDay(endOfHorizon).getTime());
-            for (let t = from.getTime(); t <= endT; t += DAY) {
-                pushIfInHorizon(new Date(t));
-            }
+        const from = selection.from ? startOfDay(selection.from).getTime() : undefined;
+        const to = selection.to ? startOfDay(selection.to).getTime() : undefined;
+        if (from !== undefined && to !== undefined && from <= to) {
+            const endT = Math.min(to, horizonT);
+            for (let t = from; t <= endT; t += DAY) pushIfInHorizon(new Date(t));
         }
     }
 
