@@ -37,6 +37,7 @@ export type ManuellBehandlingOppsummering = {
 }
 
 const FACETS = ['behandlingType', 'kategori', 'fagomrade', 'oppgaveKode', 'underkategoriKode', 'prioritetKode'] as const
+const GROUP_PARAM = 'groupBy' as const
 
 type FacetKey = (typeof FACETS)[number]
 
@@ -121,6 +122,43 @@ function distinctValuesWithCounts(
   return [...map.entries()]
     .map(([k, v]) => ({ value: decodeValue(k), label: v.label, count: v.count }))
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+}
+
+function labelForFacet(facet: FacetKey, row: ManuellBehandlingOppsummering): string {
+  if (facet === 'kategori') return row.kategoriDecode
+  const raw = row[facet]
+  if (raw == null) return manglendeVerdi
+  const translator = facetValueTranslator[facet] ?? identity
+  return translator(raw)
+}
+
+type GroupRow = {
+  labels: Partial<Record<FacetKey, string>>
+  values: Partial<Record<FacetKey, string | null>>
+  antall: number
+}
+
+function groupRows(rows: ManuellBehandlingOppsummering[], keys: FacetKey[]): GroupRow[] {
+  if (!keys.length) return []
+  const sep = '\u001F'
+  const m = new Map<string, GroupRow>()
+  for (const r of rows) {
+    const rawValues: Partial<Record<FacetKey, string | null>> = {}
+    const labels: Partial<Record<FacetKey, string>> = {}
+    for (const k of keys) {
+      const raw = r[k]
+      rawValues[k] = raw ?? null
+      labels[k] = labelForFacet(k, r)
+    }
+    const key = keys.map((k) => encodeValue(rawValues[k] ?? null)).join(sep)
+    const prev = m.get(key)
+    if (prev) {
+      prev.antall += r.antall
+    } else {
+      m.set(key, { labels, values: rawValues, antall: r.antall })
+    }
+  }
+  return [...m.values()].sort((a, b) => b.antall - a.antall)
 }
 
 function toggleParam(current: string[] | null, value: string): string[] | null {
@@ -220,6 +258,16 @@ export default function ManuellBehandlingOppsummeringRoute() {
 
   const filtered = useMemo(() => applyFilters(rows, filters), [rows, filters])
 
+  const groupBy = useMemo(
+    () =>
+      searchParams
+        .getAll(GROUP_PARAM)
+        .filter((v): v is FacetKey => (FACETS as readonly string[]).includes(v)) as FacetKey[],
+    [searchParams],
+  )
+
+  const grouped = useMemo(() => groupRows(filtered, groupBy), [filtered, groupBy])
+
   const facetOptions = useMemo(() => {
     const result: Record<FacetKey, { value: string | null; label: string; count: number }[]> = {} as Record<
       FacetKey,
@@ -260,6 +308,19 @@ export default function ManuellBehandlingOppsummeringRoute() {
     if (next) {
       for (const v of next) {
         nextParams.append(facet, v)
+      }
+    }
+    setSearchParams(nextParams)
+  }
+
+  function onToggleGroupBy(facet: FacetKey) {
+    const curr = searchParams.getAll(GROUP_PARAM)
+    const next = toggleParam(curr.length ? curr : null, facet)
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.delete(GROUP_PARAM)
+    if (next) {
+      for (const v of next) {
+        nextParams.append(GROUP_PARAM, v)
       }
     }
     setSearchParams(nextParams)
@@ -316,54 +377,89 @@ export default function ManuellBehandlingOppsummeringRoute() {
               </Button>
             </HStack>
 
-            <Table size="small" zebraStripes>
-              <Table.Header>
-                <Table.Row>
-                  <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
-                  <Table.HeaderCell>Kategori</Table.HeaderCell>
-                  <Table.HeaderCell>Fagområde</Table.HeaderCell>
-                  <Table.HeaderCell>Oppgavekode</Table.HeaderCell>
-                  <Table.HeaderCell>Underkategori</Table.HeaderCell>
-                  <Table.HeaderCell>Prioritet</Table.HeaderCell>
-                  <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {filtered
-                  .slice()
-                  .sort((a, b) => b.antall - a.antall)
-                  .map((r, idx) => (
-                    <Table.Row
-                      key={`${decodeBehandling(r.behandlingType)}-${r.kategori}-${r.fagomrade}-${r.oppgaveKode}-${r.underkategoriKode}-${r.prioritetKode}-${idx}`}
-                    >
-                      <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
-                      <Table.DataCell>
-                        <VStack gap="1">
-                          <span>{r.kategoriDecode}</span>
-                          <BodyShort size="small" as="span" style={{ color: 'var(--a-text-subtle)' }}>
-                            {r.kategori}
-                          </BodyShort>
-                        </VStack>
+            {groupBy.length === 0 ? (
+              <Table size="small" zebraStripes>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
+                    <Table.HeaderCell>Kategori</Table.HeaderCell>
+                    <Table.HeaderCell>Fagområde</Table.HeaderCell>
+                    <Table.HeaderCell>Oppgavekode</Table.HeaderCell>
+                    <Table.HeaderCell>Underkategori</Table.HeaderCell>
+                    <Table.HeaderCell>Prioritet</Table.HeaderCell>
+                    <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
+                    <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {filtered
+                    .slice()
+                    .sort((a, b) => b.antall - a.antall)
+                    .map((r, idx) => (
+                      <Table.Row
+                        key={`${decodeBehandling(r.behandlingType)}-${r.kategori}-${r.fagomrade}-${r.oppgaveKode}-${r.underkategoriKode}-${r.prioritetKode}-${idx}`}
+                      >
+                        <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
+                        <Table.DataCell>
+                          <VStack gap="1">
+                            <span>{r.kategoriDecode}</span>
+                            <BodyShort size="small" as="span" style={{ color: 'var(--a-text-subtle)' }}>
+                              {r.kategori}
+                            </BodyShort>
+                          </VStack>
+                        </Table.DataCell>
+                        <Table.DataCell>{r.fagomrade}</Table.DataCell>
+                        <Table.DataCell>{decodeOppgaveKode(r.oppgaveKode)}</Table.DataCell>
+                        <Table.DataCell>
+                          {r.underkategoriKode ? decodeUnderkategoriKode(r.underkategoriKode) : manglendeVerdi}
+                        </Table.DataCell>
+                        <Table.DataCell>
+                          {r.prioritetKode ? (
+                            <Tag size="small" variant={priorityVariant(r.prioritetKode)}>
+                              {decodeOppgavePrioritet(r.prioritetKode)}
+                            </Tag>
+                          ) : (
+                            <span>{manglendeVerdi}</span>
+                          )}
+                        </Table.DataCell>
+                        <Table.DataCell style={{ textAlign: 'right' }}>
+                          {r.antall.toLocaleString('nb-NO')}
+                        </Table.DataCell>
+                        <Table.DataCell style={{ textAlign: 'right' }}>
+                          {((r.antall * 100) / total).toFixed(1)}%
+                        </Table.DataCell>
+                      </Table.Row>
+                    ))}
+                </Table.Body>
+              </Table>
+            ) : (
+              <Table size="small" zebraStripes>
+                <Table.Header>
+                  <Table.Row>
+                    {groupBy.map((g) => (
+                      <Table.HeaderCell key={`h-${g}`}>{facetLabel(g)}</Table.HeaderCell>
+                    ))}
+                    <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
+                    <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {grouped.map((gr) => (
+                    <Table.Row key={`gr-${gr.labels}`}>
+                      {groupBy.map((g) => (
+                        <Table.DataCell key={`c-${gr.labels}-${g}`}>{gr.labels[g] ?? manglendeVerdi}</Table.DataCell>
+                      ))}
+                      <Table.DataCell style={{ textAlign: 'right' }}>
+                        {gr.antall.toLocaleString('nb-NO')}
                       </Table.DataCell>
-                      <Table.DataCell>{r.fagomrade}</Table.DataCell>
-                      <Table.DataCell>{decodeOppgaveKode(r.oppgaveKode)}</Table.DataCell>
-                      <Table.DataCell>
-                        {r.underkategoriKode ? decodeUnderkategoriKode(r.underkategoriKode) : manglendeVerdi}
+                      <Table.DataCell style={{ textAlign: 'right' }}>
+                        {((gr.antall * 100) / total).toFixed(1)}%
                       </Table.DataCell>
-                      <Table.DataCell>
-                        {r.prioritetKode ? (
-                          <Tag size="small" variant={priorityVariant(r.prioritetKode)}>
-                            {decodeOppgavePrioritet(r.prioritetKode)}
-                          </Tag>
-                        ) : (
-                          <span>{manglendeVerdi}</span>
-                        )}
-                      </Table.DataCell>
-                      <Table.DataCell style={{ textAlign: 'right' }}>{r.antall.toLocaleString('nb-NO')}</Table.DataCell>
                     </Table.Row>
                   ))}
-              </Table.Body>
-            </Table>
+                </Table.Body>
+              </Table>
+            )}
           </VStack>
         </HStack>
 
@@ -390,6 +486,20 @@ export default function ManuellBehandlingOppsummeringRoute() {
                 ))}
               </div>
             </div>
+            <Box>
+              <Label size="small">Grupper etter</Label>
+              <CheckboxGroup legend="" hideLegend size="small">
+                {FACETS.map((f) => (
+                  <Checkbox
+                    key={`gb-${f}`}
+                    checked={searchParams.getAll(GROUP_PARAM).includes(f)}
+                    onChange={() => onToggleGroupBy(f)}
+                  >
+                    {facetLabel(f)}
+                  </Checkbox>
+                ))}
+              </CheckboxGroup>
+            </Box>
           </Modal.Body>
           <Modal.Footer>
             <HStack gap="3">
@@ -397,7 +507,6 @@ export default function ManuellBehandlingOppsummeringRoute() {
                 variant="secondary"
                 onClick={() => {
                   clearAll()
-                  sokeModalRef.current?.close()
                 }}
               >
                 Nullstill
