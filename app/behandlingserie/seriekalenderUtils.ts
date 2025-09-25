@@ -100,12 +100,11 @@ export function firstWeekdayOnOrAfter(anchorDate: Date, weekdayNumber: number): 
 }
 
 export function allWeekdaysInRange(weekdayNumber: number, startDate: Date, endDate: Date): Date[] {
-    const startTime = startOfDay(startDate).getTime();
-    const endTime = startOfDay(endDate).getTime();
-    const firstDelta = (weekdayNumber - new Date(startTime).getDay() + 7) % 7;
-    const firstTime = startTime + firstDelta * MILLISECONDS_PER_DAY;
+    const start = startOfDay(startDate);
+    const end = startOfDay(endDate);
+    const first = firstWeekdayOnOrAfter(start, weekdayNumber);
     const out: Date[] = [];
-    for (let time = firstTime; time <= endTime; time += 7 * MILLISECONDS_PER_DAY) out.push(new Date(time));
+    for (let d = first; d.getTime() <= end.getTime(); d = addDays(d, 7)) out.push(startOfDay(d));
     return out;
 }
 
@@ -175,11 +174,11 @@ export function buildValgteDatoer(
     const { ekskluderHelg, ekskluderHelligdager, ekskluderSondag, endOfHorizon, helligdagerYearMonthDaySet } = options;
 
     const collectedDates: Date[] = [];
-    const horizonTime = startOfDay(endOfHorizon).getTime();
+    const horizon = startOfDay(endOfHorizon);
 
     const pushIfInHorizon = (date: Date) => {
-        const time = startOfDay(date).getTime();
-        if (time <= horizonTime) collectedDates.push(new Date(time));
+        const d = startOfDay(date);
+        if (d.getTime() <= horizon.getTime()) collectedDates.push(d);
     };
 
     if (mode === "multiple") {
@@ -187,11 +186,11 @@ export function buildValgteDatoer(
         for (const date of dates) pushIfInHorizon(date);
     } else {
         if (!isDateRange(selection)) return [];
-        const fromTime = selection.from ? startOfDay(selection.from).getTime() : undefined;
-        const toTime = selection.to ? startOfDay(selection.to).getTime() : undefined;
-        if (fromTime !== undefined && toTime !== undefined && fromTime <= toTime) {
-            const endTime = Math.min(toTime, horizonTime);
-            for (let time = fromTime; time <= endTime; time += MILLISECONDS_PER_DAY) pushIfInHorizon(new Date(time));
+        const from = selection.from ? startOfDay(selection.from) : undefined;
+        const to = selection.to ? startOfDay(selection.to) : undefined;
+        if (from && to && from.getTime() <= to.getTime()) {
+            const end = to.getTime() <= horizon.getTime() ? to : horizon;
+            for (let d = from; d.getTime() <= end.getTime(); d = addDays(d, 1)) pushIfInHorizon(d);
         }
     }
 
@@ -231,12 +230,11 @@ export function buildDisabledDates({
     const disabledSet = new Set<number>();
     const addDisabled = (date: Date) => disabledSet.add(startOfDay(date).getTime());
 
-    const startTime = startOfDay(fromDate).getTime();
-    const endTime = startOfDay(toDate).getTime();
-    for (let time = startTime; time <= endTime; time += MILLISECONDS_PER_DAY) {
-        const date = new Date(time);
-        if (ekskluderHelg && isWeekend(date)) addDisabled(date);
-        else if (!ekskluderHelg && ekskluderSondag && date.getDay() === 0) addDisabled(date);
+    const start = startOfDay(fromDate);
+    const end = startOfDay(toDate);
+    for (let d = start; d.getTime() <= end.getTime(); d = addDays(d, 1)) {
+        if (ekskluderHelg && isWeekend(d)) addDisabled(d);
+        else if (!ekskluderHelg && ekskluderSondag && d.getDay() === 0) addDisabled(d);
     }
 
     if (ekskluderHelligdager) for (const date of helligdagsdatoer) addDisabled(date);
