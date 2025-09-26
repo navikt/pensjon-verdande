@@ -1,4 +1,10 @@
-import { ChevronDownIcon, ChevronUpIcon, Density2Icon, FilterIcon } from '@navikt/aksel-icons'
+import {
+  ArrowCirclepathReverseIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  Density2Icon,
+  FilterIcon,
+} from '@navikt/aksel-icons'
 import {
   BodyShort,
   Box,
@@ -179,6 +185,10 @@ const rowKey = (r: ManuellBehandlingOppsummering) =>
 
 const manglendeVerdi = '–'
 
+function countActiveFilters(filters: Partial<Record<FacetKey, string[]>>): number {
+  return Object.values(filters).reduce((acc, v) => acc + ((v?.length ?? 0) > 0 ? 1 : 0), 0)
+}
+
 export default function ManuellBehandlingOppsummeringRoute() {
   const { nowIso, rows, fomDato, tomDato } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -297,6 +307,13 @@ export default function ManuellBehandlingOppsummeringRoute() {
 
   const total = useMemo(() => sumAntall(filtered), [filtered])
 
+  function clearAll() {
+    const next = new URLSearchParams(searchParams)
+    for (const f of FACETS) next.delete(f)
+    next.delete(GROUP_PARAM)
+    setSearchParams(next)
+  }
+
   function clearFacetFilters() {
     const next = new URLSearchParams(searchParams)
     for (const f of FACETS) next.delete(f)
@@ -402,7 +419,10 @@ export default function ManuellBehandlingOppsummeringRoute() {
                   variant="secondary"
                   size="small"
                 >
-                  Søkefilter
+                  Søkefilter{(() => {
+                    const c = countActiveFilters(filters)
+                    return c ? ` (${c})` : ''
+                  })()}
                 </Button>
                 <Button
                   icon={<Density2Icon aria-hidden />}
@@ -410,7 +430,15 @@ export default function ManuellBehandlingOppsummeringRoute() {
                   variant="secondary"
                   size="small"
                 >
-                  Gruppering
+                  Gruppering{groupBy.length ? ` (${groupBy.length})` : ''}
+                </Button>
+                <Button
+                  icon={<ArrowCirclepathReverseIcon aria-hidden />}
+                  onClick={clearAll}
+                  variant="secondary"
+                  size="small"
+                >
+                  Nullstill
                 </Button>
               </HStack>
             </HStack>
