@@ -69,7 +69,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   return {
     rows,
-    now: new Date(),
+    nowIso: new Date().toISOString(),
   }
 }
 
@@ -112,16 +112,11 @@ function distinctValuesWithCounts(
     const key = encodeValue(raw)
     const decoded = decodeForFacet(r)
     const label = decoded == null ? manglendeVerdi : decoded
-    const prev = map.get(key)
-    if (prev) {
-      prev.count += r.antall
-    } else {
-      map.set(key, { label, count: r.antall })
-    }
+    map.set(key, { label, count: (map.get(key)?.count ?? 0) + r.antall })
   }
   return [...map.entries()]
     .map(([k, v]) => ({ value: decodeValue(k), label: v.label, count: v.count }))
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'nb'))
 }
 
 function labelForFacet(facet: FacetKey, row: ManuellBehandlingOppsummering): string {
@@ -133,6 +128,7 @@ function labelForFacet(facet: FacetKey, row: ManuellBehandlingOppsummering): str
 }
 
 type GroupRow = {
+  groupKey: string
   labels: Partial<Record<FacetKey, string>>
   values: Partial<Record<FacetKey, string | null>>
   antall: number
@@ -155,7 +151,7 @@ function groupRows(rows: ManuellBehandlingOppsummering[], keys: FacetKey[]): Gro
     if (prev) {
       prev.antall += r.antall
     } else {
-      m.set(key, { labels, values: rawValues, antall: r.antall })
+      m.set(key, { groupKey: key, labels, values: rawValues, antall: r.antall })
     }
   }
   return [...m.values()].sort((a, b) => b.antall - a.antall)
@@ -172,16 +168,23 @@ function toggleParam(current: string[] | null, value: string): string[] | null {
   return arr.length ? arr : null
 }
 
+const rowKey = (r: ManuellBehandlingOppsummering) =>
+  [r.behandlingType, r.kategori, r.fagomrade, r.oppgaveKode, r.underkategoriKode ?? '∅', r.prioritetKode ?? '∅'].join(
+    '|',
+  )
+
 const manglendeVerdi = '–'
 
 export default function ManuellBehandlingOppsummeringRoute() {
-  const { now, rows } = useLoaderData<typeof loader>()
+  const { nowIso, rows } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const sokeModalRef = useRef<HTMLDialogElement>(null)
   const grupperModalRef = useRef<HTMLDialogElement>(null)
 
   const searchParamsFomDato = searchParams.get('fomDato')
   const searchParamsTomDato = searchParams.get('tomDato')
+
+  const now = new Date(nowIso)
 
   function updateSearchParams(nextFrom: string, nextTo: string) {
     const next = new URLSearchParams(searchParams)
@@ -432,15 +435,13 @@ export default function ManuellBehandlingOppsummeringRoute() {
                   {filtered
                     .slice()
                     .sort((a, b) => b.antall - a.antall)
-                    .map((r, idx) => (
-                      <Table.Row
-                        key={`${decodeBehandling(r.behandlingType)}-${r.kategori}-${r.fagomrade}-${r.oppgaveKode}-${r.underkategoriKode}-${r.prioritetKode}-${idx}`}
-                      >
+                    .map((r) => (
+                      <Table.Row key={rowKey(r)}>
                         <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
                         <Table.DataCell>
                           <VStack gap="1">
                             <span>{r.kategoriDecode}</span>
-                            <BodyShort size="small" as="span" style={{ color: 'var(--a-text-subtle)' }}>
+                            <BodyShort size="small" as="span" textColor="subtle">
                               {r.kategori}
                             </BodyShort>
                           </VStack>
@@ -482,15 +483,9 @@ export default function ManuellBehandlingOppsummeringRoute() {
                 </Table.Header>
                 <Table.Body>
                   {grouped.map((gr) => (
-                    <Table.Row
-                      key={`gr-${gr.labels.behandlingType}-${gr.labels.oppgaveKode}-${gr.labels.prioritetKode}-${gr.labels.fagomrade}-${gr.labels.underkategoriKode}-${gr.labels.kategori}`}
-                    >
+                    <Table.Row key={`gr-${gr.groupKey}`}>
                       {groupBy.map((g) => (
-                        <Table.DataCell
-                          key={`c-gr-${gr.labels.behandlingType}-${gr.labels.oppgaveKode}-${gr.labels.prioritetKode}-${gr.labels.fagomrade}-${gr.labels.underkategoriKode}-${gr.labels.kategori}-${g}`}
-                        >
-                          {gr.labels[g] ?? manglendeVerdi}
-                        </Table.DataCell>
+                        <Table.DataCell key={`c-${gr.groupKey}-${g}`}>{gr.labels[g] ?? manglendeVerdi}</Table.DataCell>
                       ))}
                       <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                         {gr.antall.toLocaleString('nb-NO')}
@@ -577,9 +572,9 @@ export default function ManuellBehandlingOppsummeringRoute() {
                           gap: 8,
                           padding: '6px 10px',
                           marginBottom: 6,
-                          border: '1px solid var(--a-border-subtle)',
+                          border: '1px solid var(--ax-border-neutral-subtle)',
                           borderRadius: 6,
-                          background: 'var(--a-surface-subtle)',
+                          background: 'var(--ax-bg-accent-soft)',
                           userSelect: 'none',
                         }}
                       >
@@ -694,14 +689,9 @@ function facetLabel(f: FacetKey): string {
   }
 }
 
-function priorityVariant(v: string): 'info' | 'success' | 'warning' | 'error' | 'neutral' | 'alt1' | 'alt2' {
-  switch (v.toUpperCase()) {
-    case 'HOY':
-    case 'HØY':
-      return 'warning'
-    case 'LAV':
-      return 'info'
-    default:
-      return 'neutral'
-  }
+function priorityVariant(v?: string | null): 'info' | 'success' | 'warning' | 'error' | 'neutral' | 'alt1' | 'alt2' {
+  const up = v?.toUpperCase()
+  if (up === 'HOY' || up === 'HØY') return 'warning'
+  if (up === 'LAV') return 'info'
+  return 'neutral'
 }
