@@ -15,6 +15,7 @@ import {
   useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
+import { sub } from 'date-fns'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
@@ -54,22 +55,25 @@ const facetValueTranslator: Partial<Record<FacetKey, (key: string) => string>> =
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url)
 
-  const fomDato = url.searchParams.get('fomDato')
-  const tomDato = url.searchParams.get('tomDato')
+  const now = new Date()
+
+  const fomDato = url.searchParams.get('fomDato') || toIsoDate(sub(now, { days: 30 }))
+  const tomDato = url.searchParams.get('tomDato') || toIsoDate(now)
 
   const qs = new URLSearchParams()
-  if (fomDato) qs.set('fomDato', fomDato)
-  if (tomDato) qs.set('tomDato', tomDato)
+  qs.set('fomDato', fomDato)
+  qs.set('tomDato', tomDato)
 
-  const path = qs.toString()
-    ? `/api/behandling/manuell-behandling/oppsummering?${qs.toString()}`
-    : '/api/behandling/manuell-behandling/oppsummering'
-
-  const rows = await apiGet<ManuellBehandlingOppsummering[]>(path, request)
+  const rows = await apiGet<ManuellBehandlingOppsummering[]>(
+    `/api/behandling/manuell-behandling/oppsummering?${qs.toString()}`,
+    request,
+  )
 
   return {
     rows,
-    nowIso: new Date().toISOString(),
+    nowIso: now.toISOString(),
+    fomDato,
+    tomDato,
   }
 }
 
@@ -176,13 +180,10 @@ const rowKey = (r: ManuellBehandlingOppsummering) =>
 const manglendeVerdi = '–'
 
 export default function ManuellBehandlingOppsummeringRoute() {
-  const { nowIso, rows } = useLoaderData<typeof loader>()
+  const { nowIso, rows, fomDato, tomDato } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const sokeModalRef = useRef<HTMLDialogElement>(null)
   const grupperModalRef = useRef<HTMLDialogElement>(null)
-
-  const searchParamsFomDato = searchParams.get('fomDato')
-  const searchParamsTomDato = searchParams.get('tomDato')
 
   const now = new Date(nowIso)
 
@@ -202,13 +203,10 @@ export default function ManuellBehandlingOppsummeringRoute() {
   }
 
   const { datepickerProps, fromInputProps, toInputProps, setSelected } = useRangeDatepicker({
-    defaultSelected:
-      searchParamsFomDato && searchParamsTomDato
-        ? {
-            from: new Date(searchParamsFomDato),
-            to: new Date(searchParamsTomDato),
-          }
-        : undefined,
+    defaultSelected: {
+      from: new Date(fomDato),
+      to: new Date(tomDato),
+    },
     required: true,
     onRangeChange: onRangeChange,
   })
