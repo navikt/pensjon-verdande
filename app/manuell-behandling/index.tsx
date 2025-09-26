@@ -375,7 +375,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
     <Box paddingBlock="6" paddingInline="6">
       <VStack gap="6">
         <Heading level="1" size="small">
-          Manuell saksbehandling
+          Manuell behandling
         </Heading>
 
         <BodyShort>Tabellen viser opptelling av antall oppgaver som er opprettet av behandlingene</BodyShort>
