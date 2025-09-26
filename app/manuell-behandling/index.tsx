@@ -567,13 +567,9 @@ export default function ManuellBehandlingOppsummeringRoute() {
             <VStack gap="4">
               <Box>
                 <Label size="small">Grupper etter</Label>
-                <CheckboxGroup legend="" hideLegend size="small">
+                <CheckboxGroup legend="" hideLegend size="small" value={searchParams.getAll(GROUP_PARAM)}>
                   {FACETS.map((f) => (
-                    <Checkbox
-                      key={`gb-${f}`}
-                      checked={searchParams.getAll(GROUP_PARAM).includes(f)}
-                      onChange={() => onToggleGroupBy(f)}
-                    >
+                    <Checkbox key={`gb-${f}`} value={f} onChange={() => onToggleGroupBy(f)}>
                       {facetLabel(f)}
                     </Checkbox>
                   ))}
@@ -671,19 +667,12 @@ function FacetSection({
   return (
     <VStack gap="2">
       <Label size="small">{title}</Label>
-      <CheckboxGroup legend="" hideLegend size="small">
+      <CheckboxGroup legend="" hideLegend size="small" value={[...selected]}>
         {options.map((opt) => {
           const enc = encodeValue(opt.value)
-          const isChecked = selected.has(enc)
           const isDisabled = opt.count === 0
           return (
-            <Checkbox
-              key={enc}
-              checked={isChecked}
-              disabled={isDisabled}
-              value={opt.value}
-              onChange={() => onToggle(facet, opt.value)}
-            >
+            <Checkbox key={enc} disabled={isDisabled} value={enc} onChange={() => onToggle(facet, opt.value)}>
               <HStack gap="2" align="center">
                 <span>{opt.label}</span>
                 <Tag size="xsmall" variant="neutral">
