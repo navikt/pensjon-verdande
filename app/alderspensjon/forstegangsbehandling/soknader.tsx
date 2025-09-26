@@ -22,6 +22,7 @@ import {
   ToggleGroup,
   VStack,
 } from '@navikt/ds-react'
+import { sub } from 'date-fns'
 import { useMemo, useRef } from 'react'
 import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
 import {
@@ -30,7 +31,7 @@ import {
 } from '~/alderspensjon/forstegangsbehandling/KildeOppsummeringVisning'
 import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
 import { buildUrl } from '~/common/build-url'
-import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow } from '~/common/date'
+import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow, toIsoDate } from '~/common/date'
 import { decodeAldeBehandlingStatus, decodeBehandlingstype } from '~/common/decode'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
@@ -46,6 +47,11 @@ export async function loader({ request }: { request: Request }) {
   const statusCsv = url.searchParams.get('status') ?? ''
   const sort = url.searchParams.get('sort') ?? 'opprettet,desc'
 
+  const now = new Date()
+
+  const fomDato = url.searchParams.get('fomDato') || toIsoDate(sub(now, { days: 30 }))
+  const tomDato = url.searchParams.get('tomDato') || toIsoDate(now)
+
   const qs = new URLSearchParams({
     page: String(page),
     size: String(size),
@@ -54,13 +60,17 @@ export async function loader({ request }: { request: Request }) {
     sort,
   })
 
+  const dateRangeSearchParams = new URLSearchParams()
+  dateRangeSearchParams.set('fomDato', fomDato)
+  dateRangeSearchParams.set('tomDato', tomDato)
+
   const data = await apiGet<PageResponse<AlderspensjonssoknadDto>>(
     `/api/alderspensjon/forstegangsbehandling/behandling?${qs.toString()}`,
     request,
   )
 
   const kildeOppsummering = await apiGet<KildeOppsummering[]>(
-    `/api/alderspensjon/forstegangsbehandling/kilde-oppsummering?fomDato=2025-08-27&tomDato=2025-09-26`,
+    `/api/alderspensjon/forstegangsbehandling/kilde-oppsummering?${dateRangeSearchParams.toString()}`,
     request,
   )
 
@@ -74,6 +84,8 @@ export async function loader({ request }: { request: Request }) {
     pageSize: size,
     psakSakUrlTemplate: env.psakSakUrlTemplate,
     kildeOppsummering,
+    fomDato,
+    tomDato,
   }
 }
 
@@ -126,8 +138,17 @@ function activeFilterSummary(sp: URLSearchParams) {
 }
 
 export default function Alderspensjonssoknader() {
-  const { aldeBehandlingUrlTemplate, nowIso, page, pageIndex, pageSize, psakSakUrlTemplate, kildeOppsummering } =
-    useLoaderData<typeof loader>()
+  const {
+    aldeBehandlingUrlTemplate,
+    nowIso,
+    page,
+    pageIndex,
+    pageSize,
+    psakSakUrlTemplate,
+    kildeOppsummering,
+    fomDato,
+    tomDato,
+  } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
   const { field: sortField, dir: sortDir } = parseSortParam(searchParams)
@@ -240,7 +261,7 @@ export default function Alderspensjonssoknader() {
           </Button>
         </HStack>
 
-        <KildeOppsummeringVisning data={kildeOppsummering} />
+        <KildeOppsummeringVisning data={kildeOppsummering} fomDato={fomDato} tomDato={tomDato} />
 
         {navigation.state === 'loading' ? (
           <HStack justify="center">
