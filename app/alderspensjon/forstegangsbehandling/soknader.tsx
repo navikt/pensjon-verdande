@@ -24,6 +24,10 @@ import {
 } from '@navikt/ds-react'
 import { useMemo, useRef } from 'react'
 import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
+import {
+  type KildeOppsummering,
+  KildeOppsummeringVisning,
+} from '~/alderspensjon/forstegangsbehandling/KildeOppsummeringVisning'
 import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
 import { buildUrl } from '~/common/build-url'
 import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow } from '~/common/date'
@@ -55,6 +59,11 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
+  const kildeOppsummering = await apiGet<KildeOppsummering[]>(
+    `/api/alderspensjon/forstegangsbehandling/kilde-oppsummering?fomDato=2025-08-27&tomDato=2025-09-26`,
+    request,
+  )
+
   const nowIso = new Date().toISOString()
 
   return {
@@ -64,6 +73,7 @@ export async function loader({ request }: { request: Request }) {
     pageIndex: page,
     pageSize: size,
     psakSakUrlTemplate: env.psakSakUrlTemplate,
+    kildeOppsummering,
   }
 }
 
@@ -116,7 +126,7 @@ function activeFilterSummary(sp: URLSearchParams) {
 }
 
 export default function Alderspensjonssoknader() {
-  const { aldeBehandlingUrlTemplate, nowIso, page, pageIndex, pageSize, psakSakUrlTemplate } =
+  const { aldeBehandlingUrlTemplate, nowIso, page, pageIndex, pageSize, psakSakUrlTemplate, kildeOppsummering } =
     useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
@@ -229,6 +239,8 @@ export default function Alderspensjonssoknader() {
             Søkefilter
           </Button>
         </HStack>
+
+        <KildeOppsummeringVisning data={kildeOppsummering} />
 
         {navigation.state === 'loading' ? (
           <HStack justify="center">
