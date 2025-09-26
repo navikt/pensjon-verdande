@@ -227,6 +227,8 @@ export default function Alderspensjonssoknader() {
         </Box>
       </Bleed>{' '}
       <VStack gap="6">
+        <KildeOppsummeringVisning data={kildeOppsummering} fomDato={fomDato} tomDato={tomDato} />
+
         <HStack justify="space-between" wrap>
           {summary.length > 0 ? (
             <Chips size="small">
@@ -260,8 +262,6 @@ export default function Alderspensjonssoknader() {
             Søkefilter
           </Button>
         </HStack>
-
-        <KildeOppsummeringVisning data={kildeOppsummering} fomDato={fomDato} tomDato={tomDato} />
 
         {navigation.state === 'loading' ? (
           <HStack justify="center">
