@@ -164,11 +164,7 @@ export default [
 
     route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx'),
     route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),
-    route(
-      'opptjening/manedlig/omregning/kategoriserBruker',
-      'opptjening/opptjening.manedlig.omregning.kategoriserBruker.tsx',
-    ),
-    route('opptjening/manedlig/omregning/uttrekk', 'opptjening/opptjening.manedlig.omregning.uttrekk.tsx'),
+    route('/opptjening/manedlig/omregning/opprett', 'opptjening/opptjening.manedlig.omregning.opprett.tsx'),
 
     route('sok', 'sok/sok.tsx'),
   ]),
