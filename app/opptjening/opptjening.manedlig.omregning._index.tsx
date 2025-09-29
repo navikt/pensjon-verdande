@@ -28,7 +28,7 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
     behandlingType: 'OpptjeningIdentifiserKategoriManedlig',
     status: searchParams.get('status'),
     page: page ? +page : 0,
-    size: size ? +size : 5,
+    size: size ? +size : 12,
     sort: searchParams.get('sort'),
   })
 
