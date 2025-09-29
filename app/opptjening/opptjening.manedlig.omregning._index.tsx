@@ -26,7 +26,7 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
 
   const behandlinger = await getBehandlinger(accessToken, {
     behandlingType: 'OpptjeningIdentifiserKategoriManedlig',
-    ansvarligTeam: searchParams.get('ansvarligTeam'),
+    status: searchParams.get('status'),
     page: page ? +page : 0,
     size: size ? +size : 5,
     sort: searchParams.get('sort'),
@@ -148,7 +148,7 @@ export default function OpprettEndretOpptjeningRoute() {
           Eksisterende behandlinger
         </Heading>
         <BehandlingerTable
-          visStatusSoek={false}
+          visStatusSoek={true}
           visBehandlingTypeSoek={false}
           visAnsvarligTeamSoek={false}
           behandlingerResponse={behandlinger as BehandlingerPage}
