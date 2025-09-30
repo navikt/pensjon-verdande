@@ -1,6 +1,11 @@
 import { env } from '~/services/env.server'
 
-export async function startBestemEtteroppgjorResultat(accessToken: string, updates: { [p: string]: File | string }) {
+export async function startBestemEtteroppgjorResultat(
+  accessToken: string,
+  dryRun: boolean,
+  ar: number | null,
+  sakIds: number[],
+) {
   return await fetch(`${env.penUrl}/api/uforetrygd/bestemetteroppgjor/start`, {
     method: 'POST',
     headers: {
@@ -9,7 +14,9 @@ export async function startBestemEtteroppgjorResultat(accessToken: string, updat
       'X-Request-ID': crypto.randomUUID(),
     },
     body: JSON.stringify({
-      dryRun: updates.dryRun,
+      dryRun: dryRun,
+      sakIds: sakIds,
+      ar: ar
     }),
   })
 }
