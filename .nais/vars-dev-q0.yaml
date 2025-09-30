@@ -2,7 +2,8 @@ app:
   name: 'pensjon-verdande-q0'
   namespace: 'pensjon-q0'
   team: 'pensjon-q0'
-  ingress: 'https://pensjon-verdande-q0.intern.dev.nav.no'
+  ingresses:
+    - 'https://pensjon-verdande-q0.intern.dev.nav.no'
   env: q0
 
 pen:
@@ -25,4 +26,3 @@ azure:
     verdande-les: c2e1d6a5-6a6d-4413-a924-cd44c9d059dd #Verdande les
     verdande-skriv: 094d7338-2897-46a9-9672-f4a30aa9f315 #Verdande skriv
     verdande-admin: ff6b81a5-6324-4213-b40d-246a2450b439 #Verdande admin
-
