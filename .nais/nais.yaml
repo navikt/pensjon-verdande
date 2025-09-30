@@ -29,7 +29,9 @@ spec:
       cpu: 10m
       memory: 256Mi
   ingresses:
-    - {{app.ingress}}
+    {{#each ingresses as |url|}}
+      - {{url}}
+    {{/each}}
   env:
     - name: ALDE_LINK_ENABLED
       value: "{{ alde.link_enabled }}"
