@@ -83,7 +83,7 @@ export default function BestemEtteroppgjorResultatPage() {
             inputMode="numeric"
           />
           <TextField
-            label="Kommaseparert liste med sak-id'er : "
+            label="Kommaseparert liste med sak-id'er som skal behandles (valgfritt) : "
             aria-label="sakIds"
             name="sakIds"
             type="text"
