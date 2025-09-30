@@ -68,7 +68,9 @@ spec:
       replyURLs:
         - "http://localhost:3000/auth/callback"
         - "http://localhost:3000/api/auth/callback/azure-ad"
-        - "{{app.ingress}}/auth/callback"
+        {{#each ingresses as |url|}}
+        - "{{url}}/auth/callback"
+        {{/each}}
     sidecar:
       enabled: true
       autoLogin: true
