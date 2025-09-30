@@ -31,6 +31,8 @@ function decodeInnsender(kilde: string): string {
     return 'Søker eller verge'
   } else if (kilde === 'EESSI_PENSJON') {
     return 'System'
+  } else if (kilde === 'srveessipensjon') {
+    return 'System'
   } else {
     return kilde
   }
