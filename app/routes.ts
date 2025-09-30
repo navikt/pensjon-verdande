@@ -162,9 +162,9 @@ export default [
     route('omregning/omregningsaker', 'omregning/omregning.omregningsaker.tsx'),
     route('omregningStatistikk', 'omregning/omregningStatistikk._index.tsx'),
 
-    route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx'),
-    route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),
-    route('/opptjening/manedlig/omregning/opprett', 'opptjening/opptjening.manedlig.omregning.opprett.tsx'),
+    route('opptjening/arlig/omregning', 'opptjening/arlig/opptjening.arlig.omregning._index.tsx'),
+    route('opptjening/manedlig/omregning', 'opptjening/manedlig/opptjening.manedlig.omregning._index.tsx'),
+    route('/opptjening/manedlig/omregning/opprett', 'opptjening/manedlig/opptjening.manedlig.omregning.opprett.tsx'),
 
     route('sok', 'sok/sok.tsx'),
   ]),
