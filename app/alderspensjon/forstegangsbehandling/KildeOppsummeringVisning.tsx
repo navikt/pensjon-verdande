@@ -20,11 +20,33 @@ export interface KildeOppsummering {
   antall: number
 }
 
+function decodeInnsender(kilde: string): string {
+  if (kilde === 'SAKSBEHANDLER') {
+    return 'Saksbehandler'
+  } else if (kilde === 'DOLLY') {
+    return 'System'
+  } else if (kilde === 'ALDERSOVERGANG') {
+    return 'System'
+  } else if (kilde === 'EN_PERSON') {
+    return 'Søker eller verge'
+  } else if (kilde === 'EESSI_PENSJON') {
+    return 'System'
+  } else {
+    return kilde
+  }
+}
+
 function decodeKilde(kilde: string): string {
   if (kilde === 'PSAK') {
     return 'psak'
+  } else if (kilde === 'DOLLY') {
+    return 'dolly'
+  } else if (kilde === 'ALDERSOVERGANG') {
+    return 'aldersovergang'
   } else if (kilde === 'SOKNAD') {
     return 'nav.no'
+  } else if (kilde === 'EESSI_PENSJON') {
+    return 'eessi-pensjon'
   } else {
     return kilde
   }
@@ -127,25 +149,27 @@ export function KildeOppsummeringVisning({
         <Table size="small">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Kilde</Table.HeaderCell>
               <Table.HeaderCell>Innsender</Table.HeaderCell>
+              <Table.HeaderCell>Kilde</Table.HeaderCell>
               <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
               <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {data.map((row) => (
-              <Table.Row key={`${row.kilde}-${row.innsenderType}`}>
-                <Table.DataCell>{decodeKilde(row.kilde)}</Table.DataCell>
-                <Table.DataCell>{row.innsenderType}</Table.DataCell>
-                <Table.DataCell style={{ textAlign: 'right' }}>
-                  {Intl.NumberFormat('nb-NO').format(row.antall)}
-                </Table.DataCell>
-                <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
-                  {((row.antall * 100) / total).toFixed(1)} %
-                </Table.DataCell>
-              </Table.Row>
-            ))}
+            {data
+              .sort((a, b) => b.antall - a.antall)
+              .map((row) => (
+                <Table.Row key={`${row.kilde}-${row.innsenderType}`}>
+                  <Table.DataCell>{decodeInnsender(row.innsenderType)}</Table.DataCell>
+                  <Table.DataCell>{decodeKilde(row.kilde)}</Table.DataCell>
+                  <Table.DataCell style={{ textAlign: 'right' }}>
+                    {Intl.NumberFormat('nb-NO').format(row.antall)}
+                  </Table.DataCell>
+                  <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                    {((row.antall * 100) / total).toFixed(1)} %
+                  </Table.DataCell>
+                </Table.Row>
+              ))}
           </Table.Body>
         </Table>
       </VStack>
