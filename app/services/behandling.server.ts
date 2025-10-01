@@ -324,13 +324,30 @@ export async function stopp(accessToken: string, behandlingId: string): Promise<
       'X-Request-ID': crypto.randomUUID(),
     },
   })
-
+    
   if (!response.ok) {
     const text = await response.text()
     throw data(`Feil ved stopping av behandling. Feil var\n${text}`, {
       status: response.status,
     })
   }
+}
+
+export async function endrePlanlagtStartet(accessToken: string, behandlingId: string, nyPlanlagtStartet: string,): Promise<void> {
+    const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/endrePlanlagtStartet?planlagtStartet=${encodeURIComponent(nyPlanlagtStartet)}`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'X-Request-ID': crypto.randomUUID(),
+        },
+    })
+
+    if (!response.ok) {
+        const text = await response.text()
+        throw data(`Feil ved endring av planlagt startet for behandling. Feil var\n${text}`, {
+            status: response.status,
+        })
+    }
 }
 
 export async function sendTilManuellMedKontrollpunkt(

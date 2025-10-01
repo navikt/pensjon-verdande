@@ -5,16 +5,17 @@ import BehandlingCard from '~/behandling/BehandlingCard'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import { requireAccessToken } from '~/services/auth.server'
 import {
-  fjernFraDebug,
-  fortsettAvhengigeBehandlinger,
-  fortsettBehandling,
-  getBehandling,
-  getDetaljertFremdrift,
-  patchBehandling,
-  runBehandling,
-  sendTilManuellMedKontrollpunkt,
-  stopp,
-  taTilDebug,
+    endrePlanlagtStartet,
+    fjernFraDebug,
+    fortsettAvhengigeBehandlinger,
+    fortsettBehandling,
+    getBehandling,
+    getDetaljertFremdrift,
+    patchBehandling,
+    runBehandling,
+    sendTilManuellMedKontrollpunkt,
+    stopp,
+    taTilDebug,
 } from '~/services/behandling.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { DetaljertFremdriftDTO } from '~/types'
@@ -28,6 +29,7 @@ export const OPERATION = {
   sendTilManuellMedKontrollpunkt: 'sendTilManuellMedKontrollpunkt',
   sendTilOppdragPaNytt: 'sendTilOppdragPaNytt',
   stopp: 'stopp',
+  endrePlanlagtStartet: 'endrePlanlagtStartet',
   taTilDebug: 'taTilDebug',
 } as const
 
@@ -74,6 +76,8 @@ function operationHandlers(
     sendTilOppdragPaNytt: () => sendTilOppdragPaNytt(accessToken, behandlingId),
 
     stopp: () => stopp(accessToken, behandlingId),
+
+    endrePlanlagtStartet: () => endrePlanlagtStartet(accessToken, behandlingId, String(form.get('nyPlanlagtStartet'))),
 
     taTilDebug: () => taTilDebug(accessToken, behandlingId),
   } satisfies Record<Operation, () => Promise<void>>
