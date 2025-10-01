@@ -33,6 +33,8 @@ const ALDE_BEHANDLING_STATUS_MAP = {
   VENTER_SAKSBEHANDLER: 'Venter saksbehandler',
   VENTER_MASKINELL: 'Venter maskinell',
   VENTER_ATTESTERING: 'Venter attestering',
+  AVBRUTT_TIl_MANUELL: 'Avbrutt manuelt',
+  AUTOMATISK_TIl_MANUELL: 'Avbrutt maskinelt',
   FULLFORT: 'Fullført',
 }
 

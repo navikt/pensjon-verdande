@@ -477,7 +477,7 @@ function BehandlingCard({
             noWrap
           />
           <KV label="Behandlingstype" value={decodeBehandlingstype(b.behandlingstype)} />
-          <KV label="Alde status" value={decodeAldeBehandlingStatus(b.aldeStatus)} />
+          <KV label="Aldestatus" value={decodeAldeBehandlingStatus(b.aldeStatus)} />
         </HStack>
 
         {b.nesteAktiviteter.length === 1 ? (
