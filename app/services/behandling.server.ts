@@ -338,6 +338,7 @@ export async function endrePlanlagtStartet(accessToken: string, behandlingId: st
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
             'X-Request-ID': crypto.randomUUID(),
         },
         body: JSON.stringify({ planlagtStartet: nyPlanlagtStartet })
