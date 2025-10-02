@@ -16,7 +16,7 @@ export async function startBestemEtteroppgjorResultat(
     body: JSON.stringify({
       dryRun: dryRun,
       sakIds: sakIds,
-      ar: ar
+      ar: ar,
     }),
   })
 }
