@@ -5,17 +5,17 @@ import BehandlingCard from '~/behandling/BehandlingCard'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import { requireAccessToken } from '~/services/auth.server'
 import {
-    endrePlanlagtStartet,
-    fjernFraDebug,
-    fortsettAvhengigeBehandlinger,
-    fortsettBehandling,
-    getBehandling,
-    getDetaljertFremdrift,
-    patchBehandling,
-    runBehandling,
-    sendTilManuellMedKontrollpunkt,
-    stopp,
-    taTilDebug,
+  endrePlanlagtStartet,
+  fjernFraDebug,
+  fortsettAvhengigeBehandlinger,
+  fortsettBehandling,
+  getBehandling,
+  getDetaljertFremdrift,
+  patchBehandling,
+  runBehandling,
+  sendTilManuellMedKontrollpunkt,
+  stopp,
+  taTilDebug,
 } from '~/services/behandling.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { DetaljertFremdriftDTO } from '~/types'
