@@ -267,11 +267,12 @@ export const oppdaterAvviksgrenser = async (accessToken: string, newAvviksgrense
   }
 }
 
-export const leggTilEkskluderteSaker = async (accessToken: string, leggTilDisse: number[]) => {
+export const leggTilEkskluderteSaker = async (accessToken: string, nyeEkskluderte: number[], kommentar: string) => {
   const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker`, {
     method: 'POST',
     body: JSON.stringify({
-      ekskluderteSaker: leggTilDisse,
+      ekskluderteSaker: nyeEkskluderte,
+      kommentar: kommentar,
     }),
     headers: {
       Authorization: `Bearer ${accessToken}`,

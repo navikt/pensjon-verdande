@@ -1,95 +1,16 @@
 import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
-import { type FileUpload, parseFormData } from '@mjackson/form-data-parser'
 import { Alert, Button, Heading, HStack, Modal, Textarea, VStack } from '@navikt/ds-react'
 import { useEffect, useRef, useState } from 'react'
 import { useActionData, useFetcher, useLoaderData } from 'react-router'
-import { hentEksluderteSaker, leggTilEkskluderteSaker } from '~/regulering/regulering.server'
+import { hentEksluderteSaker } from '~/regulering/regulering.server'
 
 type OpenEkskluderingInputBoxType = 'leggTilEkskluderteBox' | 'fjernEkskluderteBox'
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
-  const uploadHandler = async (fileUpload: FileUpload) => {
-    if (fileUpload.fieldName === 'saksnummerListe') {
-      return fileUpload.text()
-    }
-  }
-
-  const formData = await parseFormData(request, uploadHandler)
-
-  const saksnummerListe = formData.get('saksnummerListe') as string
-  const ekskluderteSaker = saksnummerListe
-    .split('\n')
-    .map((t: string) => t.trim())
-    .filter((t: string) => t !== '')
-    .map(Number)
-
-  return await leggTilEkskluderteSaker(accessToken, ekskluderteSaker)
-}
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   return await hentEksluderteSaker(accessToken)
-}
-
-export function EkskluderingInputBox(props: {
-  text: string
-  showModal: boolean
-  onOk: () => void
-  onCancel: () => void
-}) {
-  const ref = useRef<HTMLDialogElement>(null)
-
-  if (props.showModal) {
-    ref.current?.showModal()
-  } else {
-    ref.current?.close()
-  }
-
-  return (
-    <div>
-      <Modal
-        ref={ref}
-        header={{ heading: 'Modifiser ekskluderingsliste', closeButton: false }}
-        onClose={props.onCancel}
-      >
-        <Modal.Body>
-          <VStack gap={'5'}>
-            {props.text}
-            <Textarea
-              label="Saksnummer"
-              name="saksnummerListe"
-              // value={saksnummerToAddListe}
-              // onChange={(e) => setSaksnummerToAddListe(e.target.value)}
-              minRows={30}
-              style={{ width: '30em' }}
-              resize
-            />
-            <Textarea
-              label="Kommentar"
-              name="kommentar"
-              // value={saksnummerToAddListe}
-              // onChange={(e) => setSaksnummerToAddListe(e.target.value)}
-              style={{ width: '30em' }}
-              resize
-            />
-          </VStack>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button type="button" onClick={props.onOk} size="small">
-            Fortsett
-          </Button>
-          <Button type="button" variant="secondary" onClick={props.onCancel} size="small">
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
-  )
 }
 
 export default function EkskluderteSaker() {
@@ -97,16 +18,15 @@ export default function EkskluderteSaker() {
 
   const response = useActionData() as OppdaterEksluderteSakerResponse | undefined
 
-  const [saksnummerToAddListe, setSaksnummerToAddListe] = useState('')
-  const [saksnummerToRemoveListe] = useState('')
+  const [saksnummerCurrentListe, setSaksnummerCurrentListe] = useState('')
 
   useEffect(() => {
-    setSaksnummerToAddListe(ekskluderteSaker.join('\n'))
+    setSaksnummerCurrentListe(ekskluderteSaker.join('\n'))
   }, [ekskluderteSaker])
 
   const [openEkskluderingInputBox, setOpenEkskluderingInputBox] = useState<OpenEkskluderingInputBoxType | null>(null)
 
-  const antallSaker = saksnummerToAddListe
+  const antallSaker = saksnummerCurrentListe
     .split('\n')
     .map((t: string) => t.trim())
     .filter((t: string) => t !== '')
@@ -114,40 +34,6 @@ export default function EkskluderteSaker() {
 
   const fetcherAddEkskluderte = useFetcher()
   const fetcherRemoveEkskluderte = useFetcher()
-
-  function addEkskluderte() {
-    setOpenEkskluderingInputBox(null)
-    //antall saker to blob
-    const blob = new Blob([saksnummerToAddListe], { type: 'text/plain' })
-    //til fil
-    const file = new File([blob], 'saksnummerListe.txt', { type: 'text/plain' })
-    //append til formdata
-    const formData = new FormData()
-    formData.append('saksnummerListe', file)
-
-    //submit
-    fetcherAddEkskluderte.submit(formData, {
-      method: 'POST',
-      encType: 'multipart/form-data',
-    })
-  }
-
-  function removeEkskluderte() {
-    setOpenEkskluderingInputBox(null)
-    //antall saker to blob
-    const blob = new Blob([saksnummerToRemoveListe], { type: 'text/plain' })
-    //til fil
-    const file = new File([blob], 'saksnummerListe.txt', { type: 'text/plain' })
-    //append til formdata
-    const formData = new FormData()
-    formData.append('saksnummerListe', file)
-
-    //submit
-    fetcherRemoveEkskluderte.submit(formData, {
-      method: 'POST',
-      encType: 'multipart/form-data',
-    })
-  }
 
   return (
     <VStack gap="5">
@@ -162,8 +48,8 @@ export default function EkskluderteSaker() {
           label="Saksnummer"
           name="saksnummerListe"
           description="Liste av saker som skal ekskluderes fra reguleringen. Oppgis med linjeskift."
-          value={saksnummerToAddListe}
-          onChange={(e) => setSaksnummerToAddListe(e.target.value)}
+          value={saksnummerCurrentListe}
+          onChange={(e) => setSaksnummerCurrentListe(e.target.value)}
           minRows={30}
           style={{ width: '30em' }}
           resize
@@ -194,24 +80,164 @@ export default function EkskluderteSaker() {
             </Button>
           </div>
         </HStack>
-        <EkskluderingInputBox
+        <EkskluderingLeggTilInputBox
           text="Legg til følgende saker i ekskluderingsliste"
           showModal={openEkskluderingInputBox === 'leggTilEkskluderteBox'}
-          onOk={() => {
-            addEkskluderte()
-          }}
           onCancel={() => setOpenEkskluderingInputBox(null)}
         />
-        <EkskluderingInputBox
+        <EkskluderingFjernInputBox
           text="Fjern følgende saker fra ekskluderingsliste"
           showModal={openEkskluderingInputBox === 'fjernEkskluderteBox'}
-          onOk={() => {
-            removeEkskluderte()
-          }}
           onCancel={() => setOpenEkskluderingInputBox(null)}
         />
       </VStack>
     </VStack>
+  )
+}
+
+export function EkskluderingLeggTilInputBox(props: { text: string; showModal: boolean; onCancel: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null)
+  const fetcher = useFetcher()
+  const [saksnummerToAddListe, setSaksnummerToAddListe] = useState('')
+  const [kommentarToAdd, setKommentarToAdd] = useState('')
+
+  if (props.showModal) {
+    ref.current?.showModal()
+  } else {
+    ref.current?.close()
+  }
+
+  function leggTilEkskluderteIPen() {
+    const ekskluderteSaker = saksnummerToAddListe
+      .split('\n')
+      .map((t: string) => t.trim())
+      .filter((t: string) => t !== '')
+      .map(Number)
+
+    const kommentar = kommentarToAdd
+
+    fetcher.submit(
+      {
+        ekskluderteSaker,
+        kommentar,
+      },
+      {
+        action: 'leggTilEkskluderteSaker',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+
+    ref.current?.close()
+  }
+
+  return (
+    <div>
+      <Modal
+        ref={ref}
+        header={{ heading: 'Modifiser ekskluderingsliste', closeButton: false }}
+        onClose={props.onCancel}
+      >
+        <Modal.Body>
+          <VStack gap={'5'}>
+            {props.text}
+            <Textarea
+              label="Saksnummer"
+              name="saksnummerListe"
+              value={saksnummerToAddListe}
+              onChange={(e) => setSaksnummerToAddListe(e.target.value)}
+              minRows={30}
+              style={{ width: '30em' }}
+              resize
+            />
+            <Textarea
+              label="Kommentar"
+              name="kommentar"
+              value={kommentarToAdd}
+              onChange={(e) => setKommentarToAdd(e.target.value)}
+              style={{ width: '30em' }}
+              resize
+            />
+          </VStack>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button type="button" onClick={() => leggTilEkskluderteIPen()} size="small">
+            Fortsett
+          </Button>
+          <Button type="button" variant="secondary" onClick={props.onCancel} size="small">
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  )
+}
+
+export function EkskluderingFjernInputBox(props: { text: string; showModal: boolean; onCancel: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null)
+  const fetcher = useFetcher()
+  const [saksnummerToRemoveListe, setSaksnummerToRemoveListe] = useState('')
+
+  if (props.showModal) {
+    ref.current?.showModal()
+  } else {
+    ref.current?.close()
+  }
+
+  function fjernEkskluderteFraPen() {
+    const ekskluderteSaker = saksnummerToRemoveListe
+      .split('\n')
+      .map((t: string) => t.trim())
+      .filter((t: string) => t !== '')
+      .map(Number)
+
+    fetcher.submit(
+      {
+        ekskluderteSaker,
+      },
+      {
+        action: 'fjernEkskluderteSaker',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+
+    ref.current?.close()
+  }
+
+  return (
+    <div>
+      <Modal
+        ref={ref}
+        header={{ heading: 'Modifiser ekskluderingsliste', closeButton: false }}
+        onClose={props.onCancel}
+      >
+        <Modal.Body>
+          <VStack gap={'5'}>
+            {props.text}
+            <Textarea
+              label="Saksnummer"
+              name="saksnummerListe"
+              value={saksnummerToRemoveListe}
+              onChange={(e) => setSaksnummerToRemoveListe(e.target.value)}
+              minRows={30}
+              style={{ width: '30em' }}
+              resize
+            />
+          </VStack>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button type="button" onClick={() => fjernEkskluderteFraPen()} size="small">
+            Fortsett
+          </Button>
+          <Button type="button" variant="secondary" onClick={props.onCancel} size="small">
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
   )
 }
 

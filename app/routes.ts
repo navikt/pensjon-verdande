@@ -55,7 +55,9 @@ export default [
         route('hentStatistikk', 'regulering/batch.regulering.administrerbehandlinger.hentStatistikk.tsx'),
       ]),
       route('avsluttendeaktiviteter', 'regulering/batch.regulering.avsluttendeaktiviteter.tsx'),
-      route('ekskludertesaker', 'regulering/batch.regulering.ekskludertesaker.tsx'),
+      route('ekskludertesaker', 'regulering/batch.regulering.ekskludertesaker.tsx', [
+        route('leggTilEkskluderteSaker', 'regulering/batch.regulering.ekskludertesaker.leggTil.tsx'),
+      ]),
       route('orkestrering', 'regulering/batch.regulering.orkestrering.tsx', [
         route(
           'hentOrkestreringStatistikk/:behandlingId',
@@ -125,7 +127,7 @@ export default [
 
     route('kalender', 'kalender/route.tsx'),
 
-    route("etteroppgjor-historikk-ufore", "vedlikehold/etteroppgjor-historikk-ufore.tsx"),
+    route('etteroppgjor-historikk-ufore', 'vedlikehold/etteroppgjor-historikk-ufore.tsx'),
 
     route('laas-opp-sak', 'vedlikehold/laas-opp-sak.tsx', [
       route('settTilManuell', 'vedlikehold/laas-opp-sak.settTilManuell.tsx'),
