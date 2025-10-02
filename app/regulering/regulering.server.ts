@@ -267,12 +267,31 @@ export const oppdaterAvviksgrenser = async (accessToken: string, newAvviksgrense
   }
 }
 
-export const leggTilEkskluderteSaker = async (accessToken: string, nyeEkskluderte: number[], kommentar: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker`, {
+export const leggTilEkskluderteSaker = async (accessToken: string, sakIder: number[], kommentar: string) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker/leggTil`, {
     method: 'POST',
     body: JSON.stringify({
-      ekskluderteSaker: nyeEkskluderte,
+      sakIder: sakIder,
       kommentar: kommentar,
+    }),
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
+  return { erOppdatert: true }
+}
+
+export const fjernEkskluderteSaker = async (accessToken: string, sakIder: number[]) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker/fjern`, {
+    method: 'POST',
+    body: JSON.stringify({
+      sakIder: sakIder,
     }),
     headers: {
       Authorization: `Bearer ${accessToken}`,

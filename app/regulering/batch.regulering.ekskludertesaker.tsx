@@ -108,7 +108,7 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
   }
 
   function leggTilEkskluderteIPen() {
-    const ekskluderteSaker = saksnummerToAddListe
+    const sakIder = saksnummerToAddListe
       .split('\n')
       .map((t: string) => t.trim())
       .filter((t: string) => t !== '')
@@ -118,7 +118,7 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
 
     fetcher.submit(
       {
-        ekskluderteSaker,
+        sakIder,
         kommentar,
       },
       {
@@ -186,7 +186,7 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
   }
 
   function fjernEkskluderteFraPen() {
-    const ekskluderteSaker = saksnummerToRemoveListe
+    const sakIder = saksnummerToRemoveListe
       .split('\n')
       .map((t: string) => t.trim())
       .filter((t: string) => t !== '')
@@ -194,7 +194,7 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
 
     fetcher.submit(
       {
-        ekskluderteSaker,
+        sakIder,
       },
       {
         action: 'fjernEkskluderteSaker',

@@ -57,6 +57,7 @@ export default [
       route('avsluttendeaktiviteter', 'regulering/batch.regulering.avsluttendeaktiviteter.tsx'),
       route('ekskludertesaker', 'regulering/batch.regulering.ekskludertesaker.tsx', [
         route('leggTilEkskluderteSaker', 'regulering/batch.regulering.ekskludertesaker.leggTil.tsx'),
+        route('fjernEkskluderteSaker', 'regulering/batch.regulering.ekskludertesaker.fjern.tsx'),
       ]),
       route('orkestrering', 'regulering/batch.regulering.orkestrering.tsx', [
         route(
