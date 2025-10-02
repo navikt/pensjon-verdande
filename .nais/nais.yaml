@@ -29,7 +29,9 @@ spec:
       cpu: 10m
       memory: 256Mi
   ingresses:
-    - {{app.ingress}}
+    {{#each app.ingresses as |url|}}
+      - {{url}}
+    {{/each}}
   env:
     - name: ALDE_LINK_ENABLED
       value: "{{ alde.link_enabled }}"
@@ -66,7 +68,9 @@ spec:
       replyURLs:
         - "http://localhost:3000/auth/callback"
         - "http://localhost:3000/api/auth/callback/azure-ad"
-        - "{{app.ingress}}/auth/callback"
+        {{#each app.ingresses as |url|}}
+        - "{{url}}/auth/callback"
+        {{/each}}
     sidecar:
       enabled: true
       autoLogin: true

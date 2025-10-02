@@ -120,8 +120,7 @@ export const ugyldiggjorEtteroppgjorHistorikkUfore = async (
   accessToken: string,
   sakId: number,
   etteroppgjortAr: number,
-)=> {
-
+) => {
   const response = await fetch(
     `${env.penUrl}/api/uforetrygd/etteroppgjor/historikk/vedlikehold/ugyldiggjor?sakId=${sakId}&etteroppgjortAr=${etteroppgjortAr}`,
     {
