@@ -334,12 +334,13 @@ export async function stopp(accessToken: string, behandlingId: string): Promise<
 }
 
 export async function endrePlanlagtStartet(accessToken: string, behandlingId: string, nyPlanlagtStartet: string,): Promise<void> {
-    const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/endrePlanlagtStartet?planlagtStartet=${encodeURIComponent(nyPlanlagtStartet)}`, {
+    const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/endrePlanlagtStartet`, {
         method: 'PUT',
         headers: {
             Authorization: `Bearer ${accessToken}`,
             'X-Request-ID': crypto.randomUUID(),
         },
+        body: JSON.stringify({ planlagtStartet: nyPlanlagtStartet })
     })
 
     if (!response.ok) {
