@@ -129,6 +129,8 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
     )
 
     ref.current?.close()
+    setSaksnummerToAddListe('')
+    setKommentarToAdd('')
   }
 
   return (
@@ -204,6 +206,7 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
     )
 
     ref.current?.close()
+    setSaksnummerToRemoveListe('')
   }
 
   return (
