@@ -32,7 +32,15 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-const pct = (ferdig: number, totalt: number) => (totalt > 0 ? Math.round((ferdig / totalt) * 100) : 0)
+const pct = (ferdig: number, totalt: number) => {
+  if (totalt < 0) {
+    return 0
+  } else if (ferdig >= totalt) {
+    return 100
+  } else {
+    return Math.min(+((ferdig / totalt) * 100).toFixed(2), 99.99)
+  }
+}
 
 const ratio = (a: number, b: number) => `${a.toLocaleString('nb-NO')} / ${b.toLocaleString('nb-NO')}`
 
