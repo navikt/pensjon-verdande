@@ -208,8 +208,10 @@ export default function FremdriftRoute() {
                   </Table.DataCell>
 
                   <Table.DataCell>
-                    <VStack gap="1" align={'end'}>
-                      <BodyShort size="small">{rowPct} %</BodyShort>
+                    <VStack gap="1">
+                      <VStack align={'end'}>
+                        <BodyShort size="small">{rowPct} %</BodyShort>
+                      </VStack>
                       <ProgressBar value={rowPct} aria-label={`Fremdrift ${rad.behandlingCode}`} />
                     </VStack>
                   </Table.DataCell>
