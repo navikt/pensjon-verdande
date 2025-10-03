@@ -17,6 +17,7 @@ import {
   Box,
   Button,
   CopyButton,
+  DatePicker,
   Detail,
   Heading,
   HGrid,
@@ -27,10 +28,11 @@ import {
   Page,
   ProgressBar,
   Tabs,
+  TextField,
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
-import { Suspense, useRef } from 'react'
+import { Suspense, useMemo, useRef, useState } from 'react'
 import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
 import { buildUrl } from '~/common/build-url'
@@ -510,6 +512,10 @@ export default function BehandlingCard(props: Props) {
 
           {fortsettAvhengigeBehandlinger()}
 
+          {props.behandling.behandlingKjoringer.length === 0 && (
+            <EndrePlanlagtStartetButton planlagtStartet={props.behandling.planlagtStartet} />
+          )}
+
           {debugButton()}
 
           {sendTilOppdragPaNyttButton()}
@@ -575,5 +581,160 @@ export default function BehandlingCard(props: Props) {
         </Tabs>
       </Box.New>
     </Page>
+  )
+}
+
+export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStartet?: string | null }) {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const formatDDMMYYYY = (d?: Date) => (d ? `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}` : '')
+
+  const parseDDMMYYYY = (s: string): Date | null => {
+    const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(s)
+    if (!m) return null
+    const d = parseInt(m[1], 10)
+    const mo = parseInt(m[2], 10)
+    const y = parseInt(m[3], 10)
+    const dt = new Date(y, mo - 1, d)
+    if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null
+    return dt
+  }
+
+  const toIsoLocal = (date: Date, timeHHmm?: string) => {
+    let hh = '00',
+      mm = '00'
+    if (timeHHmm && /^\d{2}:\d{2}$/.test(timeHHmm)) {
+      ;[hh, mm] = timeHHmm.split(':')
+    }
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${hh}:${mm}:00`
+  }
+
+  const initialDate = useMemo(() => {
+    if (!planlagtStartet) return undefined
+    const [ymd] = planlagtStartet.split('T')
+    const [y, m, d] = (ymd ?? '').split('-').map(Number)
+    if (!y || !m || !d) return undefined
+    return new Date(y, m - 1, d) // lokal dato uten TZ-krøll
+  }, [planlagtStartet])
+
+  const initialTime = useMemo(() => {
+    const t = planlagtStartet?.split('T')[1]?.slice(0, 5) // "HH:mm"
+    return t && /^\d{2}:\d{2}$/.test(t) ? t : ''
+  }, [planlagtStartet])
+
+  const [open, setOpen] = useState(false)
+  const [dato, setDato] = useState<Date | undefined>(initialDate)
+  const [tid, setTid] = useState<string>(initialTime)
+  const [inputValue, setInputValue] = useState<string>(formatDDMMYYYY(initialDate))
+  const [inputError, setInputError] = useState<string | undefined>(undefined)
+
+  const fetcher = useFetcher()
+
+  const handleSelect = (d?: Date) => {
+    setDato(d ?? undefined)
+    setInputValue(formatDDMMYYYY(d ?? initialDate))
+    setInputError(undefined)
+  }
+
+  const handleInputChange = (v: string) => {
+    setInputValue(v)
+    if (v.length === 10) {
+      const parsed = parseDDMMYYYY(v)
+      if (parsed) {
+        setDato(parsed)
+        setInputError(undefined)
+      } else {
+        setInputError('Ugyldig dato')
+      }
+    } else {
+      setInputError(undefined)
+    }
+  }
+
+  const handleLagre = () => {
+    if (!dato) return
+    const fd = new FormData()
+    fd.set('operation', OPERATION.endrePlanlagtStartet)
+    fd.set('nyPlanlagtStartet', toIsoLocal(dato, tid))
+    fetcher.submit(fd, { method: 'post' })
+    setOpen(false)
+  }
+
+  return (
+    <>
+      <Tooltip content="Endrer planlagt startet dato på behandlingen">
+        <Button
+          type="button"
+          variant="secondary"
+          icon={<PlayIcon aria-hidden />}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setOpen(true)
+            setInputValue(formatDDMMYYYY(dato ?? initialDate))
+            setInputError(undefined)
+          }}
+        >
+          Endre planlagt startet
+        </Button>
+      </Tooltip>
+
+      <Modal
+        open={open}
+        header={{ heading: 'Endre planlagt startet' }}
+        onClose={() => {
+          setOpen(false)
+          setDato(initialDate)
+          setTid(initialTime)
+          setInputValue(formatDDMMYYYY(initialDate))
+          setInputError(undefined)
+        }}
+      >
+        <Modal.Body>
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <DatePicker
+              mode="single"
+              selected={dato}
+              defaultSelected={initialDate}
+              defaultMonth={dato ?? initialDate}
+              onSelect={handleSelect}
+            >
+              <DatePicker.Input
+                label="Ny planlagt startdato"
+                placeholder="dd.mm.åååå"
+                value={inputValue}
+                error={inputError}
+                onChange={(e) => handleInputChange(e.target.value)}
+              />
+            </DatePicker>
+
+            <TextField type="time" label="Klokkeslett" value={tid} onChange={(e) => setTid(e.target.value)} />
+          </div>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleLagre}
+            disabled={!dato || !!inputError || fetcher.state !== 'idle'}
+          >
+            {fetcher.state === 'idle' ? 'Lagre' : 'Lagrer...'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setOpen(false)
+              setDato(initialDate)
+              setTid(initialTime)
+              setInputValue(formatDDMMYYYY(initialDate))
+              setInputError(undefined)
+            }}
+          >
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   )
 }
