@@ -38,7 +38,7 @@ const pct = (ferdig: number, totalt: number) => {
   } else if (ferdig >= totalt) {
     return 100
   } else {
-    return Math.min(+((ferdig / totalt) * 100).toFixed(2), 99.99)
+    return Math.min(+((ferdig / totalt) * 100).toFixed(1), 99.9)
   }
 }
 
@@ -208,8 +208,8 @@ export default function FremdriftRoute() {
                   </Table.DataCell>
 
                   <Table.DataCell>
-                    <VStack gap="1">
-                      <BodyShort size="small">{rowPct}%</BodyShort>
+                    <VStack gap="1" align={'end'}>
+                      <BodyShort size="small">{rowPct} %</BodyShort>
                       <ProgressBar value={rowPct} aria-label={`Fremdrift ${rad.behandlingCode}`} />
                     </VStack>
                   </Table.DataCell>
