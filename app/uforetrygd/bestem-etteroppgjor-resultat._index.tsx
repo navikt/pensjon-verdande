@@ -65,19 +65,19 @@ export default function BestemEtteroppgjorResultatPage() {
       </Heading>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap="5">
-          <Select label="DryRun : " size="small" name="dryRun" defaultValue="true">
+          <Select label="DryRun:" size="small" name="dryRun" defaultValue="true">
             <option value="true">Ja</option>
             <option value="false">Nei</option>
           </Select>
           <TextField
-            label="År for Etteroppgjør : "
+            label="År for Etteroppgjør (tomt betyr alle):"
             aria-label="etteroppgjorAr"
             name="etteroppgjorAr"
             type="text"
             inputMode="numeric"
           />
           <TextField
-            label="Kommaseparert liste med sak-id'er som skal behandles (valgfritt) : "
+            label="Kommaseparert liste med sak-id'er som skal behandles (valgfritt):"
             aria-label="sakIds"
             name="sakIds"
             type="text"
