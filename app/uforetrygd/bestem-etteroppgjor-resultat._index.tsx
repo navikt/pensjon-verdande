@@ -61,7 +61,7 @@ export default function BestemEtteroppgjorResultatPage() {
         </>
       )}
       <Heading size="small" level="1">
-        Bestem etteroppgjørsresultat
+        Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap="5">
@@ -70,14 +70,14 @@ export default function BestemEtteroppgjorResultatPage() {
             <option value="false">Nei</option>
           </Select>
           <TextField
-            label="År for Etteroppgjør (tomt betyr alle):"
+            label="År for etteroppgjør (tomt betyr alle):"
             aria-label="etteroppgjorAr"
             name="etteroppgjorAr"
             type="text"
             inputMode="numeric"
           />
           <TextField
-            label="Kommaseparert liste med sak-id'er som skal behandles (valgfritt):"
+            label="Kommaseparert liste med sak-id'er som skal behandles (tomt betyr alle):"
             aria-label="sakIds"
             name="sakIds"
             type="text"
