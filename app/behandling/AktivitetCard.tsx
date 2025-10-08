@@ -1,9 +1,9 @@
 import { EnvelopeClosedIcon, InboxDownIcon, InboxUpIcon } from '@navikt/aksel-icons'
-import { Box, CopyButton, Heading, HGrid, HStack, Tabs, Tooltip, VStack } from '@navikt/ds-react'
+import { Box, CopyButton, Detail, Heading, HGrid, HStack, Tabs, Tooltip, VStack } from '@navikt/ds-react'
 import { Link, Outlet, useNavigate } from 'react-router'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitetStatus } from '~/common/decode'
-import { decodeBehandling } from '~/common/decodeBehandling'
+import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import { Entry } from '~/components/entry/Entry'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
 
@@ -28,7 +28,11 @@ export default function AktivitetCard(props: Props) {
 
   return (
     <>
-      <Heading size={'large'}>{`${decodeBehandling(props.behandling.type)} - ${props.aktivitet.type}`}</Heading>
+      <Heading size={'large'}>
+        {`${decodeBehandling(props.behandling.type)} - ${decodeAktivitet(props.aktivitet.type)}`}
+        <Detail>{props.aktivitet.type}</Detail>
+      </Heading>
+
       <VStack gap={'4'}>
         <Box.New
           background={'raised'}

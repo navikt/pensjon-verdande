@@ -2,7 +2,7 @@ import { Table } from '@navikt/ds-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
 import { formatIsoTimestamp } from '~/common/date'
-import { findCommonAktivitetPrefixLength } from '~/common/string'
+import { decodeAktivitet } from '~/common/decodeBehandling'
 import { useSort } from '~/hooks/useSort'
 import type { AktivitetDTO, BehandlingDto } from '~/types'
 
@@ -21,8 +21,6 @@ export default function BehandlingAktivitetTable(props: Props) {
   sortedAktiviteter.forEach((aktivitet) => {
     typer.push(aktivitet.type)
   })
-
-  const commonPrefix = findCommonAktivitetPrefixLength(typer)
 
   return (
     <Table
@@ -71,7 +69,7 @@ export default function BehandlingAktivitetTable(props: Props) {
                   {aktivitet.aktivitetId}
                 </Link>
               </Table.DataCell>
-              <Table.DataCell>{aktivitet.type.substring(commonPrefix)}</Table.DataCell>
+              <Table.DataCell>{decodeAktivitet(aktivitet.type)}</Table.DataCell>
               <Table.DataCell>{formatIsoTimestamp(aktivitet.opprettet)}</Table.DataCell>
               <Table.DataCell>{formatIsoTimestamp(aktivitet.sisteAktiveringsdato)}</Table.DataCell>
               <Table.DataCell>{formatIsoTimestamp(aktivitet.utsattTil)}</Table.DataCell>
