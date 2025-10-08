@@ -1,7 +1,7 @@
 import type {
   AggregerteFeilmeldinger,
   AvviksGrense,
-  EkskluderteSakerResponse,
+  Ekskluderinger,
   ReguleringDetaljer,
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
@@ -198,7 +198,7 @@ export const hentAggregerteFeilmeldinger = async (accessToken: string): Promise<
   }
 }
 
-export const hentEksluderteSaker = async (accessToken: string): Promise<EkskluderteSakerResponse> => {
+export const hentEksluderteSaker = async (accessToken: string): Promise<Ekskluderinger> => {
   const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -207,7 +207,7 @@ export const hentEksluderteSaker = async (accessToken: string): Promise<Eksklude
   })
 
   if (response.ok) {
-    return (await response.json()) as EkskluderteSakerResponse
+    return (await response.json()) as Ekskluderinger
   } else {
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
