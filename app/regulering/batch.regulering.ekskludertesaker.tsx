@@ -85,7 +85,7 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
   const [saksnummerToAddListe, setSaksnummerToAddListe] = useState('')
   const [kommentarToAdd, setKommentarToAdd] = useState('')
   const response = fetcher.data as OppdaterEksluderteSakerResponse | undefined
-  const [udefinertResponse, setUdefinertResponse] = useState(true)
+  const [harLagtTilSaker, setHarLagtTilSaker] = useState(false)
 
   if (props.showModal) {
     ref.current?.showModal()
@@ -132,17 +132,12 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
         <Modal.Body>
           <VStack gap={'5'}>
             {props.text}
-            {!udefinertResponse && !response?.erOppdatert && <Loader />}
-            {response?.erOppdatert && (
+            {(!harLagtTilSaker || response?.erOppdatert) && (
               <Alert variant="success" inline>
                 Ekskluderingsliste oppdatert
               </Alert>
             )}
-            {udefinertResponse && (
-              <Alert variant="success" inline>
-                Ekskluderingsliste oppdatert
-              </Alert>
-            )}
+            {harLagtTilSaker && !response?.erOppdatert && <Loader />}
             <Textarea
               label="Saksnummer"
               name="saksnummerListe"
@@ -168,14 +163,14 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
             type="button"
             onClick={() => {
               leggTilEkskluderteIPen()
-              setUdefinertResponse(false)
+              setHarLagtTilSaker(true)
             }}
             size="small"
           >
-            Fortsett
+            Legg til
           </Button>
           <Button type="button" variant="secondary" onClick={props.onCancel} size="small">
-            Avbryt
+            Lukk
           </Button>
         </Modal.Footer>
       </Modal>
@@ -187,6 +182,8 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
   const ref = useRef<HTMLDialogElement>(null)
   const fetcher = useFetcher()
   const [saksnummerToRemoveListe, setSaksnummerToRemoveListe] = useState('')
+  const response = fetcher.data as OppdaterEksluderteSakerResponse | undefined
+  const [harFjernetSaker, setHarFjernetSaker] = useState(false)
 
   if (props.showModal) {
     ref.current?.showModal()
@@ -212,7 +209,6 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
       },
     )
 
-    ref.current?.close()
     setSaksnummerToRemoveListe('')
   }
 
@@ -226,6 +222,12 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
         <Modal.Body>
           <VStack gap={'5'}>
             {props.text}
+            {(!harFjernetSaker || response?.erOppdatert) && (
+              <Alert variant="success" inline>
+                Ekskluderingsliste oppdatert
+              </Alert>
+            )}
+            {harFjernetSaker && !response?.erOppdatert && <Loader />}
             <Textarea
               label="Saksnummer"
               name="saksnummerListe"
@@ -239,11 +241,18 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
         </Modal.Body>
 
         <Modal.Footer>
-          <Button type="button" onClick={() => fjernEkskluderteFraPen()} size="small">
-            Fortsett
+          <Button
+            type="button"
+            onClick={() => {
+              fjernEkskluderteFraPen()
+              setHarFjernetSaker(true)
+            }}
+            size="small"
+          >
+            Fjern
           </Button>
           <Button type="button" variant="secondary" onClick={props.onCancel} size="small">
-            Avbryt
+            Lukk
           </Button>
         </Modal.Footer>
       </Modal>
