@@ -17,6 +17,8 @@ export default [
     route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),
     route('alderspensjon/forstegangsbehandling/soknader', 'alderspensjon/forstegangsbehandling/soknader.tsx'),
 
+    route('audit', 'audit/audit.index.tsx'),
+
     route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx'),
 
     route('batch/regulering', 'regulering/batch.regulering.tsx', [
@@ -88,6 +90,7 @@ export default [
         route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [
           route('fortsett', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.fortsett.tsx'),
         ]),
+        route('audit', 'behandling/behandling.$behandlingId.audit.tsx'),
         route('oppdragskvittering', 'behandling/behandling.$behandlingId.oppdragskvittering.tsx'),
         route('manuelleOppgaver', 'behandling/behandling.$behandlingId.manuelleOppgaver.tsx'),
         route('oppdragsmelding', 'behandling/behandling.$behandlingId.oppdragsmelding.tsx'),

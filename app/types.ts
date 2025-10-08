@@ -242,10 +242,6 @@ export interface HalLinks {
   [s: string]: HalLink | HalLink[]
 }
 
-export type FortsettBatchResponse = {
-  behandlingId: number[]
-}
-
 export type OmregningRequest = {
   behandlingsnokkel: string
   omregningstidspunkt: string

@@ -236,8 +236,6 @@ export default function Alderspensjonssoknader() {
                 <Chips.Removable
                   key={s}
                   onClick={() => {
-                    // enkel “nullstill alt”-handling når en chip fjernes:
-                    // (juster om du vil fjerne bare en bestemt del)
                     updateParams((p) => {
                       p.delete('status')
                       p.set('ferdig', 'alle')

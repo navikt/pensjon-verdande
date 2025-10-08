@@ -16,6 +16,19 @@ export function formatIsoDate(isoDate: string | undefined | null) {
   }
 }
 
+export function formatDate(isoDate: string | undefined | null) {
+  if (isoDate) {
+    return new Date(isoDate).toLocaleString('nb-NO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    })
+  }
+}
+
 export function toIsoDate(d: Date): string {
   const y = d.getFullYear()
   const m = `${d.getMonth() + 1}`.padStart(2, '0')
