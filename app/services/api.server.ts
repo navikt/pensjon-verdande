@@ -42,6 +42,34 @@ export async function apiGet<T>(path: string, requestCtx: RequestCtx | Request):
   }
 }
 
+export async function apiGetRawStringOrUndefined(
+  path: string,
+  requestCtx: RequestCtx | Request,
+): Promise<string | undefined> {
+  let ctx: RequestCtx
+  if ('accessToken' in requestCtx) {
+    ctx = requestCtx
+  } else {
+    ctx = {
+      accessToken: await requireAccessToken(requestCtx),
+    }
+  }
+
+  const url = `${env.penUrl}${path}`
+  const { signal, cancel } = withTimeout(15_000)
+  try {
+    const res = await fetch(url, { headers: buildHeaders(ctx), signal })
+    if (res.status === 404) {
+      return undefined
+    } else if (!res.ok) {
+      await normalizeAndThrow(res, `Feil ved GET ${path}`)
+    }
+    return await res.text()
+  } finally {
+    cancel()
+  }
+}
+
 export async function apiGetOrUndefined<T>(path: string, requestCtx: RequestCtx | Request): Promise<T | undefined> {
   let ctx: RequestCtx
   if ('accessToken' in requestCtx) {
