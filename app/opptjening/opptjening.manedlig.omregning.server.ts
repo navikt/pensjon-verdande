@@ -47,7 +47,25 @@ export async function hentMuligeManedligeKjoringer(accessToken: string): Promise
   return (await response.json()) as MuligeManedligeKjoringerResponse
 }
 
-export async function opprettAvsjekk(accessToken: string) {
+export async function getSisteAvsjekk(accessToken: string): Promise<SisteAvsjekkResponse> {
+  const response = await fetch(`${env.penUrl}/api/opptjening/sisteAvsjekk`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw data({ message: 'Feil ved henting av siste avsjekk', detail: text }, { status: response.status })
+  }
+
+  return (await response.json()) as SisteAvsjekkResponse
+}
+
+export const opprettAvsjekk = async (accessToken: string) => {
   const response = await fetch(`${env.penUrl}/api/opptjening/avsjekk`, {
     method: 'POST',
     headers: {
@@ -61,6 +79,13 @@ export async function opprettAvsjekk(accessToken: string) {
     const text = await response.text()
     throw data({ message: 'Feil ved oppretting av avsjekk', detail: text }, { status: response.status })
   }
+}
+
+export type SisteAvsjekkResponse = {
+  sisteAvsjekkTidspunkt: string
+  antallHendelserPopp: number
+  antallHendelserPen: number
+  avsjekkOk: boolean
 }
 
 export type MuligeManedligeKjoringerResponse = {
