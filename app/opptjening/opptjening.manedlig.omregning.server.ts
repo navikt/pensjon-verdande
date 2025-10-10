@@ -47,6 +47,22 @@ export async function hentMuligeManedligeKjoringer(accessToken: string): Promise
   return (await response.json()) as MuligeManedligeKjoringerResponse
 }
 
+export async function opprettAvsjekk(accessToken: string) {
+  const response = await fetch(`${env.penUrl}/api/opptjening/avsjekk`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw data({ message: 'Feil ved oppretting av avsjekk', detail: text }, { status: response.status })
+  }
+}
+
 export type MuligeManedligeKjoringerResponse = {
   maneder: string[]
   kanOverstyreBehandlingsmaned: boolean

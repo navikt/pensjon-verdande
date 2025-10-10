@@ -73,6 +73,11 @@ export default function OpprettEndretOpptjeningRoute() {
           aktuelle måneden.
         </Alert>
       )}
+      <Form action="avsjekk" method="post">
+        <Button type="submit" disabled={isSubmitting} variant="secondary">
+          Kjør avsjekk
+        </Button>
+      </Form>
 
       <Form action="opprett" method="post" style={{ width: '100%', maxWidth: 800 }}>
         <VStack gap={'4'}>
