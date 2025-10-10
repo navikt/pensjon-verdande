@@ -27,8 +27,8 @@ import {
   Modal,
   Page,
   ProgressBar,
+  Select,
   Tabs,
-  TextField,
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
@@ -621,6 +621,9 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
     return t && /^\d{2}:\d{2}$/.test(t) ? t : ''
   }, [planlagtStartet])
 
+  const timer = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
+  const kvarter = ['00', '15', '30', '45']
+
   const [open, setOpen] = useState(false)
   const [dato, setDato] = useState<Date | undefined>(initialDate)
   const [tid, setTid] = useState<string>(initialTime)
@@ -707,7 +710,29 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
               />
             </DatePicker>
 
-            <TextField type="time" label="Klokkeslett" value={tid} onChange={(e) => setTid(e.target.value)} />
+            <HStack gap="4">
+              <Select
+                label="Time"
+                value={tid.split(':')[0] ?? ''}
+                onChange={(e) => setTid(`${e.target.value}:${tid.split(':')[1] || '00'}`)}
+              >
+                <option value="">Velg time</option>
+                {timer.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </Select>
+
+              <Select
+                label="Minutt"
+                value={tid.split(':')[1] ?? ''}
+                onChange={(e) => setTid(`${tid.split(':')[0] || '00'}:${e.target.value}`)}
+              >
+                <option value="">Velg minutt</option>
+                {kvarter.map((m) => (
+                  <option key={m}>{m}</option>
+                ))}
+              </Select>
+            </HStack>
           </div>
         </Modal.Body>
 
