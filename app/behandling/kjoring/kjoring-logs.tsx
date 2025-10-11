@@ -4,13 +4,17 @@ import {
   ExternalLinkIcon,
   FilesIcon,
   MenuElipsisVerticalIcon,
+  MinusCircleIcon,
+  PlusCircleIcon,
   PlusIcon,
   XMarkIcon,
 } from '@navikt/aksel-icons'
+import type { TagProps } from '@navikt/ds-react'
 import {
   ActionMenu,
   BodyShort,
   Button,
+  Chips,
   CopyButton,
   Heading,
   HStack,
@@ -21,7 +25,7 @@ import {
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { type LoaderFunctionArgs, Link as ReactRouterLink, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$aktivitetId'
@@ -87,6 +91,18 @@ export default function Behandling() {
   const DEFAULT_COLS = ['_timestamp', 'level', 'message'] as const
   const [selectedCols, setSelectedCols] = useState<string[]>([...DEFAULT_COLS])
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('kjoringLogs.selectedCols', JSON.stringify(selectedCols))
+    } catch {}
+  }, [selectedCols])
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('kjoringLogs.selectedCols')
+      if (saved) setSelectedCols(JSON.parse(saved))
+    } catch {}
+  }, [])
+
   const addColumn = (key: string) => {
     setSelectedCols((prev) => (prev.includes(key) ? prev : [...prev, key]))
   }
@@ -110,6 +126,24 @@ export default function Behandling() {
   const isSelected = (key: string) => selectedCols.includes(key)
 
   const HIDE_IN_DETAILS = new Set(['stack_trace'])
+
+  type FilterMode = 'in' | 'out'
+  type ActiveFilter = { key: string; value: string; mode: FilterMode }
+  const [filters, setFilters] = useState<ActiveFilter[]>([])
+
+  const addFilter = (mode: FilterMode, key: string, value: string) => {
+    setFilters((prev) =>
+      prev.some((f) => f.key === key && f.value === value && f.mode === mode) ? prev : [...prev, { key, value, mode }],
+    )
+  }
+  const removeFilter = (idx: number) => setFilters((prev) => prev.filter((_, i) => i !== idx))
+
+  const visibleResult = useMemo(() => {
+    if (filters.length === 0) return result
+    return result.filter((s) => {
+      return filters.every((f) => (f.mode === 'in' ? s.stream[f.key] === f.value : s.stream[f.key] !== f.value))
+    })
+  }, [result, filters])
 
   return (
     <VStack gap="4">
@@ -270,59 +304,93 @@ export default function Behandling() {
         )}
       </HStack>
 
+      <HStack gap="2" align="center" wrap>
+        {filters.length > 0 && (
+          <Chips>
+            {filters.map((f, i) => (
+              <Chips.Removable key={`flt|${f.mode}|${f.key}|${f.value}`} onClick={() => removeFilter(i)}>
+                {`${f.mode === 'in' ? 'inkluder' : 'ekskluder'}: ${f.key}=${f.value}`}
+              </Chips.Removable>
+            ))}
+          </Chips>
+        )}
+      </HStack>
+
+      <HStack gap="2" align="center">
+        <Label as="p">Valgte kolonner</Label>
+        <Button
+          size="xsmall"
+          variant="tertiary"
+          onClick={() => setSelectedCols([...DEFAULT_COLS])}
+          aria-label="Nullstill kolonner til standard"
+        >
+          Nullstill kolonner
+        </Button>
+      </HStack>
+
       <Table size="small">
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell aria-label="Detaljer" />
             {selectedCols.map((col) => (
-              <Table.HeaderCell key={`head|${col}`}>
-                <HStack justify="space-between" align="center" gap="2">
-                  <BodyShort>{col}</BodyShort>
+              <>
+                <Table.HeaderCell key={`head|${col}`} colSpan={2}>
+                  <HStack justify="space-between" align="center" gap="2">
+                    <BodyShort>
+                      {col === '_timestamp'
+                        ? 'Tidspunkt'
+                        : col === 'level'
+                          ? 'Nivå'
+                          : col === 'message'
+                            ? 'Melding'
+                            : col}
+                    </BodyShort>
 
-                  <ActionMenu>
-                    <ActionMenu.Trigger>
-                      <Button
-                        variant="tertiary-neutral"
-                        icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
-                        size="small"
-                      />
-                    </ActionMenu.Trigger>
-                    <ActionMenu.Content>
-                      {(() => {
-                        const pos = selectedCols.indexOf(col)
-                        const canMoveLeft = pos > 0
-                        const canMoveRight = pos > -1 && pos < selectedCols.length - 1
-                        return (
-                          <>
-                            <ActionMenu.Item
-                              onSelect={() => moveColumn(col, 'left')}
-                              disabled={!canMoveLeft}
-                              icon={<ArrowLeftIcon />}
-                            >
-                              Flytt til venstre
-                            </ActionMenu.Item>
-                            <ActionMenu.Item
-                              onSelect={() => moveColumn(col, 'right')}
-                              disabled={!canMoveRight}
-                              icon={<ArrowRightIcon />}
-                            >
-                              Flytt til høyre
-                            </ActionMenu.Item>
-                            <ActionMenu.Item onSelect={() => removeColumn(col)} icon={<XMarkIcon />}>
-                              Fjern
-                            </ActionMenu.Item>
-                          </>
-                        )
-                      })()}
-                    </ActionMenu.Content>
-                  </ActionMenu>
-                </HStack>
-              </Table.HeaderCell>
+                    <ActionMenu>
+                      <ActionMenu.Trigger>
+                        <Button
+                          variant="tertiary-neutral"
+                          icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+                          size="small"
+                        />
+                      </ActionMenu.Trigger>
+                      <ActionMenu.Content>
+                        {(() => {
+                          const pos = selectedCols.indexOf(col)
+                          const canMoveLeft = pos > 0
+                          const canMoveRight = pos > -1 && pos < selectedCols.length - 1
+                          return (
+                            <>
+                              <ActionMenu.Item
+                                onSelect={() => moveColumn(col, 'left')}
+                                disabled={!canMoveLeft}
+                                icon={<ArrowLeftIcon />}
+                              >
+                                Flytt til venstre
+                              </ActionMenu.Item>
+                              <ActionMenu.Item
+                                onSelect={() => moveColumn(col, 'right')}
+                                disabled={!canMoveRight}
+                                icon={<ArrowRightIcon />}
+                              >
+                                Flytt til høyre
+                              </ActionMenu.Item>
+                              <ActionMenu.Item onSelect={() => removeColumn(col)} icon={<XMarkIcon />}>
+                                Fjern
+                              </ActionMenu.Item>
+                            </>
+                          )
+                        })()}
+                      </ActionMenu.Content>
+                    </ActionMenu>
+                  </HStack>
+                </Table.HeaderCell>
+              </>
             ))}
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {result.map((s) => {
+          {visibleResult.map((s) => {
             return (
               <Table.ExpandableRow
                 key={`logline|${s.stream._timestamp}`}
@@ -391,6 +459,18 @@ export default function Behandling() {
                                       />
                                     </ActionMenu.Trigger>
                                     <ActionMenu.Content>
+                                      <ActionMenu.Item
+                                        onSelect={() => addFilter('in', key, String(value))}
+                                        icon={<PlusCircleIcon />}
+                                      >
+                                        Inkluder verdi
+                                      </ActionMenu.Item>
+                                      <ActionMenu.Item
+                                        onSelect={() => addFilter('out', key, String(value))}
+                                        icon={<MinusCircleIcon />}
+                                      >
+                                        Ekskluder verdi
+                                      </ActionMenu.Item>
                                       <ActionMenu.Item onSelect={() => copy(String(value))} icon={<FilesIcon />}>
                                         Kopier
                                       </ActionMenu.Item>
@@ -406,9 +486,69 @@ export default function Behandling() {
                 }
               >
                 {selectedCols.map((col) => (
-                  <Table.DataCell key={`cell|${s.stream._timestamp}|${col}`}>
-                    {String(s.stream[col] ?? '')}
-                  </Table.DataCell>
+                  <>
+                    <Table.DataCell key={`cell|${s.stream._timestamp}|${col}`}>
+                      {col === '_timestamp'
+                        ? (() => {
+                            const iso = String(s.stream[col] ?? '')
+                            const d = new Date(iso)
+                            if (Number.isNaN(d.getTime())) return iso
+                            const pad = (n: number, w = 2) => String(n).padStart(w, '0')
+                            const ms = String(d.getMilliseconds()).padStart(3, '0')
+                            const txt = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${ms}`
+                            return <BodyShort>{txt}</BodyShort>
+                          })()
+                        : col === 'level'
+                          ? (() => {
+                              const lvl = String(s.stream[col] ?? '').toLowerCase()
+                              const variant: TagProps['variant'] =
+                                lvl === 'error'
+                                  ? 'error'
+                                  : lvl === 'warn' || lvl === 'warning'
+                                    ? 'warning'
+                                    : lvl === 'info'
+                                      ? 'info'
+                                      : 'neutral'
+                              return (
+                                <Tag size="small" variant={variant}>
+                                  {s.stream[col] ?? ''}
+                                </Tag>
+                              )
+                            })()
+                          : String(s.stream[col] ?? '')}
+                    </Table.DataCell>
+                    <Table.DataCell
+                      key={`cell|${s.stream._timestamp}|${col}|menu`}
+                      style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}
+                    >
+                      <ActionMenu>
+                        <ActionMenu.Trigger>
+                          <Button
+                            variant="tertiary-neutral"
+                            icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+                            size="small"
+                          />
+                        </ActionMenu.Trigger>
+                        <ActionMenu.Content>
+                          <ActionMenu.Item
+                            onSelect={() => addFilter('in', col, String(s.stream[col] ?? ''))}
+                            icon={<PlusCircleIcon />}
+                          >
+                            Inkluder verdi
+                          </ActionMenu.Item>
+                          <ActionMenu.Item
+                            onSelect={() => addFilter('out', col, String(s.stream[col] ?? ''))}
+                            icon={<MinusCircleIcon />}
+                          >
+                            Ekskluder verdi
+                          </ActionMenu.Item>
+                          <ActionMenu.Item onSelect={() => copy(String(s.stream[col] ?? ''))} icon={<FilesIcon />}>
+                            Kopier
+                          </ActionMenu.Item>
+                        </ActionMenu.Content>
+                      </ActionMenu>
+                    </Table.DataCell>
+                  </>
                 ))}
               </Table.ExpandableRow>
             )
