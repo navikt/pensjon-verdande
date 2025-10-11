@@ -8,6 +8,7 @@ export default [
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
   layout('layout.tsx', [
+    route('logs/behandling/:behandlingId/kjoring/:kjoringId', 'loki/loki-logs.tsx'),
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
 
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),

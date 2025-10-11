@@ -22,5 +22,5 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 export default function BehandlingKjoringer() {
   const { behandling } = useLoaderData<typeof loader>()
 
-  return <BehandlingKjoringerTable behandling={behandling} visAktivitetId={true} />
+  return <BehandlingKjoringerTable behandling={behandling} />
 }

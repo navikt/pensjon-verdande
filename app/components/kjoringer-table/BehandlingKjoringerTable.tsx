@@ -1,19 +1,20 @@
-import { ExternalLinkIcon } from '@navikt/aksel-icons'
-import { CopyButton, Table, Tooltip } from '@navikt/ds-react'
+import { ExternalLinkIcon, FilesIcon, MenuElipsisVerticalIcon } from '@navikt/aksel-icons'
+import { ActionMenu, Button, Table } from '@navikt/ds-react'
 import React from 'react'
-import { Link } from 'react-router'
+import { Link as ReactRouterLink } from 'react-router'
+import copy from '~/common/clipboard'
 import { formatIsoTimestamp } from '~/common/date'
+import { decodeAktivitet } from '~/common/decodeBehandling'
 import { formatNumber } from '~/common/number'
 import { useSort } from '~/hooks/useSort'
+import { logLink } from '~/loki/logs-utils'
 import type { BehandlingDto, BehandlingKjoringDTO, HalLink } from '~/types'
 
 type Props = {
   behandling: BehandlingDto
-  visBehandlingId?: boolean
-  visAktivitetId?: boolean
 }
 
-function tidsbruk(it: BehandlingKjoringDTO) {
+export function tidsbruk(it: BehandlingKjoringDTO) {
   const startet = new Date(it.startet)
   const avsluttet = new Date(it.avsluttet)
   return `${formatNumber(avsluttet.getTime() - startet.getTime())} ms`
@@ -34,19 +35,6 @@ export function BehandlingKjoringerTable(props: Props) {
     }
   }
 
-  function correlationID(it: BehandlingKjoringDTO) {
-    if (it._links?.kibana) {
-      return (
-        <a href={(it._links.kibana as HalLink).href} target="_blank" rel="noopener noreferrer">
-          {it.correlationId}
-          <ExternalLinkIcon />
-        </a>
-      )
-    } else {
-      return <>{it.correlationId}</>
-    }
-  }
-
   return (
     <Table
       size={'medium'}
@@ -61,63 +49,75 @@ export function BehandlingKjoringerTable(props: Props) {
         <Table.Row>
           <Table.HeaderCell />
 
-          {props.visBehandlingId && (
-            <Table.ColumnHeader sortable sortKey="behandlingId">
-              BehandlingId
-            </Table.ColumnHeader>
-          )}
-          <Table.ColumnHeader>Aktivitet</Table.ColumnHeader>
-          {props.visAktivitetId && (
-            <Table.ColumnHeader sortable sortKey="aktivitetId">
-              AktivitetId
-            </Table.ColumnHeader>
-          )}
           <Table.ColumnHeader sortable sortKey="startet">
             Startet
           </Table.ColumnHeader>
-          <Table.ColumnHeader sortable sortKey="avsluttet">
-            Avsluttet
-          </Table.ColumnHeader>
           <Table.ColumnHeader align={'right'}>Tidsbruk</Table.ColumnHeader>
-          <Table.ColumnHeader sortable sortKey="correlationId">
-            CorrelationId
-          </Table.ColumnHeader>
+          <Table.ColumnHeader>Aktivitet</Table.ColumnHeader>
           <Table.ColumnHeader sortable sortKey="feilmelding">
             Feilmelding
           </Table.ColumnHeader>
-          <Table.ColumnHeader>Kopier stack trace</Table.ColumnHeader>
+          <Table.ColumnHeader></Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {sortedKjoringer?.map((it: BehandlingKjoringDTO) => {
+          const aktivitet = finnAktivitet(it.aktivitetId)
+          const stackTrace = it.stackTrace
           return (
-            <Table.ExpandableRow key={it.behandlingKjoringId} content={<pre>{it.stackTrace}</pre>}>
-              {props.visBehandlingId && (
-                <Table.DataCell>
-                  <Link to={`/behandling/${it.behandlingId}`}>{it.behandlingId}</Link>
-                </Table.DataCell>
-              )}
-              <Table.DataCell>
-                <Link to={`/behandling/${it.behandlingId}/aktivitet/${it.aktivitetId}`}>
-                  {finnAktivitet(it.aktivitetId)?.type}
-                </Link>
-              </Table.DataCell>
-              {props.visAktivitetId && (
-                <Table.DataCell>
-                  <Link to={`/behandling/${it.behandlingId}/aktivitet/${it.aktivitetId}`}>{it.aktivitetId}</Link>
-                </Table.DataCell>
-              )}
+            <Table.ExpandableRow key={it.behandlingKjoringId} content={<pre>{stackTrace}</pre>}>
               <Table.DataCell>{formatIsoTimestamp(it.startet)}</Table.DataCell>
-              <Table.DataCell>{formatIsoTimestamp(it.avsluttet)}</Table.DataCell>
               <Table.DataCell align={'right'}>{tidsbruk(it)}</Table.DataCell>
-              <Table.DataCell>{correlationID(it)}</Table.DataCell>
+              <Table.DataCell>{aktivitet && decodeAktivitet(aktivitet.type)}</Table.DataCell>
               <Table.DataCell>{it.feilmelding}</Table.DataCell>
               <Table.DataCell>
-                {it.stackTrace && (
-                  <Tooltip content={`Kopier stack trace`}>
-                    <CopyButton copyText={it.stackTrace} size={'xsmall'} />
-                  </Tooltip>
-                )}
+                <ActionMenu>
+                  <ActionMenu.Trigger>
+                    <Button
+                      variant="tertiary-neutral"
+                      icon={<MenuElipsisVerticalIcon title="Kjøringmeny" />}
+                      size="small"
+                    />
+                  </ActionMenu.Trigger>
+                  <ActionMenu.Content>
+                    {it.aktivitetId && (
+                      <>
+                        <ActionMenu.Item
+                          as={ReactRouterLink}
+                          to={`/behandling/${it.behandlingId}/aktivitet/${it.aktivitetId}`}
+                        >
+                          Gå til aktivitet
+                        </ActionMenu.Item>
+                        <ActionMenu.Divider />
+                      </>
+                    )}
+
+                    <ActionMenu.Item as={ReactRouterLink} to={logLink(it)}>
+                      Se logger
+                    </ActionMenu.Item>
+                    {it._links?.kibana && (
+                      <ActionMenu.Item
+                        as={ReactRouterLink}
+                        to={(it._links.kibana as HalLink).href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Se logger i Kibana
+                        <ExternalLinkIcon />
+                      </ActionMenu.Item>
+                    )}
+
+                    {stackTrace && (
+                      <>
+                        <ActionMenu.Divider />
+                        <ActionMenu.Item onSelect={() => copy(stackTrace)}>
+                          Kopier stack trace
+                          <FilesIcon />
+                        </ActionMenu.Item>
+                      </>
+                    )}
+                  </ActionMenu.Content>
+                </ActionMenu>
               </Table.DataCell>
             </Table.ExpandableRow>
           )

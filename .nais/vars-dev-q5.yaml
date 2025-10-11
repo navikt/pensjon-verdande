@@ -6,9 +6,13 @@ app:
     - 'https://pensjon-verdande-q5.intern.dev.nav.no'
   env: q5
 
+loki:
+  apiHost: 'loki.dev.nav.cloud.nais.io'
+
 pen:
   application: 'pensjon-pen-q5'
   outbound: 'pensjon-pen-q5.dev-fss-pub.nais.io'
+  serviceName: 'pensjon-pen-q5'
   scope: 'api://dev-fss.pensjon-q5.pensjon-pen-q5/.default'
   url: 'https://pensjon-pen-q5.dev-fss-pub.nais.io'
 

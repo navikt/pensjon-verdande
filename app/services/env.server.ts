@@ -7,8 +7,12 @@ export const env = ensureEnv({
   tokenEnpoint: 'AZURE_OPENID_CONFIG_TOKEN_ENDPOINT',
 
   env: 'ENV',
+
+  lokiApiBaseUrl: 'LOKI_API_BASE_URL',
+
   penApplication: 'PEN_APPLICATION',
   penScope: 'PEN_SCOPE',
+  penServiceName: 'PEN_SERVICE_NAME',
   penUrl: 'PEN_URL',
 
   aldeLinkEnabled: 'ALDE_LINK_ENABLED',

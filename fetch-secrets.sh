@@ -95,14 +95,16 @@ fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-verda
   "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"
 
 {
+  echo ALDE_BEHANDLING_URL_TEMPLATE='http://localhost:3001/behandling/{behandlingId}'
+  echo ALDE_LINK_ENABLED='true'
   echo AZURE_CALLBACK_URL=http://localhost:3000/auth/callback
-  echo PEN_URL=http://localhost:8089
-  echo PEN_SCOPE=api://dev-fss.pensjon-q2.pensjon-pen-q2/.default
   echo ENABLE_OAUTH20_CODE_FLOW=true
   echo ENV=q2
+  echo LOKI_API_BASE_URL='https://loki.dev.nav.cloud.nais.io'
   echo PEN_APPLICATION=pensjon-pen-q2
-  echo ALDE_LINK_ENABLED='true'
-  echo ALDE_BEHANDLING_URL_TEMPLATE='http://localhost:3001/behandling/{behandlingId}'
+  echo PEN_SCOPE=api://dev-fss.pensjon-q2.pensjon-pen-q2/.default
+  echo PEN_SERVICE_NAME='pensjon-pen-q2'
+  echo PEN_URL=http://localhost:8089
   echo PSAK_SAK_URL_TEMPLATE='http://localhost:9080/psak/sak/sakId={sakId}'
 } >> ${envfile}
 

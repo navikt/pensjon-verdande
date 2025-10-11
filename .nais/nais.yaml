@@ -39,10 +39,14 @@ spec:
       value: "{{ alde.behandling_url_template }}"
     - name: ENV
       value: {{ app.env }}
+    - name: LOKI_API_BASE_URL
+      value: "https://{{ loki.apiHost }}"
     - name: PEN_APPLICATION
       value: {{ pen.application }}
     - name: PEN_SCOPE
       value: {{ pen.scope }}
+    - name: PEN_SERVICE_NAME
+      value: {{ pen.serviceName }}
     - name: PEN_URL
       value: {{ pen.url }}
     - name: PSAK_SAK_URL_TEMPLATE
@@ -53,6 +57,7 @@ spec:
         - host: graph.microsoft.com
         - host: login.microsoftonline.com
         - host: {{ pen.outbound }}
+        - host: {{ loki.apiHost }}
   azure:
     application:
       tenant: {{ azure.tenant }}
