@@ -51,6 +51,8 @@ spec:
       value: {{ pen.url }}
     - name: PSAK_SAK_URL_TEMPLATE
       value: "{{ psak.sak_url_template }}"
+    - name: TEMPO_DATA_SOURCE
+      value: "{{ tempo.dataSource }}"
   accessPolicy:
     outbound:
       external:

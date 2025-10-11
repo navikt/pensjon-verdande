@@ -19,6 +19,8 @@ export const env = ensureEnv({
   aldeBehandlingUrlTemplate: 'ALDE_BEHANDLING_URL_TEMPLATE',
 
   psakSakUrlTemplate: 'PSAK_SAK_URL_TEMPLATE',
+
+  tempoDataSource: 'TEMPO_DATA_SOURCE',
 })
 
 export const isAldeLinkEnabled = env.aldeLinkEnabled === 'true'

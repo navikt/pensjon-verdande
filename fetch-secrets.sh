@@ -106,6 +106,7 @@ fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-verda
   echo PEN_SERVICE_NAME='pensjon-pen-q2'
   echo PEN_URL=http://localhost:8089
   echo PSAK_SAK_URL_TEMPLATE='http://localhost:9080/psak/sak/sakId={sakId}'
+  echo TEMPO_DATA_SOURCE='dev-gcp-tempo'
 } >> ${envfile}
 
 echo

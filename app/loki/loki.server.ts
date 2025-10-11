@@ -50,8 +50,6 @@ export async function fetchPenLogs(
 }
 
 export function tempoUrl(start: string, end: string, traceId: string) {
-  const tempoDataSource = 'dev-gcp-tempo'
-
   const url =
     'https://grafana.nav.cloud.nais.io/explore?' +
     'left={"range":{' +
@@ -62,7 +60,7 @@ export function tempoUrl(start: string, end: string, traceId: string) {
     isoTimestampToUnixdate(end, +3) +
     '"},' +
     '"datasource":"' +
-    tempoDataSource +
+    env.tempoDataSource +
     '",' +
     '"queries":[{"query":"' +
     traceId +

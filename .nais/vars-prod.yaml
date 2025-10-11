@@ -30,3 +30,6 @@ azure:
     verdande-les: d187a290-08a1-4acf-a53f-fe17e2e93bf9 #Verdande les
     verdande-skriv: 30965367-457b-4f1e-93f0-ae756357297d #Verdande skriv
     verdande-admin: b7148a64-ebc4-4e0a-9f45-ef742aee539c #Verdande admin
+
+tempo:
+  dataSource: 'prod-gcp-tempo'
