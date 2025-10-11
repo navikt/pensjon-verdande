@@ -257,6 +257,17 @@ export default function Behandling() {
             <ExternalLinkIcon title={'Se trace i Tempo'} />
           </Button>
         )}
+        {kjoring.stackTrace && (
+          <CopyButton
+            size="small"
+            iconPosition="right"
+            copyText={kjoring.stackTrace}
+            variant="action"
+            text="Kopier stack trace"
+            activeText="Kopiert stack trace"
+            style={{ color: 'var(--a-text-action)' }}
+          />
+        )}
       </HStack>
 
       <Table size="small">
