@@ -1,5 +1,14 @@
-import { ExternalLinkIcon } from '@navikt/aksel-icons'
 import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ExternalLinkIcon,
+  FilesIcon,
+  MenuElipsisVerticalIcon,
+  PlusIcon,
+  XMarkIcon,
+} from '@navikt/aksel-icons'
+import {
+  ActionMenu,
   BodyShort,
   Button,
   CopyButton,
@@ -12,9 +21,11 @@ import {
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
+import { useState } from 'react'
 import { type LoaderFunctionArgs, Link as ReactRouterLink, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$aktivitetId'
+import copy from '~/common/clipboard'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import { tidsbruk } from '~/components/kjoringer-table/BehandlingKjoringerTable'
@@ -72,6 +83,33 @@ export default function Behandling() {
   const result = data.result as LokiStream[]
 
   const showStackTrace = false
+
+  const DEFAULT_COLS = ['_timestamp', 'level', 'message'] as const
+  const [selectedCols, setSelectedCols] = useState<string[]>([...DEFAULT_COLS])
+
+  const addColumn = (key: string) => {
+    setSelectedCols((prev) => (prev.includes(key) ? prev : [...prev, key]))
+  }
+
+  const removeColumn = (key: string) => {
+    setSelectedCols((prev) => prev.filter((c) => c !== key))
+  }
+
+  const moveColumn = (col: string, dir: 'left' | 'right') => {
+    setSelectedCols((prev) => {
+      const idx = prev.indexOf(col)
+      if (idx === -1) return prev
+      const target = dir === 'left' ? idx - 1 : idx + 1
+      if (target < 0 || target >= prev.length) return prev
+      const next = [...prev]
+      ;[next[idx], next[target]] = [next[target], next[idx]]
+      return next
+    })
+  }
+
+  const isSelected = (key: string) => selectedCols.includes(key)
+
+  const HIDE_IN_DETAILS = new Set(['stack_trace'])
 
   return (
     <VStack gap="4">
@@ -221,13 +259,55 @@ export default function Behandling() {
         )}
       </HStack>
 
-      <Table>
+      <Table size="small">
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell></Table.HeaderCell>
-            <Table.HeaderCell>Tidspunkt</Table.HeaderCell>
-            <Table.HeaderCell>Nivå</Table.HeaderCell>
-            <Table.HeaderCell>Melding</Table.HeaderCell>
+            <Table.HeaderCell aria-label="Detaljer" />
+            {selectedCols.map((col) => (
+              <Table.HeaderCell key={`head|${col}`}>
+                <HStack justify="space-between" align="center" gap="2">
+                  <BodyShort>{col}</BodyShort>
+
+                  <ActionMenu>
+                    <ActionMenu.Trigger>
+                      <Button
+                        variant="tertiary-neutral"
+                        icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+                        size="small"
+                      />
+                    </ActionMenu.Trigger>
+                    <ActionMenu.Content>
+                      {(() => {
+                        const pos = selectedCols.indexOf(col)
+                        const canMoveLeft = pos > 0
+                        const canMoveRight = pos > -1 && pos < selectedCols.length - 1
+                        return (
+                          <>
+                            <ActionMenu.Item
+                              onSelect={() => moveColumn(col, 'left')}
+                              disabled={!canMoveLeft}
+                              icon={<ArrowLeftIcon />}
+                            >
+                              Flytt til venstre
+                            </ActionMenu.Item>
+                            <ActionMenu.Item
+                              onSelect={() => moveColumn(col, 'right')}
+                              disabled={!canMoveRight}
+                              icon={<ArrowRightIcon />}
+                            >
+                              Flytt til høyre
+                            </ActionMenu.Item>
+                            <ActionMenu.Item onSelect={() => removeColumn(col)} icon={<XMarkIcon />}>
+                              Fjern
+                            </ActionMenu.Item>
+                          </>
+                        )
+                      })()}
+                    </ActionMenu.Content>
+                  </ActionMenu>
+                </HStack>
+              </Table.HeaderCell>
+            ))}
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -239,15 +319,73 @@ export default function Behandling() {
                   <VStack gap="16">
                     {showStackTrace && s.stream.stack_trace && <pre>{s.stream.stack_trace}</pre>}
 
-                    <Table>
+                    <Table size="small">
                       <Table.Body>
                         {Object.entries(s.stream)
                           .sort((a, b) => a[0].localeCompare(b[0], 'nb', { sensitivity: 'base' }))
                           .map(([key, value]) => {
+                            const selected = isSelected(key)
                             return (
                               <Table.Row key={`details|${s.stream._timestamp}|${key}`}>
-                                <Table.HeaderCell style={{ verticalAlign: 'top' }}>{key}</Table.HeaderCell>
-                                <Table.DataCell>{value}</Table.DataCell>
+                                <Table.HeaderCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
+                                  <BodyShort>{key}</BodyShort>
+                                </Table.HeaderCell>
+                                <Table.HeaderCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
+                                  {!HIDE_IN_DETAILS.has(key) && (
+                                    <ActionMenu>
+                                      <ActionMenu.Trigger>
+                                        <Button
+                                          variant="tertiary-neutral"
+                                          icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+                                          size="small"
+                                        />
+                                      </ActionMenu.Trigger>
+                                      <ActionMenu.Content>
+                                        {(() => {
+                                          return (
+                                            <>
+                                              <ActionMenu.Item
+                                                onSelect={() => addColumn(key)}
+                                                disabled={selected}
+                                                icon={<PlusIcon />}
+                                              >
+                                                Legg til
+                                              </ActionMenu.Item>
+                                              <ActionMenu.Item
+                                                onSelect={() => removeColumn(key)}
+                                                disabled={!selected}
+                                                icon={<XMarkIcon />}
+                                              >
+                                                Fjern
+                                              </ActionMenu.Item>
+                                            </>
+                                          )
+                                        })()}
+                                      </ActionMenu.Content>
+                                    </ActionMenu>
+                                  )}
+                                </Table.HeaderCell>
+                                <Table.DataCell style={{ verticalAlign: 'top', width: 'auto' }}>
+                                  <BodyShort style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                                    {String(value)}
+                                  </BodyShort>
+                                </Table.DataCell>
+                                <Table.DataCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
+                                  <ActionMenu>
+                                    <ActionMenu.Trigger>
+                                      <Button
+                                        variant="tertiary-neutral"
+                                        icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+                                        size="small"
+                                      />
+                                    </ActionMenu.Trigger>
+                                    <ActionMenu.Content>
+                                      <ActionMenu.Item onSelect={() => copy(String(value))} icon={<FilesIcon />}>
+                                        Kopier
+                                      </ActionMenu.Item>
+                                    </ActionMenu.Content>
+                                  </ActionMenu>
+                                </Table.DataCell>
                               </Table.Row>
                             )
                           })}
@@ -256,9 +394,11 @@ export default function Behandling() {
                   </VStack>
                 }
               >
-                <Table.DataCell>{s.stream._timestamp}</Table.DataCell>
-                <Table.DataCell>{s.stream.level}</Table.DataCell>
-                <Table.DataCell>{s.stream.message}</Table.DataCell>
+                {selectedCols.map((col) => (
+                  <Table.DataCell key={`cell|${s.stream._timestamp}|${col}`}>
+                    {String(s.stream[col] ?? '')}
+                  </Table.DataCell>
+                ))}
               </Table.ExpandableRow>
             )
           })}
