@@ -8,7 +8,6 @@ export default [
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
   layout('layout.tsx', [
-    route('logs/behandling/:behandlingId/kjoring/:kjoringId', 'loki/loki-logs.tsx'),
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
 
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
@@ -102,6 +101,8 @@ export default [
       route('aktivitet/:aktivitetId', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.tsx', [
         route('felt/:felt', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.felt.$felt.tsx'),
       ]),
+
+      route('kjoring/:kjoringId/logs', 'loki/loki-logs.tsx'),
     ]),
 
     route('behandlingserie', 'behandlingserie/behandlingserie.tsx'),
