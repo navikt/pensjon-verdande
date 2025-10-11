@@ -102,7 +102,7 @@ export default [
         route('felt/:felt', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.felt.$felt.tsx'),
       ]),
 
-      route('kjoring/:kjoringId/logs', 'loki/loki-logs.tsx'),
+      route('kjoring/:kjoringId/logs', 'behandling/kjoring/kjoring-logs.tsx'),
     ]),
 
     route('behandlingserie', 'behandlingserie/behandlingserie.tsx'),

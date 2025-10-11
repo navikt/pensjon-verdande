@@ -7,7 +7,7 @@ import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitet } from '~/common/decodeBehandling'
 import { formatNumber } from '~/common/number'
 import { useSort } from '~/hooks/useSort'
-import { logLink } from '~/loki/logs-utils'
+import { behandlingKjoringLogs } from '~/routes-utils'
 import type { BehandlingDto, BehandlingKjoringDTO, HalLink } from '~/types'
 
 type Props = {
@@ -92,7 +92,7 @@ export function BehandlingKjoringerTable(props: Props) {
                       </>
                     )}
 
-                    <ActionMenu.Item as={ReactRouterLink} to={logLink(it)}>
+                    <ActionMenu.Item as={ReactRouterLink} to={behandlingKjoringLogs(it)}>
                       Se logger
                     </ActionMenu.Item>
                     {it._links?.kibana && (
