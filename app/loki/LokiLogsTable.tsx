@@ -128,7 +128,15 @@ export default function LokiLogsTable({
   const removeFilter = (idx: number) => setFilters((prev) => prev.filter((_, i) => i !== idx))
 
   const visibleResult = useMemo(() => {
-    if (filters.length === 0) return result
+    const sorted = result.sort((a, b) => {
+      if (a.stream._timestamp && b.stream._timestamp) {
+        return b.stream._timestamp.localeCompare(a.stream._timestamp)
+      } else {
+        return 0
+      }
+    })
+
+    if (filters.length === 0) return sorted
     return result.filter((s) => {
       return filters.every((f) => (f.mode === 'in' ? s.stream[f.key] === f.value : s.stream[f.key] !== f.value))
     })

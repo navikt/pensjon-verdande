@@ -577,7 +577,7 @@ export default function BehandlingCard(props: Props) {
             {props.detaljertFremdrift && (
               <Tabs.Tab value="detaljertFremdrift" label="Detaljert fremdrift" icon={<TasklistIcon />} />
             )}
-            <Tabs.Tab value="logs" label="Logger" icon={<ReceiptIcon />} />
+            <Tabs.Tab value="logs" label="Logg" icon={<ReceiptIcon />} />
           </Tabs.List>
           <Outlet />
         </Tabs>
