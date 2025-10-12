@@ -1,14 +1,10 @@
 import type { LokiInstantQueryResponse } from '~/loki/loki-query-types'
+import { isoTimestampToUnixdate, type TempoConfiguration } from '~/loki/utils'
 import { normalizeAndThrow, withTimeout } from '~/services/api.server'
 import { env } from '~/services/env.server'
 
-function isoTimestampToUnixdate(iso: string, hourSkew: number) {
-  const date = new Date(iso.replace(/(\.\d{3})\d+$/, '$1'))
-
-  const skewedDate = new Date(date)
-  skewedDate.setHours(date.getHours() + hourSkew)
-
-  return skewedDate.getTime()
+export const tempoConfiguration: TempoConfiguration = {
+  dataSource: env.tempoDataSource,
 }
 
 export async function fetchPenLogs(
@@ -48,24 +44,4 @@ export async function fetchPenLogs(
   }
 
   return await doFetch()
-}
-
-export function tempoUrl(start: string, end: string, traceId: string) {
-  const url =
-    'https://grafana.nav.cloud.nais.io/explore?' +
-    'left={"range":{' +
-    '"from":"' +
-    isoTimestampToUnixdate(start, -3) +
-    '",' +
-    '"to":"' +
-    isoTimestampToUnixdate(end, +3) +
-    '"},' +
-    '"datasource":"' +
-    env.tempoDataSource +
-    '",' +
-    '"queries":[{"query":"' +
-    traceId +
-    '","queryType":"traceql"}]}'
-
-  return encodeURI(url)
 }

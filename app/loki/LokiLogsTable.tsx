@@ -1,6 +1,7 @@
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  ExternalLinkIcon,
   FilesIcon,
   MenuElipsisVerticalIcon,
   MinusCircleIcon,
@@ -12,6 +13,7 @@ import type { TagProps } from '@navikt/ds-react'
 import { ActionMenu, BodyShort, Button, Chips, HStack, Table, Tag, VStack } from '@navikt/ds-react'
 import type React from 'react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Link as ReactRouterLink } from 'react-router'
 import copy from '~/common/clipboard'
 import {
   isStreams,
@@ -19,6 +21,7 @@ import {
   type LokiInstantQueryResponse,
   type LokiStream,
 } from '~/loki/loki-query-types'
+import { type TempoConfiguration, tempoUrl } from '~/loki/utils'
 
 function hashString(str: string): string {
   let h = 0
@@ -90,15 +93,19 @@ export default function LokiLogsTable({
   initialFilters,
   initialSelectedCols,
   response,
+  start,
+  slutt,
   setShareUrl,
+  tempoConfiguration,
 }: {
   initialFilters: { key: string; value: string; mode: 'in' | 'out' }[]
   initialSelectedCols: string[]
   response: LokiInstantQueryResponse
+  start: string
+  slutt: string
   setShareUrl?: React.Dispatch<React.SetStateAction<string>> | undefined
+  tempoConfiguration?: TempoConfiguration | null
 }) {
-  const showStackTrace = false
-
   const DEFAULT_COLS = ['_timestamp', 'level', 'message'] as const
   const [selectedCols, setSelectedCols] = useState<string[]>(initialSelectedCols ?? [...DEFAULT_COLS])
 
@@ -269,7 +276,21 @@ export default function LokiLogsTable({
                 key={rowKey}
                 content={
                   <VStack gap="16">
-                    {showStackTrace && s.stream.stack_trace && <pre>{s.stream.stack_trace}</pre>}
+                    {tempoConfiguration && s.stream.trace_id && (
+                      <HStack>
+                        <Button
+                          as={ReactRouterLink}
+                          size="small"
+                          variant="tertiary"
+                          to={tempoUrl(tempoConfiguration, start, slutt, s.stream.trace_id)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Se trace i Tempo
+                          <ExternalLinkIcon title={'Se trace i Tempo'} />
+                        </Button>
+                      </HStack>
+                    )}
 
                     <Table size="small">
                       <Table.Body>
@@ -319,7 +340,7 @@ export default function LokiLogsTable({
                                 </Table.HeaderCell>
                                 <Table.DataCell style={{ verticalAlign: 'top', width: 'auto' }}>
                                   <BodyShort style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                                    {String(value)}
+                                    {value}
                                   </BodyShort>
                                 </Table.DataCell>
                                 <Table.DataCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>

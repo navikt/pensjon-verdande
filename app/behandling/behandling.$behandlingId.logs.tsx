@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { Await, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import LokiLogsTable, { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
-import { fetchPenLogs } from '~/loki/loki.server'
+import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
 import { apiGet } from '~/services/api.server'
 import type { BehandlingDto } from '~/types'
 
@@ -20,11 +20,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     }),
     selectedCols: selectedColumns(request.url),
     selectedFilters: selectedFilters(request.url),
+    start: behandling.opprettet,
+    slutt: behandling.sisteKjoring,
+    tempoConfiguration: tempoConfiguration,
   }
 }
 
 export default function BehandlingLogs() {
-  const { response, selectedCols, selectedFilters } = useLoaderData<typeof loader>()
+  const { response, selectedCols, selectedFilters, start, slutt, tempoConfiguration } = useLoaderData<typeof loader>()
 
   return (
     <VStack gap="6" className="p-4">
@@ -36,7 +39,16 @@ export default function BehandlingLogs() {
         }
       >
         <Await resolve={response}>
-          {(it) => <LokiLogsTable response={it} initialFilters={selectedFilters} initialSelectedCols={selectedCols} />}
+          {(it) => (
+            <LokiLogsTable
+              response={it}
+              initialFilters={selectedFilters}
+              initialSelectedCols={selectedCols}
+              start={start}
+              slutt={slutt}
+              tempoConfiguration={tempoConfiguration}
+            />
+          )}
         </Await>
       </Suspense>
     </VStack>

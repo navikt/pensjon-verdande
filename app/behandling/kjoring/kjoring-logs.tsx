@@ -8,13 +8,14 @@ import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import { tidsbruk } from '~/components/kjoringer-table/BehandlingKjoringerTable'
 import LokiLogsTable, { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
-import { fetchPenLogs, tempoUrl } from '~/loki/loki.server'
+import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
 import {
   isStreams,
   type LokiInstantQueryData,
   type LokiInstantQueryResponse,
   type LokiStream,
 } from '~/loki/loki-query-types'
+import { tempoUrl } from '~/loki/utils'
 import { apiGet } from '~/services/api.server'
 import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
 import type { BehandlingDto } from '~/types'
@@ -49,7 +50,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     kibanaUrl: kibanaLinkForCorrelationIdAndTraceId(kjoring.startet, kjoring.avsluttet, kjoring.correlationId, traceId),
     kjoring,
     traceId: traceId,
-    tempoUrl: traceId && tempoUrl(kjoring.startet, kjoring.avsluttet, traceId),
+    tempoUrl: traceId && tempoUrl(tempoConfiguration, kjoring.startet, kjoring.avsluttet, traceId),
     selectedColumns: selectedColumns(request.url),
     selectedFilters: selectedFilters(request.url),
   }
@@ -229,6 +230,8 @@ export default function BehandlingKjoring() {
         initialFilters={selectedFilters}
         initialSelectedCols={selectedColumns}
         setShareUrl={setShareUrl}
+        start={kjoring.startet}
+        slutt={kjoring.avsluttet}
       />
     </VStack>
   )
