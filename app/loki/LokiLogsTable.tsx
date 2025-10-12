@@ -55,6 +55,37 @@ export function selectedFilters(url: string) {
   return filter
 }
 
+type FilterMode = 'in' | 'out'
+
+function FieldActionMenu({
+  addFilter,
+  col,
+  value,
+}: {
+  addFilter: (mode: FilterMode, key: string, value: string) => void
+  col: string
+  value: string
+}) {
+  return (
+    <ActionMenu>
+      <ActionMenu.Trigger>
+        <Button variant="tertiary-neutral" icon={<MenuElipsisVerticalIcon title="Feltmeny" />} size="small" />
+      </ActionMenu.Trigger>
+      <ActionMenu.Content>
+        <ActionMenu.Item onSelect={() => addFilter('in', col, value)} icon={<PlusCircleIcon />}>
+          Inkluder verdi
+        </ActionMenu.Item>
+        <ActionMenu.Item onSelect={() => addFilter('out', col, value)} icon={<MinusCircleIcon />}>
+          Ekskluder verdi
+        </ActionMenu.Item>
+        <ActionMenu.Item onSelect={() => copy(value)} icon={<FilesIcon />}>
+          Kopier
+        </ActionMenu.Item>
+      </ActionMenu.Content>
+    </ActionMenu>
+  )
+}
+
 export default function LokiLogsTable({
   initialFilters,
   initialSelectedCols,
@@ -71,7 +102,6 @@ export default function LokiLogsTable({
   const DEFAULT_COLS = ['_timestamp', 'level', 'message'] as const
   const [selectedCols, setSelectedCols] = useState<string[]>(initialSelectedCols ?? [...DEFAULT_COLS])
 
-  type FilterMode = 'in' | 'out'
   type ActiveFilter = { key: string; value: string; mode: FilterMode }
   const [filters, setFilters] = useState<ActiveFilter[]>(initialFilters ?? [])
 
@@ -293,32 +323,7 @@ export default function LokiLogsTable({
                                   </BodyShort>
                                 </Table.DataCell>
                                 <Table.DataCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
-                                  <ActionMenu>
-                                    <ActionMenu.Trigger>
-                                      <Button
-                                        variant="tertiary-neutral"
-                                        icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
-                                        size="small"
-                                      />
-                                    </ActionMenu.Trigger>
-                                    <ActionMenu.Content>
-                                      <ActionMenu.Item
-                                        onSelect={() => addFilter('in', key, String(value))}
-                                        icon={<PlusCircleIcon />}
-                                      >
-                                        Inkluder verdi
-                                      </ActionMenu.Item>
-                                      <ActionMenu.Item
-                                        onSelect={() => addFilter('out', key, String(value))}
-                                        icon={<MinusCircleIcon />}
-                                      >
-                                        Ekskluder verdi
-                                      </ActionMenu.Item>
-                                      <ActionMenu.Item onSelect={() => copy(String(value))} icon={<FilesIcon />}>
-                                        Kopier
-                                      </ActionMenu.Item>
-                                    </ActionMenu.Content>
-                                  </ActionMenu>
+                                  <FieldActionMenu addFilter={addFilter} col={key} value={value} />
                                 </Table.DataCell>
                               </Table.Row>
                             )
@@ -364,32 +369,7 @@ export default function LokiLogsTable({
                       key={`cell|${rowKey}|${col}|menu`}
                       style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}
                     >
-                      <ActionMenu>
-                        <ActionMenu.Trigger>
-                          <Button
-                            variant="tertiary-neutral"
-                            icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
-                            size="small"
-                          />
-                        </ActionMenu.Trigger>
-                        <ActionMenu.Content>
-                          <ActionMenu.Item
-                            onSelect={() => addFilter('in', col, String(s.stream[col] ?? ''))}
-                            icon={<PlusCircleIcon />}
-                          >
-                            Inkluder verdi
-                          </ActionMenu.Item>
-                          <ActionMenu.Item
-                            onSelect={() => addFilter('out', col, String(s.stream[col] ?? ''))}
-                            icon={<MinusCircleIcon />}
-                          >
-                            Ekskluder verdi
-                          </ActionMenu.Item>
-                          <ActionMenu.Item onSelect={() => copy(String(s.stream[col] ?? ''))} icon={<FilesIcon />}>
-                            Kopier
-                          </ActionMenu.Item>
-                        </ActionMenu.Content>
-                      </ActionMenu>
+                      <FieldActionMenu addFilter={addFilter} col={col} value={String(s.stream[col] ?? '')} />
                     </Table.DataCell>
                   </Fragment>
                 ))}
