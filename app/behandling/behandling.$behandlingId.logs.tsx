@@ -47,6 +47,7 @@ export default function BehandlingLogs() {
               start={start}
               slutt={slutt}
               tempoConfiguration={tempoConfiguration}
+              visAlltidFullDato={true}
             />
           )}
         </Await>
