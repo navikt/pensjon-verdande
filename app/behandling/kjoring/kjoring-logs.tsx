@@ -42,7 +42,16 @@ import {
   type LokiStream,
 } from '~/loki/loki-query-types'
 import { apiGet } from '~/services/api.server'
-import type { BehandlingDto, HalLink } from '~/types'
+import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
+import type { BehandlingDto } from '~/types'
+
+function hashString(str: string): string {
+  let h = 0
+  for (let i = 0; i < str.length; i++) {
+    h = (h * 31 + str.charCodeAt(i)) | 0
+  }
+  return (h >>> 0).toString(36)
+}
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const { behandlingId, kjoringId } = params
@@ -93,6 +102,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     response,
     behandling,
     aktivitet,
+    kibanaUrl: kibanaLinkForCorrelationIdAndTraceId(kjoring.startet, kjoring.avsluttet, kjoring.correlationId, traceId),
     kjoring,
     traceId: traceId,
     tempoUrl: traceId && tempoUrl(kjoring.startet, kjoring.avsluttet, traceId),
@@ -104,8 +114,17 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 }
 
 export default function Behandling() {
-  const { response, behandling, aktivitet, kjoring, traceId, tempoUrl, initialSelectedCols, initialFilters } =
-    useLoaderData<typeof loader>()
+  const {
+    response,
+    behandling,
+    aktivitet,
+    kjoring,
+    traceId,
+    kibanaUrl,
+    tempoUrl,
+    initialSelectedCols,
+    initialFilters,
+  } = useLoaderData<typeof loader>()
 
   const data = response.data as LokiInstantQueryData
 
@@ -298,19 +317,17 @@ export default function Behandling() {
       </section>
 
       <HStack>
-        {kjoring._links?.kibana && (
-          <Button
-            as={ReactRouterLink}
-            to={(kjoring._links.kibana as HalLink).href}
-            size="small"
-            variant="tertiary"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Se logger i Kibana
-            <ExternalLinkIcon title={'Se logger i Kibana'} />
-          </Button>
-        )}
+        <Button
+          as={ReactRouterLink}
+          to={kibanaUrl}
+          size="small"
+          variant="tertiary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Se logger i Kibana
+          <ExternalLinkIcon title={'Se logger i Kibana'} />
+        </Button>
         {tempoUrl && (
           <Button
             as={ReactRouterLink}
@@ -431,9 +448,11 @@ export default function Behandling() {
         </Table.Header>
         <Table.Body>
           {visibleResult.map((s) => {
+            const msg = String(s.stream.message ?? '')
+            const rowKey = `logline|${s.stream._timestamp}|${hashString(msg)}`
             return (
               <Table.ExpandableRow
-                key={`logline|${s.stream._timestamp}`}
+                key={rowKey}
                 content={
                   <VStack gap="16">
                     {showStackTrace && s.stream.stack_trace && <pre>{s.stream.stack_trace}</pre>}
@@ -445,7 +464,7 @@ export default function Behandling() {
                           .map(([key, value]) => {
                             const selected = isSelected(key)
                             return (
-                              <Table.Row key={`details|${s.stream._timestamp}|${key}`}>
+                              <Table.Row key={`details|${rowKey}|${key}`}>
                                 <Table.HeaderCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
                                   <BodyShort>{key}</BodyShort>
                                 </Table.HeaderCell>
@@ -526,8 +545,8 @@ export default function Behandling() {
                 }
               >
                 {selectedCols.map((col) => (
-                  <Fragment key={`fragment|${s.stream._timestamp}|${col}`}>
-                    <Table.DataCell key={`cell|${s.stream._timestamp}|${col}`}>
+                  <Fragment key={`fragment|${rowKey}|${col}`}>
+                    <Table.DataCell key={`cell|${rowKey}|${col}`}>
                       {col === '_timestamp'
                         ? (() => {
                             const iso = String(s.stream[col] ?? '')
@@ -558,7 +577,7 @@ export default function Behandling() {
                           : String(s.stream[col] ?? '')}
                     </Table.DataCell>
                     <Table.DataCell
-                      key={`cell|${s.stream._timestamp}|${col}|menu`}
+                      key={`cell|${rowKey}|${col}|menu`}
                       style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}
                     >
                       <ActionMenu>
