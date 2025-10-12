@@ -7,7 +7,7 @@ import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import { tidsbruk } from '~/components/kjoringer-table/BehandlingKjoringerTable'
-import LokiLogsTable from '~/loki/LokiLogsTable'
+import LokiLogsTable, { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
 import { fetchPenLogs, tempoUrl } from '~/loki/loki.server'
 import {
   isStreams,
@@ -32,69 +32,32 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  const aktivitet = kjoring.aktivitetId && finnAktivitet(behandling, kjoring.aktivitetId)
-
-  const response: LokiInstantQueryResponse = await fetchPenLogs(
-    kjoring.startet,
-    kjoring.avsluttet,
-    kjoring.correlationId,
-  )
+  const response: LokiInstantQueryResponse = await fetchPenLogs(kjoring.startet, kjoring.avsluttet, {
+    transaction: kjoring.correlationId,
+  })
 
   const data = response.data as LokiInstantQueryData
 
   const result: LokiStream[] = response.status === 'success' && isStreams(data) ? (data.result as LokiStream[]) : []
+  // TODO: Lagre trace id på kjøring i pen sånn at den ikke må tas ut av svaret fra Loki
   const traceId = result.length > 0 ? result[0].stream.trace_id : undefined
-
-  const sp = new URL(request.url).searchParams
-  const urlCols = sp.get('cols')
-  const urlFilters = sp.get('filters')
-
-  const initialSelectedCols = urlCols
-    ? urlCols
-        .split(',')
-        .map((c) => c.trim())
-        .filter(Boolean)
-    : ['_timestamp', 'level', 'message']
-
-  let initialFilters: { key: string; value: string; mode: 'in' | 'out' }[] = []
-  try {
-    if (urlFilters) {
-      const parsed = JSON.parse(decodeURIComponent(urlFilters))
-      if (Array.isArray(parsed)) initialFilters = parsed
-    }
-  } catch {}
 
   return {
     response,
     behandling,
-    aktivitet,
+    aktivitet: kjoring.aktivitetId && finnAktivitet(behandling, kjoring.aktivitetId),
     kibanaUrl: kibanaLinkForCorrelationIdAndTraceId(kjoring.startet, kjoring.avsluttet, kjoring.correlationId, traceId),
     kjoring,
     traceId: traceId,
     tempoUrl: traceId && tempoUrl(kjoring.startet, kjoring.avsluttet, traceId),
-    initialSelectedCols,
-    initialFilters,
-    urlProvidedCols: Boolean(urlCols),
-    urlProvidedFilters: Boolean(urlFilters),
+    selectedColumns: selectedColumns(request.url),
+    selectedFilters: selectedFilters(request.url),
   }
 }
 
 export default function BehandlingKjoring() {
-  const {
-    response,
-    behandling,
-    aktivitet,
-    kjoring,
-    traceId,
-    kibanaUrl,
-    tempoUrl,
-    initialSelectedCols,
-    initialFilters,
-  } = useLoaderData<typeof loader>()
-
-  const data = response.data as LokiInstantQueryData
-
-  const result = data.result as LokiStream[]
+  const { response, behandling, aktivitet, kjoring, traceId, kibanaUrl, tempoUrl, selectedColumns, selectedFilters } =
+    useLoaderData<typeof loader>()
 
   const [shareUrl, setShareUrl] = useState('')
 
@@ -262,9 +225,9 @@ export default function BehandlingKjoring() {
       </HStack>
 
       <LokiLogsTable
-        result={result}
-        initialFilters={initialFilters}
-        initialSelectedCols={initialSelectedCols}
+        response={response}
+        initialFilters={selectedFilters}
+        initialSelectedCols={selectedColumns}
         setShareUrl={setShareUrl}
       />
     </VStack>

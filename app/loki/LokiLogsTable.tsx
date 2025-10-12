@@ -13,7 +13,12 @@ import { ActionMenu, BodyShort, Button, Chips, HStack, Table, Tag, VStack } from
 import type React from 'react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import copy from '~/common/clipboard'
-import type { LokiStream } from '~/loki/loki-query-types'
+import {
+  isStreams,
+  type LokiInstantQueryData,
+  type LokiInstantQueryResponse,
+  type LokiStream,
+} from '~/loki/loki-query-types'
 
 function hashString(str: string): string {
   let h = 0
@@ -23,16 +28,43 @@ function hashString(str: string): string {
   return (h >>> 0).toString(36)
 }
 
+export function selectedColumns(url: string) {
+  const sp = new URL(url).searchParams
+  const urlCols = sp.get('cols')
+
+  return urlCols
+    ? urlCols
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean)
+    : ['_timestamp', 'level', 'message']
+}
+
+export function selectedFilters(url: string) {
+  const sp = new URL(url).searchParams
+  const urlFilters = sp.get('filters')
+
+  let filter: { key: string; value: string; mode: 'in' | 'out' }[] = []
+  try {
+    if (urlFilters) {
+      const parsed = JSON.parse(decodeURIComponent(urlFilters))
+      if (Array.isArray(parsed)) filter = parsed
+    }
+  } catch {}
+
+  return filter
+}
+
 export default function LokiLogsTable({
   initialFilters,
   initialSelectedCols,
-  result,
+  response,
   setShareUrl,
 }: {
   initialFilters: { key: string; value: string; mode: 'in' | 'out' }[]
   initialSelectedCols: string[]
-  result: LokiStream[]
-  setShareUrl: React.Dispatch<React.SetStateAction<string>>
+  response: LokiInstantQueryResponse
+  setShareUrl?: React.Dispatch<React.SetStateAction<string>> | undefined
 }) {
   const showStackTrace = false
 
@@ -42,6 +74,9 @@ export default function LokiLogsTable({
   type FilterMode = 'in' | 'out'
   type ActiveFilter = { key: string; value: string; mode: FilterMode }
   const [filters, setFilters] = useState<ActiveFilter[]>(initialFilters ?? [])
+
+  const data = response.data as LokiInstantQueryData
+  const result: LokiStream[] = response.status === 'success' && isStreams(data) ? (data.result as LokiStream[]) : []
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -54,7 +89,7 @@ export default function LokiLogsTable({
         url.searchParams.delete('filters')
       }
       const next = url.toString()
-      setShareUrl(next)
+      setShareUrl?.(next)
       window.history.replaceState({}, '', next)
     } catch {
       // ignore

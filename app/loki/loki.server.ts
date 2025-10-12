@@ -14,9 +14,10 @@ function isoTimestampToUnixdate(iso: string, hourSkew: number) {
 export async function fetchPenLogs(
   start: string,
   end: string,
-  correlationId: string,
+  fields: Record<string, string | number>,
 ): Promise<LokiInstantQueryResponse> {
-  const query = `{service_name="${env.penServiceName}"}+|+json+|+logfmt+|+drop+__error__,+__error_details__+|+transaction="${correlationId}"`
+  const fieldExpression = Object.entries(fields).map(([key, value]) => ` | ${key}="${value}"`)
+  const query = `{service_name="${env.penServiceName}"} | json | logfmt | drop __error__, __error_details__ ${fieldExpression}`
 
   const url =
     env.lokiApiBaseUrl +

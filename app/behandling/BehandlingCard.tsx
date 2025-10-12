@@ -8,6 +8,7 @@ import {
   PersonIcon,
   PlayIcon,
   PrinterSmallIcon,
+  ReceiptIcon,
   SandboxIcon,
   TasklistIcon,
   XMarkOctagonIcon,
@@ -576,6 +577,7 @@ export default function BehandlingCard(props: Props) {
             {props.detaljertFremdrift && (
               <Tabs.Tab value="detaljertFremdrift" label="Detaljert fremdrift" icon={<TasklistIcon />} />
             )}
+            <Tabs.Tab value="logs" label="Logger" icon={<ReceiptIcon />} />
           </Tabs.List>
           <Outlet />
         </Tabs>

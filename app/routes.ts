@@ -92,6 +92,7 @@ export default [
         route('manuelleOppgaver', 'behandling/behandling.$behandlingId.manuelleOppgaver.tsx'),
         route('oppdragsmelding', 'behandling/behandling.$behandlingId.oppdragsmelding.tsx'),
         route('aktiviteter', 'behandling/behandling.$behandlingId.aktiviteter.tsx'),
+        route('logs', 'behandling/behandling.$behandlingId.logs.tsx'),
         route('output', 'behandling/behandling.$behandlingId.output.tsx'),
         route('input', 'behandling/behandling.$behandlingId.input.tsx'),
         route('uttrekk', 'behandling/behandling.$behandlingId.uttrekk.tsx'),
