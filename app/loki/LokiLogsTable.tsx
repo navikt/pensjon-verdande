@@ -9,7 +9,7 @@ import {
   PlusIcon,
   XMarkIcon,
 } from '@navikt/aksel-icons'
-import type { TagProps } from '@navikt/ds-react'
+import type { SortState, TagProps } from '@navikt/ds-react'
 import { ActionMenu, BodyShort, Button, Chips, HStack, Table, Tag, VStack } from '@navikt/ds-react'
 import type React from 'react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
@@ -418,14 +418,48 @@ export default function LokiLogsTable({
     return selectedCols.filter((col) => isNumericLike(visibleResult, col))
   }, [selectedCols, visibleResult])
 
+  const [sort, setSort] = useState<SortState>({ orderBy: '_timestamp', direction: 'descending' })
+
+  const sortedData = useMemo(() => {
+    const rows = [...visibleResult]
+    if (!sort) return rows
+    const { orderBy, direction } = sort
+    const sgn = direction === 'ascending' ? 1 : -1
+
+    return rows.sort((a, b) => {
+      const av = String(a.stream[orderBy] ?? '')
+      const bv = String(b.stream[orderBy] ?? '')
+
+      if (orderBy === '_timestamp') {
+        const ad = new Date(av).valueOf()
+        const bd = new Date(bv).valueOf()
+        return (ad - bd) * sgn
+      }
+
+      const nA = av.replace(',', '.')
+      const nB = bv.replace(',', '.')
+      const isNumA = /^-?\d+(?:[.,]\d+)?$/.test(av.trim())
+      const isNumB = /^-?\d+(?:[.,]\d+)?$/.test(bv.trim())
+      if (isNumA && isNumB) {
+        return (parseFloat(nA) - parseFloat(nB)) * sgn
+      }
+
+      return av.localeCompare(bv, 'nb', { numeric: true, sensitivity: 'base' }) * sgn
+    })
+  }, [visibleResult, sort])
+
   const isSameday = useMemo(() => {
-    const timestamp = visibleResult.map((s) => s.stream._timestamp).sort((a, b) => a.localeCompare(b))
-    if (timestamp.length === 0 || timestamp.length === 1) {
-      return true
-    } else {
-      return isSameDay(timestamp[0], timestamp[timestamp.length - 1])
-    }
-  }, [visibleResult])
+    const timestamp = sortedData.map((s) => s.stream._timestamp).sort((a, b) => a.localeCompare(b))
+    if (timestamp.length <= 1) return true
+    return isSameDay(timestamp[0], timestamp[timestamp.length - 1])
+  }, [sortedData])
+
+  function onSortChange(sortKey: string) {
+    setSort({
+      orderBy: sortKey,
+      direction: sort.orderBy === sortKey && sort.direction === 'ascending' ? 'descending' : 'ascending',
+    })
+  }
 
   return (
     <>
@@ -456,15 +490,15 @@ export default function LokiLogsTable({
         </Button>
       </HStack>
 
-      <Table size="small">
+      <Table size="small" sort={sort ?? undefined} onSortChange={onSortChange}>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell aria-label="Detaljer" />
             {selectedCols.map((col) => (
               <Fragment key={`head|${col}`}>
-                <Table.HeaderCell align={numbericColumns.includes(col) ? 'right' : 'left'}>
+                <Table.ColumnHeader align={numbericColumns.includes(col) ? 'right' : 'left'} sortable sortKey={col}>
                   {col === '_timestamp' ? 'Tidspunkt' : col === 'level' ? 'Nivå' : col === 'message' ? 'Melding' : col}
-                </Table.HeaderCell>
+                </Table.ColumnHeader>
                 <Table.HeaderCell className={styles.displayOnHover}>
                   <HeaderActionMenu
                     selectedCols={selectedCols}
@@ -478,7 +512,7 @@ export default function LokiLogsTable({
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {visibleResult.map((s) => {
+          {sortedData.map((s) => {
             const msg = String(s.stream.message ?? '')
             const rowKey = `logline|${s.stream._timestamp}|${hashString(msg)}`
             return (
