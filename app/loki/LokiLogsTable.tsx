@@ -33,7 +33,7 @@ function hashString(str: string): string {
   return (h >>> 0).toString(36)
 }
 
-function isNumericLike(streamArray: LokiStream[], value: string): boolean {
+function columnLooksNumeric(streamArray: LokiStream[], value: string): boolean {
   const v = streamArray.find((s) => s.stream[value])?.stream[value]?.trim()
   return !!(v && /^-?\d+(?:[.,]\d+)?$/.test(v))
 }
@@ -57,7 +57,7 @@ export function selectedFilters(url: string) {
   let filter: { key: string; value: string; mode: 'in' | 'out' }[] = []
   try {
     if (urlFilters) {
-      const parsed = JSON.parse(decodeURIComponent(urlFilters))
+      const parsed = JSON.parse(urlFilters)
       if (Array.isArray(parsed)) filter = parsed
     }
   } catch {
@@ -361,7 +361,7 @@ export default function LokiLogsTable({
       const url = new URL(window.location.href)
       url.searchParams.set('cols', selectedCols.join(','))
       if (filters.length > 0) {
-        url.searchParams.set('filters', encodeURIComponent(JSON.stringify(filters)))
+        url.searchParams.set('filters', JSON.stringify(filters))
       } else {
         url.searchParams.delete('filters')
       }
@@ -411,8 +411,8 @@ export default function LokiLogsTable({
     })
   }, [result, filters])
 
-  const numbericColumns = useMemo(() => {
-    return selectedCols.filter((col) => isNumericLike(visibleResult, col))
+  const numericColumns = useMemo(() => {
+    return selectedCols.filter((col) => columnLooksNumeric(visibleResult, col))
   }, [selectedCols, visibleResult])
 
   const [sort, setSort] = useState<SortState>({ orderBy: '_timestamp', direction: 'descending' })
@@ -445,7 +445,7 @@ export default function LokiLogsTable({
     })
   }, [visibleResult, sort])
 
-  const isSameday = useMemo(() => {
+  const allLogsAreFromTheSameDay = useMemo(() => {
     const timestamp = sortedData.map((s) => s.stream._timestamp).sort((a, b) => a.localeCompare(b))
     if (timestamp.length <= 1) return true
     return isSameDay(timestamp[0], timestamp[timestamp.length - 1])
@@ -493,7 +493,7 @@ export default function LokiLogsTable({
             <Table.HeaderCell aria-label="Detaljer" />
             {selectedCols.map((col) => (
               <Fragment key={`head|${col}`}>
-                <Table.ColumnHeader align={numbericColumns.includes(col) ? 'right' : 'left'} sortable sortKey={col}>
+                <Table.ColumnHeader align={numericColumns.includes(col) ? 'right' : 'left'} sortable sortKey={col}>
                   {col === '_timestamp' ? 'Tidspunkt' : col === 'level' ? 'Nivå' : col === 'message' ? 'Melding' : col}
                 </Table.ColumnHeader>
                 <Table.HeaderCell className={styles.displayOnHover}>
@@ -532,8 +532,8 @@ export default function LokiLogsTable({
               >
                 {selectedCols.map((col) => (
                   <Fragment key={`fragment|${rowKey}|${col}`}>
-                    <Table.DataCell align={numbericColumns.includes(col) ? 'right' : 'left'}>
-                      {decodeFieldValue(visAlltidFullDato || !isSameday, col, s)}
+                    <Table.DataCell align={numericColumns.includes(col) ? 'right' : 'left'}>
+                      {decodeFieldValue(visAlltidFullDato || !allLogsAreFromTheSameDay, col, s)}
                     </Table.DataCell>
                     <Table.DataCell
                       style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}
