@@ -3,6 +3,7 @@ import {
   ArrowRightIcon,
   ExternalLinkIcon,
   FilesIcon,
+  LinkIcon,
   MenuElipsisVerticalIcon,
   MinusCircleIcon,
   PlusCircleIcon,
@@ -25,7 +26,7 @@ import {
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { type LoaderFunctionArgs, Link as ReactRouterLink, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$aktivitetId'
@@ -69,6 +70,25 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const result: LokiStream[] = response.status === 'success' && isStreams(data) ? (data.result as LokiStream[]) : []
   const traceId = result.length > 0 ? result[0].stream.trace_id : undefined
 
+  const sp = new URL(request.url).searchParams
+  const urlCols = sp.get('cols')
+  const urlFilters = sp.get('filters')
+
+  const initialSelectedCols = urlCols
+    ? urlCols
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean)
+    : ['_timestamp', 'level', 'message']
+
+  let initialFilters: { key: string; value: string; mode: 'in' | 'out' }[] = []
+  try {
+    if (urlFilters) {
+      const parsed = JSON.parse(decodeURIComponent(urlFilters))
+      if (Array.isArray(parsed)) initialFilters = parsed
+    }
+  } catch {}
+
   return {
     response,
     behandling,
@@ -76,11 +96,16 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     kjoring,
     traceId: traceId,
     tempoUrl: traceId && tempoUrl(kjoring.startet, kjoring.avsluttet, traceId),
+    initialSelectedCols,
+    initialFilters,
+    urlProvidedCols: Boolean(urlCols),
+    urlProvidedFilters: Boolean(urlFilters),
   }
 }
 
 export default function Behandling() {
-  const { response, behandling, aktivitet, kjoring, traceId, tempoUrl } = useLoaderData<typeof loader>()
+  const { response, behandling, aktivitet, kjoring, traceId, tempoUrl, initialSelectedCols, initialFilters } =
+    useLoaderData<typeof loader>()
 
   const data = response.data as LokiInstantQueryData
 
@@ -89,19 +114,7 @@ export default function Behandling() {
   const showStackTrace = false
 
   const DEFAULT_COLS = ['_timestamp', 'level', 'message'] as const
-  const [selectedCols, setSelectedCols] = useState<string[]>([...DEFAULT_COLS])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('kjoringLogs.selectedCols', JSON.stringify(selectedCols))
-    } catch {}
-  }, [selectedCols])
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('kjoringLogs.selectedCols')
-      if (saved) setSelectedCols(JSON.parse(saved))
-    } catch {}
-  }, [])
+  const [selectedCols, setSelectedCols] = useState<string[]>(initialSelectedCols ?? [...DEFAULT_COLS])
 
   const addColumn = (key: string) => {
     setSelectedCols((prev) => (prev.includes(key) ? prev : [...prev, key]))
@@ -129,7 +142,27 @@ export default function Behandling() {
 
   type FilterMode = 'in' | 'out'
   type ActiveFilter = { key: string; value: string; mode: FilterMode }
-  const [filters, setFilters] = useState<ActiveFilter[]>([])
+  const [filters, setFilters] = useState<ActiveFilter[]>(initialFilters ?? [])
+
+  const [shareUrl, setShareUrl] = useState('')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set('cols', selectedCols.join(','))
+      if (filters.length > 0) {
+        url.searchParams.set('filters', encodeURIComponent(JSON.stringify(filters)))
+      } else {
+        url.searchParams.delete('filters')
+      }
+      const next = url.toString()
+      setShareUrl(next)
+      window.history.replaceState({}, '', next)
+    } catch {
+      // ignore
+    }
+  }, [selectedCols, filters])
 
   const addFilter = (mode: FilterMode, key: string, value: string) => {
     setFilters((prev) =>
@@ -296,19 +329,29 @@ export default function Behandling() {
             size="small"
             iconPosition="right"
             copyText={kjoring.stackTrace}
-            variant="action"
             text="Kopier stack trace"
             activeText="Kopiert stack trace"
-            style={{ color: 'var(--a-text-action)' }}
           />
         )}
+        <CopyButton
+          size="small"
+          iconPosition="right"
+          copyText={shareUrl}
+          text="Kopier lenke"
+          activeText="Kopiert lenke"
+          icon={<LinkIcon />}
+        />
       </HStack>
 
       <HStack gap="2" align="center" wrap>
         {filters.length > 0 && (
           <Chips>
             {filters.map((f, i) => (
-              <Chips.Removable key={`flt|${f.mode}|${f.key}|${f.value}`} onClick={() => removeFilter(i)}>
+              <Chips.Removable
+                key={`flt|${f.mode}|${f.key}|${f.value}`}
+                onClick={() => removeFilter(i)}
+                style={{ color: 'var(--ax-text-contrast)' }}
+              >
                 {`${f.mode === 'in' ? 'inkluder' : 'ekskluder'}: ${f.key}=${f.value}`}
               </Chips.Removable>
             ))}
@@ -316,8 +359,7 @@ export default function Behandling() {
         )}
       </HStack>
 
-      <HStack gap="2" align="center">
-        <Label as="p">Valgte kolonner</Label>
+      <HStack gap="2" align="center" justify="end">
         <Button
           size="xsmall"
           variant="tertiary"
@@ -333,59 +375,57 @@ export default function Behandling() {
           <Table.Row>
             <Table.HeaderCell aria-label="Detaljer" />
             {selectedCols.map((col) => (
-              <>
-                <Table.HeaderCell key={`head|${col}`} colSpan={2}>
-                  <HStack justify="space-between" align="center" gap="2">
-                    <BodyShort>
-                      {col === '_timestamp'
-                        ? 'Tidspunkt'
-                        : col === 'level'
-                          ? 'Nivå'
-                          : col === 'message'
-                            ? 'Melding'
-                            : col}
-                    </BodyShort>
+              <Table.HeaderCell key={`head|${col}`} colSpan={2}>
+                <HStack justify="space-between" align="center" gap="2">
+                  <BodyShort>
+                    {col === '_timestamp'
+                      ? 'Tidspunkt'
+                      : col === 'level'
+                        ? 'Nivå'
+                        : col === 'message'
+                          ? 'Melding'
+                          : col}
+                  </BodyShort>
 
-                    <ActionMenu>
-                      <ActionMenu.Trigger>
-                        <Button
-                          variant="tertiary-neutral"
-                          icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
-                          size="small"
-                        />
-                      </ActionMenu.Trigger>
-                      <ActionMenu.Content>
-                        {(() => {
-                          const pos = selectedCols.indexOf(col)
-                          const canMoveLeft = pos > 0
-                          const canMoveRight = pos > -1 && pos < selectedCols.length - 1
-                          return (
-                            <>
-                              <ActionMenu.Item
-                                onSelect={() => moveColumn(col, 'left')}
-                                disabled={!canMoveLeft}
-                                icon={<ArrowLeftIcon />}
-                              >
-                                Flytt til venstre
-                              </ActionMenu.Item>
-                              <ActionMenu.Item
-                                onSelect={() => moveColumn(col, 'right')}
-                                disabled={!canMoveRight}
-                                icon={<ArrowRightIcon />}
-                              >
-                                Flytt til høyre
-                              </ActionMenu.Item>
-                              <ActionMenu.Item onSelect={() => removeColumn(col)} icon={<XMarkIcon />}>
-                                Fjern
-                              </ActionMenu.Item>
-                            </>
-                          )
-                        })()}
-                      </ActionMenu.Content>
-                    </ActionMenu>
-                  </HStack>
-                </Table.HeaderCell>
-              </>
+                  <ActionMenu>
+                    <ActionMenu.Trigger>
+                      <Button
+                        variant="tertiary-neutral"
+                        icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+                        size="small"
+                      />
+                    </ActionMenu.Trigger>
+                    <ActionMenu.Content>
+                      {(() => {
+                        const pos = selectedCols.indexOf(col)
+                        const canMoveLeft = pos > 0
+                        const canMoveRight = pos > -1 && pos < selectedCols.length - 1
+                        return (
+                          <>
+                            <ActionMenu.Item
+                              onSelect={() => moveColumn(col, 'left')}
+                              disabled={!canMoveLeft}
+                              icon={<ArrowLeftIcon />}
+                            >
+                              Flytt til venstre
+                            </ActionMenu.Item>
+                            <ActionMenu.Item
+                              onSelect={() => moveColumn(col, 'right')}
+                              disabled={!canMoveRight}
+                              icon={<ArrowRightIcon />}
+                            >
+                              Flytt til høyre
+                            </ActionMenu.Item>
+                            <ActionMenu.Item onSelect={() => removeColumn(col)} icon={<XMarkIcon />}>
+                              Fjern
+                            </ActionMenu.Item>
+                          </>
+                        )
+                      })()}
+                    </ActionMenu.Content>
+                  </ActionMenu>
+                </HStack>
+              </Table.HeaderCell>
             ))}
           </Table.Row>
         </Table.Header>
@@ -486,7 +526,7 @@ export default function Behandling() {
                 }
               >
                 {selectedCols.map((col) => (
-                  <>
+                  <Fragment key={`fragment|${s.stream._timestamp}|${col}`}>
                     <Table.DataCell key={`cell|${s.stream._timestamp}|${col}`}>
                       {col === '_timestamp'
                         ? (() => {
@@ -548,7 +588,7 @@ export default function Behandling() {
                         </ActionMenu.Content>
                       </ActionMenu>
                     </Table.DataCell>
-                  </>
+                  </Fragment>
                 ))}
               </Table.ExpandableRow>
             )
