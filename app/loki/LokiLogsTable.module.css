@@ -8,3 +8,21 @@ tr:hover .displayOnHover button {
   opacity: 1;
   pointer-events: auto;
 }
+
+.tableScroller {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  /*noinspection CssInvalidPropertyValue*/
+  contain: inline-size;
+}
+
+.table {
+  min-width: 100%;
+  width: max-content;
+  table-layout: auto;
+}

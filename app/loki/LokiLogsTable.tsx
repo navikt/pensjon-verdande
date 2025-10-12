@@ -487,67 +487,75 @@ export default function LokiLogsTable({
         </Button>
       </HStack>
 
-      <Table size="small" sort={sort ?? undefined} onSortChange={onSortChange}>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell aria-label="Detaljer" />
-            {selectedCols.map((col) => (
-              <Fragment key={`head|${col}`}>
-                <Table.ColumnHeader align={numericColumns.includes(col) ? 'right' : 'left'} sortable sortKey={col}>
-                  {col === '_timestamp' ? 'Tidspunkt' : col === 'level' ? 'Nivå' : col === 'message' ? 'Melding' : col}
-                </Table.ColumnHeader>
-                <Table.HeaderCell className={styles.displayOnHover}>
-                  <HeaderActionMenu
-                    selectedCols={selectedCols}
-                    col={col}
-                    moveColumn={moveColumn}
-                    removeColumn={removeColumn}
-                  />
-                </Table.HeaderCell>
-              </Fragment>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {sortedData.map((s) => {
-            const msg = String(s.stream.message ?? '')
-            const rowKey = `logline|${s.stream._timestamp}|${hashString(msg)}`
-            return (
-              <Table.ExpandableRow
-                key={rowKey}
-                content={
-                  <MessageDetails
-                    tempoConfiguration={tempoConfiguration}
-                    s={s}
-                    start={start}
-                    slutt={slutt}
-                    isSelected={isSelected}
-                    rowKey={rowKey}
-                    HIDE_IN_DETAILS={HIDE_IN_DETAILS}
-                    addColumn={addColumn}
-                    removeColumn={removeColumn}
-                    addFilter={addFilter}
-                  />
-                }
-              >
-                {selectedCols.map((col) => (
-                  <Fragment key={`fragment|${rowKey}|${col}`}>
-                    <Table.DataCell align={numericColumns.includes(col) ? 'right' : 'left'}>
-                      {decodeFieldValue(visAlltidFullDato || !allLogsAreFromTheSameDay, col, s)}
-                    </Table.DataCell>
-                    <Table.DataCell
-                      style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}
-                      className={styles.displayOnHover}
-                    >
-                      <FieldActionMenu addFilter={addFilter} col={col} value={String(s.stream[col] ?? '')} />
-                    </Table.DataCell>
-                  </Fragment>
-                ))}
-              </Table.ExpandableRow>
-            )
-          })}
-        </Table.Body>
-      </Table>
+      <HStack as="div" className={styles.tableScroller} wrap={false} align="stretch">
+        <Table className={styles.table} size="small" sort={sort ?? undefined} onSortChange={onSortChange}>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell aria-label="Detaljer" />
+              {selectedCols.map((col) => (
+                <Fragment key={`head|${col}`}>
+                  <Table.ColumnHeader align={numericColumns.includes(col) ? 'right' : 'left'} sortable sortKey={col}>
+                    {col === '_timestamp'
+                      ? 'Tidspunkt'
+                      : col === 'level'
+                        ? 'Nivå'
+                        : col === 'message'
+                          ? 'Melding'
+                          : col}
+                  </Table.ColumnHeader>
+                  <Table.HeaderCell className={styles.displayOnHover}>
+                    <HeaderActionMenu
+                      selectedCols={selectedCols}
+                      col={col}
+                      moveColumn={moveColumn}
+                      removeColumn={removeColumn}
+                    />
+                  </Table.HeaderCell>
+                </Fragment>
+              ))}
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {sortedData.map((s) => {
+              const msg = String(s.stream.message ?? '')
+              const rowKey = `logline|${s.stream._timestamp}|${hashString(msg)}`
+              return (
+                <Table.ExpandableRow
+                  key={rowKey}
+                  content={
+                    <MessageDetails
+                      tempoConfiguration={tempoConfiguration}
+                      s={s}
+                      start={start}
+                      slutt={slutt}
+                      isSelected={isSelected}
+                      rowKey={rowKey}
+                      HIDE_IN_DETAILS={HIDE_IN_DETAILS}
+                      addColumn={addColumn}
+                      removeColumn={removeColumn}
+                      addFilter={addFilter}
+                    />
+                  }
+                >
+                  {selectedCols.map((col) => (
+                    <Fragment key={`fragment|${rowKey}|${col}`}>
+                      <Table.DataCell align={numericColumns.includes(col) ? 'right' : 'left'}>
+                        {decodeFieldValue(visAlltidFullDato || !allLogsAreFromTheSameDay, col, s)}
+                      </Table.DataCell>
+                      <Table.DataCell
+                        style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}
+                        className={styles.displayOnHover}
+                      >
+                        <FieldActionMenu addFilter={addFilter} col={col} value={String(s.stream[col] ?? '')} />
+                      </Table.DataCell>
+                    </Fragment>
+                  ))}
+                </Table.ExpandableRow>
+              )
+            })}
+          </Table.Body>
+        </Table>
+      </HStack>
     </>
   )
 }
