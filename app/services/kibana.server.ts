@@ -5,10 +5,9 @@ export function kibanaLink(behandling: BehandlingDto) {
   const application = env.penApplication
   const opprettetDate = new Date(behandling.opprettet)
   const sisteKjoringDate = new Date(behandling.sisteKjoring)
-  const toTimerMs = 2 * 60 * 60 * 1000
   const femMinutterIMs = 5 * 60 * 1000
-  const startTime = new Date(opprettetDate.getTime() - toTimerMs - femMinutterIMs).toISOString()
-  const endTime = new Date(sisteKjoringDate.getTime() - toTimerMs + femMinutterIMs).toISOString()
+  const startTime = new Date(opprettetDate.getTime() - femMinutterIMs).toISOString()
+  const endTime = new Date(sisteKjoringDate.getTime() + femMinutterIMs).toISOString()
 
   const refreshInterval = `(refreshInterval:(pause:!t,value:0),time:(from:'${startTime}',to:'${endTime}'))`
   const query = `(language:kuery,query:'application:%22${application}%22%20AND%20x_behandlingId:%22${behandling.behandlingId}%22')`
