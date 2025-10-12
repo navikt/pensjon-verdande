@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
-import { useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData, useOutletContext } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingCard from '~/behandling/BehandlingCard'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
+import type { MeResponse } from '~/brukere/brukere'
 import { requireAccessToken } from '~/services/auth.server'
 import {
   endrePlanlagtStartet,
@@ -125,11 +125,14 @@ export default function Behandling() {
   const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } =
     useLoaderData<typeof loader>()
 
+  const me = useOutletContext<MeResponse>()
+
   return (
     <BehandlingCard
       aldeBehandlingUrlTemplate={aldeBehandlingUrlTemplate}
       behandling={behandling}
       detaljertFremdrift={detaljertFremdrift}
+      me={me}
       psakSakUrlTemplate={psakSakUrlTemplate}
     />
   )

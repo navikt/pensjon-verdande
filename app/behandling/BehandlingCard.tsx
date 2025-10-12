@@ -36,6 +36,7 @@ import {
 import { Suspense, useMemo, useRef, useState } from 'react'
 import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
+import type { MeResponse } from '~/brukere/brukere'
 import { buildUrl } from '~/common/build-url'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandlingStatus } from '~/common/decode'
@@ -45,12 +46,14 @@ import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { Entry } from '~/components/entry/Entry'
+import { harRolle } from '~/components/venstre-meny/VenstreMeny'
 import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
 
 export interface Props {
   aldeBehandlingUrlTemplate?: string
   behandling: BehandlingDto
   detaljertFremdrift?: Promise<DetaljertFremdriftDTO | undefined | null> | null
+  me: MeResponse
   psakSakUrlTemplate: string
 }
 
@@ -578,7 +581,9 @@ export default function BehandlingCard(props: Props) {
               <Tabs.Tab value="detaljertFremdrift" label="Detaljert fremdrift" icon={<TasklistIcon />} />
             )}
             <Tabs.Tab value="logs" label="Applikasjonslogg" icon={<ReceiptIcon />} />
-            <Tabs.Tab value="audit" label="Revisjonslogg" icon={<ReceiptIcon />} />
+            {harRolle(props.me, 'VERDANDE_ADMIN') && (
+              <Tabs.Tab value="audit" label="Revisjonslogg" icon={<ReceiptIcon />} />
+            )}
           </Tabs.List>
           <Outlet />
         </Tabs>

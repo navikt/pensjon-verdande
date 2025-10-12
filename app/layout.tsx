@@ -51,7 +51,7 @@ export default function Layout() {
 
             <div style={{ paddingLeft: '12px', paddingRight: '12px', flex: 1 }}>
               {schedulerAlert}
-              <Outlet />
+              <Outlet context={me} />
             </div>
           </HStack>
         </Page>

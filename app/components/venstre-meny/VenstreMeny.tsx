@@ -68,6 +68,20 @@ const behandlingerMeny = [
   ['SE_BEHANDLINGER', '/behandlinger/UNDER_BEHANDLING', 'Under behandling'],
 ]
 
+export function harTilgang(me: MeResponse | undefined, operasjon: string) {
+  if (!me) {
+    return false
+  }
+  return me.tilganger.find((it) => it === operasjon)
+}
+
+export function harRolle(me: MeResponse | undefined, rolle: string) {
+  if (!me) {
+    return false
+  }
+  return me.verdandeRoller.find((it) => it.toUpperCase() === rolle.toUpperCase())
+}
+
 export default function VenstreMeny(props: Props) {
   const me = props.me
 
@@ -76,20 +90,6 @@ export default function VenstreMeny(props: Props) {
   function indexSupplier() {
     currentIndex += 1
     return currentIndex
-  }
-
-  function harRolle(rolle: string) {
-    if (!me) {
-      return false
-    }
-    return me.verdandeRoller.find((it) => it.toUpperCase() === rolle.toUpperCase())
-  }
-
-  function harTilgang(operasjon: string) {
-    if (!me) {
-      return false
-    }
-    return me.tilganger.find((it) => it === operasjon)
   }
 
   function createMenuItem(operasjon: string, link: string, label: string) {
@@ -117,7 +117,7 @@ export default function VenstreMeny(props: Props) {
   }
 
   function byggMeny(navn: string, menyElementer: string[][], indexSupplier: () => number, p0?: JSX.Element) {
-    const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
+    const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(me, operasjon))
     if (harTilgangTilMeny) {
       const idx: number = indexSupplier()
 
@@ -138,7 +138,7 @@ export default function VenstreMeny(props: Props) {
           </Link>
           <ul className={styles.submenu}>
             {menyElementer
-              .filter(([operasjon]) => harTilgang(operasjon))
+              .filter(([operasjon]) => harTilgang(me, operasjon))
               .map(([operasjon, link, label]) => createMenuItem(operasjon, link, label))}
           </ul>
         </li>
@@ -178,7 +178,7 @@ export default function VenstreMeny(props: Props) {
             </NavLink>
           </li>
 
-          {harRolle('VERDANDE_ADMIN') && (
+          {harRolle(me, 'VERDANDE_ADMIN') && (
             <li>
               <NavLink
                 to={`/brukere`}
@@ -192,7 +192,7 @@ export default function VenstreMeny(props: Props) {
               </NavLink>
             </li>
           )}
-          {harRolle('VERDANDE_ADMIN') && (
+          {harRolle(me, 'VERDANDE_ADMIN') && (
             <li>
               <NavLink
                 to={`/audit`}
@@ -207,7 +207,7 @@ export default function VenstreMeny(props: Props) {
             </li>
           )}
 
-          {harTilgang('SE_BEHANDLINGER') && (
+          {harTilgang(me, 'SE_BEHANDLINGER') && (
             <li>
               <NavLink
                 to={`/manuell-behandling`}
