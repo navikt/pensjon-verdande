@@ -23,6 +23,7 @@ import {
   type LokiStream,
 } from '~/loki/loki-query-types'
 import { type TempoConfiguration, tempoUrl } from '~/loki/utils'
+import styles from './LokiLogsTable.module.css'
 
 function hashString(str: string): string {
   let h = 0
@@ -464,7 +465,7 @@ export default function LokiLogsTable({
                 <Table.HeaderCell align={numbericColumns.includes(col) ? 'right' : 'left'}>
                   {col === '_timestamp' ? 'Tidspunkt' : col === 'level' ? 'Nivå' : col === 'message' ? 'Melding' : col}
                 </Table.HeaderCell>
-                <Table.HeaderCell>
+                <Table.HeaderCell className={styles.displayOnHover}>
                   <HeaderActionMenu
                     selectedCols={selectedCols}
                     col={col}
@@ -503,7 +504,10 @@ export default function LokiLogsTable({
                     <Table.DataCell align={numbericColumns.includes(col) ? 'right' : 'left'}>
                       {decodeFieldValue(visAlltidFullDato || !isSameday, col, s)}
                     </Table.DataCell>
-                    <Table.DataCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
+                    <Table.DataCell
+                      style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}
+                      className={styles.displayOnHover}
+                    >
                       <FieldActionMenu addFilter={addFilter} col={col} value={String(s.stream[col] ?? '')} />
                     </Table.DataCell>
                   </Fragment>
