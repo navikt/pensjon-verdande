@@ -1,10 +1,10 @@
 .displayOnHover button {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.1s ease-in-out;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease-in-out;
 }
 
 tr:hover .displayOnHover button {
-    opacity: 1;
-    pointer-events: auto;
+  opacity: 1;
+  pointer-events: auto;
 }

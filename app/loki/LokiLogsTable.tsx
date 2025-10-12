@@ -60,7 +60,9 @@ export function selectedFilters(url: string) {
       const parsed = JSON.parse(decodeURIComponent(urlFilters))
       if (Array.isArray(parsed)) filter = parsed
     }
-  } catch {}
+  } catch {
+    // ignore
+  }
 
   return filter
 }
@@ -113,58 +115,61 @@ function MessageTable({
   removeColumn: (key: string) => void
   addFilter: (mode: FilterMode, key: string, value: string) => void
 }) {
+  const entries = useMemo(
+    () => Object.entries(s.stream).sort((a, b) => a[0].localeCompare(b[0], 'nb', { sensitivity: 'base' })),
+    [s.stream],
+  )
+
   return (
     <Table size="small">
       <Table.Body>
-        {Object.entries(s.stream)
-          .sort((a, b) => a[0].localeCompare(b[0], 'nb', { sensitivity: 'base' }))
-          .map(([key, value]) => {
-            const selected = isSelected(key)
-            return (
-              <Table.Row key={`details|${rowKey}|${key}`}>
-                <Table.HeaderCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
-                  <BodyShort>{key}</BodyShort>
-                </Table.HeaderCell>
-                <Table.HeaderCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
-                  {!HIDE_IN_DETAILS.has(key) && (
-                    <ActionMenu>
-                      <ActionMenu.Trigger>
-                        <Button
-                          variant="tertiary-neutral"
-                          icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
-                          size="small"
-                        />
-                      </ActionMenu.Trigger>
-                      <ActionMenu.Content>
-                        {(() => {
-                          return (
-                            <>
-                              <ActionMenu.Item onSelect={() => addColumn(key)} disabled={selected} icon={<PlusIcon />}>
-                                Legg til
-                              </ActionMenu.Item>
-                              <ActionMenu.Item
-                                onSelect={() => removeColumn(key)}
-                                disabled={!selected}
-                                icon={<XMarkIcon />}
-                              >
-                                Fjern
-                              </ActionMenu.Item>
-                            </>
-                          )
-                        })()}
-                      </ActionMenu.Content>
-                    </ActionMenu>
-                  )}
-                </Table.HeaderCell>
-                <Table.DataCell style={{ verticalAlign: 'top', width: 'auto' }}>
-                  <BodyShort style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{value}</BodyShort>
-                </Table.DataCell>
-                <Table.DataCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
-                  <FieldActionMenu addFilter={addFilter} col={key} value={value} />
-                </Table.DataCell>
-              </Table.Row>
-            )
-          })}
+        {entries.map(([key, value]) => {
+          const selected = isSelected(key)
+          return (
+            <Table.Row key={`details|${rowKey}|${key}`}>
+              <Table.HeaderCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
+                <BodyShort>{key}</BodyShort>
+              </Table.HeaderCell>
+              <Table.HeaderCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
+                {!HIDE_IN_DETAILS.has(key) && (
+                  <ActionMenu>
+                    <ActionMenu.Trigger>
+                      <Button
+                        variant="tertiary-neutral"
+                        icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+                        size="small"
+                      />
+                    </ActionMenu.Trigger>
+                    <ActionMenu.Content>
+                      {(() => {
+                        return (
+                          <>
+                            <ActionMenu.Item onSelect={() => addColumn(key)} disabled={selected} icon={<PlusIcon />}>
+                              Legg til
+                            </ActionMenu.Item>
+                            <ActionMenu.Item
+                              onSelect={() => removeColumn(key)}
+                              disabled={!selected}
+                              icon={<XMarkIcon />}
+                            >
+                              Fjern
+                            </ActionMenu.Item>
+                          </>
+                        )
+                      })()}
+                    </ActionMenu.Content>
+                  </ActionMenu>
+                )}
+              </Table.HeaderCell>
+              <Table.DataCell style={{ verticalAlign: 'top', width: 'auto' }}>
+                <BodyShort style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{value}</BodyShort>
+              </Table.DataCell>
+              <Table.DataCell style={{ verticalAlign: 'top', whiteSpace: 'nowrap', width: '1%' }}>
+                <FieldActionMenu addFilter={addFilter} col={key} value={value} />
+              </Table.DataCell>
+            </Table.Row>
+          )
+        })}
       </Table.Body>
     </Table>
   )
@@ -400,15 +405,7 @@ export default function LokiLogsTable({
   const removeFilter = (idx: number) => setFilters((prev) => prev.filter((_, i) => i !== idx))
 
   const visibleResult = useMemo(() => {
-    const sorted = result.sort((a, b) => {
-      if (a.stream._timestamp && b.stream._timestamp) {
-        return b.stream._timestamp.localeCompare(a.stream._timestamp)
-      } else {
-        return 0
-      }
-    })
-
-    if (filters.length === 0) return sorted
+    if (filters.length === 0) return result
     return result.filter((s) => {
       return filters.every((f) => (f.mode === 'in' ? s.stream[f.key] === f.value : s.stream[f.key] !== f.value))
     })
