@@ -68,7 +68,7 @@ type AlternativerPatch = Partial<AlternativerVerdi>
 type BuildValgteDatoerParams = Parameters<typeof buildValgteDatoer>
 
 const TIDER: string[] = Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, '0')}:00`)
-const BEHANDLINGSTYPER = ['AvsluttSaker']
+const BEHANDLINGSTYPER = ['AvsluttSaker', 'PersonAjourhold']
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url)
