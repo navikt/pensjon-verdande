@@ -33,6 +33,7 @@ import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/
 import { buildUrl } from '~/common/build-url'
 import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow, toIsoDate } from '~/common/date'
 import { decodeAldeBehandlingStatus, decodeBehandlingstype } from '~/common/decode'
+import { decodeAktivitet } from '~/common/decodeBehandling'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { PageResponse } from '~/types'
@@ -481,14 +482,14 @@ function BehandlingCard({
         {b.nesteAktiviteter.length === 1 ? (
           <div>
             <Detail style={{ marginBottom: 4 }}>Neste aktivitet</Detail>
-            <BodyShort size="small">{b.nesteAktiviteter[0]}</BodyShort>
+            <BodyShort size="small">{decodeAktivitet(b.nesteAktiviteter[0])}</BodyShort>
           </div>
         ) : b.nesteAktiviteter.length > 1 ? (
           <div>
             <Detail style={{ marginBottom: 4 }}>Neste aktiviteter</Detail>
             <List as="ul" size="small">
               {b.nesteAktiviteter.map((a) => (
-                <List.Item key={a}>{a}</List.Item>
+                <List.Item key={a}>{decodeAktivitet(a)}</List.Item>
               ))}
             </List>
           </div>
