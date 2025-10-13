@@ -9,12 +9,7 @@ import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import { tidsbruk } from '~/components/kjoringer-table/BehandlingKjoringerTable'
 import LokiLogsTable, { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
 import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
-import {
-  isStreams,
-  type LokiInstantQueryData,
-  type LokiInstantQueryResponse,
-  type LokiStream,
-} from '~/loki/loki-query-types'
+import type { LokiInstantQueryResponse } from '~/loki/loki-query-types'
 import { tempoUrl } from '~/loki/utils'
 import { apiGet } from '~/services/api.server'
 import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
@@ -37,27 +32,25 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     transaction: kjoring.correlationId,
   })
 
-  const data = response.data as LokiInstantQueryData
-
-  const result: LokiStream[] = response.status === 'success' && isStreams(data) ? (data.result as LokiStream[]) : []
-  // TODO: Lagre trace id på kjøring i pen sånn at den ikke må tas ut av svaret fra Loki
-  const traceId = result.length > 0 ? result[0].stream.trace_id : undefined
-
   return {
     response,
     behandling,
     aktivitet: kjoring.aktivitetId && finnAktivitet(behandling, kjoring.aktivitetId),
-    kibanaUrl: kibanaLinkForCorrelationIdAndTraceId(kjoring.startet, kjoring.avsluttet, kjoring.correlationId, traceId),
+    kibanaUrl: kibanaLinkForCorrelationIdAndTraceId(
+      kjoring.startet,
+      kjoring.avsluttet,
+      kjoring.correlationId,
+      kjoring.traceId,
+    ),
     kjoring,
-    traceId: traceId,
-    tempoUrl: traceId && tempoUrl(tempoConfiguration, kjoring.startet, kjoring.avsluttet, traceId),
+    tempoUrl: kjoring.traceId && tempoUrl(tempoConfiguration, kjoring.startet, kjoring.avsluttet, kjoring.traceId),
     selectedColumns: selectedColumns(request.url),
     selectedFilters: selectedFilters(request.url),
   }
 }
 
 export default function BehandlingKjoring() {
-  const { response, behandling, aktivitet, kjoring, traceId, kibanaUrl, tempoUrl, selectedColumns, selectedFilters } =
+  const { response, behandling, aktivitet, kjoring, kibanaUrl, tempoUrl, selectedColumns, selectedFilters } =
     useLoaderData<typeof loader>()
 
   const [shareUrl, setShareUrl] = useState('')
@@ -135,16 +128,16 @@ export default function BehandlingKjoring() {
             </HStack>
           </dd>
 
-          {traceId && (
+          {kjoring.traceId && (
             <>
               <dt>
                 <Label as="span">TraceId</Label>
               </dt>
               <dd>
                 <HStack gap="2" align="center">
-                  <BodyShort>{traceId}</BodyShort>
+                  <BodyShort>{kjoring.traceId}</BodyShort>
                   <Tooltip content="Kopier TraceId">
-                    <CopyButton copyText={traceId} iconPosition="right" size="small" />
+                    <CopyButton copyText={kjoring.traceId} iconPosition="right" size="small" />
                   </Tooltip>
                 </HStack>
               </dd>

@@ -119,6 +119,7 @@ export type GjenværendeAktivitetOppsummering = {
 }
 export type BehandlingKjoringDTO = {
   behandlingKjoringId: number
+  traceId?: string | null
   behandlingId: number
   aktivitetId: number | null
   startet: string
