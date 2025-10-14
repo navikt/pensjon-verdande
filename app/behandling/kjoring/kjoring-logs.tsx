@@ -30,6 +30,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
   const response: LokiInstantQueryResponse = await fetchPenLogs(kjoring.startet, kjoring.avsluttet, {
     transaction: kjoring.correlationId,
+    ...(kjoring.traceId ? { traceId: kjoring.traceId } : {}),
   })
 
   return {

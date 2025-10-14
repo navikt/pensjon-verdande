@@ -1,6 +1,6 @@
-import { HStack, Loader, VStack } from '@navikt/ds-react'
+import { Alert, HStack, Loader, VStack } from '@navikt/ds-react'
 import { Suspense } from 'react'
-import { Await, type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { Await, type LoaderFunctionArgs, useAsyncError, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import LokiLogsTable, { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
 import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
@@ -26,6 +26,18 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
+function LokiLogsError() {
+  const errors = useAsyncError()
+
+  console.error(errors)
+
+  return (
+    <Alert variant="error" size="small">
+      Feil ved henting av logger. Dette kan skyldes tregt svar fra logg-tjenesten. Forsøk igjen senere
+    </Alert>
+  )
+}
+
 export default function BehandlingLogs() {
   const { response, selectedCols, selectedFilters, start, slutt, tempoConfiguration } = useLoaderData<typeof loader>()
 
@@ -38,7 +50,7 @@ export default function BehandlingLogs() {
           </HStack>
         }
       >
-        <Await resolve={response}>
+        <Await resolve={response} errorElement={<LokiLogsError />}>
           {(it) => (
             <LokiLogsTable
               response={it}

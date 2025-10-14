@@ -12,8 +12,15 @@ export async function fetchPenLogs(
   end: string,
   fields: Record<string, string | number>,
 ): Promise<LokiInstantQueryResponse> {
-  const fieldExpression = Object.entries(fields).map(([key, value]) => ` | ${key}="${value}"`)
-  const query = `{service_name="${env.penServiceName}"} | json | logfmt | drop __error__, __error_details__ ${fieldExpression}`
+  const initialFilter = Object.values(fields)
+    .map((string) => `${String(string).replaceAll('\\', '\\\\')}`)
+    .join('|')
+
+  const fieldExpression = Object.entries(fields)
+    .map(([key, value]) => `${key}=\`${value}\``)
+    .join(' OR ')
+
+  const query = `{service_name="${env.penServiceName}"} |~ \`${initialFilter}\` | json | logfmt | drop __error__, __error_details__ | ${fieldExpression}`
 
   const url =
     env.lokiApiBaseUrl +
