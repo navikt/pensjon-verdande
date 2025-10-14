@@ -40,9 +40,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     [FELTER.opprettOppgave]: zfd.checkbox({ trueValue: checkboxTrueValue }),
   })
 
-  const { [FELTER.aar]: aar, [FELTER.eps2g]: eps2g, [FELTER.gjenlevende]: gjenlevende, [FELTER.opprettOppgave] : opprettoppgave } = skjema.parse(fd)
+  const {
+    [FELTER.aar]: aar,
+    [FELTER.eps2g]: eps2g,
+    [FELTER.gjenlevende]: gjenlevende,
+    [FELTER.opprettOppgave]: opprettoppgave,
+  } = skjema.parse(fd)
 
-  const response = await opprettBpen014(accessToken, aar, eps2g, gjenlevende,opprettoppgave)
+  const response = await opprettBpen014(accessToken, aar, eps2g, gjenlevende, opprettoppgave)
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
