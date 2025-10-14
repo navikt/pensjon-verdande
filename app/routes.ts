@@ -4,7 +4,6 @@ export default [
   index('index.tsx'),
 
   route('auth/callback', 'auth/auth.callback.tsx'),
-  route('auth/failed', 'auth/auth.failed.tsx'),
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
   layout('layout.tsx', [

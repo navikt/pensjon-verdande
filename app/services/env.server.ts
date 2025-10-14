@@ -4,7 +4,7 @@ export const env = ensureEnv({
   clientId: 'AZURE_APP_CLIENT_ID',
   clientSecret: 'AZURE_APP_CLIENT_SECRET',
   issuer: 'AZURE_OPENID_CONFIG_ISSUER',
-  tokenEnpoint: 'AZURE_OPENID_CONFIG_TOKEN_ENDPOINT',
+  tokenEndpoint: 'AZURE_OPENID_CONFIG_TOKEN_ENDPOINT',
 
   env: 'ENV',
 
@@ -24,3 +24,4 @@ export const env = ensureEnv({
 })
 
 export const isAldeLinkEnabled = env.aldeLinkEnabled === 'true'
+export const isLocalEnv = process.env.IS_LOCAL_ENV === 'true'

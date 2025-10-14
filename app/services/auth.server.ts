@@ -1,8 +1,14 @@
-import type { OAuth2Tokens } from 'arctic'
-import { createCookieSessionStorage, redirect } from 'react-router'
+import {
+  type Cookie,
+  createCookie,
+  createCookieSessionStorage,
+  redirect,
+  type SessionData,
+  type SessionStorage,
+} from 'react-router'
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
-import { env } from '~/services/env.server'
+import { env, isLocalEnv } from '~/services/env.server'
 import { exchange } from '~/services/obo.server'
 
 type User = {
@@ -10,71 +16,84 @@ type User = {
   accessTokenExpiresAt: string
 }
 
-function getUser(tokens: OAuth2Tokens): Promise<User> {
-  return Promise.resolve({
-    accessToken: tokens.accessToken(),
-    accessTokenExpiresAt: tokens.accessTokenExpiresAt().toISOString(),
+export let sessionStorage: SessionStorage<SessionData, SessionData> | undefined
+export let returnToCookie: Cookie | undefined
+export let authenticator: Authenticator<User> | undefined
+
+if (isLocalEnv) {
+  const azureCallbackUrl = process.env.AZURE_CALLBACK_URL
+
+  if (azureCallbackUrl === undefined) {
+    console.error(`Må definere AZURE_CALLBACK_URL ved lokal utvikling`)
+    process.exit(1)
+  }
+
+  sessionStorage = createCookieSessionStorage({
+    cookie: {
+      name: '__verdande_session',
+      httpOnly: true,
+      path: '/',
+      sameSite: 'lax',
+      secure: false,
+    },
   })
-}
 
-export const sessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: '__verdande_session',
-    httpOnly: true,
+  returnToCookie = createCookie('return-to', {
     path: '/',
+    httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production', // enable this in prod only
-  },
-})
+    maxAge: 300,
+    secure: false,
+  })
 
-export const { getSession, commitSession } = sessionStorage
-
-export const authenticator = new Authenticator<User>()
-
-if (process.env.ENABLE_OAUTH20_CODE_FLOW && process.env.AZURE_CALLBACK_URL) {
+  authenticator = new Authenticator<User>()
   authenticator.use(
     new OAuth2Strategy(
       {
         clientId: env.clientId,
         clientSecret: env.clientSecret,
 
-        authorizationEndpoint: env.tokenEnpoint.replace('token', 'authorize'),
-        tokenEndpoint: env.tokenEnpoint,
-        redirectURI: process.env.AZURE_CALLBACK_URL,
+        authorizationEndpoint: env.tokenEndpoint.replace('token', 'authorize'),
+        tokenEndpoint: env.tokenEndpoint,
+        redirectURI: azureCallbackUrl,
 
         scopes: ['openid', 'offline_access', `api://${env.clientId}/.default`],
       },
       async ({ tokens }) => {
-        return await getUser(tokens)
+        return {
+          accessToken: tokens.accessToken(),
+          accessTokenExpiresAt: tokens.accessTokenExpiresAt().toISOString(),
+        }
       },
     ),
     'entra-id',
   )
 }
 
-function redirectUrl(request: Request) {
-  const searchParams = new URLSearchParams([['redirectTo', new URL(request.url).pathname]])
-  return `/auth/microsoft?${searchParams}`
-}
-
 /**
- * Returnerer en access token, om nødvendig redirekterer til innlogging. Har støtte for både nais-miljø og lokal
- * utvikling
+ * Henter et access token, og redirigerer til innlogging om nødvendig.
+ * Støtter både NAIS-miljø og lokal utvikling:
  *
- * - nais-miljø benytter Wonderwall og token kommer inn via authorization header.
- * - lokal utvikling benytter oauth2 code flow og token kommer fra session cookie.
+ * - I NAIS-miljø leveres token via Authorization-header (Wonderwall).
+ * - Lokalt brukes OAuth2 code flow, og token hentes fra session-cookie.
  *
- * Applikasjonen benytter On-Behalf-Of (OBO) flow og utveksler brukers access token for et nytt access token for
- * å kalle API-er på vegne av brukeren.
+ * Applikasjonen benytter On-Behalf-Of (OBO)-flow for å utveksle brukerens access token
+ * med et nytt token til bruk mot underliggende API-er.
  */
 export async function requireAccessToken(request: Request) {
+  function redirectUrl(request: Request) {
+    const searchParams = new URLSearchParams([['returnTo', new URL(request.url).pathname]])
+    return `/auth/microsoft?${searchParams}`
+  }
+
   const authorization = request.headers.get('authorization')
 
   if (authorization?.toLowerCase().startsWith('bearer')) {
-    const tokenResponse = await exchange(authorization.substring('bearer '.length), env.penScope)
+    const tokenResponse = await exchange(authorization?.substring('bearer '.length), env.penScope)
     return tokenResponse.access_token
-  } else {
-    const session = await getSession(request.headers.get('cookie'))
+  } else if (isLocalEnv) {
+    // biome-ignore lint/style/noNonNullAssertion: Skal være satt før man kommer hit
+    const session = await sessionStorage!.getSession(request.headers.get('cookie'))
 
     if (!session.has('user')) {
       // if there is no user session, redirect to login
@@ -88,5 +107,7 @@ export async function requireAccessToken(request: Request) {
       const tokenResponse = await exchange(user.accessToken, env.penScope)
       return tokenResponse.access_token
     }
+  } else {
+    throw Error('Token mangler')
   }
 }
