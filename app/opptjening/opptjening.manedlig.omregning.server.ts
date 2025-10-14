@@ -47,7 +47,7 @@ export async function hentMuligeManedligeKjoringer(accessToken: string): Promise
   return (await response.json()) as MuligeManedligeKjoringerResponse
 }
 
-export async function getSisteAvsjekk(accessToken: string): Promise<SisteAvsjekkResponse> {
+export async function getSisteAvsjekk(accessToken: string): Promise<SisteAvsjekkResponse | null> {
   const response = await fetch(`${env.penUrl}/api/opptjening/sisteAvsjekk`, {
     method: 'GET',
     headers: {
@@ -56,6 +56,10 @@ export async function getSisteAvsjekk(accessToken: string): Promise<SisteAvsjekk
       'X-Request-ID': crypto.randomUUID(),
     },
   })
+
+  if (response.status === 404) {
+    return null
+  }
 
   if (!response.ok) {
     const text = await response.text()

@@ -20,7 +20,7 @@ type LoaderData = {
   kanOverstyreBehandlingsmaned: boolean
   maneder: string[]
   defaultMonth: string
-  sisteAvsjekk: SisteAvsjekkResponse
+  sisteAvsjekk: SisteAvsjekkResponse | null
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
@@ -95,15 +95,21 @@ export default function OpprettEndretOpptjeningRoute() {
         </Button>
       </Form>
 
-      {!sisteAvsjekk.avsjekkOk && (
-        <Alert variant="warning" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+      {sisteAvsjekk === null && (
+        <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+          Ingen avsjekk gjort
+        </Alert>
+      )}
+
+      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === false && (
+        <Alert variant="error" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var ikke OK. PEN har mottatt{' '}
           {sisteAvsjekk.antallHendelserPen}, POPP har sendt {sisteAvsjekk.antallHendelserPopp}
         </Alert>
       )}
 
-      {sisteAvsjekk.avsjekkOk && (
-        <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
+        <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var OK. Vi har mottatt {sisteAvsjekk.antallHendelserPen}{' '}
           hendelser.
         </Alert>
