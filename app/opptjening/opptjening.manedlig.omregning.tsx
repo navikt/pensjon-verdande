@@ -2,10 +2,15 @@ import { Alert, BodyShort, Button, Heading, Label, Select, VStack } from '@navik
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useState } from 'react'
-import { Form, type LoaderFunctionArgs, useLoaderData, useNavigation } from 'react-router'
+import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
-import { hentMuligeManedligeKjoringer } from '~/opptjening/opptjening.manedlig.omregning.server'
+import {
+  getSisteAvsjekk,
+  hentMuligeManedligeKjoringer,
+  opprettAvsjekk,
+  type SisteAvsjekkResponse,
+} from '~/opptjening/opptjening.manedlig.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
@@ -15,6 +20,7 @@ type LoaderData = {
   kanOverstyreBehandlingsmaned: boolean
   maneder: string[]
   defaultMonth: string
+  sisteAvsjekk: SisteAvsjekkResponse | null
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
@@ -32,6 +38,8 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
     sort: searchParams.get('sort'),
   })
 
+  const sisteAvsjekk = await getSisteAvsjekk(accessToken)
+
   const muligeManedligeKjoringer = await hentMuligeManedligeKjoringer(accessToken)
 
   const currentMonth = format(new Date(), 'yyyy-MM')
@@ -44,11 +52,19 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
     kanOverstyreBehandlingsmaned: muligeManedligeKjoringer.kanOverstyreBehandlingsmaned,
     maneder: muligeManedligeKjoringer.maneder,
     defaultMonth,
+    sisteAvsjekk,
   }
 }
 
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const accessToken = await requireAccessToken(request)
+  await opprettAvsjekk(accessToken)
+  return null
+}
+
 export default function OpprettEndretOpptjeningRoute() {
-  const { behandlinger, maneder, kanOverstyreBehandlingsmaned, defaultMonth } = useLoaderData<typeof loader>()
+  const { behandlinger, maneder, kanOverstyreBehandlingsmaned, defaultMonth, sisteAvsjekk } =
+    useLoaderData<typeof loader>()
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
@@ -71,6 +87,31 @@ export default function OpprettEndretOpptjeningRoute() {
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
+        </Alert>
+      )}
+      <Form method="POST" navigate={false}>
+        <Button type="submit" disabled={isSubmitting} variant="secondary">
+          Kjør avsjekk
+        </Button>
+      </Form>
+
+      {sisteAvsjekk === null && (
+        <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+          Ingen avsjekk gjort
+        </Alert>
+      )}
+
+      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === false && (
+        <Alert variant="error" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+          Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var ikke OK. PEN har mottatt{' '}
+          {sisteAvsjekk.antallHendelserPen}, POPP har sendt {sisteAvsjekk.antallHendelserPopp}
+        </Alert>
+      )}
+
+      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
+        <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+          Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var OK. Vi har mottatt {sisteAvsjekk.antallHendelserPen}{' '}
+          hendelser.
         </Alert>
       )}
 
