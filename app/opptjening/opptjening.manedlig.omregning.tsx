@@ -111,8 +111,8 @@ export default function OpprettEndretOpptjeningRoute() {
 
       {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
         <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
-          Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var OK. Vi har mottatt {sisteAvsjekk.antallHendelserPen}{' '}
-          hendelser.
+          Siste avsjekk {format(sisteAvsjekk.sisteAvsjekkTidspunkt, "dd.MM.yyyy 'kl.' HH:mm:ss")} var OK. Vi har mottatt{' '}
+          {sisteAvsjekk.antallHendelserPen} hendelser.
         </Alert>
       )}
 
