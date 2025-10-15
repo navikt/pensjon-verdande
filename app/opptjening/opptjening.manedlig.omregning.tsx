@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Button, Heading, Label, Select, VStack } from '@navikt/ds-react'
+import { Alert, BodyShort, Button, Checkbox, CheckboxGroup, Heading, Label, Select, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useState } from 'react'
@@ -71,6 +71,7 @@ export default function OpprettEndretOpptjeningRoute() {
   const [selectedMonthStr, setSelectedMonthStr] = useState(defaultMonth)
   const selectedMonthDate = useMemo(() => parse(selectedMonthStr, 'yyyy-MM', new Date()), [selectedMonthStr])
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [avsjekkForKjoring, setAvsjekkForKjoring] = useState(false)
 
   const minDate = kanOverstyreBehandlingsmaned ? undefined : startOfMonth(selectedMonthDate)
   const maxDate = kanOverstyreBehandlingsmaned ? undefined : endOfMonth(selectedMonthDate)
@@ -120,23 +121,15 @@ export default function OpprettEndretOpptjeningRoute() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '200px 200px',
+              gridTemplateColumns: '250px 250px 250px',
               columnGap: '1rem',
               rowGap: '0.25rem',
             }}
           >
-            <div>
-              <Label htmlFor="behandlingsmaned" style={{ marginBottom: '0.25rem' }}>
+            <VStack>
+              <Label htmlFor="behandlingsmaned" style={{ marginBottom: '0.55rem' }}>
                 Behandlingsmåned
               </Label>
-            </div>
-            <div>
-              <Label htmlFor="kjoeretidspunkt" style={{ marginBottom: '0.25rem' }}>
-                Kjøretidspunkt {kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}
-              </Label>
-            </div>
-
-            <div>
               <Select
                 onChange={(e) => {
                   setSelectedMonthStr(e.target.value)
@@ -153,17 +146,31 @@ export default function OpprettEndretOpptjeningRoute() {
                   </option>
                 ))}
               </Select>
-            </div>
+            </VStack>
+            {kanOverstyreBehandlingsmaned && (
+              <VStack>
+                <Label htmlFor="kjoeretidspunkt">Kjøretidspunkt (valgfritt)</Label>
+                <div style={{ marginTop: '1.05rem' }}>
+                  <DateTimePicker
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                    labelText=""
+                  />
+                </div>
+              </VStack>
+            )}
 
-            <div style={{ paddingTop: '7px' }}>
-              <DateTimePicker
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                minDate={minDate}
-                maxDate={maxDate}
-                labelText=""
-              />
-            </div>
+            <CheckboxGroup legend="Avsjekk før kjøring" size={'small'}>
+              <Checkbox
+                value="true"
+                checked={avsjekkForKjoring}
+                onChange={(e) => setAvsjekkForKjoring(e.target.checked)}
+              >
+                Kjør avsjekk før kjøring
+              </Checkbox>
+            </CheckboxGroup>
 
             <input
               type="hidden"
@@ -175,6 +182,7 @@ export default function OpprettEndretOpptjeningRoute() {
               name="behandlingsmaned"
               value={selectedMonthDate.getFullYear() * 100 + (selectedMonthDate.getMonth() + 1)}
             />
+            <input type="hidden" name="avsjekkForKjoring" value={avsjekkForKjoring ? 'true' : 'false'} />
           </div>
           <div style={{ marginTop: '1rem' }}>
             <Button type="submit" disabled={isSubmitting} variant="primary">

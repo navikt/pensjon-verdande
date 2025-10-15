@@ -5,6 +5,7 @@ export async function opprettOpptjeningsendringMandeligOmregning(
   accessToken: string,
   behandlingsmaned: number,
   kjoeretidspunkt: string,
+  avsjekkForKjoring: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(`${env.penUrl}/api/opptjening/mandeliguttrekk/opprett`, {
     method: 'POST',
@@ -16,6 +17,7 @@ export async function opprettOpptjeningsendringMandeligOmregning(
     body: JSON.stringify({
       behandlingsmaned: behandlingsmaned,
       kjoeretidspunkt: kjoeretidspunkt,
+      avsjekkForKjoring: avsjekkForKjoring,
     }),
   })
 
