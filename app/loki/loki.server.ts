@@ -1,5 +1,6 @@
+import { addMinutes, max, subDays, subMinutes } from 'date-fns'
 import type { LokiInstantQueryResponse } from '~/loki/loki-query-types'
-import { isoTimestampToUnixdate, type TempoConfiguration } from '~/loki/utils'
+import { isoTimestampToDate, type TempoConfiguration } from '~/loki/utils'
 import { normalizeAndThrow, withTimeout } from '~/services/api.server'
 import { env } from '~/services/env.server'
 
@@ -22,18 +23,21 @@ export async function fetchPenLogs(
 
   const query = `{service_name="${env.penServiceName}"} |~ \`${initialFilter}\` | json | logfmt | drop __error__, __error_details__ | ${fieldExpression}`
 
+  const e = addMinutes(isoTimestampToDate(end), 5)
+  const s = max([subMinutes(isoTimestampToDate(start), 5), subDays(e, 30)])
+
   const url =
     env.lokiApiBaseUrl +
     '/loki/api/v1/query_range' +
     '?direction=BACKWARD' +
     '&end=' +
-    isoTimestampToUnixdate(end, +3) +
+    e.getTime() +
     '000000' +
     '&limit=30' +
     '&query=' +
     encodeURI(query) +
     '&start=' +
-    isoTimestampToUnixdate(start, -3) +
+    s.getTime() +
     '000000'
 
   const { signal, cancel } = withTimeout(15_000)

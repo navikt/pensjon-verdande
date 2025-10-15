@@ -7,9 +7,9 @@ import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import { tidsbruk } from '~/components/kjoringer-table/BehandlingKjoringerTable'
-import LokiLogsTable, { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
+import { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
+import { LokiLogsTableLoader } from '~/loki/LokiLogsTableLoader'
 import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
-import type { LokiInstantQueryResponse } from '~/loki/loki-query-types'
 import { tempoUrl } from '~/loki/utils'
 import { apiGet } from '~/services/api.server'
 import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
@@ -28,7 +28,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  const response: LokiInstantQueryResponse = await fetchPenLogs(kjoring.startet, kjoring.avsluttet, {
+  const response = fetchPenLogs(kjoring.startet, kjoring.avsluttet, {
     transaction: kjoring.correlationId,
     ...(kjoring.traceId ? { traceId: kjoring.traceId } : {}),
   })
@@ -219,10 +219,10 @@ export default function BehandlingKjoring() {
         />
       </HStack>
 
-      <LokiLogsTable
+      <LokiLogsTableLoader
         response={response}
-        initialFilters={selectedFilters}
-        initialSelectedCols={selectedColumns}
+        selectedFilters={selectedFilters}
+        selectedColumns={selectedColumns}
         setShareUrl={setShareUrl}
         start={kjoring.startet}
         slutt={kjoring.avsluttet}

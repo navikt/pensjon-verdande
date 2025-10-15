@@ -1,3 +1,7 @@
+export function isoTimestampToDate(iso: string) {
+  return new Date(iso.replace(/(\.\d{3})\d+$/, '$1'))
+}
+
 export function isoTimestampToUnixdate(iso: string, hourSkew: number) {
   const date = new Date(iso.replace(/(\.\d{3})\d+$/, '$1'))
 
