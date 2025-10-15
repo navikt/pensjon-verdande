@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Button, Checkbox, CheckboxGroup, Heading, Label, Select, VStack } from '@navikt/ds-react'
+import { Alert, BodyShort, Button, Checkbox, CheckboxGroup, Heading, Select, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useState } from 'react'
@@ -126,40 +126,30 @@ export default function OpprettEndretOpptjeningRoute() {
               rowGap: '0.25rem',
             }}
           >
-            <VStack>
-              <Label htmlFor="behandlingsmaned" style={{ marginBottom: '0.55rem' }}>
-                Behandlingsmåned
-              </Label>
-              <Select
-                onChange={(e) => {
-                  setSelectedMonthStr(e.target.value)
-                  setSelectedDate(null)
-                }}
-                value={selectedMonthStr}
-                size="small"
-                label=""
-                style={{ width: '100%' }}
-              >
-                {maneder.map((mnd) => (
-                  <option key={mnd} value={mnd}>
-                    {format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })}
-                  </option>
-                ))}
-              </Select>
-            </VStack>
+            <Select
+              onChange={(e) => {
+                setSelectedMonthStr(e.target.value)
+                setSelectedDate(null)
+              }}
+              value={selectedMonthStr}
+              size="small"
+              label="Behandlingsmåned"
+              style={{ width: '100%' }}
+            >
+              {maneder.map((mnd) => (
+                <option key={mnd} value={mnd}>
+                  {format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })}
+                </option>
+              ))}
+            </Select>
             {kanOverstyreBehandlingsmaned && (
-              <VStack>
-                <Label htmlFor="kjoeretidspunkt">Kjøretidspunkt (valgfritt)</Label>
-                <div style={{ marginTop: '1.05rem' }}>
-                  <DateTimePicker
-                    selectedDate={selectedDate}
-                    setSelectedDate={setSelectedDate}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                    labelText=""
-                  />
-                </div>
-              </VStack>
+              <DateTimePicker
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                minDate={minDate}
+                maxDate={maxDate}
+                label="Kjøretidspunkt (valgfritt)"
+              />
             )}
 
             <CheckboxGroup legend="Avsjekk før kjøring" size={'small'}>
