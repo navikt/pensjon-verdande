@@ -30,10 +30,11 @@ import {
   KildeOppsummeringVisning,
 } from '~/alderspensjon/forstegangsbehandling/KildeOppsummeringVisning'
 import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
-import { buildUrl } from '~/common/build-url'
 import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow, toIsoDate } from '~/common/date'
 import { decodeAldeBehandlingStatus, decodeBehandlingstype } from '~/common/decode'
 import { decodeAktivitet } from '~/common/decodeBehandling'
+import { replaceTemplates } from '~/common/replace-templates'
+import { subdomain } from '~/common/utils'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { PageResponse } from '~/types'
@@ -78,7 +79,9 @@ export async function loader({ request }: { request: Request }) {
   const nowIso = new Date().toISOString()
 
   return {
-    aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
+    aldeBehandlingUrlTemplate: isAldeLinkEnabled
+      ? replaceTemplates(env.aldeBehandlingUrlTemplate, { subdomain: subdomain(url) })
+      : undefined,
     nowIso,
     page: data,
     pageIndex: page,
@@ -534,7 +537,11 @@ function BehandlingCard({
           </HStack>
           <HStack gap="2">
             <Button size="small" variant="tertiary">
-              <Link href={buildUrl(psakSakUrlTemplate, { sakId: b.sakId })} target="_blank" rel="noopener noreferrer">
+              <Link
+                href={replaceTemplates(psakSakUrlTemplate, { sakId: b.sakId })}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Åpne i Psak
                 <ExternalLinkIcon title={'Åpne i Psak'} />
               </Link>
@@ -542,7 +549,7 @@ function BehandlingCard({
             {aldeBehandlingUrlTemplate && (b.erAldeBehandling || b.erMuligAldeBehandling) && (
               <Button size="small" variant="tertiary">
                 <Link
-                  href={buildUrl(aldeBehandlingUrlTemplate, { behandlingId: b.behandlingId })}
+                  href={replaceTemplates(aldeBehandlingUrlTemplate, { behandlingId: b.behandlingId })}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

@@ -16,3 +16,8 @@ export const ensureEnv = <T extends Record<string, string>>(variables: T) => {
 export function uniqueFilter<T>(value: T, index: number, array: T[]) {
   return array.indexOf(value) === index
 }
+
+export function subdomain(url: URL): string | undefined {
+  const host = url.host.toLowerCase()
+  return ['ansatt', 'intern'].find((k) => host.includes(k))
+}

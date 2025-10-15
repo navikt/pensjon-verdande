@@ -3,6 +3,8 @@ import invariant from 'tiny-invariant'
 import BehandlingCard from '~/behandling/BehandlingCard'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import type { MeResponse } from '~/brukere/brukere'
+import { replaceTemplates } from '~/common/replace-templates'
+import { subdomain } from '~/common/utils'
 import { requireAccessToken } from '~/services/auth.server'
 import {
   endrePlanlagtStartet,
@@ -102,6 +104,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
+  const url = new URL(request.url)
+
   const accessToken = await requireAccessToken(request)
   const behandling = await getBehandling(accessToken, params.behandlingId)
   if (!behandling) {
@@ -114,7 +118,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 
   return {
-    aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
+    aldeBehandlingUrlTemplate: isAldeLinkEnabled
+      ? replaceTemplates(env.aldeBehandlingUrlTemplate, { subdomain: subdomain(url) })
+      : undefined,
     behandling,
     detaljertFremdrift: detaljertFremdrift,
     psakSakUrlTemplate: env.psakSakUrlTemplate,

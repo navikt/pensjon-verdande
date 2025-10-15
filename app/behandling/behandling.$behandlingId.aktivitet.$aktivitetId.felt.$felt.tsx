@@ -3,7 +3,7 @@ import { useLoaderData } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import xmlFormat from 'xml-formatter'
-import { buildUrl } from '~/common/build-url'
+import { replaceTemplates } from '~/common/replace-templates'
 import { apiGetRawStringOrUndefined } from '~/services/api.server'
 
 const AKSEPTERTE_FELTER = ['input', 'message', 'output'] as const
@@ -22,7 +22,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Error(`Ukjent felt '${String(felt)}'`)
   }
 
-  const url = buildUrl('/api/behandling/{behandlingId}/aktivitet/{aktivitetId}/{felt}' as const, {
+  const url = replaceTemplates('/api/behandling/{behandlingId}/aktivitet/{aktivitetId}/{felt}' as const, {
     behandlingId,
     aktivitetId,
     felt,

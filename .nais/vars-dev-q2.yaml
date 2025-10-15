@@ -22,7 +22,7 @@ psak:
 
 alde:
   link_enabled: true
-  behandling_url_template: 'https://pensjon-alde-q2.intern.dev.nav.no/behandling/{behandlingId}'
+  behandling_url_template: 'https://pensjon-alde-q2.{subdomain}.dev.nav.no/behandling/{behandlingId}'
 
 azure:
   tenant: trygdeetaten.no

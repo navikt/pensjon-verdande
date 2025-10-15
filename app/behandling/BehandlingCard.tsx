@@ -37,11 +37,11 @@ import { Suspense, useMemo, useRef, useState } from 'react'
 import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
 import type { MeResponse } from '~/brukere/brukere'
-import { buildUrl } from '~/common/build-url'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandlingStatus } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import type { Team } from '~/common/decodeTeam'
+import { replaceTemplates } from '~/common/replace-templates'
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
@@ -488,7 +488,7 @@ export default function BehandlingCard(props: Props) {
           {props.behandling.sakId && (
             <Button size="small" variant="tertiary">
               <Link
-                href={buildUrl(props.psakSakUrlTemplate, { sakId: props.behandling.sakId })}
+                href={replaceTemplates(props.psakSakUrlTemplate, { sakId: props.behandling.sakId })}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -500,7 +500,9 @@ export default function BehandlingCard(props: Props) {
           {props.aldeBehandlingUrlTemplate !== undefined && props.behandling.erAldeBehandling === true && (
             <Button size="small" variant="tertiary">
               <Link
-                href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
+                href={replaceTemplates(props.aldeBehandlingUrlTemplate, {
+                  behandlingId: props.behandling.behandlingId,
+                })}
                 target="_blank"
                 rel="noopener noreferrer"
               >
