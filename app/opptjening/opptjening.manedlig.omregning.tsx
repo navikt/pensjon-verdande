@@ -142,15 +142,14 @@ export default function OpprettEndretOpptjeningRoute() {
                 </option>
               ))}
             </Select>
-            {kanOverstyreBehandlingsmaned && (
-              <DateTimePicker
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                minDate={minDate}
-                maxDate={maxDate}
-                label="Kjøretidspunkt (valgfritt)"
-              />
-            )}
+
+            <DateTimePicker
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              minDate={minDate}
+              maxDate={maxDate}
+              label="Kjøretidspunkt (valgfritt)"
+            />
 
             <CheckboxGroup legend="Avsjekk før kjøring" size={'small'}>
               <Checkbox
