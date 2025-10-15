@@ -186,6 +186,7 @@ export type BehandlingManuellDto = {
   oppgavekodeDekode: string
 
   aktivFra: string
+  aktivTil?: string | null
 
   oppgaveId?: number | null
   oppgaveOpprettet: string | null
