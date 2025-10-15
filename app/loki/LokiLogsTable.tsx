@@ -464,11 +464,7 @@ export default function LokiLogsTable({
         {filters.length > 0 && (
           <Chips>
             {filters.map((f, i) => (
-              <Chips.Removable
-                key={`flt|${f.mode}|${f.key}|${f.value}`}
-                onClick={() => removeFilter(i)}
-                style={{ color: 'var(--ax-text-contrast)' }}
-              >
+              <Chips.Removable key={`flt|${f.mode}|${f.key}|${f.value}`} onClick={() => removeFilter(i)}>
                 {`${f.mode === 'in' ? 'inkluder' : 'ekskluder'}: ${f.key}=${f.value}`}
               </Chips.Removable>
             ))}
