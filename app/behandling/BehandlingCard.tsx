@@ -362,6 +362,17 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
+  function toBehandlingDiscriminator(type: string) {
+    switch (type) {
+      case 'PersonAjourholdBehandling':
+        return 'PersonAjourhold'
+      case 'AvsluttSakerBehandling':
+        return 'AvsluttSaker'
+      default:
+        return type
+    }
+  }
+
   return (
     <Page>
       <Heading size={'large'}>
@@ -528,6 +539,18 @@ export default function BehandlingCard(props: Props) {
 
           {stoppButton()}
 
+          {props.behandling.behandlingSerieId !== null && (
+            <Button
+              variant="tertiary"
+              icon={<ExternalLinkIcon aria-hidden />}
+              onClick={() =>
+                navigate(`/behandlingserie?behandlingType=${toBehandlingDiscriminator(props.behandling.type)}`)
+              }
+            >
+              Gå til behandlingserie
+            </Button>
+          )}
+
           {hasLink('sendTilManuellMedKontrollpunkt') && (
             <SendTilManuellMedKontrollpunktModal
               sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
@@ -639,7 +662,6 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
   const [tid, setTid] = useState<string>(initialTime)
   const [inputValue, setInputValue] = useState<string>(formatDDMMYYYY(initialDate))
   const [inputError, setInputError] = useState<string | undefined>(undefined)
-
   const fetcher = useFetcher()
 
   const handleSelect = (d?: Date) => {
@@ -690,7 +712,6 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
           Endre planlagt startet
         </Button>
       </Tooltip>
-
       <Modal
         open={open}
         header={{ heading: 'Endre planlagt startet' }}
