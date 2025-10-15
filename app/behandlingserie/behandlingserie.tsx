@@ -21,6 +21,7 @@ import {
   useSearchParams,
 } from 'react-router'
 import 'chart.js/auto'
+import { ExternalLinkIcon } from '@navikt/aksel-icons'
 import type { DateRange } from 'react-day-picker'
 import {
   endrePlanlagtStartet,
@@ -67,7 +68,11 @@ type AlternativerVerdi = {
 type AlternativerPatch = Partial<AlternativerVerdi>
 type BuildValgteDatoerParams = Parameters<typeof buildValgteDatoer>
 
-const TIDER: string[] = Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, '0')}:00`)
+const TIDER: string[] = Array.from({ length: 24 * 4 }, (_, i) => {
+  const h = Math.floor(i / 4)
+  const m = (i % 4) * 15
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+})
 const BEHANDLINGSTYPER = ['AvsluttSaker', 'PersonAjourhold']
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -338,6 +343,7 @@ function EndreDialog({
   const [tid, setTid] = useState<string>('')
   const [input, setInput] = useState('')
   const headingId = useId()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!element) return
@@ -430,6 +436,13 @@ function EndreDialog({
           </Button>
           <Button variant="secondary" onClick={lukk}>
             Lukk
+          </Button>
+          <Button
+            variant="tertiary"
+            icon={<ExternalLinkIcon aria-hidden />}
+            onClick={() => navigate(`/behandling/${element?.behandlingId}`)}
+          >
+            Gå til behandling
           </Button>
         </HStack>
       </Modal.Footer>
@@ -647,7 +660,6 @@ export default function BehandlingOpprett_index() {
   const [dialogApen, setDialogApen] = useState(false)
   const [redigeres, setRedigeres] = useState<PlannedItem | null>(null)
   const oppdaterFetcher = useFetcher()
-  const navigate = useNavigate()
 
   const apneEndre = useCallback((item: PlannedItem) => {
     setRedigeres(item)
@@ -668,10 +680,6 @@ export default function BehandlingOpprett_index() {
     },
     [redigeres, oppdaterFetcher],
   )
-
-  const apneBehandling = useCallback(() => {
-    if (redigeres?.behandlingId) navigate(`/behandling/${redigeres.behandlingId}`)
-  }, [redigeres, navigate])
 
   return (
     <VStack gap="6">
@@ -769,12 +777,6 @@ export default function BehandlingOpprett_index() {
             deaktiverteDatoer={deaktiverteDatoer}
             onSave={lagreEndring}
           />
-
-          {redigeres?.behandlingId && (
-            <Button variant="secondary" onClick={apneBehandling}>
-              Åpne behandling
-            </Button>
-          )}
         </>
       )}
     </VStack>
