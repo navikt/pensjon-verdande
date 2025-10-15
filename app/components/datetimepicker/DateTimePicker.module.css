@@ -1,0 +1,18 @@
+.akselInputEmulering {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: var(--ax-bg-input);
+    border: 1px solid var(--ax-border-neutral);
+    border-radius: var(--ax-radius-8);
+    color: var(--ax-text-neutral);
+    min-height: 2rem;
+    padding: var(--ax-space-8);
+    scroll-margin-block-start: 4rem;
+    width:100%;
+    font-size: var(--ax-font-size-medium);
+    letter-spacing: .002em;
+    line-height: var(--ax-font-line-height-medium);
+    padding-top: 0;
+    padding-bottom: 0;
+}
