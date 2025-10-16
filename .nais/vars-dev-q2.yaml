@@ -18,7 +18,7 @@ pen:
   url: 'https://pensjon-pen-q2.dev-fss-pub.nais.io'
 
 psak:
-  sak_url_template: 'https://pensjon-psak-q2.dev.adeo.no/psak/sak/sakId={sakId}'
+  sak_url_template: 'https://pensjon-psak-q2.{subdomain}.dev.nav.no/psak/sak/sakId={sakId}'
 
 alde:
   link_enabled: true

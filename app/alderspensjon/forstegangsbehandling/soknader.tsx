@@ -86,7 +86,7 @@ export async function loader({ request }: { request: Request }) {
     page: data,
     pageIndex: page,
     pageSize: size,
-    psakSakUrlTemplate: env.psakSakUrlTemplate,
+    psakSakUrlTemplate: replaceTemplates(env.psakSakUrlTemplate, { subdomain: subdomain(url) }),
     kildeOppsummering,
     fomDato,
     tomDato,

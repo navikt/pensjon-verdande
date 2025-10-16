@@ -123,7 +123,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       : undefined,
     behandling,
     detaljertFremdrift: detaljertFremdrift,
-    psakSakUrlTemplate: env.psakSakUrlTemplate,
+    psakSakUrlTemplate: replaceTemplates(env.psakSakUrlTemplate, { subdomain: subdomain(url) }),
   }
 }
 
