@@ -89,8 +89,8 @@ export const opprettAvsjekk = async (accessToken: string) => {
 
 export type SisteAvsjekkResponse = {
   sisteAvsjekkTidspunkt: string
-  antallHendelserPopp: number
-  antallHendelserPen: number
+  antallHendelserPopp: bigint
+  antallHendelserPen: bigint
   avsjekkOk: boolean
 }
 
