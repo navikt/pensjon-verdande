@@ -1,4 +1,15 @@
-import { Alert, BodyShort, Button, Checkbox, CheckboxGroup, Heading, Select, VStack } from '@navikt/ds-react'
+import {
+  Alert,
+  BodyShort,
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Heading,
+  HelpText,
+  HStack,
+  Select,
+  VStack,
+} from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useState } from 'react'
@@ -82,37 +93,15 @@ export default function OpprettEndretOpptjeningRoute() {
         Månedlig omregning av ytelse ved oppdaterte opptjeningsopplysninger
       </Heading>
 
-      <BodyShort spacing>Velg behandlingsmåned og tidspunkt for kjøring.</BodyShort>
+      <BodyShort spacing style={{ paddingTop: '2rem', paddingBottom: '1rem' }}>
+        Velg behandlingsmåned og tidspunkt for kjøring. Dersom avsjekk skal kjøres samtidig/litt i forkant huk av det
+        valget også.
+      </BodyShort>
 
       {!kanOverstyreBehandlingsmaned && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
-        </Alert>
-      )}
-      <Form method="POST" navigate={false}>
-        <Button type="submit" disabled={isSubmitting} variant="secondary">
-          Kjør avsjekk
-        </Button>
-      </Form>
-
-      {sisteAvsjekk === null && (
-        <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
-          Ingen avsjekk gjort
-        </Alert>
-      )}
-
-      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === false && (
-        <Alert variant="error" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
-          Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var ikke OK. PEN har mottatt{' '}
-          {sisteAvsjekk.antallHendelserPen}, POPP har sendt {sisteAvsjekk.antallHendelserPopp}
-        </Alert>
-      )}
-
-      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
-        <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
-          Siste avsjekk {format(sisteAvsjekk.sisteAvsjekkTidspunkt, "dd.MM.yyyy 'kl.' HH:mm:ss")} var OK. Vi har mottatt{' '}
-          {sisteAvsjekk.antallHendelserPen} hendelser.
         </Alert>
       )}
 
@@ -134,7 +123,6 @@ export default function OpprettEndretOpptjeningRoute() {
               value={selectedMonthStr}
               size="small"
               label="Behandlingsmåned"
-              style={{ width: '100%' }}
             >
               {maneder.map((mnd) => (
                 <option key={mnd} value={mnd}>
@@ -151,15 +139,24 @@ export default function OpprettEndretOpptjeningRoute() {
               label="Kjøretidspunkt (valgfritt)"
             />
 
-            <CheckboxGroup legend="Avsjekk før kjøring" size={'small'}>
-              <Checkbox
-                value="true"
-                checked={avsjekkForKjoring}
-                onChange={(e) => setAvsjekkForKjoring(e.target.checked)}
-              >
-                Kjør avsjekk før kjøring
-              </Checkbox>
-            </CheckboxGroup>
+            <HStack>
+              <CheckboxGroup legend="Avsjekk før kjøring" size={'small'}>
+                <Checkbox
+                  value="true"
+                  checked={avsjekkForKjoring}
+                  onChange={(e) => setAvsjekkForKjoring(e.target.checked)}
+                >
+                  Ja
+                </Checkbox>
+              </CheckboxGroup>
+
+              <HelpText title="beskrivelse for avhuking" placement="top">
+                Dersom denne hukes av vil en behandling for avskjekk av hendelser mellom PEN og POPP også starte med
+                behandlingen for omregning. For schedulering kan det være nyttig at denne hukes av da den vil gi oss en
+                feilende behandling dersom avsjekken viser differanse. Den vil dog IKKE være stoppende for
+                omregningsbehandlingen.
+              </HelpText>
+            </HStack>
 
             <input
               type="hidden"
@@ -173,13 +170,38 @@ export default function OpprettEndretOpptjeningRoute() {
             />
             <input type="hidden" name="avsjekkForKjoring" value={avsjekkForKjoring ? 'true' : 'false'} />
           </div>
-          <div style={{ marginTop: '1rem' }}>
+          <HStack gap={'4'}>
             <Button type="submit" disabled={isSubmitting} variant="primary">
               Opprett
             </Button>
-          </div>
+            <Form method="POST" navigate={false}>
+              <Button type="submit" disabled={isSubmitting} variant="secondary">
+                Kjør avsjekk
+              </Button>
+            </Form>
+          </HStack>
         </VStack>
       </Form>
+
+      {sisteAvsjekk === null && (
+        <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+          Ingen avsjekk gjort
+        </Alert>
+      )}
+
+      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === false && (
+        <Alert variant="error" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+          Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var ikke OK. PEN har mottatt{' '}
+          {sisteAvsjekk.antallHendelserPen}, POPP har sendt {sisteAvsjekk.antallHendelserPopp}
+        </Alert>
+      )}
+
+      {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
+        <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+          Siste avsjekk {format(sisteAvsjekk.sisteAvsjekkTidspunkt, "dd.MM.yyyy 'kl.' HH:mm:ss")} var OK. Vi har mottatt{' '}
+          {sisteAvsjekk.antallHendelserPen} hendelser.
+        </Alert>
+      )}
 
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
