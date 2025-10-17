@@ -1,7 +1,7 @@
 import type {
   AggregerteFeilmeldinger,
   AvviksGrense,
-  EkskluderteSakerResponse,
+  Ekskluderinger,
   ReguleringDetaljer,
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
@@ -198,7 +198,7 @@ export const hentAggregerteFeilmeldinger = async (accessToken: string): Promise<
   }
 }
 
-export const hentEksluderteSaker = async (accessToken: string): Promise<EkskluderteSakerResponse> => {
+export const hentEksluderteSaker = async (accessToken: string): Promise<Ekskluderinger> => {
   const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -207,7 +207,7 @@ export const hentEksluderteSaker = async (accessToken: string): Promise<Eksklude
   })
 
   if (response.ok) {
-    return (await response.json()) as EkskluderteSakerResponse
+    return (await response.json()) as Ekskluderinger
   } else {
     const body = await response.text()
     throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
@@ -267,11 +267,31 @@ export const oppdaterAvviksgrenser = async (accessToken: string, newAvviksgrense
   }
 }
 
-export const oppdaterEkskluderteSaker = async (accessToken: string, ekskluderteSaker: number[]) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker`, {
+export const leggTilEkskluderteSaker = async (accessToken: string, sakIder: number[], kommentar: string) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker/leggTil`, {
     method: 'POST',
     body: JSON.stringify({
-      ekskluderteSaker: ekskluderteSaker,
+      sakIder: sakIder,
+      kommentar: kommentar,
+    }),
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
+  return { erOppdatert: true }
+}
+
+export const fjernEkskluderteSaker = async (accessToken: string, sakIder: number[]) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker/fjern`, {
+    method: 'POST',
+    body: JSON.stringify({
+      sakIder: sakIder,
     }),
     headers: {
       Authorization: `Bearer ${accessToken}`,

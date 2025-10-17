@@ -80,6 +80,15 @@ export type FaktoromregningMedAarsak = {
   antall: number
 }
 
+export type Ekskluderinger = {
+  ekskluderteSaker: EkskluderingMedKommentar[]
+}
+
+export type EkskluderingMedKommentar = {
+  sakId: number
+  kommentar: string
+}
+
 export type BeregningsavvikStatistikk = {
   typeAvvik: string
   sakType: string
@@ -107,9 +116,4 @@ export type AvviksGrense = {
   positivBelop: number
   negativBelop: number
   underkategori: string
-}
-
-export type EkskluderteSakerResponse = {
-  erOppdatert?: boolean
-  ekskluderteSaker: number[]
 }
