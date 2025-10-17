@@ -22,12 +22,19 @@ import {
   ToggleGroup,
   VStack,
 } from '@navikt/ds-react'
+import { sub } from 'date-fns'
 import { useMemo, useRef } from 'react'
 import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
+import {
+  type KildeOppsummering,
+  KildeOppsummeringVisning,
+} from '~/alderspensjon/forstegangsbehandling/KildeOppsummeringVisning'
 import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
-import { buildUrl } from '~/common/build-url'
-import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow } from '~/common/date'
+import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow, toIsoDate } from '~/common/date'
 import { decodeAldeBehandlingStatus, decodeBehandlingstype } from '~/common/decode'
+import { decodeAktivitet } from '~/common/decodeBehandling'
+import { replaceTemplates } from '~/common/replace-templates'
+import { subdomain } from '~/common/utils'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { PageResponse } from '~/types'
@@ -42,6 +49,11 @@ export async function loader({ request }: { request: Request }) {
   const statusCsv = url.searchParams.get('status') ?? ''
   const sort = url.searchParams.get('sort') ?? 'opprettet,desc'
 
+  const now = new Date()
+
+  const fomDato = url.searchParams.get('fomDato') || toIsoDate(sub(now, { days: 30 }))
+  const tomDato = url.searchParams.get('tomDato') || toIsoDate(now)
+
   const qs = new URLSearchParams({
     page: String(page),
     size: String(size),
@@ -50,20 +62,34 @@ export async function loader({ request }: { request: Request }) {
     sort,
   })
 
+  const dateRangeSearchParams = new URLSearchParams()
+  dateRangeSearchParams.set('fomDato', fomDato)
+  dateRangeSearchParams.set('tomDato', tomDato)
+
   const data = await apiGet<PageResponse<AlderspensjonssoknadDto>>(
     `/api/alderspensjon/forstegangsbehandling/behandling?${qs.toString()}`,
+    request,
+  )
+
+  const kildeOppsummering = await apiGet<KildeOppsummering[]>(
+    `/api/alderspensjon/forstegangsbehandling/kilde-oppsummering?${dateRangeSearchParams.toString()}`,
     request,
   )
 
   const nowIso = new Date().toISOString()
 
   return {
-    aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
+    aldeBehandlingUrlTemplate: isAldeLinkEnabled
+      ? replaceTemplates(env.aldeBehandlingUrlTemplate, { subdomain: subdomain(url) })
+      : undefined,
     nowIso,
     page: data,
     pageIndex: page,
     pageSize: size,
-    psakSakUrlTemplate: env.psakSakUrlTemplate,
+    psakSakUrlTemplate: replaceTemplates(env.psakSakUrlTemplate, { subdomain: subdomain(url) }),
+    kildeOppsummering,
+    fomDato,
+    tomDato,
   }
 }
 
@@ -116,8 +142,17 @@ function activeFilterSummary(sp: URLSearchParams) {
 }
 
 export default function Alderspensjonssoknader() {
-  const { aldeBehandlingUrlTemplate, nowIso, page, pageIndex, pageSize, psakSakUrlTemplate } =
-    useLoaderData<typeof loader>()
+  const {
+    aldeBehandlingUrlTemplate,
+    nowIso,
+    page,
+    pageIndex,
+    pageSize,
+    psakSakUrlTemplate,
+    kildeOppsummering,
+    fomDato,
+    tomDato,
+  } = useLoaderData<typeof loader>()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
   const { field: sortField, dir: sortDir } = parseSortParam(searchParams)
@@ -196,6 +231,8 @@ export default function Alderspensjonssoknader() {
         </Box>
       </Bleed>{' '}
       <VStack gap="6">
+        <KildeOppsummeringVisning data={kildeOppsummering} fomDato={fomDato} tomDato={tomDato} />
+
         <HStack justify="space-between" wrap>
           {summary.length > 0 ? (
             <Chips size="small">
@@ -203,8 +240,6 @@ export default function Alderspensjonssoknader() {
                 <Chips.Removable
                   key={s}
                   onClick={() => {
-                    // enkel “nullstill alt”-handling når en chip fjernes:
-                    // (juster om du vil fjerne bare en bestemt del)
                     updateParams((p) => {
                       p.delete('status')
                       p.set('ferdig', 'alle')
@@ -444,20 +479,20 @@ function BehandlingCard({
             noWrap
           />
           <KV label="Behandlingstype" value={decodeBehandlingstype(b.behandlingstype)} />
-          <KV label="Alde status" value={decodeAldeBehandlingStatus(b.aldeStatus)} />
+          <KV label="Aldestatus" value={decodeAldeBehandlingStatus(b.aldeStatus)} />
         </HStack>
 
         {b.nesteAktiviteter.length === 1 ? (
           <div>
             <Detail style={{ marginBottom: 4 }}>Neste aktivitet</Detail>
-            <BodyShort size="small">{b.nesteAktiviteter[0]}</BodyShort>
+            <BodyShort size="small">{decodeAktivitet(b.nesteAktiviteter[0])}</BodyShort>
           </div>
         ) : b.nesteAktiviteter.length > 1 ? (
           <div>
             <Detail style={{ marginBottom: 4 }}>Neste aktiviteter</Detail>
             <List as="ul" size="small">
               {b.nesteAktiviteter.map((a) => (
-                <List.Item key={a}>{a}</List.Item>
+                <List.Item key={a}>{decodeAktivitet(a)}</List.Item>
               ))}
             </List>
           </div>
@@ -502,7 +537,11 @@ function BehandlingCard({
           </HStack>
           <HStack gap="2">
             <Button size="small" variant="tertiary">
-              <Link href={buildUrl(psakSakUrlTemplate, { sakId: b.sakId })} target="_blank" rel="noopener noreferrer">
+              <Link
+                href={replaceTemplates(psakSakUrlTemplate, { sakId: b.sakId })}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Åpne i Psak
                 <ExternalLinkIcon title={'Åpne i Psak'} />
               </Link>
@@ -510,7 +549,7 @@ function BehandlingCard({
             {aldeBehandlingUrlTemplate && (b.erAldeBehandling || b.erMuligAldeBehandling) && (
               <Button size="small" variant="tertiary">
                 <Link
-                  href={buildUrl(aldeBehandlingUrlTemplate, { behandlingId: b.behandlingId })}
+                  href={replaceTemplates(aldeBehandlingUrlTemplate, { behandlingId: b.behandlingId })}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

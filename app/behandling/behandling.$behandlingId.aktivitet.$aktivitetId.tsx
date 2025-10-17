@@ -3,10 +3,20 @@ import invariant from 'tiny-invariant'
 import AktivitetCard from '~/behandling/AktivitetCard'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandling } from '~/services/behandling.server'
+import type { BehandlingDto } from '~/types'
+
+export function finnAktivitet(behandling: BehandlingDto, aktivitetId: number | string) {
+  if (typeof aktivitetId === 'string') {
+    return behandling.aktiviteter.find((it) => it.aktivitetId.toString() === aktivitetId)
+  } else {
+    return behandling.aktiviteter.find((it) => it.aktivitetId.toString() === aktivitetId.toString())
+  }
+}
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
-  invariant(params.aktivitetId, 'Missing aktivitetId param')
+  const aktivitetId = params.aktivitetId
+  invariant(aktivitetId, 'Missing aktivitetId param')
 
   const accessToken = await requireAccessToken(request)
   const behandling = await getBehandling(accessToken, params.behandlingId)
@@ -14,7 +24,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  const aktivitet = behandling.aktiviteter.find((it) => it.aktivitetId.toString() === params.aktivitetId)
+  const aktivitet = finnAktivitet(behandling, aktivitetId)
   if (!aktivitet) {
     throw new Response('Not Found', { status: 404 })
   }

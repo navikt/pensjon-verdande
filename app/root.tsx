@@ -1,4 +1,3 @@
-import navStyles from '@navikt/ds-css/dist/index.css?url'
 import {
   isRouteErrorResponse,
   Links,
@@ -17,12 +16,7 @@ import appStylesHref from './app.css?url'
 import '@navikt/ds-css/darkside'
 
 export const links: LinksFunction = () => {
-  return [
-    ...[
-      { rel: 'stylesheet', href: navStyles },
-      { rel: 'stylesheet', href: appStylesHref },
-    ],
-  ]
+  return [...[{ rel: 'stylesheet', href: appStylesHref }]]
 }
 
 export const loader = async () => {

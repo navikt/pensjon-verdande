@@ -4,7 +4,6 @@ export default [
   index('index.tsx'),
 
   route('auth/callback', 'auth/auth.callback.tsx'),
-  route('auth/failed', 'auth/auth.failed.tsx'),
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
   layout('layout.tsx', [
@@ -16,6 +15,8 @@ export default [
 
     route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),
     route('alderspensjon/forstegangsbehandling/soknader', 'alderspensjon/forstegangsbehandling/soknader.tsx'),
+
+    route('audit', 'audit/audit.index.tsx'),
 
     route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx'),
 
@@ -92,10 +93,12 @@ export default [
         route('avhengigeBehandlinger', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.tsx', [
           route('fortsett', 'behandling/behandling.$behandlingId.avhengigeBehandlinger.fortsett.tsx'),
         ]),
+        route('audit', 'behandling/behandling.$behandlingId.audit.tsx'),
         route('oppdragskvittering', 'behandling/behandling.$behandlingId.oppdragskvittering.tsx'),
         route('manuelleOppgaver', 'behandling/behandling.$behandlingId.manuelleOppgaver.tsx'),
         route('oppdragsmelding', 'behandling/behandling.$behandlingId.oppdragsmelding.tsx'),
         route('aktiviteter', 'behandling/behandling.$behandlingId.aktiviteter.tsx'),
+        route('logs', 'behandling/behandling.$behandlingId.logs.tsx'),
         route('output', 'behandling/behandling.$behandlingId.output.tsx'),
         route('input', 'behandling/behandling.$behandlingId.input.tsx'),
         route('uttrekk', 'behandling/behandling.$behandlingId.uttrekk.tsx'),
@@ -105,8 +108,11 @@ export default [
       route('aktivitet/:aktivitetId', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.tsx', [
         route('felt/:felt', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.felt.$felt.tsx'),
       ]),
+
+      route('kjoring/:kjoringId/logs', 'behandling/kjoring/kjoring-logs.tsx'),
     ]),
 
+    route('behandlingserie', 'behandlingserie/behandlingserie.tsx'),
     route('behandlinger', 'behandlinger/behandlinger._index.tsx'),
     route('behandlinger/:status', 'behandlinger/behandlinger.$status.tsx', [
       route('fortsett', 'behandlinger/behandlinger.$status.fortsett.tsx'),
@@ -157,21 +163,17 @@ export default [
 
     route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
 
+    route('manuell-behandling', 'manuell-behandling/index.tsx'),
+
     route('omregning', 'omregning/omregning._index.tsx'),
     route('omregning/behandlinger', 'omregning/omregning.behandlinger.tsx'),
     route('omregning/omregning', 'omregning/omregning.omregning.tsx'),
     route('omregning/omregningsaker', 'omregning/omregning.omregningsaker.tsx'),
     route('omregningStatistikk', 'omregning/omregningStatistikk._index.tsx'),
 
-    route('oppdatersakstatus', 'oppdatersakstatus/oppdatersakstatus.tsx'),
-
-    route('opptjening/arlig/omregning', 'opptjening/opptjening.arlig.omregning._index.tsx'),
-    route('opptjening/manedlig/omregning', 'opptjening/opptjening.manedlig.omregning._index.tsx'),
-    route(
-      'opptjening/manedlig/omregning/kategoriserBruker',
-      'opptjening/opptjening.manedlig.omregning.kategoriserBruker.tsx',
-    ),
-    route('opptjening/manedlig/omregning/uttrekk', 'opptjening/opptjening.manedlig.omregning.uttrekk.tsx'),
+    route('opptjening/arlig/omregning', 'opptjening/arlig/opptjening.arlig.omregning.tsx'),
+    route('opptjening/manedlig/omregning', 'opptjening/manedlig/opptjening.manedlig.omregning.tsx'),
+    route('/opptjening/manedlig/omregning/opprett', 'opptjening/manedlig/opptjening.manedlig.omregning.opprett.tsx'),
 
     route('sok', 'sok/sok.tsx'),
   ]),

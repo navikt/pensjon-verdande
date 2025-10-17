@@ -16,6 +16,26 @@ export function formatIsoDate(isoDate: string | undefined | null) {
   }
 }
 
+export function formatDate(isoDate: string | undefined | null) {
+  if (isoDate) {
+    return new Date(isoDate).toLocaleString('nb-NO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    })
+  }
+}
+
+export function toIsoDate(d: Date): string {
+  const y = d.getFullYear()
+  const m = `${d.getMonth() + 1}`.padStart(2, '0')
+  const day = `${d.getDate()}`.padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 // Basert på Wikipedia-artikkelen om Dato (ISO 8601), generert med Copilot
 export const getDato = (year: number, weekNumber: number, weekday: number) => {
   // Step 1: Multiply the week number by 7 and add the weekday number

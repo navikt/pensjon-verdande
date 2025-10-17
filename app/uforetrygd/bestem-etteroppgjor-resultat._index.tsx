@@ -1,35 +1,97 @@
-import { Button, Heading, Select, VStack } from '@navikt/ds-react'
-import type { ActionFunctionArgs } from 'react-router'
-import { Form } from 'react-router'
+import { Alert, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
+function parseSakIds(sakIds: FormDataEntryValue | null): number[] {
+  if (!sakIds || typeof sakIds !== 'string') return []
 
-  const formData = await request.formData()
-  const updates = Object.fromEntries(formData)
-
-  await startBestemEtteroppgjorResultat(accessToken, updates)
+  return sakIds
+    .split(',')
+    .map((id) => id.trim())
+    .filter((id) => id !== '')
+    .map((id) => {
+      const parsed = Number(id)
+      if (Number.isNaN(parsed)) {
+        throw new Error(`Ugyldig sak ID: "${id}"`)
+      }
+      return parsed
+    })
 }
 
-export default function BestemEtteroppgjorResultat() {
+function parseFormData(formData: FormData) {
+  const dryRun = formData.get('dryRun') === 'true'
+  const arValue = formData.get('etteroppgjorAr')
+  const ar = arValue ? Number(arValue) : null
+  const sakIds = parseSakIds(formData.get('sakIds'))
+
+  return { dryRun, ar, sakIds }
+}
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  try {
+    const accessToken = await requireAccessToken(request)
+    const formData = await request.formData()
+    const { dryRun, ar, sakIds } = parseFormData(formData)
+    await startBestemEtteroppgjorResultat(accessToken, dryRun, ar, sakIds)
+    return {
+      success: true,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error && error.message ? error.message : 'Ukjent feil',
+    }
+  }
+}
+
+export default function BestemEtteroppgjorResultatPage() {
+  const actionData = useActionData() as ActionData | undefined
+  const navigation = useNavigation()
+  const isSubmitting = navigation.state === 'submitting'
+  const error = actionData?.error
+  const success = actionData?.success
+
   return (
-    <VStack gap="4">
+    <VStack gap="4" style={{ maxWidth: '50em', margin: '2em' }}>
+      {actionData && (
+        <>
+          {success && <Alert variant="success">Behandling er opprettet</Alert>}
+          {error && <Alert variant="error">Feilmelding: {error}</Alert>}
+        </>
+      )}
       <Heading size="small" level="1">
-        Bestem etteroppgjørsresultat
+        Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap="4">
-          <Select label="DryRun" size="small" name="dryRun" defaultValue="true">
+        <VStack gap="5">
+          <Select label="Dry run:" size="small" name="dryRun" defaultValue="true">
             <option value="true">Ja</option>
             <option value="false">Nei</option>
           </Select>
-          <Button type="submit" size="small">
+          <TextField
+            label="År for etteroppgjør (tomt betyr alle):"
+            aria-label="etteroppgjorAr"
+            name="etteroppgjorAr"
+            type="text"
+            inputMode="numeric"
+          />
+          <TextField
+            label="Kommaseparert liste med sak-id'er som skal behandles (tomt betyr alle):"
+            aria-label="sakIds"
+            name="sakIds"
+            type="text"
+          />
+          <Button type="submit" disabled={isSubmitting} size="small">
             Opprett
           </Button>
         </VStack>
       </Form>
     </VStack>
   )
+}
+
+type ActionData = {
+  success: boolean
+  error: string | null
 }

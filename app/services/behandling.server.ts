@@ -28,6 +28,7 @@ export async function getBehandlinger(
   accessToken: string,
   {
     behandlingType,
+    behandlingSerieId,
     status,
     ansvarligTeam,
     behandlingManuellKategori,
@@ -40,6 +41,7 @@ export async function getBehandlinger(
     sort,
   }: {
     behandlingType?: string | null
+    behandlingSerieId?: string | null
     status?: string | null
     ansvarligTeam?: string | null
     behandlingManuellKategori?: string | null
@@ -55,6 +57,9 @@ export async function getBehandlinger(
   let request = ''
   if (behandlingType) {
     request += `&behandlingType=${behandlingType}`
+  }
+  if (behandlingSerieId) {
+    request += `&behandlingSerieId=${behandlingSerieId}`
   }
   if (status) {
     request += `&status=${status}`
@@ -323,6 +328,29 @@ export async function stopp(accessToken: string, behandlingId: string): Promise<
   if (!response.ok) {
     const text = await response.text()
     throw data(`Feil ved stopping av behandling. Feil var\n${text}`, {
+      status: response.status,
+    })
+  }
+}
+
+export async function endrePlanlagtStartet(
+  accessToken: string,
+  behandlingId: string,
+  nyPlanlagtStartet: string,
+): Promise<void> {
+  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/endrePlanlagtStartet`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+    body: JSON.stringify({ planlagtStartet: nyPlanlagtStartet }),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw data(`Feil ved endring av planlagt startet for behandling. Feil var\n${text}`, {
       status: response.status,
     })
   }

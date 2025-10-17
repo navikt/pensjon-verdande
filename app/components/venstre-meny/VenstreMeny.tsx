@@ -6,6 +6,8 @@ import {
   HouseIcon,
   NumberListIcon,
   PersonGroupIcon,
+  PersonRectangleIcon,
+  ReceiptIcon,
   SackPensionIcon,
   WrenchIcon,
 } from '@navikt/aksel-icons'
@@ -23,6 +25,7 @@ export type Props = {
 }
 
 const administrasjonMeny = [
+  ['BEHANDLINGSERIE', `/behandlingserie`, 'Behandlingserie'],
   ['UGYLDIGGJOR_ETTEROPPGJOR_HISTORIKK_UFORE', `/etteroppgjor-historikk-ufore`, 'Etteroppgjørhistorikk Uføre'],
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
   ['MANGLENDE_FOREIGN_KEY_INDEXER', `/manglende-foreign-key-indexer`, 'Manglende indekser for fjernnøkler'],
@@ -37,7 +40,6 @@ const batcherMeny = [
   ['ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling'],
   ['AFP_ETTEROPPGJOR', '/afp-etteroppgjor', 'AFP Etteroppgjør'],
   ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
-  ['AVSLUTTIKKELOPENDESAKER', `/oppdatersakstatus`, 'Avslutter ikke løpende saker'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
@@ -66,6 +68,20 @@ const behandlingerMeny = [
   ['SE_BEHANDLINGER', '/behandlinger/UNDER_BEHANDLING', 'Under behandling'],
 ]
 
+export function harTilgang(me: MeResponse | undefined, operasjon: string) {
+  if (!me) {
+    return false
+  }
+  return me.tilganger.find((it) => it === operasjon)
+}
+
+export function harRolle(me: MeResponse | undefined, rolle: string) {
+  if (!me) {
+    return false
+  }
+  return me.verdandeRoller.find((it) => it.toUpperCase() === rolle.toUpperCase())
+}
+
 export default function VenstreMeny(props: Props) {
   const me = props.me
 
@@ -74,20 +90,6 @@ export default function VenstreMeny(props: Props) {
   function indexSupplier() {
     currentIndex += 1
     return currentIndex
-  }
-
-  function harRolle(rolle: string) {
-    if (!me) {
-      return false
-    }
-    return me.verdandeRoller.find((it) => it.toUpperCase() === rolle.toUpperCase())
-  }
-
-  function harTilgang(operasjon: string) {
-    if (!me) {
-      return false
-    }
-    return me.tilganger.find((it) => it === operasjon)
   }
 
   function createMenuItem(operasjon: string, link: string, label: string) {
@@ -115,7 +117,7 @@ export default function VenstreMeny(props: Props) {
   }
 
   function byggMeny(navn: string, menyElementer: string[][], indexSupplier: () => number, p0?: JSX.Element) {
-    const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(operasjon))
+    const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(me, operasjon))
     if (harTilgangTilMeny) {
       const idx: number = indexSupplier()
 
@@ -136,7 +138,7 @@ export default function VenstreMeny(props: Props) {
           </Link>
           <ul className={styles.submenu}>
             {menyElementer
-              .filter(([operasjon]) => harTilgang(operasjon))
+              .filter(([operasjon]) => harTilgang(me, operasjon))
               .map(([operasjon, link, label]) => createMenuItem(operasjon, link, label))}
           </ul>
         </li>
@@ -176,7 +178,7 @@ export default function VenstreMeny(props: Props) {
             </NavLink>
           </li>
 
-          {harRolle('VERDANDE_ADMIN') && (
+          {harRolle(me, 'VERDANDE_ADMIN') && (
             <li>
               <NavLink
                 to={`/brukere`}
@@ -187,6 +189,35 @@ export default function VenstreMeny(props: Props) {
                   <PersonGroupIcon title="Brukere" fontSize="1.5rem" className={styles.menyIkon} />
                 </span>
                 <span className={styles.menyTekst}>Brukere</span>
+              </NavLink>
+            </li>
+          )}
+          {harRolle(me, 'VERDANDE_ADMIN') && (
+            <li>
+              <NavLink
+                to={`/audit`}
+                style={{ display: 'flex', justifyContent: 'flex-start' }}
+                className={({ isActive }) => (isActive ? styles.active : '')}
+              >
+                <span className={styles.menyIkon}>
+                  <ReceiptIcon title="Revisjonslogg" fontSize="1.5rem" className={styles.menyIkon} />
+                </span>
+                <span className={styles.menyTekst}>Revisjonslogg</span>
+              </NavLink>
+            </li>
+          )}
+
+          {harTilgang(me, 'SE_BEHANDLINGER') && (
+            <li>
+              <NavLink
+                to={`/manuell-behandling`}
+                style={{ display: 'flex', justifyContent: 'flex-start' }}
+                className={({ isActive }) => (isActive ? styles.active : '')}
+              >
+                <span className={styles.menyIkon}>
+                  <PersonRectangleIcon title="Manuell behandling" fontSize="1.5rem" className={styles.menyIkon} />
+                </span>
+                <span className={styles.menyTekst}>Manuell behandling</span>
               </NavLink>
             </li>
           )}

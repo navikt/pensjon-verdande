@@ -23,6 +23,7 @@ export enum Behandlingstatus {
 
 export type BehandlingDto = {
   level: number | null
+  behandlingSerieId: string | null
   behandlingId: number
   type: string
   uuid: string
@@ -57,6 +58,25 @@ export type BehandlingDto = {
   erAldeBehandling?: boolean
 
   _links?: HalLinks
+}
+
+export type BehandlingSerieDTO = {
+  behandlingSerieId: string
+  behandlingCode: string
+  regelmessighet: string
+  opprettetAv: string
+  opprettet: string
+  startDato: string | null
+  sluttDato: string | null
+  behandlinger: BehandlingInfoDTO[]
+}
+
+export type BehandlingInfoDTO = {
+  behandlingId: number
+  status: string
+  behandlingSerieId: string
+  behandlingCode: string
+  planlagtStartet: string
 }
 
 export type PatchBehandlingDto = {
@@ -99,6 +119,7 @@ export type GjenværendeAktivitetOppsummering = {
 }
 export type BehandlingKjoringDTO = {
   behandlingKjoringId: number
+  traceId?: string | null
   behandlingId: number
   aktivitetId: number | null
   startet: string
@@ -156,6 +177,7 @@ export type BehandlingManuellDto = {
   sakId: number
   kravId?: number | null
   kategori: string
+  kategoriDekode: string
   beskrivelse: string
 
   fagomrade: string
@@ -164,6 +186,7 @@ export type BehandlingManuellDto = {
   oppgavekodeDekode: string
 
   aktivFra: string
+  aktivTil?: string | null
 
   oppgaveId?: number | null
   oppgaveOpprettet: string | null
@@ -219,10 +242,6 @@ export interface HalLink {
 
 export interface HalLinks {
   [s: string]: HalLink | HalLink[]
-}
-
-export type FortsettBatchResponse = {
-  behandlingId: number[]
 }
 
 export type OmregningRequest = {

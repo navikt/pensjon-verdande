@@ -17,7 +17,8 @@ export type ReguleringUttrekk = {
   uttrekkDato: string
   arbeidstabellSize: number
   familierTabellSize: number
-  antallUbehandlende: number
+  antallUbehandlede: number
+  antallEkskluderte: number
   kjoretidAktiviteter: KjoretidForAktivitet[]
 }
 

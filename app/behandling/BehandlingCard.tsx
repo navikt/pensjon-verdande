@@ -8,6 +8,7 @@ import {
   PersonIcon,
   PlayIcon,
   PrinterSmallIcon,
+  ReceiptIcon,
   SandboxIcon,
   TasklistIcon,
   XMarkOctagonIcon,
@@ -17,6 +18,8 @@ import {
   Box,
   Button,
   CopyButton,
+  DatePicker,
+  Detail,
   Heading,
   HGrid,
   HStack,
@@ -25,28 +28,32 @@ import {
   Modal,
   Page,
   ProgressBar,
+  Select,
   Tabs,
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
-import { Suspense, useRef } from 'react'
+import { Suspense, useMemo, useRef, useState } from 'react'
 import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
-import { buildUrl } from '~/common/build-url'
+import type { MeResponse } from '~/brukere/brukere'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeBehandlingStatus } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import type { Team } from '~/common/decodeTeam'
+import { replaceTemplates } from '~/common/replace-templates'
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { Entry } from '~/components/entry/Entry'
+import { harRolle } from '~/components/venstre-meny/VenstreMeny'
 import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
 
 export interface Props {
   aldeBehandlingUrlTemplate?: string
   behandling: BehandlingDto
   detaljertFremdrift?: Promise<DetaljertFremdriftDTO | undefined | null> | null
+  me: MeResponse
   psakSakUrlTemplate: string
 }
 
@@ -355,9 +362,23 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
+  function toBehandlingDiscriminator(type: string) {
+    switch (type) {
+      case 'PersonAjourholdBehandling':
+        return 'PersonAjourhold'
+      case 'AvsluttSakerBehandling':
+        return 'AvsluttSaker'
+      default:
+        return type
+    }
+  }
+
   return (
     <Page>
-      <Heading size={'large'}>{decodeBehandling(props.behandling.type)}</Heading>
+      <Heading size={'large'}>
+        {decodeBehandling(props.behandling.type)}
+        <Detail>{props.behandling.type}</Detail>
+      </Heading>
       <VStack gap={'4'}>
         <HGrid
           gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
@@ -478,7 +499,7 @@ export default function BehandlingCard(props: Props) {
           {props.behandling.sakId && (
             <Button size="small" variant="tertiary">
               <Link
-                href={buildUrl(props.psakSakUrlTemplate, { sakId: props.behandling.sakId })}
+                href={replaceTemplates(props.psakSakUrlTemplate, { sakId: props.behandling.sakId })}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -490,7 +511,9 @@ export default function BehandlingCard(props: Props) {
           {props.aldeBehandlingUrlTemplate !== undefined && props.behandling.erAldeBehandling === true && (
             <Button size="small" variant="tertiary">
               <Link
-                href={buildUrl(props.aldeBehandlingUrlTemplate, { behandlingId: props.behandling.behandlingId })}
+                href={replaceTemplates(props.aldeBehandlingUrlTemplate, {
+                  behandlingId: props.behandling.behandlingId,
+                })}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -506,11 +529,27 @@ export default function BehandlingCard(props: Props) {
 
           {fortsettAvhengigeBehandlinger()}
 
+          {props.behandling.behandlingKjoringer.length === 0 && (
+            <EndrePlanlagtStartetButton planlagtStartet={props.behandling.planlagtStartet} />
+          )}
+
           {debugButton()}
 
           {sendTilOppdragPaNyttButton()}
 
           {stoppButton()}
+
+          {props.behandling.behandlingSerieId !== null && (
+            <Button
+              variant="tertiary"
+              icon={<ExternalLinkIcon aria-hidden />}
+              onClick={() =>
+                navigate(`/behandlingserie?behandlingType=${toBehandlingDiscriminator(props.behandling.type)}`)
+              }
+            >
+              Gå til behandlingserie
+            </Button>
+          )}
 
           {hasLink('sendTilManuellMedKontrollpunkt') && (
             <SendTilManuellMedKontrollpunktModal
@@ -566,10 +605,192 @@ export default function BehandlingCard(props: Props) {
             {props.detaljertFremdrift && (
               <Tabs.Tab value="detaljertFremdrift" label="Detaljert fremdrift" icon={<TasklistIcon />} />
             )}
+            <Tabs.Tab value="logs" label="Applikasjonslogg" icon={<ReceiptIcon />} />
+            {harRolle(props.me, 'VERDANDE_ADMIN') && (
+              <Tabs.Tab value="audit" label="Revisjonslogg" icon={<ReceiptIcon />} />
+            )}
           </Tabs.List>
           <Outlet />
         </Tabs>
       </Box.New>
     </Page>
+  )
+}
+
+export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStartet?: string | null }) {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const formatDDMMYYYY = (d?: Date) => (d ? `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}` : '')
+
+  const parseDDMMYYYY = (s: string): Date | null => {
+    const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(s)
+    if (!m) return null
+    const d = parseInt(m[1], 10)
+    const mo = parseInt(m[2], 10)
+    const y = parseInt(m[3], 10)
+    const dt = new Date(y, mo - 1, d)
+    if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null
+    return dt
+  }
+
+  const toIsoLocal = (date: Date, timeHHmm?: string) => {
+    let hh = '00',
+      mm = '00'
+    if (timeHHmm && /^\d{2}:\d{2}$/.test(timeHHmm)) {
+      ;[hh, mm] = timeHHmm.split(':')
+    }
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${hh}:${mm}:00`
+  }
+
+  const initialDate = useMemo(() => {
+    if (!planlagtStartet) return undefined
+    const [ymd] = planlagtStartet.split('T')
+    const [y, m, d] = (ymd ?? '').split('-').map(Number)
+    if (!y || !m || !d) return undefined
+    return new Date(y, m - 1, d) // lokal dato uten TZ-krøll
+  }, [planlagtStartet])
+
+  const initialTime = useMemo(() => {
+    const t = planlagtStartet?.split('T')[1]?.slice(0, 5) // "HH:mm"
+    return t && /^\d{2}:\d{2}$/.test(t) ? t : ''
+  }, [planlagtStartet])
+
+  const timer = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
+  const kvarter = ['00', '15', '30', '45']
+
+  const [open, setOpen] = useState(false)
+  const [dato, setDato] = useState<Date | undefined>(initialDate)
+  const [tid, setTid] = useState<string>(initialTime)
+  const [inputValue, setInputValue] = useState<string>(formatDDMMYYYY(initialDate))
+  const [inputError, setInputError] = useState<string | undefined>(undefined)
+  const fetcher = useFetcher()
+
+  const handleSelect = (d?: Date) => {
+    setDato(d ?? undefined)
+    setInputValue(formatDDMMYYYY(d ?? initialDate))
+    setInputError(undefined)
+  }
+
+  const handleInputChange = (v: string) => {
+    setInputValue(v)
+    if (v.length === 10) {
+      const parsed = parseDDMMYYYY(v)
+      if (parsed) {
+        setDato(parsed)
+        setInputError(undefined)
+      } else {
+        setInputError('Ugyldig dato')
+      }
+    } else {
+      setInputError(undefined)
+    }
+  }
+
+  const handleLagre = () => {
+    if (!dato) return
+    const fd = new FormData()
+    fd.set('operation', OPERATION.endrePlanlagtStartet)
+    fd.set('nyPlanlagtStartet', toIsoLocal(dato, tid))
+    fetcher.submit(fd, { method: 'post' })
+    setOpen(false)
+  }
+
+  return (
+    <>
+      <Tooltip content="Endrer planlagt startet dato på behandlingen">
+        <Button
+          type="button"
+          variant="secondary"
+          icon={<PlayIcon aria-hidden />}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setOpen(true)
+            setInputValue(formatDDMMYYYY(dato ?? initialDate))
+            setInputError(undefined)
+          }}
+        >
+          Endre planlagt startet
+        </Button>
+      </Tooltip>
+      <Modal
+        open={open}
+        header={{ heading: 'Endre planlagt startet' }}
+        onClose={() => {
+          setOpen(false)
+          setDato(initialDate)
+          setTid(initialTime)
+          setInputValue(formatDDMMYYYY(initialDate))
+          setInputError(undefined)
+        }}
+      >
+        <Modal.Body>
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            <DatePicker
+              mode="single"
+              selected={dato}
+              defaultSelected={initialDate}
+              defaultMonth={dato ?? initialDate}
+              onSelect={handleSelect}
+            >
+              <DatePicker.Input
+                label="Ny planlagt startdato"
+                placeholder="dd.mm.åååå"
+                value={inputValue}
+                error={inputError}
+                onChange={(e) => handleInputChange(e.target.value)}
+              />
+            </DatePicker>
+
+            <HStack gap="4">
+              <Select
+                label="Time"
+                value={tid.split(':')[0] ?? ''}
+                onChange={(e) => setTid(`${e.target.value}:${tid.split(':')[1] || '00'}`)}
+              >
+                <option value="">Velg time</option>
+                {timer.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </Select>
+
+              <Select
+                label="Minutt"
+                value={tid.split(':')[1] ?? ''}
+                onChange={(e) => setTid(`${tid.split(':')[0] || '00'}:${e.target.value}`)}
+              >
+                <option value="">Velg minutt</option>
+                {kvarter.map((m) => (
+                  <option key={m}>{m}</option>
+                ))}
+              </Select>
+            </HStack>
+          </div>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleLagre}
+            disabled={!dato || !!inputError || fetcher.state !== 'idle'}
+          >
+            {fetcher.state === 'idle' ? 'Lagre' : 'Lagrer...'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setOpen(false)
+              setDato(initialDate)
+              setTid(initialTime)
+              setInputValue(formatDDMMYYYY(initialDate))
+              setInputError(undefined)
+            }}
+          >
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   )
 }

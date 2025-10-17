@@ -1,11 +1,13 @@
-import { Alert, Box, HStack, Page, Theme } from '@navikt/ds-react'
+import { Alert, Box, CopyButton, HStack, Page, Theme } from '@navikt/ds-react'
 import { useState } from 'react'
-import { createCookie, type LoaderFunctionArgs, Outlet, useLoaderData } from 'react-router'
+import { createCookie, isRouteErrorResponse, type LoaderFunctionArgs, Outlet, useLoaderData } from 'react-router'
 import { hentMe } from '~/brukere/brukere.server'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
 import { getSchedulerStatus } from '~/services/behandling.server'
 import { env } from '~/services/env.server'
+import type { Route } from './+types'
+import IkkeTilgang from './components/feilmelding/IkkeTilgang'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const darkmodeCookie = await createCookie('darkmode').parse(request.headers.get('cookie'))
@@ -51,11 +53,87 @@ export default function Layout() {
 
             <div style={{ paddingLeft: '12px', paddingRight: '12px', flex: 1 }}>
               {schedulerAlert}
-              <Outlet />
+              <Outlet context={me} />
             </div>
           </HStack>
         </Page>
       </Box.New>
     </Theme>
   )
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  if (isRouteErrorResponse(error)) {
+    const data = error.data as
+      | Partial<{
+          status: number
+          title?: string
+          message?: string
+          detail?: string
+          path?: string
+          timestamp?: string
+          trace?: string
+        }>
+      | string
+      | undefined
+
+    const obj = typeof data === 'object' && data ? data : undefined
+    const str = typeof data === 'string' ? data : undefined
+
+    if (error.status === 403) {
+      return <IkkeTilgang error={error}></IkkeTilgang>
+    }
+
+    return (
+      <Theme>
+        <div className="p-6 space-y-3">
+          <h1 className="text-xl font-semibold">
+            {error.status} {error.statusText}
+          </h1>
+
+          {obj?.message && <p>{obj.message}</p>}
+          {obj?.detail && <pre className="whitespace-pre-wrap">{obj.detail}</pre>}
+          {str && <pre className="whitespace-pre-wrap">{str}</pre>}
+
+          <div className="text-sm opacity-70 space-y-1">
+            {obj?.path && (
+              <div>
+                Path: <code>{obj.path}</code>
+              </div>
+            )}
+            {obj?.timestamp && <div>Tid: {obj.timestamp}</div>}
+          </div>
+
+          {obj?.trace && (
+            <>
+              <CopyButton copyText={obj.trace.toString()} />
+              <details className="mt-2">
+                <summary style={{ cursor: 'pointer' }}>Stack trace</summary>
+                <pre className="mt-2 overflow-auto">{obj.trace}</pre>
+              </details>
+            </>
+          )}
+        </div>
+      </Theme>
+    )
+  }
+
+  if (error instanceof Error) {
+    return (
+      <Theme>
+        <div className="p-6 space-y-2">
+          <h1 className="text-xl font-semibold">Feil</h1>
+          <p>{error.message}</p>
+          {error.stack && (
+            <details>
+              <summary style={{ cursor: 'pointer' }}>Stack trace</summary>
+              <pre className="mt-2 overflow-auto">{error.stack}</pre>
+            </details>
+          )}
+        </div>
+      </Theme>
+    )
+  }
+
+  return <h1>Ukjent feil</h1>
 }

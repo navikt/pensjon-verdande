@@ -2,12 +2,17 @@ app:
   name: 'pensjon-verdande-q0'
   namespace: 'pensjon-q0'
   team: 'pensjon-q0'
-  ingress: 'https://pensjon-verdande-q0.intern.dev.nav.no'
+  ingresses:
+    - 'https://pensjon-verdande-q0.intern.dev.nav.no'
   env: q0
+
+loki:
+  apiHost: 'loki.dev.nav.cloud.nais.io'
 
 pen:
   application: 'pensjon-pen-q0'
   outbound: 'pensjon-pen-q0.dev-fss-pub.nais.io'
+  serviceName: 'pensjon-pen-q0'
   scope: 'api://dev-fss.pensjon-q0.pensjon-pen-q0/.default'
   url: 'https://pensjon-pen-q0.dev-fss-pub.nais.io'
 
@@ -26,3 +31,5 @@ azure:
     verdande-skriv: 094d7338-2897-46a9-9672-f4a30aa9f315 #Verdande skriv
     verdande-admin: ff6b81a5-6324-4213-b40d-246a2450b439 #Verdande admin
 
+tempo:
+  dataSource: 'dev-gcp-tempo'

@@ -33,7 +33,7 @@ export async function exchange(assertion: string, scope: string) {
     formBody.push(`${encodedKey}=${encodedValue}`)
   }
 
-  const response = await fetch(env.tokenEnpoint, {
+  const response = await fetch(env.tokenEndpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',

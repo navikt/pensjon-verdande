@@ -1,10 +1,13 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
-import { useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData, useOutletContext } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingCard from '~/behandling/BehandlingCard'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
+import type { MeResponse } from '~/brukere/brukere'
+import { replaceTemplates } from '~/common/replace-templates'
+import { subdomain } from '~/common/utils'
 import { requireAccessToken } from '~/services/auth.server'
 import {
+  endrePlanlagtStartet,
   fjernFraDebug,
   fortsettAvhengigeBehandlinger,
   fortsettBehandling,
@@ -28,6 +31,7 @@ export const OPERATION = {
   sendTilManuellMedKontrollpunkt: 'sendTilManuellMedKontrollpunkt',
   sendTilOppdragPaNytt: 'sendTilOppdragPaNytt',
   stopp: 'stopp',
+  endrePlanlagtStartet: 'endrePlanlagtStartet',
   taTilDebug: 'taTilDebug',
 } as const
 
@@ -75,6 +79,8 @@ function operationHandlers(
 
     stopp: () => stopp(accessToken, behandlingId),
 
+    endrePlanlagtStartet: () => endrePlanlagtStartet(accessToken, behandlingId, String(form.get('nyPlanlagtStartet'))),
+
     taTilDebug: () => taTilDebug(accessToken, behandlingId),
   } satisfies Record<Operation, () => Promise<void>>
 }
@@ -98,6 +104,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
+  const url = new URL(request.url)
+
   const accessToken = await requireAccessToken(request)
   const behandling = await getBehandling(accessToken, params.behandlingId)
   if (!behandling) {
@@ -110,10 +118,12 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 
   return {
-    aldeBehandlingUrlTemplate: isAldeLinkEnabled ? env.aldeBehandlingUrlTemplate : undefined,
+    aldeBehandlingUrlTemplate: isAldeLinkEnabled
+      ? replaceTemplates(env.aldeBehandlingUrlTemplate, { subdomain: subdomain(url) })
+      : undefined,
     behandling,
     detaljertFremdrift: detaljertFremdrift,
-    psakSakUrlTemplate: env.psakSakUrlTemplate,
+    psakSakUrlTemplate: replaceTemplates(env.psakSakUrlTemplate, { subdomain: subdomain(url) }),
   }
 }
 
@@ -121,11 +131,14 @@ export default function Behandling() {
   const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } =
     useLoaderData<typeof loader>()
 
+  const me = useOutletContext<MeResponse>()
+
   return (
     <BehandlingCard
       aldeBehandlingUrlTemplate={aldeBehandlingUrlTemplate}
       behandling={behandling}
       detaljertFremdrift={detaljertFremdrift}
+      me={me}
       psakSakUrlTemplate={psakSakUrlTemplate}
     />
   )

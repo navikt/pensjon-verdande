@@ -32,7 +32,15 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-const pct = (ferdig: number, totalt: number) => (totalt > 0 ? Math.round((ferdig / totalt) * 100) : 0)
+const pct = (ferdig: number, totalt: number) => {
+  if (totalt < 0) {
+    return 0
+  } else if (ferdig >= totalt) {
+    return 100
+  } else {
+    return Math.min(+((ferdig / totalt) * 100).toFixed(1), 99.9)
+  }
+}
 
 const ratio = (a: number, b: number) => `${a.toLocaleString('nb-NO')} / ${b.toLocaleString('nb-NO')}`
 
@@ -201,7 +209,9 @@ export default function FremdriftRoute() {
 
                   <Table.DataCell>
                     <VStack gap="1">
-                      <BodyShort size="small">{rowPct}%</BodyShort>
+                      <VStack align={'end'}>
+                        <BodyShort size="small">{rowPct} %</BodyShort>
+                      </VStack>
                       <ProgressBar value={rowPct} aria-label={`Fremdrift ${rad.behandlingCode}`} />
                     </VStack>
                   </Table.DataCell>

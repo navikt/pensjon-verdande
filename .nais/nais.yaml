@@ -29,7 +29,9 @@ spec:
       cpu: 10m
       memory: 256Mi
   ingresses:
-    - {{app.ingress}}
+    {{#each app.ingresses as |url|}}
+      - {{url}}
+    {{/each}}
   env:
     - name: ALDE_LINK_ENABLED
       value: "{{ alde.link_enabled }}"
@@ -37,20 +39,27 @@ spec:
       value: "{{ alde.behandling_url_template }}"
     - name: ENV
       value: {{ app.env }}
+    - name: LOKI_API_BASE_URL
+      value: "https://{{ loki.apiHost }}"
     - name: PEN_APPLICATION
       value: {{ pen.application }}
     - name: PEN_SCOPE
       value: {{ pen.scope }}
+    - name: PEN_SERVICE_NAME
+      value: {{ pen.serviceName }}
     - name: PEN_URL
       value: {{ pen.url }}
     - name: PSAK_SAK_URL_TEMPLATE
       value: "{{ psak.sak_url_template }}"
+    - name: TEMPO_DATA_SOURCE
+      value: "{{ tempo.dataSource }}"
   accessPolicy:
     outbound:
       external:
         - host: graph.microsoft.com
         - host: login.microsoftonline.com
         - host: {{ pen.outbound }}
+        - host: {{ loki.apiHost }}
   azure:
     application:
       tenant: {{ azure.tenant }}
@@ -66,7 +75,9 @@ spec:
       replyURLs:
         - "http://localhost:3000/auth/callback"
         - "http://localhost:3000/api/auth/callback/azure-ad"
-        - "{{app.ingress}}/auth/callback"
+        {{#each app.ingresses as |url|}}
+        - "{{url}}/auth/callback"
+        {{/each}}
     sidecar:
       enabled: true
       autoLogin: true

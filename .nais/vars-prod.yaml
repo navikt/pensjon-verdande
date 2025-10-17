@@ -2,12 +2,17 @@ app:
   name: 'pensjon-verdande'
   namespace: 'pensjondeployer'
   team: 'pensjondeployer'
-  ingress: 'https://pensjon-verdande.intern.nav.no'
+  ingresses:
+    - 'https://pensjon-verdande.intern.nav.no'
   env: p
+
+loki:
+  apiHost: 'loki.prod.nav.cloud.nais.io'
 
 pen:
   application: 'pensjon-pen'
   outbound: 'pensjon-pen.prod-fss-pub.nais.io'
+  serviceName: 'pensjon-pen'
   scope: 'api://prod-fss.pensjondeployer.pensjon-pen/.default'
   url: 'https://pensjon-pen.prod-fss-pub.nais.io'
 
@@ -25,3 +30,6 @@ azure:
     verdande-les: d187a290-08a1-4acf-a53f-fe17e2e93bf9 #Verdande les
     verdande-skriv: 30965367-457b-4f1e-93f0-ae756357297d #Verdande skriv
     verdande-admin: b7148a64-ebc4-4e0a-9f45-ef742aee539c #Verdande admin
+
+tempo:
+  dataSource: 'prod-gcp-tempo'

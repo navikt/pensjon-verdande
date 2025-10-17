@@ -2,8 +2,9 @@ import type { LoaderFunctionArgs } from 'react-router'
 import { useLoaderData } from 'react-router'
 
 import invariant from 'tiny-invariant'
-import { buildUrl } from '~/common/build-url'
-import { apiGetOrUndefined } from '~/services/api.server'
+import xmlFormat from 'xml-formatter'
+import { replaceTemplates } from '~/common/replace-templates'
+import { apiGetRawStringOrUndefined } from '~/services/api.server'
 
 const AKSEPTERTE_FELTER = ['input', 'message', 'output'] as const
 
@@ -21,13 +22,13 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Error(`Ukjent felt '${String(felt)}'`)
   }
 
-  const url = buildUrl('/api/behandling/{behandlingId}/aktivitet/{aktivitetId}/{felt}' as const, {
+  const url = replaceTemplates('/api/behandling/{behandlingId}/aktivitet/{aktivitetId}/{felt}' as const, {
     behandlingId,
     aktivitetId,
     felt,
   })
 
-  const value = await apiGetOrUndefined<string>(url, request)
+  const value = await apiGetRawStringOrUndefined(url, request)
 
   return {
     value,
@@ -36,6 +37,19 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 export default function Felt() {
   const { value } = useLoaderData<typeof loader>()
+  console.log(value)
 
-  return <pre>{JSON.stringify(value, null, 2)}</pre>
+  try {
+    if (!value) {
+      return <pre></pre>
+    } else if (value.startsWith('<?xml')) {
+      console.log(value.substring(0, 10))
+      return <pre>{xmlFormat(value)}</pre>
+    } else {
+      console.log(value.substring(0, 10))
+      return <pre>{JSON.stringify(value, null, 2)}</pre>
+    }
+  } catch (_error) {
+    return <pre>{value}</pre>
+  }
 }

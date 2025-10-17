@@ -50,3 +50,15 @@ export function decodeBehandling(string: string) {
   const oversetting = oversettinger.find((value) => value[0] === string)
   return oversetting ? oversetting[1] : splitOnCapitals(string.replace(/Behandling$/, ''))
 }
+
+const aktivitetRegex = /(A\d+)(.*?)(?=Aktivitet|$)/
+
+export function decodeAktivitet(string: string, separator: string = '-') {
+  const match = string.match(aktivitetRegex)
+  if (match) {
+    const [, code, rest] = match
+    return `${code} ${separator} ${splitOnCapitals(rest)}`
+  } else {
+    return string
+  }
+}

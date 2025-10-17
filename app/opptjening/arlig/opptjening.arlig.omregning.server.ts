@@ -1,10 +1,11 @@
+import { data } from 'react-router'
 import { env } from '~/services/env.server'
 
-export async function opprettOpptjeningsendring(
+export async function opprettOpptjeningsendringArligOmregning(
   accessToken: string,
-  behandlingsmaned: number,
+  opptjeningsar: number,
 ): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/api/opptjening/kategoriserbruker/opprett`, {
+  const response = await fetch(`${env.penUrl}/api/opptjening/arligendring/opprett`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -12,14 +13,17 @@ export async function opprettOpptjeningsendring(
       'X-Request-ID': crypto.randomUUID(),
     },
     body: JSON.stringify({
-      behandlingsmaned: behandlingsmaned,
+      opptjeningsar: opptjeningsar,
     }),
   })
 
   if (response.ok) {
     return (await response.json()) as StartBatchResponse
   } else {
-    throw new Error()
+    const text = await response.text()
+    throw data(`Feil ved start av årlig omregning. Feil var\n${text}`, {
+      status: response.status,
+    })
   }
 }
 

@@ -2,21 +2,27 @@ app:
   name: 'pensjon-verdande-q2'
   namespace: 'pensjon-q2'
   team: 'pensjon-q2'
-  ingress: 'https://pensjon-verdande-q2.intern.dev.nav.no'
+  ingresses:
+    - 'https://pensjon-verdande-q2.intern.dev.nav.no'
+    - 'https://pensjon-verdande-q2.ansatt.dev.nav.no'
   env: q2
+
+loki:
+  apiHost: 'loki.dev.nav.cloud.nais.io'
 
 pen:
   application: 'pensjon-pen-q2'
   outbound: 'pensjon-pen-q2.dev-fss-pub.nais.io'
+  serviceName: 'pensjon-pen-q2'
   scope: 'api://dev-fss.pensjon-q2.pensjon-pen-q2/.default'
   url: 'https://pensjon-pen-q2.dev-fss-pub.nais.io'
 
 psak:
-  sak_url_template: 'https://pensjon-psak-q2.dev.adeo.no/psak/sak/sakId={sakId}'
+  sak_url_template: 'https://pensjon-psak-q2.{subdomain}.dev.nav.no/psak/sak/sakId={sakId}'
 
 alde:
   link_enabled: true
-  behandling_url_template: 'https://pensjon-alde-q2.intern.dev.nav.no/behandling/{behandlingId}'
+  behandling_url_template: 'https://pensjon-alde-q2.{subdomain}.dev.nav.no/behandling/{behandlingId}'
 
 azure:
   tenant: trygdeetaten.no
@@ -25,3 +31,6 @@ azure:
     verdande-les: c2e1d6a5-6a6d-4413-a924-cd44c9d059dd #Verdande les
     verdande-skriv: 094d7338-2897-46a9-9672-f4a30aa9f315 #Verdande skriv
     verdande-admin: ff6b81a5-6324-4213-b40d-246a2450b439 #Verdande admin
+
+tempo:
+  dataSource: 'dev-gcp-tempo'

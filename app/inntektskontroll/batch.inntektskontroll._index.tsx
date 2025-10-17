@@ -10,6 +10,7 @@ export const FELTER = {
   aar: 'aar',
   eps2g: 'eps2g',
   gjenlevende: 'gjenlevende',
+  opprettOppgave: 'opprettOppgave',
 } as const
 
 const checkboxTrueValue = 'true' as const
@@ -36,11 +37,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     ),
     [FELTER.eps2g]: zfd.checkbox({ trueValue: checkboxTrueValue }),
     [FELTER.gjenlevende]: zfd.checkbox({ trueValue: checkboxTrueValue }),
+    [FELTER.opprettOppgave]: zfd.checkbox({ trueValue: checkboxTrueValue }),
   })
 
-  const { [FELTER.aar]: aar, [FELTER.eps2g]: eps2g, [FELTER.gjenlevende]: gjenlevende } = skjema.parse(fd)
+  const {
+    [FELTER.aar]: aar,
+    [FELTER.eps2g]: eps2g,
+    [FELTER.gjenlevende]: gjenlevende,
+    [FELTER.opprettOppgave]: opprettoppgave,
+  } = skjema.parse(fd)
 
-  const response = await opprettBpen014(accessToken, aar, eps2g, gjenlevende)
+  const response = await opprettBpen014(accessToken, aar, eps2g, gjenlevende, opprettoppgave)
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
@@ -83,7 +90,9 @@ export default function BatchOpprett_index() {
             <Checkbox name={FELTER.eps2g} value={checkboxTrueValue}>
               Inntektskontroll for ektefelle/samboer (2G)
             </Checkbox>
-
+            <Checkbox name={FELTER.opprettOppgave} value={checkboxTrueValue}>
+              Opprett oppgave for Eps2G
+            </Checkbox>
             <Checkbox name={FELTER.gjenlevende} value={checkboxTrueValue}>
               Inntektskontroll for gjenlevende
             </Checkbox>
