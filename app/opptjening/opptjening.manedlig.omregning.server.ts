@@ -96,7 +96,7 @@ export type SisteAvsjekkResponse = {
 
 export type MuligeManedligeKjoringerResponse = {
   maneder: string[]
-  kanOverstyreBehandlingsmaned: boolean
+  kanOverstyre: boolean
 }
 
 type StartBatchResponse = {
