@@ -28,7 +28,7 @@ import type { BehandlingerPage } from '~/types'
 
 type LoaderData = {
   behandlinger: BehandlingerPage
-  kanOverstyreBehandlingsmaned: boolean
+  kanOverstyre: boolean
   maneder: string[]
   defaultMonth: string
   sisteAvsjekk: SisteAvsjekkResponse | null
@@ -60,7 +60,7 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
 
   return {
     behandlinger,
-    kanOverstyreBehandlingsmaned: muligeManedligeKjoringer.kanOverstyreBehandlingsmaned,
+    kanOverstyre: muligeManedligeKjoringer.kanOverstyre,
     maneder: muligeManedligeKjoringer.maneder,
     defaultMonth,
     sisteAvsjekk,
@@ -74,8 +74,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function OpprettEndretOpptjeningRoute() {
-  const { behandlinger, maneder, kanOverstyreBehandlingsmaned, defaultMonth, sisteAvsjekk } =
-    useLoaderData<typeof loader>()
+  const { behandlinger, maneder, kanOverstyre, defaultMonth, sisteAvsjekk } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
@@ -84,8 +83,8 @@ export default function OpprettEndretOpptjeningRoute() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [avsjekkForKjoring, setAvsjekkForKjoring] = useState(false)
 
-  const minDate = kanOverstyreBehandlingsmaned ? undefined : startOfMonth(selectedMonthDate)
-  const maxDate = kanOverstyreBehandlingsmaned ? undefined : endOfMonth(selectedMonthDate)
+  const minDate = kanOverstyre ? undefined : startOfMonth(selectedMonthDate)
+  const maxDate = kanOverstyre ? undefined : endOfMonth(selectedMonthDate)
 
   return (
     <div>
@@ -94,11 +93,10 @@ export default function OpprettEndretOpptjeningRoute() {
       </Heading>
 
       <BodyShort spacing style={{ paddingTop: '2rem', paddingBottom: '1rem' }}>
-        Velg behandlingsmåned og tidspunkt for kjøring. Dersom avsjekk skal kjøres samtidig/litt i forkant huk av det
-        valget også.
+        Velg behandlingsmåned og tidspunkt for kjøring.
       </BodyShort>
 
-      {!kanOverstyreBehandlingsmaned && (
+      {!kanOverstyre && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
@@ -139,24 +137,26 @@ export default function OpprettEndretOpptjeningRoute() {
               label="Kjøretidspunkt (valgfritt)"
             />
 
-            <HStack>
-              <CheckboxGroup legend="Avsjekk før kjøring" size={'small'}>
-                <Checkbox
-                  value="true"
-                  checked={avsjekkForKjoring}
-                  onChange={(e) => setAvsjekkForKjoring(e.target.checked)}
-                >
-                  Ja
-                </Checkbox>
-              </CheckboxGroup>
+            {kanOverstyre && (
+              <HStack>
+                <CheckboxGroup legend="Avsjekk før kjøring" size={'small'}>
+                  <Checkbox
+                    value="true"
+                    checked={avsjekkForKjoring}
+                    onChange={(e) => setAvsjekkForKjoring(e.target.checked)}
+                  >
+                    Ja
+                  </Checkbox>
+                </CheckboxGroup>
 
-              <HelpText title="beskrivelse for avhuking" placement="top">
-                Dersom denne hukes av vil en behandling for avskjekk av hendelser mellom PEN og POPP også starte med
-                behandlingen for omregning. For schedulering kan det være nyttig at denne hukes av da den vil gi oss en
-                feilende behandling dersom avsjekken viser differanse. Den vil dog IKKE være stoppende for
-                omregningsbehandlingen.
-              </HelpText>
-            </HStack>
+                <HelpText title="beskrivelse for avhuking" placement="top">
+                  Dersom denne hukes av vil en behandling for avskjekk av hendelser mellom PEN og POPP også starte med
+                  behandlingen for omregning. For schedulering kan det være nyttig at denne hukes av da den vil gi oss
+                  en feilende behandling dersom avsjekken viser differanse. Den vil dog IKKE være stoppende for
+                  omregningsbehandlingen.
+                </HelpText>
+              </HStack>
+            )}
 
             <input
               type="hidden"
