@@ -44,6 +44,7 @@ export default function ManuelleBehandlinger() {
           <Table.HeaderCell>Fagområde</Table.HeaderCell>
           <Table.HeaderCell>Oppgavekode</Table.HeaderCell>
           <Table.HeaderCell>Aktiv fra</Table.HeaderCell>
+          <Table.HeaderCell>Aktiv til</Table.HeaderCell>
           <Table.HeaderCell>OppgaveId</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -64,6 +65,7 @@ export default function ManuelleBehandlinger() {
               <Table.DataCell>{it.fagomradeDekode}</Table.DataCell>
               <Table.DataCell>{it.oppgavekodeDekode}</Table.DataCell>
               <Table.DataCell>{it.aktivFra}</Table.DataCell>
+              <Table.DataCell>{it.aktivTil}</Table.DataCell>
               <Table.DataCell>{it.oppgaveId}</Table.DataCell>
             </Table.Row>
           )

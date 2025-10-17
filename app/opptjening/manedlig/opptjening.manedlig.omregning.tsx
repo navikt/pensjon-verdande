@@ -21,7 +21,7 @@ import {
   hentMuligeManedligeKjoringer,
   opprettAvsjekk,
   type SisteAvsjekkResponse,
-} from '~/opptjening/opptjening.manedlig.omregning.server'
+} from '~/opptjening/manedlig/opptjening.manedlig.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'

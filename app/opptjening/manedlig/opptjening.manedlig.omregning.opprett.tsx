@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from 'react-router'
 import { redirect } from 'react-router'
-import { opprettOpptjeningsendringMandeligOmregning } from '~/opptjening/opptjening.manedlig.omregning.server'
+import { opprettOpptjeningsendringMandeligOmregning } from '~/opptjening/manedlig/opptjening.manedlig.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
 
 export const action = async ({ request }: ActionFunctionArgs) => {

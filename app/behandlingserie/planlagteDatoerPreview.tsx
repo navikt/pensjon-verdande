@@ -17,9 +17,49 @@ type Props = {
   onClickItem?: (item: PlannedItem) => void
 }
 
+function hashSerieId(id?: string) {
+  if (!id) return 0
+  let h = 0
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0
+  return Math.abs(h)
+}
+
+const PALETT = [
+  '#0044CC', // klar blå
+  '#FF3B30', // rød
+  '#2DD36F', // grønn
+  '#FFA500', // oransje
+  '#8E44AD', // lilla
+  '#00BFFF', // himmelblå
+  '#FF69B4', // rosa
+  '#32CD32', // limegrønn
+  '#FFD700', // gul
+  '#FF4500', // orangerød
+  '#00CED1', // turkis
+  '#9B870C', // gyllen brun
+  '#1E90FF', // sterk blå
+  '#AD1457', // mørk rosa
+  '#20B2AA', // aquagrønn
+  '#C71585', // magenta
+  '#FF8C00', // mørk oransje
+  '#6A5ACD', // blå-lilla
+  '#2E8B57', // mørk grønn
+  '#DC143C', // crimson
+  '#4682B4', // stålblå
+  '#FF6347', // tomato
+  '#008B8B', // cyan-teal
+  '#B8860B', // mørk gyllen
+]
+
+function fargeForSerie(serieId?: string) {
+  const bg = PALETT[hashSerieId(serieId) % PALETT.length]
+  const fg = '#fff'
+  return { bg, fg }
+}
+
 function shortSerieId(id?: string) {
   if (!id) return ''
-  return `••••-${id.slice(-4)}`
+  return `***${id.slice(-4)}`
 }
 
 function weekdayFromyearMonthDay(yearMonthDay: string): number {
@@ -92,7 +132,19 @@ export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Pr
                     <span className={styles.dayLabel}>{dayLabel(w)}</span>
                     <span className={styles.dateLabel}>{item.yearMonthDay}</span>
                     {item.time && <span className={styles.timeLabel}>{item.time}</span>}
-                    {item.serieId && <span className={styles.serieTag}>{shortSerieId(item.serieId)}</span>}
+                    {item.serieId && (
+                      <span
+                        className={styles.serieTag}
+                        style={
+                          {
+                            ['--serie-bg']: fargeForSerie(item.serieId).bg,
+                            ['--serie-fg']: fargeForSerie(item.serieId).fg,
+                          } as React.CSSProperties
+                        }
+                      >
+                        {shortSerieId(item.serieId)}
+                      </span>
+                    )}
                   </button>
                 )
               })}

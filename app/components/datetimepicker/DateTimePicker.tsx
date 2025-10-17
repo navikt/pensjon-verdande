@@ -22,6 +22,7 @@ interface DateTimePickerProps {
   maxDate?: Date
 }
 
+/** @deprecated Bruk aksel-komponent https://aksel.nav.no/komponenter/core/datepicker */
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
   selectedDate,
   setSelectedDate,
