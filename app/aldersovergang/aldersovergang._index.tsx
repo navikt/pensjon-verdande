@@ -123,7 +123,7 @@ export default function BatchOpprett_index() {
                 setSelectedDate={setSelectedDate}
                 minDate={minDate}
                 maxDate={maxDate}
-                labelText=""
+                label=""
               />
             </div>
           </div>
