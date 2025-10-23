@@ -12,6 +12,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     accessToken,
     +updates.behandlingsmaned,
     updates.kjoeretidspunkt as string,
+    updates.avsjekkForKjoring === 'true',
   )
 
   return redirect(`/behandling/${response.behandlingId}`)
