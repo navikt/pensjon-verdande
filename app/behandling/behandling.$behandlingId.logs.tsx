@@ -31,7 +31,7 @@ export default function BehandlingLogs() {
     useLoaderData<typeof loader>()
 
   return (
-    <VStack gap="6" className="p-4">
+    <VStack gap="6">
       <LokiLogsTableLoader
         response={response}
         selectedFilters={selectedFilters}

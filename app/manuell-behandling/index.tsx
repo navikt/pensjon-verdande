@@ -30,6 +30,7 @@ import { decodeFagomrade } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeOppgaveKode, decodeOppgavePrioritet } from '~/common/decodeOppgave'
 import { decodeUnderkategoriKode } from '~/common/decodeUnderkategori'
+import { ManuellBehandlingActionMenu } from '~/manuell-behandling/ManuellBehandlingActionMenu'
 import { apiGet } from '~/services/api.server'
 
 export type ManuellBehandlingOppsummering = {
@@ -455,6 +456,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
                     <Table.HeaderCell>Prioritet</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
+                    <Table.ColumnHeader />
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -492,6 +494,9 @@ export default function ManuellBehandlingOppsummeringRoute() {
                         <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                           {((r.antall * 100) / total).toFixed(1)} %
                         </Table.DataCell>
+                        <Table.DataCell>
+                          <ManuellBehandlingActionMenu />
+                        </Table.DataCell>
                       </Table.Row>
                     ))}
                 </Table.Body>
@@ -505,6 +510,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
                     ))}
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
+                    <Table.ColumnHeader />
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -518,6 +524,9 @@ export default function ManuellBehandlingOppsummeringRoute() {
                       </Table.DataCell>
                       <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                         {((gr.antall * 100) / total).toFixed(1)} %
+                      </Table.DataCell>
+                      <Table.DataCell>
+                        <ManuellBehandlingActionMenu />
                       </Table.DataCell>
                     </Table.Row>
                   ))}

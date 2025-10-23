@@ -1,7 +1,7 @@
 import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
 import type { KalenderHendelser, KalenderHendelserDTO } from '~/components/kalender/types'
-import { apiGet, apiGetOrUndefined, type RequestCtx } from '~/services/api.server'
+import { apiGet, apiGetOrUndefined, normalizeAndThrow, type RequestCtx } from '~/services/api.server'
 import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
 import type {
@@ -309,10 +309,7 @@ export async function runBehandling(accessToken: string, behandlingId: string): 
   })
 
   if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved kjøring av behandling. Feil var\n${text}`, {
-      status: response.status,
-    })
+    await normalizeAndThrow(response, `Feil ved kjøring av behandling. Feil var`)
   }
 }
 

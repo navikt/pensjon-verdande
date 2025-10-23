@@ -96,7 +96,7 @@ export default function FremdriftRoute() {
   const isRefreshing = revalidator.state === 'loading'
 
   return (
-    <VStack gap="6" className="p-4">
+    <VStack gap="6">
       <Box.New>
         <Heading size={'small'}>
           <HStack justify="space-between" align="center">

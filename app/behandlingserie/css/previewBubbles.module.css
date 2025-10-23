@@ -46,16 +46,16 @@
 }
 
 .serieTag {
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    border-radius: 6px;
-    padding: 0 6px;
-    margin-top: 4px;
-    background-color: var(--serie-bg, #eee);
-    color: var(--serie-fg, #111);
-    border: 1px solid transparent;
-    transition: background-color 0.2s ease;
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0 6px;
+  margin-top: 4px;
+  background-color: var(--serie-bg, #eee);
+  color: var(--serie-fg, #111);
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease;
 }
 
 /* Ulike bakgrunnsfarger per ukedag */

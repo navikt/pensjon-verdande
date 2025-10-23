@@ -160,6 +160,7 @@ export default [
     route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
 
     route('manuell-behandling', 'manuell-behandling/index.tsx'),
+    route('manuell-behandling-uttrekk', 'manuell-behandling/uttrekk.tsx'),
 
     route('omregning', 'omregning/omregning._index.tsx'),
     route('omregning/behandlinger', 'omregning/omregning.behandlinger.tsx'),
