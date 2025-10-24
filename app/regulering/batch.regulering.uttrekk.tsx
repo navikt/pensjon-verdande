@@ -28,7 +28,8 @@ export default function Uttrekk() {
     interval: uttrekk?.status === Behandlingstatus.UNDER_BEHANDLING ? 500 : 1500,
   })
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [isStartUttrekkOpen, setIsStartUttrekkOpen] = useState(false)
+  const [isLeggTilUttrekkOpen, setIsLeggTilUttrekkOpen] = useState(false)
   return (
     <>
       <HStack>
@@ -95,12 +96,21 @@ export default function Uttrekk() {
         {(uttrekk === null ||
           uttrekk.behandlingId == null ||
           uttrekk.status === Behandlingstatus.FULLFORT ||
-          uttrekk.status === Behandlingstatus.STOPPET) && <Button onClick={() => setIsOpen(true)}>Kjør uttrekk</Button>}
+          uttrekk.status === Behandlingstatus.STOPPET) && (
+          <Button onClick={() => setIsStartUttrekkOpen(true)}>Kjør uttrekk</Button>
+        )}
+        {(uttrekk === null ||
+          uttrekk.behandlingId == null ||
+          uttrekk.status === Behandlingstatus.FULLFORT ||
+          uttrekk.status === Behandlingstatus.STOPPET) && (
+          <Button onClick={() => setIsLeggTilUttrekkOpen(true)}>Legg til uttrekk</Button>
+        )}
         {uttrekk?.status === Behandlingstatus.FULLFORT && (
           <Link to="/batch/regulering/orkestrering">Gå til Orkestrering</Link>
         )}
       </HStack>
-      <StartUttrekkModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <StartUttrekkModal isOpen={isStartUttrekkOpen} onClose={() => setIsStartUttrekkOpen(false)} />
+      <LeggTilUttrekkModal isOpen={isLeggTilUttrekkOpen} onClose={() => setIsLeggTilUttrekkOpen(false)} />
     </>
   )
 }
@@ -144,6 +154,37 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
       <Modal.Footer>
         <Button onClick={startUttrekk} loading={fetcher.state === 'submitting'}>
           Start uttrekk
+        </Button>
+        <Button type="button" variant="secondary" onClick={() => onClose()}>
+          Avbryt
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}
+
+function LeggTilUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const fetcher = useFetcher()
+
+  function leggTilUttrekk() {
+    fetcher.submit(
+      {
+        initieltUttrekk: false,
+      },
+      {
+        action: 'leggTilUttrekk',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+    onClose()
+  }
+
+  return (
+    <Modal header={{ heading: 'Legg til uttrekk' }} open={isOpen} onClose={() => onClose()}>
+      <Modal.Footer>
+        <Button onClick={leggTilUttrekk} loading={fetcher.state === 'submitting'}>
+          Legg til uttrekk
         </Button>
         <Button type="button" variant="secondary" onClick={() => onClose()}>
           Avbryt
