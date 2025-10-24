@@ -56,7 +56,11 @@ export default [
         route('hentStatistikk', 'regulering/batch.regulering.administrerbehandlinger.hentStatistikk.tsx'),
       ]),
       route('avsluttendeaktiviteter', 'regulering/batch.regulering.avsluttendeaktiviteter.tsx'),
-      route('ekskludertesaker', 'regulering/batch.regulering.ekskludertesaker.tsx'),
+      route('ekskludertesaker', 'regulering/batch.regulering.ekskludertesaker.tsx', [
+        route('hentEkskluderteSaker', 'regulering/batch.regulering.ekskludertesaker.hent.tsx'),
+        route('leggTilEkskluderteSaker', 'regulering/batch.regulering.ekskludertesaker.leggTil.tsx'),
+        route('fjernEkskluderteSaker', 'regulering/batch.regulering.ekskludertesaker.fjern.tsx'),
+      ]),
       route('orkestrering', 'regulering/batch.regulering.orkestrering.tsx', [
         route(
           'hentOrkestreringStatistikk/:behandlingId',
