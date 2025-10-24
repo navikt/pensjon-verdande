@@ -3,6 +3,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   Density2Icon,
+  DownloadIcon,
   FilterIcon,
 } from '@navikt/aksel-icons'
 import {
@@ -23,7 +24,7 @@ import {
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import { type LoaderFunctionArgs, redirect, useLoaderData, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { decodeFagomrade } from '~/common/decode'
@@ -64,8 +65,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const now = new Date()
 
-  const fomDato = url.searchParams.get('fomDato') || toIsoDate(sub(now, { days: 30 }))
-  const tomDato = url.searchParams.get('tomDato') || toIsoDate(now)
+  const fomDato = url.searchParams.get('fomDato') as string
+  const tomDato = url.searchParams.get('tomDato') as string
+
+  const iso = /^\d{4}-\d{2}-\d{2}$/
+  const manglendeEllerUgyldigDato = !fomDato || !tomDato || !iso.test(fomDato) || !iso.test(tomDato)
+
+  if (manglendeEllerUgyldigDato) {
+    url.searchParams.set('fomDato', fomDato ?? toIsoDate(sub(now, { days: 30 })))
+    url.searchParams.set('tomDato', tomDato ?? toIsoDate(now))
+
+    return redirect(`${url.pathname}?${url.searchParams.toString()}`)
+  }
 
   const qs = new URLSearchParams()
   qs.set('fomDato', fomDato)
@@ -534,6 +545,19 @@ export default function ManuellBehandlingOppsummeringRoute() {
               </Table>
             )}
           </VStack>
+        </HStack>
+
+        <HStack justify="end">
+          <Button
+            size="small"
+            icon={<DownloadIcon />}
+            as="a"
+            href={`/manuell-behandling-uttrekk?${searchParams.toString()}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Last ned uttrekk
+          </Button>
         </HStack>
 
         <Modal ref={sokeModalRef} header={{ heading: 'Søkefilter' }} width={1440}>
