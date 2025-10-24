@@ -75,6 +75,7 @@ export default [
       ]),
       route('uttrekk', 'regulering/batch.regulering.uttrekk.tsx', [
         route('startUttrekk', 'regulering/batch.regulering.uttrekk.startUttrekk.tsx'),
+        route('leggTilUttrekk', 'regulering/batch.regulering.uttrekk.leggTilUttrekk.tsx'),
       ]),
     ]),
 
