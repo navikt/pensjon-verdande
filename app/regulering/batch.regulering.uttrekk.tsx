@@ -182,6 +182,11 @@ function LeggTilUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
 
   return (
     <Modal header={{ heading: 'Legg til uttrekk' }} open={isOpen} onClose={() => onClose()}>
+      <Modal.Body>
+        <VStack gap="5">
+          <BodyLong>Dette vil oppdatere arbeidstabellene med familiesammenstøt som nå er klare for regulering</BodyLong>
+        </VStack>
+      </Modal.Body>
       <Modal.Footer>
         <Button onClick={leggTilUttrekk} loading={fetcher.state === 'submitting'}>
           Legg til uttrekk
