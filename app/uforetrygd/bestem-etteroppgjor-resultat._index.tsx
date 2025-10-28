@@ -1,4 +1,5 @@
 import { Alert, Button, Checkbox, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { useState } from 'react'
 import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
@@ -52,6 +53,12 @@ export default function BestemEtteroppgjorResultatPage() {
   const isSubmitting = navigation.state === 'submitting'
   const error = actionData?.error
   const success = actionData?.success
+  const [etteroppgjørsårErSatt, setEtteroppgjørsårErSatt] = useState(false)
+
+  const handleEtteroppgjorArChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value
+    setEtteroppgjørsårErSatt(value !== undefined && Number.isInteger(+value))
+  }
 
   return (
     <VStack gap="4" style={{ maxWidth: '50em', margin: '2em' }}>
@@ -76,8 +83,9 @@ export default function BestemEtteroppgjorResultatPage() {
             name="etteroppgjorAr"
             type="text"
             inputMode="numeric"
+            onChange={handleEtteroppgjorArChange}
           />
-          <Checkbox name="oppdaterSisteGyldigeEtteroppgjørsÅr" value="checked">
+          <Checkbox name="oppdaterSisteGyldigeEtteroppgjørsÅr" value="checked" disabled={!etteroppgjørsårErSatt}>
             Oppdater etteroppgjørsår for saksbehandler
           </Checkbox>
           <TextField
