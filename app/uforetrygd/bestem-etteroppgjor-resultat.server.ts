@@ -5,6 +5,7 @@ export async function startBestemEtteroppgjorResultat(
   dryRun: boolean,
   ar: number | null,
   sakIds: number[],
+  oppdaterSisteGyldigeEtteroppgjørsÅr: boolean,
 ) {
   return await fetch(`${env.penUrl}/api/uforetrygd/bestemetteroppgjor/start`, {
     method: 'POST',
@@ -17,6 +18,7 @@ export async function startBestemEtteroppgjorResultat(
       dryRun: dryRun,
       sakIds: sakIds,
       ar: ar,
+      oppdaterSisteGyldigeEtteroppgjørsÅr: oppdaterSisteGyldigeEtteroppgjørsÅr,
     }),
   })
 }

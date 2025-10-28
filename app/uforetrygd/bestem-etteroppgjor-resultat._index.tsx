@@ -1,4 +1,4 @@
-import { Alert, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { Alert, Button, Checkbox, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
@@ -24,16 +24,17 @@ function parseFormData(formData: FormData) {
   const arValue = formData.get('etteroppgjorAr')
   const ar = arValue ? Number(arValue) : null
   const sakIds = parseSakIds(formData.get('sakIds'))
+  const oppdaterSisteGyldigeEtteroppgjørsÅr = formData.get('oppdaterSisteGyldigeEtteroppgjørsÅr') === 'checked'
 
-  return { dryRun, ar, sakIds }
+  return { dryRun, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr }
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     const accessToken = await requireAccessToken(request)
     const formData = await request.formData()
-    const { dryRun, ar, sakIds } = parseFormData(formData)
-    await startBestemEtteroppgjorResultat(accessToken, dryRun, ar, sakIds)
+    const { dryRun, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
+    await startBestemEtteroppgjorResultat(accessToken, dryRun, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr)
     return {
       success: true,
     }
@@ -76,6 +77,9 @@ export default function BestemEtteroppgjorResultatPage() {
             type="text"
             inputMode="numeric"
           />
+          <Checkbox name="oppdaterSisteGyldigeEtteroppgjørsÅr" value="checked">
+            Oppdater etteroppgjørsår for saksbehandler
+          </Checkbox>
           <TextField
             label="Kommaseparert liste med sak-id'er som skal behandles (tomt betyr alle):"
             aria-label="sakIds"
