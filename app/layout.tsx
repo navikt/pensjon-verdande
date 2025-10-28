@@ -122,18 +122,31 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     return (
       <Theme>
         <div className="p-6 space-y-2">
-          <h1 className="text-xl font-semibold">Feil</h1>
+          <h1 className="text-xl font-semibold">Operasjon feilet</h1>
           <p>{error.message}</p>
           {error.stack && (
-            <details>
-              <summary style={{ cursor: 'pointer' }}>Stack trace</summary>
-              <pre className="mt-2 overflow-auto">{error.stack}</pre>
-            </details>
+            <>
+              <CopyButton copyText={error.stack.toString()} />
+              <details>
+                <summary style={{ cursor: 'pointer' }}>Stack trace</summary>
+                <pre className="mt-2 overflow-auto">{error.stack}</pre>
+              </details>
+            </>
           )}
         </div>
       </Theme>
     )
   }
 
-  return <h1>Ukjent feil</h1>
+  return (
+    <Theme>
+      <div className="p-6 space-y-2">
+        <h1 className="text-xl font-semibold">Ukjent feil</h1>
+        <details>
+          <summary style={{ cursor: 'pointer' }}>Stack trace</summary>
+          <pre className="mt-2 overflow-auto">{JSON.stringify(error, null, 2)}</pre>
+        </details>
+      </div>
+    </Theme>
+  )
 }

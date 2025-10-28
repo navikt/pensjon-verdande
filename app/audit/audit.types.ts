@@ -19,7 +19,7 @@ export interface BehandlingAuditDTO {
   handlingDekode: string
   handlingType: string
   behandlingId: number
-  behandlingType: string
+  behandlingType: string | null
   behandlingStatus: string
   aktivitetId?: number | null
   aktivitetType?: string | null
