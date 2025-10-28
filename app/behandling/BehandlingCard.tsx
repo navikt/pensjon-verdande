@@ -368,6 +368,8 @@ export default function BehandlingCard(props: Props) {
         return 'PersonAjourhold'
       case 'AvsluttSakerBehandling':
         return 'AvsluttSaker'
+      case 'KontrollerOppgaverBehandling':
+        return 'KontrollerOppgaver'
       default:
         return type
     }

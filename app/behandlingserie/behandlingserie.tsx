@@ -73,7 +73,7 @@ const TIDER: string[] = Array.from({ length: 24 * 4 }, (_, i) => {
   const m = (i % 4) * 15
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 })
-const BEHANDLINGSTYPER = ['AvsluttSaker', 'PersonAjourhold']
+const BEHANDLINGSTYPER = ['AvsluttSaker', 'PersonAjourhold', 'KontrollerOppgaver']
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url)
