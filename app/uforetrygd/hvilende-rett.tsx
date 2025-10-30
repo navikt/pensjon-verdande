@@ -1,10 +1,9 @@
 import { Alert, Button, Heading, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
+import { type ActionFunctionArgs, Form, redirect, useActionData, useNavigation } from 'react-router'
 
 type ActionData = {
   success: boolean
   error: string | null
-  senesteHvilendeAr: number | null
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -22,11 +21,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
   }
 
-  const response = await opprettHvilendeRettVarselbrevBehandlinger(accessToken, senesteHvilendeAr)
-
-  return {
-    ...response,
-    senesteHvilendeAr,
+  try {
+    const response = await opprettHvilendeRettVarselbrevBehandlinger(accessToken, senesteHvilendeAr)
+    return redirect(`/behandling/${response.behandlingId}`)
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'En ukjent feil oppstod',
+    }
   }
 }
 
@@ -45,9 +47,8 @@ export default function HvilendeRettPage() {
 
       <Form method="post" style={{ width: '10em' }}>
         <VStack gap={'4'}>
-          <TextField label="Sak Id" aria-label="sakId" name="sakId" type="text" inputMode="numeric" />
           <TextField
-            label="Seneste hvilende år for Uføretrygd"
+            label="Seneste hvilende år :"
             aria-label="senesteHvilendeAr"
             name="senesteHvilendeAr"
             type="text"

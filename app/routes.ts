@@ -126,6 +126,8 @@ export default [
 
     route('bpen096', 'uforetrygd/bpen096.tsx'),
 
+    route('hvilenderett', 'uforetrygd/hvilende-rett.tsx'),
+
     route('brukere', 'brukere/index.tsx'),
     route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),
 

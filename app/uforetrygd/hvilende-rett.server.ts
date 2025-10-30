@@ -1,6 +1,9 @@
 import { env } from '~/services/env.server'
 
-export const opprettHvilendeRettVarselbrevBehandlinger = async (accessToken: string, senesteHvilendeAr: number) => {
+export const opprettHvilendeRettVarselbrevBehandlinger = async (
+  accessToken: string,
+  senesteHvilendeAr: number,
+): Promise<HvilendeRettBehandlingResponse> => {
   const response = await fetch(`${env.penUrl}/api/uforetrygd/hvilenderett/behandling/varsel/batch`, {
     method: 'POST',
     headers: {
@@ -13,7 +16,13 @@ export const opprettHvilendeRettVarselbrevBehandlinger = async (accessToken: str
     }),
   })
 
-  return {
-    success: response.ok,
+  if (response.ok) {
+    return (await response.json()) as HvilendeRettBehandlingResponse
+  } else {
+    throw new Error(`Kunne ikke opprette behandling. Statuskode : ${response.status}`)
   }
+}
+
+type HvilendeRettBehandlingResponse = {
+  behandlingId: number
 }
