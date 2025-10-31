@@ -18,7 +18,7 @@ export async function opprettAdHocBrevSlettFullmaktBprofBehandling(
   if (response.ok) {
     return (await response.json()) as StartBatchResponse
   } else {
-    throw new Error()
+    throw new Error(await response.text())
   }
 }
 
