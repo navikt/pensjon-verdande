@@ -12,7 +12,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const response = await opprettAdHocBrevSlettFullmaktBprofBehandling(
     accessToken,
-    JSON.parse(formData.get('brpofUttrekk') as string) as BprofUttrekk,
+    JSON.parse(formData.get('bprofUttrekk') as string) as BprofUttrekk,
   )
 
   return redirect(`/behandling/${response.behandlingId}`)
@@ -36,7 +36,7 @@ export default function AdhocBrevFullmakt() {
         <VStack gap={'4'}>
           <Textarea
             label="BPROF-uttrekk (JSON-format)"
-            name="brpofUttrekk"
+            name="bprofUttrekk"
             resize
             onChange={(e) => {
               setBprofUttrekk(e.target.value)
