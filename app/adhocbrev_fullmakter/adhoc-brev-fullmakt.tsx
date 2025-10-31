@@ -37,7 +37,6 @@ export default function AdhocBrevFullmakt() {
           <Textarea
             label="BPROF-uttrekk (JSON-format)"
             name="brpofUttrekk"
-            maxLength={1000}
             resize
             onChange={(e) => {
               console.log(e.target.value)
