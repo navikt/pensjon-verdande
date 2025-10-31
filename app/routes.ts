@@ -8,7 +8,7 @@ export default [
 
   layout('layout.tsx', [
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
-
+    route('adhocbrev_fullmakter', 'adhocbrev_fullmakter/adhoc-brev-fullmakt.tsx'),
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
 
     route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx'),
