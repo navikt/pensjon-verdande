@@ -19,7 +19,7 @@ export const opprettHvilendeRettVarselbrevBehandlinger = async (
   if (response.ok) {
     return (await response.json()) as HvilendeRettBehandlingResponse
   } else {
-    throw new Error(`Kunne ikke opprette behandling. Statuskode : ${response.status}`)
+    throw new Error(`Kunne ikke opprette behandling. Statuskode: ${response.status}`)
   }
 }
 

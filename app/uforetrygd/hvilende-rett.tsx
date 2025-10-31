@@ -17,7 +17,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (!senesteHvilendeAr || Number.isNaN(senesteHvilendeAr)) {
     return {
       success: false,
-      error: 'Seneste hvilende år for Uføretryged må være et gyldig tall',
+      error: 'Seneste hvilende år for Uføretrygd må være et gyldig tall',
     }
   }
 
@@ -48,7 +48,7 @@ export default function HvilendeRettPage() {
       <Form method="post" style={{ width: '10em' }}>
         <VStack gap={'4'}>
           <TextField
-            label="Seneste hvilende år :"
+            label="Seneste hvilende år:"
             aria-label="senesteHvilendeAr"
             name="senesteHvilendeAr"
             type="text"
