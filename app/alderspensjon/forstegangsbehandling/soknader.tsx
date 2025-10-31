@@ -434,7 +434,7 @@ function BehandlingCard({
   const C = statusConfig[b.status]
   const tid = formatBehandlingstid(b.opprettet, b.ferdig, nowIso)
 
-  const enhet = b.enhetId && b.enhetId + (b.enhetsNavn != null ? ' - ' + b.enhetsNavn : '')
+  const enhet = b.enhetId && b.enhetId + (b.enhetsNavn != null ? ` - ${b.enhetsNavn}` : '')
 
   return (
     <Box.New
