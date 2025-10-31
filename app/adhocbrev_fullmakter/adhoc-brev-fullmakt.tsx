@@ -39,7 +39,6 @@ export default function AdhocBrevFullmakt() {
             name="brpofUttrekk"
             resize
             onChange={(e) => {
-              console.log(e.target.value)
               setBprofUttrekk(e.target.value)
             }}
             value={bprofUttrekk}
