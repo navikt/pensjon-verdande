@@ -38,6 +38,7 @@ const administrasjonMeny = [
 const batcherMeny = [
   ['BATCH_KJORINGER', '/batcher', 'Alle batchkjøringer'],
   ['ADHOC_BREVBESTILLING', `/adhocbrev`, 'Adhoc brevbestilling'],
+  ['ADHOC_BREVBESTILLING_FULLMAKTER', `/adhocbrev_fullmakter`, 'AdHoc brevbestillinger fullmakter'],
   ['AFP_ETTEROPPGJOR', '/afp-etteroppgjor', 'AFP Etteroppgjør'],
   ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
