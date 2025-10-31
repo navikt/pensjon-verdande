@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@mjackson/form-data-parser": "^0.9.1",
-    "@navikt/aksel-icons": "^7.32.3",
-    "@navikt/ds-css": "^7.32.3",
-    "@navikt/ds-react": "^7.32.3",
+    "@navikt/aksel-icons": "^7.32.5",
+    "@navikt/ds-css": "^7.32.5",
+    "@navikt/ds-react": "^7.32.5",
     "@react-router/express": "^7.9.4",
     "@react-router/node": "^7.9.4",
     "chart.js": "^4.5.1",
