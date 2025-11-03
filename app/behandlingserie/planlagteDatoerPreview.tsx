@@ -1,6 +1,11 @@
 import { Heading, VStack } from '@navikt/ds-react'
 import styles from './css/previewBubbles.module.css'
 
+type SerieTagStyle = React.CSSProperties & {
+  '--serie-bg'?: string
+  '--serie-fg'?: string
+}
+
 export type PlannedItem = {
   id: string
   yearMonthDay: string // YYYY-MM-DD
@@ -137,9 +142,9 @@ export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Pr
                         className={styles.serieTag}
                         style={
                           {
-                            ['--serie-bg']: fargeForSerie(item.serieId).bg,
-                            ['--serie-fg']: fargeForSerie(item.serieId).fg,
-                          } as React.CSSProperties
+                            '--serie-bg': fargeForSerie(item.serieId).bg,
+                            '--serie-fg': fargeForSerie(item.serieId).fg,
+                          } as SerieTagStyle
                         }
                       >
                         {shortSerieId(item.serieId)}
