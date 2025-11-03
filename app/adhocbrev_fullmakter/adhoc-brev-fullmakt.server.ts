@@ -25,3 +25,22 @@ export async function opprettAdHocBrevSlettFullmaktBprofBehandling(
 type StartBatchResponse = {
   behandlingId: number
 }
+
+export async function bekreftAdHocBrevSlettFullmaktBprofBrevUtsending(accessToken: string, behandlingId: string) {
+  const response = await fetch(
+    `${env.penUrl}/api/behandling/adhocBrevSlettFullmaktBprof/${behandlingId}/bekreftKlarForBrevUtsending`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Request-ID': crypto.randomUUID(),
+      },
+    },
+  )
+
+  if (!response.ok) {
+    console.log(response.text())
+    throw new Error()
+  }
+}
