@@ -7,7 +7,7 @@ export async function startBestemEtteroppgjorResultat(
   sakIds: number[],
   oppdaterSisteGyldigeEtteroppgjørsÅr: boolean,
 ) {
-  return await fetch(`${env.penUrl}/api/uforetrygd/bestemetteroppgjor/start`, {
+  const response = await fetch(`${env.penUrl}/api/uforetrygd/bestemetteroppgjor/start`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -21,4 +21,14 @@ export async function startBestemEtteroppgjorResultat(
       oppdaterSisteGyldigeEtteroppgjørsÅr: oppdaterSisteGyldigeEtteroppgjørsÅr,
     }),
   })
+
+  if (response.ok) {
+    return (await response.json()) as Response
+  } else {
+    throw new Error(`Kunne ikke opprette behandling. Statuskode: ${response.status}`)
+  }
+}
+
+type Response = {
+  behandlingId: number
 }

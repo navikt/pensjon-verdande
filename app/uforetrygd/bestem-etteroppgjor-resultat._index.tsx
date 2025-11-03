@@ -1,6 +1,6 @@
 import { Alert, Button, Checkbox, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
+import { type ActionFunctionArgs, Form, redirect, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
 
@@ -35,10 +35,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const accessToken = await requireAccessToken(request)
     const formData = await request.formData()
     const { dryRun, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
-    await startBestemEtteroppgjorResultat(accessToken, dryRun, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr)
-    return {
-      success: true,
-    }
+    const response = await startBestemEtteroppgjorResultat(
+      accessToken,
+      dryRun,
+      ar,
+      sakIds,
+      oppdaterSisteGyldigeEtteroppgjørsÅr,
+    )
+    return redirect(`/behandling/${response.behandlingId}`)
   } catch (error) {
     return {
       success: false,
@@ -52,7 +56,6 @@ export default function BestemEtteroppgjorResultatPage() {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
   const error = actionData?.error
-  const success = actionData?.success
   const [etteroppgjørsårErSatt, setEtteroppgjørsårErSatt] = useState(false)
 
   const handleEtteroppgjorArChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,12 +65,7 @@ export default function BestemEtteroppgjorResultatPage() {
 
   return (
     <VStack gap="4" style={{ maxWidth: '50em', margin: '2em' }}>
-      {actionData && (
-        <>
-          {success && <Alert variant="success">Behandling er opprettet</Alert>}
-          {error && <Alert variant="error">Feilmelding: {error}</Alert>}
-        </>
-      )}
+      {actionData && error && <Alert variant="error">Feilmelding: {error}</Alert>}
       <Heading size="small" level="1">
         Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
@@ -104,6 +102,5 @@ export default function BestemEtteroppgjorResultatPage() {
 }
 
 type ActionData = {
-  success: boolean
   error: string | null
 }
