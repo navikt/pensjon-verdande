@@ -2,7 +2,6 @@ import { env } from '~/services/env.server'
 
 export async function startBestemEtteroppgjorResultat(
   accessToken: string,
-  dryRun: boolean,
   ar: number | null,
   sakIds: number[],
   oppdaterSisteGyldigeEtteroppgjørsÅr: boolean,
@@ -15,7 +14,6 @@ export async function startBestemEtteroppgjorResultat(
       'X-Request-ID': crypto.randomUUID(),
     },
     body: JSON.stringify({
-      dryRun: dryRun,
       sakIds: sakIds,
       ar: ar,
       oppdaterSisteGyldigeEtteroppgjørsÅr: oppdaterSisteGyldigeEtteroppgjørsÅr,

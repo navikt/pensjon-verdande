@@ -1,4 +1,4 @@
-import { Alert, Button, Checkbox, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { Alert, Button, Checkbox, Heading, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { type ActionFunctionArgs, Form, redirect, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
@@ -21,27 +21,20 @@ function parseSakIds(sakIds: FormDataEntryValue | null): number[] {
 }
 
 function parseFormData(formData: FormData) {
-  const dryRun = formData.get('dryRun') === 'true'
   const arValue = formData.get('etteroppgjorAr')
   const ar = arValue ? Number(arValue) : null
   const sakIds = parseSakIds(formData.get('sakIds'))
   const oppdaterSisteGyldigeEtteroppgjørsÅr = formData.get('oppdaterSisteGyldigeEtteroppgjørsÅr') === 'checked'
 
-  return { dryRun, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr }
+  return { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr }
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     const accessToken = await requireAccessToken(request)
     const formData = await request.formData()
-    const { dryRun, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
-    const response = await startBestemEtteroppgjorResultat(
-      accessToken,
-      dryRun,
-      ar,
-      sakIds,
-      oppdaterSisteGyldigeEtteroppgjørsÅr,
-    )
+    const { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
+    const response = await startBestemEtteroppgjorResultat(accessToken, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr)
     return redirect(`/behandling/${response.behandlingId}`)
   } catch (error) {
     return {
@@ -71,10 +64,6 @@ export default function BestemEtteroppgjorResultatPage() {
       </Heading>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap="5">
-          <Select label="Dry run:" size="small" name="dryRun" defaultValue="true">
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
           <TextField
             label="År for etteroppgjør (tomt betyr alle):"
             aria-label="etteroppgjorAr"
