@@ -25,6 +25,8 @@ export interface AlderspensjonssoknadDto {
   stackTrace: string | null
   sakId: number
   kravId: number
+  enhetId: string | null
+  enhetsNavn: string | null
   behandlingstype: BehandlingTypeCode
   onsketVirkningsdato: string // LocalDate ISO
   erAldeBehandling: boolean

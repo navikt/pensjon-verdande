@@ -368,6 +368,8 @@ export default function BehandlingCard(props: Props) {
         return 'PersonAjourhold'
       case 'AvsluttSakerBehandling':
         return 'AvsluttSaker'
+      case 'KontrollerOppgaverBehandling':
+        return 'KontrollerOppgaver'
       default:
         return type
     }
@@ -434,6 +436,7 @@ export default function BehandlingCard(props: Props) {
               <Entry labelText={'Prioritet'}>{props.behandling.prioritet}</Entry>
 
               <Entry labelText={'Opprettet'}>{formatIsoTimestamp(props.behandling.opprettet)}</Entry>
+              {props.behandling.opprettetAv && <Entry labelText={'Opprettet av'}>{props.behandling.opprettetAv}</Entry>}
               <Entry labelText={'Siste kjøring'}>{formatIsoTimestamp(props.behandling.sisteKjoring)}</Entry>
               {props.behandling.ferdig ? (
                 <Entry labelText={'Ferdig'}>{formatIsoTimestamp(props.behandling.ferdig)}</Entry>

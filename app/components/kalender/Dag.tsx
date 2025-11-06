@@ -1,5 +1,6 @@
-import { HStack, Link, Spacer } from '@navikt/ds-react'
+import { Button, HStack, Link, Modal, Spacer, VStack } from '@navikt/ds-react'
 import type { JSX } from 'react'
+import { useMemo, useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router'
 import { isSameDay } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -53,6 +54,8 @@ export default function Dag(props: Props) {
   }
 
   const offentligFridag = props.kalenderHendelser.offentligeFridager.find((it) => isSameDay(it.dato, props.dato))?.navn
+
+  const [modalOpen, setModalOpen] = useState(false)
 
   function dayRow() {
     if (props.dato.getDay() === 1) {
@@ -114,26 +117,21 @@ export default function Dag(props: Props) {
       </HStack>
     )
   }
-
+  const dagens = useMemo(
+    () =>
+      props.kalenderHendelser.kalenderBehandlinger
+        .filter((b) => isSameDay(new Date(b.kjoreDato), props.dato))
+        .sort((a, b) => a.kjoreDato.localeCompare(b.kjoreDato, 'nb', { sensitivity: 'base' })),
+    [props.kalenderHendelser, props.dato],
+  )
   function visDagensBehandlingerMedBegrensning(maksAntall: number = 5) {
-    const dagens = props.kalenderHendelser.kalenderBehandlinger
-      .filter((b) => isSameDay(new Date(b.kjoreDato), props.dato))
-      .sort((a, b) => a.kjoreDato.localeCompare(b.kjoreDato, 'nb', { sensitivity: 'base' }))
-
-    const behandlingerSomVises = dagens.length > maksAntall ? dagens.slice(0, maksAntall - 1) : dagens
-
+    const behandlingerSomVises = dagens.length > maksAntall ? dagens.slice(0, Math.max(1, maksAntall - 1)) : dagens
     const antallEkstra = Math.max(0, dagens.length - behandlingerSomVises.length)
 
     const offentligFridagElement = offentligFridag
       ? [
           <HStack key="kalenderHendelse" style={{ fontSize: '0.8em' }}>
-            <span
-              style={{
-                color: 'red',
-              }}
-            >
-              {offentligFridag}
-            </span>
+            <span style={{ color: 'red' }}>{offentligFridag}</span>
           </HStack>,
         ]
       : []
@@ -142,36 +140,75 @@ export default function Dag(props: Props) {
       behandlingElement(behandling, textColor, props.visKlokkeSlett),
     )
 
-    const ekstreElement =
+    const ekstraKnapp =
       antallEkstra > 0
         ? [
-            <HStack key="ekstra" style={{ fontSize: '0.8em' }}>
-              <span
-                style={{
-                  color: textColor,
-                }}
+            <div key="vis-alle" style={{ marginTop: '0.25rem' }}>
+              <Button
+                size="xsmall"
+                variant="tertiary"
+                onClick={() => setModalOpen(true)}
+                aria-label={`Vis ${antallEkstra} flere behandlinger denne dagen`}
               >
-                og {antallEkstra} til
-              </span>
-            </HStack>,
+                +{antallEkstra} (Vis alle)
+              </Button>
+            </div>,
           ]
         : []
 
-    return [...offentligFridagElement, ...behandlingElementer, ...ekstreElement]
+    return [...offentligFridagElement, ...behandlingElementer, ...ekstraKnapp]
   }
 
   return (
-    <table style={{ width: '100%', tableLayout: 'fixed' }}>
-      <thead>
-        <tr>
-          <td>{dayRow()}</td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{visDagensBehandlingerMedBegrensning(props.maksAntallPerDag)}</td>
-        </tr>
-      </tbody>
-    </table>
+    <>
+      <table style={{ width: '100%', tableLayout: 'fixed' }}>
+        <thead>
+          <tr>
+            <td>{dayRow()}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{visDagensBehandlingerMedBegrensning(props.maksAntallPerDag)}</td>
+          </tr>
+        </tbody>
+      </table>
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        width="small"
+        header={{
+          heading: props.dato.toLocaleDateString('no-NO', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          }),
+        }}
+      >
+        <Modal.Body>
+          <VStack gap="1">
+            {offentligFridag && (
+              <HStack key="modal-kalenderHendelse" style={{ fontSize: '0.9em' }}>
+                <span style={{ color: 'red' }}>{offentligFridag}</span>
+              </HStack>
+            )}
+
+            {dagens.length === 0 && (
+              <span style={{ color: 'var(--ax-neutral-700)' }}>Ingen behandlinger denne dagen.</span>
+            )}
+
+            <div style={{ maxHeight: 360, overflow: 'auto', paddingRight: 4 }}>
+              {dagens.map((b) => behandlingElement(b, textColor, props.visKlokkeSlett))}
+            </div>
+          </VStack>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button size="small" onClick={() => setModalOpen(false)}>
+            Lukk
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   )
 }

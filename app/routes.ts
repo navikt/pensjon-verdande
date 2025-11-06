@@ -8,7 +8,11 @@ export default [
 
   layout('layout.tsx', [
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
-
+    route('adhocbrev_fullmakter', 'adhocbrev_fullmakter/adhoc-brev-fullmakt.tsx'),
+    route(
+      'adhocbrev_fullmakter/bekreft-brevutsending',
+      'adhocbrev_fullmakter/adhoc-brev-fullmakt-bekreft-brevutsending.tsx',
+    ),
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
 
     route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx'),
@@ -126,6 +130,8 @@ export default [
     route('bpen091', 'uforetrygd/bpen091.tsx'),
 
     route('bpen096', 'uforetrygd/bpen096.tsx'),
+
+    route('hvilenderett', 'uforetrygd/hvilende-rett.tsx'),
 
     route('brukere', 'brukere/index.tsx'),
     route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),

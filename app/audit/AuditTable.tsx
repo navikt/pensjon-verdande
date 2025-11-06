@@ -96,7 +96,7 @@ export function AuditTable({
             <Table.DataCell>{row.navident}</Table.DataCell>
             <Table.DataCell>{row.handlingType}</Table.DataCell>
             <Table.DataCell>{row.handlingDekode}</Table.DataCell>
-            <Table.DataCell>{decodeBehandling(row.behandlingType)}</Table.DataCell>
+            <Table.DataCell>{decodeBehandling(row.behandlingType || 'Ukjent')}</Table.DataCell>
             <Table.DataCell>{row.aktivitetType ? decodeAktivitet(row.aktivitetType) : '—'}</Table.DataCell>
             <Table.DataCell>
               <AuditTableActionMenu row={row}></AuditTableActionMenu>

@@ -434,6 +434,8 @@ function BehandlingCard({
   const C = statusConfig[b.status]
   const tid = formatBehandlingstid(b.opprettet, b.ferdig, nowIso)
 
+  const enhet = b.enhetId && b.enhetId + (b.enhetsNavn != null ? ` - ${b.enhetsNavn}` : '')
+
   return (
     <Box.New
       as="article"
@@ -480,6 +482,7 @@ function BehandlingCard({
           />
           <KV label="Behandlingstype" value={decodeBehandlingstype(b.behandlingstype)} />
           <KV label="Aldestatus" value={decodeAldeBehandlingStatus(b.aldeStatus)} />
+          {enhet && <KV label="Enhet" value={enhet} />}
         </HStack>
 
         {b.nesteAktiviteter.length === 1 ? (

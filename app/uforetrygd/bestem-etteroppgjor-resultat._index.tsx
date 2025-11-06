@@ -1,5 +1,6 @@
-import { Alert, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
+import { Alert, Button, Checkbox, Heading, TextField, VStack } from '@navikt/ds-react'
+import { useState } from 'react'
+import { type ActionFunctionArgs, Form, redirect, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
 
@@ -20,23 +21,21 @@ function parseSakIds(sakIds: FormDataEntryValue | null): number[] {
 }
 
 function parseFormData(formData: FormData) {
-  const dryRun = formData.get('dryRun') === 'true'
   const arValue = formData.get('etteroppgjorAr')
   const ar = arValue ? Number(arValue) : null
   const sakIds = parseSakIds(formData.get('sakIds'))
+  const oppdaterSisteGyldigeEtteroppgjørsÅr = formData.get('oppdaterSisteGyldigeEtteroppgjørsÅr') === 'checked'
 
-  return { dryRun, ar, sakIds }
+  return { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr }
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     const accessToken = await requireAccessToken(request)
     const formData = await request.formData()
-    const { dryRun, ar, sakIds } = parseFormData(formData)
-    await startBestemEtteroppgjorResultat(accessToken, dryRun, ar, sakIds)
-    return {
-      success: true,
-    }
+    const { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
+    const response = await startBestemEtteroppgjorResultat(accessToken, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr)
+    return redirect(`/behandling/${response.behandlingId}`)
   } catch (error) {
     return {
       success: false,
@@ -50,32 +49,32 @@ export default function BestemEtteroppgjorResultatPage() {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
   const error = actionData?.error
-  const success = actionData?.success
+  const [etteroppgjørsårErSatt, setEtteroppgjørsårErSatt] = useState(false)
+
+  const handleEtteroppgjorArChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value
+    setEtteroppgjørsårErSatt(value !== undefined && Number.isInteger(+value))
+  }
 
   return (
     <VStack gap="4" style={{ maxWidth: '50em', margin: '2em' }}>
-      {actionData && (
-        <>
-          {success && <Alert variant="success">Behandling er opprettet</Alert>}
-          {error && <Alert variant="error">Feilmelding: {error}</Alert>}
-        </>
-      )}
+      {actionData && error && <Alert variant="error">Feilmelding: {error}</Alert>}
       <Heading size="small" level="1">
         Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap="5">
-          <Select label="Dry run:" size="small" name="dryRun" defaultValue="true">
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
           <TextField
             label="År for etteroppgjør (tomt betyr alle):"
             aria-label="etteroppgjorAr"
             name="etteroppgjorAr"
             type="text"
             inputMode="numeric"
+            onChange={handleEtteroppgjorArChange}
           />
+          <Checkbox name="oppdaterSisteGyldigeEtteroppgjørsÅr" value="checked" disabled={!etteroppgjørsårErSatt}>
+            Oppdater etteroppgjørsår for saksbehandler
+          </Checkbox>
           <TextField
             label="Kommaseparert liste med sak-id'er som skal behandles (tomt betyr alle):"
             aria-label="sakIds"
@@ -92,6 +91,5 @@ export default function BestemEtteroppgjorResultatPage() {
 }
 
 type ActionData = {
-  success: boolean
   error: string | null
 }
