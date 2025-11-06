@@ -40,3 +40,11 @@ export interface AlderspensjonssoknadDto {
   erMuligAldeBehandling: boolean
   isVurderSamboerUnderBehandling: boolean
 }
+
+export interface AldeOppsummeringDto {
+  antallBehandlinger: number
+  antallAldeBehandlinger: number
+  aldeBehandlingerUnderBehandling: number
+  fullforteAldeBehandlinger: number
+  avbrutteAldeBehandlingr: number
+}
