@@ -1,3 +1,5 @@
+import type { AldeBehandlingState } from './alderspensjon/forstegangsbehandling/types'
+
 export interface PageResponse<T> {
   content: T[]
   pageable: {
@@ -128,6 +130,9 @@ export type BehandlingKjoringDTO = {
   correlationId: string
   feilmelding: string | null
   stackTrace: string | null
+  aktivitetType: string
+  aldeStartState: AldeBehandlingState | null
+  aldeEndState: AldeBehandlingState | null
 
   _links?: HalLinks
 }

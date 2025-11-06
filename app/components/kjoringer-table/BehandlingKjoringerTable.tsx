@@ -1,9 +1,10 @@
-import { ExternalLinkIcon, FilesIcon, MenuElipsisVerticalIcon } from '@navikt/aksel-icons'
-import { ActionMenu, Button, Table } from '@navikt/ds-react'
+import { ArrowRightIcon, ExternalLinkIcon, FilesIcon, MenuElipsisVerticalIcon } from '@navikt/aksel-icons'
+import { ActionMenu, Button, HStack, Table, Tag } from '@navikt/ds-react'
 import React from 'react'
 import { Link as ReactRouterLink } from 'react-router'
 import copy from '~/common/clipboard'
 import { formatIsoTimestamp } from '~/common/date'
+import { decodeAldeBehandlingState } from '~/common/decode'
 import { decodeAktivitet } from '~/common/decodeBehandling'
 import { formatNumber } from '~/common/number'
 import { useSort } from '~/hooks/useSort'
@@ -12,6 +13,7 @@ import type { BehandlingDto, BehandlingKjoringDTO, HalLink } from '~/types'
 
 type Props = {
   behandling: BehandlingDto
+  erAldeKjoring: boolean
 }
 
 export function tidsbruk(it: BehandlingKjoringDTO) {
@@ -54,6 +56,7 @@ export function BehandlingKjoringerTable(props: Props) {
           </Table.ColumnHeader>
           <Table.ColumnHeader align={'right'}>Tidsbruk</Table.ColumnHeader>
           <Table.ColumnHeader>Aktivitet</Table.ColumnHeader>
+          {props.erAldeKjoring && <Table.ColumnHeader>Alde state</Table.ColumnHeader>}
           <Table.ColumnHeader sortable sortKey="feilmelding">
             Feilmelding
           </Table.ColumnHeader>
@@ -69,6 +72,25 @@ export function BehandlingKjoringerTable(props: Props) {
               <Table.DataCell>{formatIsoTimestamp(it.startet)}</Table.DataCell>
               <Table.DataCell align={'right'}>{tidsbruk(it)}</Table.DataCell>
               <Table.DataCell>{aktivitet && decodeAktivitet(aktivitet.type)}</Table.DataCell>
+
+              {props.erAldeKjoring && (
+                <Table.DataCell>
+                  {it.aldeStartState && it.aldeEndState && (
+                    <HStack gap="2" align="center" style={{ flexWrap: 'nowrap' }}>
+                      {it.aldeStartState && (
+                        <Tag variant="alt1" style={{ whiteSpace: 'nowrap' }}>
+                          {decodeAldeBehandlingState(it.aldeStartState)}
+                        </Tag>
+                      )}
+                      <ArrowRightIcon title="a11y-title" fontSize="1.5rem" />
+                      <Tag style={{ whiteSpace: 'nowrap' }} variant="alt3">
+                        {decodeAldeBehandlingState(it.aldeEndState)}
+                      </Tag>
+                    </HStack>
+                  )}
+                </Table.DataCell>
+              )}
+
               <Table.DataCell>{it.feilmelding}</Table.DataCell>
               <Table.DataCell>
                 <ActionMenu>
