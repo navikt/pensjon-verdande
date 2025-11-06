@@ -4,6 +4,13 @@ export type BehandlingTypeCode = 'AUTO' | 'DEL_AUTO' | 'MAN'
 
 export type AldeBehandlingStatus = 'VENTER_SAKSBEHANDLER' | 'VENTER_MASKINELL' | 'VENTER_ATTESTERING' | 'FULLFORT'
 
+export type AldeBehandlingState =
+  | 'HENT_GRUNNLAG'
+  | 'PROSSESER_GRUNNLAG'
+  | 'MANUELL_BEHANDLING'
+  | 'PROSESSER_VURDERING'
+  | 'SKIPPED'
+
 export type Kontrollpunkt = {
   type: string
   status: string

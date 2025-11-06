@@ -43,6 +43,14 @@ const FAGOMRADE_MAP = {
   OKO: 'Økonomi',
 }
 
+const ALDE_BEHANDLING_STATE_MAP = {
+  HENT_GRUNNLAG: 'Hent grunnlag',
+  PROSESSER_GRUNNLAG: 'Prosesser grunnlag',
+  MANUELL_BEHANDLING: 'Manuell behandling',
+  PROSESSER_VURDERING: 'Prosesser vurdering',
+  SKIPPED: 'Skipped',
+}
+
 export function makeDecoder<M extends Record<string, string>>(map: M) {
   return (key: string) => map[key as keyof M] ?? key
 }
@@ -56,3 +64,5 @@ export const decodeBehandlingstype = makeDecoder(BEHANDLING_TYPES_MAP)
 export const decodeFagomrade = makeDecoder(FAGOMRADE_MAP)
 
 export const decodeAldeBehandlingStatus = makeDecoder(ALDE_BEHANDLING_STATUS_MAP)
+
+export const decodeAldeBehandlingState = makeDecoder(ALDE_BEHANDLING_STATE_MAP)
