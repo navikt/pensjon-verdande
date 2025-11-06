@@ -60,7 +60,7 @@ export default function Orkestrering() {
             Start orkestrering
           </Heading>
           <Entry labelText="Antall ubehandlede familier">{uttrekk.antallUbehandlede}</Entry>
-          <Entry labelText="Antall ekskluderte familier">{uttrekk.antallEkskluderte}</Entry>
+          <Entry labelText="Antall ekskluderte saker">{uttrekk.antallEkskluderteSaker}</Entry>
           <Form method="post">
             <VStack gap="3">
               <TextField
