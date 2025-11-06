@@ -370,8 +370,8 @@ export const startUttrekk = async (accessToken: string, satsDato: string) => {
   }
 }
 
-export const leggTilUttrekk = async (accessToken: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/uttrekk/leggTil`, {
+export const oppdaterUttrekk = async (accessToken: string) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/uttrekk/oppdater`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
