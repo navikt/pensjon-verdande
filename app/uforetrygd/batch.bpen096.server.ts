@@ -4,7 +4,6 @@ export async function opprettBpen096(
   accessToken: string,
   maksAntallSekvensnummer: number,
   sekvensnummerPerBehandling: number,
-  dryRun: boolean,
   debug: boolean,
 ): Promise<StartBatchResponse> {
   const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser`, {
@@ -17,7 +16,6 @@ export async function opprettBpen096(
     body: JSON.stringify({
       maksAntallSekvensnummer: maksAntallSekvensnummer,
       sekvensnummerPerBehandling: sekvensnummerPerBehandling,
-      dryRun: dryRun,
       debug: debug,
     }),
   })

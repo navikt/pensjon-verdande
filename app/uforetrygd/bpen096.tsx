@@ -23,7 +23,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       accessToken,
       +formData.maksAntallSekvensnummer,
       +formData.sekvensnummerPerBehandling,
-      formData.dryRun === 'true',
       formData.debug === 'true',
     )
     return redirect(`/behandling/${response.behandlingId}`)
@@ -56,7 +55,6 @@ export default function HentOpplysningerFraSkatt() {
   const actionData = useActionData()
 
   const isSubmitting = navigation.state === 'submitting'
-  const [dryRun, setDryRun] = useState<string | ''>('')
   const [debug, setDebug] = useState<string>('')
 
   return (
@@ -89,20 +87,6 @@ export default function HentOpplysningerFraSkatt() {
           />
 
           <Select
-            label="Dry run"
-            size={'medium'}
-            name={'dryRun'}
-            onChange={(e) => setDryRun(e.target.value)}
-            value={dryRun ?? ''}
-          >
-            <option value="" disabled>
-              Velg
-            </option>
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-
-          <Select
             label="Debug"
             size={'medium'}
             name={'debug'}
@@ -120,7 +104,7 @@ export default function HentOpplysningerFraSkatt() {
             type="submit"
             name="action"
             value={Action.HentSkattehendelser}
-            disabled={isSubmitting || dryRun === '' || debug === ''}
+            disabled={isSubmitting || debug === ''}
           >
             {isSubmitting ? 'Oppretter…' : 'Opprett'}
           </Button>
