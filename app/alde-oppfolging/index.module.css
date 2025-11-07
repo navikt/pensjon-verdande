@@ -1,0 +1,44 @@
+.topBanner {
+  align-self: stretch;
+  background-color: var(--ax-bg-sunken);
+  border-bottom: 1px solid var(--ax-border-neutral-subtle);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+}
+
+.topBannerContent {
+  margin: 0 auto 0;
+  max-width: 900px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  overflow: hidden;
+  position: relative;
+}
+
+.topBannerText {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin: 1.5rem 1rem 1.5rem;
+  z-index: 1;
+}
+
+.topBannerImgContainer {
+  align-self: flex-end;
+  margin: 0 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 40%;
+  position: relative;
+}
+
+.topBannerImgContainer .illustration {
+  width: 430px;
+}

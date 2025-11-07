@@ -3,6 +3,7 @@ import {
   ChevronDownIcon,
   CircleIcon,
   CurrencyExchangeIcon,
+  HandShakeHeartIcon,
   HouseIcon,
   NumberListIcon,
   PersonGroupIcon,
@@ -225,6 +226,21 @@ export default function VenstreMeny(props: Props) {
                   <PersonRectangleIcon title="Manuell behandling" fontSize="1.5rem" className={styles.menyIkon} />
                 </span>
                 <span className={styles.menyTekst}>Manuell behandling</span>
+              </NavLink>
+            </li>
+          )}
+
+          {harTilgang(me, 'SE_BEHANDLINGER') && (
+            <li>
+              <NavLink
+                to={`/alde`}
+                style={{ display: 'flex', justifyContent: 'flex-start' }}
+                className={({ isActive }) => (isActive ? styles.active : '')}
+              >
+                <span className={styles.menyIkon}>
+                  <HandShakeHeartIcon title="a11y-title" fontSize="1.5rem" />
+                </span>
+                <span className={styles.menyTekst}>Alde oppfølging</span>
               </NavLink>
             </li>
           )}
