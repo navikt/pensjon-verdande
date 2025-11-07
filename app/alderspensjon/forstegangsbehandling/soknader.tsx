@@ -29,11 +29,7 @@ import {
   type KildeOppsummering,
   KildeOppsummeringVisning,
 } from '~/alderspensjon/forstegangsbehandling/KildeOppsummeringVisning'
-import type {
-  AldeOppsummeringDto,
-  AlderspensjonssoknadDto,
-  BehandlingStatus,
-} from '~/alderspensjon/forstegangsbehandling/types'
+import type { AlderspensjonssoknadDto, BehandlingStatus } from '~/alderspensjon/forstegangsbehandling/types'
 import { fmtDateTime, formatBehandlingstid, formatIsoDate, relativeFromNow, toIsoDate } from '~/common/date'
 import { decodeAldeBehandlingStatus, decodeBehandlingstype } from '~/common/decode'
 import { decodeAktivitet } from '~/common/decodeBehandling'
@@ -42,7 +38,6 @@ import { subdomain } from '~/common/utils'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { PageResponse } from '~/types'
-import { AldeOppsummeringVisning } from './AldeOppsummeringVisning'
 import css from './soknader.module.css'
 
 export async function loader({ request }: { request: Request }) {
@@ -76,11 +71,6 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
-  const aldeOppsummering = await apiGet<AldeOppsummeringDto>(
-    `/api/alderspensjon/forstegangsbehandling/alde-oppsummering?${dateRangeSearchParams.toString()}`,
-    request,
-  )
-
   const kildeOppsummering = await apiGet<KildeOppsummering[]>(
     `/api/alderspensjon/forstegangsbehandling/kilde-oppsummering?${dateRangeSearchParams.toString()}`,
     request,
@@ -98,7 +88,6 @@ export async function loader({ request }: { request: Request }) {
     pageSize: size,
     psakSakUrlTemplate: replaceTemplates(env.psakSakUrlTemplate, { subdomain: subdomain(url) }),
     kildeOppsummering,
-    aldeOppsummering,
     fomDato,
     tomDato,
   }
@@ -161,7 +150,6 @@ export default function Alderspensjonssoknader() {
     pageSize,
     psakSakUrlTemplate,
     kildeOppsummering,
-    aldeOppsummering,
     fomDato,
     tomDato,
   } = useLoaderData<typeof loader>()
@@ -244,7 +232,6 @@ export default function Alderspensjonssoknader() {
       </Bleed>{' '}
       <VStack gap="6">
         <KildeOppsummeringVisning data={kildeOppsummering} fomDato={fomDato} tomDato={tomDato} />
-        <AldeOppsummeringVisning data={aldeOppsummering} fomDato={fomDato} tomDato={tomDato} />
 
         <HStack justify="space-between" wrap>
           {summary.length > 0 ? (

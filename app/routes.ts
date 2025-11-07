@@ -15,6 +15,8 @@ export default [
     ),
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
 
+    route('alde', 'alde-oppfolging/index.tsx'),
+
     route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx'),
 
     route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),
