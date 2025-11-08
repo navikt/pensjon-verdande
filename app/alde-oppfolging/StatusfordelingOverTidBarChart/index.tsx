@@ -19,7 +19,7 @@ export const options: ChartOptions<'bar'> = {
   plugins: {
     title: {
       display: true,
-      text: 'Statusfordeling over tid',
+      text: 'Alde statusfordeling over tid',
     },
     legend: {
       display: false,

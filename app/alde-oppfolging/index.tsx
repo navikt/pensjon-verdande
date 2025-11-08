@@ -24,17 +24,14 @@ import type { Route } from './+types'
 import FordelingAldeStatus from './FordelingAldeStatus'
 import FordelingBehandlingStatus from './FordelingBehandling'
 import css from './index.module.css'
-import StatusfordelingOverTidBarChart from './StatusfordelingOverTidBarChart '
-import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart /utils'
-import type { AldeAvbrutteBehandlingerDto, AldeFordelingStatusDto, AldeFordelingStatusOverTidDto } from './types'
-
-const behandlingstypeOptions = [
-  { value: 'alle', label: 'Alle behandlingstyper' },
-  { value: 'alderspensjon', label: 'Alderspensjon' },
-  { value: 'uforep', label: 'Uføretrygd' },
-  { value: 'barnep', label: 'Barnepensjon' },
-  { value: 'gjenlevendep', label: 'Gjenlevendepensjon' },
-]
+import StatusfordelingOverTidBarChart from './StatusfordelingOverTidBarChart'
+import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart/utils'
+import type {
+  AldeAvbrutteBehandlingerDto,
+  AldeBehandlingNavn,
+  AldeFordelingStatusDto,
+  AldeFordelingStatusOverTidDto,
+} from './types'
 
 export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url)
@@ -71,6 +68,8 @@ export async function loader({ request }: { request: Request }) {
       })),
   )
 
+  const aldeBehandlinger = await apiGet<AldeBehandlingNavn[]>('/api/saksbehandling/alde/behandling-typer', request)
+
   const statusfordelingOverTid = await apiGet<AldeFordelingStatusOverTidDto[]>(
     `/api/saksbehandling/alde/behandling-status?${dateRangeSearchParams.toString()}`,
     request,
@@ -81,6 +80,7 @@ export async function loader({ request }: { request: Request }) {
     statusfordelingOverTid,
     aldeStatusFordeling,
     behandlingFordeling,
+    aldeBehandlinger,
     fomDato,
     tomDato,
     behandlingstype,
@@ -97,6 +97,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     avbrutteBehandlinger,
     statusfordelingOverTid,
     behandlingFordeling,
+    aldeBehandlinger,
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
@@ -215,9 +216,9 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                   value={behandlingstype}
                   onChange={(e) => updateSearchParams({ behandlingstype: e.target.value })}
                 >
-                  {behandlingstypeOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
+                  {aldeBehandlinger.map((opt) => (
+                    <option key={opt.behandlingType} value={opt.behandlingType}>
+                      {opt.friendlyName}
                     </option>
                   ))}
                 </Select>
