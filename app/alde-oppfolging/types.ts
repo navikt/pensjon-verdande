@@ -12,3 +12,15 @@ export interface AldeFordelingStatusDto {
     antall: number
   }[]
 }
+
+export interface AldeAvbrutteBehandlingerDto {
+  avbrutteBehandlinger: {
+    opprettet: string // date
+    begrunnelse: string
+  }[]
+}
+
+export interface AldeFordelingStatusOverTidDto {
+  dato: string
+  fordeling: AldeFordelingStatusDto['statusFordeling']
+}
