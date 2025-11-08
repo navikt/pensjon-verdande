@@ -10,18 +10,23 @@ import {
   Loader,
   Page,
   Select,
-  Tag,
+  Table,
   useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
-import { sub } from 'date-fns'
-import { useLoaderData, useNavigation, useSearchParams } from 'react-router'
+import { format, sub } from 'date-fns'
+import React from 'react'
+import { useNavigation, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { apiGet } from '~/services/api.server'
-import AldePieChart from './AldePieChart'
+import type { Route } from './+types'
+import FordelingAldeStatus from './FordelingAldeStatus'
+import FordelingBehandlingStatus from './FordelingBehandling'
 import css from './index.module.css'
-import type { AldeFordelingStatusDto } from './types'
+import StatusfordelingOverTidBarChart from './StatusfordelingOverTidBarChart '
+import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart /utils'
+import type { AldeAvbrutteBehandlingerDto, AldeFordelingStatusDto, AldeFordelingStatusOverTidDto } from './types'
 
 const behandlingstypeOptions = [
   { value: 'alle', label: 'Alle behandlingstyper' },
@@ -35,7 +40,7 @@ export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url)
   const now = new Date()
 
-  const fomDato = url.searchParams.get('fomDato') || toIsoDate(sub(now, { days: 30 }))
+  const fomDato = url.searchParams.get('fomDato') || toIsoDate(sub(now, { days: 7 }))
   const tomDato = url.searchParams.get('tomDato') || toIsoDate(now)
   const behandlingstype = url.searchParams.get('behandlingstype') || 'FleksibelApSak'
 
@@ -45,12 +50,37 @@ export async function loader({ request }: { request: Request }) {
   dateRangeSearchParams.set('behandlingType', behandlingstype)
 
   const aldeStatusFordeling = await apiGet<AldeFordelingStatusDto>(
-    `/api/saksbehandling/alde/alde-status-fordeling?${dateRangeSearchParams.toString()}`,
+    `/api/saksbehandling/alde/status-fordeling?${dateRangeSearchParams.toString()}`,
+    request,
+  ).then((it) => it.statusFordeling)
+
+  const behandlingFordeling = await apiGet<{ fordeling: { behandlingType: string; antall: number }[] }>(
+    `/api/saksbehandling/alde/behandling-fordeling?${dateRangeSearchParams.toString()}`,
+    request,
+  ).then((it) => it.fordeling)
+
+  const avbrutteBehandlinger = await apiGet<AldeAvbrutteBehandlingerDto>(
+    `/api/saksbehandling/alde/avbrutte-behandlinger?${dateRangeSearchParams.toString()}`,
+    request,
+  ).then((response) =>
+    response.avbrutteBehandlinger
+      .sort((a, b) => b.opprettet.localeCompare(a.opprettet))
+      .map((avbruttBehandling) => ({
+        ...avbruttBehandling,
+        opprettet: format(new Date(avbruttBehandling.opprettet), 'dd.MM.yyyy HH:mm'),
+      })),
+  )
+
+  const statusfordelingOverTid = await apiGet<AldeFordelingStatusOverTidDto[]>(
+    `/api/saksbehandling/alde/behandling-status?${dateRangeSearchParams.toString()}`,
     request,
   )
 
   return {
-    aldeStatusFordeling: aldeStatusFordeling.statusFordeling,
+    avbrutteBehandlinger,
+    statusfordelingOverTid,
+    aldeStatusFordeling,
+    behandlingFordeling,
     fomDato,
     tomDato,
     behandlingstype,
@@ -58,10 +88,54 @@ export async function loader({ request }: { request: Request }) {
   }
 }
 
-export default function AldeOppfolging() {
-  const { aldeStatusFordeling, fomDato, tomDato, behandlingstype } = useLoaderData<typeof loader>()
+export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
+  const {
+    aldeStatusFordeling,
+    fomDato,
+    tomDato,
+    behandlingstype,
+    avbrutteBehandlinger,
+    statusfordelingOverTid,
+    behandlingFordeling,
+  } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
+  const [hiddenStatuses, setHiddenStatuses] = React.useState<string[]>([])
+  const [debouncedLoading, setDebouncedLoading] = React.useState(false)
+
+  const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET']
+
+  const isLoading = navigation.state === 'loading'
+
+  React.useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setDebouncedLoading(true)
+      }, 200)
+      return () => clearTimeout(timer)
+    } else {
+      setDebouncedLoading(false)
+    }
+  }, [isLoading])
+
+  function handleStatusClick(status: string, ctrlOrMeta: boolean) {
+    if (ctrlOrMeta) {
+      // Ctrl-click (Win/Linux) or Cmd-click (Mac): show only this status
+      setHiddenStatuses(allStatuses.filter((s) => s !== status))
+    } else {
+      // Normal click: toggle this status
+      setHiddenStatuses((prev) => {
+        const newHidden = prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
+
+        // If all statuses are hidden, reset to show all
+        if (newHidden.length === allStatuses.length) {
+          return []
+        }
+
+        return newHidden
+      })
+    }
+  }
 
   function updateSearchParams(updates: Record<string, string>) {
     const next = new URLSearchParams(searchParams)
@@ -110,8 +184,6 @@ export default function AldeOppfolging() {
     const to = toIsoDate(now)
     applyPeriod(from, to)
   }
-
-  const isLoading = navigation.state === 'loading'
 
   return (
     <Page.Block>
@@ -179,60 +251,92 @@ export default function AldeOppfolging() {
           </VStack>
         </Box.New>
 
-        {isLoading ? (
-          <HStack justify="center" style={{ padding: '4rem 0' }}>
-            <Loader size="xlarge" />
+        <Box style={{ position: 'relative' }}>
+          {debouncedLoading && (
+            <Box
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10,
+              }}
+            >
+              <Loader size="xlarge" />
+            </Box>
+          )}
+          <VStack gap="4">
+            <HStack gap="4" wrap>
+              {allStatuses.map((status) => {
+                const statusData = aldeStatusFordeling.find((item) => item.status === status)
+                const antall = statusData?.antall || 0
+                const colors = statusColors[status]
+                const isHidden = hiddenStatuses.includes(status)
+                return (
+                  <Box.New
+                    key={status}
+                    borderWidth="2"
+                    padding="4"
+                    borderRadius="medium"
+                    style={{
+                      borderColor: colors?.borderColor || 'var(--a-border-default)',
+                      backgroundColor: colors?.backgroundColor || 'transparent',
+                      opacity: isHidden ? 0.3 : 1,
+                      transition: 'opacity 0.2s',
+                      minWidth: '140px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={(e) => handleStatusClick(status, e.ctrlKey || e.metaKey)}
+                  >
+                    <VStack gap="2">
+                      <BodyShort size="small" weight="semibold">
+                        {statusLabels[status] || status}
+                      </BodyShort>
+                      <Heading level="3" size="large">
+                        {antall}
+                      </Heading>
+                    </VStack>
+                  </Box.New>
+                )
+              })}
+            </HStack>
+          </VStack>
+          <Box>
+            <StatusfordelingOverTidBarChart
+              data={statusfordelingOverTid}
+              fomDate={fomDato}
+              tomDate={tomDato}
+              hiddenStatuses={hiddenStatuses}
+            />
+          </Box>
+          <HStack maxHeight="300px">
+            <FordelingAldeStatus data={aldeStatusFordeling} hiddenStatuses={hiddenStatuses} />
+            <FordelingBehandlingStatus data={behandlingFordeling} />
           </HStack>
-        ) : (
-          <AldePieChart title="Status på alde behandlinger" data={aldeStatusFordeling} />
-        )}
+          <Heading as="h2" size="medium">
+            Avbrutte behandlinger
+          </Heading>
+          <Table size="medium" zebraStripes>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader style={{ width: '10rem' }}>Tid</Table.ColumnHeader>
+                <Table.ColumnHeader>Begrunnelse</Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+            {avbrutteBehandlinger.map((avbruttBehandling) => (
+              <Table.Row key={avbruttBehandling.begrunnelse}>
+                <Table.DataCell>{avbruttBehandling.opprettet}</Table.DataCell>
+                <Table.DataCell>{avbruttBehandling.begrunnelse}</Table.DataCell>
+              </Table.Row>
+            ))}
+          </Table>
+        </Box>
       </VStack>
     </Page.Block>
-  )
-}
-
-function _MetrikkCard({
-  tittel,
-  verdi,
-  variant,
-  prosent,
-  ikon,
-}: {
-  tittel: string
-  verdi: string
-  variant: 'info' | 'success' | 'error' | 'warning' | 'alt1' | 'alt2' | 'neutral'
-  prosent?: string
-  ikon?: React.ReactNode
-}) {
-  return (
-    <Box.New
-      borderWidth="1"
-      padding="5"
-      borderRadius="large"
-      borderColor="neutral-subtleA"
-      style={{
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        cursor: 'default',
-      }}
-    >
-      <VStack gap="3">
-        <HStack justify="space-between" align="center">
-          <BodyShort size="small" textColor="subtle">
-            {tittel}
-          </BodyShort>
-          {ikon && <div style={{ color: 'var(--a-icon-subtle)' }}>{ikon}</div>}
-        </HStack>
-        <HStack align="end" gap="3">
-          <Heading level="3" size="xlarge">
-            {verdi}
-          </Heading>
-          {prosent && (
-            <Tag size="small" variant={variant}>
-              {prosent}%
-            </Tag>
-          )}
-        </HStack>
-      </VStack>
-    </Box.New>
   )
 }
