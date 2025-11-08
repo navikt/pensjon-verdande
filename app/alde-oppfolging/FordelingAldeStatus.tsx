@@ -1,7 +1,7 @@
 import { VStack } from '@navikt/ds-react'
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
-import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart /utils'
+import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart/utils'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 

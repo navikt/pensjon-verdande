@@ -24,3 +24,9 @@ export interface AldeFordelingStatusOverTidDto {
   dato: string
   fordeling: AldeFordelingStatusDto['statusFordeling']
 }
+
+export interface AldeBehandlingNavn {
+  friendlyName: string
+  handlerName: string
+  behandlingType: string
+}
