@@ -72,3 +72,23 @@ export async function fjernEkskluderteSakerFraArligOmregning(accessToken: string
     })
   }
 }
+
+export async function fjernAlleEkskluderteSakerFraArligOmregning(accessToken: string): Promise<void> {
+  const response = await fetch(`${env.penUrl}/api/opptjening/eksludertesaker/fjernAlle`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (response.ok) {
+    return
+  } else {
+    const text = await response.text()
+    throw data(`Feil ved å fjerne alle ekskluderte saker. Feil var\n${text}`, {
+      status: response.status,
+    })
+  }
+}

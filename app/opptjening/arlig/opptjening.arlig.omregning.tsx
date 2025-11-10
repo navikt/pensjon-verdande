@@ -4,6 +4,7 @@ import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation }
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
+  fjernAlleEkskluderteSakerFraArligOmregning,
   fjernEkskluderteSakerFraArligOmregning,
   hentEkskluderSakerFraArligOmregning,
 } from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
@@ -29,6 +30,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
 enum Action {
   ekskluderSaker = 'EKSKLUDER_SAKER',
+  fjernAlleEkskluderSaker = 'FJERN_ALLE_EKSKLUDERTE_SAKER',
   fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
@@ -50,6 +52,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const sakIder = konverterTilListe(ekskluderteSakIderText)
 
     await fjernEkskluderteSakerFraArligOmregning(accessToken, sakIder)
+    return redirect(request.url)
+  } else if (fromEntries.action === Action.fjernAlleEkskluderSaker) {
+    await fjernAlleEkskluderteSakerFraArligOmregning(accessToken)
     return redirect(request.url)
   } else if (fromEntries.action === Action.kjoerUttrekk) {
     const response = await opprettOpptjeningsendringArligUttrekk(accessToken)
@@ -134,8 +139,23 @@ export default function EndretOpptjeningArligUttrekk() {
               <Button type="submit" name="action" value={Action.ekskluderSaker} disabled={isSubmitting}>
                 Ekskluder saker fra årlig omregning
               </Button>
-              <Button type="submit" name="action" value={Action.fjernEkskluderSaker} disabled={isSubmitting}>
+              <Button
+                type="submit"
+                name="action"
+                value={Action.fjernEkskluderSaker}
+                disabled={isSubmitting}
+                style={{ backgroundColor: '#CC0000', color: 'white' }}
+              >
                 Fjern ekskluderte saker fra årlig omregning
+              </Button>
+              <Button
+                type="submit"
+                name="action"
+                value={Action.fjernAlleEkskluderSaker}
+                disabled={isSubmitting}
+                style={{ backgroundColor: '#CC0000', color: 'white' }}
+              >
+                Fjern ALLE ekskluderte saker fra årlig omregning
               </Button>
             </HStack>
           </VStack>
