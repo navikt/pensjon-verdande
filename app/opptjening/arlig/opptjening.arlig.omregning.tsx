@@ -10,6 +10,7 @@ import {
 } from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
 import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/opptjening.arlig.omregning.server'
 import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
+import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
 import { requireAccessToken } from '~/services/auth.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -20,11 +21,14 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const defaultOpptjeningsaar = new Date().getFullYear() - 1
   const aarListe: number[] = [defaultOpptjeningsaar + 1, defaultOpptjeningsaar, defaultOpptjeningsaar - 1]
 
+  const defaultOmsorgGodskrivingsaar = innevaerendeAar - 1
+
   return {
     ekskluderteSaker,
     innevaerendeAar,
     aarListe,
     defaultOpptjeningsaar,
+    defaultOmsorgGodskrivingsaar,
   }
 }
 
@@ -34,6 +38,7 @@ enum Action {
   fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
+  oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -62,6 +67,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   } else if (fromEntries.action === Action.kjoerOmregning) {
     const response = await opprettOpptjeningsendringArligOmregning(accessToken, +fromEntries.opptjeningsar)
     return redirect(`/behandling/${response.behandlingId}`)
+  } else if (fromEntries.action === Action.oppdaterSisteOmsorgGodskrivingsaar) {
+    await oppdaterSisteOmsorgGodskrivingsaar(accessToken, +fromEntries.oppdaterOmsorgGodskrivingsaar)
+    return {
+      message: `Omsorg godskrivingsår er oppdatert til ${+fromEntries.oppdaterOmsorgGodskrivingsaar}`,
+    }
   }
 }
 
@@ -73,7 +83,8 @@ function konverterTilListe(ekskluderteSakIderText: string): string[] {
 }
 
 export default function EndretOpptjeningArligUttrekk() {
-  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = useLoaderData<typeof loader>()
+  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar, defaultOmsorgGodskrivingsaar } =
+    useLoaderData<typeof loader>()
   const navigation = useNavigation()
 
   const [selectedYear, setSelectedYear] = useState(defaultOpptjeningsaar)
@@ -83,6 +94,8 @@ export default function EndretOpptjeningArligUttrekk() {
   const [ekskluderteSakIderText, setEkskluderteSakIderText] = useState<string>('')
   const [kommentar, setKommentar] = useState<string>('')
 
+  const [selectedOmsorgGodskrivingsaar, setSelectedOmsorgGodskrivingsaar] = useState(defaultOmsorgGodskrivingsaar)
+
   return (
     <Page>
       <VStack gap="8">
@@ -91,6 +104,33 @@ export default function EndretOpptjeningArligUttrekk() {
           <Button type="submit" name="action" value={Action.kjoerUttrekk} disabled={isSubmitting}>
             Opprett uttrekk for {innevaerendeAar}
           </Button>
+        </Form>
+
+        <Heading size="medium">Oppdater siste omsorg godskrivingsår</Heading>
+        <Form method="post">
+          <HStack gap="4" align="end">
+            <Select
+              name="oppdaterOmsorgGodskrivingsaar" // <- dette må matche action
+              label="Velg omsorg godskrivingsår"
+              onChange={(e) => setSelectedOmsorgGodskrivingsaar(+e.target.value)}
+              value={selectedOmsorgGodskrivingsaar}
+            >
+              {aarListe.map((aar) => (
+                <option key={aar} value={aar}>
+                  {aar}
+                </option>
+              ))}
+            </Select>
+
+            <Button
+              type="submit"
+              name="action"
+              value={Action.oppdaterSisteOmsorgGodskrivingsaar}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Oppdaterer...' : 'Oppdater siste gyldige omsorg godskrivingsår'}
+            </Button>
+          </HStack>
         </Form>
 
         <Heading size="medium">Kjør årlig omregningsendring</Heading>
