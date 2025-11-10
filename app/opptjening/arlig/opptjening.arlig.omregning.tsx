@@ -10,6 +10,7 @@ import {
 } from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
 import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/opptjening.arlig.omregning.server'
 import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
+import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
 import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
 import { requireAccessToken } from '~/services/auth.server'
 
@@ -38,6 +39,7 @@ enum Action {
   fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
+  oppdaterSisteGyldigeOpptjeningsaar = 'OPPDATER_SISTE_GYLDIGE_OPPTJENINGSAAR',
   oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
 
@@ -67,11 +69,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   } else if (fromEntries.action === Action.kjoerOmregning) {
     const response = await opprettOpptjeningsendringArligOmregning(accessToken, +fromEntries.opptjeningsar)
     return redirect(`/behandling/${response.behandlingId}`)
+  } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
+    await oppdaterSisteGyldigOpptjeningsaar(accessToken, +fromEntries.oppdaterOpptjeningsaar)
   } else if (fromEntries.action === Action.oppdaterSisteOmsorgGodskrivingsaar) {
     await oppdaterSisteOmsorgGodskrivingsaar(accessToken, +fromEntries.oppdaterOmsorgGodskrivingsaar)
-    return {
-      message: `Omsorg godskrivingsår er oppdatert til ${+fromEntries.oppdaterOmsorgGodskrivingsaar}`,
-    }
   }
 }
 
@@ -83,18 +84,15 @@ function konverterTilListe(ekskluderteSakIderText: string): string[] {
 }
 
 export default function EndretOpptjeningArligUttrekk() {
-  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar, defaultOmsorgGodskrivingsaar } =
-    useLoaderData<typeof loader>()
+  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
 
-  const [selectedYear, setSelectedYear] = useState(defaultOpptjeningsaar)
+  const [selectedOpptjeningsaar, setSelectedOpptjeningsaar] = useState(defaultOpptjeningsaar)
 
   const isSubmitting = navigation.state === 'submitting'
 
   const [ekskluderteSakIderText, setEkskluderteSakIderText] = useState<string>('')
   const [kommentar, setKommentar] = useState<string>('')
-
-  const [selectedOmsorgGodskrivingsaar, setSelectedOmsorgGodskrivingsaar] = useState(defaultOmsorgGodskrivingsaar)
 
   return (
     <Page>
@@ -106,14 +104,41 @@ export default function EndretOpptjeningArligUttrekk() {
           </Button>
         </Form>
 
+        <Heading size="medium">Oppdater siste gyldige opptjeningsår</Heading>
+        <Form method="post">
+          <HStack gap="4" align="end">
+            <Select
+              name="oppdaterOpptjeningsaar" // <- dette må matche action
+              label="Velg opptjeningsår"
+              onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
+              value={selectedOpptjeningsaar}
+            >
+              {aarListe.map((aar) => (
+                <option key={aar} value={aar}>
+                  {aar}
+                </option>
+              ))}
+            </Select>
+
+            <Button
+              type="submit"
+              name="action"
+              value={Action.oppdaterSisteGyldigeOpptjeningsaar}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Oppdaterer...' : 'Oppdater siste gyldige opptjeningsår'}
+            </Button>
+          </HStack>
+        </Form>
+
         <Heading size="medium">Oppdater siste omsorg godskrivingsår</Heading>
         <Form method="post">
           <HStack gap="4" align="end">
             <Select
               name="oppdaterOmsorgGodskrivingsaar" // <- dette må matche action
               label="Velg omsorg godskrivingsår"
-              onChange={(e) => setSelectedOmsorgGodskrivingsaar(+e.target.value)}
-              value={selectedOmsorgGodskrivingsaar}
+              onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
+              value={selectedOpptjeningsaar}
             >
               {aarListe.map((aar) => (
                 <option key={aar} value={aar}>
@@ -139,8 +164,8 @@ export default function EndretOpptjeningArligUttrekk() {
             <Select
               name="opptjeningsar"
               label="Velg opptjeningsår"
-              onChange={(e) => setSelectedYear(+e.target.value)}
-              value={selectedYear}
+              onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
+              value={selectedOpptjeningsaar}
             >
               {aarListe.map((aar) => (
                 <option key={aar} value={aar}>
