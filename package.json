@@ -47,7 +47,7 @@
     "zod-form-data": "^3.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.3",
+    "@biomejs/biome": "^2.3.4",
     "@react-router/dev": "^7.9.5",
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.5",
