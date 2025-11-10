@@ -47,17 +47,17 @@ export async function loader({ request }: { request: Request }) {
   dateRangeSearchParams.set('behandlingType', behandlingstype)
 
   const aldeStatusFordeling = await apiGet<AldeFordelingStatusDto>(
-    `/api/saksbehandling/alde/status-fordeling?${dateRangeSearchParams.toString()}`,
+    `/api/behandling/alde/oppfolging/status-fordeling?${dateRangeSearchParams.toString()}`,
     request,
   ).then((it) => it.statusFordeling)
 
   const behandlingFordeling = await apiGet<{ fordeling: { behandlingType: string; antall: number }[] }>(
-    `/api/saksbehandling/alde/behandling-fordeling?${dateRangeSearchParams.toString()}`,
+    `/api/behandling/alde/oppfolging/behandling-fordeling?${dateRangeSearchParams.toString()}`,
     request,
   ).then((it) => it.fordeling)
 
   const avbrutteBehandlinger = await apiGet<AldeAvbrutteBehandlingerDto>(
-    `/api/saksbehandling/alde/avbrutte-behandlinger?${dateRangeSearchParams.toString()}`,
+    `/api/behandling/alde/oppfolging/avbrutte-behandlinger?${dateRangeSearchParams.toString()}`,
     request,
   ).then((response) =>
     response.avbrutteBehandlinger
@@ -68,10 +68,13 @@ export async function loader({ request }: { request: Request }) {
       })),
   )
 
-  const aldeBehandlinger = await apiGet<AldeBehandlingNavn[]>('/api/saksbehandling/alde/behandling-typer', request)
+  const aldeBehandlinger = await apiGet<AldeBehandlingNavn[]>(
+    '/api/behandling/alde/oppfolging/behandling-typer',
+    request,
+  )
 
   const statusfordelingOverTid = await apiGet<AldeFordelingStatusOverTidDto[]>(
-    `/api/saksbehandling/alde/behandling-status?${dateRangeSearchParams.toString()}`,
+    `/api/behandling/alde/oppfolging/behandling-status?${dateRangeSearchParams.toString()}`,
     request,
   )
 
