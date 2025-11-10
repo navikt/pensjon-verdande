@@ -16,7 +16,7 @@ import {
 } from '@navikt/ds-react'
 import { format, sub } from 'date-fns'
 import React from 'react'
-import { useNavigation, useSearchParams } from 'react-router'
+import { useNavigation, useRevalidator, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { apiGet } from '~/services/api.server'
@@ -101,15 +101,18 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
+  const revalidator = useRevalidator()
   const [hiddenStatuses, setHiddenStatuses] = React.useState<string[]>([])
   const [debouncedLoading, setDebouncedLoading] = React.useState(false)
+  const [autoReloadInterval, setAutoReloadInterval] = React.useState<number | null>(null)
+  const [isAutoReloading, setIsAutoReloading] = React.useState(false)
 
   const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET']
 
   const isLoading = navigation.state === 'loading'
 
   React.useEffect(() => {
-    if (isLoading) {
+    if (isLoading && !isAutoReloading) {
       const timer = setTimeout(() => {
         setDebouncedLoading(true)
       }, 200)
@@ -117,7 +120,24 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     } else {
       setDebouncedLoading(false)
     }
-  }, [isLoading])
+  }, [isLoading, isAutoReloading])
+
+  React.useEffect(() => {
+    if (autoReloadInterval) {
+      const interval = setInterval(() => {
+        // Trigger a reload by revalidating
+        setIsAutoReloading(true)
+        revalidator.revalidate()
+      }, autoReloadInterval)
+      return () => clearInterval(interval)
+    }
+  }, [autoReloadInterval, revalidator])
+
+  React.useEffect(() => {
+    if (!isLoading && isAutoReloading) {
+      setIsAutoReloading(false)
+    }
+  }, [isLoading, isAutoReloading])
 
   function handleStatusClick(status: string, ctrlOrMeta: boolean) {
     if (ctrlOrMeta) {
@@ -248,6 +268,21 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                   </Button>
                 </HStack>
               </VStack>
+
+              <Box style={{ minWidth: '150px' }}>
+                <Select
+                  size="small"
+                  label="Auto-oppdatering"
+                  value={autoReloadInterval?.toString() || 'off'}
+                  onChange={(e) => setAutoReloadInterval(e.target.value === 'off' ? null : Number(e.target.value))}
+                >
+                  <option value="off">Av</option>
+                  <option value="5000">5 sekunder</option>
+                  <option value="60000">1 minutt</option>
+                  <option value="600000">10 minutter</option>
+                  <option value="1800000">30 minutter</option>
+                </Select>
+              </Box>
             </HStack>
           </VStack>
         </Box.New>
