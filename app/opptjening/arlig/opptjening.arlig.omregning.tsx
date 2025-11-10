@@ -1,9 +1,10 @@
-import { Button, Heading, Page, Select, Table, Textarea, VStack } from '@navikt/ds-react'
+import { Button, Heading, HStack, Page, Select, Table, Textarea, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
+  fjernEkskluderteSakerFraArligOmregning,
   hentEkskluderSakerFraArligOmregning,
 } from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
 import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/opptjening.arlig.omregning.server'
@@ -28,6 +29,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 
 enum Action {
   ekskluderSaker = 'EKSKLUDER_SAKER',
+  fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
 }
@@ -39,12 +41,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (fromEntries.action === Action.ekskluderSaker) {
     const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
-    const sakIder = ekskluderteSakIderText
-      .split('\n')
-      .map((id) => id.trim())
-      .filter((id) => id !== '')
+    const sakIder = konverterTilListe(ekskluderteSakIderText)
 
     await ekskluderSakerFraArligOmregning(accessToken, sakIder, fromEntries.kommentar as string | undefined)
+    return redirect(request.url)
+  } else if (fromEntries.action === Action.fjernEkskluderSaker) {
+    const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
+    const sakIder = konverterTilListe(ekskluderteSakIderText)
+
+    await fjernEkskluderteSakerFraArligOmregning(accessToken, sakIder)
     return redirect(request.url)
   } else if (fromEntries.action === Action.kjoerUttrekk) {
     const response = await opprettOpptjeningsendringArligUttrekk(accessToken)
@@ -53,6 +58,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const response = await opprettOpptjeningsendringArligOmregning(accessToken, +fromEntries.opptjeningsar)
     return redirect(`/behandling/${response.behandlingId}`)
   }
+}
+
+function konverterTilListe(ekskluderteSakIderText: string): string[] {
+  return ekskluderteSakIderText
+    .split('\n')
+    .map((id) => id.trim())
+    .filter((id) => id !== '')
 }
 
 export default function EndretOpptjeningArligUttrekk() {
@@ -69,33 +81,6 @@ export default function EndretOpptjeningArligUttrekk() {
   return (
     <Page>
       <VStack gap="8">
-        <Heading size={'medium'}>Ekskluderte saker fra årlig omregning</Heading>
-        {ekskluderteSaker.length > 0 ? (
-          <EkskluderingerMedKommentarTable ekskluderteSaker={ekskluderteSaker} />
-        ) : (
-          <p>Ingen saker er ekskludert fra årlig omregning.</p>
-        )}
-        <Form method="post">
-          <VStack gap="4">
-            <Textarea
-              label={'Saker som skal ekskluderes'}
-              onChange={(e) => setEkskluderteSakIderText(e.target.value)}
-              value={ekskluderteSakIderText}
-              name="ekskluderteSakIderText"
-            />
-            <Textarea
-              label={'Kommentar (valgfritt)'}
-              onChange={(e) => setKommentar(e.target.value)}
-              value={kommentar}
-              name="kommentar"
-            />
-            <div>
-              <Button type="submit" name="action" value={Action.ekskluderSaker} disabled={isSubmitting}>
-                Ekskluder saker fra årlig omregning
-              </Button>
-            </div>
-          </VStack>
-        </Form>
         <Heading size={'medium'}>Årlig omregning av ytelse ved oppdaterte opptjeningsopplysninger</Heading>
         <Form method="post">
           <Button type="submit" name="action" value={Action.kjoerUttrekk} disabled={isSubmitting}>
@@ -122,6 +107,37 @@ export default function EndretOpptjeningArligUttrekk() {
             <Button type="submit" name="action" value={Action.kjoerOmregning} disabled={isSubmitting}>
               Start årlig opptjeningsendring
             </Button>
+          </VStack>
+        </Form>
+
+        <Heading size={'medium'}>Ekskluderte saker fra årlig omregning</Heading>
+        {ekskluderteSaker.length > 0 ? (
+          <EkskluderingerMedKommentarTable ekskluderteSaker={ekskluderteSaker} />
+        ) : (
+          <p>Ingen saker er ekskludert fra årlig omregning.</p>
+        )}
+        <Form method="post">
+          <VStack gap="4">
+            <Textarea
+              label={'Saker som skal ekskluderes'}
+              onChange={(e) => setEkskluderteSakIderText(e.target.value)}
+              value={ekskluderteSakIderText}
+              name="ekskluderteSakIderText"
+            />
+            <Textarea
+              label={'Kommentar (valgfritt)'}
+              onChange={(e) => setKommentar(e.target.value)}
+              value={kommentar}
+              name="kommentar"
+            />
+            <HStack gap="4">
+              <Button type="submit" name="action" value={Action.ekskluderSaker} disabled={isSubmitting}>
+                Ekskluder saker fra årlig omregning
+              </Button>
+              <Button type="submit" name="action" value={Action.fjernEkskluderSaker} disabled={isSubmitting}>
+                Fjern ekskluderte saker fra årlig omregning
+              </Button>
+            </HStack>
           </VStack>
         </Form>
       </VStack>

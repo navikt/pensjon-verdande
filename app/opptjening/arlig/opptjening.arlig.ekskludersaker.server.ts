@@ -44,7 +44,30 @@ export async function ekskluderSakerFraArligOmregning(
     return
   } else {
     const text = await response.text()
-    throw data(`Feil ved start av årlig omregning. Feil var\n${text}`, {
+    throw data(`Feil ved å legge til ekskluderte saker. Feil var\n${text}`, {
+      status: response.status,
+    })
+  }
+}
+
+export async function fjernEkskluderteSakerFraArligOmregning(accessToken: string, sakIder: string[]): Promise<void> {
+  const response = await fetch(`${env.penUrl}/api/opptjening/eksludertesaker/fjern`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+    body: JSON.stringify({
+      sakIder: sakIder,
+    }),
+  })
+
+  if (response.ok) {
+    return
+  } else {
+    const text = await response.text()
+    throw data(`Feil ved å fjerne ekskluderte saker. Feil var\n${text}`, {
       status: response.status,
     })
   }
