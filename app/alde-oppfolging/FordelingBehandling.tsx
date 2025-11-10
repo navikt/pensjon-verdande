@@ -26,12 +26,12 @@ export const FordelingBehandlingStatus: React.FC<AldeOppsummeringProps> = ({ dat
       {
         data: [aldeBehandling, behandlingMinusAlde],
         backgroundColor: [
-          'rgba(153, 222, 173, 0.5)', // green
-          'rgba(255, 194, 194, 0.5)', // red
+          'rgba(147, 112, 219, 0.5)', // purple
+          'rgba(66, 133, 244, 0.5)', // blue
         ],
         borderColor: [
-          'rgba(42, 167, 88, 1)', // green
-          'rgba(195, 0, 0, 1)', // red
+          'rgba(102, 51, 153, 1)', // purple
+          'rgba(25, 103, 210, 1)', // blue
         ],
         borderWidth: 1,
       },
@@ -42,9 +42,6 @@ export const FordelingBehandlingStatus: React.FC<AldeOppsummeringProps> = ({ dat
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
-      legend: {
-        display: false,
-      },
       tooltip: {
         enabled: true,
       },
