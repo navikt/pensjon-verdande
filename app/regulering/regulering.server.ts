@@ -369,3 +369,18 @@ export const startUttrekk = async (accessToken: string, satsDato: string) => {
     success: response.ok,
   }
 }
+
+export const oppdaterUttrekk = async (accessToken: string) => {
+  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/uttrekk/oppdater`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  return {
+    success: response.ok,
+  }
+}

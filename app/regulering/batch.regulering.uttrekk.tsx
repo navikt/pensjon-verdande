@@ -28,7 +28,8 @@ export default function Uttrekk() {
     interval: uttrekk?.status === Behandlingstatus.UNDER_BEHANDLING ? 500 : 1500,
   })
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [isStartUttrekkOpen, setIsStartUttrekkOpen] = useState(false)
+  const [isOppdaterUttrekkOpen, setIsOppdaterUttrekkOpen] = useState(false)
   return (
     <>
       <HStack>
@@ -95,12 +96,21 @@ export default function Uttrekk() {
         {(uttrekk === null ||
           uttrekk.behandlingId == null ||
           uttrekk.status === Behandlingstatus.FULLFORT ||
-          uttrekk.status === Behandlingstatus.STOPPET) && <Button onClick={() => setIsOpen(true)}>Kjør uttrekk</Button>}
+          uttrekk.status === Behandlingstatus.STOPPET) && (
+          <Button onClick={() => setIsStartUttrekkOpen(true)}>Kjør uttrekk</Button>
+        )}
+        {(uttrekk === null ||
+          uttrekk.behandlingId == null ||
+          uttrekk.status === Behandlingstatus.FULLFORT ||
+          uttrekk.status === Behandlingstatus.STOPPET) && (
+          <Button onClick={() => setIsOppdaterUttrekkOpen(true)}>Oppdater uttrekk</Button>
+        )}
         {uttrekk?.status === Behandlingstatus.FULLFORT && (
           <Link to="/batch/regulering/orkestrering">Gå til Orkestrering</Link>
         )}
       </HStack>
-      <StartUttrekkModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <StartUttrekkModal isOpen={isStartUttrekkOpen} onClose={() => setIsStartUttrekkOpen(false)} />
+      <OppdaterUttrekkModal isOpen={isOppdaterUttrekkOpen} onClose={() => setIsOppdaterUttrekkOpen(false)} />
     </>
   )
 }
@@ -144,6 +154,42 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
       <Modal.Footer>
         <Button onClick={startUttrekk} loading={fetcher.state === 'submitting'}>
           Start uttrekk
+        </Button>
+        <Button type="button" variant="secondary" onClick={() => onClose()}>
+          Avbryt
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}
+
+function OppdaterUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const fetcher = useFetcher()
+
+  function oppdaterUttrekk() {
+    fetcher.submit(
+      {
+        initieltUttrekk: false,
+      },
+      {
+        action: 'oppdaterUttrekk',
+        method: 'POST',
+        encType: 'application/json',
+      },
+    )
+    onClose()
+  }
+
+  return (
+    <Modal header={{ heading: 'Oppdater uttrekk' }} open={isOpen} onClose={() => onClose()}>
+      <Modal.Body>
+        <VStack gap="5">
+          <BodyLong>Dette vil oppdatere arbeidstabellene med familiesammenstøt som nå er klare for regulering</BodyLong>
+        </VStack>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={oppdaterUttrekk} loading={fetcher.state === 'submitting'}>
+          Oppdater uttrekk
         </Button>
         <Button type="button" variant="secondary" onClick={() => onClose()}>
           Avbryt
