@@ -2,16 +2,13 @@ import { data } from 'react-router'
 import { env } from '~/services/env.server'
 
 export async function oppdaterSisteGyldigOpptjeningsaar(accessToken: string, opptjeningsar: number): Promise<string> {
-  const response = await fetch(`${env.penUrl}/api/opptjening/opptjeningsaar/oppdater`, {
+  const response = await fetch(`${env.penUrl}/api/opptjening/opptjeningsaar/oppdater?opptjeningsar=${opptjeningsar}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
       'X-Request-ID': crypto.randomUUID(),
     },
-    body: JSON.stringify({
-      opptjeningsar: opptjeningsar,
-    }),
   })
 
   if (response.ok) {
