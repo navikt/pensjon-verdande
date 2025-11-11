@@ -1,6 +1,6 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
@@ -10,6 +10,8 @@ import {
 } from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
 import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/opptjening.arlig.omregning.server'
 import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
+import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
+import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
 import { requireAccessToken } from '~/services/auth.server'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -17,7 +19,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)
 
   const innevaerendeAar = new Date().getFullYear()
-  const defaultOpptjeningsaar = new Date().getFullYear() - 1
+  const defaultOpptjeningsaar = innevaerendeAar - 1
   const aarListe: number[] = [defaultOpptjeningsaar + 1, defaultOpptjeningsaar, defaultOpptjeningsaar - 1]
 
   return {
@@ -34,6 +36,8 @@ enum Action {
   fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
+  oppdaterSisteGyldigeOpptjeningsaar = 'OPPDATER_SISTE_GYLDIGE_OPPTJENINGSAAR',
+  oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -62,6 +66,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   } else if (fromEntries.action === Action.kjoerOmregning) {
     const response = await opprettOpptjeningsendringArligOmregning(accessToken, +fromEntries.opptjeningsar)
     return redirect(`/behandling/${response.behandlingId}`)
+  } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
+    await oppdaterSisteGyldigOpptjeningsaar(accessToken, +fromEntries.oppdaterOpptjeningsaar)
+    return JSON.stringify({
+      melding: `✅ Siste gyldige opptjeningsår er oppdatert til ${fromEntries.oppdaterOpptjeningsaar}`,
+      action: Action.oppdaterSisteGyldigeOpptjeningsaar,
+    })
+  } else if (fromEntries.action === Action.oppdaterSisteOmsorgGodskrivingsaar) {
+    await oppdaterSisteOmsorgGodskrivingsaar(accessToken, +fromEntries.oppdaterOmsorgGodskrivingsaar)
+    return JSON.stringify({
+      melding: `✅ Siste godskrivingsår for omsorg er oppdatert til ${fromEntries.oppdaterOmsorgGodskrivingsaar}`,
+      action: Action.oppdaterSisteOmsorgGodskrivingsaar,
+    })
   }
 }
 
@@ -73,10 +89,11 @@ function konverterTilListe(ekskluderteSakIderText: string): string[] {
 }
 
 export default function EndretOpptjeningArligUttrekk() {
+  const data = useActionData<typeof action>()
   const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
 
-  const [selectedYear, setSelectedYear] = useState(defaultOpptjeningsaar)
+  const [selectedOpptjeningsaar, setSelectedOpptjeningsaar] = useState(defaultOpptjeningsaar)
 
   const isSubmitting = navigation.state === 'submitting'
 
@@ -93,14 +110,74 @@ export default function EndretOpptjeningArligUttrekk() {
           </Button>
         </Form>
 
+        <Heading size="medium">Oppdater siste gyldige opptjeningsår</Heading>
+        <Form method="post">
+          <HStack gap="4" align="end">
+            <Select
+              name="oppdaterOpptjeningsaar" // <- dette må matche action
+              label="Velg opptjeningsår"
+              onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
+              value={selectedOpptjeningsaar}
+            >
+              {aarListe.map((aar) => (
+                <option key={aar} value={aar}>
+                  {aar}
+                </option>
+              ))}
+            </Select>
+
+            <Button
+              type="submit"
+              name="action"
+              value={Action.oppdaterSisteGyldigeOpptjeningsaar}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Oppdaterer...' : 'Oppdater siste gyldige opptjeningsår'}
+            </Button>
+          </HStack>
+          {data && (JSON.parse(data) as meldingResponse)?.action === Action.oppdaterSisteGyldigeOpptjeningsaar && (
+            <p>{(JSON.parse(data) as meldingResponse)?.melding}</p>
+          )}
+        </Form>
+
+        <Heading size="medium">Oppdater siste omsorg godskrivingsår</Heading>
+        <Form method="post">
+          <HStack gap="4" align="end">
+            <Select
+              name="oppdaterOmsorgGodskrivingsaar" // <- dette må matche action
+              label="Velg omsorg godskrivingsår"
+              onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
+              value={selectedOpptjeningsaar}
+            >
+              {aarListe.map((aar) => (
+                <option key={aar} value={aar}>
+                  {aar}
+                </option>
+              ))}
+            </Select>
+
+            <Button
+              type="submit"
+              name="action"
+              value={Action.oppdaterSisteOmsorgGodskrivingsaar}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Oppdaterer...' : 'Oppdater siste gyldige omsorg godskrivingsår'}
+            </Button>
+          </HStack>
+          {data && (JSON.parse(data) as meldingResponse)?.action === Action.oppdaterSisteOmsorgGodskrivingsaar && (
+            <p>{(JSON.parse(data) as meldingResponse)?.melding}</p>
+          )}
+        </Form>
+
         <Heading size="medium">Kjør årlig omregningsendring</Heading>
         <Form method="post">
           <VStack gap="4" width="20em">
             <Select
               name="opptjeningsar"
               label="Velg opptjeningsår"
-              onChange={(e) => setSelectedYear(+e.target.value)}
-              value={selectedYear}
+              onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
+              value={selectedOpptjeningsaar}
             >
               {aarListe.map((aar) => (
                 <option key={aar} value={aar}>
@@ -163,6 +240,11 @@ export default function EndretOpptjeningArligUttrekk() {
       </VStack>
     </Page>
   )
+}
+
+interface meldingResponse {
+  melding: string
+  action: Action
 }
 
 function EkskluderingerMedKommentarTable({ ekskluderteSaker }: { ekskluderteSaker: EkskludertSak[] }) {
