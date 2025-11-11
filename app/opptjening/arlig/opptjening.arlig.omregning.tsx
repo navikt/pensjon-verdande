@@ -1,6 +1,6 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
@@ -19,17 +19,14 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)
 
   const innevaerendeAar = new Date().getFullYear()
-  const defaultOpptjeningsaar = new Date().getFullYear() - 1
+  const defaultOpptjeningsaar = innevaerendeAar - 1
   const aarListe: number[] = [defaultOpptjeningsaar + 1, defaultOpptjeningsaar, defaultOpptjeningsaar - 1]
-
-  const defaultOmsorgGodskrivingsaar = innevaerendeAar - 1
 
   return {
     ekskluderteSaker,
     innevaerendeAar,
     aarListe,
     defaultOpptjeningsaar,
-    defaultOmsorgGodskrivingsaar,
   }
 }
 
@@ -71,8 +68,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
     await oppdaterSisteGyldigOpptjeningsaar(accessToken, +fromEntries.oppdaterOpptjeningsaar)
+    return JSON.stringify({
+      melding: `✅ Siste gyldige opptjeningsår er oppdatert til ${fromEntries.oppdaterOpptjeningsaar}`,
+      action: Action.oppdaterSisteGyldigeOpptjeningsaar,
+    })
   } else if (fromEntries.action === Action.oppdaterSisteOmsorgGodskrivingsaar) {
     await oppdaterSisteOmsorgGodskrivingsaar(accessToken, +fromEntries.oppdaterOmsorgGodskrivingsaar)
+    return JSON.stringify({
+      melding: `✅ Siste godskrivingsår for omsorg er oppdatert til ${fromEntries.oppdaterOmsorgGodskrivingsaar}`,
+      action: Action.oppdaterSisteOmsorgGodskrivingsaar,
+    })
   }
 }
 
@@ -84,6 +89,7 @@ function konverterTilListe(ekskluderteSakIderText: string): string[] {
 }
 
 export default function EndretOpptjeningArligUttrekk() {
+  const data = useActionData<typeof action>()
   const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
 
@@ -129,6 +135,9 @@ export default function EndretOpptjeningArligUttrekk() {
               {isSubmitting ? 'Oppdaterer...' : 'Oppdater siste gyldige opptjeningsår'}
             </Button>
           </HStack>
+          {data && (JSON.parse(data) as meldingResponse)?.action === Action.oppdaterSisteGyldigeOpptjeningsaar && (
+            <p>{(JSON.parse(data) as meldingResponse)?.melding}</p>
+          )}
         </Form>
 
         <Heading size="medium">Oppdater siste omsorg godskrivingsår</Heading>
@@ -156,6 +165,9 @@ export default function EndretOpptjeningArligUttrekk() {
               {isSubmitting ? 'Oppdaterer...' : 'Oppdater siste gyldige omsorg godskrivingsår'}
             </Button>
           </HStack>
+          {data && (JSON.parse(data) as meldingResponse)?.action === Action.oppdaterSisteOmsorgGodskrivingsaar && (
+            <p>{(JSON.parse(data) as meldingResponse)?.melding}</p>
+          )}
         </Form>
 
         <Heading size="medium">Kjør årlig omregningsendring</Heading>
@@ -228,6 +240,11 @@ export default function EndretOpptjeningArligUttrekk() {
       </VStack>
     </Page>
   )
+}
+
+interface meldingResponse {
+  melding: string
+  action: Action
 }
 
 function EkskluderingerMedKommentarTable({ ekskluderteSaker }: { ekskluderteSaker: EkskludertSak[] }) {
