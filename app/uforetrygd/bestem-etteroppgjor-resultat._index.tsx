@@ -53,7 +53,7 @@ export default function BestemEtteroppgjorResultatPage() {
 
   const handleEtteroppgjorArChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value
-    setEtteroppgjørsårErSatt(value !== undefined && Number.isInteger(+value))
+    setEtteroppgjørsårErSatt(value !== undefined && value !== '' && Number.isInteger(+value))
   }
 
   return (
@@ -65,7 +65,7 @@ export default function BestemEtteroppgjorResultatPage() {
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap="5">
           <TextField
-            label="År for etteroppgjør (tomt betyr alle):"
+            label="År for etteroppgjør:"
             aria-label="etteroppgjorAr"
             name="etteroppgjorAr"
             type="text"
@@ -81,7 +81,8 @@ export default function BestemEtteroppgjorResultatPage() {
             name="sakIds"
             type="text"
           />
-          <Button type="submit" disabled={isSubmitting} size="small">
+          {!etteroppgjørsårErSatt && 'År for etteroppgjør må være satt'}
+          <Button type="submit" disabled={isSubmitting || !etteroppgjørsårErSatt} size="small">
             Opprett
           </Button>
         </VStack>
