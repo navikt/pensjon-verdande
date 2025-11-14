@@ -36,7 +36,7 @@
     "pino-http": "^11.0.0",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
-    "react-datepicker": "^8.8.0",
+    "react-datepicker": "^8.9.0",
     "react-dom": "^19.2.0",
     "react-router": "^7.9.1",
     "remix-auth": "^4.2.0",
