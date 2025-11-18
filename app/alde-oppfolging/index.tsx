@@ -17,6 +17,8 @@ import {
 import { format, sub } from 'date-fns'
 import React from 'react'
 import { useNavigation, useRevalidator, useSearchParams } from 'react-router'
+import KontrollpunktfordelingOverTidBarChart from '~/alde-oppfolging/KontrollpunktfordelingOverTidBarChart'
+import KontrollpunktfordelingPieChart from '~/alde-oppfolging/KontrollpunktfordelingPieChart'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { apiGet } from '~/services/api.server'
@@ -29,6 +31,7 @@ import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart/uti
 import type {
   AldeAvbrutteBehandlingerDto,
   AldeBehandlingNavn,
+  AldeFordelingKontrollpunktOverTidDto,
   AldeFordelingStatusDto,
   AldeFordelingStatusOverTidDto,
 } from './types'
@@ -78,6 +81,11 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
+  const kontrollpunktFordelingOverTid = await apiGet<AldeFordelingKontrollpunktOverTidDto>(
+    `/api/behandling/alde/oppfolging/behandling-samboer-kontrollpunkt-fordeling?kontrollpunktType=SAMBOER&${dateRangeSearchParams.toString()}`,
+    request,
+  )
+
   return {
     avbrutteBehandlinger,
     statusfordelingOverTid,
@@ -87,6 +95,7 @@ export async function loader({ request }: { request: Request }) {
     fomDato,
     tomDato,
     behandlingstype,
+    kontrollpunktFordelingOverTid,
     nowIso: now.toISOString(),
   }
 }
@@ -101,6 +110,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     statusfordelingOverTid,
     behandlingFordeling,
     aldeBehandlinger,
+    kontrollpunktFordelingOverTid,
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
@@ -109,7 +119,6 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
   const [debouncedLoading, setDebouncedLoading] = React.useState(false)
   const [autoReloadInterval, setAutoReloadInterval] = React.useState<number | null>(null)
   const [isAutoReloading, setIsAutoReloading] = React.useState(false)
-
   const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET']
 
   const isLoading = navigation.state === 'loading'
@@ -357,6 +366,17 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
             <FordelingAldeStatus data={aldeStatusFordeling} hiddenStatuses={hiddenStatuses} />
             <FordelingBehandlingStatus data={behandlingFordeling} />
           </HStack>
+
+          <Box>
+            <KontrollpunktfordelingOverTidBarChart
+              data={kontrollpunktFordelingOverTid}
+              fomDate={fomDato}
+              tomDate={tomDato}
+            />
+          </Box>
+
+          <KontrollpunktfordelingPieChart data={kontrollpunktFordelingOverTid} />
+
           <Heading as="h2" size="medium">
             Avbrutte behandlinger
           </Heading>
