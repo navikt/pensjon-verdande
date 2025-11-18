@@ -52,7 +52,7 @@
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.3",
+    "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
     "lefthook": "^2.0.3",
     "react-router-devtools": "^5.1.3",
