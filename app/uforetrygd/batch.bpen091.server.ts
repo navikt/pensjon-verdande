@@ -1,6 +1,11 @@
 import { env } from '~/services/env.server'
 
-export async function opprettBpen091(accessToken: string, beregningsAr: number): Promise<StartBatchResponse> {
+export async function opprettBpen091(
+  accessToken: string,
+  beregningsAr: number,
+  begrensUtplukk: boolean,
+  dryRun: boolean,
+): Promise<StartBatchResponse> {
   const response = await fetch(`${env.penUrl}/api/uforetrygd/fastsettforventetinntekt/batch`, {
     method: 'POST',
     headers: {
@@ -10,8 +15,8 @@ export async function opprettBpen091(accessToken: string, beregningsAr: number):
     },
     body: JSON.stringify({
       beregningsAr: beregningsAr,
-      begrensUtplukk: false,
-      dryRun: true,
+      begrensUtplukk: begrensUtplukk,
+      dryRun: dryRun,
     }),
   })
 
