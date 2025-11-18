@@ -30,3 +30,17 @@ export interface AldeBehandlingNavn {
   handlerName: string
   behandlingType: string
 }
+
+export interface KontrollpunktElement {
+  type: string
+  antall: number
+}
+
+export interface AldeFordelingSamboerKontrollpunktBehandlingDto {
+  dato: string
+  data?: KontrollpunktElement[]
+}
+
+export interface AldeFordelingKontrollpunktOverTidDto {
+  fordeling: AldeFordelingSamboerKontrollpunktBehandlingDto[]
+}
