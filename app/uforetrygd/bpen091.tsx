@@ -43,6 +43,7 @@ export default function FastsettForventetInntekt() {
         <VStack gap={'4'}>
           <TextField
             label={'Behandlingsår'}
+            description={<BodyShort as="div">Året nye inntekter skal gjelde</BodyShort>}
             defaultValue={lastYear}
             aria-label="År"
             name="behandlingsAr"
