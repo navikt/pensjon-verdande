@@ -367,15 +367,15 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
             <FordelingBehandlingStatus data={behandlingFordeling} />
           </HStack>
 
-          <Box>
+          <VStack gap="10" padding="4">
             <KontrollpunktfordelingOverTidBarChart
               data={kontrollpunktFordelingOverTid}
               fomDate={fomDato}
               tomDate={tomDato}
             />
-          </Box>
 
-          <KontrollpunktfordelingPieChart data={kontrollpunktFordelingOverTid} />
+            <KontrollpunktfordelingPieChart data={kontrollpunktFordelingOverTid} />
+          </VStack>
 
           <Heading as="h2" size="medium">
             Avbrutte behandlinger
