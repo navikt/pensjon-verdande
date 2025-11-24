@@ -34,6 +34,7 @@ export interface AldeBehandlingNavn {
 export interface KontrollpunktElement {
   type: string
   antall: number
+  enhet: string
 }
 
 export interface AldeFordelingSamboerKontrollpunktBehandlingDto {

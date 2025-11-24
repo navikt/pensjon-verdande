@@ -1,7 +1,7 @@
-import { BodyShort } from '@navikt/ds-react'
+import { BodyShort, UNSAFE_Combobox } from '@navikt/ds-react'
 import type { ChartData, ChartOptions } from 'chart.js'
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Bar } from 'react-chartjs-2'
 import type {
   AldeFordelingKontrollpunktOverTidDto,
@@ -54,26 +54,27 @@ function safeGetItems(entry: AldeFordelingSamboerKontrollpunktBehandlingDto): Ko
 function parseKontrollpunktToChartData(data: AldeFordelingSamboerKontrollpunktBehandlingDto[]) {
   if (!data.length) return { labels: [], fordeling: {}, typeColors: {} }
   const labels = data.map((d) => d.dato).sort()
-  const typesSet = new Set<string>()
+  // Collect all unique type+enhet combinations
+  const typeEnhetSet = new Set<string>()
   data.forEach((d) => {
     const items = safeGetItems(d)
     items.forEach((item) => {
-      typesSet.add(item.type)
+      typeEnhetSet.add(`${item.type}__${item.enhet}`)
     })
   })
-  const types = Array.from(typesSet)
+  const typeEnhetArr = Array.from(typeEnhetSet)
   const typeColors: Record<string, { backgroundColor: string; borderColor: string }> = {}
-  types.forEach((type, idx) => {
-    typeColors[type] = {
+  typeEnhetArr.forEach((typeEnhet, idx) => {
+    typeColors[typeEnhet] = {
       backgroundColor: `rgba(${60 + idx * 30},${140 + idx * 25},${210 - idx * 25},0.55)`,
       borderColor: `rgba(${60 + idx * 30},${140 + idx * 25},${210 - idx * 25},1)`,
     }
   })
   const fordeling: Record<string, number[]> = {}
-  types.forEach((t) => {
-    fordeling[t] = labels.map((label) => {
+  typeEnhetArr.forEach((te) => {
+    fordeling[te] = labels.map((label) => {
       const dag = data.find((d) => d.dato === label)
-      const element = dag ? safeGetItems(dag).find((e) => e.type === t) : undefined
+      const element = dag ? safeGetItems(dag).find((e) => `${e.type}__${e.enhet}` === te) : undefined
       return element?.antall ?? 0
     })
   })
@@ -84,9 +85,35 @@ const KontrollpunktfordelingOverTidBarChart: React.FC<KontrollpunktfordelingOver
   data,
   height = 420,
 }) => {
+  // Finn alle unike enheter som array av {label, value}
+  const allEnheter = useMemo(() => {
+    const set = new Set<string>()
+    data.fordeling.forEach((d) => {
+      ;(d.data || []).forEach((item) => {
+        if (item.enhet) set.add(item.enhet)
+      })
+    })
+
+    return Array.from(set)
+      .sort()
+      .map((enhet) => ({ label: enhet, value: enhet }))
+  }, [data.fordeling])
+
+  console.log(allEnheter)
+  const [selectedEnheter, setSelectedEnheter] = useState<string[]>([])
+
+  // Filter data på valgte enheter (eller alle hvis ingen valgt)
+  const filteredFordeling = useMemo(() => {
+    if (!selectedEnheter.length) return data.fordeling
+    return data.fordeling.map((d) => ({
+      ...d,
+      data: (d.data || []).filter((item) => selectedEnheter.includes(item.enhet)),
+    }))
+  }, [data.fordeling, selectedEnheter])
+
   const { labels, fordeling, typeColors } = useMemo(
-    () => parseKontrollpunktToChartData(data.fordeling),
-    [data.fordeling],
+    () => parseKontrollpunktToChartData(filteredFordeling),
+    [filteredFordeling],
   )
 
   if (!labels.length) {
@@ -96,6 +123,7 @@ const KontrollpunktfordelingOverTidBarChart: React.FC<KontrollpunktfordelingOver
       </div>
     )
   }
+
   const datasets = Object.entries(fordeling).map(([type, counts]) => ({
     label: type,
     data: counts,
@@ -107,6 +135,18 @@ const KontrollpunktfordelingOverTidBarChart: React.FC<KontrollpunktfordelingOver
 
   return (
     <div style={{ height, width: '100%', marginBottom: '1.5rem' }}>
+      <div style={{ maxWidth: 400, marginBottom: 8 }}>
+        <UNSAFE_Combobox
+          label="Filtrer på enhet"
+          options={allEnheter}
+          isMultiSelect
+          selectedOptions={selectedEnheter}
+          onToggleSelected={(enhet) => {
+            setSelectedEnheter((prev) => (prev.includes(enhet) ? prev.filter((e) => e !== enhet) : [...prev, enhet]))
+          }}
+          size="small"
+        />
+      </div>
       <Bar options={options} data={chartData} />
     </div>
   )

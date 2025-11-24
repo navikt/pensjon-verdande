@@ -1,7 +1,7 @@
-import { BodyShort } from '@navikt/ds-react'
+import { BodyShort, UNSAFE_Combobox } from '@navikt/ds-react'
 import type { ChartData, ChartOptions } from 'chart.js'
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Pie } from 'react-chartjs-2'
 import type {
   AldeFordelingKontrollpunktOverTidDto,
@@ -70,17 +70,45 @@ export const pieOptions: ChartOptions<'pie'> = {
 
 const KontrollpunktfordelingPieChart: React.FC<KontrollpunktfordelingPieChartProps> = ({
   data,
-  height = 340,
+  height = 300,
   title,
 }) => {
-  const chartData = useMemo<ChartData<'pie'> | null>(() => {
+  // Finn alle unike enheter som array av {label, value}
+  const allEnheter = useMemo(() => {
     const array: AldeFordelingSamboerKontrollpunktBehandlingDto[] = Array.isArray(data)
       ? data
       : Array.isArray(data.fordeling)
         ? data.fordeling
         : []
-    if (!array.length) return null
-    const totals = aggregate(array)
+    const set = new Set<string>()
+    array.forEach((d) => {
+      ;(d.data || []).forEach((item) => {
+        if (item.enhet) set.add(item.enhet)
+      })
+    })
+    return Array.from(set)
+      .sort()
+      .map((enhet) => ({ label: enhet, value: enhet }))
+  }, [data])
+  const [selectedEnheter, setSelectedEnheter] = useState<string[]>([])
+
+  // Filter data på valgte enheter (eller alle hvis ingen valgt)
+  const filteredArray = useMemo(() => {
+    const array: AldeFordelingSamboerKontrollpunktBehandlingDto[] = Array.isArray(data)
+      ? data
+      : Array.isArray(data.fordeling)
+        ? data.fordeling
+        : []
+    if (!selectedEnheter.length) return array
+    return array.map((d) => ({
+      ...d,
+      data: (d.data || []).filter((item) => selectedEnheter.includes(item.enhet)),
+    }))
+  }, [data, selectedEnheter])
+
+  const chartData = useMemo<ChartData<'pie'> | null>(() => {
+    if (!filteredArray.length) return null
+    const totals = aggregate(filteredArray)
     const types = Object.keys(totals).sort()
     if (!types.length) return null
     const colors = generateColors(types)
@@ -97,7 +125,7 @@ const KontrollpunktfordelingPieChart: React.FC<KontrollpunktfordelingPieChartPro
         },
       ],
     }
-  }, [data])
+  }, [filteredArray])
 
   if (!chartData) {
     return (
@@ -114,6 +142,18 @@ const KontrollpunktfordelingPieChart: React.FC<KontrollpunktfordelingPieChartPro
 
   return (
     <div style={{ width: '100%', height }}>
+      <div style={{ maxWidth: 400, marginBottom: 8 }}>
+        <UNSAFE_Combobox
+          label="Filtrer på enhet"
+          options={allEnheter}
+          isMultiSelect
+          selectedOptions={selectedEnheter}
+          onToggleSelected={(enhet) => {
+            setSelectedEnheter((prev) => (prev.includes(enhet) ? prev.filter((e) => e !== enhet) : [...prev, enhet]))
+          }}
+          size="small"
+        />
+      </div>
       <Pie data={chartData} options={localOptions} />
     </div>
   )
