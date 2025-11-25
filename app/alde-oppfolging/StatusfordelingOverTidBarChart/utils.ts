@@ -20,8 +20,8 @@ export const statusColors: Record<string, { backgroundColor: string; borderColor
     borderColor: 'rgba(51, 134, 224, 1)', // blue-400
   },
   UNDER_ATTESTERING: {
-    backgroundColor: 'rgba(255, 236, 179, 0.7)', // gulaktig
-    borderColor: 'rgba(255, 193, 7, 1)', // gul
+    backgroundColor: 'rgba(255, 236, 179, 0.7)', // yellowish
+    borderColor: 'rgba(255, 193, 7, 1)', // yellow
   },
   AVBRUTT: {
     backgroundColor: 'rgba(255, 194, 194, 0.5)', // red-100 with opacity

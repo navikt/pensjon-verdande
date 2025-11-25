@@ -91,11 +91,11 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
-  // Beregn total Under attestering ved å summere UNDER_BEHANDLING fra attesteringOverTid
-  const underAttesteringTotal = attesteringOverTid.reduce((sum, dag) => {
-    const dagSum = dag.fordeling.filter((f) => f.status === 'UNDER_BEHANDLING').reduce((acc, f) => acc + f.antall, 0)
-    return sum + dagSum
-  }, 0)
+  // Beregn total Under attestering ved å bruke kun siste dags UNDER_BEHANDLING fra attesteringOverTid
+  const sisteDag = attesteringOverTid[attesteringOverTid.length - 1]
+  const underAttesteringTotal = sisteDag
+    ? sisteDag.fordeling.filter((f) => f.status === 'UNDER_BEHANDLING').reduce((acc, f) => acc + f.antall, 0)
+    : 0
 
   // Lag utvidet status-fordeling med syntetisk UNDER_ATTESTERING
   const aldeStatusFordelingMedAttestering = [
