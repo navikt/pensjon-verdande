@@ -86,23 +86,41 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
+  const attesteringOverTid = await apiGet<AldeFordelingStatusOverTidDto[]>(
+    `/api/behandling/alde/oppfolging/under-attestering-behandlinger?${dateRangeSearchParams.toString()}`,
+    request,
+  )
+
+  // Beregn total Under attestering ved å summere UNDER_BEHANDLING fra attesteringOverTid
+  const underAttesteringTotal = attesteringOverTid.reduce((sum, dag) => {
+    const dagSum = dag.fordeling.filter((f) => f.status === 'UNDER_BEHANDLING').reduce((acc, f) => acc + f.antall, 0)
+    return sum + dagSum
+  }, 0)
+
+  // Lag utvidet status-fordeling med syntetisk UNDER_ATTESTERING
+  const aldeStatusFordelingMedAttestering = [
+    ...aldeStatusFordeling.filter((s) => s.status !== 'UNDER_ATTESTERING'),
+    { status: 'UNDER_ATTESTERING', antall: underAttesteringTotal },
+  ]
+
   return {
     avbrutteBehandlinger,
     statusfordelingOverTid,
-    aldeStatusFordeling,
+    aldeStatusFordelingMedAttestering,
     behandlingFordeling,
     aldeBehandlinger,
     fomDato,
     tomDato,
     behandlingstype,
     kontrollpunktFordelingOverTid,
+    attesteringOverTid,
     nowIso: now.toISOString(),
   }
 }
 
 export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
   const {
-    aldeStatusFordeling,
+    aldeStatusFordelingMedAttestering,
     fomDato,
     tomDato,
     behandlingstype,
@@ -111,6 +129,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     behandlingFordeling,
     aldeBehandlinger,
     kontrollpunktFordelingOverTid,
+    attesteringOverTid,
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
@@ -119,7 +138,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
   const [debouncedLoading, setDebouncedLoading] = React.useState(false)
   const [autoReloadInterval, setAutoReloadInterval] = React.useState<number | null>(null)
   const [isAutoReloading, setIsAutoReloading] = React.useState(false)
-  const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET']
+  const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'UNDER_ATTESTERING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET']
 
   const isLoading = navigation.state === 'loading'
 
@@ -321,8 +340,14 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
           <VStack gap="4">
             <HStack gap="4" wrap>
               {allStatuses.map((status) => {
-                const statusData = aldeStatusFordeling.find((item) => item.status === status)
-                const antall = statusData?.antall || 0
+                const statusData = aldeStatusFordelingMedAttestering.find((item) => item.status === status)
+                let antall = statusData?.antall || 0
+                if (status === 'UNDER_BEHANDLING') {
+                  const underAttestering =
+                    aldeStatusFordelingMedAttestering.find((s) => s.status === 'UNDER_ATTESTERING')?.antall || 0
+                  antall = Math.max(antall - underAttestering, 0)
+                }
+
                 const colors = statusColors[status]
                 const isHidden = hiddenStatuses.includes(status)
                 return (
@@ -357,13 +382,14 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
           <Box>
             <StatusfordelingOverTidBarChart
               data={statusfordelingOverTid}
+              attesteringData={attesteringOverTid}
               fomDate={fomDato}
               tomDate={tomDato}
               hiddenStatuses={hiddenStatuses}
             />
           </Box>
           <HStack maxHeight="300px">
-            <FordelingAldeStatus data={aldeStatusFordeling} hiddenStatuses={hiddenStatuses} />
+            <FordelingAldeStatus data={aldeStatusFordelingMedAttestering} hiddenStatuses={hiddenStatuses} />
             <FordelingBehandlingStatus data={behandlingFordeling} />
           </HStack>
 

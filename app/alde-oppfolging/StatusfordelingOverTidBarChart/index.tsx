@@ -10,6 +10,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 interface StatusfordelingOverTidBarChartProps {
   data: AldeFordelingStatusOverTidDto[]
+  attesteringData?: AldeFordelingStatusOverTidDto[]
   fomDate: string
   tomDate: string
   hiddenStatuses?: string[]
@@ -46,10 +47,11 @@ export const options: ChartOptions<'bar'> = {
 
 const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartProps> = ({
   data,
+  attesteringData,
   hiddenStatuses = [],
 }) => {
   const chartData = useMemo(() => {
-    const [labels, parsedData] = parseToChartData(data)
+    const [labels, parsedData] = parseToChartData(data, attesteringData)
 
     // Handle empty data
     if (!parsedData || parsedData.length === 0 || !parsedData[0]) {
@@ -76,7 +78,7 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
     }
 
     return result
-  }, [data, hiddenStatuses])
+  }, [data, attesteringData, hiddenStatuses])
 
   if (!chartData) {
     return (
