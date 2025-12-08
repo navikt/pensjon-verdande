@@ -1,18 +1,19 @@
-function splitOnCapitals(string: string) {
-  const match = string.match(/([A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+)/g)
-  if (match) {
-    return match
-      .map((value, index) => {
-        if (index === 0) {
-          return value
-        } else {
-          return value.toLocaleLowerCase('no-NO')
-        }
-      })
-      .join(' ')
-  } else {
-    return string
+function splitOnCapitals(input: string): string {
+  const parts = input.match(
+    /[A-ZÆØÅ]{2}(?=[A-ZÆØÅ][a-zæøå])|[A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+|[a-zæøå]+/g,
+  )
+
+  if (!parts) {
+    return input
   }
+
+  return parts
+    .map((part, index) => {
+      if (index === 0) return part
+      if (/^[A-ZÆØÅ]{2,}$/.test(part)) return part
+      return part.toLocaleLowerCase('no-NO')
+    })
+    .join(' ')
 }
 
 const oversettinger = [
