@@ -370,6 +370,12 @@ export default function BehandlingCard(props: Props) {
         return 'AvsluttSaker'
       case 'KontrollerOppgaverBehandling':
         return 'KontrollerOppgaver'
+      case 'FodselsdatoAjourholdBehandling':
+        return 'FodselsdatoAjourhold'
+      case 'IdentAjourholdBehandling':
+        return 'IdentAjourhold'
+      case 'DagligAvstemmingBehandling':
+        return 'DagligAvstemming'
       default:
         return type
     }
