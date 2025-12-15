@@ -16,7 +16,7 @@ interface OmregningOppsummeringProps {
   opprettAlleOppgaver: boolean
   sjekkYtelseFraAvtaleland: boolean
   omregneAFP: boolean
-  skalIverksettOnline: boolean
+  prioritet: string
   skalSamordne: boolean
   skalSletteIverksettingsoppgaver: boolean
   skalDistribuereUforevedtak: boolean
@@ -113,8 +113,8 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
               <FormSummary.Value>
                 <FormSummary.Answers>
                   <FormSummary.Answer>
-                    <FormSummary.Label>Skal Iverksett Online</FormSummary.Label>
-                    <FormSummary.Value>{props.skalIverksettOnline ? 'Ja' : 'Nei'}</FormSummary.Value>
+                    <FormSummary.Label>Prioritet - Iverksetting</FormSummary.Label>
+                    <FormSummary.Value>{props.prioritet}</FormSummary.Value>
                   </FormSummary.Answer>
                   <FormSummary.Answer>
                     <FormSummary.Label>Skal samordne</FormSummary.Label>

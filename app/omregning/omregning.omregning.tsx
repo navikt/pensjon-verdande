@@ -48,7 +48,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     sendBrevBerorteSaker: updates.sendBrevBerorteSaker === 'true',
     brevkoderSoker: brevkoderSoker,
     brevkoderBerorteSaker: brevkoderBerorteSaker,
-    skalIverksettOnline: updates.skalIverksettOnline === 'true',
+    prioritet: updates.prioritet,
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
