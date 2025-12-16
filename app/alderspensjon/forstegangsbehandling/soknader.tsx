@@ -23,6 +23,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
+import type React from 'react'
 import { useMemo, useRef } from 'react'
 import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
 import {
@@ -218,19 +219,20 @@ export default function Alderspensjonssoknader() {
 
   return (
     <Page.Block>
-      <Bleed marginInline={'12 12'} asChild>
+      <Bleed marginInline={'12 12'} marginBlock={'space-16'} asChild>
         <Box>
           <Heading className={css.topBanner} level={'1'} size={'large'} style={{ marginTop: 0 }}>
             <div className={css.topBannerContent}>
-              <div className={css.topBannerText}>Alderspensjonssøknader</div>
+              <div className={css.topBannerText}>Førstegangsbehandling alderspensjon</div>
               <div className={css.topBannerImgContainer}>
                 <img src="/alderspensjon.svg" className={css.illustration} alt="" />
               </div>
             </div>
           </Heading>
         </Box>
-      </Bleed>{' '}
-      <VStack gap="6">
+      </Bleed>
+
+      <VStack gap="6" paddingBlock={'8'}>
         <KildeOppsummeringVisning data={kildeOppsummering} fomDato={fomDato} tomDato={tomDato} />
 
         <HStack justify="space-between" wrap>

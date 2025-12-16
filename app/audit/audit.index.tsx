@@ -129,7 +129,7 @@ export default function AuditIndexPage() {
   }
 
   return (
-    <Page.Block gutters>
+    <Page.Block>
       <Heading level="1" size="large">
         Revisjonslogg
       </Heading>

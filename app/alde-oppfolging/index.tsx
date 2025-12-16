@@ -220,7 +220,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
 
   return (
     <Page.Block>
-      <Bleed marginInline={'12 12'} asChild>
+      <Bleed marginInline={'12 12'} marginBlock={'space-16'} asChild>
         <Box>
           <Heading className={css.topBanner} level={'1'} size={'large'} style={{ marginTop: 0 }}>
             <div className={css.topBannerContent}>
@@ -233,7 +233,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
         </Box>
       </Bleed>
 
-      <VStack gap="6">
+      <VStack gap="6" paddingBlock={'8'}>
         <Box.New>
           <VStack gap="4">
             <Heading level="2" size="small">
