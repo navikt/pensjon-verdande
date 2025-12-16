@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Button, Heading, Label, Radio, RadioGroup, Select, VStack } from '@navikt/ds-react'
+import { Alert, BodyShort, Button, Heading, Label, Radio, RadioGroup, Select, Textarea, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import type React from 'react'
@@ -14,10 +14,14 @@ import type { BehandlingerPage } from '~/types'
 type LoaderData = {
   behandlinger: BehandlingerPage
   maneder: string[]
-  erBegrensUtplukkLovlig: boolean
+  begrensetUtplukk: {
+    erLovlig: boolean
+    fnrListe: string[]
+  }
   kanOverstyreBehandlingsmaned: boolean
   defaultMonth: string
 }
+
 export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
@@ -41,14 +45,16 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
   return {
     behandlinger,
     maneder: aldersoverganger.maneder,
-    erBegrensUtplukkLovlig: aldersoverganger.erBegrensUtplukkLovlig,
+    begrensetUtplukk: aldersoverganger.begrensetUtplukk,
     kanOverstyreBehandlingsmaned: aldersoverganger.kanOverstyreBehandlingsmaned,
     defaultMonth,
   }
 }
 
+const FNR_REGEX = /^\d{11}$/
+
 export default function BatchOpprett_index() {
-  const { behandlinger, maneder, erBegrensUtplukkLovlig, kanOverstyreBehandlingsmaned, defaultMonth } =
+  const { behandlinger, maneder, begrensetUtplukk, kanOverstyreBehandlingsmaned, defaultMonth } =
     useLoaderData<typeof loader>()
 
   const [selectedMonthStr, setSelectedMonthStr] = useState(defaultMonth)
@@ -56,12 +62,30 @@ export default function BatchOpprett_index() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const submit = useSubmit()
 
+  const [begrensetUtplukkValg, setBegrensetUtplukkValg] = useState(false)
+  const [fnrText, setFnrText] = useState<string>(() => (begrensetUtplukk?.fnrListe ?? []).join('\n'))
+
   const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
     submit(e.currentTarget.form)
   }
 
   const minDate = kanOverstyreBehandlingsmaned ? undefined : startOfMonth(selectedMonthDate)
   const maxDate = kanOverstyreBehandlingsmaned ? undefined : endOfMonth(selectedMonthDate)
+
+  const visBegrensetUtplukk = Boolean(selectedMonthDate && begrensetUtplukk?.erLovlig)
+
+  const parsedFnrListe = useMemo(() => {
+    const list = fnrText
+      .split(/\r?\n/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    return Array.from(new Set(list))
+  }, [fnrText])
+
+  const ugyldigeFnr = useMemo(() => parsedFnrListe.filter((fnr) => !FNR_REGEX.test(fnr)), [parsedFnrListe])
+
+  const opprettDisabled = begrensetUtplukkValg && (parsedFnrListe.length === 0 || ugyldigeFnr.length > 0)
 
   return (
     <div>
@@ -88,44 +112,32 @@ export default function BatchOpprett_index() {
               rowGap: '0.25rem',
             }}
           >
-            <div>
-              <Label htmlFor="behandlingsmaned" style={{ marginBottom: '0.25rem' }}>
-                Behandlingsmåned
-              </Label>
-            </div>
-            <div>
-              <Label htmlFor="kjoeretidspunkt" style={{ marginBottom: '0.25rem' }}>
-                Kjøretidspunkt {kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}
-              </Label>
-            </div>
+            <Label>Behandlingsmåned</Label>
+            <Label>Kjøretidspunkt {kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}</Label>
 
-            <div>
-              <Select
-                onChange={(e) => {
-                  setSelectedMonthStr(e.target.value)
-                  setSelectedDate(null)
-                }}
-                value={selectedMonthStr}
-                size="small"
-                label=""
-                style={{ width: '100%' }}
-              >
-                {maneder.map((mnd) => (
-                  <option key={mnd} value={mnd}>
-                    {format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div style={{ paddingTop: '7px' }}>
-              <DateTimePicker
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                minDate={minDate}
-                maxDate={maxDate}
-                label=""
-              />
-            </div>
+            <Select
+              onChange={(e) => {
+                setSelectedMonthStr(e.target.value)
+                setSelectedDate(null)
+              }}
+              value={selectedMonthStr}
+              size="small"
+              label=""
+            >
+              {maneder.map((mnd) => (
+                <option key={mnd} value={mnd}>
+                  {format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })}
+                </option>
+              ))}
+            </Select>
+
+            <DateTimePicker
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              minDate={minDate}
+              maxDate={maxDate}
+              label=""
+            />
           </div>
 
           {selectedMonthDate && (
@@ -143,22 +155,46 @@ export default function BatchOpprett_index() {
             </>
           )}
 
-          {selectedMonthDate && erBegrensUtplukkLovlig && (
+          {visBegrensetUtplukk && (
             <div>
               <Label>Begrenset utplukk</Label>
-              <BodyShort size="small" style={{ marginBottom: '0.5rem' }}>
-                Behandler kun personer som ligger i utplukkstabellen.
-              </BodyShort>
-              <RadioGroup name="begrensetUtplukk" defaultValue="false" legend="" size="small">
+
+              <RadioGroup
+                name="begrensetUtplukk"
+                value={begrensetUtplukkValg ? 'true' : 'false'}
+                onChange={(value) => setBegrensetUtplukkValg(value === 'true')}
+                legend=""
+                size="small"
+              >
                 <Radio value="true">Ja</Radio>
                 <Radio value="false">Nei</Radio>
               </RadioGroup>
+
+              {begrensetUtplukkValg && (
+                <div style={{ marginTop: '0.75rem' }}>
+                  <Textarea
+                    label="Personer som skal inngå i kjøringen."
+                    description="Ett fødselsnummer per linje (11 siffer)."
+                    value={fnrText}
+                    onChange={(e) => setFnrText(e.target.value)}
+                    minRows={8}
+                  />
+
+                  {ugyldigeFnr.length > 0 && (
+                    <BodyShort size="small" style={{ color: '#c30000', marginTop: '0.25rem' }}>
+                      Ugyldig fødselsnummer (må være 11 siffer): {ugyldigeFnr.join(', ')}
+                    </BodyShort>
+                  )}
+
+                  <input type="hidden" name="begrensetUtplukkFnrListe" value={JSON.stringify(parsedFnrListe)} />
+                </div>
+              )}
             </div>
           )}
 
           {selectedMonthDate && (kanOverstyreBehandlingsmaned || selectedDate) && (
             <div style={{ marginTop: '1rem' }}>
-              <Button type="submit" onClick={handleSubmit} variant="primary">
+              <Button type="submit" onClick={handleSubmit} variant="primary" disabled={opprettDisabled}>
                 Opprett
               </Button>
             </div>

@@ -4,8 +4,9 @@ import { env } from '~/services/env.server'
 export async function opprettAldersovergang(
   accessToken: string,
   behandlingsmaned: number,
-  kjoeretidspunkt: string,
+  kjoeretidspunkt: string | null,
   begrensetUtplukk: boolean,
+  begrensetUtplukkFnrListe: string[] | null,
 ): Promise<StartBatchResponse> {
   const response = await fetch(`${env.penUrl}/api/aldersovergang/utplukk`, {
     method: 'POST',
@@ -18,6 +19,7 @@ export async function opprettAldersovergang(
       behandlingsmaned,
       kjoeretidspunkt,
       begrensetUtplukk,
+      begrensetUtplukkFnrListe: begrensetUtplukk ? begrensetUtplukkFnrListe : null,
     }),
   })
 
@@ -52,8 +54,13 @@ export async function hentMuligeAldersoverganger(accessToken: string): Promise<M
 
 export type MuligeAldersovergangerResponse = {
   maneder: string[]
-  erBegrensUtplukkLovlig: boolean
+  begrensetUtplukk: BegrensetUtplukk
   kanOverstyreBehandlingsmaned: boolean
+}
+
+export type BegrensetUtplukk = {
+  erLovlig: boolean
+  fnrListe: string[]
 }
 
 type StartBatchResponse = {
