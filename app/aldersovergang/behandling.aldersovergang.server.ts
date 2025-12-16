@@ -17,7 +17,7 @@ export async function opprettAldersovergang(
     },
     body: JSON.stringify({
       behandlingsmaned,
-      kjoeretidspunkt: kjoeretidspunkt,
+      kjoeretidspunkt,
       begrensetUtplukk,
       begrensetUtplukkFnrListe: begrensetUtplukk ? begrensetUtplukkFnrListe : null,
     }),

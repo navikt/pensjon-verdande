@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Button, Heading, Label, Radio, RadioGroup, Select, Textarea, VStack } from '@navikt/ds-react'
+import { Alert, BodyShort, Button, Heading, Radio, RadioGroup, Select, Textarea, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import type React from 'react'
@@ -79,7 +79,6 @@ export default function BatchOpprett_index() {
       .split(/\r?\n/)
       .map((s) => s.trim())
       .filter(Boolean)
-
     return Array.from(new Set(list))
   }, [fnrText])
 
@@ -112,9 +111,6 @@ export default function BatchOpprett_index() {
               rowGap: '0.25rem',
             }}
           >
-            <Label>Behandlingsmåned</Label>
-            <Label>Kjøretidspunkt {kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}</Label>
-
             <Select
               onChange={(e) => {
                 setSelectedMonthStr(e.target.value)
@@ -122,7 +118,8 @@ export default function BatchOpprett_index() {
               }}
               value={selectedMonthStr}
               size="small"
-              label=""
+              label="Behandlingsmåned"
+              style={{ width: '100%' }}
             >
               {maneder.map((mnd) => (
                 <option key={mnd} value={mnd}>
@@ -131,13 +128,15 @@ export default function BatchOpprett_index() {
               ))}
             </Select>
 
-            <DateTimePicker
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              minDate={minDate}
-              maxDate={maxDate}
-              label=""
-            />
+            <div style={{ paddingTop: '7px' }}>
+              <DateTimePicker
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                minDate={minDate}
+                maxDate={maxDate}
+                label={`Kjøretidspunkt ${kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}`}
+              />
+            </div>
           </div>
 
           {selectedMonthDate && (
@@ -155,13 +154,11 @@ export default function BatchOpprett_index() {
 
           {visBegrensetUtplukk && (
             <div>
-              <Label>Begrenset utplukk</Label>
-
               <RadioGroup
                 name="begrensetUtplukk"
                 value={begrensetUtplukkValg ? 'true' : 'false'}
                 onChange={(value) => setBegrensetUtplukkValg(value === 'true')}
-                legend=""
+                legend="Begrenset utplukk"
                 size="small"
               >
                 <Radio value="true">Ja</Radio>
@@ -179,9 +176,9 @@ export default function BatchOpprett_index() {
                   />
 
                   {ugyldigeFnr.length > 0 && (
-                    <BodyShort size="small" style={{ color: '#c30000', marginTop: '0.25rem' }}>
+                    <Alert variant="error" inline style={{ marginTop: '0.5rem' }}>
                       Ugyldig fødselsnummer (må være 11 siffer): {ugyldigeFnr.join(', ')}
-                    </BodyShort>
+                    </Alert>
                   )}
 
                   <input type="hidden" name="begrensetUtplukkFnrListe" value={JSON.stringify(parsedFnrListe)} />
