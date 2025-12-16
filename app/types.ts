@@ -339,3 +339,10 @@ export type BehandlingManuellOpptellingDto = {
 export type BehandlingManuellOpptellingResponse = {
   behandlingManuellOpptelling: BehandlingManuellOpptellingDto[]
 }
+
+export type RelatertFamilieBehandling = {
+  behandlingId: number
+  behandlingCode: string
+  gruppeSekvens: number
+  status: string
+}
