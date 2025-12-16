@@ -6,18 +6,27 @@ import {
   Heading,
   HStack,
   Label,
+  Switch,
   Table,
   useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
+import { BehandlingTypeChart } from './BehandlingTypeChart'
 
 export interface KildeOppsummering {
   kilde: string
   innsenderType: string
   antall: number
+  behandlingTyper: {
+    auto: number
+    manuell: number
+    delAuto: number
+    ikkeFullort: number
+  }
 }
 
 function decodeInnsender(kilde: string): string {
@@ -65,6 +74,7 @@ export function KildeOppsummeringVisning({
 }) {
   const now = new Date()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [showChart, setShowChart] = useState(true)
 
   function updateSearchParams(nextFrom: string, nextTo: string) {
     const next = new URLSearchParams(searchParams)
@@ -151,10 +161,30 @@ export function KildeOppsummeringVisning({
         <Table size="small">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Innsender</Table.HeaderCell>
-              <Table.HeaderCell>Kilde</Table.HeaderCell>
-              <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
-              <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
+              <Table.HeaderCell style={{ whiteSpace: 'nowrap' }}>Innsender</Table.HeaderCell>
+              <Table.HeaderCell style={{ whiteSpace: 'nowrap' }}>Kilde</Table.HeaderCell>
+              {showChart ? (
+                <Table.HeaderCell style={{ whiteSpace: 'nowrap' }}>Fordeling</Table.HeaderCell>
+              ) : (
+                <>
+                  <Table.HeaderCell style={{ textAlign: 'right', whiteSpace: 'nowrap', color: 'rgba(195, 0, 0, 1)' }}>
+                    Ikke fullført
+                  </Table.HeaderCell>
+                  <Table.HeaderCell style={{ textAlign: 'right', whiteSpace: 'nowrap', color: 'rgba(199, 115, 0, 1)' }}>
+                    Manuell
+                  </Table.HeaderCell>
+                  <Table.HeaderCell
+                    style={{ textAlign: 'right', whiteSpace: 'nowrap', color: 'rgba(51, 134, 224, 1)' }}
+                  >
+                    Delvis auto
+                  </Table.HeaderCell>
+                  <Table.HeaderCell style={{ textAlign: 'right', whiteSpace: 'nowrap', color: 'rgba(42, 167, 88, 1)' }}>
+                    Auto
+                  </Table.HeaderCell>
+                </>
+              )}
+              <Table.HeaderCell style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>Antall</Table.HeaderCell>
+              <Table.HeaderCell style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>Andel</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -164,16 +194,41 @@ export function KildeOppsummeringVisning({
                 <Table.Row key={`${row.kilde}-${row.innsenderType}`}>
                   <Table.DataCell>{decodeInnsender(row.innsenderType)}</Table.DataCell>
                   <Table.DataCell>{decodeKilde(row.kilde)}</Table.DataCell>
+                  {showChart ? (
+                    <Table.DataCell>
+                      <BehandlingTypeChart behandlingTyper={row.behandlingTyper} />
+                    </Table.DataCell>
+                  ) : (
+                    <>
+                      <Table.DataCell style={{ textAlign: 'right' }}>
+                        {Intl.NumberFormat('nb-NO').format(row.behandlingTyper.ikkeFullort)}
+                      </Table.DataCell>
+                      <Table.DataCell style={{ textAlign: 'right' }}>
+                        {Intl.NumberFormat('nb-NO').format(row.behandlingTyper.manuell)}
+                      </Table.DataCell>
+                      <Table.DataCell style={{ textAlign: 'right' }}>
+                        {Intl.NumberFormat('nb-NO').format(row.behandlingTyper.delAuto)}
+                      </Table.DataCell>
+                      <Table.DataCell style={{ textAlign: 'right' }}>
+                        {Intl.NumberFormat('nb-NO').format(row.behandlingTyper.auto)}
+                      </Table.DataCell>
+                    </>
+                  )}
                   <Table.DataCell style={{ textAlign: 'right' }}>
                     {Intl.NumberFormat('nb-NO').format(row.antall)}
                   </Table.DataCell>
-                  <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                  <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
                     {((row.antall * 100) / total).toFixed(1)} %
                   </Table.DataCell>
                 </Table.Row>
               ))}
           </Table.Body>
         </Table>
+        <HStack justify="space-between" align="center">
+          <Switch size="small" checked={showChart} onChange={(e) => setShowChart(e.target.checked)}>
+            Vis som graf
+          </Switch>
+        </HStack>
       </VStack>
     </Box.New>
   )
