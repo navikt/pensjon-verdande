@@ -28,7 +28,7 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "compression": "^1.8.1",
     "date-fns-tz": "^3.2.0",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "isbot": "^5.1.32",
     "jwt-decode": "^4.0.0",
     "node-cache": "^5.1.2",
