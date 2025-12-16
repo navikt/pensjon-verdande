@@ -142,11 +142,9 @@ export default function BatchOpprett_index() {
 
           {selectedMonthDate && (
             <>
-              <input
-                type="hidden"
-                name="kjoeretidspunkt"
-                value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
-              />
+              {selectedDate && (
+                <input type="hidden" name="kjoeretidspunkt" value={format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss")} />
+              )}
               <input
                 type="hidden"
                 name="behandlingsmaned"
