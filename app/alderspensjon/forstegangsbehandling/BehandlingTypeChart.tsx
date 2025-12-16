@@ -97,13 +97,14 @@ export function BehandlingTypeChart({ behandlingTyper }: BehandlingTypeChartProp
         external: (context: { chart: ChartJS; tooltip: TooltipModel<'bar'> }) => {
           const tooltipModel = context.tooltip
 
-          if (tooltipModel.opacity === 0) {
+          if (tooltipModel.opacity === 0 || !tooltipModel.dataPoints?.[0]) {
             setTooltip(null)
             return
           }
 
-          const datasetIndex = tooltipModel.dataPoints[0].datasetIndex
-          const percentage = tooltipModel.dataPoints[0].parsed.x.toFixed(1)
+          const dataPoint = tooltipModel.dataPoints[0]
+          const datasetIndex = dataPoint.datasetIndex
+          const percentage = (dataPoint.parsed.x ?? 0).toFixed(1)
           let count = 0
           let label = ''
 
