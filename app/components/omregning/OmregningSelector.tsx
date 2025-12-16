@@ -7,6 +7,7 @@ interface OmregningSelectorProps {
   value: string
   setSelectedValue: React.Dispatch<React.SetStateAction<string>>
   optionsmap: { value: string; label: string }[]
+  size?: 'small' | 'medium'
 }
 
 export default function OmregningSelector(props: OmregningSelectorProps) {
@@ -16,6 +17,7 @@ export default function OmregningSelector(props: OmregningSelectorProps) {
       name={props.navn}
       value={props.value}
       onChange={(event) => props.setSelectedValue(event.target.value)}
+      size={props.size}
     >
       {props.optionsmap.map((option) => (
         <option key={option.value} value={option.value}>

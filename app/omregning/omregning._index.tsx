@@ -61,7 +61,6 @@ export default function BatchOpprett_index() {
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
-  const [skalIverksettOnline, setSkalIverksettOnline] = useState(false)
   const [skalBestilleBrev, setSkalBestilleBrev] = useState('INGEN')
 
   const [selectedBrevkodeSokerAlderGammeltRegelverk, setselectedBrevkodeSokerAlderGammeltRegelverk] = useState<
@@ -169,6 +168,11 @@ export default function BatchOpprett_index() {
     { value: 'ALLE', label: 'Alle' },
     { value: 'ALLE_MED_ENDRING_I_BELOP', label: 'Alle med endring i beløp' },
   ]
+  const optionPrioritet = [
+    { value: 'ONLINE', label: 'ONLINE - online-kø med høy prioritet' },
+    { value: 'ONLINE_BATCH', label: 'ONLINE_BATCH - online-kø med lav prioritet' },
+    { value: 'BATCH', label: 'BATCH - egen batch-kø med HPEN' },
+  ]
 
   function setMonthSelected(date: Date | undefined): Date | undefined {
     if (!date) {
@@ -198,6 +202,7 @@ export default function BatchOpprett_index() {
   const [toleransegrenseSett, setToleransegrenseSett] = useState(optionToleransegrenseSett[0].value)
   const [oppgaveSett, setOppgaveSett] = useState(optionOppgaveSett[0].value)
   const [oppgavePrefiks, setOppgavePrefiks] = useState(optionOppgavePrefiks[0].value)
+  const [prioritet, setPrioritet] = useState(optionPrioritet[1].value)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const omregningsaker = omregningSakerPage as OmregningSakerPage
@@ -393,15 +398,16 @@ export default function BatchOpprett_index() {
                         Omregne AFP
                       </OmregningCheckbox>
                     </CheckboxGroup>
+
                     <CheckboxGroup size={'medium'} legend={'Iverksetting parametere'}>
-                      <OmregningCheckbox
-                        defaultChecked={skalIverksettOnline}
-                        name={'skalIverksettOnline'}
-                        value={skalIverksettOnline}
-                        onChange={setSkalIverksettOnline}
-                      >
-                        Iverksett Online
-                      </OmregningCheckbox>
+                      <OmregningSelector
+                        label={'Iverksetting - Prioritet'}
+                        navn={'prioritet'}
+                        value={prioritet}
+                        setSelectedValue={setPrioritet}
+                        optionsmap={optionPrioritet}
+                        size={'small'}
+                      />
                       <OmregningCheckbox
                         defaultChecked={skalSamordne}
                         name={'skalSamordne'}
@@ -615,7 +621,7 @@ export default function BatchOpprett_index() {
                   oppgaveSett={oppgaveSett}
                   oppgavePrefiks={oppgavePrefiks}
                   omregneAFP={omregneAFP}
-                  skalIverksettOnline={skalIverksettOnline}
+                  prioritet={prioritet}
                   skalSamordne={skalSamordne}
                   skalSletteIverksettingsoppgaver={skalSletteIverksettingsoppgaver}
                   skalDistribuereUforevedtak={skalDistribuereUforevedtak}
@@ -681,7 +687,7 @@ export default function BatchOpprett_index() {
       `sjekkYtelseFraAvtaleland: ${sjekkYtelseFraAvtaleland}`,
       `omregneAFP: ${omregneAFP}`,
       ``,
-      `skalIverksettOnline: ${skalIverksettOnline}`,
+      `prioritet: ${prioritet}`,
       `skalSamordne: ${skalSamordne}`,
       `skalSletteIverksettingsoppgaver: ${skalSletteIverksettingsoppgaver}`,
       `skalDistribuereUførevedtak: ${skalDistribuereUforevedtak}`,
