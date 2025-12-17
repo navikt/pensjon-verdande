@@ -603,11 +603,13 @@ export default function BehandlingCard(props: Props) {
             {props.behandling._links?.uttrekk && (
               <Tabs.Tab value="uttrekk" label="Uttrekk" icon={<PrinterSmallIcon />} />
             )}
-            <Tabs.Tab
-              value="relaterteFamiliebehandlinger"
-              label="Relaterte Familiebehandlinger"
-              icon={<TasklistIcon />}
-            />
+            {props.behandling.gruppeId && (
+              <Tabs.Tab
+                value="relaterteFamiliebehandlinger"
+                label="Relaterte Familiebehandlinger"
+                icon={<TasklistIcon />}
+              />
+            )}
             {props.behandling._links?.oppdragsmelding && (
               <Tabs.Tab value="oppdragsmelding" label="Oppdragsmelding" icon={<TasklistIcon />} />
             )}

@@ -53,6 +53,7 @@ export type BehandlingDto = {
   journalpostId: string | null
   kibanaUrl?: string
   feilmelding: string | null
+  gruppeId: string | null
 
   parametere: Record<string, string | null>
 

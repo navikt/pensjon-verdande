@@ -488,12 +488,9 @@ export async function HentRelaterteFamiliebehandlinger(
     },
   })
 
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved henting av manuelle behandlinger. Feil var\n${text}`, {
-      status: response.status,
-    })
+  if (!response) {
+    throw new Response('Not Found', { status: 404 })
+  } else {
+    return (await response.json()) as RelatertFamilieBehandling[]
   }
-
-  return (await response.json()) as RelatertFamilieBehandling[]
 }
