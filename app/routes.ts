@@ -127,6 +127,8 @@ export default [
 
     route('bestem-etteroppgjor-resultat', 'uforetrygd/bestem-etteroppgjor-resultat._index.tsx'),
 
+    route('vedlikehold-barn', 'uforetrygd/vedlikehold-barn.tsx'),
+
     route('bpen090', 'uforetrygd/bpen090.tsx'),
 
     route('bpen091', 'uforetrygd/bpen091.tsx'),
