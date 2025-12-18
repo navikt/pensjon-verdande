@@ -1,4 +1,4 @@
-import { BodyLong, Box, Button, Heading, Skeleton, TextField, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, DatePicker, Heading, Skeleton, TextField, VStack } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
 import {
   type ActionFunctionArgs,
@@ -56,8 +56,13 @@ export default function Avstemming() {
 
   const isSubmitting = navigation.state === 'submitting'
   const [underkomponentKode, setUnderkomponentKode] = useState<string | ''>('')
-  const [avstemmingsperiodeStart, setAvstemmingsperiodeStart] = useState<string | ''>('')
-  const [avstemmingsperiodeEnd, setAvstemmingsperiodeEnd] = useState<string | ''>('')
+
+  const year = new Date().getFullYear()
+  const month = new Date().getMonth() + 1
+  const day = new Date().getDate()
+  const defaultAvstemmingsdato = new Date(`${month} ${day - 1} ${year}`)
+  const [avstemmingsperiodeStart, setAvstemmingsperiodeStart] = useState<Date | undefined>(defaultAvstemmingsdato)
+  const [avstemmingsperiodeEnd, setAvstemmingsperiodeEnd] = useState<Date | undefined>(defaultAvstemmingsdato)
 
   return (
     <VStack gap={'4'}>
@@ -83,31 +88,29 @@ export default function Avstemming() {
             }}
             value={underkomponentKode}
           />
-          <TextField
-            label="Avstemmingsperiode start (fom):"
-            name="avstemmingsperiodeStart"
-            type="text"
-            placeholder="20250101"
-            onChange={(e) => {
-              const v = e.currentTarget.value
-              setAvstemmingsperiodeStart(v === '' ? '' : v)
-            }}
-            value={avstemmingsperiodeStart}
+          Avstemmingsperiode start (fom):
+          <DatePicker.Standalone
+            selected={avstemmingsperiodeStart}
+            today={defaultAvstemmingsdato}
+            onSelect={setAvstemmingsperiodeStart}
+            fromDate={new Date(`1 Jan ${year - 1}`)}
+            toDate={defaultAvstemmingsdato}
+            dropdownCaption
           />
-          <TextField
-            label="Avstemmingsperiode end (tom):"
-            name="avstemmingsperiodeEnd"
-            type="text"
-            placeholder="20250101"
-            onChange={(e) => {
-              const v = e.currentTarget.value
-              setAvstemmingsperiodeEnd(v === '' ? '' : v)
-            }}
-            value={avstemmingsperiodeEnd}
+          Avstemmingsperiode end (tom):
+          <DatePicker.Standalone
+            selected={avstemmingsperiodeEnd}
+            today={defaultAvstemmingsdato}
+            onSelect={setAvstemmingsperiodeEnd}
+            fromDate={new Date(`1 Jan ${year - 1}`)}
+            toDate={defaultAvstemmingsdato}
+            dropdownCaption
           />
           <Button
             type="submit"
-            disabled={underkomponentKode === '' || avstemmingsperiodeStart === '' || avstemmingsperiodeEnd === ''}
+            disabled={
+              underkomponentKode === '' || avstemmingsperiodeStart === undefined || avstemmingsperiodeEnd === undefined
+            }
             loading={isSubmitting}
           >
             Opprett avstemming-behandling
