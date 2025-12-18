@@ -13,6 +13,7 @@ import {
   fortsettBehandling,
   getBehandling,
   getDetaljertFremdrift,
+  godkjennOpprettelse,
   patchBehandling,
   runBehandling,
   sendTilManuellMedKontrollpunkt,
@@ -26,6 +27,7 @@ export const OPERATION = {
   fjernFraDebug: 'fjernFraDebug',
   fortsett: 'fortsett',
   fortsettAvhengigeBehandlinger: 'fortsettAvhengigeBehandlinger',
+  godkjennOpprettelse: 'godkjennOpprettelse',
   oppdaterAnsvarligTeam: 'oppdaterAnsvarligTeam',
   runBehandling: 'runBehandling',
   sendTilManuellMedKontrollpunkt: 'sendTilManuellMedKontrollpunkt',
@@ -78,6 +80,8 @@ function operationHandlers(
     sendTilOppdragPaNytt: () => sendTilOppdragPaNytt(accessToken, behandlingId),
 
     stopp: () => stopp(accessToken, behandlingId),
+
+    godkjennOpprettelse: () => godkjennOpprettelse(accessToken, behandlingId),
 
     endrePlanlagtStartet: () => endrePlanlagtStartet(accessToken, behandlingId, String(form.get('nyPlanlagtStartet'))),
 

@@ -262,6 +262,25 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
+  function godkjennOpprettelse() {
+    if (hasLink('godkjennOpprettelse')) {
+      return (
+        <Tooltip content="Godkjenner opprettelse av behandlingen slik at prosessering starter">
+          <fetcher.Form method="post">
+            <Button
+              variant={'secondary'}
+              icon={<PlayIcon aria-hidden />}
+              name="operation"
+              value={OPERATION.godkjennOpprettelse}
+            >
+              Godkjenn opprettelse
+            </Button>
+          </fetcher.Form>
+        </Tooltip>
+      )
+    }
+  }
+
   function fortsettAvhengigeBehandlinger() {
     if (hasLink('fortsettAvhengigeBehandlinger')) {
       return (
@@ -535,6 +554,8 @@ export default function BehandlingCard(props: Props) {
 
         <HStack gap="space-16">
           {fortsettBehandling(props.behandling.planlagtStartet)}
+
+          {godkjennOpprettelse()}
 
           {fortsettAvhengigeBehandlinger()}
 

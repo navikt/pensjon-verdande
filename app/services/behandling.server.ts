@@ -313,6 +313,23 @@ export async function runBehandling(accessToken: string, behandlingId: string): 
   }
 }
 
+export async function godkjennOpprettelse(accessToken: string, behandlingId: string): Promise<void> {
+  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/godkjennOpprettelse`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw data(`Feil ved godkjenning av opprettelse av behandling. Feil var\n${text}`, {
+      status: response.status,
+    })
+  }
+}
+
 export async function stopp(accessToken: string, behandlingId: string): Promise<void> {
   const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/stopp`, {
     method: 'PUT',
