@@ -1,11 +1,10 @@
-import { BodyLong, Box, Button, DatePicker, Heading, Skeleton, TextField, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, Checkbox, CheckboxGroup, Heading, Skeleton, TextField, VStack } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
 import {
   type ActionFunctionArgs,
   Await,
   Form,
   type LoaderFunctionArgs,
-  redirect,
   useLoaderData,
   useNavigation,
 } from 'react-router'
@@ -37,17 +36,35 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
-  const updates = Object.fromEntries(formData)
+  const PENAFP = (formData.get('PENAFP') as string) === 'true'
+  const PENAFPP = (formData.get('PENAFPP') as string) === 'true'
+  const PENAP = (formData.get('PENAP') as string) === 'true'
+  const PENBP = (formData.get('PENBP') as string) === 'true'
+  const PENGJ = (formData.get('PENGJ') as string) === 'true'
+  const PENGY = (formData.get('PENGY') as string) === 'true'
+  const PENKP = (formData.get('PENKP') as string) === 'true'
+  const PENUP = (formData.get('PENUP') as string) === 'true'
+  const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
+  const avstemmingsperiodeStart = formData.get('fom') as string
+  const avstemmingsperiodeEnd = formData.get('tom') as string
   const accessToken = await requireAccessToken(request)
 
-  const response = await opprettAvstemmingGrensesnittBehandling(
+  await opprettAvstemmingGrensesnittBehandling(
     accessToken,
-    updates.underkomponentKode as string,
-    updates.avstemmingsperiodeStart as string,
-    updates.avstemmingsperiodeEnd as string,
+    PENAFP,
+    PENAFPP,
+    PENAP,
+    PENBP,
+    PENGJ,
+    PENGY,
+    PENKP,
+    PENUP,
+    UFOREUT,
+    avstemmingsperiodeStart,
+    avstemmingsperiodeEnd,
   )
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  return
 }
 
 export default function Avstemming() {
@@ -55,14 +72,9 @@ export default function Avstemming() {
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
-  const [underkomponentKode, setUnderkomponentKode] = useState<string | ''>('')
 
-  const year = new Date().getFullYear()
-  const month = new Date().getMonth() + 1
-  const day = new Date().getDate()
-  const defaultAvstemmingsdato = new Date(`${month} ${day - 1} ${year}`)
-  const [avstemmingsperiodeStart, setAvstemmingsperiodeStart] = useState<Date | undefined>(defaultAvstemmingsdato)
-  const [avstemmingsperiodeEnd, setAvstemmingsperiodeEnd] = useState<Date | undefined>(defaultAvstemmingsdato)
+  const [avstemmingsperiodeStart, setAvstemmingsperiodeStart] = useState<string | ''>('')
+  const [avstemmingsperiodeEnd, setAvstemmingsperiodeEnd] = useState<string | ''>('')
 
   return (
     <VStack gap={'4'}>
@@ -77,43 +89,63 @@ export default function Avstemming() {
 
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'4'}>
+          <CheckboxGroup legend="Underkomponentkoder" hideLegend={true}>
+            <Checkbox name={'PENAFP'} value={'true'}>
+              PENAFP
+            </Checkbox>
+            <Checkbox name={'PENAFPP'} value={'true'}>
+              PENAFPP
+            </Checkbox>
+            <Checkbox name={'PENAP'} value={'true'}>
+              PENAP
+            </Checkbox>
+            <Checkbox name={'PENBP'} value={'true'}>
+              PENBP
+            </Checkbox>
+            <Checkbox name={'PENGJ'} value={'true'}>
+              PENGJ
+            </Checkbox>
+            <Checkbox name={'PENGY'} value={'true'}>
+              PENGY
+            </Checkbox>
+            <Checkbox name={'PENKP'} value={'true'}>
+              PENKP
+            </Checkbox>
+            <Checkbox name={'PENUP'} value={'true'}>
+              PENUP
+            </Checkbox>
+            <Checkbox name={'UFOREUT'} value={'true'}>
+              UFOREUT
+            </Checkbox>
+          </CheckboxGroup>
           <TextField
-            label="Underkomponent-kode:"
-            name="underkomponentKode"
+            label="Avstemmingsperiode fom:"
+            name="fom"
             type="text"
-            placeholder="PENAP"
+            description={'(ÅÅÅÅ-MM-DD)'}
             onChange={(e) => {
               const v = e.currentTarget.value
-              setUnderkomponentKode(v === '' ? '' : v)
+              setAvstemmingsperiodeStart(v === '' ? '' : v)
             }}
-            value={underkomponentKode}
+            value={avstemmingsperiodeStart}
           />
-          Avstemmingsperiode start (fom):
-          <DatePicker.Standalone
-            selected={avstemmingsperiodeStart}
-            today={defaultAvstemmingsdato}
-            onSelect={setAvstemmingsperiodeStart}
-            fromDate={new Date(`1 Jan ${year - 1}`)}
-            toDate={defaultAvstemmingsdato}
-            dropdownCaption
-          />
-          Avstemmingsperiode end (tom):
-          <DatePicker.Standalone
-            selected={avstemmingsperiodeEnd}
-            today={defaultAvstemmingsdato}
-            onSelect={setAvstemmingsperiodeEnd}
-            fromDate={new Date(`1 Jan ${year - 1}`)}
-            toDate={defaultAvstemmingsdato}
-            dropdownCaption
+          <TextField
+            label="Avstemmingsperiode tom:"
+            name="tom"
+            type="text"
+            description={'(ÅÅÅÅ-MM-DD)'}
+            onChange={(e) => {
+              const v = e.currentTarget.value
+              setAvstemmingsperiodeEnd(v === '' ? '' : v)
+            }}
+            value={avstemmingsperiodeEnd}
           />
           <Button
             type="submit"
-            disabled={
-              underkomponentKode === '' || avstemmingsperiodeStart === undefined || avstemmingsperiodeEnd === undefined
-            }
+            disabled={avstemmingsperiodeStart === '' || avstemmingsperiodeEnd === ''}
             loading={isSubmitting}
           >
-            Opprett avstemming-behandling
+            Opprett avstemming-behandlinger
           </Button>
         </VStack>
       </Form>

@@ -2,24 +2,38 @@ import { env } from '~/services/env.server'
 
 export async function opprettAvstemmingGrensesnittBehandling(
   accessToken: string,
-  underkomponentKode: string,
+  PENAFP: boolean,
+  PENAFPP: boolean,
+  PENAP: boolean,
+  PENBP: boolean,
+  PENGJ: boolean,
+  PENGY: boolean,
+  PENKP: boolean,
+  PENUP: boolean,
+  UFOREUT: boolean,
   avstemmingsperiodeStart: string,
   avstemmingsperiodeEnd: string,
 ): Promise<StartAvstemmingResponse> {
-  const body = {
-    underkomponentKode: underkomponentKode,
-    avstemmingsperiodeStart: avstemmingsperiodeStart,
-    avstemmingsperiodeEnd: avstemmingsperiodeEnd,
-  }
-
-  const response = await fetch(`${env.penUrl}/api/avstemming/grensesnitt/start`, {
+  const response = await fetch(`${env.penUrl}/api/vedtak/avstemming/grensesnitt/start`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
       'X-Request-ID': crypto.randomUUID(),
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      penAfp: PENAFP,
+      penAfpp: PENAFPP,
+      penPenap: PENAP,
+      penPenbp: PENBP,
+      penPengj: PENGJ,
+      penPengy: PENGY,
+      penPenkp: PENKP,
+      penPenup: PENUP,
+      penUforeut: UFOREUT,
+      avstemmingsperiodeStart: avstemmingsperiodeStart,
+      avstemmingsperiodeEnd: avstemmingsperiodeEnd,
+    }),
   })
 
   if (response.ok) {
@@ -30,5 +44,5 @@ export async function opprettAvstemmingGrensesnittBehandling(
 }
 
 type StartAvstemmingResponse = {
-  behandlingId: number
+  behandlingIder: number[]
 }
