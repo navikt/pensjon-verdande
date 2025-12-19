@@ -110,6 +110,7 @@ export default [
         route('input', 'behandling/behandling.$behandlingId.input.tsx'),
         route('uttrekk', 'behandling/behandling.$behandlingId.uttrekk.tsx'),
         route('detaljertFremdrift', 'behandling/behandling.$behandlingId.detaljertFremdrift.tsx'),
+        route('relaterteFamiliebehandlinger', 'behandling/behandling.$behandlingId.relaterteFamiliebehandlinger.tsx'),
       ]),
 
       route('aktivitet/:aktivitetId', 'behandling/behandling.$behandlingId.aktivitet.$aktivitetId.tsx', [
