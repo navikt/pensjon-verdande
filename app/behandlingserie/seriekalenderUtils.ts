@@ -86,7 +86,7 @@ export function byggHelligdagsdata(includeNextYear: boolean) {
   return { holidayDates, yearMonthDaySet }
 }
 
-export function firstBusinessDayOnOrAfter(
+export function firstPossibleDayOnOrAfter(
   anchorDate: Date,
   holidaySet?: Set<string>,
   excludeWeekend: boolean = true,
