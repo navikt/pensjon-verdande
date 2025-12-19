@@ -500,19 +500,19 @@ export default function BehandlingOpprett_index() {
     }
 
     const monthStart = new Date(idag.getFullYear(), idag.getMonth(), 1)
-    const firstBusinessThisMonth = firstBusinessDayOnOrAfter(monthStart)
+    const firstBusinessThisMonth = firstBusinessDayOnOrAfter(monthStart, helligdagsdata.yearMonthDaySet)
     const includeCurrentMonth = isSameDay(idag, firstBusinessThisMonth) && timeAfterNowToday(valgtTid)
     const nextMonthStart = new Date(idag.getFullYear(), idag.getMonth() + 1, 1)
 
     const quarterStart = new Date(idag.getFullYear(), Math.floor(idag.getMonth() / 3) * 3, 1)
-    const firstBusinessThisQuarter = firstBusinessDayOnOrAfter(quarterStart)
+    const firstBusinessThisQuarter = firstBusinessDayOnOrAfter(quarterStart, helligdagsdata.yearMonthDaySet)
     const includeCurrentQuarter = isSameDay(idag, firstBusinessThisQuarter) && timeAfterNowToday(valgtTid)
     const nextQuarterStart = new Date(quarterStart.getFullYear(), quarterStart.getMonth() + 3, 1)
 
     const tertialAnchorMonths = [0, 4, 8]
     const currentTertialMonth = tertialAnchorMonths.reduce((p, m) => (idag.getMonth() >= m ? m : p), 0)
     const tertialStart = new Date(idag.getFullYear(), currentTertialMonth, 1)
-    const firstBusinessThisTertial = firstBusinessDayOnOrAfter(tertialStart)
+    const firstBusinessThisTertial = firstBusinessDayOnOrAfter(tertialStart, helligdagsdata.yearMonthDaySet)
     const includeCurrentTertial = isSameDay(idag, firstBusinessThisTertial) && timeAfterNowToday(valgtTid)
     const nextTertialStart = new Date(tertialStart.getFullYear(), tertialStart.getMonth() + 4, 1)
 
@@ -521,16 +521,20 @@ export default function BehandlingOpprett_index() {
     if (dagvalgModus === 'first-weekday') {
       if (intervallModus === 'quarterly') {
         const base = includeCurrentQuarter ? quarterStart : nextQuarterStart
-        datoer = quarterlyStartDates(base, horisontSlutt).map((start) => firstBusinessDayOnOrAfter(start))
+        datoer = quarterlyStartDates(base, horisontSlutt).map((start) =>
+          firstBusinessDayOnOrAfter(start, helligdagsdata.yearMonthDaySet),
+        )
       } else if (intervallModus === 'tertial') {
         const base = includeCurrentTertial ? tertialStart : nextTertialStart
-        datoer = tertialStartDates(base, horisontSlutt).map((start) => firstBusinessDayOnOrAfter(start))
+        datoer = tertialStartDates(base, horisontSlutt).map((start) =>
+          firstBusinessDayOnOrAfter(start, helligdagsdata.yearMonthDaySet),
+        )
       } else if (maanedsSteg) {
         const m = parseInt(maanedsSteg, 10)
         if (m > 0) {
           const base = includeCurrentMonth ? monthStart : nextMonthStart
           const starts = monthlyAnchoredStartDates(base, m, horisontSlutt)
-          datoer = starts.map((start) => firstBusinessDayOnOrAfter(start))
+          datoer = starts.map((start) => firstBusinessDayOnOrAfter(start, helligdagsdata.yearMonthDaySet))
         }
       }
     } else {
@@ -559,7 +563,17 @@ export default function BehandlingOpprett_index() {
         : datoer
 
     setUtvalg(endeligeDatoer)
-  }, [regelmessighet, dagvalgModus, valgtUkedag, maanedsSteg, intervallModus, ekskluderHelg, horisontSlutt, valgtTid])
+  }, [
+    regelmessighet,
+    dagvalgModus,
+    valgtUkedag,
+    maanedsSteg,
+    intervallModus,
+    ekskluderHelg,
+    horisontSlutt,
+    valgtTid,
+    helligdagsdata.yearMonthDaySet,
+  ])
 
   const oppdaterBehandlingType = useCallback(
     (value: string) => {

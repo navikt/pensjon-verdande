@@ -86,9 +86,11 @@ export function byggHelligdagsdata(includeNextYear: boolean) {
   return { holidayDates, yearMonthDaySet }
 }
 
-export function firstBusinessDayOnOrAfter(anchorDate: Date): Date {
+export function firstBusinessDayOnOrAfter(anchorDate: Date, holidaySet?: Set<string>): Date {
   let currentDate = startOfDay(anchorDate)
-  while (isWeekend(currentDate)) currentDate = addDays(currentDate, 1)
+  while (isWeekend(currentDate) || (holidaySet?.has(toYearMonthDay(currentDate)) ?? false)) {
+    currentDate = addDays(currentDate, 1)
+  }
   return currentDate
 }
 
