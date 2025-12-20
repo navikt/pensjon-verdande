@@ -1,4 +1,15 @@
-import { BodyLong, Box, Button, Checkbox, CheckboxGroup, Heading, Skeleton, TextField, VStack } from '@navikt/ds-react'
+import {
+  BodyLong,
+  Box,
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Detail,
+  Heading,
+  Skeleton,
+  TextField,
+  VStack,
+} from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
 import {
   type ActionFunctionArgs,
@@ -83,38 +94,42 @@ export default function Avstemming() {
           Opprett avstemming
         </Heading>
         <VStack gap="2">
-          <BodyLong>Oppretter avstemming mot Oppdrag</BodyLong>
+          <BodyLong>Oppretter behandlinger for grensesnittavstemming mot Oppdrag</BodyLong>
+          <Detail>
+            Avstemmingsperiode fom settes til starten av angitt dag. Avstemmingsperiode tom settes til slutten av angitt
+            dag. For å avstemme for én dag skal altså fom og tom være satt til samme dag.
+          </Detail>
         </VStack>
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'4'}>
-          <CheckboxGroup legend="Underkomponentkoder" hideLegend={true}>
-            <Checkbox name={'PENAFP'} value={'true'}>
+          <CheckboxGroup legend="Underkomponentkoder">
+            <Checkbox name={'PENAFP'} value={'true'} defaultChecked={true}>
               PENAFP
             </Checkbox>
-            <Checkbox name={'PENAFPP'} value={'true'}>
+            <Checkbox name={'PENAFPP'} value={'true'} defaultChecked={true}>
               PENAFPP
             </Checkbox>
-            <Checkbox name={'PENAP'} value={'true'}>
+            <Checkbox name={'PENAP'} value={'true'} defaultChecked={true}>
               PENAP
             </Checkbox>
-            <Checkbox name={'PENBP'} value={'true'}>
+            <Checkbox name={'PENBP'} value={'true'} defaultChecked={true}>
               PENBP
             </Checkbox>
-            <Checkbox name={'PENGJ'} value={'true'}>
+            <Checkbox name={'PENGJ'} value={'true'} defaultChecked={true}>
               PENGJ
             </Checkbox>
-            <Checkbox name={'PENGY'} value={'true'}>
+            <Checkbox name={'PENGY'} value={'true'} defaultChecked={true}>
               PENGY
             </Checkbox>
-            <Checkbox name={'PENKP'} value={'true'}>
+            <Checkbox name={'PENKP'} value={'true'} defaultChecked={true}>
               PENKP
             </Checkbox>
-            <Checkbox name={'PENUP'} value={'true'}>
+            <Checkbox name={'PENUP'} value={'true'} defaultChecked={true}>
               PENUP
             </Checkbox>
-            <Checkbox name={'UFOREUT'} value={'true'}>
+            <Checkbox name={'UFOREUT'} value={'true'} defaultChecked={true}>
               UFOREUT
             </Checkbox>
           </CheckboxGroup>
