@@ -3,7 +3,7 @@ import { env } from '~/services/env.server'
 export const hentPersonDetaljer = async (
   accessToken: string,
   sakId: string,
-): Promise<PersonDetalj[] | null> => {
+): Promise<PersonDetaljForVedlikehold[] | null> => {
   const response = await fetch(`${env.penUrl}/api/behandling/barngrunnlag/${sakId}`, {
     method: 'GET',
     headers: {
@@ -12,14 +12,12 @@ export const hentPersonDetaljer = async (
       'X-Request-ID': crypto.randomUUID(),
     },
   })
-  console.log(response)
   if (response.ok) {
     const text = await response.text()
     if (!text || text.trim() === '') {
       return []
     }
-    console.log(JSON.parse(text))
-    return JSON.parse(text) as PersonDetalj[]
+    return JSON.parse(text) as PersonDetaljForVedlikehold[]
   } else {
     return null
   }
@@ -27,7 +25,7 @@ export const hentPersonDetaljer = async (
 
 export const oppdaterPersonDetalj = async (
   accessToken: string,
-  personDetalj: PersonDetalj,
+  personDetalj: PersonDetaljForVedlikehold[],
 ): Promise<void> => {
   const response = await fetch(`${env.penUrl}/api/behandling/barngrunnlag`, {
     method: 'PUT',
@@ -44,12 +42,14 @@ export const oppdaterPersonDetalj = async (
   }
 }
 
-export type PersonDetalj = {
+export type PersonDetaljForVedlikehold = {
   personDetaljId: string,
+  persongrunnlagId: string,
   fnr: string,
   annenForelder: string,
   rolleFom: string,
   rolleTom?: string,
+  vurdertTilBarnetillegg: boolean,
   kilde: string,
   bruk: boolean,
 }
