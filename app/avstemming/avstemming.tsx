@@ -131,7 +131,7 @@ export default function Avstemming() {
 
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'4'}>
-          <CheckboxGroup legend="Underkomponentkoder">
+          <CheckboxGroup legend="Fagområder">
             <Checkbox name={'PENAFP'} value={'true'} defaultChecked={true}>
               PENAFP
             </Checkbox>
