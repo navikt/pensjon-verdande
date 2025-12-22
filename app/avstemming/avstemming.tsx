@@ -78,6 +78,33 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return
 }
 
+function areDatesValid(dateFom: string, dateTom: string) {
+  if (
+    // Sjekk at format er YYYY-MM-DD
+    !dateFom.match(/\d{4}-\d{2}-\d{2}/) ||
+    !dateTom.match(/\d{4}-\d{2}-\d{2}/)
+  ) {
+    return false
+  }
+
+  const today = new Date()
+  const minimumDate = new Date(new Date().setFullYear(today.getFullYear() - 1))
+  const inputFom = new Date(dateFom)
+  const inputTom = new Date(dateTom)
+  if (!Number.isNaN(inputFom.getTime()) && !Number.isNaN(inputTom.getTime())) {
+    // Sjekk at input er gyldig dato
+    if (inputFom < minimumDate) {
+      // Sjekk at dato ikke er for langt tilbake i tid
+      return false
+    } else if (inputFom > today) {
+      // Sjekk at dato ikke er i framtiden
+      return false
+    } else return inputFom <= inputTom // Sjekk at ikke fom er etter tom
+  } else {
+    return false
+  }
+}
+
 export default function Avstemming() {
   const { behandlinger } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
@@ -157,7 +184,11 @@ export default function Avstemming() {
           />
           <Button
             type="submit"
-            disabled={avstemmingsperiodeStart === '' || avstemmingsperiodeEnd === ''}
+            disabled={
+              avstemmingsperiodeStart === '' ||
+              avstemmingsperiodeEnd === '' ||
+              !areDatesValid(avstemmingsperiodeStart, avstemmingsperiodeEnd)
+            }
             loading={isSubmitting}
           >
             Opprett avstemming-behandlinger
