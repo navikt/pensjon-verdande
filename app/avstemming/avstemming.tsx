@@ -91,13 +91,14 @@ function areDatesValid(dateFom: string, dateTom: string) {
   const minimumDate = new Date(new Date().setFullYear(today.getFullYear() - 1))
   const inputFom = new Date(dateFom)
   const inputTom = new Date(dateTom)
+
+  // Sjekk at input er gyldig dato
   if (!Number.isNaN(inputFom.getTime()) && !Number.isNaN(inputTom.getTime())) {
-    // Sjekk at input er gyldig dato
+    // Sjekk at dato ikke er for langt tilbake i tid
     if (inputFom < minimumDate) {
-      // Sjekk at dato ikke er for langt tilbake i tid
       return false
     } else if (inputFom > today) {
-      // Sjekk at dato ikke er i framtiden
+      // Sjekk at ikke i framtiden
       return false
     } else return inputFom <= inputTom // Sjekk at ikke fom er etter tom
   } else {
