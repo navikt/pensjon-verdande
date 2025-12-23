@@ -24,6 +24,8 @@ export default [
 
     route('audit', 'audit/audit.index.tsx'),
 
+    route('avstemming', 'avstemming/avstemming.tsx'),
+
     route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx'),
 
     route('batch/regulering', 'regulering/batch.regulering.tsx', [
