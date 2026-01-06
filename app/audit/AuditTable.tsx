@@ -4,6 +4,7 @@ import type { AuditSortState, BehandlingAuditDTO, PageDTO } from '~/audit/audit.
 import { formatDate } from '~/common/date'
 import { decodeBehandlingStatus } from '~/common/decode'
 import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
+import { linkifyText } from '~/common/linkifyText'
 
 export function AuditTable({
   page,
@@ -60,7 +61,7 @@ export function AuditTable({
                   <Heading size="small" level="3">
                     Begrunnelse
                   </Heading>
-                  <BodyShort>{row.begrunnelse ?? '—'}</BodyShort>
+                  <BodyShort>{row.begrunnelse ? linkifyText(row.begrunnelse) : '—'}</BodyShort>
                 </VStack>
 
                 <VStack>
