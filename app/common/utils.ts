@@ -21,3 +21,7 @@ export function subdomain(url: URL): string | undefined {
   const host = url.host.toLowerCase()
   return ['ansatt', 'intern'].find((k) => host.includes(k))
 }
+
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object'
+}

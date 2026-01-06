@@ -17,7 +17,7 @@ import type { JSX } from 'react'
 import { useState } from 'react'
 import { NavLink } from 'react-router'
 import type { MeResponse } from '~/brukere/brukere'
-
+import { BEHANDLING_STATUS_MAP } from '~/common/decode'
 import styles from './venstre-meny.module.css'
 
 export type Props = {
@@ -34,7 +34,7 @@ const administrasjonMeny = [
   ['LAASTE_VEDTAK', `/laaste-vedtak`, 'Låste vedtak'],
   ['LINKE_DNR_TIL_FNR', `/linke-dnr-fnr`, 'Linke Dnr Fnr'],
   ['VERIFISER_ANTALL_FRA_MOT', `/leveattester-sokos-spkmottak`, 'Verifiser antall fra MOT'],
-  ['OPPDATER_BARN_BRUK', '/vedlikehold-barn', 'Vedlikehold barn']
+  ['OPPDATER_BARN_BRUK', '/vedlikehold-barn', 'Vedlikehold barn'],
 ]
 
 const batcherMeny = [
@@ -74,12 +74,8 @@ const omregningMeny = [
 const behandlingerMeny = [
   ['SE_BEHANDLINGER', '/behandlinger', 'Alle behandlinger'],
   ['SE_BEHANDLINGER', '/alderspensjon/forstegangsbehandling/soknader', 'Alderspensjonssøknader'],
-  ['SE_BEHANDLINGER', '/behandlinger/DEBUG', 'I debug'],
-  ['SE_BEHANDLINGER', '/behandlinger/FEILENDE', 'Feilende'],
-  ['SE_BEHANDLINGER', '/behandlinger/FULLFORT', 'Fullførte'],
-  ['SE_BEHANDLINGER', '/behandlinger/OPPRETTET', 'Opprettet'],
-  ['SE_BEHANDLINGER', '/behandlinger/STOPPET', 'Stoppede'],
-  ['SE_BEHANDLINGER', '/behandlinger/UNDER_BEHANDLING', 'Under behandling'],
+
+  ...Object.entries(BEHANDLING_STATUS_MAP).map(([key, label]) => ['SE_BEHANDLINGER', `/behandlinger/${key}`, label]),
 ]
 
 export function harTilgang(me: MeResponse | undefined, operasjon: string) {

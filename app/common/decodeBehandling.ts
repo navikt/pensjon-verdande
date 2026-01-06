@@ -1,7 +1,7 @@
+import type { BehandlingDto } from '~/types'
+
 function splitOnCapitals(input: string): string {
-  const parts = input.match(
-    /[A-ZÆØÅ]{2}(?=[A-ZÆØÅ][a-zæøå])|[A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+|[a-zæøå]+/g,
-  )
+  const parts = input.match(/[A-ZÆØÅ]{2}(?=[A-ZÆØÅ][a-zæøå])|[A-ZÆØÅ]{2,}|[A-ZÆØÅ][a-zæøå]+|[a-zæøå]+/g)
 
   if (!parts) {
     return input
@@ -40,6 +40,7 @@ const oversettinger = [
   ['IverksettOmsorgspoengBehandling', 'Iverksett omsorgspoeng'],
   ['IverksettVedtakBehandling', 'Iverksett vedtak'],
   ['OppdaterFodselsnummerBehandling', 'Oppdater fødselsnummer'],
+  ['OpptjeningsendringUforeBehandling', 'Opptjeningsendring uføre'],
   ['OverforOmsorgspoengBehandling', 'Overfør omsorgspoeng'],
   ['RekonverterUpTilUtBehandling', 'Rekonverter uførepensjon til uføretrygd'],
   ['TilbakekrevingEtteroppgjorUTBehandling', 'Tilbakekreving etteroppgjør uføretrygd'],
@@ -47,7 +48,9 @@ const oversettinger = [
   ['UtvandringAnnulleringMeldingBehandling', 'Annulert utvandringsmelding'],
   ['UtvandringMeldingBehandling', 'Utvandringsmelding'],
 ]
-export function decodeBehandling(string: string) {
+export function decodeBehandling(behandling: string | BehandlingDto) {
+  const string: string = typeof behandling === 'string' ? behandling : behandling.type
+
   const oversetting = oversettinger.find((value) => value[0] === string)
   return oversetting ? oversetting[1] : splitOnCapitals(string.replace(/Behandling$/, ''))
 }

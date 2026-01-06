@@ -1,5 +1,10 @@
 {
-  "include": [".react-router/types/**/*", "**/*.ts", "**/*.tsx", "types/**/*.d.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "types/**/*.d.ts",
+    ".react-router/types/**/*"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "module": "ES2022",

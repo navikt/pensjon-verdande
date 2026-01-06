@@ -1,4 +1,4 @@
-const BEHANDLING_STATUS_MAP = {
+export const BEHANDLING_STATUS_MAP = {
   DEBUG: 'Debug',
   FEILENDE: 'Feilende',
   FULLFORT: 'Fullført',

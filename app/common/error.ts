@@ -1,4 +1,5 @@
 import { isRouteErrorResponse } from 'react-router'
+import { isRecord } from '~/common/utils'
 import type { NormalizedError } from '~/services/api.server'
 
 declare class DataWithResponseInit<D> {
@@ -7,7 +8,6 @@ declare class DataWithResponseInit<D> {
   init: ResponseInit | null
   constructor(data: D, init?: ResponseInit)
 }
-const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null
 
 export function isDataWithResponseInit<D = unknown>(value: unknown): value is DataWithResponseInit<D> {
   if (!isRecord(value)) return false
