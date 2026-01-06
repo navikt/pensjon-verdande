@@ -1,29 +1,38 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs, useFetcher, useSearchParams } from 'react-router'
 import { BodyLong, Button, Checkbox, Heading, HStack, Modal, Table, TextField, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { hentPersonDetaljer, oppdaterPersonDetalj, type PersonDetaljForVedlikehold } from '~/uforetrygd/vedlikehold-barn.server'
-import { requireAccessToken } from '~/services/auth.server'
+import {apiGet, apiPut} from "~/services/api.server";
+
+export type PersonDetaljForVedlikehold = {
+  personDetaljId: string,
+  persongrunnlagId: string,
+  fnr: string,
+  annenForelder: string,
+  rolleFom: string,
+  rolleTom?: string,
+  vurdertTilBarnetillegg: boolean,
+  kilde: string,
+  bruk: boolean,
+}
 
 // GET
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url)
   const sakId = url.searchParams.get('sakId')
-  const accessToken = await requireAccessToken(request)
 
   if (!sakId) {
     return null
   }
 
-  return await hentPersonDetaljer(accessToken, sakId)
+  return await apiGet<PersonDetaljForVedlikehold[]>(`api/behandling/barngrunnlag/${sakId}`, request)
 }
 
 // PUT
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData()
   const personDetalj = JSON.parse(formData.get('personDetalj') as string) as PersonDetaljForVedlikehold[]
-  const accessToken = await requireAccessToken(request)
 
-  await oppdaterPersonDetalj(accessToken, personDetalj)
+  await apiPut('/api/behandling/barngrunnlag', personDetalj, request)
 }
 
 export default function VedlikeholdBarnPage() {
