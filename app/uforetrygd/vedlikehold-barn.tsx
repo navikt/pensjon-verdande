@@ -1,18 +1,18 @@
-import { type ActionFunctionArgs, type LoaderFunctionArgs, useFetcher, useSearchParams } from 'react-router'
 import { BodyLong, Button, Checkbox, Heading, HStack, Modal, Table, TextField, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import {apiGet, apiPut} from "~/services/api.server";
+import { type ActionFunctionArgs, type LoaderFunctionArgs, useFetcher, useSearchParams } from 'react-router'
+import { apiGet, apiPut } from '~/services/api.server'
 
 export type PersonDetaljForVedlikehold = {
-  personDetaljId: string,
-  persongrunnlagId: string,
-  fnr: string,
-  annenForelder: string,
-  rolleFom: string,
-  rolleTom?: string,
-  vurdertTilBarnetillegg: boolean,
-  kilde: string,
-  bruk: boolean,
+  personDetaljId: string
+  persongrunnlagId: string
+  fnr: string
+  annenForelder: string
+  rolleFom: string
+  rolleTom?: string
+  vurdertTilBarnetillegg: boolean
+  kilde: string
+  bruk: boolean
 }
 
 // GET
@@ -45,25 +45,20 @@ export default function VedlikeholdBarnPage() {
 
     if (personer) {
       if (personer.find((p) => p.personDetaljId === oppdatertPerson.personDetaljId)) {
-        setPersoner((allePersoner) => allePersoner?.map((p) =>
-          p.personDetaljId === oppdatertPerson.personDetaljId ? oppdatertPerson : p,
-        ))
+        setPersoner((allePersoner) =>
+          allePersoner?.map((p) => (p.personDetaljId === oppdatertPerson.personDetaljId ? oppdatertPerson : p)),
+        )
       } else {
         setPersoner((personer) => personer && [...personer, oppdatertPerson])
       }
     }
   }
 
-
   const lagreOgSendInn = () => {
     setÅpen(false)
 
-    putFetcher.submit(
-      { personDetalj: JSON.stringify(personer) },
-      { method: 'PUT' },
-    )
+    putFetcher.submit({ personDetalj: JSON.stringify(personer) }, { method: 'PUT' })
   }
-
 
   return (
     <VStack gap="5" style={{ maxWidth: '75em', margin: '2em' }}>
@@ -89,37 +84,43 @@ export default function VedlikeholdBarnPage() {
             </Table.Header>
             <Table.Body>
               {personer.map((person) => (
-                  <Table.Row key={person.personDetaljId}>
-                    <Table.DataCell>{person.personDetaljId}</Table.DataCell>
-                    <Table.DataCell>{person.persongrunnlagId}</Table.DataCell>
-                    <Table.DataCell>{person.fnr}</Table.DataCell>
-                    <Table.DataCell>{person.rolleFom}</Table.DataCell>
-                    <Table.DataCell>{person.rolleTom}</Table.DataCell>
-                    <Table.DataCell>{person.annenForelder}</Table.DataCell>
-                    <Table.DataCell>{person.vurdertTilBarnetillegg ? 'Ja' : 'Nei'}</Table.DataCell>
-                    <Table.DataCell>{person.kilde}</Table.DataCell>
-                    <Table.DataCell>
-                      <Checkbox
-                        checked={person.bruk}
-                        onChange={(e) => endreBruk(person, e.target.checked)}>{''}
-                      </Checkbox>
-                    </Table.DataCell>
-                  </Table.Row>
-                ),
-              )}
+                <Table.Row key={person.personDetaljId}>
+                  <Table.DataCell>{person.personDetaljId}</Table.DataCell>
+                  <Table.DataCell>{person.persongrunnlagId}</Table.DataCell>
+                  <Table.DataCell>{person.fnr}</Table.DataCell>
+                  <Table.DataCell>{person.rolleFom}</Table.DataCell>
+                  <Table.DataCell>{person.rolleTom}</Table.DataCell>
+                  <Table.DataCell>{person.annenForelder}</Table.DataCell>
+                  <Table.DataCell>{person.vurdertTilBarnetillegg ? 'Ja' : 'Nei'}</Table.DataCell>
+                  <Table.DataCell>{person.kilde}</Table.DataCell>
+                  <Table.DataCell>
+                    <Checkbox checked={person.bruk} onChange={(e) => endreBruk(person, e.target.checked)}>
+                      {''}
+                    </Checkbox>
+                  </Table.DataCell>
+                </Table.Row>
+              ))}
             </Table.Body>
           </Table>
           <LagreOgSendInnModal lagre={lagreOgSendInn} avbryt={() => setÅpen(false)} åpen={åpen} />
-          <Button onClick={() => setÅpen(true)} style={{ alignSelf: 'start' }}
-                  loading={putFetcher.state == 'submitting'}>Lagre</Button>
+          <Button
+            onClick={() => setÅpen(true)}
+            style={{ alignSelf: 'start' }}
+            loading={putFetcher.state === 'submitting'}
+          >
+            Lagre
+          </Button>
         </>
       )}
     </VStack>
   )
 }
 
-
-function HentPersonDetaljer({ onLoad }: { onLoad: (personDetaljer: PersonDetaljForVedlikehold[] | null | undefined) => void }) {
+function HentPersonDetaljer({
+  onLoad,
+}: {
+  onLoad: (personDetaljer: PersonDetaljForVedlikehold[] | null | undefined) => void
+}) {
   const [searchParams, setSearchParams] = useSearchParams()
   const sakIdParam = searchParams.get('sakId')
   const [sakId, setSakId] = useState<string>(sakIdParam ?? '')
@@ -130,7 +131,7 @@ function HentPersonDetaljer({ onLoad }: { onLoad: (personDetaljer: PersonDetaljF
       setSearchParams({ sakId: sakId })
       fetcher.load(`?sakId=${sakId}`)
     }
-  }, [fetcher.data, fetcher.state, sakIdParam, sakId, setSearchParams])
+  }, [fetcher.data, fetcher.state, sakIdParam, sakId, setSearchParams, fetcher.load])
 
   useEffect(() => {
     onLoad(fetcher.data as PersonDetaljForVedlikehold[] | null | undefined)
@@ -163,8 +164,8 @@ function HentPersonDetaljer({ onLoad }: { onLoad: (personDetaljer: PersonDetaljF
 }
 
 interface LagreOgSendInnModalProps {
-  lagre: () => void,
-  avbryt: () => void,
+  lagre: () => void
+  avbryt: () => void
   åpen: boolean
 }
 
@@ -172,19 +173,13 @@ function LagreOgSendInnModal({ lagre, avbryt, åpen }: LagreOgSendInnModalProps)
   return (
     <Modal open={åpen} onClose={avbryt} header={{ heading: 'Er du sikker?', closeButton: false }}>
       <Modal.Body>
-        <BodyLong>
-          Endringer kan påvirke brukers ytelse eller gi inkonsistent datagrunnlag.
-        </BodyLong>
+        <BodyLong>Endringer kan påvirke brukers ytelse eller gi inkonsistent datagrunnlag.</BodyLong>
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={lagre}>
           Lagre
         </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={avbryt}
-        >
+        <Button type="button" variant="secondary" onClick={avbryt}>
           Avbryt
         </Button>
       </Modal.Footer>
