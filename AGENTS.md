@@ -85,6 +85,14 @@ Repoet bruker Lefthook (`lefthook.yml`). Hvis hooks feiler: kjør samme kommando
   - Fang i `loader` via `try/catch`
   - Bruk `toNormalizedError(e)?.status` for å avgjøre flyt
 
+### Imports (unngå dynamisk import i routes)
+- **Unngå** `await import(...)` inne i `loader`/`action` med mindre du har en tydelig, dokumentert grunn.
+  - I praksis gir det ofte **ingen** chunk-/bundle-gevinst i dette repoet, og kan trigge Vite-advarsel om at en modul er både dynamisk og statisk importert.
+- Foretrekk **statiske imports** på toppnivå:
+  - `import { requireAccessToken } from '~/services/auth.server'`
+  - `import { someServerFn } from '~/.../*.server'`
+- Unntak: Moduler som *må* lazy-loades og som **ikke** er statisk importert andre steder (må verifiseres), eller spesielle runtime-behov.
+
 ## API-kall (server-side)
 - Foretrekk metodene i `app/services/api.server.ts` (`apiGet`, `apiPost`, `apiGetOrUndefined`, `apiGetRawStringOrUndefined`) fremfor å bruke `fetch` direkte.
   - Gir konsistent auth (`requireAccessToken`), tidsavbrudd, headers og feilnormalisering via `normalizeAndThrow`.

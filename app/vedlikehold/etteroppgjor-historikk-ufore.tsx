@@ -1,5 +1,7 @@
 import { Alert, Button, Heading, TextField, VStack } from '@navikt/ds-react'
 import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
+import { requireAccessToken } from '~/services/auth.server'
+import { ugyldiggjorEtteroppgjorHistorikkUfore } from '~/vedlikehold/vedlikehold.server'
 
 type ActionData = {
   success: boolean
@@ -9,9 +11,6 @@ type ActionData = {
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { requireAccessToken } = await import('~/services/auth.server')
-  const { ugyldiggjorEtteroppgjorHistorikkUfore } = await import('./vedlikehold.server')
-
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const sakId = Number(formData.get('sakId'))

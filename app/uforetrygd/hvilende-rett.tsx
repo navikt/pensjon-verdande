@@ -1,5 +1,7 @@
 import { Alert, Button, Heading, TextField, VStack } from '@navikt/ds-react'
 import { type ActionFunctionArgs, Form, redirect, useActionData, useNavigation } from 'react-router'
+import { requireAccessToken } from '~/services/auth.server'
+import { opprettHvilendeRettVarselbrevBehandlinger } from '~/uforetrygd/hvilende-rett.server'
 
 type ActionData = {
   success: boolean
@@ -7,9 +9,6 @@ type ActionData = {
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { requireAccessToken } = await import('~/services/auth.server')
-  const { opprettHvilendeRettVarselbrevBehandlinger } = await import('~/uforetrygd/hvilende-rett.server')
-
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const senesteHvilendeAr = Number(formData.get('senesteHvilendeAr'))
