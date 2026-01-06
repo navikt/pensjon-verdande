@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return null
   }
 
-  return await apiGet<PersonDetaljForVedlikehold[]>(`api/behandling/barngrunnlag/${sakId}`, request)
+  return await apiGet<PersonDetaljForVedlikehold[]>(`/api/behandling/barngrunnlag/${sakId}`, request)
 }
 
 // PUT
