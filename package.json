@@ -6,11 +6,17 @@
   "scripts": {
     "build": "react-router build",
     "build:server": "tsc --project server/tsconfig.json",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
     "dev": "react-router dev",
     "fetch-secrets": "./fetch-secrets.sh",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "node scripts/copy-server-dts.ts && react-router typegen && tsc",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "node scripts/copy-server-dts.ts && react-router typegen && tsc"
   },
   "prettier": {
     "trailingComma": "all",
@@ -47,7 +53,7 @@
     "zod-form-data": "^3.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.7",
+    "@biomejs/biome": "2.3.11",
     "@react-router/dev": "^7.10.1",
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.5",
