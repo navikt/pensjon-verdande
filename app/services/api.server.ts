@@ -34,13 +34,20 @@ async function apiFetch<T>(
   path: string,
   requestCtx: RequestCtx | Request,
   parse: (res: Response) => Promise<T>,
-  opts?: { allow404AsUndefined?: boolean },
+  opts?: { allow404AsUndefined?: boolean; body?: unknown },
 ): Promise<T | undefined> {
   const ctx = await resolveCtx(requestCtx)
   const url = `${env.penUrl}${path}`
   const { signal, cancel } = withTimeout(15_000)
   try {
-    const res = await fetch(url, { headers: buildHeaders(ctx), signal })
+    const headers: HeadersInit = { ...buildHeaders(ctx) }
+    const init: RequestInit = { headers, signal, method }
+    if (opts?.body !== undefined) {
+      // JSON body
+      ;(headers as Record<string, string>)['Content-Type'] = 'application/json'
+      init.body = JSON.stringify(opts.body)
+    }
+    const res = await fetch(url, init)
 
     if (opts?.allow404AsUndefined && res.status === 404) {
       return undefined
@@ -80,6 +87,30 @@ export async function apiGetRawStringOrUndefined(
   requestCtx: RequestCtx | Request,
 ): Promise<string | undefined> {
   return apiFetch<string>('GET', path, requestCtx, (res) => res.text(), { allow404AsUndefined: true })
+}
+
+export async function apiPost<T>(
+  path: string,
+  body: unknown,
+  requestCtx: RequestCtx | Request,
+): Promise<T | undefined> {
+  return apiFetch<T | undefined>('POST', path, requestCtx, (res) => parseJsonOrUndefined<T>(res), { body })
+}
+
+export async function apiPut<T>(path: string, body: unknown, requestCtx: RequestCtx | Request): Promise<T | undefined> {
+  return apiFetch<T | undefined>('PUT', path, requestCtx, (res) => parseJsonOrUndefined<T>(res), { body })
+}
+
+export async function apiPatch<T>(
+  path: string,
+  body: unknown,
+  requestCtx: RequestCtx | Request,
+): Promise<T | undefined> {
+  return apiFetch<T | undefined>('PATCH', path, requestCtx, (res) => parseJsonOrUndefined<T>(res), { body })
+}
+
+export async function apiDelete<T>(path: string, requestCtx: RequestCtx | Request): Promise<T | undefined> {
+  return apiFetch<T | undefined>('DELETE', path, requestCtx, (res) => parseJsonOrUndefined<T>(res))
 }
 
 export type NormalizedError = {
@@ -187,4 +218,11 @@ function normalizeErrorBody(response: Response, body: unknown, fallbackTitle: st
     title: response.statusText || fallbackTitle,
     raw: body,
   }
+}
+
+async function parseJsonOrUndefined<T>(res: Response): Promise<T | undefined> {
+  if (res.status === 204) return undefined
+  const text = await res.text()
+  if (!text || text.trim() === '') return undefined
+  return JSON.parse(text) as T
 }
