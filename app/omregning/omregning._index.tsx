@@ -269,15 +269,7 @@ export default function BatchOpprett_index() {
               href="https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlinger/Felles/Omregning.html"
               target="_blank"
             >
-              Dokumentasjon lokal pc
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlinger/Felles/Omregning.html"
-              target="_blank"
-            >
-              Dokumentasjon driftimage
+              Dokumentasjon
             </Link>
           </li>
         </ul>
