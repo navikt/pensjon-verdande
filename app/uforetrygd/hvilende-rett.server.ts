@@ -14,6 +14,7 @@ export async function opprettHvilendeRettVarselbrevBehandlinger(senesteHvilendeA
 export async function opprettHvilendeRettOpphorBehandlinger(
   senesteHvilendeAr: number,
   sakIdListe: number[],
+  dryRun: boolean,
   request: Request,
 ) {
   return await apiPost<HvilendeRettBehandlingResponse>(
@@ -21,6 +22,7 @@ export async function opprettHvilendeRettOpphorBehandlinger(
     {
       senesteHvilendeAr,
       sakIdListe,
+      dryRun,
     },
     request,
   )

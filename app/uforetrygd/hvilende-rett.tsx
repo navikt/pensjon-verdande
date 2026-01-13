@@ -1,6 +1,6 @@
-import { Button, Heading, TextField, VStack } from '@navikt/ds-react'
+import { Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { type ActionFunctionArgs, Form, redirect, useNavigation } from 'react-router'
-import { parseSakIds, SakIdTextField } from '~/uforetrygd/components/input/SakIdTextField'
+import { parseSakIds, SakIdTextArea } from '~/uforetrygd/components/input/SakIdTextArea'
 import {
   opprettHvilendeRettOpphorBehandlinger,
   opprettHvilendeRettVarselbrevBehandlinger,
@@ -25,6 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
     response = await opprettHvilendeRettOpphorBehandlinger(
       Number(formData.senesteHvilendeAr),
       parseSakIds(formData.sakIds),
+      formData.dryRun === 'true',
       request,
     )
   }
@@ -37,7 +38,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function HvilendeRettPage() {
   const navigation = useNavigation()
-
   const isSubmitting = navigation.state === 'submitting'
 
   return (
@@ -62,19 +62,24 @@ export default function HvilendeRettPage() {
       </VStack>
 
       <VStack gap="5">
-        <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygdetest</Heading>
+        <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
 
-        <Form method="post" style={{ width: '10em' }}>
+        <Form method="post" style={{ width: '50em' }}>
           <VStack gap={'4'}>
+            <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
+              <option value="true">Ja</option>
+              <option value="false">Nei</option>
+            </Select>
             <TextField
+              style={{ width: '10em' }}
               label="Seneste hvilende år:"
               aria-label="senesteHvilendeAr"
               name="senesteHvilendeAr"
               type="text"
               inputMode="numeric"
             />
-            <SakIdTextField fieldName="sakIds" />
-            <Button type="submit" name="action" value={Action.HvilendeRettOpphor} disabled={isSubmitting}>
+            <SakIdTextArea fieldName="sakIds" />
+            <Button type="submit" name="action" style={{ width: '10em' }} value={Action.HvilendeRettOpphor}>
               Opprett
             </Button>
           </VStack>

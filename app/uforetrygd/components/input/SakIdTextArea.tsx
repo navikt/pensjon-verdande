@@ -1,4 +1,4 @@
-import { TextField } from '@navikt/ds-react'
+import { Textarea } from '@navikt/ds-react'
 
 export function parseSakIds(sakIds: FormDataEntryValue | null): number[] {
   if (!sakIds || typeof sakIds !== 'string') return []
@@ -20,13 +20,14 @@ interface Props {
   fieldName: string
 }
 
-export function SakIdTextField({ fieldName }: Props) {
+export function SakIdTextArea({ fieldName }: Props) {
   return (
-    <TextField
+    <Textarea
       label="Kommaseparert liste med sak-id'er som skal behandles (tomt betyr alle):"
       aria-label="sakIds"
       name={fieldName}
-      type="text"
+      minRows={3}
+      maxRows={10}
     />
   )
 }
