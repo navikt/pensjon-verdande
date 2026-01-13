@@ -1,36 +1,30 @@
 import { Button, Heading, TextField, VStack } from '@navikt/ds-react'
 import { type ActionFunctionArgs, Form, redirect, useNavigation } from 'react-router'
-import { apiPost } from '~/services/api.server'
 import { parseSakIds, SakIdTextField } from '~/uforetrygd/components/input/SakIdTextField'
+import {
+  opprettHvilendeRettOpphorBehandlinger,
+  opprettHvilendeRettVarselbrevBehandlinger,
+} from '~/uforetrygd/hvilende-rett.server'
+
+export type HvilendeRettBehandlingResponse = {
+  behandlingId: number
+}
 
 enum Action {
   HvilendeRettOpphor = 'HVILENDE_RETT_OPPHOR',
   HvilendeRettVarsel = 'HVILENDE_RETT_VARSEL',
 }
 
-type HvilendeRettResponse = {
-  behandlingId: number
-}
-
 export async function action({ request }: ActionFunctionArgs) {
   const formData = Object.fromEntries(await request.formData())
-  let response: HvilendeRettResponse | undefined
+  let response: HvilendeRettBehandlingResponse | undefined
 
-  if (formData.action === 'HVILENDE_RETT_VARSEL') {
-    response = await apiPost<HvilendeRettResponse>(
-      '/api/uforetrygd/hvilenderett/behandling/varsel/batch',
-      {
-        senesteHvilendeAr: formData.senesteHvilendeAr,
-      },
-      request,
-    )
-  } else if (formData.action === 'HVILENDE_RETT_OPPHOR') {
-    response = await apiPost<HvilendeRettResponse>(
-      '/api/uforetrygd/hvilenderett/behandling/opphor/batch',
-      {
-        senesteHvilendeAr: formData.senesteHvilendeAr,
-        sakIdListe: parseSakIds(formData.sakIds),
-      },
+  if (formData.action === Action.HvilendeRettVarsel) {
+    response = await opprettHvilendeRettVarselbrevBehandlinger(Number(formData.senesteHvilendeAr), request)
+  } else if (formData.action === Action.HvilendeRettOpphor) {
+    response = await opprettHvilendeRettOpphorBehandlinger(
+      Number(formData.senesteHvilendeAr),
+      parseSakIds(formData.sakIds),
       request,
     )
   }
