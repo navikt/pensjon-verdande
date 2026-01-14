@@ -1,27 +1,40 @@
 import { Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, redirect, useNavigation } from 'react-router'
+import { useRef, useState } from 'react'
+import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
+import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { parseSakIds, SakIdTextArea } from '~/uforetrygd/components/input/SakIdTextArea'
 import {
   opprettHvilendeRettOpphorBehandlinger,
   opprettHvilendeRettVarselbrevBehandlinger,
 } from '~/uforetrygd/hvilende-rett.server'
 
+type Action = {
+  type: string
+  beskrivelse: string
+}
+
 export type HvilendeRettBehandlingResponse = {
   behandlingId: number
 }
 
-enum Action {
-  HvilendeRettOpphor = 'HVILENDE_RETT_OPPHOR',
-  HvilendeRettVarsel = 'HVILENDE_RETT_VARSEL',
+const hvilendeRettOpphorAction: Action = {
+  type: 'HVILENDE_RETT_OPPHOR',
+  beskrivelse:
+    'Dette vil opprette behandlinger for opphør av saker med 10 år hvilende rett. Er du sikker på at du vil fortsette?',
+}
+const hvilendeRettVarselAction: Action = {
+  type: 'HVILENDE_RETT_VARSEL',
+  beskrivelse:
+    'Dette vil opprette behandlinger for varselbrev for saker med hvilende rett. Er du sikker på at du vil fortsette?',
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = Object.fromEntries(await request.formData())
   let response: HvilendeRettBehandlingResponse | undefined
 
-  if (formData.action === Action.HvilendeRettVarsel) {
+  if (formData.action === hvilendeRettVarselAction.type) {
     response = await opprettHvilendeRettVarselbrevBehandlinger(Number(formData.senesteHvilendeAr), request)
-  } else if (formData.action === Action.HvilendeRettOpphor) {
+  } else if (formData.action === hvilendeRettOpphorAction.type) {
     response = await opprettHvilendeRettOpphorBehandlinger(
       Number(formData.senesteHvilendeAr),
       parseSakIds(formData.sakIds),
@@ -37,54 +50,110 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function HvilendeRettPage() {
-  const navigation = useNavigation()
-  const isSubmitting = navigation.state === 'submitting'
-
   return (
     <VStack gap="20" style={{ maxWidth: '50em', margin: '2em' }}>
-      <VStack gap="5">
-        <Heading size="small">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
+      {hvilendeRettVarselForm()}
+      {hvilendeRettOpphorForm()}
+    </VStack>
+  )
+}
 
-        <Form method="post" style={{ width: '10em' }}>
-          <VStack gap={'4'}>
-            <TextField
-              label="Seneste hvilende år:"
-              aria-label="senesteHvilendeAr"
-              name="senesteHvilendeAr"
-              type="text"
-              inputMode="numeric"
-            />
-            <Button type="submit" name="action" value={Action.HvilendeRettVarsel} disabled={isSubmitting}>
-              Opprett
-            </Button>
-          </VStack>
-        </Form>
-      </VStack>
+function hvilendeRettVarselForm() {
+  const fetcher = useFetcher()
+  const varselFormRef = useRef<HTMLFormElement | null>(null)
+  const [visModal, setVisModal] = useState<boolean>(false)
 
-      <VStack gap="5">
-        <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
+  const onFormSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault()
+    setVisModal(true)
+  }
 
-        <Form method="post" style={{ width: '50em' }}>
-          <VStack gap={'4'}>
-            <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
-              <option value="true">Ja</option>
-              <option value="false">Nei</option>
-            </Select>
-            <TextField
-              style={{ width: '10em' }}
-              label="Seneste hvilende år:"
-              aria-label="senesteHvilendeAr"
-              name="senesteHvilendeAr"
-              type="text"
-              inputMode="numeric"
-            />
-            <SakIdTextArea fieldName="sakIds" />
-            <Button type="submit" name="action" style={{ width: '10em' }} value={Action.HvilendeRettOpphor}>
-              Opprett
-            </Button>
-          </VStack>
-        </Form>
-      </VStack>
+  const sendTilVarsel = () => {
+    setVisModal(false)
+    if (!varselFormRef.current) return
+
+    const newFormData = new FormData(varselFormRef.current)
+    newFormData.set('action', hvilendeRettVarselAction.type)
+
+    fetcher.submit(newFormData, { method: 'post' }).catch(console.error)
+  }
+
+  return (
+    <VStack gap="5">
+      <Heading size="small">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
+      <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '10em' }}>
+        <VStack gap={'4'}>
+          <TextField
+            label="Seneste hvilende år:"
+            aria-label="senesteHvilendeAr"
+            name="senesteHvilendeAr"
+            type="text"
+            inputMode="numeric"
+          />
+          <Button type="submit" style={{ width: '10em' }} disabled={fetcher.state === 'submitting'}>
+            Opprett
+          </Button>
+        </VStack>
+      </fetcher.Form>
+      <ConfirmationModal
+        onOk={sendTilVarsel}
+        onCancel={() => setVisModal(false)}
+        showModal={visModal}
+        text={hvilendeRettVarselAction.beskrivelse}
+      />
+    </VStack>
+  )
+}
+
+function hvilendeRettOpphorForm() {
+  const fetcher = useFetcher()
+  const opphorFormRef = useRef<HTMLFormElement | null>(null)
+  const [visModal, setVisModal] = useState<boolean>(false)
+
+  const onFormSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault()
+    setVisModal(true)
+  }
+
+  const sendTilOpphor = () => {
+    setVisModal(false)
+    if (!opphorFormRef.current) return
+
+    const newFormData = new FormData(opphorFormRef.current)
+    newFormData.set('action', hvilendeRettOpphorAction.type)
+
+    fetcher.submit(newFormData, { method: 'post' }).catch(console.error)
+  }
+
+  return (
+    <VStack gap="5">
+      <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
+      <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '50em' }}>
+        <VStack gap={'4'}>
+          <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
+          <TextField
+            style={{ width: '10em' }}
+            label="Seneste hvilende år:"
+            aria-label="senesteHvilendeAr"
+            name="senesteHvilendeAr"
+            type="text"
+            inputMode="numeric"
+          />
+          <SakIdTextArea fieldName="sakIds" />
+          <Button type="submit" style={{ width: '10em' }} disabled={fetcher.state === 'submitting'}>
+            Opprett
+          </Button>
+        </VStack>
+      </fetcher.Form>
+      <ConfirmationModal
+        onOk={sendTilOpphor}
+        onCancel={() => setVisModal(false)}
+        showModal={visModal}
+        text={hvilendeRettOpphorAction.beskrivelse}
+      />
     </VStack>
   )
 }
