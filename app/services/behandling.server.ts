@@ -13,6 +13,7 @@ import type {
   DetaljertFremdriftDTO,
   IkkeFullforteAktiviteterDTO,
   PatchBehandlingDto,
+  RelatertFamilieBehandling,
   SchedulerStatusResponse,
 } from '~/types'
 
@@ -491,4 +492,22 @@ export async function getBehandlingManuellOpptelling(
   behandlingId: number,
 ): Promise<BehandlingManuellOpptellingResponse> {
   return apiGet(`/api/behandling/${behandlingId}/behandlingManuellOpptelling`, ctx)
+}
+
+export async function HentRelaterteFamiliebehandlinger(
+  accessToken: string,
+  behandlingId: number,
+): Promise<RelatertFamilieBehandling[]> {
+  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/hentRelaterteFamiliebehandlinger`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
+    },
+  })
+
+  if (!response) {
+    throw new Response('Not Found', { status: 404 })
+  } else {
+    return (await response.json()) as RelatertFamilieBehandling[]
+  }
 }
