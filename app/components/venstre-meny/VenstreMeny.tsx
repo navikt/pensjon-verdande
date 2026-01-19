@@ -63,6 +63,7 @@ const batcherMeny = [
     'Årlig omregning ved opptjeningsendring',
   ],
   ['REGULERING_LES', `/batch/regulering`, 'Regulering'],
+  ['KONTROLLERE_SAERSKILT_SATS', '/kontroll-saerskilt-sats', 'Kontroll særskilt sats'],
 ]
 
 const omregningMeny = [
