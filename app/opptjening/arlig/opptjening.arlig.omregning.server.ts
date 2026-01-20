@@ -4,6 +4,7 @@ import { env } from '~/services/env.server'
 export async function opprettOpptjeningsendringArligOmregning(
   accessToken: string,
   opptjeningsar: number,
+  bolkstorrelse: number,
 ): Promise<StartBatchResponse> {
   const response = await fetch(`${env.penUrl}/api/opptjening/arligendring/opprett`, {
     method: 'POST',
@@ -14,6 +15,7 @@ export async function opprettOpptjeningsendringArligOmregning(
     },
     body: JSON.stringify({
       opptjeningsar: opptjeningsar,
+      bolkstorrelse: bolkstorrelse,
     }),
   })
 
@@ -29,4 +31,5 @@ export async function opprettOpptjeningsendringArligOmregning(
 
 type StartBatchResponse = {
   behandlingId: number
+  bolkstorrelse: number
 }
