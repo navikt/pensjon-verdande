@@ -395,6 +395,8 @@ export default function BehandlingCard(props: Props) {
         return 'IdentAjourhold'
       case 'DagligAvstemmingBehandling':
         return 'DagligAvstemming'
+      case 'E500FilleveringBatchBehandling':
+        return 'E500Fillevering'
       default:
         return type
     }

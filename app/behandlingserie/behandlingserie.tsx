@@ -80,6 +80,7 @@ const BEHANDLINGSTYPER = [
   'IdentAjourhold',
   'KontrollerOppgaver',
   'PersonAjourhold',
+  'E500Fillevering',
 ]
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
