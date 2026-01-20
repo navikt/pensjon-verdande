@@ -1,28 +1,29 @@
-import { env } from '~/services/env.server'
+import { apiPost } from '~/services/api.server'
+import type { HvilendeRettBehandlingResponse } from '~/uforetrygd/hvilende-rett'
 
-export const opprettHvilendeRettVarselbrevBehandlinger = async (
-  accessToken: string,
-  senesteHvilendeAr: number,
-): Promise<HvilendeRettBehandlingResponse> => {
-  const response = await fetch(`${env.penUrl}/api/uforetrygd/hvilenderett/behandling/varsel/batch`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
+export async function opprettHvilendeRettVarselbrevBehandlinger(senesteHvilendeAr: number, request: Request) {
+  return await apiPost<HvilendeRettBehandlingResponse>(
+    '/api/uforetrygd/hvilenderett/behandling/varsel/batch',
+    {
       senesteHvilendeAr,
-    }),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as HvilendeRettBehandlingResponse
-  } else {
-    throw new Error(`Kunne ikke opprette behandling. Statuskode: ${response.status}`)
-  }
+    },
+    request,
+  )
 }
 
-type HvilendeRettBehandlingResponse = {
-  behandlingId: number
+export async function opprettHvilendeRettOpphorBehandlinger(
+  senesteHvilendeAr: number,
+  sakIdListe: number[],
+  dryRun: boolean,
+  request: Request,
+) {
+  return await apiPost<HvilendeRettBehandlingResponse>(
+    '/api/uforetrygd/hvilenderett/behandling/opphor/batch',
+    {
+      senesteHvilendeAr,
+      sakIdListe,
+      dryRun,
+    },
+    request,
+  )
 }
