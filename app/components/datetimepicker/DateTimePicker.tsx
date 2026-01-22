@@ -48,7 +48,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         <DatePicker
           id={id}
           selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
+          onChange={(date: Date | null) => setSelectedDate(date)}
           showTimeSelect
           timeFormat={timeFormat}
           timeIntervals={timeIntervals}
