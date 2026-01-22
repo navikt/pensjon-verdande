@@ -1,8 +1,15 @@
-import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
 import type { KalenderHendelser, KalenderHendelserDTO } from '~/components/kalender/types'
-import { apiGet, apiGetOrUndefined, normalizeAndThrow, type RequestCtx } from '~/services/api.server'
-import { env } from '~/services/env.server'
+import {
+  apiDelete,
+  apiGet,
+  apiGetOrUndefined,
+  apiGetRawStringOrUndefined,
+  apiPatch,
+  apiPost,
+  apiPut,
+  type RequestCtx,
+} from '~/services/api.server'
 import { kibanaLink } from '~/services/kibana.server'
 import type {
   BehandlingDto,
@@ -119,24 +126,10 @@ export async function getAvhengigeBehandlinger(
     request += `&ansvarligTeam=${ansvarligTeam}`
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/${behandlingId}/avhengigeBehandlinger?page=${page}&size=${size}${request}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
+  return await apiGet<BehandlingerPage>(
+    `/api/behandling/${behandlingId}/avhengigeBehandlinger?page=${page}&size=${size}${request}`,
+    { accessToken },
   )
-
-  if (response.ok) {
-    return (await response.json()) as BehandlingerPage
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av avhengige behandlinger. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
 }
 
 export async function search(
@@ -166,21 +159,9 @@ export async function search(
     request += `&ansvarligTeam=${ansvarligTeam}`
   }
 
-  const response = await fetch(`${env.penUrl}/api/behandling?query=${query}&page=${page}&size=${size}${request}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
+  return await apiGet<BehandlingerPage>(`/api/behandling?query=${query}&page=${page}&size=${size}${request}`, {
+    accessToken,
   })
-
-  if (response.ok) {
-    return (await response.json()) as BehandlingerPage
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved søking etter behandlinger. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
 }
 
 export async function getBehandling(accessToken: string, behandlingId: string): Promise<BehandlingDto> {
@@ -208,73 +189,19 @@ export async function fortsettBehandling(
   behandlingId: string,
   nullstillPlanlagtStartet: boolean,
 ): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/fortsett`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ nullstillPlanlagtStartet: nullstillPlanlagtStartet }),
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved forsetting av behandling. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPut(`/api/behandling/${behandlingId}/fortsett`, { nullstillPlanlagtStartet }, { accessToken })
 }
 
 export async function fortsettAvhengigeBehandlinger(accessToken: string, behandlingId: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/fortsettAvhengigeBehandlinger`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved forsetting av avhengige behandlinger. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPut(`/api/behandling/${behandlingId}/fortsettAvhengigeBehandlinger`, {}, { accessToken })
 }
 
 export async function taTilDebug(accessToken: string, behandlingId: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/debug`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved sending til debug. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPut(`/api/behandling/${behandlingId}/debug`, {}, { accessToken })
 }
 
 export async function fjernFraDebug(accessToken: string, behandlingId: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/debug`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved fjerning av debug. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiDelete(`/api/behandling/${behandlingId}/debug`, { accessToken })
 }
 
 export async function patchBehandling(
@@ -282,70 +209,19 @@ export async function patchBehandling(
   behandlingId: string,
   patch: Partial<PatchBehandlingDto>,
 ): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}`, {
-    method: 'PATCH',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify(patch),
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved oppdatering av behandling. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPatch(`/api/behandling/${behandlingId}`, patch, { accessToken })
 }
 
 export async function runBehandling(accessToken: string, behandlingId: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/run`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    await normalizeAndThrow(response, `Feil ved kjøring av behandling. Feil var`)
-  }
+  await apiPost(`/api/behandling/${behandlingId}/run`, {}, { accessToken })
 }
 
 export async function godkjennOpprettelse(accessToken: string, behandlingId: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/godkjennOpprettelse`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved godkjenning av opprettelse av behandling. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPut(`/api/behandling/${behandlingId}/godkjennOpprettelse`, {}, { accessToken })
 }
 
 export async function stopp(accessToken: string, behandlingId: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/stopp`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved stopping av behandling. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPut(`/api/behandling/${behandlingId}/stopp`, {}, { accessToken })
 }
 
 export async function endrePlanlagtStartet(
@@ -353,22 +229,13 @@ export async function endrePlanlagtStartet(
   behandlingId: string,
   nyPlanlagtStartet: string,
 ): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/endrePlanlagtStartet`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
+  await apiPut(
+    `/api/behandling/${behandlingId}/endrePlanlagtStartet`,
+    { planlagtStartet: nyPlanlagtStartet },
+    {
+      accessToken,
     },
-    body: JSON.stringify({ planlagtStartet: nyPlanlagtStartet }),
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved endring av planlagt startet for behandling. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  )
 }
 
 export async function sendTilManuellMedKontrollpunkt(
@@ -376,58 +243,15 @@ export async function sendTilManuellMedKontrollpunkt(
   behandlingId: string,
   kontrollpunkt: string,
 ): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/sendTilManuellMedKontrollpunkt`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({ kontrollpunkt: kontrollpunkt }),
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved sending til manuell behandling. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPut(`/api/behandling/${behandlingId}/sendTilManuellMedKontrollpunkt`, { kontrollpunkt }, { accessToken })
 }
 
 export async function getOppdragsmelding(accessToken: string, behandlingId: string) {
-  const response = await fetch(`${env.penUrl}/api/vedtak/iverksett/${behandlingId}/oppdragsmelding`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return await response.text()
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av oppdragsmelding. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  return await apiGetRawStringOrUndefined(`/api/vedtak/iverksett/${behandlingId}/oppdragsmelding`, { accessToken })
 }
 
 export async function getOppdragskvittering(accessToken: string, behandlingId: string) {
-  const response = await fetch(`${env.penUrl}/api/vedtak/iverksett/${behandlingId}/oppdragskvittering`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return await response.text()
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av oppdragskvittering. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  return await apiGetRawStringOrUndefined(`/api/vedtak/iverksett/${behandlingId}/oppdragskvittering`, { accessToken })
 }
 
 export async function henBehandlingManuell(
@@ -443,24 +267,10 @@ export async function henBehandlingManuell(
     request += `&sort=${sort}`
   }
 
-  const response = await fetch(
-    `${env.penUrl}/api/behandling/${behandlingId}/behandlingManuell?page=${page}&size=${size}${request}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'X-Request-ID': crypto.randomUUID(),
-      },
-    },
+  return await apiGet<BehandlingManuellPage>(
+    `/api/behandling/${behandlingId}/behandlingManuell?page=${page}&size=${size}${request}`,
+    { accessToken },
   )
-
-  if (response.ok) {
-    return (await response.json()) as BehandlingManuellPage
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av manuelle behandlinger. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
 }
 
 export async function hentKalenderHendelser(
@@ -498,16 +308,7 @@ export async function HentRelaterteFamiliebehandlinger(
   accessToken: string,
   behandlingId: number,
 ): Promise<RelatertFamilieBehandling[]> {
-  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/hentRelaterteFamiliebehandlinger`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
+  return await apiGet<RelatertFamilieBehandling[]>(`/api/behandling/${behandlingId}/hentRelaterteFamiliebehandlinger`, {
+    accessToken,
   })
-
-  if (!response) {
-    throw new Response('Not Found', { status: 404 })
-  } else {
-    return (await response.json()) as RelatertFamilieBehandling[]
-  }
 }
