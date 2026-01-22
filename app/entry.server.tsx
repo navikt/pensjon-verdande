@@ -13,6 +13,8 @@ const ABORT_DELAY = 120_000
 // endel tid på å laste inn
 export const streamTimeout = 30_000
 
+// Custom unhandledRejection handler to filter out React Router control-flow objects
+// Winston's rejectionHandlers would log these as errors, creating noise in logs
 process.on('unhandledRejection', (reason: unknown) => {
   const unwrap =
     typeof reason === 'object' && reason !== null && 'reason' in reason
@@ -55,23 +57,22 @@ process.on('unhandledRejection', (reason: unknown) => {
     stack = inspect(unwrap, { depth: 2, breakLength: 120 })
   }
 
-  console.error('Unhandled rejection', { reason: unwrap, stack })
+  logger.error('Unhandled rejection', { reason: unwrap, stack })
 })
 
+// Custom uncaughtException handler to ensure process exits on critical errors
+// Winston's exceptionHandlers may not exit the process
 process.on('uncaughtException', (error: Error) => {
   const stack = `${error.name}: ${error.message}\n${error.stack ?? ''}`
 
-  console.error('Uncaught exception', {
-    error,
-    stack,
-  })
+  logger.error('Uncaught exception', { error, stack })
 
   process.exit(1)
 })
 
 export function handleError(error: unknown, { request }: LoaderFunctionArgs | ActionFunctionArgs) {
   if (!request.signal.aborted) {
-    logger.error({ err: error }, 'Unhandled error')
+    logger.error('Unhandled error', { error })
   }
 }
 
@@ -134,7 +135,7 @@ function handleBotRequest(
         // errors encountered during initial shell rendering since they'll
         // reject and get logged in handleDocumentRequest.
         if (shellRendered) {
-          console.error(error)
+          logger.error('Streaming render error', { error })
         }
       },
     })
@@ -177,7 +178,7 @@ function handleBrowserRequest(
         // errors encountered during initial shell rendering since they'll
         // reject and get logged in handleDocumentRequest.
         if (shellRendered) {
-          console.error(error)
+          logger.error('Streaming render error', { error })
         }
       },
     })

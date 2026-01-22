@@ -1,9 +1,11 @@
+import { logger } from '~/services/logger.server'
+
 export default async function copy(text: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(text)
   } catch (err) {
     if (process.env.NODE_ENV !== 'production') {
-      console.error('Unable to copy using Clipboard API', err)
+      logger.error('Unable to copy using Clipboard API', { err })
     }
 
     // Fallback for browsers that do not support the Clipboard API.

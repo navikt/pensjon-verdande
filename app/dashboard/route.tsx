@@ -13,6 +13,7 @@ import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-d
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
+import { logger } from '~/services/logger.server'
 import type { Route } from '../../.react-router/types/app/dashboard/+types/route'
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
@@ -120,7 +121,7 @@ export default function Dashboard() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  console.log({ error })
+  logger.error('Dashboard error', { error })
   if (error instanceof Error && error.message === 'Server Timeout') {
     return (
       <Box.New style={{ paddingTop: '0.5em' }}>

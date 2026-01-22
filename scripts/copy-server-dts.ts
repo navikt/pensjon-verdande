@@ -10,7 +10,6 @@ async function main() {
 
   await mkdir(destDir, { recursive: true })
   await copyFile(src, dest)
-  console.log(`[copy-server-dts] ${path.relative(root, src)} -> ${path.relative(root, dest)}`)
 }
 
 main().catch((err) => {

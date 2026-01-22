@@ -99,7 +99,6 @@ const KontrollpunktfordelingOverTidBarChart: React.FC<KontrollpunktfordelingOver
       .map((enhet) => ({ label: enhet, value: enhet }))
   }, [data.fordeling])
 
-  console.log(allEnheter)
   const [selectedEnheter, setSelectedEnheter] = useState<string[]>([])
 
   // Filter data på valgte enheter (eller alle hvis ingen valgt)
