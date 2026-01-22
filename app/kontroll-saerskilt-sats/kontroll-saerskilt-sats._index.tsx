@@ -49,7 +49,7 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
   const today = useMemo(() => startOfDay(new Date()), [])
 
   const kjoereMaanedYearMonth = selectedKjoereMaaned ? parse(selectedKjoereMaaned, 'yyyy-MM', new Date()) : null
-  const kontrollAar = kjoereMaanedYearMonth?.getFullYear().toString() ?? ''
+  const kontrollAar = kjoereMaanedYearMonth ? (kjoereMaanedYearMonth.getFullYear() - 1).toString() : ''
 
   const kjoretidspunktMinDate = useMemo(() => {
     if (!kjoereMaanedYearMonth) return today
