@@ -38,7 +38,7 @@
     "isbot": "^5.1.32",
     "jwt-decode": "^4.0.0",
     "node-cache": "^5.1.2",
-    "pino": "^10.1.0",
+    "pino": "^10.2.0",
     "pino-http": "^11.0.0",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
