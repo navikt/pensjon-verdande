@@ -1,5 +1,4 @@
 import { PassThrough } from 'node:stream'
-import { inspect } from 'node:util'
 import { createReadableStreamFromReadable } from '@react-router/node'
 import * as isbotModule from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
@@ -13,58 +12,8 @@ const ABORT_DELAY = 120_000
 // endel tid på å laste inn
 export const streamTimeout = 30_000
 
-process.on('unhandledRejection', (reason: unknown) => {
-  const unwrap =
-    typeof reason === 'object' && reason !== null && 'reason' in reason
-      ? (reason as { reason?: unknown }).reason
-      : reason
-
-  const isControlFlow = (() => {
-    // Router control-flow objects:
-    if (unwrap instanceof Response) return true
-
-    if (typeof unwrap === 'object' && unwrap !== null) {
-      const obj = unwrap as Record<string, unknown>
-
-      // DataWithResponseInit from `throw data(...)`
-      if (obj.type === 'DataWithResponseInit') return true
-
-      // RouteErrorResponse-like
-      if (obj.name === 'RouteErrorResponse') return true
-
-      const hasStatus = 'status' in obj && typeof obj.status === 'number'
-      const hasStatusText = 'statusText' in obj && typeof obj.statusText === 'string'
-      const hasDataOrBodyUsed = 'data' in obj || 'bodyUsed' in obj
-      if (hasStatus && hasStatusText && hasDataOrBodyUsed) return true
-    }
-
-    return false
-  })()
-
-  if (isControlFlow) {
-    // Let the router / ErrorBoundary handle it without noisy logs
-    return
-  }
-
-  let stack: string
-  if (unwrap instanceof Error) {
-    stack = `${unwrap.name}: ${unwrap.message}\n${unwrap.stack ?? ''}`
-  } else if (typeof unwrap === 'string') {
-    stack = unwrap
-  } else {
-    stack = inspect(unwrap, { depth: 2, breakLength: 120 })
-  }
-
-  logger.error('Unhandled rejection', { reason: unwrap, stack })
-})
-
-process.on('uncaughtException', (error: Error) => {
-  const stack = `${error.name}: ${error.message}\n${error.stack ?? ''}`
-
-  logger.error('Uncaught exception', { error, stack })
-
-  process.exit(1)
-})
+// Winston logger handles unhandled exceptions and rejections automatically
+// via exceptionHandlers and rejectionHandlers configured in logger.server.ts
 
 export function handleError(error: unknown, { request }: LoaderFunctionArgs | ActionFunctionArgs) {
   if (!request.signal.aborted) {

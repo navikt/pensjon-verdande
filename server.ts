@@ -7,32 +7,34 @@ import * as build from './build/server/index.js'
 
 const app = express()
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const isDevelopment = process.env.ENV === 'local'
 
-// Winston logger configuration
-const winstonLogger = winston.createLogger({
+// Winston logger configuration - matches logger.server.ts configuration
+const logger = winston.createLogger({
   level: isDevelopment ? 'debug' : 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.errors({ stack: true }),
-    isDevelopment
-      ? winston.format.combine(winston.format.colorize(), winston.format.simple())
-      : winston.format.json(),
+    winston.format.splat(),
+    isDevelopment ? winston.format.combine(winston.format.colorize(), winston.format.simple()) : winston.format.json(),
   ),
   defaultMeta: {
     service: 'pensjon-verdande',
+    environment: process.env.ENV ?? 'unknown',
   },
   transports: [
     new winston.transports.Console({
       stderrLevels: ['error'],
     }),
   ],
+  exceptionHandlers: [new winston.transports.Console()],
+  rejectionHandlers: [new winston.transports.Console()],
 })
 
-// Express Winston middleware for HTTP request logging
+// Keep logging middleware before compression so requests are logged before response processing
 app.use(
   expressWinston.logger({
-    winstonInstance: winstonLogger,
+    winstonInstance: logger,
     meta: true,
     msg: 'HTTP {{req.method}} {{req.url}}',
     expressFormat: false,
@@ -71,5 +73,5 @@ app.all(
 const port = process.env.PORT || 8080
 
 app.listen(port, () => {
-  winstonLogger.info(`Express server listening at http://localhost:${port}`)
+  logger.info(`Express server listening at http://localhost:${port}`)
 })
