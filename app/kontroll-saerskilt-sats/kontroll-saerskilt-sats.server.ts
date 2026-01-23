@@ -1,5 +1,4 @@
-import { env } from '~/services/env.server'
-import { data } from 'react-router'
+import { apiPost } from '~/services/api.server'
 
 export type StartKontrollereSaerskiltSatsRequest = {
   /** yyyy-MM */
@@ -17,25 +16,13 @@ type StartBatchResponse = {
 }
 
 export async function opprettKontrollereSaerskiltSatsBehandling(
-  accessToken: string,
   payload: StartKontrollereSaerskiltSatsRequest,
+  request: Request,
 ): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/api/behandling/kontrollere-saerskilt-sats/opprett`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify(payload),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as StartBatchResponse
-  }
-
-  const text = await response.text()
-  throw data(`Feil ved opprettelse av kontrollere særskilt sats-behandling. Feil var\n${text}`, {
-    status: response.status,
-  })
+  const response = await apiPost<StartBatchResponse>(
+    '/api/behandling/kontrollere-saerskilt-sats/opprett',
+    payload,
+    request,
+  )
+  return response!
 }
