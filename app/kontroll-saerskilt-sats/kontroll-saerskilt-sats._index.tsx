@@ -2,13 +2,28 @@ import {Alert, Button, Heading, HStack, Modal, Select, TextField, VStack} from '
 import { useMemo, useRef, useState } from 'react'
 import { endOfMonth, format, parse, startOfDay, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import type { LoaderFunctionArgs } from 'react-router'
-import { Form, useLoaderData, useNavigation } from 'react-router'
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
+import { Form, redirect, useLoaderData, useNavigation } from 'react-router'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import { opprettKontrollereSaerskiltSatsBehandling } from '~/kontroll-saerskilt-sats/kontroll-saerskilt-sats.server'
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData()
+  const updates = Object.fromEntries(formData)
+
+  const response = await opprettKontrollereSaerskiltSatsBehandling({
+    kjoereMaaned: updates.kjoereMaaned as string,
+    kontrollAar: updates.kontrollAar as string,
+    oensketVirkMaaned: updates.oensketVirkMaaned ? (updates.oensketVirkMaaned as string) : undefined,
+    kjoeretidspunkt: updates.kjoeretidspunkt ? (updates.kjoeretidspunkt as string) : undefined,
+  }, request)
+
+  return redirect(`/behandling/${response.behandlingId}`)
+}
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -68,7 +83,7 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
         Kontrollere særskilt sats
       </Heading>
 
-      <Form id="skjema" action="opprett" method="post">
+      <Form id="skjema" method="post">
         <VStack gap="4">
             <div
               style={{
