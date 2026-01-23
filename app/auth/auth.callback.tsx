@@ -3,6 +3,7 @@ import { redirect } from 'react-router'
 import invariant from 'tiny-invariant'
 import { authenticator, returnToCookie, sessionStorage } from '~/services/auth.server'
 import { isLocalEnv } from '~/services/env.server'
+import { logger } from '~/services/logger.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (!isLocalEnv) {
@@ -26,7 +27,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
     })
   } catch (error) {
-    console.error('Feil ved autentisering', error)
+    logger.error('Feil ved autentisering', { error })
 
     throw error
   }
