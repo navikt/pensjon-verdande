@@ -22,6 +22,7 @@ export const logger = winston.createLogger({
       stderrLevels: ['error'],
     }),
   ],
-  exceptionHandlers: [new winston.transports.Console()],
-  rejectionHandlers: [new winston.transports.Console()],
+  // Note: exceptionHandlers and rejectionHandlers are NOT used here
+  // because entry.server.tsx has custom logic to filter out React Router
+  // control-flow objects (Response, DataWithResponseInit, etc.)
 })
