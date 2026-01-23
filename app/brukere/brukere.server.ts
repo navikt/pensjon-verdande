@@ -1,7 +1,5 @@
-import { data } from 'react-router'
 import type { BrukerResponse, MeResponse, Tilgangsmeta } from '~/brukere/brukere'
-import { apiGet } from '~/services/api.server'
-import { env } from '~/services/env.server'
+import { apiDelete, apiGet, apiPut } from '~/services/api.server'
 
 export async function hentTilgangskontrollMeta(request: Request) {
   return (
@@ -12,26 +10,11 @@ export async function hentTilgangskontrollMeta(request: Request) {
 }
 
 export async function hentBrukere(accessToken: string) {
-  const response = await fetch(`${env.penUrl}/api/behandling/brukere/alle`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (
-      (await response.json()) as {
-        brukere: BrukerResponse[]
-      }
-    ).brukere
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved henting av bruker fra pen. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  return (
+    await apiGet<{
+      brukere: BrukerResponse[]
+    }>('/api/behandling/brukere/alle', { accessToken })
+  ).brukere
 }
 
 export async function hentMe(request: Request) {
@@ -43,39 +26,9 @@ export async function hentBruker(request: Request, brukerIdent: string) {
 }
 
 export async function giBrukerTilgang(accessToken: string, brukernavn: string, operasjon: string) {
-  const response = await fetch(`${env.penUrl}/api/behandling/brukere/tilganger`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      brukernavn: brukernavn,
-      operasjon: operasjon,
-    }),
-  })
-
-  if (!response.ok) {
-    throw data(`Feil ved lagring av brukertilgang: ${await response.text()}`)
-  }
+  await apiPut('/api/behandling/brukere/tilganger', { brukernavn, operasjon }, { accessToken })
 }
 
 export async function fjernBrukertilgang(accessToken: string, brukernavn: string, operasjon: string) {
-  const response = await fetch(`${env.penUrl}/api/behandling/brukere/tilganger`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      brukernavn: brukernavn,
-      operasjon: operasjon,
-    }),
-  })
-
-  if (!response.ok) {
-    throw data(`Feil ved lagring av brukertilgang: ${await response.text()}`)
-  }
+  await apiDelete('/api/behandling/brukere/tilganger', { brukernavn, operasjon }, { accessToken })
 }

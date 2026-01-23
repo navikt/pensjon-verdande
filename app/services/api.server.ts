@@ -109,8 +109,21 @@ export async function apiPatch<T>(
   return apiFetch<T | undefined>('PATCH', path, requestCtx, (res) => parseJsonOrUndefined<T>(res), { body })
 }
 
-export async function apiDelete<T>(path: string, requestCtx: RequestCtx | Request): Promise<T | undefined> {
-  return apiFetch<T | undefined>('DELETE', path, requestCtx, (res) => parseJsonOrUndefined<T>(res))
+export async function apiDelete<T>(
+  path: string,
+  bodyOrRequestCtx: unknown | RequestCtx | Request,
+  requestCtx?: RequestCtx | Request,
+): Promise<T | undefined> {
+  // Hvis requestCtx er definert, da er første parameter body
+  if (requestCtx !== undefined) {
+    return apiFetch<T | undefined>('DELETE', path, requestCtx, (res) => parseJsonOrUndefined<T>(res), {
+      body: bodyOrRequestCtx,
+    })
+  }
+  // Ellers er første parameter requestCtx (ingen body)
+  return apiFetch<T | undefined>('DELETE', path, bodyOrRequestCtx as RequestCtx | Request, (res) =>
+    parseJsonOrUndefined<T>(res),
+  )
 }
 
 export type NormalizedError = {
