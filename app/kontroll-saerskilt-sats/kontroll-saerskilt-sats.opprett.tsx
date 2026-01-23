@@ -13,8 +13,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const response = await opprettKontrollereSaerskiltSatsBehandling(accessToken, {
     kjoereMaaned: updates.kjoereMaaned as string,
     kontrollAar: updates.kontrollAar as string,
-    oensketVirkMaaned: (updates.oensketVirkMaaned as string) || undefined,
-    kjoeretidspunkt: (updates.kjoeretidspunkt as string) || undefined,
+    oensketVirkMaaned: updates.oensketVirkMaaned ? (updates.oensketVirkMaaned as string) : undefined,
+    kjoeretidspunkt: updates.kjoeretidspunkt ? (updates.kjoeretidspunkt as string) : undefined,
   })
 
   return redirect(`/behandling/${response.behandlingId}`)
