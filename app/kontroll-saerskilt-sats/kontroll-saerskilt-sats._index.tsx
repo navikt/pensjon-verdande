@@ -43,7 +43,6 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
   const [selectedKjoereMaaned, setSelectedKjoereMaaned] = useState('')
   const [selectedKjoeretidspunkt, setSelectedKjoeretidspunkt] = useState<Date | null>(null)
   const [selectedOensketVirkMaaned, setSelectedOensketVirkMaaned] = useState('')
-  const [isClicked, setIsClicked] = useState(false)
 
   const maneder = useMemo(genererManedsalternativer, [])
   const today = useMemo(() => startOfDay(new Date()), [])
@@ -64,7 +63,6 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (kanOpprette) {
-      setIsClicked(true)
       e.currentTarget.submit()
     }
   }
@@ -186,7 +184,7 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <Button form="skjema" type="submit" disabled={!kanOpprette || isClicked} loading={isSubmitting}>
+          <Button form="skjema" type="submit" disabled={!kanOpprette || isSubmitting} loading={isSubmitting}>
             Start behandling
           </Button>
           <Button type="button" variant="secondary" onClick={() => modalRef.current?.close()}>
