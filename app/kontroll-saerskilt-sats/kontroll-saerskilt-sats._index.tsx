@@ -1,5 +1,4 @@
 import {Alert, Button, Heading, HStack, Modal, Select, TextField, VStack} from '@navikt/ds-react'
-import type React from 'react'
 import { useMemo, useRef, useState } from 'react'
 import { endOfMonth, format, parse, startOfDay, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
@@ -60,12 +59,6 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
 
   const kanOpprette = selectedKjoereMaaned !== '' && !isSubmitting
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (kanOpprette) {
-      e.currentTarget.submit()
-    }
-  }
 
   const formatYearMonth = (mnd: string) => format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })
 
@@ -75,7 +68,7 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
         Kontrollere særskilt sats
       </Heading>
 
-      <Form id="skjema" action="opprett" method="post" onSubmit={handleSubmit}>
+      <Form id="skjema" action="opprett" method="post">
         <VStack gap="4">
             <div
               style={{
