@@ -74,6 +74,7 @@
     "@types/react-dom": "^19.2.3",
     "lefthook": "^2.0.13",
     "msw": "^2.12.7",
+    "msw-storybook-addon": "^2.0.6",
     "react-router-devtools": "^6.0.2",
     "storybook": "^10.2.0",
     "typescript": "^5.9.3",
@@ -83,5 +84,10 @@
   },
   "engines": {
     "node": ">=24.11.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
