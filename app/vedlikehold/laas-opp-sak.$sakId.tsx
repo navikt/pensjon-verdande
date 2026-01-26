@@ -276,7 +276,7 @@ function SettTilManuellModal({ kravId, onClose }: { kravId: string; onClose: () 
         kravId: kravId,
       },
       {
-        action: 'settTilManuell',
+        action: '../settTilManuell',
         method: 'POST',
         encType: 'application/json',
       },
@@ -332,7 +332,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClos
         vedtakId: vedtak.vedtakId,
       },
       {
-        action: 'laasOpp',
+        action: '../laasOpp',
         method: 'POST',
         encType: 'application/json',
       },
