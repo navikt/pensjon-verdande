@@ -15,20 +15,16 @@ export default function LaasOppSakPage() {
   return (
     <div>
       <VStack gap="5">
-        <HStack>
-          <Heading size="large">Lås opp sak</Heading>
-        </HStack>
+        <Heading size="large">Lås opp sak</Heading>
 
-        <VStack gap="4">
-          <fetcher.Form method="post">
-            <HStack gap="2" align="end">
-              <TextField name="sakId" label="Sak ID" />
-              <Button type="submit" loading={fetcher.state !== 'idle'}>
-                Hent sak
-              </Button>
-            </HStack>
-          </fetcher.Form>
-        </VStack>
+        <fetcher.Form method="post">
+          <HStack gap="2" align="end">
+            <TextField name="sakId" label="Sak ID" />
+            <Button type="submit" loading={fetcher.state !== 'idle'}>
+              Hent sak
+            </Button>
+          </HStack>
+        </fetcher.Form>
 
         <Outlet />
       </VStack>
