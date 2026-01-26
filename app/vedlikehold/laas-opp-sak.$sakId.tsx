@@ -36,11 +36,9 @@ import type {
 import type { VedtakYtelsekomponenter } from '~/vedlikehold/laaste-vedtak.types'
 import type { Route } from './+types/laas-opp-sak.$sakId'
 
-export const loader = async ({ params: { sakId }, request }: Route.LoaderArgs) => {
-  return {
-    sak: await apiPost<SakOppsummeringLaasOpp>('/api/behandling/laas-opp/hentSak', { sakId }, request),
-  }
-}
+export const loader = async ({ params: { sakId }, request }: Route.LoaderArgs) => ({
+  sak: await apiPost<SakOppsummeringLaasOpp>('/api/behandling/laas-opp/hentSak', { sakId }, request),
+})
 
 export default function LaasOppSakSakIdPage() {
   const { sak } = useLoaderData<typeof loader>()
