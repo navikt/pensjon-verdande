@@ -11,6 +11,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CopyButton,
   Detail,
   Heading,
   HGrid,
@@ -179,7 +180,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     title: string
     code?: number
     message?: string
-    trace?: string
+    stack?: string
   } = {
     title: 'Ukjent feil',
   }
@@ -195,16 +196,16 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         code: error.status,
         title: error.statusText,
         message:
-          error.data.message ??
+          error.data?.message ??
           'En teknisk feil på våre servere gjør at siden er utilgjengelig. Dette skyldes ikke noe du gjorde.',
-        trace: error.data.trace,
+        stack: error.data?.trace,
       }
     }
   } else if (error instanceof Error) {
     errorData = {
       title: 'En feil oppstod',
       message: error.message,
-      trace: error.stack,
+      stack: error.stack,
     }
   }
 
@@ -222,11 +223,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           </Heading>
         </div>
         {errorData.message && <BodyShort>{errorData.message}</BodyShort>}
-        {errorData.trace && (
-          <div>
-            <BodyShort>Stack trace:</BodyShort>
-            <Detail as="pre">{errorData.trace}</Detail>
-          </div>
+        {errorData.stack && (
+          <details>
+            <summary>Stack trace</summary>
+            <Box paddingBlock="space-16 space-0">
+              <CopyButton data-color="accent" text="Kopier stack trace" copyText={errorData.stack} />
+              <pre className="mt-2 overflow-auto">{errorData.stack}</pre>
+            </Box>
+          </details>
         )}
       </HGrid>
     </Box>
