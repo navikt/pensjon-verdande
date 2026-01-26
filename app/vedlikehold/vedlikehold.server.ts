@@ -1,7 +1,6 @@
-import { apiPost } from '~/services/api.server'
 import { env } from '~/services/env.server'
 import { logger } from '~/services/logger.server'
-import type { LaasOppResultat, SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.types'
+import type { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import type {
   LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary,
@@ -137,16 +136,6 @@ export const ugyldiggjorEtteroppgjorHistorikkUfore = async (
   return {
     success: response.ok,
   }
-}
-
-export const hentSak = async (accessToken: string, sakId: string): Promise<SakOppsummeringLaasOpp> => {
-  const result = await apiPost<SakOppsummeringLaasOpp>('/api/behandling/laas-opp/hentSak', { sakId }, { accessToken })
-
-  if (!result) {
-    throw new Error('Forventet data fra api, men fikk ingen respons')
-  }
-
-  return result
 }
 
 export const laasOpp = async (accessToken: string, vedtakId: string) => {
