@@ -220,7 +220,7 @@ function HentSakInput() {
     <Form method="get">
       <HStack gap="2" align="end">
         <TextField name="sakId" label="Sak ID" value={sakId} onChange={(e) => setSakId(e.target.value)} />
-        <Button loading={navigation.state === 'loading' && navigation.formMethod === 'GET'} type="submit">
+        <Button loading={navigation.state !== 'idle' && navigation.formMethod === 'GET'} type="submit">
           Hent sak
         </Button>
       </HStack>
