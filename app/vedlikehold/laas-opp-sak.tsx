@@ -21,19 +21,46 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { Link, useFetcher, useSearchParams } from 'react-router'
+import type { LoaderFunctionArgs } from 'react-router'
+import { Form, Link, useFetcher, useLoaderData, useNavigation, useSearchParams } from 'react-router'
 import { decodeBehandling } from '~/common/decodeBehandling'
+import { toNormalizedError } from '~/common/error'
 import { Entry } from '~/components/entry/Entry'
-import type {
-  LaasOppBehandlingSummary,
-  LaasOppResultat,
-  SakOppsummeringLaasOpp,
-  VedtakLaasOpp,
-} from '~/vedlikehold/laas-opp.types'
+import { requireAccessToken } from '~/services/auth.server'
+import { logger } from '~/services/logger.server'
+import type { LaasOppBehandlingSummary, LaasOppResultat, VedtakLaasOpp } from '~/vedlikehold/laas-opp.types'
 import type { VedtakYtelsekomponenter } from '~/vedlikehold/laaste-vedtak.types'
+import { hentSak } from '~/vedlikehold/vedlikehold.server'
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url)
+  const sakId = url.searchParams.get('sakId')
+
+  if (!sakId) {
+    return {}
+  }
+
+  const accessToken = await requireAccessToken(request)
+
+  try {
+    const sak = await hentSak(accessToken, sakId)
+    return { sak }
+  } catch (err) {
+    const normalizedError = toNormalizedError(err)
+
+    if (normalizedError?.status === 404) {
+      return { error: 'Fant ikke sak' }
+    }
+
+    logger.error(normalizedError, `Feil ved henting av sak: ${sakId}`)
+    return {
+      error: `${normalizedError?.status}: ${normalizedError?.title ?? 'Ukjent feil'}`,
+    }
+  }
+}
 
 export default function LaasteVedtakPage() {
-  const [sak, setSak] = useState<SakOppsummeringLaasOpp | undefined | null>(undefined)
+  const { sak, error } = useLoaderData<typeof loader>()
   const [laasOppVedtak, setLaasOppVedtak] = useState<VedtakLaasOpp | null>(null)
   const [kravTilManuell, setKravTilManuell] = useState<string | null>(null)
   const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] = useState<VedtakLaasOpp | null>(null)
@@ -44,9 +71,14 @@ export default function LaasteVedtakPage() {
         <HStack>
           <Heading size="large">Lås opp sak</Heading>
         </HStack>
-        <HStack>
-          <HentSakInput onLoad={setSak} />
-        </HStack>
+        <VStack gap="4">
+          <HentSakInput />
+          {error && (
+            <Alert variant="error" size="small">
+              {error}
+            </Alert>
+          )}
+        </VStack>
         <HStack>
           {sak !== undefined && sak !== null && (
             <VStack gap="5">
@@ -174,70 +206,25 @@ export default function LaasteVedtakPage() {
   )
 }
 
-function HentSakInput({ onLoad }: { onLoad: (sak: SakOppsummeringLaasOpp | null | undefined) => void }) {
-  const [searchParams, setSearchParams] = useSearchParams()
+function HentSakInput() {
+  const navigation = useNavigation()
+  const [searchParams] = useSearchParams()
   const sakIdParam = searchParams.get('sakId')
   const [sakId, setSakId] = useState<string>(sakIdParam ?? '')
-  const fetcher = useFetcher()
 
   useEffect(() => {
-    if (sakIdParam !== null && fetcher.data === undefined && fetcher.state === 'idle') {
-      setSearchParams({ sakId: sakId })
-      fetcher
-        .submit(
-          {
-            sakId,
-          },
-          {
-            action: 'hentSak',
-            method: 'POST',
-            encType: 'application/json',
-          },
-        )
-        .then()
-    }
-  }, [fetcher.data, fetcher.state, sakIdParam, fetcher.submit, sakId, setSearchParams])
-
-  useEffect(() => {
-    onLoad(fetcher.data as SakOppsummeringLaasOpp | null | undefined)
-  }, [fetcher.data, onLoad])
-
-  function hentSak() {
-    setSearchParams({ sakId: sakId })
-    fetcher
-      .submit(
-        {
-          sakId,
-        },
-        {
-          action: 'hentSak',
-          method: 'POST',
-          encType: 'application/json',
-        },
-      )
-      .then()
-  }
+    setSakId(sakIdParam ?? '')
+  }, [sakIdParam])
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-      }}
-    >
+    <Form method="get">
       <HStack gap="2" align="end">
-        <TextField
-          error={fetcher.data === null ? 'Fant ikke sak' : undefined}
-          label="Sak ID"
-          value={sakId}
-          onChange={(e) => setSakId(e.target.value)}
-        />
-        <div>
-          <Button loading={fetcher.state === 'submitting'} onClick={hentSak}>
-            Hent sak
-          </Button>
-        </div>
+        <TextField name="sakId" label="Sak ID" value={sakId} onChange={(e) => setSakId(e.target.value)} />
+        <Button loading={navigation.state === 'loading' && navigation.formMethod === 'GET'} type="submit">
+          Hent sak
+        </Button>
       </HStack>
-    </form>
+    </Form>
   )
 }
 

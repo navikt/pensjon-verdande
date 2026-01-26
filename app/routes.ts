@@ -153,7 +153,6 @@ export default [
 
     route('laas-opp-sak', 'vedlikehold/laas-opp-sak.tsx', [
       route('settTilManuell', 'vedlikehold/laas-opp-sak.settTilManuell.tsx'),
-      route('hentSak', 'vedlikehold/laas-opp-sak.hentSak.tsx'),
       route('laasOpp', 'vedlikehold/laas-opp-sak.laasOpp.tsx'),
     ]),
 
