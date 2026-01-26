@@ -41,7 +41,7 @@ export default function EtteroppgjorHistorikkUforePage() {
   const error = actionData?.error
 
   return (
-    <VStack gap="5" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-5" style={{ maxWidth: '50em', margin: '2em' }}>
       {actionData && (
         <>
           {success && (
@@ -55,7 +55,7 @@ export default function EtteroppgjorHistorikkUforePage() {
       <Heading size="small">Ugyldiggjør EtteroppgjørHistorikk Uføretrygd</Heading>
 
       <Form method="post" style={{ width: '10em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <TextField label="Sak Id" aria-label="sakId" name="sakId" type="text" inputMode="numeric" />
           <TextField
             label="Etteroppgjort År"

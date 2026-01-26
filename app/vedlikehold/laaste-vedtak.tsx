@@ -75,15 +75,15 @@ export default function LaasteVedtakPage() {
 
   return (
     <div>
-      <VStack gap="5">
-        <HStack align="center" justify="center" gap="2">
+      <VStack gap="space-5">
+        <HStack align="center" justify="center" gap="space-2">
           <Heading size="large">Låste vedtak</Heading>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
             <Detail>Antall låst: {laasteVedtakSummary.laasteVedtak.length}</Detail>
           )}
 
           <div style={{ marginLeft: 'auto' }}>
-            <HStack gap="4" align="center">
+            <HStack gap="space-4" align="center">
               {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
                 <Alert variant="success" size="small" inline>
                   Sist kjørt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}
@@ -111,8 +111,8 @@ export default function LaasteVedtakPage() {
         </HStack>
         <HStack>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig === true && (
-            <VStack gap="5">
-              <HStack gap="4" align="end" justify="start">
+            <VStack gap="space-5">
+              <HStack gap="space-4" align="end" justify="start">
                 <VelgTeam />
                 <VelgAksjonspunkt />
                 <Switch checked={avansertVisning} onChange={() => setAvansertVisning(!avansertVisning)}>
@@ -209,7 +209,7 @@ export default function LaasteVedtakPage() {
                           </Table.DataCell>
                         )}
                         <Table.DataCell>
-                          <HStack align="center" gap="1">
+                          <HStack align="center" gap="space-1">
                             {vedtak.sakType}{' '}
                             {vedtak.isAutomatisk ? (
                               <Tooltip content="Automatisk krav">
@@ -448,7 +448,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow; onCl
   return (
     <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-5">
           <BodyLong>
             Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
             innvolvert og at saksbehandler får nødvendig informasjon.
@@ -522,13 +522,13 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Laa
   return (
     <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-5">
           <BodyLong>
             Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>
 
           {fetcher.state === 'loading' && (
-            <HStack gap="2">
+            <HStack gap="space-2">
               <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
             </HStack>
           )}
@@ -628,7 +628,7 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string; behandlinger: 
   return (
     <VStack>
       {behandlinger.map((behandling) => (
-        <HStack key={kravid + behandling.behandlingId} gap="1" align="center">
+        <HStack key={kravid + behandling.behandlingId} gap="space-1" align="center">
           <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">
             {decodeBehandling(behandling.type)}
           </Link>

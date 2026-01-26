@@ -98,7 +98,7 @@ export default function Kalender(props: Props) {
             <strong>{valgtDato.toLocaleDateString('no-NO', { month: 'long' })}</strong> {valgtDato.getFullYear()}
           </span>
           <Spacer></Spacer>
-          <HStack gap="1" style={{ height: '10px' }}>
+          <HStack gap="space-1" style={{ height: '10px' }}>
             <Button
               icon={<ChevronLeftIcon title="Forrige måned" />}
               variant="primary-neutral"

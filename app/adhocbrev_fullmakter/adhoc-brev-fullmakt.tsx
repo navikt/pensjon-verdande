@@ -25,7 +25,7 @@ export default function AdhocBrevFullmakt() {
   const [bprofUttrekk, setBprofUttrekk] = useState<string | ''>('')
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-4'}>
       <Box.New className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett ad-hoc brevbestilling for sletting av fullmakt i BPROF
@@ -33,7 +33,7 @@ export default function AdhocBrevFullmakt() {
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <Textarea
             label="BPROF-uttrekk (JSON-format)"
             name="bprofUttrekk"

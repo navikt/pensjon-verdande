@@ -283,8 +283,8 @@ export default function BatchOpprett_index() {
         <Tabs.Panel value="Omregning">
           <br />
           <Form id={'skjema'} action="omregning" method="POST" onSubmit={handleSubmit}>
-            <VStack gap="6">
-              <HGrid columns={3} gap="12">
+            <VStack gap="space-6">
+              <HGrid columns={3} gap="space-12">
                 <Box.New>
                   <TextField
                     label={'Behandlingsnøkkel'}
@@ -347,7 +347,7 @@ export default function BatchOpprett_index() {
                   <br />
                 </Box.New>
                 <Box.New>
-                  <VStack gap="2">
+                  <VStack gap="space-2">
                     <CheckboxGroup size={'medium'} legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
                       <OmregningCheckbox
                         defaultChecked={behandleApneKrav}
@@ -430,8 +430,8 @@ export default function BatchOpprett_index() {
                 <Box.New>
                   <CheckboxGroup legend={'Brevparametere'}>
                     Ved å <b>ikke</b> angi brev for berørte saker vil default brevkode bli brukt.
-                    <HGrid columns={2} gap="12">
-                      <Box.New padding="4" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
+                    <HGrid columns={2} gap="space-12">
+                      <Box.New padding="space-4" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
                         <OmregningSelector
                           label={'Bestill brev for'}
                           navn={'skalBestilleBrev'}
@@ -497,7 +497,7 @@ export default function BatchOpprett_index() {
                           optionBatchbrevtyper={optionBatchbrevtyper}
                         />
                       </Box.New>
-                      <Box.New padding="4" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
+                      <Box.New padding="space-4" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
                         <OmregningCheckbox
                           defaultChecked={skalSendeBrevBerorteSaker}
                           name={'sendBrevBerorteSaker'}

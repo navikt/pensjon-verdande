@@ -48,11 +48,11 @@ export default function Layout() {
             setShowIconMenu={setShowIconMenu}
           />
 
-          <HStack gap="0" wrap={false}>
+          <HStack gap="space-0" wrap={false}>
             <VenstreMeny me={me} showIconMenu={showIconMenu}></VenstreMeny>
 
             <Page.Block>
-              <Box padding={'4'}>
+              <Box padding={'space-4'}>
                 {schedulerAlert}
                 <Outlet context={me} />
               </Box>

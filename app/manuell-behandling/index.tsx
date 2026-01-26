@@ -384,18 +384,18 @@ export default function ManuellBehandlingOppsummeringRoute() {
   }
 
   return (
-    <Box paddingBlock="6" paddingInline="6">
-      <VStack gap="6">
+    <Box paddingBlock="space-6" paddingInline="space-6">
+      <VStack gap="space-6">
         <Heading level="1" size="small">
           Manuell behandling
         </Heading>
 
         <BodyShort>Tabellen viser opptelling av antall oppgaver som er opprettet av behandlingene</BodyShort>
 
-        <HStack gap="6" align="start" wrap>
-          <VStack gap="4" style={{ flex: 1, minWidth: 420 }}>
-            <Box.New padding="3" borderRadius="large" borderWidth="1" borderColor="neutral-subtleA">
-              <HStack gap="3" align="end" wrap>
+        <HStack gap="space-6" align="start" wrap>
+          <VStack gap="space-4" style={{ flex: 1, minWidth: 420 }}>
+            <Box.New padding="space-3" borderRadius="large" borderWidth="1" borderColor="neutral-subtleA">
+              <HStack gap="space-3" align="end" wrap>
                 <DatePicker {...datepickerProps}>
                   <HStack wrap gap="space-16" justify="center">
                     <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
@@ -405,7 +405,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
 
                 <VStack gap="space-8">
                   <Label size="small">Periode</Label>
-                  <HStack gap="1" wrap>
+                  <HStack gap="space-1" wrap>
                     <Button size="small" variant="secondary" onClick={() => presetLastNDays(7)}>
                       7 d
                     </Button>
@@ -424,7 +424,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
               <Tag size="small" variant="alt1">
                 Sum antall: {total.toLocaleString('nb-NO')}
               </Tag>
-              <HStack gap="2">
+              <HStack gap="space-2">
                 <Button
                   icon={<FilterIcon aria-hidden />}
                   onClick={() => sokeModalRef.current?.showModal()}
@@ -478,7 +478,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
                       <Table.Row key={rowKey(r)}>
                         <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
                         <Table.DataCell>
-                          <VStack gap="1">
+                          <VStack gap="space-1">
                             <span>{r.kategoriDecode}</span>
                             <BodyShort size="small" as="span" textColor="subtle">
                               {r.kategori}
@@ -585,7 +585,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <HStack gap="3">
+            <HStack gap="space-3">
               <Button variant="secondary" onClick={clearFacetFilters}>
                 Nullstill
               </Button>
@@ -597,7 +597,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
         </Modal>
         <Modal ref={grupperModalRef} header={{ heading: 'Gruppering' }} width={720}>
           <Modal.Body>
-            <VStack gap="4">
+            <VStack gap="space-4">
               <Box>
                 <Label size="small">Grupper etter</Label>
                 <CheckboxGroup legend="" hideLegend size="small" value={searchParams.getAll(GROUP_PARAM)}>
@@ -609,7 +609,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
                 </CheckboxGroup>
               </Box>
 
-              <Box.New padding="3" borderRadius="large" borderColor="warning">
+              <Box.New padding="space-3" borderRadius="large" borderColor="warning">
                 <Label size="small">Rekkefølge</Label>
                 {groupBy.length === 0 ? (
                   <BodyShort size="small" textColor="subtle">
@@ -637,7 +637,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
                           ≡
                         </span>
                         <span style={{ flex: 1 }}>{facetLabel(g)}</span>
-                        <HStack gap="1" align="center">
+                        <HStack gap="space-1" align="center">
                           <Button
                             size="xsmall"
                             variant="tertiary"
@@ -669,7 +669,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
             </VStack>
           </Modal.Body>
           <Modal.Footer>
-            <HStack gap="3">
+            <HStack gap="space-3">
               <Button variant="secondary" onClick={clearGrouping}>
                 Nullstill gruppering
               </Button>
@@ -698,7 +698,7 @@ function FacetSection({
   onToggle: (facet: FacetKey, value: string | null) => void
 }) {
   return (
-    <VStack gap="2">
+    <VStack gap="space-2">
       <Label size="small">{title}</Label>
       <CheckboxGroup legend="" hideLegend size="small" value={[...selected]}>
         {options.map((opt) => {
@@ -706,7 +706,7 @@ function FacetSection({
           const isDisabled = opt.count === 0
           return (
             <Checkbox key={enc} disabled={isDisabled} value={enc} onChange={() => onToggle(facet, opt.value)}>
-              <HStack gap="2" align="center">
+              <HStack gap="space-2" align="center">
                 <span>{opt.label}</span>
                 <Tag size="xsmall" variant="neutral">
                   {opt.count.toLocaleString('nb-NO')}

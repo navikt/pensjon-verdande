@@ -408,7 +408,7 @@ export default function BehandlingCard(props: Props) {
         {decodeBehandling(props.behandling.type)}
         <Detail>{props.behandling.type}</Detail>
       </Heading>
-      <VStack gap={'4'}>
+      <VStack gap={'space-4'}>
         <HGrid
           gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
           columns={{ xl: 1, '2xl': props.detaljertFremdrift !== null ? 2 : 1 }}
@@ -418,7 +418,7 @@ export default function BehandlingCard(props: Props) {
             borderRadius={'xlarge'}
             borderWidth={'1'}
             borderColor={'neutral-subtleA'}
-            padding={'4'}
+            padding={'space-4'}
           >
             <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
               {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
@@ -503,7 +503,7 @@ export default function BehandlingCard(props: Props) {
                   borderRadius={'xlarge'}
                   borderWidth={'1'}
                   borderColor={'neutral-subtleA'}
-                  padding={'4'}
+                  padding={'space-4'}
                 >
                   <Suspense fallback={<Loader size="3xlarge" title="Venter..." />}>
                     <Await resolve={props.detaljertFremdrift}>
@@ -780,7 +780,7 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
               />
             </DatePicker>
 
-            <HStack gap="4">
+            <HStack gap="space-4">
               <Select
                 label="Time"
                 value={tid.split(':')[0] ?? ''}

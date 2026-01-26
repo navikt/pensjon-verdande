@@ -51,7 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function HvilendeRettPage() {
   return (
-    <VStack gap="20" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-20" style={{ maxWidth: '50em', margin: '2em' }}>
       {hvilendeRettVarselForm()}
       {hvilendeRettOpphorForm()}
     </VStack>
@@ -79,10 +79,10 @@ function hvilendeRettVarselForm() {
   }
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-5">
       <Heading size="small">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '10em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <TextField
             label="Seneste hvilende år:"
             aria-label="senesteHvilendeAr"
@@ -126,10 +126,10 @@ function hvilendeRettOpphorForm() {
   }
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-5">
       <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '50em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
             <option value="true">Ja</option>
             <option value="false">Nei</option>

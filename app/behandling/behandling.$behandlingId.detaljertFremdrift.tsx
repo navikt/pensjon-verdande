@@ -96,7 +96,7 @@ export default function FremdriftRoute() {
   const isRefreshing = revalidator.state === 'loading'
 
   return (
-    <VStack gap="6">
+    <VStack gap="space-6">
       <Box.New>
         <Heading size={'small'}>
           <HStack justify="space-between" align="center">
@@ -113,7 +113,7 @@ export default function FremdriftRoute() {
             </Button>
           </HStack>
         </Heading>
-        <VStack gap="4">
+        <VStack gap="space-4">
           <BodyShort>
             Totalt: <strong>{ratio(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}</strong>
           </BodyShort>
@@ -126,7 +126,7 @@ export default function FremdriftRoute() {
           <Heading size="small" level={'2'}>
             Detaljer per behandling
           </Heading>
-          <HStack gap="4" wrap>
+          <HStack gap="space-4" wrap>
             <Switch checked={onlyIssues} onChange={(e) => setOnlyIssues(e.target.checked)}>
               Vis kun feil/avvik
             </Switch>
@@ -194,7 +194,7 @@ export default function FremdriftRoute() {
                         marginLeft: rad.level > 1 ? 4 : 0,
                       }}
                     >
-                      <HStack gap="2" align="center" wrap={false}>
+                      <HStack gap="space-2" align="center" wrap={false}>
                         <BodyShort as="span" style={{ fontWeight: 600 }}>
                           {rad.behandlingCode}
                         </BodyShort>
@@ -208,7 +208,7 @@ export default function FremdriftRoute() {
                   </Table.DataCell>
 
                   <Table.DataCell>
-                    <VStack gap="1">
+                    <VStack gap="space-1">
                       <VStack align={'end'}>
                         <BodyShort size="small">{rowPct} %</BodyShort>
                       </VStack>
@@ -217,7 +217,7 @@ export default function FremdriftRoute() {
                   </Table.DataCell>
 
                   <Table.DataCell>
-                    <HStack gap="2" wrap>
+                    <HStack gap="space-2" wrap>
                       {antallEtterStatus
                         .filter((it) => it.antall > 0 && rad.level > 1)
                         .map((it) => (

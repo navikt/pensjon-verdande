@@ -76,7 +76,7 @@ export function BehandlingKjoringerTable(props: Props) {
               {props.erAldeKjoring && (
                 <Table.DataCell>
                   {it.aldeStartState && it.aldeEndState && (
-                    <HStack gap="2" align="center" style={{ flexWrap: 'nowrap' }}>
+                    <HStack gap="space-2" align="center" style={{ flexWrap: 'nowrap' }}>
                       {it.aldeStartState && (
                         <Tag variant="alt1" style={{ whiteSpace: 'nowrap' }}>
                           {decodeAldeBehandlingState(it.aldeStartState)}

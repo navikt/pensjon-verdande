@@ -104,7 +104,7 @@ export default function OpprettEndretOpptjeningRoute() {
       )}
 
       <Form action="opprett" method="post" style={{ width: '100%', maxWidth: 800 }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <div
             style={{
               display: 'grid',
@@ -170,7 +170,7 @@ export default function OpprettEndretOpptjeningRoute() {
             />
             <input type="hidden" name="avsjekkForKjoring" value={avsjekkForKjoring ? 'true' : 'false'} />
           </div>
-          <HStack gap={'4'}>
+          <HStack gap={'space-4'}>
             <Button type="submit" disabled={isSubmitting} variant="primary">
               Opprett
             </Button>

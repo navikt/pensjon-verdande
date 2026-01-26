@@ -61,7 +61,7 @@ export default function VedlikeholdBarnPage() {
   }
 
   return (
-    <VStack gap="5" style={{ maxWidth: '75em', margin: '2em' }}>
+    <VStack gap="space-5" style={{ maxWidth: '75em', margin: '2em' }}>
       <Heading size="large">Oppdater bruk på persongrunnlag for barn</Heading>
 
       <HentPersonDetaljer onLoad={setPersoner} />
@@ -148,7 +148,7 @@ function HentPersonDetaljer({
         e.preventDefault()
       }}
     >
-      <HStack gap="2" align="start">
+      <HStack gap="space-2" align="start">
         <TextField
           error={fetcher.data === null ? 'Fant ingen barn' : undefined}
           label="Sak ID"

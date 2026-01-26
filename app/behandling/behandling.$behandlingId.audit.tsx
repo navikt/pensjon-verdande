@@ -143,7 +143,7 @@ export default function AuditIndexPage() {
         >
           Gruppert visning
         </Switch>
-        <HStack gap="2" align="center">
+        <HStack gap="space-2" align="center">
           <Button
             icon={<FilterIcon aria-hidden />}
             size="small"
@@ -174,8 +174,8 @@ export default function AuditIndexPage() {
 
       <Modal ref={filterModalRef} onClose={() => filterModalRef.current?.close()} header={{ heading: 'Filtrer audit' }}>
         <Modal.Body>
-          <VStack gap="6">
-            <HStack gap="4" wrap>
+          <VStack gap="space-6">
+            <HStack gap="space-4" wrap>
               <TextField
                 label="BehandlingId"
                 inputMode="numeric"
@@ -205,7 +205,7 @@ export default function AuditIndexPage() {
 
             <fieldset className={styles.filterFieldset}>
               <legend className={styles.filterLegend}>Tidsrom</legend>
-              <HStack gap="6" align="start" wrap>
+              <HStack gap="space-6" align="start" wrap>
                 <DatePicker {...datepickerProps}>
                   <HStack wrap gap="space-16" justify="center">
                     <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
@@ -217,7 +217,7 @@ export default function AuditIndexPage() {
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <HStack gap="2">
+          <HStack gap="space-2">
             <Button type="button" variant="secondary" onClick={clearAll}>
               Nullstill
             </Button>

@@ -58,7 +58,7 @@ export default function HentOpplysningerFraSkatt() {
   const [debug, setDebug] = useState<string>('')
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-4'}>
       <Box.New className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Hent opplysninger fra Skatt (tidligere BPEN096)
@@ -67,7 +67,7 @@ export default function HentOpplysningerFraSkatt() {
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <TextField
             label={'Max antall sekvensnummer'}
             defaultValue="10000"
@@ -114,7 +114,7 @@ export default function HentOpplysningerFraSkatt() {
       <Heading size="medium">Kjør hendelser manuelt</Heading>
       <BodyShort>Angi sekvensnummer for å lagre inntektene på disse hendelsene manuelt.</BodyShort>
       <Form method="post">
-        <VStack gap="4" width="20em">
+        <VStack gap="space-4" width="20em">
           <TextField
             label="Kommaseparert liste med sekvensnr."
             name="sekvensnr"
@@ -140,7 +140,7 @@ export default function HentOpplysningerFraSkatt() {
       <Heading size="medium">Antall hendelser å hente</Heading>
       <BodyShort>Gjør et kall mot Sigrun for å se hvor mange hendelser en faktisk kjøring vil hente.</BodyShort>
       <Form method="post">
-        <VStack gap="4" width="20em">
+        <VStack gap="space-4" width="20em">
           <Button type="submit" name="action" value={Action.HentAntallSkattehendelser} disabled={isSubmitting}>
             Hent
           </Button>

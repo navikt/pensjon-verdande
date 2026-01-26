@@ -49,7 +49,7 @@ export function AuditTable({
           <Table.ExpandableRow
             key={`${row.tidspunkt}|${row.navident}|${row.handling}|${row.behandlingId}|${row.aktivitetId ?? 'null'}`}
             content={
-              <VStack gap="4">
+              <VStack gap="space-4">
                 <VStack>
                   <Heading size="small" level="3">
                     Issue

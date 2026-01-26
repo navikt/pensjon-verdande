@@ -23,7 +23,7 @@ export default function AdhocBrevFullmaktBekreftBrevutsending() {
   const [behandlingId, setBehandlingId] = useState<string | ''>('')
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-4'}>
       <Box.New className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Bekreft at ad-hoc brevbestilling for sletting av fullmakt i BPROF er klar for brevutsending
@@ -31,7 +31,7 @@ export default function AdhocBrevFullmaktBekreftBrevutsending() {
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <TextField
             label="Behandling ID"
             name="behandlingId"

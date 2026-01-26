@@ -16,7 +16,7 @@ export default function LinkeDnrFnrPage() {
 
   return (
     <div>
-      <VStack gap="5">
+      <VStack gap="space-5">
         <HStack>
           <Heading size="large">Linke Dnr Fnr</Heading>
         </HStack>
@@ -37,7 +37,7 @@ export default function LinkeDnrFnrPage() {
         )}
 
         <Form method="post">
-          <VStack gap="3">
+          <VStack gap="space-3">
             <TextField
               label="Gammelt ident"
               name="gammelIdent"

@@ -37,7 +37,7 @@ export function DashboardCard(props: Props) {
             }}
           />
         </Box.New>
-        <VStack gap="4">
+        <VStack gap="space-4">
           <Box.New>{props.title}</Box.New>
           <Box.New>{props.value}</Box.New>
         </VStack>

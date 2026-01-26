@@ -40,7 +40,7 @@ export default function LaasteVedtakPage() {
 
   return (
     <div>
-      <VStack gap="5">
+      <VStack gap="space-5">
         <HStack>
           <Heading size="large">Lås opp sak</Heading>
         </HStack>
@@ -49,8 +49,8 @@ export default function LaasteVedtakPage() {
         </HStack>
         <HStack>
           {sak !== undefined && sak !== null && (
-            <VStack gap="5">
-              <HStack gap="4" align="end" justify="start">
+            <VStack gap="space-5">
+              <HStack gap="space-4" align="end" justify="start">
                 <Entry labelText={'Saktype'}>{sak.sakType}</Entry>
                 <Entry labelText={'Sakstatus'}>{sak.sakStatus}</Entry>
               </HStack>
@@ -87,7 +87,7 @@ export default function LaasteVedtakPage() {
                               <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />
                             </Table.DataCell>
                             <Table.DataCell>
-                              <HStack gap="3">
+                              <HStack gap="space-3">
                                 {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
                                   <Button
                                     onClick={() => setKravTilManuell(vedtak.kravId)}
@@ -224,7 +224,7 @@ function HentSakInput({ onLoad }: { onLoad: (sak: SakOppsummeringLaasOpp | null 
         e.preventDefault()
       }}
     >
-      <HStack gap="2" align="end">
+      <HStack gap="space-2" align="end">
         <TextField
           error={fetcher.data === null ? 'Fant ikke sak' : undefined}
           label="Sak ID"
@@ -245,7 +245,7 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string; behandlinger: 
   return (
     <VStack>
       {behandlinger.map((behandling) => (
-        <HStack key={kravid + behandling.behandlingId} gap="1" align="center">
+        <HStack key={kravid + behandling.behandlingId} gap="space-1" align="center">
           <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">
             {decodeBehandling(behandling.type)}
           </Link>
@@ -307,7 +307,7 @@ function SettTilManuellModal({ kravId, onClose }: { kravId: string; onClose: () 
   return (
     <Modal header={{ heading: 'Sett til manuell' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-5">
           <BodyLong>
             Er du sikker på at du vil sette kravet til manuell? Dette fører til merarbeid for saksbehandler, sørg for at
             fag er innvolvert og at saksbehandler får nødvendig informasjon.
@@ -363,7 +363,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClos
   return (
     <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-5">
           <BodyLong>
             Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
             innvolvert og at saksbehandler får nødvendig informasjon.
@@ -447,13 +447,13 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
   return (
     <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-5">
           <BodyLong>
             Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>
 
           {fetcher.state === 'loading' && (
-            <HStack gap="2">
+            <HStack gap="space-2">
               <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
             </HStack>
           )}

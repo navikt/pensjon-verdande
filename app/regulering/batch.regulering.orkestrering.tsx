@@ -54,15 +54,15 @@ export default function Orkestrering() {
 
   return (
     <>
-      <HStack gap="5">
-        <VStack gap="5">
+      <HStack gap="space-5">
+        <VStack gap="space-5">
           <Heading level="2" size="medium">
             Start orkestrering
           </Heading>
           <Entry labelText="Antall ubehandlede familier">{uttrekk.antallUbehandlede}</Entry>
           <Entry labelText="Antall ekskluderte saker">{uttrekk.antallEkskluderteSaker}</Entry>
           <Form method="post">
-            <VStack gap="3">
+            <VStack gap="space-3">
               <TextField
                 label="Antall familier"
                 name="antallFamilier"
@@ -80,7 +80,7 @@ export default function Orkestrering() {
                   Send til samordning
                 </Checkbox>
               </CheckboxGroup>
-              <HStack gap="3" align="center">
+              <HStack gap="space-3" align="center">
                 <div>
                   <Button loading={navigation.state === 'submitting'} type="submit">
                     Start orkestrering
@@ -94,9 +94,9 @@ export default function Orkestrering() {
           </Form>
         </VStack>
       </HStack>
-      <VStack gap="5">
-        <HStack gap="10">
-          <VStack gap="4" style={{ paddingRight: '5rem' }}>
+      <VStack gap="space-5">
+        <HStack gap="space-10">
+          <VStack gap="space-4" style={{ paddingRight: '5rem' }}>
             <Heading level="2" size="medium">
               Orkestreringer
             </Heading>
@@ -113,7 +113,7 @@ export default function Orkestrering() {
               />
             ))}
           </VStack>
-          <VStack gap="5">{orkestreringer.length !== 0 && <AggregerteFeilmeldingerTabell />}</VStack>
+          <VStack gap="space-5">{orkestreringer.length !== 0 && <AggregerteFeilmeldingerTabell />}</VStack>
         </HStack>
       </VStack>
     </>
@@ -150,8 +150,8 @@ export function OrkestreringDetaljer({
   }
 
   return (
-    <VStack gap="5">
-      <HStack gap="5" align="end">
+    <VStack gap="space-5">
+      <HStack gap="space-5" align="end">
         <Entry labelText="Status">
           {orkestrering.status === Behandlingstatus.OPPRETTET && (
             <Alert variant="info" size="small" inline>
@@ -160,7 +160,7 @@ export function OrkestreringDetaljer({
           )}
           {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
             <Alert variant="info" size="small" inline>
-              <HStack gap="2">
+              <HStack gap="space-2">
                 Under behandling <Loader size="small" />
               </HStack>
             </Alert>
@@ -281,11 +281,11 @@ export function AggregerteFeilmeldingerTabell() {
   const { aggregerteFeilmeldinger } = aggregerteFeilmeldingerWrapper
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-5">
       <Heading level="2" size="medium">
         Feilmeldinger
       </Heading>
-      <HStack style={{ marginLeft: 'auto' }} gap="3">
+      <HStack style={{ marginLeft: 'auto' }} gap="space-3">
         {aggregerteFeilmeldinger.length > 0 && (
           <Table>
             <Table.Header>

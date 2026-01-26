@@ -57,13 +57,13 @@ export default function BestemEtteroppgjorResultatPage() {
   }
 
   return (
-    <VStack gap="4" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-4" style={{ maxWidth: '50em', margin: '2em' }}>
       {actionData && error && <Alert variant="error">Feilmelding: {error}</Alert>}
       <Heading size="small" level="1">
         Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap="5">
+        <VStack gap="space-5">
           <TextField
             label="År for etteroppgjør:"
             aria-label="etteroppgjorAr"

@@ -233,14 +233,14 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
         </Box>
       </Bleed>
 
-      <VStack gap="6" paddingBlock={'8'}>
+      <VStack gap="space-6" paddingBlock={'space-8'}>
         <Box.New>
-          <VStack gap="4">
+          <VStack gap="space-4">
             <Heading level="2" size="small">
               Søkekriterier
             </Heading>
 
-            <HStack gap="4" wrap align="end">
+            <HStack gap="space-4" wrap align="end">
               <Box style={{ minWidth: '200px' }}>
                 <Select
                   label="Behandlingstype"
@@ -257,15 +257,15 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
               </Box>
 
               <DatePicker {...datepickerProps}>
-                <HStack gap="4">
+                <HStack gap="space-4">
                   <DatePicker.Input size="small" {...fromInputProps} label="Fra dato" />
                   <DatePicker.Input size="small" {...toInputProps} label="Til dato" />
                 </HStack>
               </DatePicker>
 
-              <VStack gap="2">
+              <VStack gap="space-2">
                 <Label size="small">Hurtigvalg</Label>
-                <HStack gap="2">
+                <HStack gap="space-2">
                   <Button size="small" variant="secondary" onClick={() => presetLastNDays(1)}>
                     1 dag
                   </Button>
@@ -318,8 +318,8 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
               <Loader size="xlarge" />
             </Box>
           )}
-          <VStack gap="4">
-            <HStack gap="4" wrap>
+          <VStack gap="space-4">
+            <HStack gap="space-4" wrap>
               {allStatuses.map((status) => {
                 const statusData = aldeStatusFordeling.find((item) => item.status === status)
                 const antall = statusData?.antall || 0
@@ -329,7 +329,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                   <Box.New
                     key={status}
                     borderWidth="2"
-                    padding="4"
+                    padding="space-4"
                     borderRadius="medium"
                     style={{
                       borderColor: colors?.borderColor || 'var(--a-border-default)',
@@ -341,7 +341,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                     }}
                     onClick={(e) => handleStatusClick(status, e.ctrlKey || e.metaKey)}
                   >
-                    <VStack gap="2">
+                    <VStack gap="space-2">
                       <BodyShort size="small" weight="semibold">
                         {statusLabels[status] || status}
                       </BodyShort>
@@ -367,7 +367,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
             <FordelingBehandlingStatus data={behandlingFordeling} />
           </HStack>
 
-          <VStack gap="10" padding="4">
+          <VStack gap="space-10" padding="space-4">
             <KontrollpunktfordelingOverTidBarChart
               data={kontrollpunktFordelingOverTid}
               fomDate={fomDato}

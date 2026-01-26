@@ -187,7 +187,7 @@ export default function Dag(props: Props) {
         }}
       >
         <Modal.Body>
-          <VStack gap="1">
+          <VStack gap="space-1">
             {offentligFridag && (
               <HStack key="modal-kalenderHendelse" style={{ fontSize: '0.9em' }}>
                 <span style={{ color: 'red' }}>{offentligFridag}</span>

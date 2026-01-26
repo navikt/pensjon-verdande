@@ -25,7 +25,7 @@ export default function Bruker(props: Props) {
             <Tabs.Tab value="historikk" label="Historikk" icon={<ClockDashedIcon aria-hidden />} />
           </Tabs.List>
           <Tabs.Panel value="tilganger">
-            <Box.New padding={'4'}>
+            <Box.New padding={'space-4'}>
               <BrukersTilganger
                 bruker={props.bruker}
                 readonly={props.readOnly}
@@ -34,7 +34,7 @@ export default function Bruker(props: Props) {
             </Box.New>
           </Tabs.Panel>
           <Tabs.Panel value="historikk">
-            <Box.New padding={'4'}>
+            <Box.New padding={'space-4'}>
               <BrukersTilgangsLogg
                 bruker={props.bruker}
                 tilgangskontrollmeta={props.tilgangskontrollmeta}

@@ -10,7 +10,7 @@ export default function ValgteDatoerPreview({
   if (!yearMonthDayDates.length) {
     return (
       <VStack
-        gap="1"
+        gap="space-1"
         style={{
           background: 'var(--a-surface-neutral-subtle, #f3f3f3)',
           padding: '1rem',
@@ -66,7 +66,7 @@ export default function ValgteDatoerPreview({
 
   return (
     <VStack
-      gap="2"
+      gap="space-2"
       style={{
         background: 'var(--a-surface-neutral-subtle, #f3f3f3)',
         padding: '1rem',
@@ -80,11 +80,11 @@ export default function ValgteDatoerPreview({
         <span style={{ opacity: 0.7 }}>{yearMonthDayDates.length} stk</span>
       </HStack>
 
-      <VStack gap="3">
+      <VStack gap="space-3">
         {orderedKeys.map((key) => (
-          <VStack key={key} gap="1">
+          <VStack key={key} gap="space-1">
             <strong style={{ textTransform: 'capitalize' }}>{monthLabel(key)}</strong>
-            <HStack gap="1" wrap>
+            <HStack gap="space-1" wrap>
               {groups[key].map((yearMonthDay) => {
                 const date = parseDate(yearMonthDay)
                 const weekday = date.getDay()
