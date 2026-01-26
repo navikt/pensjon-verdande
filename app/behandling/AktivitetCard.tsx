@@ -33,13 +33,13 @@ export default function AktivitetCard(props: Props) {
         <Detail>{props.aktivitet.type}</Detail>
       </Heading>
 
-      <VStack gap={'4'}>
+      <VStack gap={'space-4'}>
         <Box.New
           background={'raised'}
-          borderRadius={'xlarge'}
+          borderRadius={'12'}
           borderWidth={'1'}
           borderColor={'neutral-subtleA'}
-          padding={'4'}
+          padding={'space-4'}
         >
           <HGrid columns={{ md: 2, lg: 3, xl: 4 }} gap="space-24">
             <Entry labelText={'BehandlingId'}>
@@ -76,7 +76,7 @@ export default function AktivitetCard(props: Props) {
           style={{ padding: '6px', marginTop: '12px' }}
           borderColor={'neutral-subtle'}
           borderWidth={'1'}
-          borderRadius={'medium'}
+          borderRadius={'12'}
           shadow={'dialog'}
         >
           <Tabs

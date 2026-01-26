@@ -59,12 +59,12 @@ export default function AdhocBrev() {
   const [eksluderAvdod, setEksluderAvdod] = useState<string>('')
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-4'}>
       <Box.New className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett ad-hoc brevbestilling
         </Heading>
-        <VStack gap="2">
+        <VStack gap="space-2">
           <BodyLong>
             Oppretter brevbestillinger med oppgitt brevmal for verdiene angitt i tabellen{' '}
             <code>PEN.T_ADHOC_BREVBESTILLING</code>.
@@ -77,7 +77,7 @@ export default function AdhocBrev() {
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <TextField
             label="Brevmal kode for Sak:"
             name="brevmal"

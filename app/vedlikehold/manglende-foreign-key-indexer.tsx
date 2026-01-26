@@ -110,7 +110,7 @@ export default function ManglendeForeignKeyIndexer() {
   const { manglendeForeignKeyIndexer } = useLoaderData<typeof loader>()
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-6">
       <Heading size="large">Manglende indekser for fjernnøkler</Heading>
 
       {manglendeForeignKeyIndexer.length > 0 ? (

@@ -44,8 +44,8 @@ export default function BatchOpprett_index() {
   const lastYear = now.getFullYear() - 1
 
   return (
-    <VStack gap="8">
-      <VStack gap="4">
+    <VStack gap="space-8">
+      <VStack gap="space-4">
         <Heading size="medium">Lever samboeropplysning til Skattedirektoratet</Heading>
 
         <BodyShort>
@@ -55,7 +55,7 @@ export default function BatchOpprett_index() {
       </VStack>
 
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap="4">
+        <VStack gap="space-4">
           <TextField
             label="Behandlingsår"
             defaultValue={lastYear}

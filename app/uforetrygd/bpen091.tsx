@@ -31,7 +31,7 @@ export default function FastsettForventetInntekt() {
   const isSubmitting = navigation.state === 'submitting'
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-4'}>
       <Box.New className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Fastsett forventet inntekt (BPEN091)
@@ -40,7 +40,7 @@ export default function FastsettForventetInntekt() {
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <TextField
             label={'Behandlingsår'}
             description={<BodyShort as="div">Året nye inntekter skal gjelde</BodyShort>}

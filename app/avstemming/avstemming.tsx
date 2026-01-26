@@ -116,12 +116,12 @@ export default function Avstemming() {
   const [avstemmingsperiodeEnd, setAvstemmingsperiodeEnd] = useState<string | ''>('')
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-4'}>
       <Box.New className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett avstemming
         </Heading>
-        <VStack gap="2">
+        <VStack gap="space-2">
           <BodyLong>Oppretter behandlinger for grensesnittavstemming mot Oppdrag</BodyLong>
           <Detail>
             Avstemmingsperiode fom settes til starten av angitt dag. Avstemmingsperiode tom settes til slutten av angitt
@@ -131,7 +131,7 @@ export default function Avstemming() {
       </Box.New>
 
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-4'}>
           <CheckboxGroup legend="Fagområder">
             <Checkbox name={'PENAFP'} value={'true'} defaultChecked={true}>
               PENAFP

@@ -79,7 +79,7 @@ export default function BatchOpprett_index() {
       )}
 
       <Form action="opprett" method="POST" style={{ width: '100%', maxWidth: 800 }}>
-        <VStack gap="4" style={{ marginBottom: '2rem' }}>
+        <VStack gap="space-4" style={{ marginBottom: '2rem' }}>
           <div
             style={{
               display: 'grid',

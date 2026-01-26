@@ -88,8 +88,8 @@ function statusTag(status: Behandlingstatus) {
 
 function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
   return (
-    <Box className={styles.etteroppgjorBox} padding={'4'}>
-      <VStack gap="2">
+    <Box className={styles.etteroppgjorBox} padding={'space-4'}>
+      <VStack gap="space-2">
         <HStack justify="space-between" align="center">
           <Heading size="small">
             <Link as={NavLink} to={`/behandling/${item.behandlingId}`}>
@@ -99,7 +99,7 @@ function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
           {statusTag(item.status)}
         </HStack>
 
-        <HStack gap="6" wrap>
+        <HStack gap="space-6" wrap>
           <Tidspunkt label="Opprettet" verdi={item.opprettet} />
           <Tidspunkt label="Siste kjøring" verdi={item.sisteKjoring} />
           <Tidspunkt label="Planlagt startet" verdi={item.planlagtStartet} />
@@ -114,7 +114,7 @@ function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
 
 function Tidspunkt({ label, verdi }: { label: string; verdi?: string }) {
   return (
-    <VStack gap="1" style={{ minWidth: '10rem' }}>
+    <VStack gap="space-1" style={{ minWidth: '10rem' }}>
       <Label>{label}</Label>
       <BodyShort>{formaterTidspunkt(verdi)}</BodyShort>
     </VStack>
@@ -140,7 +140,7 @@ export default function EtteroppgjorOversikt() {
 
       <div style={{ maxWidth: '20em' }}>
         <Form method="post">
-          <VStack gap="4">
+          <VStack gap="space-4">
             <Select
               name="kjorear"
               label="Velg kjøreår"
@@ -171,7 +171,7 @@ export default function EtteroppgjorOversikt() {
 
       <Heading size="medium">Eksisterende etteroppgjør</Heading>
 
-      <VStack gap="4">
+      <VStack gap="space-4">
         <VStack>
           {etteroppgjor.length > 0 ? (
             etteroppgjor

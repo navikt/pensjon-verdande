@@ -38,7 +38,7 @@ export default function ManuellKategoriBehandlinger() {
   const { behandlingManuellKategori, manuellKategoriBehandlinger } = useLoaderData<typeof loader>()
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-4'}>
       <Heading size={'medium'} level={'2'}>
         {behandlingManuellKategori}
       </Heading>

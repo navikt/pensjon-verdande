@@ -41,7 +41,7 @@ export default function Sok() {
   const { behandlinger } = useLoaderData<typeof loader>()
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-4">
       {behandlinger && <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />}
     </VStack>
   )

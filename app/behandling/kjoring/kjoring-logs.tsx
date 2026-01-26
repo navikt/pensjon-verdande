@@ -57,7 +57,7 @@ export default function BehandlingKjoring() {
   const [shareUrl, setShareUrl] = useState('')
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-4">
       <Heading size={'small'}>Kjøring</Heading>
 
       <section aria-labelledby="overview-heading">
@@ -121,7 +121,7 @@ export default function BehandlingKjoring() {
             <Label as="span">Korrelasjonsid</Label>
           </dt>
           <dd>
-            <HStack gap="2" align="center">
+            <HStack gap="space-2" align="center">
               <BodyShort>{kjoring.correlationId}</BodyShort>
               <Tooltip content="Kopier korrelasjonsid">
                 <CopyButton copyText={kjoring.correlationId} iconPosition="right" size="small" />
@@ -135,7 +135,7 @@ export default function BehandlingKjoring() {
                 <Label as="span">TraceId</Label>
               </dt>
               <dd>
-                <HStack gap="2" align="center">
+                <HStack gap="space-2" align="center">
                   <BodyShort>{kjoring.traceId}</BodyShort>
                   <Tooltip content="Kopier TraceId">
                     <CopyButton copyText={kjoring.traceId} iconPosition="right" size="small" />

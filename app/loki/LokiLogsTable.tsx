@@ -247,7 +247,7 @@ function MessageDetails({
   addFilter: (mode: FilterMode, key: string, value: string) => void
 }) {
   return (
-    <VStack gap="16">
+    <VStack gap="space-16">
       {tempoConfiguration && s.stream.trace_id && (
         <HStack>
           <Button
@@ -460,7 +460,7 @@ export default function LokiLogsTable({
 
   return (
     <>
-      <HStack gap="2" align="center" wrap>
+      <HStack gap="space-2" align="center" wrap>
         {filters.length > 0 && (
           <Chips>
             {filters.map((f, i) => (
@@ -472,7 +472,7 @@ export default function LokiLogsTable({
         )}
       </HStack>
 
-      <HStack gap="2" align="center" justify="end">
+      <HStack gap="space-2" align="center" justify="end">
         <Button
           size="xsmall"
           variant="tertiary"

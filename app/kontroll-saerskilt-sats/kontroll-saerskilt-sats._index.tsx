@@ -84,7 +84,7 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
       </Heading>
 
       <Form id="skjema" method="post">
-        <VStack gap="4">
+        <VStack gap="space-4">
             <div
               style={{
                 display: 'grid',
@@ -150,7 +150,7 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
             Kjøremåned må velges før behandlingen opprettes.
           </Alert>
 
-          <HStack gap="4">
+          <HStack gap="space-4">
             <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
               Opprett kontroll
             </Button>
@@ -172,7 +172,7 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
 
       <Modal ref={modalRef} header={{ heading: 'Start kontroll: særskilt sats' }} size="small">
         <Modal.Body>
-          <VStack gap="4">
+          <VStack gap="space-4">
             <div>
               <b>Kjøremåned:</b> {kjoereMaanedYearMonth ? formatYearMonth(selectedKjoereMaaned) : '-'}
             </div>

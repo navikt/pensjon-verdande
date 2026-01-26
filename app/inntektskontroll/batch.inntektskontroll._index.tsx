@@ -65,7 +65,7 @@ export default function BatchOpprett_index() {
       <Heading size="medium">Start inntektskontroll</Heading>
 
       <Form method="post" style={{ maxWidth: '25em' }}>
-        <VStack gap="4">
+        <VStack gap="space-4">
           <Select
             name={FELTER.aar}
             label="Velg år"

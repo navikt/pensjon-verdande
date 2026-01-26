@@ -9,7 +9,7 @@ type Props = {
 
 export function BehandlingAntallTableCard(props: Props) {
   return (
-    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
+    <Box.New background={'raised'} borderRadius="12" shadow="dialog" style={{ padding: '6px' }}>
       <Box.New>
         <div style={{ float: 'left', textAlign: 'center' }}>
           <NumberListIcon
