@@ -189,7 +189,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     if (error.status === 404) {
       errorData = {
         title: 'Beklager, vi fant ikke saken',
-        message: 'Denne saken kan være slettet, eller det er feil id.',
+        message: 'Vennligst sjekk at du har riktig saksnummer og prøv igjen.',
       }
     } else {
       errorData = {
