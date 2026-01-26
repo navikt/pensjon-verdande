@@ -219,7 +219,7 @@ export default function Alderspensjonssoknader() {
 
   return (
     <Page.Block>
-      <Bleed marginInline={'12 12'} marginBlock={'space-16'} asChild>
+      <Bleed marginInline={'space-12 space-12'} marginBlock={'space-16'} asChild>
         <Box>
           <Heading className={css.topBanner} level={'1'} size={'large'} style={{ marginTop: 0 }}>
             <div className={css.topBannerContent}>
@@ -274,7 +274,7 @@ export default function Alderspensjonssoknader() {
         ) : page.content.length === 0 ? (
           <EmptyState />
         ) : (
-          <VStack gap="space-3">
+          <VStack gap="space-4">
             {page.content.map((b) => (
               <BehandlingCard
                 key={b.uuid}
@@ -352,7 +352,7 @@ function FilterBar({
   const allStatuses: BehandlingStatus[] = ['OPPRETTET', 'UNDER_BEHANDLING', 'FULLFORT', 'STOPPET', 'DEBUG', 'FEILENDE']
 
   return (
-    <VStack gap="space-3">
+    <VStack gap="space-4">
       <div>
         <Detail style={{ marginBottom: 8 }}>Fullføringsgrad</Detail>
         <ToggleGroup size="small" onChange={(val) => onToggleFerdig(clampFerdig(val))} value={ferdig}>
@@ -442,11 +442,11 @@ function BehandlingCard({
     <Box.New
       as="article"
       borderWidth="1"
-      padding={{ xs: '4', md: '5' }}
-      borderRadius={'large'}
+      padding={{ xs: 'space-4', md: 'space-6' }}
+      borderRadius={'16'}
       borderColor={'neutral-subtleA'}
     >
-      <VStack gap="space-3">
+      <VStack gap="space-4">
         <HStack justify="space-between" wrap>
           <HStack gap="space-2" align="center">
             <Heading level="3" size="small">
@@ -613,8 +613,8 @@ function EmptyState() {
   return (
     <Box.New
       borderWidth="1"
-      padding={{ xs: '8' }}
-      borderRadius={'large'}
+      padding={{ xs: 'space-8' }}
+      borderRadius={'16'}
       style={{ textAlign: 'center' }}
       borderColor={'neutral-subtleA'}
     >

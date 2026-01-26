@@ -34,7 +34,7 @@ export default function Uttrekk() {
     <>
       <HStack>
         {uttrekk !== null && uttrekk.behandlingId !== null && (
-          <VStack gap="space-3">
+          <VStack gap="space-4">
             {uttrekk.status === Behandlingstatus.UNDER_BEHANDLING && (
               <Alert variant="info" inline>
                 <VStack gap="space-2">
@@ -67,7 +67,7 @@ export default function Uttrekk() {
                 <VStack gap="space-2">Uttrekk er fullført {formatIsoTimestamp(uttrekk.uttrekkDato)}</VStack>
               </Alert>
             )}
-            <HStack gap="space-3">
+            <HStack gap="space-4">
               <ReadMore header="Vis kjøretid for aktiviteter">
                 <VStack>
                   {uttrekk?.kjoretidAktiviteter.map((aktivitet) => (
@@ -78,7 +78,7 @@ export default function Uttrekk() {
                 </VStack>
               </ReadMore>
             </HStack>
-            <HStack gap="space-5">
+            <HStack gap="space-6">
               <Entry labelText={'Satsdato'}>{formatIsoDate(uttrekk?.satsDato)}</Entry>
               <Entry labelText={'Populasjon'}>{uttrekk?.arbeidstabellSize}</Entry>
               <Entry labelText={'Antall familier'}>{uttrekk?.familierTabellSize}</Entry>
@@ -92,7 +92,7 @@ export default function Uttrekk() {
           </VStack>
         )}
       </HStack>
-      <HStack gap="space-3" align="center">
+      <HStack gap="space-4" align="center">
         {(uttrekk === null ||
           uttrekk.behandlingId == null ||
           uttrekk.status === Behandlingstatus.FULLFORT ||
@@ -139,7 +139,7 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   return (
     <Modal header={{ heading: 'Start uttrekk' }} open={isOpen} onClose={() => onClose()}>
       <Modal.Body>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <BodyLong>Velg satsdato</BodyLong>
           <DatePicker.Standalone
             selected={satsDato}
@@ -183,7 +183,7 @@ function OppdaterUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   return (
     <Modal header={{ heading: 'Oppdater uttrekk' }} open={isOpen} onClose={() => onClose()}>
       <Modal.Body>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <BodyLong>Dette vil oppdatere arbeidstabellene med familiesammenstøt som nå er klare for regulering</BodyLong>
         </VStack>
       </Modal.Body>

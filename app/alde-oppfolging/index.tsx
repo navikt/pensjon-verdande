@@ -220,7 +220,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
 
   return (
     <Page.Block>
-      <Bleed marginInline={'12 12'} marginBlock={'space-16'} asChild>
+      <Bleed marginInline={'space-12 space-12'} marginBlock={'space-16'} asChild>
         <Box>
           <Heading className={css.topBanner} level={'1'} size={'large'} style={{ marginTop: 0 }}>
             <div className={css.topBannerContent}>
@@ -330,7 +330,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                     key={status}
                     borderWidth="2"
                     padding="space-4"
-                    borderRadius="medium"
+                    borderRadius="12"
                     style={{
                       borderColor: colors?.borderColor || 'var(--a-border-default)',
                       backgroundColor: colors?.backgroundColor || 'transparent',
@@ -367,7 +367,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
             <FordelingBehandlingStatus data={behandlingFordeling} />
           </HStack>
 
-          <VStack gap="space-10" padding="space-4">
+          <VStack gap="space-12" padding="space-4">
             <KontrollpunktfordelingOverTidBarChart
               data={kontrollpunktFordelingOverTid}
               fomDate={fomDato}

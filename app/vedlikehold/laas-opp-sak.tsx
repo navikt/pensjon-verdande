@@ -40,7 +40,7 @@ export default function LaasteVedtakPage() {
 
   return (
     <div>
-      <VStack gap="space-5">
+      <VStack gap="space-6">
         <HStack>
           <Heading size="large">Lås opp sak</Heading>
         </HStack>
@@ -49,7 +49,7 @@ export default function LaasteVedtakPage() {
         </HStack>
         <HStack>
           {sak !== undefined && sak !== null && (
-            <VStack gap="space-5">
+            <VStack gap="space-6">
               <HStack gap="space-4" align="end" justify="start">
                 <Entry labelText={'Saktype'}>{sak.sakType}</Entry>
                 <Entry labelText={'Sakstatus'}>{sak.sakStatus}</Entry>
@@ -87,7 +87,7 @@ export default function LaasteVedtakPage() {
                               <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />
                             </Table.DataCell>
                             <Table.DataCell>
-                              <HStack gap="space-3">
+                              <HStack gap="space-4">
                                 {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
                                   <Button
                                     onClick={() => setKravTilManuell(vedtak.kravId)}
@@ -307,7 +307,7 @@ function SettTilManuellModal({ kravId, onClose }: { kravId: string; onClose: () 
   return (
     <Modal header={{ heading: 'Sett til manuell' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <BodyLong>
             Er du sikker på at du vil sette kravet til manuell? Dette fører til merarbeid for saksbehandler, sørg for at
             fag er innvolvert og at saksbehandler får nødvendig informasjon.
@@ -363,7 +363,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClos
   return (
     <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <BodyLong>
             Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
             innvolvert og at saksbehandler får nødvendig informasjon.
@@ -447,7 +447,7 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
   return (
     <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
       <Modal.Body>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <BodyLong>
             Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>

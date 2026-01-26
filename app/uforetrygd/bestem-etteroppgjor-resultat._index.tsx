@@ -63,7 +63,7 @@ export default function BestemEtteroppgjorResultatPage() {
         Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <TextField
             label="År for etteroppgjør:"
             aria-label="etteroppgjorAr"

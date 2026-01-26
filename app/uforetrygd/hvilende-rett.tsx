@@ -79,7 +79,7 @@ function hvilendeRettVarselForm() {
   }
 
   return (
-    <VStack gap="space-5">
+    <VStack gap="space-6">
       <Heading size="small">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '10em' }}>
         <VStack gap={'space-4'}>
@@ -126,7 +126,7 @@ function hvilendeRettOpphorForm() {
   }
 
   return (
-    <VStack gap="space-5">
+    <VStack gap="space-6">
       <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '50em' }}>
         <VStack gap={'space-4'}>

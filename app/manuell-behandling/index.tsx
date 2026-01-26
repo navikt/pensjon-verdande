@@ -394,8 +394,8 @@ export default function ManuellBehandlingOppsummeringRoute() {
 
         <HStack gap="space-6" align="start" wrap>
           <VStack gap="space-4" style={{ flex: 1, minWidth: 420 }}>
-            <Box.New padding="space-3" borderRadius="large" borderWidth="1" borderColor="neutral-subtleA">
-              <HStack gap="space-3" align="end" wrap>
+            <Box.New padding="space-4" borderRadius="16" borderWidth="1" borderColor="neutral-subtleA">
+              <HStack gap="space-4" align="end" wrap>
                 <DatePicker {...datepickerProps}>
                   <HStack wrap gap="space-16" justify="center">
                     <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
@@ -585,7 +585,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <HStack gap="space-3">
+            <HStack gap="space-4">
               <Button variant="secondary" onClick={clearFacetFilters}>
                 Nullstill
               </Button>
@@ -609,7 +609,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
                 </CheckboxGroup>
               </Box>
 
-              <Box.New padding="space-3" borderRadius="large" borderColor="warning">
+              <Box.New padding="space-4" borderRadius="16" borderColor="warning">
                 <Label size="small">Rekkefølge</Label>
                 {groupBy.length === 0 ? (
                   <BodyShort size="small" textColor="subtle">
@@ -669,7 +669,7 @@ export default function ManuellBehandlingOppsummeringRoute() {
             </VStack>
           </Modal.Body>
           <Modal.Footer>
-            <HStack gap="space-3">
+            <HStack gap="space-4">
               <Button variant="secondary" onClick={clearGrouping}>
                 Nullstill gruppering
               </Button>

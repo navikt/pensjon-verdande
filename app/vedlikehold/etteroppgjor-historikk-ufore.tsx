@@ -41,7 +41,7 @@ export default function EtteroppgjorHistorikkUforePage() {
   const error = actionData?.error
 
   return (
-    <VStack gap="space-5" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-6" style={{ maxWidth: '50em', margin: '2em' }}>
       {actionData && (
         <>
           {success && (

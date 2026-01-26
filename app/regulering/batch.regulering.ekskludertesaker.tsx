@@ -24,10 +24,10 @@ export default function EkskluderteSaker() {
   const fetcherRemoveEkskluderte = useFetcher()
 
   return (
-    <VStack gap="space-5">
+    <VStack gap="space-6">
       <Heading size="small">Saker som skal ekskluderes fra reguleringen</Heading>
       <HStack>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <Tabs defaultValue="ekskludertePanel">
             <Tabs.Panel value="ekskludertePanel" style={{ paddingTop: '2em' }}>
               {ekskluderteSakerMedKommentar !== undefined ? (
@@ -43,7 +43,7 @@ export default function EkskluderteSaker() {
             </Alert>
           </VStack>
 
-          <HStack gap="space-5">
+          <HStack gap="space-6">
             <div>
               <Button
                 type="submit"
@@ -130,7 +130,7 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
         onClose={props.onCancel}
       >
         <Modal.Body>
-          <VStack gap={'space-5'}>
+          <VStack gap={'space-6'}>
             {props.text}
             {(!harLagtTilSaker || response?.erOppdatert) && (
               <Alert variant="success" inline>
@@ -220,7 +220,7 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
         onClose={props.onCancel}
       >
         <Modal.Body>
-          <VStack gap={'space-5'}>
+          <VStack gap={'space-6'}>
             {props.text}
             {(!harFjernetSaker || response?.erOppdatert) && (
               <Alert variant="success" inline>

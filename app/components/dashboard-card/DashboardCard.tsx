@@ -16,7 +16,7 @@ type Props = {
 
 export function DashboardCard(props: Props) {
   return (
-    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
+    <Box.New background={'raised'} borderRadius="12" shadow="dialog" style={{ padding: '6px' }}>
       <HStack>
         <Box.New
           style={{
@@ -25,7 +25,7 @@ export function DashboardCard(props: Props) {
             backgroundColor: props.iconBackgroundColor,
             marginRight: '12px',
           }}
-          borderRadius="medium"
+          borderRadius="12"
         >
           <props.icon
             fontSize="1.5rem"

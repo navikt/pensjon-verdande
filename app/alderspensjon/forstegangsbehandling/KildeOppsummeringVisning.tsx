@@ -123,7 +123,7 @@ export function KildeOppsummeringVisning({
   const total = data.reduce((sum, row) => sum + row.antall, 0)
 
   return (
-    <Box.New borderWidth="1" borderRadius="large" borderColor="neutral-subtleA" padding={{ xs: '4', md: '5' }}>
+    <Box.New borderWidth="1" borderRadius="16" borderColor="neutral-subtleA" padding={{ xs: 'space-4', md: 'space-6' }}>
       <VStack gap="space-4">
         <HStack justify="space-between" align="center" wrap={false}>
           <Heading level="2" size="small">
@@ -134,7 +134,7 @@ export function KildeOppsummeringVisning({
           </Detail>
         </HStack>
 
-        <HStack gap="space-3" align="end" wrap>
+        <HStack gap="space-4" align="end" wrap>
           <DatePicker {...datepickerProps}>
             <HStack wrap gap="space-16" justify="center">
               <DatePicker.Input size="small" {...fromInputProps} label="Fra" />

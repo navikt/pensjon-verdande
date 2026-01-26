@@ -18,7 +18,7 @@ export default function Bruker(props: Props) {
         <BodyShort size={'small'}>{props.bruker.brukernavn}</BodyShort>
       </Heading>
 
-      <Box.New background={'raised'} style={{ padding: '6px' }} borderRadius="medium" shadow="dialog">
+      <Box.New background={'raised'} style={{ padding: '6px' }} borderRadius="12" shadow="dialog">
         <Tabs defaultValue="tilganger">
           <Tabs.List>
             <Tabs.Tab value="tilganger" label="Tilganger" icon={<KeyHorizontalIcon aria-hidden />} />

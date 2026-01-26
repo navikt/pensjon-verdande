@@ -80,7 +80,7 @@ export default function ValgteDatoerPreview({
         <span style={{ opacity: 0.7 }}>{yearMonthDayDates.length} stk</span>
       </HStack>
 
-      <VStack gap="space-3">
+      <VStack gap="space-4">
         {orderedKeys.map((key) => (
           <VStack key={key} gap="space-1">
             <strong style={{ textTransform: 'capitalize' }}>{monthLabel(key)}</strong>

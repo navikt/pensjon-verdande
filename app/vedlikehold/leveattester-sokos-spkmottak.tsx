@@ -18,7 +18,7 @@ export default function SokosSPKMottakPage() {
 
   return (
     <div>
-      <VStack gap="space-5">
+      <VStack gap="space-6">
         <HStack>
           <Heading size="large">Hent antall fra MOT</Heading>
         </HStack>
@@ -39,7 +39,7 @@ export default function SokosSPKMottakPage() {
         )}
 
         <Form method="post">
-          <VStack gap="space-3">
+          <VStack gap="space-4">
             <TextField
               label="fomYear"
               name="fomYear"

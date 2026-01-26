@@ -38,13 +38,13 @@ export default function Avsluttendeaktiviteter() {
   }
 
   return (
-    <VStack gap="space-5">
+    <VStack gap="space-6">
       {actionData?.success && (
         <Alert variant="success" inline>
           Behandlinger avbrutt mot {actionData.action === 'avbrytBehandlingerFeiletMotPOPP' ? 'POPP' : 'Beregn Ytelse'}
         </Alert>
       )}
-      <HStack gap="space-5">
+      <HStack gap="space-6">
         <Button onClick={() => setOpenConfirmationModal('avbrytBehandlingerFeiletMotPOPP')}>
           Avbryt behandlinger feilet mot POPP
         </Button>

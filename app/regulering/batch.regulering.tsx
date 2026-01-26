@@ -30,7 +30,7 @@ export default function OpprettReguleringBatchRoute() {
   }
 
   return (
-    <VStack gap="space-5">
+    <VStack gap="space-6">
       <Heading level="1" size="medium">
         Regulering
       </Heading>

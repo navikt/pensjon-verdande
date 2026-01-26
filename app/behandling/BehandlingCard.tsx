@@ -415,7 +415,7 @@ export default function BehandlingCard(props: Props) {
         >
           <Box.New
             background={'raised'}
-            borderRadius={'xlarge'}
+            borderRadius={'12'}
             borderWidth={'1'}
             borderColor={'neutral-subtleA'}
             padding={'space-4'}
@@ -500,7 +500,7 @@ export default function BehandlingCard(props: Props) {
               <Page.Block>
                 <Box.New
                   background={'raised'}
-                  borderRadius={'xlarge'}
+                  borderRadius={'12'}
                   borderWidth={'1'}
                   borderColor={'neutral-subtleA'}
                   padding={'space-4'}
@@ -600,7 +600,7 @@ export default function BehandlingCard(props: Props) {
         style={{ padding: '6px', marginTop: '12px' }}
         borderColor={'neutral-subtle'}
         borderWidth={'1'}
-        borderRadius={'medium'}
+        borderRadius={'12'}
         shadow={'dialog'}
       >
         <Tabs

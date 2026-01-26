@@ -12,7 +12,7 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
   const [antallDager, setAntallDager] = useState(30)
 
   return (
-    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
+    <Box.New background={'raised'} borderRadius="12" shadow="dialog" style={{ padding: '6px' }}>
       <HStack>
         <AreaChartFillIcon
           title="Antall behandlinger"

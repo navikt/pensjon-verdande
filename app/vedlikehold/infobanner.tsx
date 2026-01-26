@@ -53,9 +53,9 @@ export default function InfoBannerPage() {
   const enabled = validToDate !== undefined && (isFuture(validToDate) || isToday(validToDate))
 
   return (
-    <HGrid columns={{ xs: 1, md: 1, xl: 2 }} gap="space-5">
+    <HGrid columns={{ xs: 1, md: 1, xl: 2 }} gap="space-6">
       <Form method="post">
-        <VStack gap="space-5" style={{ width: '25em' }}>
+        <VStack gap="space-6" style={{ width: '25em' }}>
           <Heading size="medium">Endre Infobanner</Heading>
           <BodyLong size="medium">Her kan infobanner i PSAK endres. </BodyLong>
           <Textarea
@@ -89,7 +89,7 @@ export default function InfoBannerPage() {
             Aktiver infobanner
           </Switch>
           {enabled && (
-            <VStack gap="space-3">
+            <VStack gap="space-4">
               <Alert variant="info" inline>
                 Til og med dato for når infobanner skal være aktivt
               </Alert>
@@ -111,7 +111,7 @@ export default function InfoBannerPage() {
           </Button>
         </VStack>
       </Form>
-      <VStack gap="space-5">
+      <VStack gap="space-6">
         <Heading size="medium">Forhåndsvisning</Heading>
         {beskrivelse.length > 0 ? (
           <Alert variant={toAkselVariant(valgtVariant)} size="medium">

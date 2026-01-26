@@ -91,7 +91,7 @@ export default function Kalender(props: Props) {
   }
 
   return (
-    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
+    <Box.New background={'raised'} borderRadius="12" shadow="dialog" style={{ padding: '6px' }}>
       <Heading size={'xlarge'} level="1" spacing>
         <HStack align="center" padding="space-4">
           <span>

@@ -75,7 +75,7 @@ export default function LaasteVedtakPage() {
 
   return (
     <div>
-      <VStack gap="space-5">
+      <VStack gap="space-6">
         <HStack align="center" justify="center" gap="space-2">
           <Heading size="large">Låste vedtak</Heading>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
@@ -111,7 +111,7 @@ export default function LaasteVedtakPage() {
         </HStack>
         <HStack>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig === true && (
-            <VStack gap="space-5">
+            <VStack gap="space-6">
               <HStack gap="space-4" align="end" justify="start">
                 <VelgTeam />
                 <VelgAksjonspunkt />
@@ -448,7 +448,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow; onCl
   return (
     <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <BodyLong>
             Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
             innvolvert og at saksbehandler får nødvendig informasjon.
@@ -522,7 +522,7 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Laa
   return (
     <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
       <Modal.Body>
-        <VStack gap="space-5">
+        <VStack gap="space-6">
           <BodyLong>
             Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>
