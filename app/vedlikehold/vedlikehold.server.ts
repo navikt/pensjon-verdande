@@ -139,8 +139,14 @@ export const ugyldiggjorEtteroppgjorHistorikkUfore = async (
   }
 }
 
-export const hentSak = async (accessToken: string, sakId: string) => {
-  return await apiPost<SakOppsummeringLaasOpp>('/api/behandling/laas-opp/hentSak', { sakId }, { accessToken })
+export const hentSak = async (accessToken: string, sakId: string): Promise<SakOppsummeringLaasOpp> => {
+  const result = await apiPost<SakOppsummeringLaasOpp>('/api/behandling/laas-opp/hentSak', { sakId }, { accessToken })
+
+  if (!result) {
+    throw new Error('Forventet data fra api, men fikk ingen respons')
+  }
+
+  return result
 }
 
 export const laasOpp = async (accessToken: string, vedtakId: string) => {

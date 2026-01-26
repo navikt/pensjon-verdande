@@ -54,7 +54,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     logger.error(normalizedError, `Feil ved henting av sak: ${sakId}`)
     return {
-      error: `${normalizedError?.status}: ${normalizedError?.title ?? 'Ukjent feil'}`,
+      error: `${normalizedError?.status}: ${normalizedError?.message ?? normalizedError?.title ?? 'Ukjent feil'}`,
     }
   }
 }
