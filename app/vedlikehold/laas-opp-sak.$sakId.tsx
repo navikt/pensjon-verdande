@@ -51,7 +51,7 @@ export default function LaasOppSakSakIdPage() {
   return (
     <>
       <HStack>
-        {sak !== undefined && sak !== null && (
+        {!!sak && (
           <VStack gap="5">
             <HStack gap="4" align="end" justify="start">
               <Entry labelText={'Saktype'}>{sak.sakType}</Entry>
@@ -124,7 +124,7 @@ export default function LaasOppSakSakIdPage() {
                 </HStack>
               </>
             )}
-            {sak !== null && sak.automatiskeKravUtenVedtak.length > 0 && (
+            {sak.automatiskeKravUtenVedtak.length > 0 && (
               <>
                 <Heading size="medium">Automatiske krav uten vedtak</Heading>
                 <HStack>
