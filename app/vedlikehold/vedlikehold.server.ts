@@ -1,6 +1,6 @@
 import { env } from '~/services/env.server'
 import { logger } from '~/services/logger.server'
-import type { LaasOppResultat, SakOppsummeringLaasOpp } from '~/vedlikehold/laas-opp.types'
+import type { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import type {
   LaasteVedtakUttrekkStatus,
   LaasteVedtakUttrekkSummary,
@@ -135,28 +135,6 @@ export const ugyldiggjorEtteroppgjorHistorikkUfore = async (
 
   return {
     success: response.ok,
-  }
-}
-
-export const hentSak = async (accessToken: string, sakId: string) => {
-  const response = await fetch(`${env.penUrl}/api/behandling/laas-opp/hentSak`, {
-    method: 'POST',
-    body: JSON.stringify({ sakId }),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-      'Content-Type': 'application/json',
-    },
-  })
-
-  if (response.status === 404) {
-    return null
-  }
-  if (response.ok) {
-    return (await response.json()) as SakOppsummeringLaasOpp
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
   }
 }
 
