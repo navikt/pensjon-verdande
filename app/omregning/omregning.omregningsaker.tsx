@@ -11,7 +11,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     .map((t: string) => t.trim())
     .filter((t: string) => t !== '')
     .map(Number)
-  console.log('Saker', omregnedeSaker)
 
   const requestPen: { saker: number[] } = {
     saker: omregnedeSaker,

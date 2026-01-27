@@ -40,7 +40,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 export default function Foo() {
   const { bruker, tilgangskontrollmeta, readOnly } = useLoaderData<typeof loader>()
-  console.log(tilgangskontrollmeta)
 
   return <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta} readOnly={readOnly}></Bruker>
 }

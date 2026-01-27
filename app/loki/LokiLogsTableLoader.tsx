@@ -5,11 +5,12 @@ import { Await, useAsyncError } from 'react-router'
 import LokiLogsTable from '~/loki/LokiLogsTable'
 import type { LokiInstantQueryResponse } from '~/loki/loki-query-types'
 import type { TempoConfiguration } from '~/loki/utils'
+import { logger } from '~/services/logger.server'
 
 function LokiLogsError() {
   const errors = useAsyncError()
 
-  console.error(errors)
+  logger.error('Loki logs fetch error', { errors })
 
   return (
     <Alert variant="error" size="small">

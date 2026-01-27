@@ -11,7 +11,7 @@ import {
   ReadMore,
   VStack,
 } from '@navikt/ds-react'
-import { format, formatISO } from 'date-fns'
+import { format } from 'date-fns'
 import { useState } from 'react'
 import { Link, useFetcher, useOutletContext } from 'react-router'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
@@ -122,7 +122,6 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   const fetcher = useFetcher()
 
   function startUttrekk() {
-    console.log(formatISO(satsDato ?? defaultSatsdato))
     fetcher.submit(
       {
         satsDato: format(satsDato ?? defaultSatsdato, 'yyyy-MM-dd'),
