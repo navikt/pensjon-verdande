@@ -25,6 +25,7 @@ import { apiGet } from '~/services/api.server'
 import type { Route } from './+types'
 import FordelingAldeStatus from './FordelingAldeStatus'
 import FordelingBehandlingStatus from './FordelingBehandling'
+import FordelingStatusMedAktivitet from './FordelingStatusMedAktivitet'
 import css from './index.module.css'
 import StatusfordelingOverTidBarChart from './StatusfordelingOverTidBarChart'
 import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart/utils'
@@ -33,6 +34,7 @@ import type {
   AldeBehandlingNavn,
   AldeFordelingKontrollpunktOverTidDto,
   AldeFordelingStatusDto,
+  AldeFordelingStatusMedAktivitet,
   AldeFordelingStatusOverTidDto,
 } from './types'
 
@@ -86,6 +88,11 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
+  const statusfordelingAldeAktiviteter = await apiGet<{ statusFordeling: AldeFordelingStatusMedAktivitet[] }>(
+    `/api/behandling/alde/oppfolging/status-fordeling-med-aktivitet?${dateRangeSearchParams.toString()}`,
+    request,
+  ).then((it) => it.statusFordeling)
+
   return {
     avbrutteBehandlinger,
     statusfordelingOverTid,
@@ -96,6 +103,7 @@ export async function loader({ request }: { request: Request }) {
     tomDato,
     behandlingstype,
     kontrollpunktFordelingOverTid,
+    statusfordelingAldeAktiviteter,
     nowIso: now.toISOString(),
   }
 }
@@ -111,6 +119,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     behandlingFordeling,
     aldeBehandlinger,
     kontrollpunktFordelingOverTid,
+    statusfordelingAldeAktiviteter,
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
@@ -375,6 +384,8 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
             />
 
             <KontrollpunktfordelingPieChart data={kontrollpunktFordelingOverTid} />
+
+            <FordelingStatusMedAktivitet data={statusfordelingAldeAktiviteter} />
           </VStack>
 
           <Heading as="h2" size="medium">
