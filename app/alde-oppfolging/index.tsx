@@ -11,6 +11,7 @@ import {
   Page,
   Select,
   Table,
+  Tabs,
   useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
@@ -25,6 +26,7 @@ import { apiGet } from '~/services/api.server'
 import type { Route } from './+types'
 import FordelingAldeStatus from './FordelingAldeStatus'
 import FordelingBehandlingStatus from './FordelingBehandling'
+import FordelingStatusMedAktivitet from './FordelingStatusMedAktivitet'
 import css from './index.module.css'
 import StatusfordelingOverTidBarChart from './StatusfordelingOverTidBarChart'
 import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart/utils'
@@ -33,6 +35,7 @@ import type {
   AldeBehandlingNavn,
   AldeFordelingKontrollpunktOverTidDto,
   AldeFordelingStatusDto,
+  AldeFordelingStatusMedAktivitet,
   AldeFordelingStatusOverTidDto,
 } from './types'
 
@@ -86,6 +89,11 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
+  const statusfordelingAldeAktiviteter = await apiGet<{ statusFordeling: AldeFordelingStatusMedAktivitet[] }>(
+    `/api/behandling/alde/oppfolging/status-fordeling-med-aktivitet?${dateRangeSearchParams.toString()}`,
+    request,
+  ).then((it) => it.statusFordeling)
+
   return {
     avbrutteBehandlinger,
     statusfordelingOverTid,
@@ -96,6 +104,7 @@ export async function loader({ request }: { request: Request }) {
     tomDato,
     behandlingstype,
     kontrollpunktFordelingOverTid,
+    statusfordelingAldeAktiviteter,
     nowIso: now.toISOString(),
   }
 }
@@ -111,6 +120,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     behandlingFordeling,
     aldeBehandlinger,
     kontrollpunktFordelingOverTid,
+    statusfordelingAldeAktiviteter,
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
@@ -354,46 +364,73 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
               })}
             </HStack>
           </VStack>
-          <Box>
-            <StatusfordelingOverTidBarChart
-              data={statusfordelingOverTid}
-              fomDate={fomDato}
-              tomDate={tomDato}
-              hiddenStatuses={hiddenStatuses}
-            />
-          </Box>
-          <HStack maxHeight="300px">
-            <FordelingAldeStatus data={aldeStatusFordeling} hiddenStatuses={hiddenStatuses} />
-            <FordelingBehandlingStatus data={behandlingFordeling} />
-          </HStack>
 
-          <VStack gap="10" padding="4">
-            <KontrollpunktfordelingOverTidBarChart
-              data={kontrollpunktFordelingOverTid}
-              fomDate={fomDato}
-              tomDate={tomDato}
-            />
+          <Tabs defaultValue="status-over-tid" fill>
+            <Tabs.List>
+              <Tabs.Tab value="status-over-tid" label="Statusfordeling over tid" />
+              <Tabs.Tab value="kontrollpunkt" label="Kontrollpunkt" />
+              <Tabs.Tab value="status-aktivitet" label="Status med aktivitet" />
+              <Tabs.Tab value="avbrutte-behandlinger" label="Avbrutte behandlinger" />
+            </Tabs.List>
 
-            <KontrollpunktfordelingPieChart data={kontrollpunktFordelingOverTid} />
-          </VStack>
+            <Tabs.Panel value="status-over-tid">
+              <VStack gap="6" padding="6">
+                <StatusfordelingOverTidBarChart
+                  data={statusfordelingOverTid}
+                  fomDate={fomDato}
+                  tomDate={tomDato}
+                  hiddenStatuses={hiddenStatuses}
+                />
 
-          <Heading as="h2" size="medium">
-            Avbrutte behandlinger
-          </Heading>
-          <Table size="medium" zebraStripes>
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeader style={{ width: '10rem' }}>Tid</Table.ColumnHeader>
-                <Table.ColumnHeader>Begrunnelse</Table.ColumnHeader>
-              </Table.Row>
-            </Table.Header>
-            {avbrutteBehandlinger.map((avbruttBehandling) => (
-              <Table.Row key={avbruttBehandling.begrunnelse}>
-                <Table.DataCell>{avbruttBehandling.opprettet}</Table.DataCell>
-                <Table.DataCell>{avbruttBehandling.begrunnelse}</Table.DataCell>
-              </Table.Row>
-            ))}
-          </Table>
+                <HStack gap="6" wrap>
+                  <FordelingAldeStatus data={aldeStatusFordeling} hiddenStatuses={hiddenStatuses} />
+                  <FordelingBehandlingStatus data={behandlingFordeling} />
+                </HStack>
+              </VStack>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="kontrollpunkt">
+              <VStack gap="14" padding="6">
+                <KontrollpunktfordelingOverTidBarChart
+                  data={kontrollpunktFordelingOverTid}
+                  fomDate={fomDato}
+                  tomDate={tomDato}
+                />
+
+                <KontrollpunktfordelingPieChart data={kontrollpunktFordelingOverTid} />
+              </VStack>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="status-aktivitet">
+              <Box padding="6">
+                <FordelingStatusMedAktivitet data={statusfordelingAldeAktiviteter} />
+              </Box>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="avbrutte-behandlinger">
+              <VStack gap="4" padding="6">
+                <Heading as="h2" size="medium">
+                  Avbrutte behandlinger
+                </Heading>
+                <Table size="medium" zebraStripes>
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.ColumnHeader style={{ width: '10rem' }}>Tid</Table.ColumnHeader>
+                      <Table.ColumnHeader>Begrunnelse</Table.ColumnHeader>
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {avbrutteBehandlinger.map((avbruttBehandling, idx) => (
+                      <Table.Row key={`${avbruttBehandling.opprettet}-${idx}`}>
+                        <Table.DataCell>{avbruttBehandling.opprettet}</Table.DataCell>
+                        <Table.DataCell>{avbruttBehandling.begrunnelse}</Table.DataCell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table>
+              </VStack>
+            </Tabs.Panel>
+          </Tabs>
         </Box>
       </VStack>
     </Page.Block>
