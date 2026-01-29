@@ -25,6 +25,12 @@ export interface AldeFordelingStatusOverTidDto {
   fordeling: AldeFordelingStatusDto['statusFordeling']
 }
 
+export interface AldeFordelingStatusMedAktivitet {
+  status: string
+  aktivitet: string
+  antall: number
+}
+
 export interface AldeBehandlingNavn {
   friendlyName: string
   handlerName: string
