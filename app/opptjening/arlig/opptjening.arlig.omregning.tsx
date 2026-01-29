@@ -1,4 +1,4 @@
-import { Button, Heading, HStack, Page, Select, Table, Textarea, VStack } from '@navikt/ds-react'
+import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
@@ -64,7 +64,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const response = await opprettOpptjeningsendringArligUttrekk(accessToken)
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.kjoerOmregning) {
-    const response = await opprettOpptjeningsendringArligOmregning(accessToken, +fromEntries.opptjeningsar)
+    const response = await opprettOpptjeningsendringArligOmregning(
+      accessToken,
+      +fromEntries.opptjeningsar,
+      +fromEntries.bolkstorrelse,
+    )
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
     await oppdaterSisteGyldigOpptjeningsaar(accessToken, +fromEntries.oppdaterOpptjeningsaar)
@@ -97,6 +101,7 @@ export default function EndretOpptjeningArligUttrekk() {
 
   const isSubmitting = navigation.state === 'submitting'
 
+  const [bolkstorrelse, setBolkstorrelse] = useState<number>(10000)
   const [ekskluderteSakIderText, setEkskluderteSakIderText] = useState<string>('')
   const [kommentar, setKommentar] = useState<string>('')
 
@@ -171,24 +176,35 @@ export default function EndretOpptjeningArligUttrekk() {
         </Form>
 
         <Heading size="medium">Kjør årlig omregningsendring</Heading>
-        <Form method="post">
-          <VStack gap="4" width="20em">
-            <Select
-              name="opptjeningsar"
-              label="Velg opptjeningsår"
-              onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
-              value={selectedOpptjeningsaar}
-            >
-              {aarListe.map((aar) => (
-                <option key={aar} value={aar}>
-                  {aar}
-                </option>
-              ))}
-            </Select>
 
-            <Button type="submit" name="action" value={Action.kjoerOmregning} disabled={isSubmitting}>
-              Start årlig opptjeningsendring
-            </Button>
+        <Form method="post">
+          <VStack gap="4">
+            <HStack gap="4">
+              <Select
+                name="opptjeningsar"
+                label="Velg opptjeningsår"
+                onChange={(e) => setSelectedOpptjeningsaar(+e.target.value)}
+                value={selectedOpptjeningsaar}
+              >
+                {aarListe.map((aar) => (
+                  <option key={aar} value={aar}>
+                    {aar}
+                  </option>
+                ))}
+              </Select>
+
+              <TextField
+                label="Bolkstørrelse"
+                name="bolkstorrelse"
+                value={bolkstorrelse}
+                onChange={(e) => setBolkstorrelse(+e.target.value)}
+              />
+            </HStack>
+            <div style={{ marginTop: '1rem' }}>
+              <Button type="submit" name="action" value={Action.kjoerOmregning} disabled={isSubmitting}>
+                Start årlig opptjeningsendring
+              </Button>
+            </div>
           </VStack>
         </Form>
 

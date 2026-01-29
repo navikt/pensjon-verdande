@@ -55,6 +55,7 @@ const batcherMeny = [
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
   ['HVILENDE_RETT_UFORETRYGD', `/hvilenderett`, 'Hvilende rett av Uføretrygd'],
   ['INNTEKTSKONTROLL', `/batch/inntektskontroll`, 'Inntektskontroll'],
+  ['KONTROLLERE_SAERSKILT_SATS', '/kontroll-saerskilt-sats', 'Kontroll særskilt sats'],
   ['LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning'],
   ['LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting'],
   ['OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/manedlig/omregning`, 'Månedlig omregning ved opptjeningsendring'],

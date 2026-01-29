@@ -154,8 +154,8 @@ export default [
     route('etteroppgjor-historikk-ufore', 'vedlikehold/etteroppgjor-historikk-ufore.tsx'),
 
     route('laas-opp-sak', 'vedlikehold/laas-opp-sak.tsx', [
+      route(':sakId', 'vedlikehold/laas-opp-sak.$sakId.tsx'),
       route('settTilManuell', 'vedlikehold/laas-opp-sak.settTilManuell.tsx'),
-      route('hentSak', 'vedlikehold/laas-opp-sak.hentSak.tsx'),
       route('laasOpp', 'vedlikehold/laas-opp-sak.laasOpp.tsx'),
     ]),
 
@@ -191,6 +191,8 @@ export default [
     route('opptjening/arlig/omregning', 'opptjening/arlig/opptjening.arlig.omregning.tsx'),
     route('opptjening/manedlig/omregning', 'opptjening/manedlig/opptjening.manedlig.omregning.tsx'),
     route('/opptjening/manedlig/omregning/opprett', 'opptjening/manedlig/opptjening.manedlig.omregning.opprett.tsx'),
+
+    route('kontroll-saerskilt-sats', 'kontroll-saerskilt-sats/kontroll-saerskilt-sats._index.tsx'),
 
     route('sok', 'sok/sok.tsx'),
   ]),

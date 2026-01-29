@@ -1,0 +1,228 @@
+# Copilot Instructions for pensjon-verdande
+
+## Repository Overview
+Verdande is a web application for monitoring, debugging, and developing treatments in NAV's pension and disability benefits system (pensjon-pen). Built with React Router 7 (Framework Mode), TypeScript, Node.js/Express, and Nav Designsystem (Aksel). The codebase has ~18,000 lines of TypeScript/TSX.
+
+**Tech Stack:**
+- **Frontend**: React Router 7 (data routers), React 19, TypeScript
+- **UI**: Nav Designsystem (`@navikt/ds-react`, `@navikt/ds-css` Darkside)
+- **Backend**: Node.js/Express, React Router SSR
+- **Testing**: Vitest
+- **Linting/Formatting**: Biome
+- **Build**: Vite, React Router build system
+- **Deployment**: NAIS (NAV's Kubernetes platform), Docker
+
+## Critical Setup Requirements
+
+### Node Version Requirement (CRITICAL)
+**ALWAYS use Node.js >= 24.11.0**. The project has `engine-strict=true` in `.npmrc`, making this non-negotiable.
+- Check Node version: `node --version`
+- Package.json engines field: `"node": ">=24.11.0"`
+- CI uses Node 24
+- **npm install WILL FAIL** with Node < 24.11.0
+
+### Environment Setup
+Local development requires secrets from Kubernetes:
+```bash
+npm install
+./fetch-secrets.sh  # Creates .env file with Azure AD & backend URLs
+npm run dev
+```
+The `fetch-secrets.sh` script requires `kubectl`, `gcloud`, `base64`, and NAIS device connection.
+
+## Build and Validation Commands
+
+### Installation
+```bash
+npm ci  # Use in CI or for clean install
+npm install  # For local development
+```
+
+### Development
+```bash
+npm run dev  # Start dev server on http://localhost:3000
+```
+
+### Type Checking
+```bash
+npm run typecheck  # MUST run before builds
+```
+This command:
+1. Runs `node scripts/copy-server-dts.ts` (copies `types/build-server.d.ts` to `build/server/index.d.ts`)
+2. Runs `react-router typegen` (generates types in `.react-router/types/`)
+3. Runs `tsc` for TypeScript compilation check
+
+**Important**: Generated types in `.react-router/types/` and `app/**/+types/` may not be checked in. ALWAYS run `typecheck` before build.
+
+### Building
+```bash
+npm run build  # Builds client and server bundles to build/
+```
+Production build creates:
+- `build/client/` - Client-side assets
+- `build/server/` - Server bundle
+
+### Testing
+```bash
+npm test  # Run Vitest tests
+```
+Only 2 test files exist currently:
+- `app/common/decodeBehandling.test.ts`
+- `app/alde-oppfolging/StatusfordelingOverTidBarChart/utils.test.ts`
+
+### Linting and Formatting (Biome)
+Biome is configured in `biome.json` and handles both linting and formatting:
+```bash
+npm run check      # Check linting + formatting
+npm run check:fix  # Auto-fix issues
+npm run lint       # Lint only
+npm run lint:fix   # Auto-fix lint issues
+npm run format     # Check formatting
+npm run format:fix # Auto-fix formatting
+```
+
+**Biome Config Highlights:**
+- Only checks `app/**` directory
+- Quote style: single quotes
+- Semicolons: as needed (minimal)
+- Trailing commas: always
+- Line width: 120
+
+### Pre-commit Hooks (Lefthook)
+Lefthook (`lefthook.yml`) runs on pre-commit:
+1. `biome check --write` on staged files
+2. `npm run typecheck`
+
+If hooks fail locally, run the same commands manually.
+
+### CI/CD Pipeline
+GitHub Actions workflow (`.github/workflows/deploy.yml`):
+1. **Build job**: `npm ci && npm run typecheck && npm run build && npm prune --omit=dev`
+2. Docker build and push to NAIS registry
+3. Deploy to dev (q0, q1, q2, q5) and prod environments
+
+**To replicate CI locally**:
+```bash
+npm ci
+npm run typecheck
+npm run build
+```
+
+## Project Structure
+
+### Key Directories
+```
+.
+├── app/                       # Main application code
+│   ├── routes.ts              # Route definitions (React Router file-based)
+│   ├── root.tsx               # Root layout component
+│   ├── entry.client.tsx       # Client entry
+│   ├── entry.server.tsx       # Server entry
+│   ├── layout.tsx             # Main layout wrapper
+│   ├── services/              # Server-side services (auth, API clients, env)
+│   │   ├── api.server.ts      # API client with auth/timeout/error handling
+│   │   ├── auth.server.ts     # Azure AD authentication
+│   │   ├── env.server.ts      # Environment configuration
+│   ├── common/                # Shared utilities
+│   │   ├── error.ts           # Error normalization helpers
+│   │   └── utils.ts           # Common utilities
+│   ├── components/            # Shared React components
+│   ├── behandling/            # Treatment-related routes and UI
+│   └── [feature-folders]/     # Feature-specific code (alderspensjon, audit, etc.)
+├── server.ts                  # Express server entry point
+├── public/                    # Static assets (favicon, images)
+├── build/                     # Generated build output (DO NOT edit manually)
+├── .react-router/             # Generated React Router types (DO NOT edit)
+├── types/                     # Type definitions
+│   └── build-server.d.ts      # Server build types
+├── scripts/
+│   └── copy-server-dts.ts     # Copies types for typecheck
+├── .nais/                     # NAIS deployment configs
+├── biome.json                 # Biome config
+├── tsconfig.json              # TypeScript config
+├── vite.config.ts             # Vite config
+├── react-router.config.ts     # React Router config
+└── lefthook.yml               # Git hooks config
+```
+
+### TypeScript Path Aliases
+`tsconfig.json` defines `~/` as alias for `./app/`:
+```typescript
+import { apiGet } from '~/services/api.server'
+```
+
+### Server-Side vs Client-Side Code
+Files ending in `.server.ts` are server-only. Use `~/services/api.server.ts` for backend API calls.
+
+## Coding Patterns and Conventions
+
+### React Router Patterns
+- **Loaders**: Fetch data server-side (`loader` function)
+- **Actions**: Handle form submissions/mutations (`action` function)
+- **Resource Routes**: Routes with only `loader` for on-demand data fetching
+- **Form Submission**: Use `<Form method="post">` for navigation-based submits
+- **Fetcher**: Use `useFetcher()` for non-navigation submits (modals, inline actions)
+
+### API Calls (Server-Side)
+**ALWAYS use `api.server.ts` functions instead of `fetch` directly**:
+- `apiGet<T>(path, request)` - GET requests
+- `apiPost<T>(path, request, body)` - POST requests
+- `apiGetOrUndefined<T>(path, request)` - GET with 404 as undefined
+- `apiGetRawStringOrUndefined(path, request)` - Raw string response
+
+Benefits: Consistent auth via `requireAccessToken`, 15s timeout, error normalization via `normalizeAndThrow`.
+
+### Error Handling
+Use helpers in `app/common/error.ts`:
+- `toNormalizedError(err)` - Normalizes errors from various sources
+- Check `e.data.status` and/or `e.init.status` for HTTP status codes
+- Errors from React Router can be `DataWithResponseInit` or `ErrorResponse`
+
+### Imports (CRITICAL)
+**AVOID `await import(...)` in loaders/actions** unless absolutely necessary. Use static imports:
+```typescript
+import { requireAccessToken } from '~/services/auth.server'
+```
+Dynamic imports can trigger Vite warnings about modules being both dynamically and statically imported.
+
+### Code Style
+- **Semi**: false (no semicolons unless required)
+- **Quotes**: single
+- **Trailing commas**: always
+- **Line width**: 120
+- **Comments**: Only add if matching existing style or necessary for complex logic
+- **Nav Designsystem**: Use components from `@navikt/ds-react`, support dark/light mode
+
+### Security
+- DO NOT log tokens/secrets
+- DO NOT put sensitive data in URLs (use POST body)
+- Use `requireAccessToken` for authenticated requests
+
+## Common Issues and Workarounds
+
+### Build/Typecheck Failures
+1. **Always run `npm run typecheck` before `npm run build`**
+2. If typecheck fails with missing types, ensure `.react-router/types/` is generated
+3. Node version mismatch: Verify `node --version` >= 24.11.0
+
+### Test Failures
+- Only 2 test files exist; most features lack tests
+- If adding features, tests are not strictly required but recommended
+
+### Environment Issues
+- Missing `.env` file: Run `./fetch-secrets.sh`
+- Requires NAV infrastructure access (kubectl, gcloud, NAIS device)
+
+## Definition of Done
+Before submitting changes:
+1. `npm run typecheck` passes
+2. `npm run check` (Biome) passes
+3. `npm run test` passes (if tests exist)
+4. `npm run build` succeeds
+5. Changes documented in PR description
+
+## Additional Notes
+- **AGENTS.md** contains team-specific Norwegian instructions (complementary to this file)
+- Deployment targets: dev-gcp (q0, q1, q2, q5) and prod-gcp
+- Server runs on port 8080 in production, 3000 in development
+- Uses SSR by default (`ssr: true` in `react-router.config.ts`)
