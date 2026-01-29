@@ -26,6 +26,8 @@ export default [
 
     route('avstemming', 'avstemming/avstemming.tsx'),
 
+    route('konsistensavstemming', 'konsistensavstemming/konsistensavstemming.tsx'),
+
     route('batch/inntektskontroll', 'inntektskontroll/batch.inntektskontroll._index.tsx'),
 
     route('batch/regulering', 'regulering/batch.regulering.tsx', [

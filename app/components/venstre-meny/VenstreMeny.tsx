@@ -49,6 +49,7 @@ const batcherMeny = [
   ['AFP_ETTEROPPGJOR', '/afp-etteroppgjor', 'AFP Etteroppgjør'],
   ['ALDERSOVERGANG', '/aldersovergang', 'Aldersovergang'],
   ['AVSTEMMING_LES', '/avstemming', 'Avstemming'],
+  ['AVSTEMMING_LES', '/konsistensavstemming', 'Konsistensavstemming'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
