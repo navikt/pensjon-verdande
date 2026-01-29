@@ -79,7 +79,7 @@ export default function FordelingStatusMedAktivitet({ data }: Props) {
                     }
                   >
                     {idx === 0 && (
-                      <Table.DataCell aria-rowspan={items.length + 1} style={{ fontWeight: 500 }}>
+                      <Table.DataCell rowSpan={items.length + 1} style={{ fontWeight: 500 }}>
                         {statusLabels[status] || status}
                       </Table.DataCell>
                     )}
