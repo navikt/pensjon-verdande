@@ -1,28 +1,31 @@
-import {Alert, Button, Heading, HStack, Modal, Select, TextField, VStack} from '@navikt/ds-react'
-import { useMemo, useRef, useState } from 'react'
+import { Alert, Button, Heading, HStack, Modal, Select, TextField, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfDay, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
+import { useMemo, useRef, useState } from 'react'
 import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
 import { Form, redirect, useLoaderData, useNavigation } from 'react-router'
-import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import { opprettKontrollereSaerskiltSatsBehandling } from '~/kontroll-saerskilt-sats/kontroll-saerskilt-sats.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
-import { opprettKontrollereSaerskiltSatsBehandling } from '~/kontroll-saerskilt-sats/kontroll-saerskilt-sats.server'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
-  const response = await opprettKontrollereSaerskiltSatsBehandling({
-    kjoereMaaned: updates.kjoereMaaned as string,
-    kontrollAar: updates.kontrollAar as string,
-    oensketVirkMaaned: updates.oensketVirkMaaned ? (updates.oensketVirkMaaned as string) : undefined,
-    kjoeretidspunkt: updates.kjoeretidspunkt ? (updates.kjoeretidspunkt as string) : undefined,
-  }, request)
+  const response = await opprettKontrollereSaerskiltSatsBehandling(
+    {
+      kjoereMaaned: updates.kjoereMaaned as string,
+      kontrollAar: updates.kontrollAar as string,
+      oensketVirkMaaned: updates.oensketVirkMaaned ? (updates.oensketVirkMaaned as string) : undefined,
+      kjoeretidspunkt: updates.kjoeretidspunkt ? (updates.kjoeretidspunkt as string) : undefined,
+    },
+    request,
+  )
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  return redirect(`/behandling/${response?.behandlingId}`)
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -74,7 +77,6 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
 
   const kanOpprette = selectedKjoereMaaned !== '' && !isSubmitting
 
-
   const formatYearMonth = (mnd: string) => format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })
 
   return (
@@ -85,66 +87,66 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
 
       <Form id="skjema" method="post">
         <VStack gap="4">
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '250px 140px 250px 250px',
-                columnGap: '1rem',
-                rowGap: '0.75rem',
-                paddingTop: '0.5rem',
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '250px 140px 250px 250px',
+              columnGap: '1rem',
+              rowGap: '0.75rem',
+              paddingTop: '0.5rem',
+            }}
+          >
+            <Select
+              label="Kjøremåned"
+              size="small"
+              value={selectedKjoereMaaned}
+              onChange={(e) => {
+                setSelectedKjoereMaaned(e.target.value)
+                setSelectedKjoeretidspunkt(null)
               }}
             >
-              <Select
-                label="Kjøremåned"
-                size="small"
-                value={selectedKjoereMaaned}
-                onChange={(e) => {
-                  setSelectedKjoereMaaned(e.target.value)
-                  setSelectedKjoeretidspunkt(null)
-                }}
-              >
-                <option value="" disabled>
-                  Velg måned
+              <option value="" disabled>
+                Velg måned
+              </option>
+              {maneder.map((m) => (
+                <option key={m} value={m}>
+                  {formatYearMonth(m)}
                 </option>
-                {maneder.map((m) => (
-                  <option key={m} value={m}>
-                    {formatYearMonth(m)}
-                  </option>
-                ))}
-              </Select>
-              <input hidden name="kjoereMaaned" readOnly value={selectedKjoereMaaned} />
+              ))}
+            </Select>
+            <input hidden name="kjoereMaaned" readOnly value={selectedKjoereMaaned} />
 
-              <TextField label="Kontrollår" size="small" value={kontrollAar} readOnly />
-              <input hidden name="kontrollAar" readOnly value={kontrollAar} />
+            <TextField label="Kontrollår" size="small" value={kontrollAar} readOnly />
+            <input hidden name="kontrollAar" readOnly value={kontrollAar} />
 
-              <Select
-                label="Ønsket virkningmåned (valgfritt)"
-                size="small"
-                value={selectedOensketVirkMaaned}
-                onChange={(e) => setSelectedOensketVirkMaaned(e.target.value)}
-              >
-                <option value="">Ikke sett</option>
-                {maneder.map((m) => (
-                  <option key={m} value={m}>
-                    {formatYearMonth(m)}
-                  </option>
-                ))}
-              </Select>
-              <input hidden name="oensketVirkMaaned" readOnly value={selectedOensketVirkMaaned} />
+            <Select
+              label="Ønsket virkningmåned (valgfritt)"
+              size="small"
+              value={selectedOensketVirkMaaned}
+              onChange={(e) => setSelectedOensketVirkMaaned(e.target.value)}
+            >
+              <option value="">Ikke sett</option>
+              {maneder.map((m) => (
+                <option key={m} value={m}>
+                  {formatYearMonth(m)}
+                </option>
+              ))}
+            </Select>
+            <input hidden name="oensketVirkMaaned" readOnly value={selectedOensketVirkMaaned} />
 
-              <DateTimePicker
-                selectedDate={selectedKjoeretidspunkt}
-                setSelectedDate={setSelectedKjoeretidspunkt}
-                minDate={kjoretidspunktMinDate}
-                maxDate={kjoretidspunktMaxDate}
-                label="Kjøretidspunkt (valgfritt)"
-              />
-              <input
-                type="hidden"
-                name="kjoeretidspunkt"
-                value={selectedKjoeretidspunkt ? format(selectedKjoeretidspunkt, "yyyy-MM-dd'T'HH:mm:ss") : ''}
-              />
-            </div>
+            <DateTimePicker
+              selectedDate={selectedKjoeretidspunkt}
+              setSelectedDate={setSelectedKjoeretidspunkt}
+              minDate={kjoretidspunktMinDate}
+              maxDate={kjoretidspunktMaxDate}
+              label="Kjøretidspunkt (valgfritt)"
+            />
+            <input
+              type="hidden"
+              name="kjoeretidspunkt"
+              value={selectedKjoeretidspunkt ? format(selectedKjoeretidspunkt, "yyyy-MM-dd'T'HH:mm:ss") : ''}
+            />
+          </div>
 
           <Alert variant="info" size="small" style={{ visibility: kanOpprette ? 'hidden' : 'visible' }}>
             Kjøremåned må velges før behandlingen opprettes.
@@ -158,7 +160,8 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
         </VStack>
       </Form>
 
-      <div style={{ marginTop: '2rem' }}> {/* Sikrer at knappen ikke flytter seg */}
+      {/* Sikrer at knappen ikke flytter seg */}
+      <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
           Eksisterende behandlinger
         </Heading>
@@ -184,7 +187,8 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
               {selectedKjoeretidspunkt ? format(selectedKjoeretidspunkt, "dd.MM.yyyy 'kl.' HH:mm:ss") : 'nå'}
             </div>
             <div>
-              <b>Ønsket virkningmåned:</b> {selectedOensketVirkMaaned ? formatYearMonth(selectedOensketVirkMaaned) : 'ikke satt'}
+              <b>Ønsket virkningmåned:</b>{' '}
+              {selectedOensketVirkMaaned ? formatYearMonth(selectedOensketVirkMaaned) : 'ikke satt'}
             </div>
             <Alert variant="warning" size="small">
               Etter start kan du ikke angre denne handlingen.

@@ -18,11 +18,11 @@ type StartBatchResponse = {
 export async function opprettKontrollereSaerskiltSatsBehandling(
   payload: StartKontrollereSaerskiltSatsRequest,
   request: Request,
-): Promise<StartBatchResponse> {
+) {
   const response = await apiPost<StartBatchResponse>(
     '/api/behandling/kontrollere-saerskilt-sats/opprett',
     payload,
     request,
   )
-  return response!
+  return response
 }
