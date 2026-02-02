@@ -54,7 +54,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 const genererManedsalternativer = () => {
   const now = new Date()
   return Array.from({ length: 15 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
+    const d = new Date(now.getFullYear(), now.getMonth() + i + 1, 1)
     return format(d, 'yyyy-MM')
   })
 }
