@@ -127,7 +127,7 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
           </div>
 
           <Alert variant="info" size="small" style={{ visibility: kanOpprette ? 'hidden' : 'visible' }}>
-            Kjøremåned må velges før behandlingen opprettes.
+            Fra og med måned må velges før behandlingen opprettes.
           </Alert>
 
           {opprettedeBehandlinger && opprettedeBehandlinger.length > 1 && (

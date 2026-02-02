@@ -61,9 +61,10 @@ const batcherMeny = [
 ]
 
 const kontrollMeny = [
-  ['INNTEKTSKONTROLL',
-    `/batch/inntektskontroll`,
-    'Inntektskontroll'
+  [
+    'INNTEKTSKONTROLL',
+    '/batch/inntektskontroll',
+    'Inntektskontroll',
   ],
   [
     'KONTROLLERE_SAERSKILT_SATS',
