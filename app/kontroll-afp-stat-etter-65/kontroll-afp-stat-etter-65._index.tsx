@@ -66,12 +66,12 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
-  const [selectedKjoereMaaned, setSelectedKjoereMaaned] = useState('')
+  const [selectedFomMaaned, setSelectedFomMaaned] = useState('')
   const [antallMaaneder, setAntallMaaneder] = useState('1')
 
   const maneder = useMemo(genererManedsalternativer, [])
 
-  const kanOpprette = selectedKjoereMaaned !== '' && !isSubmitting
+  const kanOpprette = selectedFomMaaned !== '' && !isSubmitting
 
   const formatYearMonth = (mnd: string) => format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })
 
@@ -97,8 +97,8 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
             <Select
               label="Fra og med måned"
               size="small"
-              value={selectedKjoereMaaned}
-              onChange={(e) => setSelectedKjoereMaaned(e.target.value)}
+              value={selectedFomMaaned}
+              onChange={(e) => setSelectedFomMaaned(e.target.value)}
             >
               <option value="" disabled>
                 Velg måned
@@ -109,7 +109,7 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
                 </option>
               ))}
             </Select>
-            <input hidden name="fomMaaned" readOnly value={selectedKjoereMaaned} />
+            <input hidden name="fomMaaned" readOnly value={selectedFomMaaned} />
 
             <Select
               label="Antall måneder å opprette"
@@ -176,17 +176,17 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
           <VStack gap="4">
             <div>
               <b>Fra og med måned:</b>{' '}
-              {selectedKjoereMaaned ? formatYearMonth(selectedKjoereMaaned) : '-'}
+              {selectedFomMaaned ? formatYearMonth(selectedFomMaaned) : '-'}
             </div>
             <div>
               <b>Antall måneder å opprette:</b> {antallMaaneder}
             </div>
-            {selectedKjoereMaaned && (
+            {selectedFomMaaned && (
               <div>
                 <b>Måneder som opprettes:</b>
                 <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
                   {Array.from({ length: parseInt(antallMaaneder, 10) }, (_, i) => {
-                    const startDate = parse(selectedKjoereMaaned, 'yyyy-MM', new Date())
+                    const startDate = parse(selectedFomMaaned, 'yyyy-MM', new Date())
                     const d = new Date(startDate)
                     d.setMonth(d.getMonth() + i)
                     return <li key={i}>{format(d, 'MMMM yyyy', { locale: nb })}</li>
