@@ -1,4 +1,4 @@
-import { Alert, Button, Heading, HStack, Modal, Select, VStack } from '@navikt/ds-react'
+import { Alert, Button, Heading, HStack, Link, Modal, Select, VStack } from '@navikt/ds-react'
 import { format, parse } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useRef, useState } from 'react'
@@ -29,6 +29,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const behandlingIds = response?.behandlingIds ?? []
 
+  if (behandlingIds.length === 0) {
+    return { behandlingIds, error: 'Ingen behandlinger ble opprettet.' }
+  }
+
   if (behandlingIds.length === 1) {
     return redirect(`/behandling/${behandlingIds[0]}`)
   }
@@ -51,10 +55,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return { behandlinger: behandlinger as BehandlingerPage }
 }
 
+const KJOEREDAG = 6 // matcher dagen som behandlingen kjører hver maned
+
 const genererManedsalternativer = () => {
   const now = new Date()
+  const offset = now.getDate() < KJOEREDAG ? 0 : 1
   return Array.from({ length: 15 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() + i + 1, 1)
+    const d = new Date(now.getFullYear(), now.getMonth() + i + offset, 1)
     return format(d, 'yyyy-MM')
   })
 }
@@ -76,6 +83,7 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
   const formatYearMonth = (mnd: string) => format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })
 
   const opprettedeBehandlinger = actionData && 'behandlingIds' in actionData ? actionData.behandlingIds : null
+  const feilmelding = actionData && 'error' in actionData ? actionData.error : null
 
   return (
     <div>
@@ -130,12 +138,18 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
             Fra og med måned må velges før behandlingen opprettes.
           </Alert>
 
+          {feilmelding && (
+            <Alert variant="error" size="small">
+              {feilmelding}
+            </Alert>
+          )}
+
           {opprettedeBehandlinger && opprettedeBehandlinger.length > 1 && (
             <Alert variant="success" size="small">
               Opprettet {opprettedeBehandlinger.length} behandlinger:{' '}
               {opprettedeBehandlinger.map((id, index) => (
                 <span key={id}>
-                  <a href={`/behandling/${id}`}>{id}</a>
+                  <Link href={`/behandling/${id}`}>{id}</Link>
                   {index < opprettedeBehandlinger.length - 1 ? ', ' : ''}
                 </span>
               ))}
