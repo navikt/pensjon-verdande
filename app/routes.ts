@@ -8,11 +8,6 @@ export default [
 
   layout('layout.tsx', [
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
-    route('adhocbrev_fullmakter', 'adhocbrev_fullmakter/adhoc-brev-fullmakt.tsx'),
-    route(
-      'adhocbrev_fullmakter/bekreft-brevutsending',
-      'adhocbrev_fullmakter/adhoc-brev-fullmakt-bekreft-brevutsending.tsx',
-    ),
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
 
     route('alde', 'alde-oppfolging/index.tsx'),
