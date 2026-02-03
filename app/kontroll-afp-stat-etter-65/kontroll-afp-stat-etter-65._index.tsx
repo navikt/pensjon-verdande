@@ -1,7 +1,7 @@
-import { Alert, Button, Heading, HStack, Link, Modal, Select, VStack } from '@navikt/ds-react'
+import { Alert, Button, Heading, HStack, Modal, Select, VStack } from '@navikt/ds-react'
 import { format, parse } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
 import { Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
@@ -30,14 +30,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const behandlingIds = response?.behandlingIds ?? []
 
   if (behandlingIds.length === 0) {
-    return { behandlingIds, error: 'Ingen behandlinger ble opprettet.' }
+    return { error: 'Ingen behandlinger ble opprettet.' }
   }
 
   if (behandlingIds.length === 1) {
     return redirect(`/behandling/${behandlingIds[0]}`)
   }
 
-  return { behandlingIds }
+  return { success: true, antallOpprettet: behandlingIds.length }
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -82,8 +82,17 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
 
   const formatYearMonth = (mnd: string) => format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })
 
-  const opprettedeBehandlinger = actionData && 'behandlingIds' in actionData ? actionData.behandlingIds : null
   const feilmelding = actionData && 'error' in actionData ? actionData.error : null
+  const suksessmelding = actionData && 'success' in actionData
+    ? `${actionData.antallOpprettet} behandlinger ble opprettet.`
+    : null
+
+  // Lukk modal ved oppretting av flere behandlinger samtidig
+  useEffect(() => {
+    if (suksessmelding) {
+      modalRef.current?.close()
+    }
+  }, [suksessmelding])
 
   return (
     <div>
@@ -144,18 +153,6 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
             </Alert>
           )}
 
-          {opprettedeBehandlinger && opprettedeBehandlinger.length > 1 && (
-            <Alert variant="success" size="small">
-              Opprettet {opprettedeBehandlinger.length} behandlinger:{' '}
-              {opprettedeBehandlinger.map((id, index) => (
-                <span key={id}>
-                  <Link href={`/behandling/${id}`}>{id}</Link>
-                  {index < opprettedeBehandlinger.length - 1 ? ', ' : ''}
-                </span>
-              ))}
-            </Alert>
-          )}
-
           <HStack gap="4">
             <Button
               type="button"
@@ -167,6 +164,12 @@ export default function OpprettKontrollAFPStat65KontrollRoute() {
           </HStack>
         </VStack>
       </Form>
+
+      {suksessmelding && (
+        <Alert variant="success" size="small" style={{ marginTop: '1rem' }}>
+          {suksessmelding}
+        </Alert>
+      )}
 
       {/* Sikrer at knappen ikke flytter seg */}
       <div style={{ marginTop: '2rem' }}>
