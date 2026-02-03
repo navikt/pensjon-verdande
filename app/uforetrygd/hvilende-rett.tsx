@@ -85,7 +85,7 @@ function hvilendeRettVarselForm() {
 
   return (
     <VStack gap="5">
-      <Heading size="small">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
+      <Heading size="medium">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
         <VStack gap={'4'}>
           <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
@@ -138,7 +138,7 @@ function hvilendeRettOpphorForm() {
 
   return (
     <VStack gap="5">
-      <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
+      <Heading size="medium">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
         <VStack gap={'4'}>
           <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
