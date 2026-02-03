@@ -33,7 +33,12 @@ export async function action({ request }: ActionFunctionArgs) {
   let response: HvilendeRettBehandlingResponse | undefined
 
   if (formData.action === hvilendeRettVarselAction.type) {
-    response = await opprettHvilendeRettVarselbrevBehandlinger(Number(formData.senesteHvilendeAr), request)
+    response = await opprettHvilendeRettVarselbrevBehandlinger(
+      Number(formData.senesteHvilendeAr),
+      parseSakIds(formData.sakIds),
+      formData.dryRun === 'true',
+      request,
+    )
   } else if (formData.action === hvilendeRettOpphorAction.type) {
     response = await opprettHvilendeRettOpphorBehandlinger(
       Number(formData.senesteHvilendeAr),
@@ -81,15 +86,21 @@ function hvilendeRettVarselForm() {
   return (
     <VStack gap="5">
       <Heading size="small">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
-      <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '10em' }}>
+      <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
         <VStack gap={'4'}>
+          <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
           <TextField
+            style={{ width: '10em' }}
             label="Seneste hvilende år:"
             aria-label="senesteHvilendeAr"
             name="senesteHvilendeAr"
             type="text"
             inputMode="numeric"
           />
+          <SakIdTextArea fieldName="sakIds" />
           <Button type="submit" style={{ width: '10em' }} disabled={fetcher.state === 'submitting'}>
             Opprett
           </Button>
@@ -128,7 +139,7 @@ function hvilendeRettOpphorForm() {
   return (
     <VStack gap="5">
       <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
-      <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '50em' }}>
+      <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
         <VStack gap={'4'}>
           <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
             <option value="true">Ja</option>
