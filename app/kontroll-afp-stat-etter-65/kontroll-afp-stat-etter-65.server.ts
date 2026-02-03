@@ -3,7 +3,7 @@ import { apiPost } from '~/services/api.server'
 export type StartKontrollereAfpStatEtter65Request = {
   // yyyy-MM
   fomMaaned: string
-  // Antall behandlinger som skal opprettes
+  // Antall måneder å opprette behandlinger for
   antallMaaneder: number
 }
 

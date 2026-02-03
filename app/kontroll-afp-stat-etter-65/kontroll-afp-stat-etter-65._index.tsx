@@ -66,7 +66,7 @@ const genererManedsalternativer = () => {
   })
 }
 
-export default function OpprettKontrollAFPStat65KontrollRoute() {
+export default function OpprettKontrollAfpStatEtter65Route() {
   const { behandlinger } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const modalRef = useRef<HTMLDialogElement>(null)
