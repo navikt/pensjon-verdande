@@ -76,6 +76,7 @@ const TIDER: string[] = Array.from({ length: 24 * 4 }, (_, i) => {
 const BEHANDLINGSTYPER = [
   'AvsluttSaker',
   'DagligAvstemming',
+  'ManedligAvstemming',
   'FodselsdatoAjourhold',
   'IdentAjourhold',
   'KontrollerOppgaver',
