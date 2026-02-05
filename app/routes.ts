@@ -189,6 +189,8 @@ export default [
 
     route('kontroll-saerskilt-sats', 'kontroll-saerskilt-sats/kontroll-saerskilt-sats._index.tsx'),
 
+    route('kontroll-afp-stat-etter-65', 'kontroll-afp-stat-etter-65/kontroll-afp-stat-etter-65._index.tsx'),
+
     route('sok', 'sok/sok.tsx'),
   ]),
 ] satisfies RouteConfig

@@ -3,6 +3,7 @@ import {
   ChevronDownIcon,
   CircleIcon,
   CurrencyExchangeIcon,
+  GavelIcon,
   HandShakeHeartIcon,
   HouseIcon,
   NumberListIcon,
@@ -48,8 +49,6 @@ const batcherMeny = [
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
   ['HVILENDE_RETT_UFORETRYGD', `/hvilenderett`, 'Hvilende rett av Uføretrygd'],
-  ['INNTEKTSKONTROLL', `/batch/inntektskontroll`, 'Inntektskontroll'],
-  ['KONTROLLERE_SAERSKILT_SATS', '/kontroll-saerskilt-sats', 'Kontroll særskilt sats'],
   ['LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning'],
   ['LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting'],
   ['OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/manedlig/omregning`, 'Månedlig omregning ved opptjeningsendring'],
@@ -59,6 +58,24 @@ const batcherMeny = [
     'Årlig omregning ved opptjeningsendring',
   ],
   ['REGULERING_LES', `/batch/regulering`, 'Regulering'],
+]
+
+const kontrollMeny = [
+  [
+    'INNTEKTSKONTROLL',
+    '/batch/inntektskontroll',
+    'Inntektskontroll',
+  ],
+  [
+    'KONTROLLERE_SAERSKILT_SATS',
+    '/kontroll-saerskilt-sats',
+    'Kontroll særskilt sats',
+  ],
+  [
+    'KONTROLLER_AFP_STAT_ETTER_65',
+    '/kontroll-afp-stat-etter-65',
+    'Kontroll AFP Stat etter 65 år',
+  ],
 ]
 
 const omregningMeny = [
@@ -248,6 +265,16 @@ export default function VenstreMeny(props: Props) {
             batcherMeny,
             indexSupplier,
             <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" className={styles.menyIkon} />,
+          )}
+          {byggMeny(
+            'Kontroll',
+            kontrollMeny,
+            indexSupplier,
+            <GavelIcon
+              title="Kontroll"
+              fontSize="1.5rem"
+              className={styles.menyIkon}
+            />,
           )}
           {byggMeny(
             'Behandlinger',
