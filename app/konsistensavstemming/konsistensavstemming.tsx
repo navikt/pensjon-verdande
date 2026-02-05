@@ -36,7 +36,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const behandlinger = getBehandlinger(accessToken, {
     behandlingType: behandlingType,
     page: page ? +page : 0,
-    size: size ? +size : 10,
+    size: size ? +size : 9,
     sort: searchParams.get('sort'),
   })
 
