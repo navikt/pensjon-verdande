@@ -189,6 +189,8 @@ export default [
 
     route('kontroll-saerskilt-sats', 'kontroll-saerskilt-sats/kontroll-saerskilt-sats._index.tsx'),
 
+    route('gradert-ap-brev', 'gradert-ap-brev/gradert_ap_brev._index.tsx'),
+
     route('sok', 'sok/sok.tsx'),
   ]),
 ] satisfies RouteConfig

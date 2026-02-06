@@ -25,7 +25,7 @@ export default function OpprettGradertAPRoute() {
       <Form id="skjema" method="post">
         <VStack gap="4">
           <HStack gap="4">
-            <Button type="submit" disabled={!isSubmitting}>
+            <Button type="submit" disabled={isSubmitting}>
               Kjør
             </Button>
           </HStack>
