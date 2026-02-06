@@ -36,7 +36,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const behandlinger = getBehandlinger(accessToken, {
     behandlingType: behandlingType,
     page: page ? +page : 0,
-    size: size ? +size : 10,
+    size: size ? +size : 9,
     sort: searchParams.get('sort'),
   })
 
@@ -55,8 +55,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const PENGJ = (formData.get('PENGJ') as string) === 'true'
   const PENGY = (formData.get('PENGY') as string) === 'true'
   const PENKP = (formData.get('PENKP') as string) === 'true'
-  const PENUP = (formData.get('PENUP') as string) === 'true'
-  // const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
+  const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
   const accessToken = await requireAccessToken(request)
 
@@ -70,8 +69,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     PENGJ,
     PENGY,
     PENKP,
-    PENUP,
-    // UFOREUT,
+    UFOREUT,
     avstemmingsdato,
   )
 
@@ -153,12 +151,9 @@ export default function Konsistensavstemming() {
             <Checkbox name={'PENKP'} value={'true'} defaultChecked={true}>
               PENKP
             </Checkbox>
-            <Checkbox name={'PENUP'} value={'true'} defaultChecked={true}>
-              PENUP
+            <Checkbox name={'UFOREUT'} value={'true'} defaultChecked={true}>
+              UFOREUT
             </Checkbox>
-            {/*<Checkbox name={'UFOREUT'} value={'true'} defaultChecked={true}>*/}
-            {/*  UFOREUT*/}
-            {/*</Checkbox>*/}
           </CheckboxGroup>
           <TextField
             label="Avstemmingsdato:"
