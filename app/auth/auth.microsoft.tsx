@@ -1,9 +1,9 @@
-import type { ActionFunctionArgs } from 'react-router'
+import type { LoaderFunctionArgs } from 'react-router'
 import invariant from 'tiny-invariant'
 import { authenticator, returnToCookie } from '~/services/auth.server'
 import { isLocalEnv } from '~/services/env.server'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (!isLocalEnv) {
     throw new Error('OAuth 2.0 code flyt er kun tilgjengelig ved lokal utvikling')
   }

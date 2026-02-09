@@ -15,7 +15,7 @@ import {
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
+import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, NavLink, redirect, useLoaderData } from 'react-router'
 import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { apiGet } from '~/services/api.server'
@@ -23,7 +23,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import type { Behandlingstatus } from '~/types'
 import styles from './afp-etteroppgjor.module.css'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const behandlinger = await apiGet<HentAlleResponse>(`/api/afpoffentlig/etteroppgjor/behandling`, request)
 
   const etteroppgjor: AfpEtteroppgjorResponse[] = behandlinger.etteroppgjor

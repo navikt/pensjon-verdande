@@ -1,11 +1,11 @@
-import { type ActionFunctionArgs, useLoaderData } from 'react-router'
+import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 
-export const loader = async ({ params, request }: ActionFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.status, 'Missing status param')
   const { searchParams } = new URL(request.url)
 

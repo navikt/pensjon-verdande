@@ -6,7 +6,7 @@ import {
 } from '@navikt/aksel-icons'
 import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
-import { type ActionFunctionArgs, Await, useLoaderData } from 'react-router'
+import { Await, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import { formatNumber } from '~/common/number'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
@@ -15,7 +15,7 @@ import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Ka
 import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
 import type { Route } from '../../.react-router/types/app/dashboard/+types/route'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const dashboardResponse = getDashboardSummary(request)
   if (!dashboardResponse) {
     throw new Response('Not Found', { status: 404 })

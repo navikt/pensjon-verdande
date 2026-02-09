@@ -1,12 +1,12 @@
 import { VStack } from '@navikt/ds-react'
-import type { ActionFunctionArgs } from 'react-router'
+import type { LoaderFunctionArgs } from 'react-router'
 import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url)
 
   let behandlinger: BehandlingerPage | null

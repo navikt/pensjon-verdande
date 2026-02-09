@@ -17,14 +17,14 @@ import {
 import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import type { ChangeEvent } from 'react'
 import { useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
 import { Form, useFetcher, useLoaderData } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   return await apiGet<Infobanner>('/api/verdande/infobanner', request)
 }
 

@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs } from 'react-router'
+import type { LoaderFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { getUttrekkStatus } from '~/vedlikehold/vedlikehold.server'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const behandlingId = new URL(request.url).searchParams.get('behandlingId') ?? ''
