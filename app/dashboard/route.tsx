@@ -6,16 +6,16 @@ import {
 } from '@navikt/aksel-icons'
 import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
-import { Await, type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { Await } from 'react-router'
 import { formatNumber } from '~/common/number'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
-import type { Route } from '../../.react-router/types/app/dashboard/+types/route'
+import type { Route } from './+types/route'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const dashboardResponse = getDashboardSummary(request)
   if (!dashboardResponse) {
     throw new Response('Not Found', { status: 404 })
@@ -39,8 +39,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function Dashboard() {
-  const { kalenderHendelser, loadingDashboardResponse, startDato } = useLoaderData<typeof loader>()
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
+  const { kalenderHendelser, loadingDashboardResponse, startDato } = loaderData
 
   return (
     <React.Suspense
