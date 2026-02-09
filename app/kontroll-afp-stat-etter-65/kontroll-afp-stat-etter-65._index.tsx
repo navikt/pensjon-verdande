@@ -194,7 +194,7 @@ export default function OpprettKontrollAfpStatEtter65Route() {
                     const startDate = parse(selectedFomMaaned, 'yyyy-MM', new Date())
                     const d = new Date(startDate)
                     d.setMonth(d.getMonth() + i)
-                    return <li key={i}>{format(d, 'MMMM yyyy', { locale: nb })}</li>
+                    return <li key={format(d, 'yyyy-MM')}>{format(d, 'MMMM yyyy', { locale: nb })}</li>
                   })}
                 </ul>
               </div>
