@@ -157,6 +157,44 @@ Files ending in `.server.ts` are server-only. Use `~/services/api.server.ts` for
 ## Coding Patterns and Conventions
 
 ### React Router Patterns
+
+#### Typegen (auto-generated types)
+The codebase uses React Router typegen for type-safe route modules. **Always use typegen types:**
+
+```tsx
+// ✅ Correct — use Route types from +types
+import type { Route } from './+types/my-route'
+
+export const loader = async ({ request }: Route.LoaderArgs) => { ... }
+export const action = async ({ request }: Route.ActionArgs) => { ... }
+
+export default function MyPage({ loaderData, actionData }: Route.ComponentProps) { ... }
+
+export function meta({ loaderData }: Route.MetaArgs): Route.MetaDescriptors {
+  return [{ title: 'Page Name | Verdande' }]
+}
+```
+
+```tsx
+// ❌ Wrong — do NOT use generic types or hooks
+import type { LoaderFunctionArgs } from 'react-router'
+const data = useLoaderData<typeof loader>()  // Don't use this
+```
+
+#### root.tsx Layout Export
+- `root.tsx` exports a `Layout` component that wraps the entire HTML document (`<head>`, `<Scripts>`, etc.)
+- `Layout` uses `useRouteLoaderData('root')` (returns `undefined` when loader fails — safe for ErrorBoundary)
+- `ErrorBoundary` in root.tsx renders automatically within `Layout`
+
+#### Page Titles (meta)
+- All routes export `meta()` with format `'Page Name | Verdande'`
+- Use `Route.MetaArgs` for type-safe access to `loaderData` in meta
+
+#### Global Loading Indicator
+- `layout.tsx` has a global loading bar shown during navigation (`useNavigation()`)
+- Do not add per-page loading indicators for navigation — the global one handles this
+
+#### Loaders and Actions
 - **Loaders**: Fetch data server-side (`loader` function)
 - **Actions**: Handle form submissions/mutations (`action` function)
 - **Resource Routes**: Routes with only `loader` for on-demand data fetching
