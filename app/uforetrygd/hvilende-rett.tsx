@@ -4,6 +4,7 @@ import { redirect, useFetcher } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { parseSakIds, SakIdTextArea } from '~/uforetrygd/components/input/SakIdTextArea'
 import {
+  HvilendeRettVarselModus,
   opprettHvilendeRettOpphorBehandlinger,
   opprettHvilendeRettVarselbrevBehandlinger,
 } from '~/uforetrygd/hvilende-rett.server'
@@ -38,11 +39,19 @@ export async function action({ request }: Route.ActionArgs) {
   let response: HvilendeRettBehandlingResponse | undefined
 
   if (formData.action === hvilendeRettVarselAction.type) {
+    const varselmodus = formData.varselmodus as string
+    if (
+      varselmodus !== HvilendeRettVarselModus.FramtidigOpphor &&
+      varselmodus !== HvilendeRettVarselModus.EndeligOpphor
+    ) {
+      throw new Error('Ugyldig varselmodus')
+    }
+
     response = await opprettHvilendeRettVarselbrevBehandlinger(
       Number(formData.senesteHvilendeAr),
       parseSakIds(formData.sakIds),
       formData.dryRun === 'true',
-      formData.varselmodus as string,
+      varselmodus as HvilendeRettVarselModus,
       request,
     )
   } else if (formData.action === hvilendeRettOpphorAction.type) {
