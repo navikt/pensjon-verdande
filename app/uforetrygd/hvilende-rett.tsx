@@ -42,6 +42,7 @@ export async function action({ request }: Route.ActionArgs) {
       Number(formData.senesteHvilendeAr),
       parseSakIds(formData.sakIds),
       formData.dryRun === 'true',
+      formData.varselmodus as string,
       request,
     )
   } else if (formData.action === hvilendeRettOpphorAction.type) {
@@ -105,6 +106,19 @@ function hvilendeRettVarselForm() {
             type="text"
             inputMode="numeric"
           />
+          <Select
+            label="Varselmodus"
+            size={'medium'}
+            name={'varselmodus'}
+            defaultValue={'velg'}
+            style={{ width: '20em' }}
+          >
+            <option value="velg" disabled>
+              Velg
+            </option>
+            <option value="framtidigOpphor">Varsel om framtidig opphør</option>
+            <option value="endeligOpphor">Varsel om endelig opphør</option>
+          </Select>
           <SakIdTextArea fieldName="sakIds" />
           <Button type="submit" style={{ width: '10em' }} disabled={fetcher.state === 'submitting'}>
             Opprett

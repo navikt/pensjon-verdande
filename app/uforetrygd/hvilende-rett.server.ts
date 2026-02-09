@@ -5,6 +5,7 @@ export async function opprettHvilendeRettVarselbrevBehandlinger(
   senesteHvilendeAr: number,
   sakIdListe: number[],
   dryRun: boolean,
+  modus: string,
   request: Request,
 ) {
   return await apiPost<HvilendeRettBehandlingResponse>(
@@ -13,6 +14,7 @@ export async function opprettHvilendeRettVarselbrevBehandlinger(
       senesteHvilendeAr,
       sakIdListe,
       dryRun,
+      modus: mapVarselModus(modus),
     },
     request,
   )
@@ -33,4 +35,13 @@ export async function opprettHvilendeRettOpphorBehandlinger(
     },
     request,
   )
+}
+
+function mapVarselModus(varselModus: string): string {
+  if (varselModus === 'framtidigOpphor') {
+    return 'VARSEL_FRAMTIDIG_OPPHOR'
+  } else if (varselModus === 'endeligOpphor') {
+    return 'VARSEL_ENDELIG_OPPHOR'
+  }
+  throw new Error(`Ugyldig varselmodus: ${varselModus}`)
 }
