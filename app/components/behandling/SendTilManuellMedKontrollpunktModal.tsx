@@ -18,7 +18,7 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
       <Tooltip content="Fortsett videre behandling manuelt med oppgitt kontrollpunkt">
         <Button
           data-color="danger"
-          variant={'primary'}
+          variant={'secondary'}
           icon={<PersonIcon aria-hidden />}
           onClick={() => props.modalRef.current?.showModal()}
         >

@@ -1,3 +1,4 @@
+import { data } from 'react-router'
 import { asLocalDateString } from '~/common/date'
 import type { KalenderHendelser, KalenderHendelserDTO } from '~/components/kalender/types'
 import {
@@ -10,6 +11,7 @@ import {
   apiPut,
   type RequestCtx,
 } from '~/services/api.server'
+import { env } from '~/services/env.server'
 import { kibanaLink } from '~/services/kibana.server'
 import type {
   BehandlingDto,
@@ -220,8 +222,29 @@ export async function godkjennOpprettelse(accessToken: string, behandlingId: str
   await apiPut(`/api/behandling/${behandlingId}/godkjennOpprettelse`, {}, { accessToken })
 }
 
-export async function stopp(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/stopp`, {}, { accessToken })
+export async function bekreftStoppBehandling(accessToken: string, behandlingId: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/bekreftStoppBehandling`, undefined, { accessToken })
+}
+
+export async function stopp(accessToken: string, behandlingId: string, begrunnelse: string): Promise<void> {
+  const response = await fetch(`${env.penUrl}/api/behandling/${behandlingId}/stopp`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'X-Request-ID': crypto.randomUUID(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      begrunnelse: begrunnelse,
+    }),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw data(`Feil ved stopping av behandling. Feil var\n${text}`, {
+      status: response.status,
+    })
+  }
 }
 
 export async function endrePlanlagtStartet(

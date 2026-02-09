@@ -7,6 +7,7 @@ import { replaceTemplates } from '~/common/replace-templates'
 import { subdomain } from '~/common/utils'
 import { requireAccessToken } from '~/services/auth.server'
 import {
+  bekreftStoppBehandling,
   endrePlanlagtStartet,
   fjernFraDebug,
   fortsettAvhengigeBehandlinger,
@@ -29,6 +30,7 @@ export const OPERATION = {
   fortsett: 'fortsett',
   fortsettAvhengigeBehandlinger: 'fortsettAvhengigeBehandlinger',
   godkjennOpprettelse: 'godkjennOpprettelse',
+  bekreftStoppBehandling: 'bekreftStoppBehandling',
   oppdaterAnsvarligTeam: 'oppdaterAnsvarligTeam',
   runBehandling: 'runBehandling',
   sendTilManuellMedKontrollpunkt: 'sendTilManuellMedKontrollpunkt',
@@ -46,64 +48,92 @@ function isOperation(x: unknown): x is Operation {
   return typeof x === 'string' && OperationSet.has(x)
 }
 
-function requireField(form: FormData, name: string): string {
-  const v = form.get(name)
-  if (typeof v !== 'string' || v.length === 0) {
-    throw new Error(`Påkrevd felt mangler: ${name}`)
-  }
-  return v
-}
-
 const getBool = (v: FormDataEntryValue | null) => v === 'true' || v === 'on' || v === '1'
 
+function requireField(
+  form: FormData,
+  name: string,
+): { value: string; error?: never } | { value?: never; error: string } {
+  const v = form.get(name)
+  if (typeof v !== 'string' || v.length === 0) {
+    return { error: `Påkrevd felt mangler: ${name}` }
+  }
+  return { value: v }
+}
+
+// Endret: operationHandlers returnerer errors og handler
 function operationHandlers(
   accessToken: string,
   behandlingId: string,
   form: FormData,
-): Record<Operation, () => Promise<void>> {
-  return {
-    fjernFraDebug: () => fjernFraDebug(accessToken, behandlingId),
+): { errors: Record<string, string>; handler?: () => Promise<void> } {
+  // Hjelpefunksjon for å samle errors
+  const errors: Record<string, string> = {}
 
-    fortsett: () => fortsettBehandling(accessToken, behandlingId, getBool(form.get('nullstillPlanlagtStartet'))),
-
-    fortsettAvhengigeBehandlinger: () => fortsettAvhengigeBehandlinger(accessToken, behandlingId),
-
-    oppdaterAnsvarligTeam: () =>
-      patchBehandling(accessToken, behandlingId, {
-        ansvarligTeam: requireField(form, 'ansvarligTeam'),
-      }),
-
-    runBehandling: () => runBehandling(accessToken, behandlingId),
-
-    sendTilManuellMedKontrollpunkt: () =>
-      sendTilManuellMedKontrollpunkt(accessToken, behandlingId, requireField(form, 'kontrollpunkt')),
-
-    sendTilOppdragPaNytt: () => sendTilOppdragPaNytt(accessToken, behandlingId),
-
-    stopp: () => stopp(accessToken, behandlingId),
-
-    godkjennOpprettelse: () => godkjennOpprettelse(accessToken, behandlingId),
-
-    endrePlanlagtStartet: () => endrePlanlagtStartet(accessToken, behandlingId, String(form.get('nyPlanlagtStartet'))),
-
-    taTilDebug: () => taTilDebug(accessToken, behandlingId),
-  } satisfies Record<Operation, () => Promise<void>>
-}
-
-export const action = async ({ params, request }: Route.ActionArgs) => {
-  invariant(params.behandlingId, 'Mangler parameter: behandlingId')
-  const behandlingId = params.behandlingId
-
-  const form = await request.formData()
-  const operation = form.get('operation')
-  if (!isOperation(operation)) {
-    throw new Error(`Operasjon mangler eller er ukjent: ${String(operation)}`)
+  // For operasjoner med påkrevde felter
+  const ansvarligTeam = requireField(form, 'ansvarligTeam')
+  if (form.get('operation') === 'oppdaterAnsvarligTeam' && ansvarligTeam.error) {
+    errors.ansvarligTeam = ansvarligTeam.error
+  }
+  const kontrollpunkt = requireField(form, 'kontrollpunkt')
+  if (form.get('operation') === 'sendTilManuellMedKontrollpunkt' && kontrollpunkt.error) {
+    errors.kontrollpunkt = kontrollpunkt.error
+  }
+  const beskrivelse = form.get('begrunnelse')
+  if (form.get('operation') === 'stopp') {
+    if (beskrivelse === null || beskrivelse === undefined || (beskrivelse as string).trim().length === 0) {
+      errors.beskrivelse = 'Du må fylle ut en begrunnelse for å stoppe behandlingen.'
+    } else if ((beskrivelse as string).trim().length < 10) {
+      errors.beskrivelse = 'Begrunnelsen er for kort.'
+    }
   }
 
-  const accessToken = await requireAccessToken(request)
-
-  const handlers = operationHandlers(accessToken, behandlingId, form)
-  await handlers[operation]()
+  // Handler-funksjon kun hvis ingen errors
+  let handler: (() => Promise<void>) | undefined
+  if (Object.keys(errors).length === 0) {
+    const op = form.get('operation')
+    switch (op) {
+      case 'fjernFraDebug':
+        handler = () => fjernFraDebug(accessToken, behandlingId)
+        break
+      case 'fortsett':
+        handler = () => fortsettBehandling(accessToken, behandlingId, getBool(form.get('nullstillPlanlagtStartet')))
+        break
+      case 'fortsettAvhengigeBehandlinger':
+        handler = () => fortsettAvhengigeBehandlinger(accessToken, behandlingId)
+        break
+      case 'oppdaterAnsvarligTeam':
+        if (ansvarligTeam.value)
+          handler = () => patchBehandling(accessToken, behandlingId, { ansvarligTeam: ansvarligTeam.value })
+        break
+      case 'runBehandling':
+        handler = () => runBehandling(accessToken, behandlingId)
+        break
+      case 'sendTilManuellMedKontrollpunkt':
+        if (kontrollpunkt.value)
+          handler = () => sendTilManuellMedKontrollpunkt(accessToken, behandlingId, kontrollpunkt.value)
+        break
+      case 'sendTilOppdragPaNytt':
+        handler = () => sendTilOppdragPaNytt(accessToken, behandlingId)
+        break
+      case 'stopp':
+        handler = () => stopp(accessToken, behandlingId, String(form.get('begrunnelse')))
+        break
+      case 'godkjennOpprettelse':
+        handler = () => godkjennOpprettelse(accessToken, behandlingId)
+        break
+      case 'bekreftStoppBehandling':
+        handler = () => bekreftStoppBehandling(accessToken, behandlingId)
+        break
+      case 'endrePlanlagtStartet':
+        handler = () => endrePlanlagtStartet(accessToken, behandlingId, String(form.get('nyPlanlagtStartet')))
+        break
+      case 'taTilDebug':
+        handler = () => taTilDebug(accessToken, behandlingId)
+        break
+    }
+  }
+  return { errors, handler }
 }
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
@@ -132,10 +162,33 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Behandling({ loaderData }: Route.ComponentProps) {
+export const action = async ({ params, request }: Route.ActionArgs) => {
+  invariant(params.behandlingId, 'Mangler parameter: behandlingId')
+  const behandlingId = params.behandlingId
+
+  const form = await request.formData()
+  const operation = form.get('operation')
+  if (!isOperation(operation)) {
+    return { errors: { operation: `Operasjon mangler eller er ukjent: ${String(operation)}` } }
+  }
+
+  const accessToken = await requireAccessToken(request)
+
+  const { errors, handler } = operationHandlers(accessToken, behandlingId, form)
+  if (Object.keys(errors).length > 0 || !handler) {
+    return { errors }
+  }
+  await handler()
+  return null
+}
+
+export default function Behandling({ loaderData, actionData }: Route.ComponentProps) {
   const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } = loaderData
 
   const me = useOutletContext<MeResponse>()
+
+  // Send errors fra actionData til BehandlingCard
+  const errors = actionData?.errors || {}
 
   return (
     <BehandlingCard
@@ -144,6 +197,7 @@ export default function Behandling({ loaderData }: Route.ComponentProps) {
       detaljertFremdrift={detaljertFremdrift}
       me={me}
       psakSakUrlTemplate={psakSakUrlTemplate}
+      errors={errors}
     />
   )
 }

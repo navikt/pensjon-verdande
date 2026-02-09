@@ -5,6 +5,7 @@ export const BEHANDLING_STATUS_MAP = {
   OPPRETTET: 'Opprettet',
   OPPRETTET_VENTER_TO_TRINNS_GODKJENNING: 'Venter godkjenning',
   STOPPET: 'Stoppet',
+  STOPPET_VENTER_BEKREFTELSE: 'Stoppet, venter bekreftelse',
   UNDER_BEHANDLING: 'Under behandling',
 } as const
 
