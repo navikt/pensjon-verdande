@@ -1,10 +1,11 @@
 import { Button, Checkbox, CheckboxGroup, Heading, Select, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useLoaderData, useNavigation } from 'react-router'
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
 import { opprettBpen014 } from '~/inntektskontroll/batch.bpen014.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/batch.inntektskontroll._index'
 
 export const FELTER = {
   aar: 'aar',
@@ -22,7 +23,7 @@ export const loader = async () => {
     detteÅret,
   }
 }
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const fd = await request.formData()
   const accessToken = await requireAccessToken(request)
 

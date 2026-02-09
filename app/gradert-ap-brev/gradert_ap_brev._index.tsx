@@ -1,16 +1,13 @@
 import { Button, Heading, HStack, VStack } from '@navikt/ds-react'
-import type { ActionFunctionArgs } from 'react-router'
 import { Form, redirect, useNavigation } from 'react-router'
 import { opprettGradertAPBehandling } from '~/gradert-ap-brev/gradert-ap-brev.server'
+import type { Route } from './+types/gradert_ap_brev._index'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const response = await opprettGradertAPBehandling(
-    request,
-  )
+export const action = async ({ request }: Route.ActionArgs) => {
+  const response = await opprettGradertAPBehandling(request)
 
   return redirect(`/behandling/${response?.behandlingId}`)
 }
-
 
 export default function OpprettGradertAPRoute() {
   const navigation = useNavigation()

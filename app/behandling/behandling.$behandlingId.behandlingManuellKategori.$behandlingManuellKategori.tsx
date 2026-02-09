@@ -1,13 +1,13 @@
 import { Heading, VStack } from '@navikt/ds-react'
-import type { LoaderFunctionArgs } from 'react-router'
 import { useLoaderData } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/behandling.$behandlingId.behandlingManuellKategori.$behandlingManuellKategori'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
   invariant(params.behandlingManuellKategori, 'Missing behandlingManuellKategori param')
 
@@ -19,7 +19,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const size = searchParams.get('size')
   const manuellKategoriBehandlinger = await getBehandlinger(accessToken, {
     behandlingType: searchParams.get('behandlingType'),
-    status: params.status,
+    status: searchParams.get('status'),
     ansvarligTeam: searchParams.get('ansvarligTeam'),
     behandlingManuellKategori: params.behandlingManuellKategori,
     forrigeBehandlingId: +params.behandlingId,

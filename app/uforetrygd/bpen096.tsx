@@ -1,12 +1,13 @@
 import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, Link, redirect, useActionData, useNavigation } from 'react-router'
+import { Form, Link, redirect, useActionData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import {
   hentAntallSkattehendelser,
   hentSkattehendelserManuelt,
   opprettBpen096,
 } from '~/uforetrygd/batch.bpen096.server'
+import type { Route } from './+types/bpen096'
 
 enum Action {
   HentSkattehendelser = 'HENT_SKATTEHENDELSER',
@@ -14,7 +15,7 @@ enum Action {
   HentAntallSkattehendelser = 'HENT_ANTALL_SKATTEHENDELSER',
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = Object.fromEntries(await request.formData())
   const accessToken = await requireAccessToken(request)
 

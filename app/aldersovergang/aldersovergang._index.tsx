@@ -3,13 +3,14 @@ import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import type React from 'react'
 import { useMemo, useState } from 'react'
-import { Form, type LoaderFunctionArgs, useLoaderData, useSubmit } from 'react-router'
+import { Form, useLoaderData, useSubmit } from 'react-router'
 import { hentMuligeAldersoverganger } from '~/aldersovergang/behandling.aldersovergang.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/aldersovergang._index'
 
 type LoaderData = {
   behandlinger: BehandlingerPage
@@ -18,7 +19,7 @@ type LoaderData = {
   kanOverstyreBehandlingsmaned: boolean
   defaultMonth: string
 }
-export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
+export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')

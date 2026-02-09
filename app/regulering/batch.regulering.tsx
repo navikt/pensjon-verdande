@@ -1,11 +1,12 @@
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
-import { type LoaderFunctionArgs, Outlet, redirect, useLoaderData, useLocation } from 'react-router'
+import { Outlet, redirect, useLoaderData, useLocation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
 import { getReguleringDetaljer } from '~/regulering/regulering.server'
+import type { Route } from './+types/batch.regulering'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const regulering = await getReguleringDetaljer(accessToken)
 

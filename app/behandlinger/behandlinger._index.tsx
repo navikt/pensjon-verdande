@@ -1,10 +1,11 @@
-import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/behandlinger._index'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
   const accessToken = await requireAccessToken(request)

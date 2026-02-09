@@ -1,8 +1,9 @@
-import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { useLoaderData } from 'react-router'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { hentKalenderHendelser } from '~/services/behandling.server'
+import type { Route } from './+types/route'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
   const dato = searchParams.get('dato')

@@ -11,15 +11,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  redirect,
-  useFetcher,
-  useLoaderData,
-  useNavigate,
-  useSearchParams,
-} from 'react-router'
+import { redirect, useFetcher, useLoaderData, useNavigate, useSearchParams } from 'react-router'
 import 'chart.js/auto'
 import { ExternalLinkIcon } from '@navikt/aksel-icons'
 import type { DateRange } from 'react-day-picker'
@@ -32,6 +24,7 @@ import PlanlagteDatoerPreview, { type PlannedItem } from '~/behandlingserie/plan
 import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview'
 import { requireAccessToken } from '~/services/auth.server'
 import type { BehandlingInfoDTO, BehandlingSerieDTO } from '~/types'
+import type { Route } from './+types/behandlingserie'
 import {
   addMonths,
   allWeekdaysInRange,
@@ -83,7 +76,7 @@ const BEHANDLINGSTYPER = [
   'E500Fillevering',
 ]
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const behandlingType = searchParams.get('behandlingType') ?? ''
   const accessToken = await requireAccessToken(request)
@@ -91,7 +84,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return { behandlingSerier }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const intent = String(formData.get('_intent') ?? '')

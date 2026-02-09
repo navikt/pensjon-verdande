@@ -1,12 +1,13 @@
 import { Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useRef, useState } from 'react'
-import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
+import { redirect, useFetcher } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { parseSakIds, SakIdTextArea } from '~/uforetrygd/components/input/SakIdTextArea'
 import {
   opprettHvilendeRettOpphorBehandlinger,
   opprettHvilendeRettVarselbrevBehandlinger,
 } from '~/uforetrygd/hvilende-rett.server'
+import type { Route } from './+types/hvilende-rett'
 
 type Action = {
   type: string
@@ -28,7 +29,7 @@ const hvilendeRettVarselAction: Action = {
     'Dette vil opprette behandlinger for varselbrev for saker med hvilende rett. Er du sikker på at du vil fortsette?',
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const formData = Object.fromEntries(await request.formData())
   let response: HvilendeRettBehandlingResponse | undefined
 

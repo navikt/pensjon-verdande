@@ -1,9 +1,9 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
 import { Form, useActionData } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { linkDnrFnr } from '~/vedlikehold/vedlikehold.server'
+import type { Route } from './+types/linke-dnr-fnr'
 
 export default function LinkeDnrFnrPage() {
   const [gammeltIdent, setGammelIdent] = useState('')
@@ -64,7 +64,7 @@ export default function LinkeDnrFnrPage() {
   )
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const accessToken = await requireAccessToken(request)
 

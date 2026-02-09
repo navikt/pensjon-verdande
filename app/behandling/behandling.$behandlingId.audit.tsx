@@ -13,15 +13,16 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useMemo, useRef } from 'react'
-import { type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import { useLoaderData, useSearchParams } from 'react-router'
 import invariant from 'tiny-invariant'
 import { AuditGroupedTable } from '~/audit/AuditGroupedTable'
 import { AuditTable } from '~/audit/AuditTable'
 import styles from '~/audit/audit.module.css'
 import type { BehandlingAuditDTO, BehandlingAuditGroupedDTO, PageDTO } from '~/audit/audit.types'
 import { apiGet } from '~/services/api.server'
+import type { Route } from './+types/behandling.$behandlingId.audit'
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   const { behandlingId } = params
 
   invariant(behandlingId, 'Missing behandlingId param')
