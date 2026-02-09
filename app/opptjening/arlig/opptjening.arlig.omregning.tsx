@@ -1,6 +1,14 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import {
+  type ActionFunctionArgs,
+  Form,
+  type LoaderFunctionArgs,
+  redirect,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
@@ -14,7 +22,7 @@ import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyld
 import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
 import { requireAccessToken } from '~/services/auth.server'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const accessToken = await requireAccessToken(request)
   const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)
 

@@ -1,9 +1,9 @@
-import type { ActionFunctionArgs } from 'react-router'
+import type { LoaderFunctionArgs } from 'react-router'
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { getVedtakIOppdrag } from '~/vedlikehold/vedlikehold.server'
 
-export const loader = async ({ params, request }: ActionFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.vedtakId, 'Missing vedtakId param')
   const accessToken = await requireAccessToken(request)
 

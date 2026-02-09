@@ -28,7 +28,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import React, { useEffect, useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
+import type { LoaderFunctionArgs } from 'react-router'
 import { Link, useFetcher, useLoaderData, useSearchParams } from 'react-router'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -46,7 +46,7 @@ import {
 } from '~/vedlikehold/laaste-vedtak.types'
 import { getLaasteVedtakSummary } from '~/vedlikehold/vedlikehold.server'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url)
   const team = searchParams.get('team')
   const aksjonspunkt = searchParams.get('aksjonspunkt')
