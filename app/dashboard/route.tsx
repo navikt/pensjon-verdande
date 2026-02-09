@@ -15,6 +15,10 @@ import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Ka
 import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
 import type { Route } from './+types/route'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Dashboard | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const dashboardResponse = getDashboardSummary(request)
   if (!dashboardResponse) {

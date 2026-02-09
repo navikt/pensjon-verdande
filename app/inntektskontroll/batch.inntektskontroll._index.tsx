@@ -7,6 +7,10 @@ import { opprettBpen014 } from '~/inntektskontroll/batch.bpen014.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/batch.inntektskontroll._index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Inntektskontroll | Verdande' }]
+}
+
 export const FELTER = {
   aar: 'aar',
   eps2g: 'eps2g',

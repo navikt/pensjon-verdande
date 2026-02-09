@@ -5,6 +5,10 @@ import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/batcher'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Batcher | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')

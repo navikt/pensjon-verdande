@@ -8,6 +8,10 @@ interface ScopedSortState extends SortState {
   orderBy: keyof ManglendeForeignKeyIndex
 }
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Manglende foreign key-indexer | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const manglendeForeignKeyIndexer: ManglendeForeignKeyIndexResponse = await apiGet(
     '/api/vedlikehold/manglende-fk-index',

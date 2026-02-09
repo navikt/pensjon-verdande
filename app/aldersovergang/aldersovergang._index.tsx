@@ -19,6 +19,10 @@ type LoaderData = {
   kanOverstyreBehandlingsmaned: boolean
   defaultMonth: string
 }
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Aldersovergang | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')

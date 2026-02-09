@@ -20,6 +20,10 @@ import type { Route } from './+types/konsistensavstemming'
 
 const behandlingType = 'KonsistensavstemmingBehandling'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Konsistensavstemming | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')

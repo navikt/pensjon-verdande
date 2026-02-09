@@ -5,6 +5,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import { linkDnrFnr } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/linke-dnr-fnr'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Linke D-nr/F-nr | Verdande' }]
+}
+
 export default function LinkeDnrFnrPage({ actionData }: Route.ComponentProps) {
   const [gammeltIdent, setGammelIdent] = useState('')
   const [nyIdent, setNyIdent] = useState('')

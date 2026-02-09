@@ -31,6 +31,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningInit, OmregningSakerPage } from '~/types'
 import type { Route } from './+types/omregning._index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Omregning | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const accesstoken = await requireAccessToken(request)
 

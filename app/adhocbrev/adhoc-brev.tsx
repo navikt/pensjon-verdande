@@ -10,6 +10,10 @@ import type { Route } from './+types/adhoc-brev'
 
 const behandlingType = 'AdhocBrevBestillingBatchBehandling'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Adhoc-brev | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')

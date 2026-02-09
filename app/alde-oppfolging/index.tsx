@@ -39,6 +39,10 @@ import type {
   AldeFordelingStatusOverTidDto,
 } from './types'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'ALDE oppfølging | Verdande' }]
+}
+
 export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url)
   const now = new Date()

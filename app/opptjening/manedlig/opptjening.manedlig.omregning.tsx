@@ -35,6 +35,10 @@ type LoaderData = {
   sisteAvsjekk: SisteAvsjekkResponse | null
 }
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Månedlig opptjening | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')

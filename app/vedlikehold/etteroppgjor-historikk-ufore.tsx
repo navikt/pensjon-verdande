@@ -4,6 +4,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import { ugyldiggjorEtteroppgjorHistorikkUfore } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/etteroppgjor-historikk-ufore'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Etteroppgjør historikk uføre | Verdande' }]
+}
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()

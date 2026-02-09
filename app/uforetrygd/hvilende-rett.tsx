@@ -29,6 +29,10 @@ const hvilendeRettVarselAction: Action = {
     'Dette vil opprette behandlinger for varselbrev for saker med hvilende rett. Er du sikker på at du vil fortsette?',
 }
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Hvilende rett | Verdande' }]
+}
+
 export async function action({ request }: Route.ActionArgs) {
   const formData = Object.fromEntries(await request.formData())
   let response: HvilendeRettBehandlingResponse | undefined

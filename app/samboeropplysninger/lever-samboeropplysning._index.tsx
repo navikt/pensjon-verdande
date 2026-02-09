@@ -6,6 +6,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/lever-samboeropplysning._index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Lever samboeopplysning | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 

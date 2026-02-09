@@ -6,6 +6,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import { hentMot } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/leveattester-sokos-spkmottak'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Leveattester SOKOS/SPK-mottak | Verdande' }]
+}
+
 export default function SokosSPKMottakPage({ actionData }: Route.ComponentProps) {
   const [fomYear, setFomYear] = useState('')
   const [fomMonth, setFomMonth] = useState('')

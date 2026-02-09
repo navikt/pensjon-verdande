@@ -5,6 +5,10 @@ import { search } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/sok'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Søk | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 

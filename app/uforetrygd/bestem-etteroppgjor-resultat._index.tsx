@@ -30,6 +30,10 @@ function parseFormData(formData: FormData) {
   return { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr }
 }
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Bestem etteroppgjør resultat | Verdande' }]
+}
+
 export const action = async ({ request }: Route.ActionArgs) => {
   try {
     const accessToken = await requireAccessToken(request)

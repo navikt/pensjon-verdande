@@ -10,6 +10,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningStatistikkPage } from '~/types'
 import type { Route } from './+types/omregningStatistikk._index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Omregningsstatistikk | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const accesstoken = await requireAccessToken(request)
 

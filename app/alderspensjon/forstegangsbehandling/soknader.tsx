@@ -42,6 +42,10 @@ import type { PageResponse } from '~/types'
 import type { Route } from './+types/soknader'
 import css from './soknader.module.css'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Førstegangsbehandling søknader | Verdande' }]
+}
+
 export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page') ?? 0)

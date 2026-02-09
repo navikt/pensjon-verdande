@@ -45,6 +45,10 @@ import {
 import { getLaasteVedtakSummary } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/laaste-vedtak'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Låste vedtak | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const team = searchParams.get('team')

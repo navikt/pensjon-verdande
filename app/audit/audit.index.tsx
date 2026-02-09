@@ -23,6 +23,10 @@ import { AuditGroupedTable } from './AuditGroupedTable'
 import { AuditTable } from './AuditTable'
 import styles from './audit.module.css'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Audit | Verdande' }]
+}
+
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
   const params = url.searchParams

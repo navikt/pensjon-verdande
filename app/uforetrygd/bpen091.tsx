@@ -4,6 +4,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
 import type { Route } from './+types/bpen091'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'BPEN091 | Verdande' }]
+}
+
 export const loader = () => {
   return {
     lastYear: new Date().getFullYear() - 1,
