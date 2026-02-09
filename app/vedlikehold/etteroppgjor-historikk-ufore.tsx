@@ -1,15 +1,8 @@
 import { Alert, Button, Heading, TextField, VStack } from '@navikt/ds-react'
-import { Form, useActionData, useNavigation } from 'react-router'
+import { Form, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { ugyldiggjorEtteroppgjorHistorikkUfore } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/etteroppgjor-historikk-ufore'
-
-type ActionData = {
-  success: boolean
-  error: string | null
-  sakId: number | null
-  etteroppgjortAar: number | null
-}
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
@@ -33,8 +26,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   }
 }
 
-export default function EtteroppgjorHistorikkUforePage() {
-  const actionData = useActionData() as ActionData | undefined
+export default function EtteroppgjorHistorikkUforePage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
@@ -45,9 +37,9 @@ export default function EtteroppgjorHistorikkUforePage() {
     <VStack gap="5" style={{ maxWidth: '50em', margin: '2em' }}>
       {actionData && (
         <>
-          {success && (
+          {success && 'sakId' in actionData && (
             <Alert variant="success">
-              Oppdatert historikk for sakid {actionData.sakId} og etteroppgjort år {actionData.etteroppgjortAar}
+              Oppdatert historikk for sakid {actionData.sakId} og etteroppgjort år {actionData.etteroppgjortAr}
             </Alert>
           )}
           {!success && <Alert variant="error">Feilmelding: {error}</Alert>}

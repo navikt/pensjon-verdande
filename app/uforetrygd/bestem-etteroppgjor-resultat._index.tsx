@@ -1,6 +1,6 @@
 import { Alert, Button, Checkbox, Heading, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Form, redirect, useActionData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
 import type { Route } from './+types/bestem-etteroppgjor-resultat._index'
@@ -45,8 +45,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   }
 }
 
-export default function BestemEtteroppgjorResultatPage() {
-  const actionData = useActionData() as ActionData | undefined
+export default function BestemEtteroppgjorResultatPage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
   const error = actionData?.error
@@ -90,8 +89,4 @@ export default function BestemEtteroppgjorResultatPage() {
       </Form>
     </VStack>
   )
-}
-
-type ActionData = {
-  error: string | null
 }

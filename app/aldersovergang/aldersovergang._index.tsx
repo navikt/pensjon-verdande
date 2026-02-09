@@ -3,7 +3,7 @@ import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import type React from 'react'
 import { useMemo, useState } from 'react'
-import { Form, useLoaderData, useSubmit } from 'react-router'
+import { Form, useSubmit } from 'react-router'
 import { hentMuligeAldersoverganger } from '~/aldersovergang/behandling.aldersovergang.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
@@ -48,9 +48,8 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData>
   }
 }
 
-export default function BatchOpprett_index() {
-  const { behandlinger, maneder, erBegrensUtplukkLovlig, kanOverstyreBehandlingsmaned, defaultMonth } =
-    useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { behandlinger, maneder, erBegrensUtplukkLovlig, kanOverstyreBehandlingsmaned, defaultMonth } = loaderData
 
   const [selectedMonthStr, setSelectedMonthStr] = useState(defaultMonth)
   const selectedMonthDate = useMemo(() => parse(selectedMonthStr, 'yyyy-MM', new Date()), [selectedMonthStr])

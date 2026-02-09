@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import xmlFormat from 'xml-formatter'
 import { requireAccessToken } from '~/services/auth.server'
@@ -19,8 +18,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Oppdragskvittering() {
-  const { output } = useLoaderData<typeof loader>()
+export default function Oppdragskvittering({ loaderData }: Route.ComponentProps) {
+  const { output } = loaderData
 
   return <pre>{xmlFormat(output)}</pre>
 }

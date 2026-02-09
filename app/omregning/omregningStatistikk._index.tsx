@@ -1,6 +1,6 @@
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { Form, useLoaderData, useSearchParams } from 'react-router'
+import { Form, useSearchParams } from 'react-router'
 import {
   hentOmregningbehandlingsnokler,
   hentOmregningStatistikk,
@@ -50,8 +50,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return { omregningStatistikkPage }
 }
 
-export default function OmregningStatistikk() {
-  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkCsv } = useLoaderData<typeof loader>()
+export default function OmregningStatistikk({ loaderData }: Route.ComponentProps) {
+  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkCsv } = loaderData
 
   const optionBehandlingsNoekler: { value: string; label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })

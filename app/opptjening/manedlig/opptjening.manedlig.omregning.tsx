@@ -13,7 +13,7 @@ import {
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useState } from 'react'
-import { Form, useLoaderData, useNavigation } from 'react-router'
+import { Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import {
@@ -74,8 +74,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return null
 }
 
-export default function OpprettEndretOpptjeningRoute() {
-  const { behandlinger, maneder, kanOverstyre, defaultMonth, sisteAvsjekk } = useLoaderData<typeof loader>()
+export default function OpprettEndretOpptjeningRoute({ loaderData }: Route.ComponentProps) {
+  const { behandlinger, maneder, kanOverstyre, defaultMonth, sisteAvsjekk } = loaderData
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 

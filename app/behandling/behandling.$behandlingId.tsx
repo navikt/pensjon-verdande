@@ -1,4 +1,4 @@
-import { useLoaderData, useOutletContext } from 'react-router'
+import { useOutletContext } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingCard from '~/behandling/BehandlingCard'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
@@ -132,9 +132,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Behandling() {
-  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } =
-    useLoaderData<typeof loader>()
+export default function Behandling({ loaderData }: Route.ComponentProps) {
+  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } = loaderData
 
   const me = useOutletContext<MeResponse>()
 

@@ -2,7 +2,7 @@ import { Alert, Button, Heading, HStack, Modal, Select, VStack } from '@navikt/d
 import { format, parse } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { opprettKontrollereAfpStatEtter65Behandling } from '~/kontroll-afp-stat-etter-65/kontroll-afp-stat-etter-65.server'
 import { requireAccessToken } from '~/services/auth.server'
@@ -64,9 +64,8 @@ const genererManedsalternativer = () => {
   })
 }
 
-export default function OpprettKontrollAfpStatEtter65Route() {
-  const { behandlinger } = useLoaderData<typeof loader>()
-  const actionData = useActionData<typeof action>()
+export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const modalRef = useRef<HTMLDialogElement>(null)
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'

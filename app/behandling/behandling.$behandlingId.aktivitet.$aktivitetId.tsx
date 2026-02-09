@@ -1,4 +1,4 @@
-import { useLoaderData, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 import invariant from 'tiny-invariant'
 import AktivitetCard from '~/behandling/AktivitetCard'
 import { requireAccessToken } from '~/services/auth.server'
@@ -33,8 +33,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   return { behandling, aktivitet }
 }
 
-export default function Behandling() {
-  const { behandling, aktivitet } = useLoaderData<typeof loader>()
+export default function Behandling({ loaderData }: Route.ComponentProps) {
+  const { behandling, aktivitet } = loaderData
   const location = useLocation()
 
   return <AktivitetCard behandling={behandling} aktivitet={aktivitet} pathname={location.pathname} />

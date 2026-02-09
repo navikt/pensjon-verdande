@@ -1,5 +1,5 @@
 import { Table } from '@navikt/ds-react'
-import { Link, useLoaderData } from 'react-router'
+import { Link } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import { formatIsoTimestamp } from '~/common/date'
@@ -29,8 +29,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function ManuelleBehandlinger() {
-  const { behandling, behandlingManuellPage } = useLoaderData<typeof loader>()
+export default function ManuelleBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { behandling, behandlingManuellPage } = loaderData
 
   return (
     <Table>

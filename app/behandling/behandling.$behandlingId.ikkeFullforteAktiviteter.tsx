@@ -1,6 +1,6 @@
 import { Skeleton } from '@navikt/ds-react'
 import { Suspense } from 'react'
-import { Await, useLoaderData } from 'react-router'
+import { Await } from 'react-router'
 import invariant from 'tiny-invariant'
 import IkkeFullforteAktiviteter from '~/components/behandling/IkkeFullforteAktiviteter'
 import { getIkkeFullforteAktiviteter } from '~/services/behandling.server'
@@ -16,8 +16,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function AvhengigeBehandlinger() {
-  const { ikkeFullforteAktiviteter } = useLoaderData<typeof loader>()
+export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { ikkeFullforteAktiviteter } = loaderData
 
   return (
     <Suspense fallback={<Skeleton variant="text" width="100%" />}>

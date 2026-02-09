@@ -1,6 +1,6 @@
 import { Button, Modal, Textarea, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { useFetcher, useLoaderData } from 'react-router'
+import { useFetcher } from 'react-router'
 import invariant from 'tiny-invariant'
 import { toNormalizedError } from '~/common/error'
 import { apiGet, apiPost } from '~/services/api.server'
@@ -36,8 +36,8 @@ export const action = async ({ params, request }: Route.ActionArgs) => {
   return { output }
 }
 
-export default function BehandlingOutput() {
-  const { output, requiresBegrunnelse } = useLoaderData<typeof loader>() as LoaderData
+export default function BehandlingOutput({ loaderData }: Route.ComponentProps) {
+  const { output, requiresBegrunnelse } = loaderData
   const fetcher = useFetcher<typeof action>()
   const [open, setOpen] = useState(false)
   const [begrunnelse, setBegrunnelse] = useState('')

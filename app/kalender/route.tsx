@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { hentKalenderHendelser } from '~/services/behandling.server'
 import type { Route } from './+types/route'
@@ -21,8 +20,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   }
 }
 
-export default function KalenderVisning() {
-  const { kalenderHendelser, startDato } = useLoaderData<typeof loader>()
+export default function KalenderVisning({ loaderData }: Route.ComponentProps) {
+  const { kalenderHendelser, startDato } = loaderData
 
   return (
     <Kalender

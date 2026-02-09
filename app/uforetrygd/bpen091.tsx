@@ -1,5 +1,5 @@
 import { BodyLong, BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
 import type { Route } from './+types/bpen091'
@@ -25,8 +25,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function FastsettForventetInntekt() {
-  const { lastYear } = useLoaderData<typeof loader>()
+export default function FastsettForventetInntekt({ loaderData }: Route.ComponentProps) {
+  const { lastYear } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'

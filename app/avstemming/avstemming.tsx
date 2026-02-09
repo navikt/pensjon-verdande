@@ -11,7 +11,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import { Await, Form, useLoaderData, useNavigation } from 'react-router'
+import { Await, Form, useNavigation } from 'react-router'
 import { opprettAvstemmingGrensesnittBehandling } from '~/avstemming/avstemming.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
@@ -100,8 +100,8 @@ function areDatesValid(dateFom: string, dateTom: string) {
   }
 }
 
-export default function Avstemming() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function Avstemming({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'

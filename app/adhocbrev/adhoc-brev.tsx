@@ -1,6 +1,6 @@
 import { BodyLong, Box, Button, Heading, Select, Skeleton, TextField, VStack } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import { Await, Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Await, Form, redirect, useNavigation } from 'react-router'
 import { opprettAdhocBrevBehandling } from '~/adhocbrev/adhoc-brev.server'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
@@ -43,8 +43,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function AdhocBrev() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'

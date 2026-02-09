@@ -1,15 +1,13 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Form, useActionData } from 'react-router'
+import { Form } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { linkDnrFnr } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/linke-dnr-fnr'
 
-export default function LinkeDnrFnrPage() {
+export default function LinkeDnrFnrPage({ actionData }: Route.ComponentProps) {
   const [gammeltIdent, setGammelIdent] = useState('')
   const [nyIdent, setNyIdent] = useState('')
-
-  const actionData = useActionData() as ActionData | undefined
 
   const success = actionData?.success
   const error = actionData?.error
@@ -69,9 +67,4 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   return await linkDnrFnr(accessToken, formData.get('gammelIdent'), formData.get('nyIdent'))
-}
-
-type ActionData = {
-  success: boolean
-  error: string | null
 }

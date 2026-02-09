@@ -1,7 +1,7 @@
 import { ExternalLinkIcon, LinkIcon } from '@navikt/aksel-icons'
 import { BodyShort, Button, CopyButton, Heading, HStack, Label, Link, Tag, Tooltip, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Link as ReactRouterLink, useLoaderData } from 'react-router'
+import { Link as ReactRouterLink } from 'react-router'
 import invariant from 'tiny-invariant'
 import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$aktivitetId'
 import { formatIsoTimestamp } from '~/common/date'
@@ -51,9 +51,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function BehandlingKjoring() {
-  const { response, behandling, aktivitet, kjoring, kibanaUrl, tempoUrl, selectedColumns, selectedFilters } =
-    useLoaderData<typeof loader>()
+export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) {
+  const { response, behandling, aktivitet, kjoring, kibanaUrl, tempoUrl, selectedColumns, selectedFilters } = loaderData
 
   const [shareUrl, setShareUrl] = useState('')
 

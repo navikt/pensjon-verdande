@@ -1,5 +1,4 @@
 import { VStack } from '@navikt/ds-react'
-import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
@@ -37,8 +36,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Sok() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function Sok({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
 
   return (
     <VStack gap="4">

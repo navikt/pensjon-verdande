@@ -1,6 +1,6 @@
 import { Button, Checkbox, CheckboxGroup, Heading, Select, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
 import { opprettBpen014 } from '~/inntektskontroll/batch.bpen014.server'
@@ -52,8 +52,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function BatchOpprett_index() {
-  const { detteÅret } = useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { detteÅret } = loaderData
   const navigation = useNavigation()
 
   const [kjøreår, setKjøreår] = useState<number | ''>('')

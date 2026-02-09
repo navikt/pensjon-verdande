@@ -15,7 +15,7 @@ import {
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useState } from 'react'
-import { Form, NavLink, redirect, useLoaderData } from 'react-router'
+import { Form, NavLink, redirect } from 'react-router'
 import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { apiGet } from '~/services/api.server'
@@ -122,8 +122,8 @@ function Tidspunkt({ label, verdi }: { label: string; verdi?: string }) {
   )
 }
 
-export default function EtteroppgjorOversikt() {
-  const { etteroppgjor } = useLoaderData<typeof loader>()
+export default function EtteroppgjorOversikt({ loaderData }: Route.ComponentProps) {
+  const { etteroppgjor } = loaderData
 
   const [kjøreår, setKjøreår] = useState<number | undefined>(undefined)
 

@@ -1,5 +1,4 @@
 import { VStack } from '@navikt/ds-react'
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
 import { LokiLogsTableLoader } from '~/loki/LokiLogsTableLoader'
@@ -27,9 +26,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function BehandlingLogs() {
-  const { response, selectedColumns, selectedFilters, start, slutt, tempoConfiguration } =
-    useLoaderData<typeof loader>()
+export default function BehandlingLogs({ loaderData }: Route.ComponentProps) {
+  const { response, selectedColumns, selectedFilters, start, slutt, tempoConfiguration } = loaderData
 
   return (
     <VStack gap="6">

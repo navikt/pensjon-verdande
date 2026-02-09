@@ -11,7 +11,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import { Await, Form, useLoaderData, useNavigation } from 'react-router'
+import { Await, Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { opprettKonsistensavstemmingBehandling } from '~/konsistensavstemming/konsistensavstemming.server'
 import { requireAccessToken } from '~/services/auth.server'
@@ -100,8 +100,8 @@ function areDatesValid(dateFom: string) {
   }
 }
 
-export default function Konsistensavstemming() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function Konsistensavstemming({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'

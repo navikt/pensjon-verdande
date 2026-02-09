@@ -1,6 +1,5 @@
 import { BodyLong, BodyShort, Box, CopyButton, Heading, type SortState, Table, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { useLoaderData } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import type { ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse } from '~/vedlikehold/vedlikehold.types'
 import type { Route } from './+types/manglende-foreign-key-indexer'
@@ -107,8 +106,8 @@ function ManglendeForeignKeyIndexerTable({
   )
 }
 
-export default function ManglendeForeignKeyIndexer() {
-  const { manglendeForeignKeyIndexer } = useLoaderData<typeof loader>()
+export default function ManglendeForeignKeyIndexer({ loaderData }: Route.ComponentProps) {
+  const { manglendeForeignKeyIndexer } = loaderData
 
   return (
     <VStack gap="5">

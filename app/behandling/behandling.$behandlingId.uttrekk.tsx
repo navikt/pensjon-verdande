@@ -1,6 +1,5 @@
 import { Accordion, Box, CopyButton, Link } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/behandling.$behandlingId.uttrekk'
@@ -22,8 +21,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function BehandlingOutput() {
-  const { output } = useLoaderData<typeof loader>()
+export default function BehandlingOutput({ loaderData }: Route.ComponentProps) {
+  const { output } = loaderData
 
   const [downloadLink, setDownloadLink] = useState('')
 

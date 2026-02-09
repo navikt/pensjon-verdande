@@ -1,6 +1,6 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
@@ -93,9 +93,9 @@ function konverterTilListe(ekskluderteSakIderText: string): string[] {
     .filter((id) => id !== '')
 }
 
-export default function EndretOpptjeningArligUttrekk() {
-  const data = useActionData<typeof action>()
-  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = useLoaderData<typeof loader>()
+export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }: Route.ComponentProps) {
+  const data = actionData
+  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = loaderData
   const navigation = useNavigation()
 
   const [selectedOpptjeningsaar, setSelectedOpptjeningsaar] = useState(defaultOpptjeningsaar)

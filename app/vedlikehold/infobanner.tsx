@@ -17,7 +17,7 @@ import {
 import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import type { ChangeEvent } from 'react'
 import { useState } from 'react'
-import { Form, useFetcher, useLoaderData } from 'react-router'
+import { Form, useFetcher } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
@@ -34,8 +34,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return await oppdaterInfoBanner(infoBanner, accessToken)
 }
 
-export default function InfoBannerPage() {
-  const infobanner = useLoaderData<typeof loader>()
+export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
+  const infobanner = loaderData
   const fecher = useFetcher()
   const response = fecher.data as OppdaterInfoBannerResponse | undefined
 

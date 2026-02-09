@@ -1,6 +1,6 @@
 import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Form, Link, redirect, useActionData, useNavigation } from 'react-router'
+import { Form, Link, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import {
   hentAntallSkattehendelser,
@@ -51,9 +51,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   }
 }
 
-export default function HentOpplysningerFraSkatt() {
+export default function HentOpplysningerFraSkatt({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation()
-  const actionData = useActionData()
 
   const isSubmitting = navigation.state === 'submitting'
   const [debug, setDebug] = useState<string>('')

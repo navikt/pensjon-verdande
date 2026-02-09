@@ -1,6 +1,6 @@
 import { Skeleton } from '@navikt/ds-react'
 import { Suspense } from 'react'
-import { Await, useLoaderData } from 'react-router'
+import { Await } from 'react-router'
 import invariant from 'tiny-invariant'
 import AvhengigeBehandlingerElement from '~/components/behandling/avhengige-behandlinger/AvhengigeBehandlingerElement'
 import { requireAccessToken } from '~/services/auth.server'
@@ -32,8 +32,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function AvhengigeBehandlinger() {
-  const { avhengigeBehandlinger } = useLoaderData<typeof loader>()
+export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { avhengigeBehandlinger } = loaderData
 
   return (
     <Suspense fallback={<Skeleton variant="text" width="100%" />}>

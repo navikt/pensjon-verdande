@@ -1,5 +1,5 @@
 import { BodyShort, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
 import type { Route } from './+types/bpen090'
@@ -68,10 +68,10 @@ enum OppdragsPrioritet {
   Batch = 2,
 }
 
-export default function LopendeInntektsavkorting() {
-  const { kjoremaaned } = useLoaderData<typeof loader>()
+export default function LopendeInntektsavkorting({ loaderData, actionData }: Route.ComponentProps) {
+  const { kjoremaaned } = loaderData
   const navigation = useNavigation()
-  const errors = useActionData() as ActionErrors | undefined
+  const errors = actionData as ActionErrors | undefined
 
   const isSubmitting = navigation.state === 'submitting'
 
