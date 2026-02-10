@@ -1,7 +1,7 @@
 .previewContainer {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--ax-space-8);
 }
 
 .previewBubble {
@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.45rem 0.6rem;
-  border-radius: 8px;
+  border-radius: var(--ax-radius-8);
   min-width: 74px;
   background: #f4f4f4;
   cursor: pointer;
@@ -42,7 +42,7 @@
 .timeLabel {
   font-size: 0.8rem;
   color: #333;
-  margin-top: 2px;
+  margin-top: var(--ax-space-2);
 }
 
 .serieTag {
@@ -50,8 +50,8 @@
   font-size: 0.7rem;
   font-weight: 600;
   border-radius: 6px;
-  padding: 0 6px;
-  margin-top: 4px;
+  padding: 0 var(--ax-space-6);
+  margin-top: var(--ax-space-4);
   background-color: var(--serie-bg, #eee);
   color: var(--serie-fg, #111);
   border: 1px solid transparent;
