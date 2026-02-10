@@ -1,5 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
-import { Box, Button, Heading, HStack, Spacer } from '@navikt/ds-react'
+import { Box, Button, Heading, HStack } from '@navikt/ds-react'
 import { useSearchParams } from 'react-router'
 import { erHelgedag, getDato, isSameDay } from '~/common/date'
 import { getWeek, getWeekYear } from '~/common/weeknumber'
@@ -93,11 +93,10 @@ export default function Kalender(props: Props) {
   return (
     <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
       <Heading size={'xlarge'} level="1" spacing>
-        <HStack align="center" padding="space-4">
+        <HStack align="center" padding="space-4" justify="space-between">
           <span>
             <strong>{valgtDato.toLocaleDateString('no-NO', { month: 'long' })}</strong> {valgtDato.getFullYear()}
           </span>
-          <Spacer></Spacer>
           <HStack gap="space-4" style={{ height: '10px' }}>
             <Button
               data-color="neutral"
