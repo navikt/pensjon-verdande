@@ -1,12 +1,15 @@
 import { VStack } from '@navikt/ds-react'
-import type { ActionFunctionArgs } from 'react-router'
-import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/sok'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Søk | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
   let behandlinger: BehandlingerPage | null
@@ -37,11 +40,11 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export default function Sok() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function Sok({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-16">
       {behandlinger && <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />}
     </VStack>
   )

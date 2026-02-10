@@ -1,11 +1,11 @@
-import { type ActionFunctionArgs, useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/omregning.behandlinger'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
   const size = searchParams.get('size')
@@ -26,8 +26,8 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   return { behandlinger }
 }
 
-export default function BehandlingerStatus() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function BehandlingerStatus({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
 
   return (
     <BehandlingerTable

@@ -1,4 +1,3 @@
-import { type ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import Bruker from '~/brukere/Bruker'
 import {
@@ -9,8 +8,9 @@ import {
   hentTilgangskontrollMeta,
 } from '~/brukere/brukere.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/$brukernavn'
 
-export async function action({ params, request }: ActionFunctionArgs) {
+export async function action({ params, request }: Route.ActionArgs) {
   const accesstoken = await requireAccessToken(request)
 
   invariant(params.brukernavn, 'Missing brukernavn param')
@@ -28,7 +28,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   return null
 }
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.brukernavn, 'Missing brukernavn param')
 
   return {
@@ -38,8 +38,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function Foo() {
-  const { bruker, tilgangskontrollmeta, readOnly } = useLoaderData<typeof loader>()
+export default function Foo({ loaderData }: Route.ComponentProps) {
+  const { bruker, tilgangskontrollmeta, readOnly } = loaderData
   console.log(tilgangskontrollmeta)
 
   return <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta} readOnly={readOnly}></Bruker>

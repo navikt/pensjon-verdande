@@ -17,25 +17,29 @@ import {
 import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import type { ChangeEvent } from 'react'
 import { useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
-import { Form, useFetcher, useLoaderData } from 'react-router'
+import { Form, useFetcher } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
+import type { Route } from './+types/infobanner'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Infobanner | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   return await apiGet<Infobanner>('/api/verdande/infobanner', request)
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const infoBanner = (await request.json()) as Infobanner
   return await oppdaterInfoBanner(infoBanner, accessToken)
 }
 
-export default function InfoBannerPage() {
-  const infobanner = useLoaderData<typeof loader>()
+export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
+  const infobanner = loaderData
   const fecher = useFetcher()
   const response = fecher.data as OppdaterInfoBannerResponse | undefined
 
@@ -53,9 +57,9 @@ export default function InfoBannerPage() {
   const enabled = validToDate !== undefined && (isFuture(validToDate) || isToday(validToDate))
 
   return (
-    <HGrid columns={{ xs: 1, md: 1, xl: 2 }} gap="5">
+    <HGrid columns={{ xs: 1, md: 1, xl: 2 }} gap="space-20">
       <Form method="post">
-        <VStack gap="5" style={{ width: '25em' }}>
+        <VStack gap="space-20" style={{ width: '25em' }}>
           <Heading size="medium">Endre Infobanner</Heading>
           <BodyLong size="medium">Her kan infobanner i PSAK endres. </BodyLong>
           <Textarea
@@ -89,7 +93,7 @@ export default function InfoBannerPage() {
             Aktiver infobanner
           </Switch>
           {enabled && (
-            <VStack gap="3">
+            <VStack gap="space-12">
               <Alert variant="info" inline>
                 Til og med dato for når infobanner skal være aktivt
               </Alert>
@@ -111,11 +115,11 @@ export default function InfoBannerPage() {
           </Button>
         </VStack>
       </Form>
-      <VStack gap="5">
+      <VStack gap="space-20">
         <Heading size="medium">Forhåndsvisning</Heading>
         {beskrivelse.length > 0 ? (
           <Alert variant={toAkselVariant(valgtVariant)} size="medium">
-            <VStack gap="2">
+            <VStack gap="space-8">
               {beskrivelse}
               {urlText && url && (
                 <Link href={url}>

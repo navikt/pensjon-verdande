@@ -1,12 +1,13 @@
 import { Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useRef, useState } from 'react'
-import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
+import { redirect, useFetcher } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { parseSakIds, SakIdTextArea } from '~/uforetrygd/components/input/SakIdTextArea'
 import {
   opprettHvilendeRettOpphorBehandlinger,
   opprettHvilendeRettVarselbrevBehandlinger,
 } from '~/uforetrygd/hvilende-rett.server'
+import type { Route } from './+types/hvilende-rett'
 
 type Action = {
   type: string
@@ -28,12 +29,21 @@ const hvilendeRettVarselAction: Action = {
     'Dette vil opprette behandlinger for varselbrev for saker med hvilende rett. Er du sikker på at du vil fortsette?',
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Hvilende rett | Verdande' }]
+}
+
+export async function action({ request }: Route.ActionArgs) {
   const formData = Object.fromEntries(await request.formData())
   let response: HvilendeRettBehandlingResponse | undefined
 
   if (formData.action === hvilendeRettVarselAction.type) {
-    response = await opprettHvilendeRettVarselbrevBehandlinger(Number(formData.senesteHvilendeAr), request)
+    response = await opprettHvilendeRettVarselbrevBehandlinger(
+      Number(formData.senesteHvilendeAr),
+      parseSakIds(formData.sakIds),
+      formData.dryRun === 'true',
+      request,
+    )
   } else if (formData.action === hvilendeRettOpphorAction.type) {
     response = await opprettHvilendeRettOpphorBehandlinger(
       Number(formData.senesteHvilendeAr),
@@ -51,7 +61,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function HvilendeRettPage() {
   return (
-    <VStack gap="20" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-80" style={{ maxWidth: '50em', margin: '2em' }}>
       {hvilendeRettVarselForm()}
       {hvilendeRettOpphorForm()}
     </VStack>
@@ -79,17 +89,23 @@ function hvilendeRettVarselForm() {
   }
 
   return (
-    <VStack gap="5">
-      <Heading size="small">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
-      <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '10em' }}>
-        <VStack gap={'4'}>
+    <VStack gap="space-20">
+      <Heading size="medium">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
+      <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
+        <VStack gap={'space-16'}>
+          <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
           <TextField
+            style={{ width: '10em' }}
             label="Seneste hvilende år:"
             aria-label="senesteHvilendeAr"
             name="senesteHvilendeAr"
             type="text"
             inputMode="numeric"
           />
+          <SakIdTextArea fieldName="sakIds" />
           <Button type="submit" style={{ width: '10em' }} disabled={fetcher.state === 'submitting'}>
             Opprett
           </Button>
@@ -126,10 +142,10 @@ function hvilendeRettOpphorForm() {
   }
 
   return (
-    <VStack gap="5">
-      <Heading size="small">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
-      <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '50em' }}>
-        <VStack gap={'4'}>
+    <VStack gap="space-20">
+      <Heading size="medium">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
+      <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
+        <VStack gap={'space-16'}>
           <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
             <option value="true">Ja</option>
             <option value="false">Nei</option>

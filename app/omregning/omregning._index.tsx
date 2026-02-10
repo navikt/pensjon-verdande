@@ -20,8 +20,8 @@ import {
 import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
 import type React from 'react'
 import { useRef, useState } from 'react'
-import type { HTMLFormMethod, LoaderFunctionArgs } from 'react-router'
-import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from 'react-router'
+import type { HTMLFormMethod } from 'react-router'
+import { Form, useFetcher, useNavigation, useSearchParams, useSubmit } from 'react-router'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
 import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
 import { OmregningOppsummering } from '~/components/omregning/OmregningOppsummering'
@@ -29,8 +29,13 @@ import OmregningSelector from '~/components/omregning/OmregningSelector'
 import { hentOmregningInit, hentOmregningInput } from '~/omregning/batch.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningInit, OmregningSakerPage } from '~/types'
+import type { Route } from './+types/omregning._index'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Omregning | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   const omregningInit = (await hentOmregningInit(accesstoken)) as OmregningInit
@@ -48,8 +53,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return { omregningInit, omregningSakerPage }
 }
 
-export default function BatchOpprett_index() {
-  const { omregningInit, omregningSakerPage } = useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { omregningInit, omregningSakerPage } = loaderData
   const now = new Date()
   const [isClicked, setIsClicked] = useState(false)
   const ref = useRef<HTMLDialogElement>(null)
@@ -259,7 +264,7 @@ export default function BatchOpprett_index() {
   return (
     <div>
       <h1>Omregn ytelser</h1>
-      <Box.New>
+      <Box>
         Behandling for Omregning av ytelser (tidligere BPEN093).
         <br />
         Dokumentasjon kan finnes her:
@@ -273,7 +278,7 @@ export default function BatchOpprett_index() {
             </Link>
           </li>
         </ul>
-      </Box.New>
+      </Box>
       <Tabs defaultValue="Omregning">
         <Tabs.List>
           <Tabs.Tab value="Omregning" label="Omregning" />
@@ -283,9 +288,9 @@ export default function BatchOpprett_index() {
         <Tabs.Panel value="Omregning">
           <br />
           <Form id={'skjema'} action="omregning" method="POST" onSubmit={handleSubmit}>
-            <VStack gap="6">
-              <HGrid columns={3} gap="12">
-                <Box.New>
+            <VStack gap="space-24">
+              <HGrid columns={3} gap="space-48">
+                <Box>
                   <TextField
                     label={'Behandlingsnøkkel'}
                     name={'behandlingsnokkel'}
@@ -345,9 +350,9 @@ export default function BatchOpprett_index() {
                   />
 
                   <br />
-                </Box.New>
-                <Box.New>
-                  <VStack gap="2">
+                </Box>
+                <Box>
+                  <VStack gap="space-8">
                     <CheckboxGroup size={'medium'} legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
                       <OmregningCheckbox
                         defaultChecked={behandleApneKrav}
@@ -426,12 +431,12 @@ export default function BatchOpprett_index() {
                       </OmregningCheckbox>
                     </CheckboxGroup>
                   </VStack>
-                </Box.New>
-                <Box.New>
+                </Box>
+                <Box>
                   <CheckboxGroup legend={'Brevparametere'}>
                     Ved å <b>ikke</b> angi brev for berørte saker vil default brevkode bli brukt.
-                    <HGrid columns={2} gap="12">
-                      <Box.New padding="4" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
+                    <HGrid columns={2} gap="space-48">
+                      <Box padding="space-16" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
                         <OmregningSelector
                           label={'Bestill brev for'}
                           navn={'skalBestilleBrev'}
@@ -496,8 +501,8 @@ export default function BatchOpprett_index() {
                           setselectedBrevKode={setselectedBrevkodeSokerAFPPrivat}
                           optionBatchbrevtyper={optionBatchbrevtyper}
                         />
-                      </Box.New>
-                      <Box.New padding="4" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
+                      </Box>
+                      <Box padding="space-16" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
                         <OmregningCheckbox
                           defaultChecked={skalSendeBrevBerorteSaker}
                           name={'sendBrevBerorteSaker'}
@@ -563,15 +568,15 @@ export default function BatchOpprett_index() {
                           setselectedBrevKode={setselectedBrevkodeBerorteSakerAFPPrivat}
                           optionBatchbrevtyper={optionBatchbrevtyper}
                         />
-                      </Box.New>
+                      </Box>
                     </HGrid>
                   </CheckboxGroup>
-                </Box.New>
+                </Box>
               </HGrid>
             </VStack>
           </Form>
 
-          <Box.New>
+          <Box>
             <br />
             <Button icon={<PlayIcon aria-hidden />} onClick={() => ref.current?.showModal()}>
               Start omregning
@@ -634,7 +639,7 @@ export default function BatchOpprett_index() {
                 <CopyButton copyText={getHumanReadableParameterText()} text="Kopier parameterliste" />
               </Modal.Footer>
             </Modal>
-          </Box.New>
+          </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="Saker til Omregning">

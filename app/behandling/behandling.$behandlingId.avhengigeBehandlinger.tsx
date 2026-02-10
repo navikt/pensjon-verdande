@@ -1,13 +1,13 @@
 import { Skeleton } from '@navikt/ds-react'
 import { Suspense } from 'react'
-import type { LoaderFunctionArgs } from 'react-router'
-import { Await, useLoaderData } from 'react-router'
+import { Await } from 'react-router'
 import invariant from 'tiny-invariant'
 import AvhengigeBehandlingerElement from '~/components/behandling/avhengige-behandlinger/AvhengigeBehandlingerElement'
 import { requireAccessToken } from '~/services/auth.server'
 import { getAvhengigeBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/behandling.$behandlingId.avhengigeBehandlinger'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
   const { searchParams } = new URL(request.url)
@@ -32,8 +32,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function AvhengigeBehandlinger() {
-  const { avhengigeBehandlinger } = useLoaderData<typeof loader>()
+export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { avhengigeBehandlinger } = loaderData
 
   return (
     <Suspense fallback={<Skeleton variant="text" width="100%" />}>

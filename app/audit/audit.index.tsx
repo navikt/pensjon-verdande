@@ -15,14 +15,19 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useMemo, useRef } from 'react'
-import { type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import type { BehandlingAuditDTO, BehandlingAuditGroupedDTO, PageDTO } from '~/audit/audit.types'
 import { apiGet } from '~/services/api.server'
+import type { Route } from './+types/audit.index'
 import { AuditGroupedTable } from './AuditGroupedTable'
 import { AuditTable } from './AuditTable'
 import styles from './audit.module.css'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Audit | Verdande' }]
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
   const params = url.searchParams
 
@@ -56,8 +61,8 @@ function isGroupedPage(
   return p.content.length > 0 && 'antall' in p.content[0]
 }
 
-export default function AuditIndexPage() {
-  const { page, view: initialView } = useLoaderData<typeof loader>()
+export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
+  const { page, view: initialView } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const filterModalRef = useRef<HTMLDialogElement>(null)
 
@@ -141,7 +146,7 @@ export default function AuditIndexPage() {
         >
           Gruppert visning
         </Switch>
-        <HStack gap="2" align="center">
+        <HStack gap="space-8" align="center">
           <Button
             icon={<FilterIcon aria-hidden />}
             size="small"
@@ -162,18 +167,15 @@ export default function AuditIndexPage() {
           </Button>
         </HStack>
       </VStack>
-
       {isGroupedPage(page) && <AuditGroupedTable page={page} sort={sortState} onSortChange={onSortChange} />}
       {!isGroupedPage(page) && <AuditTable page={page} sort={sortState} onSortChange={onSortChange} />}
-
       <div className={styles.pageTopMargin}>
         <Pagination page={page.number + 1} onPageChange={(p) => goToPage(p - 1)} count={page.totalPages} />
       </div>
-
       <Modal ref={filterModalRef} onClose={() => filterModalRef.current?.close()} header={{ heading: 'Filtrer audit' }}>
         <Modal.Body>
-          <VStack gap="6">
-            <HStack gap="4" wrap>
+          <VStack gap="space-24">
+            <HStack gap="space-16" wrap>
               <TextField
                 label="BehandlingId"
                 inputMode="numeric"
@@ -203,7 +205,7 @@ export default function AuditIndexPage() {
 
             <fieldset className={styles.filterFieldset}>
               <legend className={styles.filterLegend}>Tidsrom</legend>
-              <HStack gap="6" align="start" wrap>
+              <HStack gap="space-24" align="start" wrap>
                 <DatePicker {...datepickerProps}>
                   <HStack wrap gap="space-16" justify="center">
                     <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
@@ -215,7 +217,7 @@ export default function AuditIndexPage() {
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <HStack gap="2">
+          <HStack gap="space-8">
             <Button type="button" variant="secondary" onClick={clearAll}>
               Nullstill
             </Button>

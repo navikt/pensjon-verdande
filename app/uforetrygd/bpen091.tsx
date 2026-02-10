@@ -1,7 +1,12 @@
 import { BodyLong, BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
+import type { Route } from './+types/bpen091'
+
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'BPEN091 | Verdande' }]
+}
 
 export const loader = () => {
   return {
@@ -9,7 +14,7 @@ export const loader = () => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   const begrensUtplukkStr = String(formData.get('begrensUtplukk') ?? 'false')
@@ -24,23 +29,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function FastsettForventetInntekt() {
-  const { lastYear } = useLoaderData<typeof loader>()
+export default function FastsettForventetInntekt({ loaderData }: Route.ComponentProps) {
+  const { lastYear } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
 
   return (
-    <VStack gap={'4'}>
-      <Box.New className={'aksel-pageblock--lg'}>
+    <VStack gap={'space-16'}>
+      <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Fastsett forventet inntekt (BPEN091)
         </Heading>
         <BodyLong>Fastsette neste års forventet inntekt for uføretrygd</BodyLong>
-      </Box.New>
-
+      </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <TextField
             label={'Behandlingsår'}
             description={<BodyShort as="div">Året nye inntekter skal gjelde</BodyShort>}

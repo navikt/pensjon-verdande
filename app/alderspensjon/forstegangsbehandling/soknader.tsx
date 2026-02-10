@@ -25,7 +25,7 @@ import {
 import { sub } from 'date-fns'
 import type React from 'react'
 import { useMemo, useRef } from 'react'
-import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
+import { NavLink, useNavigation, useSearchParams } from 'react-router'
 import {
   type KildeOppsummering,
   KildeOppsummeringVisning,
@@ -39,7 +39,12 @@ import { subdomain } from '~/common/utils'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { PageResponse } from '~/types'
+import type { Route } from './+types/soknader'
 import css from './soknader.module.css'
+
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Førstegangsbehandling søknader | Verdande' }]
+}
 
 export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url)
@@ -142,7 +147,7 @@ function activeFilterSummary(sp: URLSearchParams) {
   return parts
 }
 
-export default function Alderspensjonssoknader() {
+export default function Alderspensjonssoknader({ loaderData }: Route.ComponentProps) {
   const {
     aldeBehandlingUrlTemplate,
     nowIso,
@@ -153,7 +158,7 @@ export default function Alderspensjonssoknader() {
     kildeOppsummering,
     fomDato,
     tomDato,
-  } = useLoaderData<typeof loader>()
+  } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
   const { field: sortField, dir: sortDir } = parseSortParam(searchParams)
@@ -219,7 +224,7 @@ export default function Alderspensjonssoknader() {
 
   return (
     <Page.Block>
-      <Bleed marginInline={'12 12'} marginBlock={'space-16'} asChild>
+      <Bleed marginInline={'space-48 space-48'} marginBlock={'space-16'} asChild>
         <Box>
           <Heading className={css.topBanner} level={'1'} size={'large'} style={{ marginTop: 0 }}>
             <div className={css.topBannerContent}>
@@ -231,8 +236,7 @@ export default function Alderspensjonssoknader() {
           </Heading>
         </Box>
       </Bleed>
-
-      <VStack gap="6" paddingBlock={'8'}>
+      <VStack gap="space-24" paddingBlock={'space-32'}>
         <KildeOppsummeringVisning data={kildeOppsummering} fomDato={fomDato} tomDato={tomDato} />
 
         <HStack justify="space-between" wrap>
@@ -274,7 +278,7 @@ export default function Alderspensjonssoknader() {
         ) : page.content.length === 0 ? (
           <EmptyState />
         ) : (
-          <VStack gap="3">
+          <VStack gap="space-12">
             {page.content.map((b) => (
               <BehandlingCard
                 key={b.uuid}
@@ -294,7 +298,7 @@ export default function Alderspensjonssoknader() {
       <Modal ref={ref} header={{ heading: 'Søkefilter' }}>
         <Modal.Body>
           {' '}
-          <VStack gap="6">
+          <VStack gap="space-24">
             <FilterBar
               ferdig={clampFerdig(searchParams.get('ferdig') ?? 'alle')}
               status={(searchParams.get('status')?.split(',').filter(Boolean) as BehandlingStatus[]) ?? []}
@@ -352,7 +356,7 @@ function FilterBar({
   const allStatuses: BehandlingStatus[] = ['OPPRETTET', 'UNDER_BEHANDLING', 'FULLFORT', 'STOPPET', 'DEBUG', 'FEILENDE']
 
   return (
-    <VStack gap="3">
+    <VStack gap="space-12">
       <div>
         <Detail style={{ marginBottom: 8 }}>Fullføringsgrad</Detail>
         <ToggleGroup size="small" onChange={(val) => onToggleFerdig(clampFerdig(val))} value={ferdig}>
@@ -361,7 +365,6 @@ function FilterBar({
           <ToggleGroup.Item value="ferdige">Ferdige</ToggleGroup.Item>
         </ToggleGroup>
       </div>
-
       <div>
         <Detail style={{ marginBottom: 8 }}>Status</Detail>
         <Chips size="small">
@@ -376,11 +379,10 @@ function FilterBar({
           })}
         </Chips>
       </div>
-
       <div>
         <Detail style={{ marginBottom: 8 }}>Sortering</Detail>
 
-        <HStack gap="2" wrap>
+        <HStack gap="space-8" wrap>
           <Select
             label="Felt"
             size="small"
@@ -403,8 +405,7 @@ function FilterBar({
           </ToggleGroup>
         </HStack>
       </div>
-
-      <HStack gap="4" wrap>
+      <HStack gap="space-16" wrap>
         <Select
           label="Elementer per side"
           size="small"
@@ -439,16 +440,16 @@ function BehandlingCard({
   const enhet = b.enhetId && b.enhetId + (b.enhetsNavn != null ? ` - ${b.enhetsNavn}` : '')
 
   return (
-    <Box.New
+    <Box
       as="article"
       borderWidth="1"
-      padding={{ xs: '4', md: '5' }}
-      borderRadius={'large'}
+      padding={{ xs: 'space-16', md: 'space-20' }}
+      borderRadius={'8'}
       borderColor={'neutral-subtleA'}
     >
-      <VStack gap="3">
+      <VStack gap="space-12">
         <HStack justify="space-between" wrap>
-          <HStack gap="2" align="center">
+          <HStack gap="space-8" align="center">
             <Heading level="3" size="small">
               <Link as={NavLink} to={`/behandling/${b.behandlingId}`}>
                 Behandling #{b.behandlingId}
@@ -458,13 +459,13 @@ function BehandlingCard({
               {C.label}
             </Tag>
           </HStack>
-          <HStack gap="2" align="center">
+          <HStack gap="space-8" align="center">
             <CalendarIcon aria-hidden />
             <Detail title={b.onsketVirkningsdato}>Ønsket virkningsdato: {formatIsoDate(b.onsketVirkningsdato)}</Detail>
           </HStack>
         </HStack>
 
-        <HStack wrap gap="6">
+        <HStack wrap gap="space-24">
           <KV
             label="Siste kjøring"
             value={fmtDateTime(b.sisteKjoring)}
@@ -520,7 +521,7 @@ function BehandlingCard({
         ) : null}
 
         {b.feilmelding && (
-          <VStack gap="2">
+          <VStack gap="space-8">
             <KV label="Feilmelding" value={<ErrorMessage size="small">{b.feilmelding}</ErrorMessage>} />
 
             {b.stackTrace && (
@@ -540,7 +541,7 @@ function BehandlingCard({
             <Detail>Sak {b.sakId}</Detail>
             <CopyButton size={'small'} copyText={`${b.sakId}`} />
           </HStack>
-          <HStack gap="2">
+          <HStack gap="space-8">
             <Button size="small" variant="tertiary">
               <Link
                 href={replaceTemplates(psakSakUrlTemplate, { sakId: b.sakId })}
@@ -566,7 +567,7 @@ function BehandlingCard({
           </HStack>
         </HStack>
       </VStack>
-    </Box.New>
+    </Box>
   )
 }
 
@@ -594,9 +595,9 @@ function KV({
       : undefined
 
   return (
-    <VStack gap="1" className={css.kv}>
+    <VStack gap="space-4" className={css.kv}>
       <Detail>{label}</Detail>
-      <HStack gap="2" style={style}>
+      <HStack gap="space-8" style={style}>
         <BodyShort as={'div'}>{value}</BodyShort>
         {hint && (
           <Detail className={css.hint}>
@@ -611,19 +612,19 @@ function KV({
 
 function EmptyState() {
   return (
-    <Box.New
+    <Box
       borderWidth="1"
-      padding={{ xs: '8' }}
-      borderRadius={'large'}
+      padding={{ xs: 'space-32' }}
+      borderRadius={'8'}
       style={{ textAlign: 'center' }}
       borderColor={'neutral-subtleA'}
     >
-      <VStack gap="2" align="center">
+      <VStack gap="space-8" align="center">
         <Heading level="2" size="small">
           Ingen søknader matcher filtrene
         </Heading>
         <BodyShort>Juster filtrene eller tilbakestill for å se flere.</BodyShort>
       </VStack>
-    </Box.New>
+    </Box>
   )
 }

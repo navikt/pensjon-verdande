@@ -1,10 +1,14 @@
-import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/behandlinger._index'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Behandlinger | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
   const accessToken = await requireAccessToken(request)
@@ -28,8 +32,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return { behandlinger }
 }
 
-export default function AvhengigeBehandlinger() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
 
   return <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
 }

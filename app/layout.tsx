@@ -1,15 +1,15 @@
 import { Alert, Box, CopyButton, HStack, Page, Theme } from '@navikt/ds-react'
 import { useState } from 'react'
-import { createCookie, isRouteErrorResponse, type LoaderFunctionArgs, Outlet, useLoaderData } from 'react-router'
+import { createCookie, isRouteErrorResponse, Outlet, useNavigation } from 'react-router'
 import { hentMe } from '~/brukere/brukere.server'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
 import { getSchedulerStatus } from '~/services/behandling.server'
 import { env } from '~/services/env.server'
-import type { Route } from './+types'
+import type { Route } from './+types/layout'
 import IkkeTilgang from './components/feilmelding/IkkeTilgang'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const darkmodeCookie = await createCookie('darkmode').parse(request.headers.get('cookie'))
   const darkmode = darkmodeCookie === 'true' || darkmodeCookie === true
 
@@ -23,10 +23,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function Layout() {
-  const { env, me, schedulerStatus, darkmode } = useLoaderData<typeof loader>()
+export default function Layout({ loaderData }: Route.ComponentProps) {
+  const { env, me, schedulerStatus, darkmode } = loaderData
   const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
   const [showIconMenu, setShowIconMenu] = useState<boolean>(false)
+  const navigation = useNavigation()
+  const isNavigating = navigation.state !== 'idle'
 
   const schedulerAlert = schedulerStatus && !schedulerStatus.schedulerEnabled && !schedulerStatus.schedulerLocal && (
     <Alert variant="error" style={{ marginBottom: '1rem' }}>
@@ -36,8 +38,24 @@ export default function Layout() {
 
   return (
     <Theme theme={isDarkmode ? 'dark' : 'light'}>
-      <Box.New asChild background={'default'}>
+      <Box asChild background={'default'}>
         <Page>
+          {isNavigating && (
+            <div
+              role="progressbar"
+              aria-label="Laster side"
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '3px',
+                zIndex: 9999,
+                background: 'var(--ax-bg-brand-blue-strong, var(--ax-accent-600))',
+                animation: 'loading-bar 1.5s ease-in-out infinite',
+              }}
+            />
+          )}
           <NavHeader
             erProduksjon={env === 'p'}
             env={env}
@@ -48,18 +66,18 @@ export default function Layout() {
             setShowIconMenu={setShowIconMenu}
           />
 
-          <HStack gap="0" wrap={false}>
+          <HStack gap="space-0" wrap={false}>
             <VenstreMeny me={me} showIconMenu={showIconMenu}></VenstreMeny>
 
             <Page.Block>
-              <Box padding={'4'}>
+              <Box padding={'space-16'}>
                 {schedulerAlert}
                 <Outlet context={me} />
               </Box>
             </Page.Block>
           </HStack>
         </Page>
-      </Box.New>
+      </Box>
     </Theme>
   )
 }

@@ -1,7 +1,7 @@
 import { ExternalLinkIcon, LinkIcon } from '@navikt/aksel-icons'
 import { BodyShort, Button, CopyButton, Heading, HStack, Label, Link, Tag, Tooltip, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type LoaderFunctionArgs, Link as ReactRouterLink, useLoaderData } from 'react-router'
+import { Link as ReactRouterLink } from 'react-router'
 import invariant from 'tiny-invariant'
 import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$aktivitetId'
 import { formatIsoTimestamp } from '~/common/date'
@@ -14,8 +14,9 @@ import { tempoUrl } from '~/loki/utils'
 import { apiGet } from '~/services/api.server'
 import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
 import type { BehandlingDto } from '~/types'
+import type { Route } from './+types/kjoring-logs'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId, kjoringId } = params
 
   invariant(behandlingId, 'Missing behandlingId param')
@@ -50,16 +51,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function BehandlingKjoring() {
-  const { response, behandling, aktivitet, kjoring, kibanaUrl, tempoUrl, selectedColumns, selectedFilters } =
-    useLoaderData<typeof loader>()
+export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) {
+  const { response, behandling, aktivitet, kjoring, kibanaUrl, tempoUrl, selectedColumns, selectedFilters } = loaderData
 
   const [shareUrl, setShareUrl] = useState('')
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-16">
       <Heading size={'small'}>Kjøring</Heading>
-
       <section aria-labelledby="overview-heading">
         <dl
           style={{
@@ -121,7 +120,7 @@ export default function BehandlingKjoring() {
             <Label as="span">Korrelasjonsid</Label>
           </dt>
           <dd>
-            <HStack gap="2" align="center">
+            <HStack gap="space-8" align="center">
               <BodyShort>{kjoring.correlationId}</BodyShort>
               <Tooltip content="Kopier korrelasjonsid">
                 <CopyButton copyText={kjoring.correlationId} iconPosition="right" size="small" />
@@ -135,7 +134,7 @@ export default function BehandlingKjoring() {
                 <Label as="span">TraceId</Label>
               </dt>
               <dd>
-                <HStack gap="2" align="center">
+                <HStack gap="space-8" align="center">
                   <BodyShort>{kjoring.traceId}</BodyShort>
                   <Tooltip content="Kopier TraceId">
                     <CopyButton copyText={kjoring.traceId} iconPosition="right" size="small" />
@@ -151,11 +150,11 @@ export default function BehandlingKjoring() {
           <dd>
             <BodyShort>
               {kjoring.feilmelding ? (
-                <Tag size="small" variant="error">
+                <Tag data-color="danger" size="small" variant="outline">
                   Feilet
                 </Tag>
               ) : (
-                <Tag size="small" variant="success">
+                <Tag data-color="success" size="small" variant="outline">
                   OK
                 </Tag>
               )}
@@ -174,7 +173,6 @@ export default function BehandlingKjoring() {
           )}
         </dl>
       </section>
-
       <HStack>
         <Button
           as={ReactRouterLink}
@@ -218,7 +216,6 @@ export default function BehandlingKjoring() {
           icon={<LinkIcon />}
         />
       </HStack>
-
       <LokiLogsTableLoader
         response={response}
         selectedFilters={selectedFilters}

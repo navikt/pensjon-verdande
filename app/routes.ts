@@ -188,6 +188,8 @@ export default [
     route('/opptjening/manedlig/omregning/opprett', 'opptjening/manedlig/opptjening.manedlig.omregning.opprett.tsx'),
 
     route('kontroll-saerskilt-sats', 'kontroll-saerskilt-sats/kontroll-saerskilt-sats._index.tsx'),
+    route('kontroll-afp-stat-etter-65', 'kontroll-afp-stat-etter-65/kontroll-afp-stat-etter-65._index.tsx'),
+    route('gradert-ap-brev', 'gradert-ap-brev/gradert_ap_brev._index.tsx'),
 
     route('sok', 'sok/sok.tsx'),
   ]),

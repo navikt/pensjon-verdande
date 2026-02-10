@@ -13,7 +13,12 @@ export function AuditTableActionMenu({ row }: Props) {
   return (
     <ActionMenu>
       <ActionMenu.Trigger>
-        <Button variant="tertiary-neutral" icon={<MenuElipsisVerticalIcon title="Saksmeny" />} size="small" />
+        <Button
+          data-color="neutral"
+          variant="tertiary"
+          icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+          size="small"
+        />
       </ActionMenu.Trigger>
       <ActionMenu.Content>
         <ActionMenu.Group label={`Behandling ${row.behandlingId}`}>

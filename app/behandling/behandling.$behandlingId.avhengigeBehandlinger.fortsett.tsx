@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { fortsettBehandling } from '~/services/behandling.server'
+import type { Route } from './+types/behandling.$behandlingId.avhengigeBehandlinger.fortsett'
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const accessToken = await requireAccessToken(request)
 
   const body = await request.formData()

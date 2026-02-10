@@ -1,11 +1,16 @@
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Outlet, redirect, useLoaderData, useLocation } from 'react-router'
+import { Outlet, redirect, useLocation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
 import { getReguleringDetaljer } from '~/regulering/regulering.server'
+import type { Route } from './+types/batch.regulering'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Regulering | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const regulering = await getReguleringDetaljer(accessToken)
 
@@ -18,8 +23,8 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   return { regulering }
 }
 
-export default function OpprettReguleringBatchRoute() {
-  const { regulering } = useLoaderData<typeof loader>()
+export default function OpprettReguleringBatchRoute({ loaderData }: Route.ComponentProps) {
+  const { regulering } = loaderData
 
   const location = useLocation()
   const currentStep = getCurrentStep(location.pathname)
@@ -30,7 +35,7 @@ export default function OpprettReguleringBatchRoute() {
   }
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading level="1" size="medium">
         Regulering
       </Heading>

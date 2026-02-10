@@ -91,33 +91,34 @@ export default function Kalender(props: Props) {
   }
 
   return (
-    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
+    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
       <Heading size={'xlarge'} level="1" spacing>
         <HStack align="center" padding="space-4">
           <span>
             <strong>{valgtDato.toLocaleDateString('no-NO', { month: 'long' })}</strong> {valgtDato.getFullYear()}
           </span>
           <Spacer></Spacer>
-          <HStack gap="1" style={{ height: '10px' }}>
+          <HStack gap="space-4" style={{ height: '10px' }}>
             <Button
+              data-color="neutral"
               icon={<ChevronLeftIcon title="Forrige måned" />}
-              variant="primary-neutral"
+              variant="primary"
               size="xsmall"
               onClick={forrigeMaaned}
             ></Button>
-            <Button variant="primary-neutral" size="xsmall" onClick={iDag}>
+            <Button data-color="neutral" variant="primary" size="xsmall" onClick={iDag}>
               I dag
             </Button>
             <Button
+              data-color="neutral"
               icon={<ChevronRightIcon title="Neste måned" />}
-              variant="primary-neutral"
+              variant="primary"
               size="xsmall"
               onClick={nesteMaaned}
             ></Button>
           </HStack>
         </HStack>
       </Heading>
-
       <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed' }}>
         <thead>
           <tr>
@@ -136,6 +137,6 @@ export default function Kalender(props: Props) {
           ))}
         </tbody>
       </table>
-    </Box.New>
+    </Box>
   )
 }

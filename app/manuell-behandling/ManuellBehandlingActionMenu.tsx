@@ -8,7 +8,12 @@ export function ManuellBehandlingActionMenu() {
   return (
     <ActionMenu>
       <ActionMenu.Trigger>
-        <Button variant="tertiary-neutral" icon={<MenuElipsisVerticalIcon title="Kjøringmeny" />} size="small" />
+        <Button
+          data-color="neutral"
+          variant="tertiary"
+          icon={<MenuElipsisVerticalIcon title="Kjøringmeny" />}
+          size="small"
+        />
       </ActionMenu.Trigger>
       <ActionMenu.Content>
         <ActionMenu.Item

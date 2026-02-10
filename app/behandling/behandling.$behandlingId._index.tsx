@@ -1,11 +1,10 @@
-import type { LoaderFunctionArgs } from 'react-router'
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { BehandlingKjoringerTable } from '~/components/kjoringer-table/BehandlingKjoringerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandling } from '~/services/behandling.server'
+import type { Route } from './+types/behandling.$behandlingId._index'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
   const accessToken = await requireAccessToken(request)
@@ -19,8 +18,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function BehandlingKjoringer() {
-  const { behandling } = useLoaderData<typeof loader>()
+export default function BehandlingKjoringer({ loaderData }: Route.ComponentProps) {
+  const { behandling } = loaderData
 
   return <BehandlingKjoringerTable behandling={behandling} erAldeKjoring={!!behandling.erAldeBehandling} />
 }

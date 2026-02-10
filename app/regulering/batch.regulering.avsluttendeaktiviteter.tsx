@@ -1,15 +1,16 @@
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, useActionData, useSubmit } from 'react-router'
+import { useSubmit } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { avbrytBehandlinger } from '~/regulering/regulering.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/batch.regulering.avsluttendeaktiviteter'
 
 export const loader = async () => {
   return {}
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const data = (await request.json()) as FormType
 
@@ -22,10 +23,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return { success: true, action: data.action }
 }
 
-export default function Avsluttendeaktiviteter() {
+export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentProps) {
   const [openConfirmationModal, setOpenConfirmationModal] = useState<ActionType | null>(null)
   const submit = useSubmit()
-  const actionData = useActionData() as ActionData | undefined
 
   function avbrytBehandlingerFeiletMotPopp() {
     submit({ action: 'avbrytBehandlingerFeiletMotPOPP' }, { method: 'post', encType: 'application/json' })
@@ -38,13 +38,13 @@ export default function Avsluttendeaktiviteter() {
   }
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       {actionData?.success && (
         <Alert variant="success" inline>
           Behandlinger avbrutt mot {actionData.action === 'avbrytBehandlingerFeiletMotPOPP' ? 'POPP' : 'Beregn Ytelse'}
         </Alert>
       )}
-      <HStack gap="5">
+      <HStack gap="space-20">
         <Button onClick={() => setOpenConfirmationModal('avbrytBehandlingerFeiletMotPOPP')}>
           Avbryt behandlinger feilet mot POPP
         </Button>
@@ -76,8 +76,4 @@ type FormType = {
   action: ActionType
 }
 
-type ActionData = {
-  success: boolean
-  action: ActionType
-}
 type ActionType = 'avbrytBehandlingerFeiletMotPOPP' | 'avbrytBehandlingerFeiletIBeregnYtelse' | null

@@ -6,10 +6,10 @@
   border-spacing: 0;
   border-collapse: separate;
   &:first-of-type {
-    border-radius: var(--ax-border-radius-large) var(--ax-border-radius-large) 0 0;
+    border-radius: var(--ax-radius-8) var(--ax-radius-8) 0 0;
     border-top: 1px solid var(--ax-border-neutral-subtle);
   }
   &:last-of-type {
-    border-radius: 0 0 var(--ax-border-radius-large) var(--ax-border-radius-large);
+    border-radius: 0 0 var(--ax-radius-8) var(--ax-radius-8);
   }
 }
