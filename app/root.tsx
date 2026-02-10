@@ -6,7 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
+  useRouteLoaderData,
 } from 'react-router'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 
@@ -25,10 +25,10 @@ export const loader = async () => {
   }
 }
 
-export default function App() {
-  const { env } = useLoaderData<typeof loader>()
-
-  const title = env === 'p' ? 'Verdande' : `(${env.toUpperCase()}) Verdande`
+export function Layout({ children }: { children: React.ReactNode }) {
+  const rootData = useRouteLoaderData<typeof loader>('root')
+  const envName = rootData?.env
+  const title = envName ? (envName === 'p' ? 'Verdande' : `(${envName.toUpperCase()}) Verdande`) : 'Verdande'
 
   return (
     <html lang="en">
@@ -40,14 +40,16 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div style={{ width: '100%' }}>
-          <Outlet />
-        </div>
+        <div style={{ width: '100%' }}>{children}</div>
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   )
+}
+
+export default function App() {
+  return <Outlet />
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
