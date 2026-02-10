@@ -1,5 +1,5 @@
 .production {
-  background-color: rgb(195, 33, 33);
+  background-color: var(--ax-bg-danger-strong);
 }
 
 .environmentPostscript {
