@@ -1,4 +1,4 @@
-import { Alert, HStack, Loader } from '@navikt/ds-react'
+import { HStack, InlineMessage, Loader } from '@navikt/ds-react'
 import type React from 'react'
 import { Suspense } from 'react'
 import { Await, useAsyncError } from 'react-router'
@@ -12,9 +12,9 @@ function LokiLogsError() {
   console.error(errors)
 
   return (
-    <Alert variant="error" size="small">
+    <InlineMessage status="error" size="small">
       Feil ved henting av logger. Dette kan skyldes tregt svar fra logg-tjenesten. Forsøk igjen senere
-    </Alert>
+    </InlineMessage>
   )
 }
 
