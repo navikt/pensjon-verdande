@@ -24,6 +24,10 @@ import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
 import type { Route } from './+types/infobanner'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Infobanner | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   return await apiGet<Infobanner>('/api/verdande/infobanner', request)
 }

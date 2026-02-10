@@ -24,6 +24,10 @@ import type { Behandlingstatus } from '~/types'
 import type { Route } from './+types/afp-etteroppgjor'
 import styles from './afp-etteroppgjor.module.css'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'AFP etteroppgjør | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const behandlinger = await apiGet<HentAlleResponse>(`/api/afpoffentlig/etteroppgjor/behandling`, request)
 

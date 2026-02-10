@@ -61,6 +61,10 @@ const facetValueTranslator: Partial<Record<FacetKey, (key: string) => string>> =
   underkategoriKode: decodeUnderkategoriKode,
 }
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Manuell behandling | Verdande' }]
+}
+
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
 

@@ -11,6 +11,10 @@ import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/kontroll-saerskilt-sats._index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Kontroll særskilt sats | Verdande' }]
+}
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)

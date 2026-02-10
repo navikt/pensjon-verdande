@@ -4,6 +4,10 @@ import { hentBrukere } from '~/brukere/brukere.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Brukere | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const accesstoken = await requireAccessToken(request)
 

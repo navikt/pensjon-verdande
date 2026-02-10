@@ -10,6 +10,10 @@ import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/kontroll-afp-stat-etter-65._index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Kontroll AFP stat etter 65 | Verdande' }]
+}
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)

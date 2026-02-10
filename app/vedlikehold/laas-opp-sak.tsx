@@ -2,6 +2,10 @@ import { Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
 import { Outlet, redirect, useFetcher } from 'react-router'
 import type { Route } from './+types/laas-opp-sak'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Lås opp sak | Verdande' }]
+}
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const sakId = formData.get('sakId')?.toString()

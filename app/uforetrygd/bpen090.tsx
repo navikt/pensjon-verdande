@@ -15,6 +15,10 @@ const toYyyyMM = (d = new Date()) => {
   return y * 100 + m
 }
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'BPEN090 | Verdande' }]
+}
+
 export const loader = async () => {
   return { kjoremaaned: toYyyyMM() }
 }

@@ -15,6 +15,10 @@ enum Action {
   HentAntallSkattehendelser = 'HENT_ANTALL_SKATTEHENDELSER',
 }
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'BPEN096 | Verdande' }]
+}
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = Object.fromEntries(await request.formData())
   const accessToken = await requireAccessToken(request)

@@ -76,6 +76,10 @@ const BEHANDLINGSTYPER = [
   'E500Fillevering',
 ]
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Behandlingserier | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const behandlingType = searchParams.get('behandlingType') ?? ''

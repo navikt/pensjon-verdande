@@ -6,6 +6,10 @@ import 'chart.js/auto'
 import { getReguleringDetaljer } from '~/regulering/regulering.server'
 import type { Route } from './+types/batch.regulering'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Regulering | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const regulering = await getReguleringDetaljer(accessToken)

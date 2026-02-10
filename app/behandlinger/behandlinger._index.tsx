@@ -4,6 +4,10 @@ import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/behandlinger._index'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Behandlinger | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 

@@ -5,6 +5,10 @@ import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/behandlinger.$status'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Behandlinger | Verdande' }]
+}
+
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.status, 'Missing status param')
   const { searchParams } = new URL(request.url)

@@ -15,6 +15,10 @@ import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.oms
 import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/opptjening.arlig.omregning'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Årlig opptjening | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)

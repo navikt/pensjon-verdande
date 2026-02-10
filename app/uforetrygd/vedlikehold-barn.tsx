@@ -17,6 +17,10 @@ export type PersonDetaljForVedlikehold = {
 }
 
 // GET
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Vedlikehold barn | Verdande' }]
+}
+
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
   const sakId = url.searchParams.get('sakId')

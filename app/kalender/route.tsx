@@ -2,6 +2,10 @@ import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Ka
 import { hentKalenderHendelser } from '~/services/behandling.server'
 import type { Route } from './+types/route'
 
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Kalender | Verdande' }]
+}
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
