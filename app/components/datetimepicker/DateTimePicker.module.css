@@ -6,9 +6,9 @@
   border: 1px solid var(--ax-border-neutral);
   border-radius: var(--ax-radius-8);
   color: var(--ax-text-neutral);
-  min-height: 2rem;
+  min-height: var(--ax-space-32);
   padding: var(--ax-space-8);
-  scroll-margin-block-start: 4rem;
+  scroll-margin-block-start: var(--ax-space-64);
   width: 100%;
   font-size: var(--ax-font-size-medium);
   letter-spacing: 0.002em;
