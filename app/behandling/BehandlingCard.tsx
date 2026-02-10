@@ -121,6 +121,7 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
           <Button
             type="button"
             variant="danger"
+            disabled={fetcher.state !== 'idle'}
             onClick={() => fetcher.submit({ operation: OPERATION.stopp, begrunnelse }, { method: 'POST' })}
           >
             Stopp behandling

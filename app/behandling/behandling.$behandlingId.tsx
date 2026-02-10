@@ -50,10 +50,7 @@ function isOperation(x: unknown): x is Operation {
 
 const getBool = (v: FormDataEntryValue | null) => v === 'true' || v === 'on' || v === '1'
 
-function requireField(
-  form: FormData,
-  name: string,
-): { value: string; error?: never } | { value?: never; error: string } {
+function getField(form: FormData, name: string): { value: string; error?: never } | { value?: never; error: string } {
   const v = form.get(name)
   if (typeof v !== 'string' || v.length === 0) {
     return { error: `Påkrevd felt mangler: ${name}` }
@@ -69,11 +66,11 @@ function operationHandlers(
 ): { errors: Record<string, string>; handler?: () => Promise<void> } {
   const errors: Record<string, string> = {}
 
-  const ansvarligTeam = requireField(form, 'ansvarligTeam')
+  const ansvarligTeam = getField(form, 'ansvarligTeam')
   if (operation === OPERATION.oppdaterAnsvarligTeam && ansvarligTeam.error) {
     errors.ansvarligTeam = ansvarligTeam.error
   }
-  const kontrollpunkt = requireField(form, 'kontrollpunkt')
+  const kontrollpunkt = getField(form, 'kontrollpunkt')
   if (operation === OPERATION.sendTilManuellMedKontrollpunkt && kontrollpunkt.error) {
     errors.kontrollpunkt = kontrollpunkt.error
   }
