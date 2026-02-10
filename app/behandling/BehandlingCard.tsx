@@ -197,7 +197,6 @@ export default function BehandlingCard(props: Props) {
   const navigate = useNavigate()
 
   const fortsettModal = useRef<HTMLDialogElement>(null)
-  const sendTilManuellMedKontrollpunktModal = useRef<HTMLDialogElement>(null)
   const sendTilOppdragPaNyttModal = useRef<HTMLDialogElement>(null)
 
   function beregnFremdriftProsent(ferdig: number, totalt: number): string {
@@ -235,8 +234,6 @@ export default function BehandlingCard(props: Props) {
         method: 'POST',
       },
     )
-
-    sendTilManuellMedKontrollpunktModal.current?.close()
   }
 
   function sendTilOppdragPaNytt() {
@@ -693,9 +690,8 @@ export default function BehandlingCard(props: Props) {
           {hasLink('sendTilManuellMedKontrollpunkt') && (
             <SendTilManuellMedKontrollpunktModal
               sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
-              modalRef={sendTilManuellMedKontrollpunktModal}
               behandling={props.behandling}
-            ></SendTilManuellMedKontrollpunktModal>
+            />
           )}
 
           {runButton()}

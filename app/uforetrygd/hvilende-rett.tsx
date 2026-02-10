@@ -114,7 +114,7 @@ function hvilendeRettVarselForm() {
       <ConfirmationModal
         onOk={sendTilVarsel}
         onCancel={() => setVisModal(false)}
-        showModal={visModal}
+        open={visModal}
         text={hvilendeRettVarselAction.beskrivelse}
       />
     </VStack>
@@ -167,7 +167,7 @@ function hvilendeRettOpphorForm() {
       <ConfirmationModal
         onOk={sendTilOpphor}
         onCancel={() => setVisModal(false)}
-        showModal={visModal}
+        open={visModal}
         text={hvilendeRettOpphorAction.beskrivelse}
       />
     </VStack>
