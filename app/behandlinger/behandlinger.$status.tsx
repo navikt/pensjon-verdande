@@ -1,11 +1,15 @@
-import { type ActionFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/behandlinger.$status'
 
-export const loader = async ({ params, request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Behandlinger | Verdande' }]
+}
+
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.status, 'Missing status param')
   const { searchParams } = new URL(request.url)
 
@@ -28,8 +32,8 @@ export const loader = async ({ params, request }: ActionFunctionArgs) => {
   return { behandlinger }
 }
 
-export default function BehandlingerStatus() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function BehandlingerStatus({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
 
   return <BehandlingerTable visStatusSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
 }

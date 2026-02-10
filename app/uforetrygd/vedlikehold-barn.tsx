@@ -1,7 +1,8 @@
 import { BodyLong, Button, Checkbox, Heading, HStack, Modal, Table, TextField, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { type ActionFunctionArgs, type LoaderFunctionArgs, useFetcher, useSearchParams } from 'react-router'
+import { useFetcher, useSearchParams } from 'react-router'
 import { apiGet, apiPut } from '~/services/api.server'
+import type { Route } from './+types/vedlikehold-barn'
 
 export type PersonDetaljForVedlikehold = {
   personDetaljId: string
@@ -16,7 +17,11 @@ export type PersonDetaljForVedlikehold = {
 }
 
 // GET
-export async function loader({ request }: LoaderFunctionArgs) {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Vedlikehold barn | Verdande' }]
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
   const sakId = url.searchParams.get('sakId')
 
@@ -28,7 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 // PUT
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData()
   const personDetalj = JSON.parse(formData.get('personDetalj') as string) as PersonDetaljForVedlikehold[]
 
@@ -125,21 +130,22 @@ function HentPersonDetaljer({
   const sakIdParam = searchParams.get('sakId')
   const [sakId, setSakId] = useState<string>(sakIdParam ?? '')
   const fetcher = useFetcher()
+  const { data: fetcherData, state: fetcherState, load: fetcherLoad } = fetcher
 
   useEffect(() => {
-    if (sakIdParam !== null && fetcher.data === undefined && fetcher.state === 'idle') {
+    if (sakIdParam !== null && fetcherData === undefined && fetcherState === 'idle') {
       setSearchParams({ sakId: sakId })
-      fetcher.load(`?sakId=${sakId}`)
+      fetcherLoad(`?sakId=${sakId}`)
     }
-  }, [fetcher.data, fetcher.state, sakIdParam, sakId, setSearchParams, fetcher.load])
+  }, [fetcherData, fetcherState, sakIdParam, sakId, setSearchParams, fetcherLoad])
 
   useEffect(() => {
-    onLoad(fetcher.data as PersonDetaljForVedlikehold[] | null | undefined)
-  }, [fetcher.data, onLoad])
+    onLoad(fetcherData as PersonDetaljForVedlikehold[] | null | undefined)
+  }, [fetcherData, onLoad])
 
   function hentPersonGrunnlag() {
     setSearchParams({ sakId: sakId })
-    fetcher.load(`?sakId=${sakId}`)
+    fetcherLoad(`?sakId=${sakId}`)
   }
 
   return (
@@ -150,12 +156,12 @@ function HentPersonDetaljer({
     >
       <HStack gap="2" align="start">
         <TextField
-          error={fetcher.data === null ? 'Fant ingen barn' : undefined}
+          error={fetcherData === null ? 'Fant ingen barn' : undefined}
           label="Sak ID"
           value={sakId}
           onChange={(e) => setSakId(e.target.value)}
         />
-        <Button onClick={hentPersonGrunnlag} style={{ marginTop: '32px' }} loading={fetcher.state === 'loading'}>
+        <Button onClick={hentPersonGrunnlag} style={{ marginTop: '32px' }} loading={fetcherState === 'loading'}>
           Hent barn
         </Button>
       </HStack>

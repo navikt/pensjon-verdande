@@ -1,6 +1,6 @@
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useSearchParams } from 'react-router'
+import { Form, useSearchParams } from 'react-router'
 import {
   hentOmregningbehandlingsnokler,
   hentOmregningStatistikk,
@@ -8,8 +8,13 @@ import {
 } from '~/omregning/batch.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningStatistikkPage } from '~/types'
+import type { Route } from './+types/omregningStatistikk._index'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Omregningsstatistikk | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   const { searchParams } = new URL(request.url)
@@ -32,7 +37,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accesstoken = await requireAccessToken(request)
   const formData = await request.formData()
   const { searchParams } = new URL(request.url)
@@ -49,8 +54,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return { omregningStatistikkPage }
 }
 
-export default function OmregningStatistikk() {
-  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkCsv } = useLoaderData<typeof loader>()
+export default function OmregningStatistikk({ loaderData }: Route.ComponentProps) {
+  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkCsv } = loaderData
 
   const optionBehandlingsNoekler: { value: string; label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })

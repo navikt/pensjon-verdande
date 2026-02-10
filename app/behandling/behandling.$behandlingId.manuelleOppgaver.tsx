@@ -1,13 +1,14 @@
 import { Table } from '@navikt/ds-react'
-import { Link, type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { Link } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import { formatIsoTimestamp } from '~/common/date'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandling, henBehandlingManuell } from '~/services/behandling.server'
 import type { BehandlingManuellDto } from '~/types'
+import type { Route } from './+types/behandling.$behandlingId.manuelleOppgaver'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId } = params
   invariant(behandlingId, 'Missing behandlingId param')
 
@@ -28,8 +29,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function ManuelleBehandlinger() {
-  const { behandling, behandlingManuellPage } = useLoaderData<typeof loader>()
+export default function ManuelleBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { behandling, behandlingManuellPage } = loaderData
 
   return (
     <Table>

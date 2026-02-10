@@ -28,8 +28,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import React, { useEffect, useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
-import { Link, useFetcher, useLoaderData, useSearchParams } from 'react-router'
+import { Link, useFetcher, useSearchParams } from 'react-router'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
@@ -40,13 +39,17 @@ import {
   type LaasteVedtakBehandlingSummary,
   type LaasteVedtakRow,
   type LaasteVedtakUttrekkStatus,
-  type LaasteVedtakUttrekkSummary,
   muligeAksjonspunkt,
   type VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'
 import { getLaasteVedtakSummary } from '~/vedlikehold/vedlikehold.server'
+import type { Route } from './+types/laaste-vedtak'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Låste vedtak | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const team = searchParams.get('team')
   const aksjonspunkt = searchParams.get('aksjonspunkt')
@@ -59,8 +62,8 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   return laasteVedtakSummary
 }
 
-export default function LaasteVedtakPage() {
-  const laasteVedtakSummary = useLoaderData() as LaasteVedtakUttrekkSummary
+export default function LaasteVedtakPage({ loaderData }: Route.ComponentProps) {
+  const laasteVedtakSummary = loaderData
   const [uttrekkStatus, setUttrekkStatus] = useState<LaasteVedtakUttrekkStatus | null>(
     laasteVedtakSummary.uttrekkStatus,
   )

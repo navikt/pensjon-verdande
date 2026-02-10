@@ -1,8 +1,9 @@
 import { Alert, Button, Checkbox, Heading, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useActionData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
+import type { Route } from './+types/bestem-etteroppgjor-resultat._index'
 
 function parseSakIds(sakIds: FormDataEntryValue | null): number[] {
   if (!sakIds || typeof sakIds !== 'string') return []
@@ -29,7 +30,11 @@ function parseFormData(formData: FormData) {
   return { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Bestem etteroppgjør resultat | Verdande' }]
+}
+
+export const action = async ({ request }: Route.ActionArgs) => {
   try {
     const accessToken = await requireAccessToken(request)
     const formData = await request.formData()
@@ -44,8 +49,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export default function BestemEtteroppgjorResultatPage() {
-  const actionData = useActionData() as ActionData | undefined
+export default function BestemEtteroppgjorResultatPage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
   const error = actionData?.error
@@ -89,8 +93,4 @@ export default function BestemEtteroppgjorResultatPage() {
       </Form>
     </VStack>
   )
-}
-
-type ActionData = {
-  error: string | null
 }

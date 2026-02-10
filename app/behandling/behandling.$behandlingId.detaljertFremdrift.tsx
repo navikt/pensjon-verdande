@@ -14,13 +14,14 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useMemo, useState } from 'react'
-import { type LoaderFunctionArgs, NavLink, useLoaderData, useRevalidator } from 'react-router'
+import { NavLink, useRevalidator } from 'react-router'
 import invariant from 'tiny-invariant'
 import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
 import { getDetaljertFremdrift } from '~/services/behandling.server'
 import type { BehandlingDetaljertFremdriftDTO } from '~/types'
+import type { Route } from './+types/behandling.$behandlingId.detaljertFremdrift'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
   const detaljertFremdrift = await getDetaljertFremdrift(request, +params.behandlingId)
@@ -76,8 +77,8 @@ const StatusTag: React.FC<{
   </Tag>
 )
 
-export default function FremdriftRoute() {
-  const { detaljertFremdrift } = useLoaderData<typeof loader>()
+export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
+  const { detaljertFremdrift } = loaderData
   const revalidator = useRevalidator()
 
   const [onlyIssues, setOnlyIssues] = useState(false)

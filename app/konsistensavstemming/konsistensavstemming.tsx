@@ -11,22 +11,20 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import {
-  type ActionFunctionArgs,
-  Await,
-  Form,
-  type LoaderFunctionArgs,
-  useLoaderData,
-  useNavigation,
-} from 'react-router'
+import { Await, Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { opprettKonsistensavstemmingBehandling } from '~/konsistensavstemming/konsistensavstemming.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/konsistensavstemming'
 
 const behandlingType = 'KonsistensavstemmingBehandling'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Konsistensavstemming | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -45,7 +43,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const PENAFP = (formData.get('PENAFP') as string) === 'true'
   const PENAFPP = (formData.get('PENAFPP') as string) === 'true'
@@ -106,8 +104,8 @@ function areDatesValid(dateFom: string) {
   }
 }
 
-export default function Konsistensavstemming() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function Konsistensavstemming({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'

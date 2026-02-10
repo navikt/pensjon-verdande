@@ -24,7 +24,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { isRouteErrorResponse, Link, useFetcher, useLoaderData } from 'react-router'
+import { isRouteErrorResponse, Link, useFetcher } from 'react-router'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { Entry } from '~/components/entry/Entry'
 import { apiPost } from '~/services/api.server'
@@ -41,8 +41,8 @@ export const loader = async ({ params: { sakId }, request }: Route.LoaderArgs) =
   sak: await apiPost<SakOppsummeringLaasOpp>('/api/behandling/laas-opp/hentSak', { sakId }, request),
 })
 
-export default function LaasOppSakSakIdPage() {
-  const { sak } = useLoaderData<typeof loader>()
+export default function LaasOppSakSakIdPage({ loaderData }: Route.ComponentProps) {
+  const { sak } = loaderData
   const [laasOppVedtak, setLaasOppVedtak] = useState<VedtakLaasOpp | null>(null)
   const [kravTilManuell, setKravTilManuell] = useState<string | null>(null)
   const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] = useState<VedtakLaasOpp | null>(null)

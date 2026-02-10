@@ -1,4 +1,4 @@
-import { type ActionFunctionArgs, type LoaderFunctionArgs, useLoaderData, useOutletContext } from 'react-router'
+import { useOutletContext } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingCard from '~/behandling/BehandlingCard'
 import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
@@ -22,6 +22,7 @@ import {
 } from '~/services/behandling.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { DetaljertFremdriftDTO } from '~/types'
+import type { Route } from './+types/behandling.$behandlingId'
 
 export const OPERATION = {
   fjernFraDebug: 'fjernFraDebug',
@@ -89,7 +90,7 @@ function operationHandlers(
   } satisfies Record<Operation, () => Promise<void>>
 }
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ params, request }: Route.ActionArgs) => {
   invariant(params.behandlingId, 'Mangler parameter: behandlingId')
   const behandlingId = params.behandlingId
 
@@ -105,7 +106,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   await handlers[operation]()
 }
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
   const url = new URL(request.url)
@@ -131,9 +132,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function Behandling() {
-  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } =
-    useLoaderData<typeof loader>()
+export default function Behandling({ loaderData }: Route.ComponentProps) {
+  const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } = loaderData
 
   const me = useOutletContext<MeResponse>()
 

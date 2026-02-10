@@ -1,8 +1,12 @@
-import { type ActionFunctionArgs, useLoaderData } from 'react-router'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { hentKalenderHendelser } from '~/services/behandling.server'
+import type { Route } from './+types/route'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Kalender | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
   const dato = searchParams.get('dato')
@@ -20,8 +24,8 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export default function KalenderVisning() {
-  const { kalenderHendelser, startDato } = useLoaderData<typeof loader>()
+export default function KalenderVisning({ loaderData }: Route.ComponentProps) {
+  const { kalenderHendelser, startDato } = loaderData
 
   return (
     <Kalender

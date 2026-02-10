@@ -1,7 +1,8 @@
 import { BodyShort, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
+import type { Route } from './+types/bpen090'
 
 type ActionErrors = {
   kjoremaaned?: string
@@ -12,6 +13,10 @@ const toYyyyMM = (d = new Date()) => {
   const y = d.getFullYear()
   const m = d.getMonth() + 1
   return y * 100 + m
+}
+
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'BPEN090 | Verdande' }]
 }
 
 export const loader = async () => {
@@ -29,7 +34,7 @@ const isBetweenAprilAndOctober = (n: number) => {
   return mm >= 4 && mm <= 10
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
 
   const kjoremaanedStr = String(formData.get('kjoremaaned') ?? '')
@@ -67,10 +72,10 @@ enum OppdragsPrioritet {
   Batch = 2,
 }
 
-export default function LopendeInntektsavkorting() {
-  const { kjoremaaned } = useLoaderData<typeof loader>()
+export default function LopendeInntektsavkorting({ loaderData, actionData }: Route.ComponentProps) {
+  const { kjoremaaned } = loaderData
   const navigation = useNavigation()
-  const errors = useActionData() as ActionErrors | undefined
+  const errors = actionData as ActionErrors | undefined
 
   const isSubmitting = navigation.state === 'submitting'
 

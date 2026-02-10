@@ -1,6 +1,6 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
@@ -13,8 +13,13 @@ import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
 import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
 import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/opptjening.arlig.omregning'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Årlig opptjening | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)
 
@@ -40,7 +45,7 @@ enum Action {
   oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const fromEntries = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
@@ -92,9 +97,9 @@ function konverterTilListe(ekskluderteSakIderText: string): string[] {
     .filter((id) => id !== '')
 }
 
-export default function EndretOpptjeningArligUttrekk() {
-  const data = useActionData<typeof action>()
-  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = useLoaderData<typeof loader>()
+export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }: Route.ComponentProps) {
+  const data = actionData
+  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = loaderData
   const navigation = useNavigation()
 
   const [selectedOpptjeningsaar, setSelectedOpptjeningsaar] = useState(defaultOpptjeningsaar)

@@ -1,14 +1,18 @@
 import { BodyLong, BodyShort, Box, CopyButton, Heading, type SortState, Table, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import type { ManglendeForeignKeyIndex, ManglendeForeignKeyIndexResponse } from '~/vedlikehold/vedlikehold.types'
+import type { Route } from './+types/manglende-foreign-key-indexer'
 
 interface ScopedSortState extends SortState {
   orderBy: keyof ManglendeForeignKeyIndex
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Manglende foreign key-indexer | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const manglendeForeignKeyIndexer: ManglendeForeignKeyIndexResponse = await apiGet(
     '/api/vedlikehold/manglende-fk-index',
     request,
@@ -106,8 +110,8 @@ function ManglendeForeignKeyIndexerTable({
   )
 }
 
-export default function ManglendeForeignKeyIndexer() {
-  const { manglendeForeignKeyIndexer } = useLoaderData<typeof loader>()
+export default function ManglendeForeignKeyIndexer({ loaderData }: Route.ComponentProps) {
+  const { manglendeForeignKeyIndexer } = loaderData
 
   return (
     <VStack gap="5">

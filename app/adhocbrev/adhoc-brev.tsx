@@ -1,23 +1,20 @@
 import { BodyLong, Box, Button, Heading, Select, Skeleton, TextField, VStack } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import {
-  type ActionFunctionArgs,
-  Await,
-  Form,
-  type LoaderFunctionArgs,
-  redirect,
-  useLoaderData,
-  useNavigation,
-} from 'react-router'
+import { Await, Form, redirect, useNavigation } from 'react-router'
 import { opprettAdhocBrevBehandling } from '~/adhocbrev/adhoc-brev.server'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/adhoc-brev'
 
 const behandlingType = 'AdhocBrevBestillingBatchBehandling'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Adhoc-brev | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -36,7 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
@@ -50,8 +47,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function AdhocBrev() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'

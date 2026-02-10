@@ -1,9 +1,10 @@
-import { type LoaderFunctionArgs, useLoaderData, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 import invariant from 'tiny-invariant'
 import AktivitetCard from '~/behandling/AktivitetCard'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandling } from '~/services/behandling.server'
 import type { BehandlingDto } from '~/types'
+import type { Route } from './+types/behandling.$behandlingId.aktivitet.$aktivitetId'
 
 export function finnAktivitet(behandling: BehandlingDto, aktivitetId: number | string) {
   if (typeof aktivitetId === 'string') {
@@ -13,7 +14,7 @@ export function finnAktivitet(behandling: BehandlingDto, aktivitetId: number | s
   }
 }
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
   const aktivitetId = params.aktivitetId
   invariant(aktivitetId, 'Missing aktivitetId param')
@@ -32,8 +33,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   return { behandling, aktivitet }
 }
 
-export default function Behandling() {
-  const { behandling, aktivitet } = useLoaderData<typeof loader>()
+export default function Behandling({ loaderData }: Route.ComponentProps) {
+  const { behandling, aktivitet } = loaderData
   const location = useLocation()
 
   return <AktivitetCard behandling={behandling} aktivitet={aktivitet} pathname={location.pathname} />

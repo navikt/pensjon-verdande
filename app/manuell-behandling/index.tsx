@@ -24,7 +24,7 @@ import {
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { type LoaderFunctionArgs, redirect, useLoaderData, useSearchParams } from 'react-router'
+import { redirect, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { decodeFagomrade } from '~/common/decode'
@@ -33,6 +33,7 @@ import { decodeOppgaveKode, decodeOppgavePrioritet } from '~/common/decodeOppgav
 import { decodeUnderkategoriKode } from '~/common/decodeUnderkategori'
 import { ManuellBehandlingActionMenu } from '~/manuell-behandling/ManuellBehandlingActionMenu'
 import { apiGet } from '~/services/api.server'
+import type { Route } from './+types/index'
 
 export type ManuellBehandlingOppsummering = {
   behandlingType: string
@@ -60,7 +61,11 @@ const facetValueTranslator: Partial<Record<FacetKey, (key: string) => string>> =
   underkategoriKode: decodeUnderkategoriKode,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Manuell behandling | Verdande' }]
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
 
   const now = new Date()
@@ -201,8 +206,8 @@ function countActiveFilters(filters: Partial<Record<FacetKey, string[]>>): numbe
   return Object.values(filters).reduce((acc, v) => acc + ((v?.length ?? 0) > 0 ? 1 : 0), 0)
 }
 
-export default function ManuellBehandlingOppsummeringRoute() {
-  const { nowIso, rows, fomDato, tomDato } = useLoaderData<typeof loader>()
+export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route.ComponentProps) {
+  const { nowIso, rows, fomDato, tomDato } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const sokeModalRef = useRef<HTMLDialogElement>(null)
   const grupperModalRef = useRef<HTMLDialogElement>(null)

@@ -1,4 +1,3 @@
-import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
@@ -23,8 +22,9 @@ import { Entry } from '~/components/entry/Entry'
 import { startOrkestrering } from '~/regulering/regulering.server'
 import type { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering/regulering.types'
 import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
+import type { Route } from './+types/batch.regulering.orkestrering'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const antallFamilier = formData.get('antallFamilier') as string

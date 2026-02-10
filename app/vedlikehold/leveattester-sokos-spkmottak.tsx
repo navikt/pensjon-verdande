@@ -1,17 +1,18 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
-import { Form, useActionData } from 'react-router'
+import { Form } from 'react-router'
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { hentMot } from '~/vedlikehold/vedlikehold.server'
-import type { ActionData } from '~/vedlikehold/vedlikehold.types'
+import type { Route } from './+types/leveattester-sokos-spkmottak'
 
-export default function SokosSPKMottakPage() {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Leveattester SOKOS/SPK-mottak | Verdande' }]
+}
+
+export default function SokosSPKMottakPage({ actionData }: Route.ComponentProps) {
   const [fomYear, setFomYear] = useState('')
   const [fomMonth, setFomMonth] = useState('')
-
-  const actionData = useActionData() as ActionData | undefined
 
   const antall = actionData?.antall
   const error = actionData?.error
@@ -64,7 +65,7 @@ export default function SokosSPKMottakPage() {
   )
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const accessToken = await requireAccessToken(request)
 

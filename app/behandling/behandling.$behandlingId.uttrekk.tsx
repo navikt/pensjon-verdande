@@ -1,15 +1,14 @@
 import { Accordion, Box, CopyButton, Link } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import type { LoaderFunctionArgs } from 'react-router'
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { apiGet } from '~/services/api.server'
+import type { Route } from './+types/behandling.$behandlingId.uttrekk'
 
 type BehandlingUttrekk = {
   str: string[]
 }
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
   const output = await apiGet<BehandlingUttrekk>(`/api/behandling/uttrekk/${params.behandlingId}/output`, request)
@@ -22,8 +21,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function BehandlingOutput() {
-  const { output } = useLoaderData<typeof loader>()
+export default function BehandlingOutput({ loaderData }: Route.ComponentProps) {
+  const { output } = loaderData
 
   const [downloadLink, setDownloadLink] = useState('')
 

@@ -15,15 +15,20 @@ import {
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
+import { Form, NavLink, redirect } from 'react-router'
 import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { Behandlingstatus } from '~/types'
+import type { Route } from './+types/afp-etteroppgjor'
 import styles from './afp-etteroppgjor.module.css'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'AFP etteroppgjør | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const behandlinger = await apiGet<HentAlleResponse>(`/api/afpoffentlig/etteroppgjor/behandling`, request)
 
   const etteroppgjor: AfpEtteroppgjorResponse[] = behandlinger.etteroppgjor
@@ -33,7 +38,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const formData = Object.fromEntries(await request.formData())
@@ -121,8 +126,8 @@ function Tidspunkt({ label, verdi }: { label: string; verdi?: string }) {
   )
 }
 
-export default function EtteroppgjorOversikt() {
-  const { etteroppgjor } = useLoaderData<typeof loader>()
+export default function EtteroppgjorOversikt({ loaderData }: Route.ComponentProps) {
+  const { etteroppgjor } = loaderData
 
   const [kjøreår, setKjøreår] = useState<number | undefined>(undefined)
 

@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs } from 'react-router'
 import { oppdaterOmregningInput } from '~/omregning/batch.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/omregning.omregningsaker'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const formData = await request.formData()

@@ -1,11 +1,16 @@
 import { BodyShort, Button, Heading, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, useLoaderData, useNavigation } from 'react-router'
+import { Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { startVurderSamboereBatch } from '~/samboeropplysninger/samboeropplysninger.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/lever-samboeropplysning._index'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Lever samboeopplysning | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
 
   const size = searchParams.get('size')
@@ -27,7 +32,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
@@ -35,8 +40,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   await startVurderSamboereBatch(accessToken, +updates.behandlingsAr)
 }
 
-export default function BatchOpprett_index() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
