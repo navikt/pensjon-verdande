@@ -15,7 +15,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useMemo, useRef } from 'react'
-import { useLoaderData, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import type { BehandlingAuditDTO, BehandlingAuditGroupedDTO, PageDTO } from '~/audit/audit.types'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/audit.index'
@@ -57,8 +57,8 @@ function isGroupedPage(
   return p.content.length > 0 && 'antall' in p.content[0]
 }
 
-export default function AuditIndexPage() {
-  const { page, view: initialView } = useLoaderData<typeof loader>()
+export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
+  const { page, view: initialView } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const filterModalRef = useRef<HTMLDialogElement>(null)
 

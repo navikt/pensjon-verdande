@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
 import { requireAccessToken } from '~/services/auth.server'
@@ -29,8 +28,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   return { behandlinger }
 }
 
-export default function AvhengigeBehandlinger() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
 
   return <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
 }

@@ -1,5 +1,5 @@
 import { Box, Table } from '@navikt/ds-react'
-import { Link, useLoaderData } from 'react-router'
+import { Link } from 'react-router'
 import { hentBrukere } from '~/brukere/brukere.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/index'
@@ -12,8 +12,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Brukere() {
-  const { brukere } = useLoaderData<typeof loader>()
+export default function Brukere({ loaderData }: Route.ComponentProps) {
+  const { brukere } = loaderData
 
   return (
     <Box.New style={{ padding: '6px' }} borderRadius="medium">

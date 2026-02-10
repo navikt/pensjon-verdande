@@ -21,7 +21,7 @@ import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/comb
 import type React from 'react'
 import { useRef, useState } from 'react'
 import type { HTMLFormMethod } from 'react-router'
-import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from 'react-router'
+import { Form, useFetcher, useNavigation, useSearchParams, useSubmit } from 'react-router'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
 import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
 import { OmregningOppsummering } from '~/components/omregning/OmregningOppsummering'
@@ -49,8 +49,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   return { omregningInit, omregningSakerPage }
 }
 
-export default function BatchOpprett_index() {
-  const { omregningInit, omregningSakerPage } = useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { omregningInit, omregningSakerPage } = loaderData
   const now = new Date()
   const [isClicked, setIsClicked] = useState(false)
   const ref = useRef<HTMLDialogElement>(null)

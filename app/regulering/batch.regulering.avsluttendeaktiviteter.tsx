@@ -1,6 +1,6 @@
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { useActionData, useSubmit } from 'react-router'
+import { useSubmit } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { avbrytBehandlinger } from '~/regulering/regulering.server'
 import { requireAccessToken } from '~/services/auth.server'
@@ -23,10 +23,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return { success: true, action: data.action }
 }
 
-export default function Avsluttendeaktiviteter() {
+export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentProps) {
   const [openConfirmationModal, setOpenConfirmationModal] = useState<ActionType | null>(null)
   const submit = useSubmit()
-  const actionData = useActionData() as ActionData | undefined
 
   function avbrytBehandlingerFeiletMotPopp() {
     submit({ action: 'avbrytBehandlingerFeiletMotPOPP' }, { method: 'post', encType: 'application/json' })
@@ -77,8 +76,4 @@ type FormType = {
   action: ActionType
 }
 
-type ActionData = {
-  success: boolean
-  action: ActionType
-}
 type ActionType = 'avbrytBehandlingerFeiletMotPOPP' | 'avbrytBehandlingerFeiletIBeregnYtelse' | null

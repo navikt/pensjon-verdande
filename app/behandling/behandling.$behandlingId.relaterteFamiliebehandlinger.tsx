@@ -1,5 +1,5 @@
 import { Link, Table } from '@navikt/ds-react'
-import { NavLink, useLoaderData } from 'react-router'
+import { NavLink } from 'react-router'
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { HentRelaterteFamiliebehandlinger } from '~/services/behandling.server'
@@ -16,8 +16,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   return HentRelaterteFamiliebehandlinger(accessToken, +behandlingId)
 }
 
-export default function RelaterteFamiliebehandlingerehandlinger() {
-  const relaterteFamiliebehandlinger = useLoaderData<typeof loader>()
+export default function RelaterteFamiliebehandlingerehandlinger({ loaderData }: Route.ComponentProps) {
+  const relaterteFamiliebehandlinger = loaderData
 
   return (
     <Table>

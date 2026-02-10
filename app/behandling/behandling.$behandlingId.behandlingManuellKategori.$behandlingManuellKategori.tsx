@@ -1,5 +1,4 @@
 import { Heading, VStack } from '@navikt/ds-react'
-import { useLoaderData } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
@@ -34,8 +33,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function ManuellKategoriBehandlinger() {
-  const { behandlingManuellKategori, manuellKategoriBehandlinger } = useLoaderData<typeof loader>()
+export default function ManuellKategoriBehandlinger({ loaderData }: Route.ComponentProps) {
+  const { behandlingManuellKategori, manuellKategoriBehandlinger } = loaderData
 
   return (
     <VStack gap={'4'}>

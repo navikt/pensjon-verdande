@@ -1,5 +1,5 @@
 import { BodyShort, Button, Heading, TextField, VStack } from '@navikt/ds-react'
-import { Form, useLoaderData, useNavigation } from 'react-router'
+import { Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { startVurderSamboereBatch } from '~/samboeropplysninger/samboeropplysninger.server'
 import { requireAccessToken } from '~/services/auth.server'
@@ -36,8 +36,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   await startVurderSamboereBatch(accessToken, +updates.behandlingsAr)
 }
 
-export default function BatchOpprett_index() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 

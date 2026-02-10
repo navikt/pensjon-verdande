@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingAktivitetTable from '~/components/aktiviteter-table/BehandlingAktivitetTable'
 import { requireAccessToken } from '~/services/auth.server'
@@ -19,8 +18,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function BehandlingAktiviteter() {
-  const { behandling } = useLoaderData<typeof loader>()
+export default function BehandlingAktiviteter({ loaderData }: Route.ComponentProps) {
+  const { behandling } = loaderData
 
   return <BehandlingAktivitetTable behandling={behandling} />
 }

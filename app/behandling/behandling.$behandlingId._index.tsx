@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { BehandlingKjoringerTable } from '~/components/kjoringer-table/BehandlingKjoringerTable'
 import { requireAccessToken } from '~/services/auth.server'
@@ -19,8 +18,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function BehandlingKjoringer() {
-  const { behandling } = useLoaderData<typeof loader>()
+export default function BehandlingKjoringer({ loaderData }: Route.ComponentProps) {
+  const { behandling } = loaderData
 
   return <BehandlingKjoringerTable behandling={behandling} erAldeKjoring={!!behandling.erAldeBehandling} />
 }

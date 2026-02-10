@@ -2,7 +2,7 @@ import { Alert, Button, Heading, HStack, Modal, Select, TextField, VStack } from
 import { endOfMonth, format, parse, startOfDay, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useRef, useState } from 'react'
-import { Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { opprettKontrollereSaerskiltSatsBehandling } from '~/kontroll-saerskilt-sats/kontroll-saerskilt-sats.server'
@@ -51,8 +51,8 @@ const genererManedsalternativer = () => {
   })
 }
 
-export default function OpprettKontrollSaerskiltSatsRoute() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const modalRef = useRef<HTMLDialogElement>(null)
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'

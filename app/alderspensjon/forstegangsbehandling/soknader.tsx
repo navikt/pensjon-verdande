@@ -25,7 +25,7 @@ import {
 import { sub } from 'date-fns'
 import type React from 'react'
 import { useMemo, useRef } from 'react'
-import { NavLink, useLoaderData, useNavigation, useSearchParams } from 'react-router'
+import { NavLink, useNavigation, useSearchParams } from 'react-router'
 import {
   type KildeOppsummering,
   KildeOppsummeringVisning,
@@ -39,6 +39,7 @@ import { subdomain } from '~/common/utils'
 import { apiGet } from '~/services/api.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
 import type { PageResponse } from '~/types'
+import type { Route } from './+types/soknader'
 import css from './soknader.module.css'
 
 export async function loader({ request }: { request: Request }) {
@@ -142,7 +143,7 @@ function activeFilterSummary(sp: URLSearchParams) {
   return parts
 }
 
-export default function Alderspensjonssoknader() {
+export default function Alderspensjonssoknader({ loaderData }: Route.ComponentProps) {
   const {
     aldeBehandlingUrlTemplate,
     nowIso,
@@ -153,7 +154,7 @@ export default function Alderspensjonssoknader() {
     kildeOppsummering,
     fomDato,
     tomDato,
-  } = useLoaderData<typeof loader>()
+  } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
   const { field: sortField, dir: sortDir } = parseSortParam(searchParams)

@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import Bruker from '~/brukere/Bruker'
 import {
@@ -39,8 +38,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Foo() {
-  const { bruker, tilgangskontrollmeta, readOnly } = useLoaderData<typeof loader>()
+export default function Foo({ loaderData }: Route.ComponentProps) {
+  const { bruker, tilgangskontrollmeta, readOnly } = loaderData
   console.log(tilgangskontrollmeta)
 
   return <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta} readOnly={readOnly}></Bruker>

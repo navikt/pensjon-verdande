@@ -1,5 +1,5 @@
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
-import { Outlet, redirect, useLoaderData, useLocation } from 'react-router'
+import { Outlet, redirect, useLocation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
@@ -19,8 +19,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   return { regulering }
 }
 
-export default function OpprettReguleringBatchRoute() {
-  const { regulering } = useLoaderData<typeof loader>()
+export default function OpprettReguleringBatchRoute({ loaderData }: Route.ComponentProps) {
+  const { regulering } = loaderData
 
   const location = useLocation()
   const currentStep = getCurrentStep(location.pathname)

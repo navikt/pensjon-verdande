@@ -1,5 +1,3 @@
-import { useLoaderData } from 'react-router'
-
 import invariant from 'tiny-invariant'
 import xmlFormat from 'xml-formatter'
 import { replaceTemplates } from '~/common/replace-templates'
@@ -35,8 +33,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Felt() {
-  const { value } = useLoaderData<typeof loader>()
+export default function Felt({ loaderData }: Route.ComponentProps) {
+  const { value } = loaderData
   console.log(value)
 
   try {

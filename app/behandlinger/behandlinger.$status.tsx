@@ -1,4 +1,3 @@
-import { useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
@@ -29,8 +28,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   return { behandlinger }
 }
 
-export default function BehandlingerStatus() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function BehandlingerStatus({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
 
   return <BehandlingerTable visStatusSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
 }

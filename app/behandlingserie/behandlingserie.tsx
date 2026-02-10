@@ -11,7 +11,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
-import { redirect, useFetcher, useLoaderData, useNavigate, useSearchParams } from 'react-router'
+import { redirect, useFetcher, useNavigate, useSearchParams } from 'react-router'
 import 'chart.js/auto'
 import { ExternalLinkIcon } from '@navikt/aksel-icons'
 import type { DateRange } from 'react-day-picker'
@@ -451,7 +451,7 @@ function EndreDialog({
   )
 }
 
-export default function BehandlingOpprett_index() {
+export default function BehandlingOpprett_index({ loaderData }: Route.ComponentProps) {
   const now = new Date()
   const [inkluderNesteAar, setInkluderNesteAar] = useState(false)
   const horisontSlutt = useMemo(() => {
@@ -473,7 +473,7 @@ export default function BehandlingOpprett_index() {
   const createFetcher = useFetcher()
   const [searchParams, setSearchParams] = useSearchParams()
   const [behandlingType, setBehandlingType] = useState(searchParams.get('behandlingType') || '')
-  const { behandlingSerier } = useLoaderData<{ behandlingSerier: BehandlingSerieDTO[] }>()
+  const { behandlingSerier } = loaderData
 
   const helligdagsdata = useMemo(() => byggHelligdagsdata(inkluderNesteAar), [inkluderNesteAar])
   const booketData = useMemo(() => byggBookedeDatoer(behandlingSerier || []), [behandlingSerier])

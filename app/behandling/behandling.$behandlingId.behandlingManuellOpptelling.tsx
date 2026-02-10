@@ -1,5 +1,5 @@
 import { Link, Table } from '@navikt/ds-react'
-import { NavLink, useLoaderData } from 'react-router'
+import { NavLink } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
@@ -26,8 +26,8 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function BehandlingManuellOpptelling() {
-  const { behandlingId, behandlingManuellOpptelling } = useLoaderData<typeof loader>()
+export default function BehandlingManuellOpptelling({ loaderData }: Route.ComponentProps) {
+  const { behandlingId, behandlingManuellOpptelling } = loaderData
 
   return (
     <Table>
