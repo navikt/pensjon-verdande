@@ -126,21 +126,22 @@ function HentPersonDetaljer({
   const sakIdParam = searchParams.get('sakId')
   const [sakId, setSakId] = useState<string>(sakIdParam ?? '')
   const fetcher = useFetcher()
+  const { data: fetcherData, state: fetcherState, load: fetcherLoad } = fetcher
 
   useEffect(() => {
-    if (sakIdParam !== null && fetcher.data === undefined && fetcher.state === 'idle') {
+    if (sakIdParam !== null && fetcherData === undefined && fetcherState === 'idle') {
       setSearchParams({ sakId: sakId })
-      fetcher.load(`?sakId=${sakId}`)
+      fetcherLoad(`?sakId=${sakId}`)
     }
-  }, [fetcher.data, fetcher.state, sakIdParam, sakId, setSearchParams, fetcher.load])
+  }, [fetcherData, fetcherState, sakIdParam, sakId, setSearchParams, fetcherLoad])
 
   useEffect(() => {
-    onLoad(fetcher.data as PersonDetaljForVedlikehold[] | null | undefined)
-  }, [fetcher.data, onLoad])
+    onLoad(fetcherData as PersonDetaljForVedlikehold[] | null | undefined)
+  }, [fetcherData, onLoad])
 
   function hentPersonGrunnlag() {
     setSearchParams({ sakId: sakId })
-    fetcher.load(`?sakId=${sakId}`)
+    fetcherLoad(`?sakId=${sakId}`)
   }
 
   return (
@@ -151,12 +152,12 @@ function HentPersonDetaljer({
     >
       <HStack gap="2" align="start">
         <TextField
-          error={fetcher.data === null ? 'Fant ingen barn' : undefined}
+          error={fetcherData === null ? 'Fant ingen barn' : undefined}
           label="Sak ID"
           value={sakId}
           onChange={(e) => setSakId(e.target.value)}
         />
-        <Button onClick={hentPersonGrunnlag} style={{ marginTop: '32px' }} loading={fetcher.state === 'loading'}>
+        <Button onClick={hentPersonGrunnlag} style={{ marginTop: '32px' }} loading={fetcherState === 'loading'}>
           Hent barn
         </Button>
       </HStack>
