@@ -44,7 +44,7 @@ export async function action({ request }: Route.ActionArgs) {
       varselmodus !== HvilendeRettVarselModus.FramtidigOpphor &&
       varselmodus !== HvilendeRettVarselModus.EndeligOpphor
     ) {
-      throw new Error('Ugyldig varselmodus')
+      throw new Response('Ugyldig varselmodus', { status: 400 })
     }
 
     response = await opprettHvilendeRettVarselbrevBehandlinger(
@@ -119,10 +119,11 @@ function hvilendeRettVarselForm() {
             label="Varselmodus"
             size={'medium'}
             name={'varselmodus'}
-            defaultValue={'velg'}
+            defaultValue={''}
             style={{ width: '20em' }}
+            required
           >
-            <option value="velg" disabled>
+            <option value="" disabled>
               Velg
             </option>
             <option value="framtidigOpphor">Varsel om framtidig opphør</option>

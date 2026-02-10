@@ -42,10 +42,17 @@ export async function opprettHvilendeRettOpphorBehandlinger(
   )
 }
 
+function handterUgyldigModus(value: never): never {
+  throw new Error(`Ukjent HvilendeRettVarselModus: ${value}`)
+}
+
 function mapVarselModus(varselModus: HvilendeRettVarselModus): string {
-  if (varselModus === HvilendeRettVarselModus.FramtidigOpphor) {
-    return 'VARSEL_FRAMTIDIG_OPPHOR'
-  } else {
-    return 'VARSEL_ENDELIG_OPPHOR'
+  switch (varselModus) {
+    case HvilendeRettVarselModus.FramtidigOpphor:
+      return 'VARSEL_FRAMTIDIG_OPPHOR'
+    case HvilendeRettVarselModus.EndeligOpphor:
+      return 'VARSEL_ENDELIG_OPPHOR'
+    default:
+      return handterUgyldigModus(varselModus)
   }
 }
