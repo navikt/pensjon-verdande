@@ -3,9 +3,9 @@ import {
   BodyShort,
   Button,
   Checkbox,
+  Dialog,
   Heading,
   HStack,
-  Modal,
   Table,
   TextField,
   VStack,
@@ -190,18 +190,25 @@ interface LagreOgSendInnModalProps {
 
 function LagreOgSendInnModal({ lagre, avbryt, åpen }: LagreOgSendInnModalProps) {
   return (
-    <Modal open={åpen} onClose={avbryt} header={{ heading: 'Er du sikker?', closeButton: false }}>
-      <Modal.Body>
-        <BodyLong>Endringer kan påvirke brukers ytelse eller gi inkonsistent datagrunnlag.</BodyLong>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button type="button" onClick={lagre}>
-          Lagre
-        </Button>
-        <Button type="button" variant="secondary" onClick={avbryt}>
-          Avbryt
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <Dialog open={åpen} onOpenChange={(open) => !open && avbryt()}>
+      <Dialog.Popup>
+        <Dialog.Header>
+          <Dialog.Title>Er du sikker?</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Body>
+          <BodyLong>Endringer kan påvirke brukers ytelse eller gi inkonsistent datagrunnlag.</BodyLong>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Button type="button" onClick={lagre}>
+            Lagre
+          </Button>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary">
+              Avbryt
+            </Button>
+          </Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }
