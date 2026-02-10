@@ -115,14 +115,7 @@ function hvilendeRettVarselForm() {
             type="text"
             inputMode="numeric"
           />
-          <Select
-            label="Varselmodus"
-            size={'medium'}
-            name={'varselmodus'}
-            defaultValue={''}
-            style={{ width: '20em' }}
-            required
-          >
+          <Select label="Varselmodus" size={'medium'} name={'varselmodus'} defaultValue={''} style={{ width: '20em' }}>
             <option value="" disabled>
               Velg
             </option>
