@@ -31,7 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const title = envName ? (envName === 'p' ? 'Verdande' : `(${envName.toUpperCase()}) Verdande`) : 'Verdande'
 
   return (
-    <html lang="en">
+    <html lang="nb">
       <head>
         <title>{title}</title>
         <meta charSet="utf-8" />
