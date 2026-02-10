@@ -85,58 +85,59 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
           Stopp behandling
         </Button>
       </Tooltip>
-      <fetcher.Form method="post">
-        <Modal
-          open={open}
-          onClose={() => {
-            setOpen(false)
-            setBegrunnelse('')
-            fetcher.reset()
-          }}
-          header={{ heading: 'Stopp behandling' }}
-        >
-          <Modal.Body>
-            <VStack gap={'space-16'}>
-              <BodyLong>
-                Bekreft at du ønsker å stoppe <i>{decodeBehandling(behandling)}</i> behandlingen med status{' '}
-                <i>{decodeBehandlingStatus(behandling.status)}</i>. <b>Denne handlingen kan ikke angres.</b>
-              </BodyLong>
-              <BodyLong>
-                Saken, kravet, vedtaket eller liknende, som behandlinger er knyttet til må mest sannsynlig rapporteres
-                til linja. Stopping av en behandling skal kun gjøres om feil ikke kan løses på annen måte.
-              </BodyLong>
-              <BodyLong>
-                Du må gi en begrunnelse for hvorfor du stopper behandlingen. I tillegg må noen andre bekrefte at
-                behandlingen er blitt tilstrekkelig fulgt opp. Legg gjerne ved en lenke til Slacktråd, Jira eller
-                liknende.
-              </BodyLong>
-              <Textarea
-                label="Begrunnelse"
-                value={begrunnelse}
-                onChange={(e) => setBegrunnelse(e.target.value)}
-                error={fetcher.data?.errors?.begrunnelse}
-                name="begrunnelse"
-              />
-            </VStack>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button type="submit" variant="danger" name="operation" value={OPERATION.stopp}>
-              Stopp behandling
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setOpen(false)
-                setBegrunnelse('')
-                fetcher.reset()
-              }}
-            >
-              Avbryt
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </fetcher.Form>
+      <Modal
+        open={open}
+        onClose={() => {
+          setOpen(false)
+          setBegrunnelse('')
+          fetcher.reset()
+        }}
+        header={{ heading: 'Stopp behandling' }}
+      >
+        <Modal.Body>
+          <VStack gap={'space-16'}>
+            <BodyLong>
+              Bekreft at du ønsker å stoppe <i>{decodeBehandling(behandling)}</i> behandlingen med status{' '}
+              <i>{decodeBehandlingStatus(behandling.status)}</i>. <b>Denne handlingen kan ikke angres.</b>
+            </BodyLong>
+            <BodyLong>
+              Saken, kravet, vedtaket eller liknende, som behandlinger er knyttet til må mest sannsynlig rapporteres til
+              linja. Stopping av en behandling skal kun gjøres om feil ikke kan løses på annen måte.
+            </BodyLong>
+            <BodyLong>
+              Du må gi en begrunnelse for hvorfor du stopper behandlingen. I tillegg må noen andre bekrefte at
+              behandlingen er blitt tilstrekkelig fulgt opp. Legg gjerne ved en lenke til Slacktråd, Jira eller
+              liknende.
+            </BodyLong>
+            <Textarea
+              label="Begrunnelse"
+              value={begrunnelse}
+              onChange={(e) => setBegrunnelse(e.target.value)}
+              error={fetcher.data?.errors?.begrunnelse}
+            />
+          </VStack>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            type="button"
+            variant="danger"
+            onClick={() => fetcher.submit({ operation: OPERATION.stopp, begrunnelse }, { method: 'POST' })}
+          >
+            Stopp behandling
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setOpen(false)
+              setBegrunnelse('')
+              fetcher.reset()
+            }}
+          >
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }
