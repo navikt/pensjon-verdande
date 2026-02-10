@@ -24,7 +24,7 @@ import {
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { type LoaderFunctionArgs, redirect, useLoaderData, useSearchParams } from 'react-router'
+import { redirect, useLoaderData, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { decodeFagomrade } from '~/common/decode'
@@ -33,6 +33,7 @@ import { decodeOppgaveKode, decodeOppgavePrioritet } from '~/common/decodeOppgav
 import { decodeUnderkategoriKode } from '~/common/decodeUnderkategori'
 import { ManuellBehandlingActionMenu } from '~/manuell-behandling/ManuellBehandlingActionMenu'
 import { apiGet } from '~/services/api.server'
+import type { Route } from './+types/index'
 
 export type ManuellBehandlingOppsummering = {
   behandlingType: string
@@ -60,7 +61,7 @@ const facetValueTranslator: Partial<Record<FacetKey, (key: string) => string>> =
   underkategoriKode: decodeUnderkategoriKode,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
 
   const now = new Date()

@@ -1,15 +1,16 @@
 import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, useActionData, useSubmit } from 'react-router'
+import { useActionData, useSubmit } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { avbrytBehandlinger } from '~/regulering/regulering.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/batch.regulering.avsluttendeaktiviteter'
 
 export const loader = async () => {
   return {}
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const data = (await request.json()) as FormType
 

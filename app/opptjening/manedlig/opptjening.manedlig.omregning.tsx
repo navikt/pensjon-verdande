@@ -13,7 +13,7 @@ import {
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useState } from 'react'
-import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useNavigation } from 'react-router'
+import { Form, useLoaderData, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import {
@@ -25,6 +25,7 @@ import {
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/opptjening.manedlig.omregning'
 
 type LoaderData = {
   behandlinger: BehandlingerPage
@@ -34,7 +35,7 @@ type LoaderData = {
   sisteAvsjekk: SisteAvsjekkResponse | null
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
+export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -67,7 +68,7 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   await opprettAvsjekk(accessToken)
   return null

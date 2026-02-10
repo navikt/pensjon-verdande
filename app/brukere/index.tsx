@@ -1,9 +1,10 @@
 import { Box, Table } from '@navikt/ds-react'
-import { Link, type LoaderFunctionArgs, useLoaderData } from 'react-router'
+import { Link, useLoaderData } from 'react-router'
 import { hentBrukere } from '~/brukere/brukere.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/index'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   return {

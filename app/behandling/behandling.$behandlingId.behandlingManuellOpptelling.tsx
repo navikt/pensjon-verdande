@@ -1,11 +1,12 @@
 import { Link, Table } from '@navikt/ds-react'
-import { type LoaderFunctionArgs, NavLink, useLoaderData } from 'react-router'
+import { NavLink, useLoaderData } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlingManuellOpptelling } from '~/services/behandling.server'
+import type { Route } from './+types/behandling.$behandlingId.behandlingManuellOpptelling'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId } = params
   invariant(behandlingId, 'Missing behandlingId param')
 

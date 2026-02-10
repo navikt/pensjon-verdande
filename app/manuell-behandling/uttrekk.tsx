@@ -1,8 +1,8 @@
-import type { LoaderFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from '~/services/env.server'
+import type { Route } from './+types/uttrekk'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const incomingUrl = new URL(request.url)
 
   const accessToken = await requireAccessToken(request)

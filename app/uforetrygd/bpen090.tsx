@@ -1,7 +1,8 @@
 import { BodyShort, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
+import type { Route } from './+types/bpen090'
 
 type ActionErrors = {
   kjoremaaned?: string
@@ -29,7 +30,7 @@ const isBetweenAprilAndOctober = (n: number) => {
   return mm >= 4 && mm <= 10
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
 
   const kjoremaanedStr = String(formData.get('kjoremaaned') ?? '')

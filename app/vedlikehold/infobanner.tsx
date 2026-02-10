@@ -17,18 +17,18 @@ import {
 import { isFuture, isToday, parseISO, setHours } from 'date-fns'
 import type { ChangeEvent } from 'react'
 import { useState } from 'react'
-import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
 import { Form, useFetcher, useLoaderData } from 'react-router'
 import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
+import type { Route } from './+types/infobanner'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   return await apiGet<Infobanner>('/api/verdande/infobanner', request)
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const infoBanner = (await request.json()) as Infobanner
   return await oppdaterInfoBanner(infoBanner, accessToken)

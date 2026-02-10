@@ -1,8 +1,8 @@
 import { Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
-import type { ActionFunctionArgs } from 'react-router'
 import { Outlet, redirect, useFetcher } from 'react-router'
+import type { Route } from './+types/laas-opp-sak'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const sakId = formData.get('sakId')?.toString()
 

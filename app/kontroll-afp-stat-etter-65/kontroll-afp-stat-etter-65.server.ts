@@ -22,4 +22,3 @@ export async function opprettKontrollereAfpStatEtter65Behandling(
   )
   return response
 }
-

@@ -1,7 +1,8 @@
 import { BodyLong, Button, Checkbox, Heading, HStack, Modal, Table, TextField, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { type ActionFunctionArgs, type LoaderFunctionArgs, useFetcher, useSearchParams } from 'react-router'
+import { useFetcher, useSearchParams } from 'react-router'
 import { apiGet, apiPut } from '~/services/api.server'
+import type { Route } from './+types/vedlikehold-barn'
 
 export type PersonDetaljForVedlikehold = {
   personDetaljId: string
@@ -16,7 +17,7 @@ export type PersonDetaljForVedlikehold = {
 }
 
 // GET
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
   const sakId = url.searchParams.get('sakId')
 
@@ -28,7 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 // PUT
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData()
   const personDetalj = JSON.parse(formData.get('personDetalj') as string) as PersonDetaljForVedlikehold[]
 

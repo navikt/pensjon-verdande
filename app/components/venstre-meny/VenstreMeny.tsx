@@ -62,21 +62,9 @@ const batcherMeny = [
 ]
 
 const kontrollMeny = [
-  [
-    'INNTEKTSKONTROLL',
-    '/batch/inntektskontroll',
-    'Inntektskontroll',
-  ],
-  [
-    'KONTROLLERE_SAERSKILT_SATS',
-    '/kontroll-saerskilt-sats',
-    'Kontroll særskilt sats',
-  ],
-  [
-    'KONTROLLER_AFP_STAT_ETTER_65',
-    '/kontroll-afp-stat-etter-65',
-    'Kontroll AFP Stat etter 65 år',
-  ],
+  ['INNTEKTSKONTROLL', '/batch/inntektskontroll', 'Inntektskontroll'],
+  ['KONTROLLERE_SAERSKILT_SATS', '/kontroll-saerskilt-sats', 'Kontroll særskilt sats'],
+  ['KONTROLLER_AFP_STAT_ETTER_65', '/kontroll-afp-stat-etter-65', 'Kontroll AFP Stat etter 65 år'],
 ]
 
 const omregningMeny = [
@@ -271,11 +259,7 @@ export default function VenstreMeny(props: Props) {
             'Kontroll',
             kontrollMeny,
             indexSupplier,
-            <GavelIcon
-              title="Kontroll"
-              fontSize="1.5rem"
-              className={styles.menyIkon}
-            />,
+            <GavelIcon title="Kontroll" fontSize="1.5rem" className={styles.menyIkon} />,
           )}
           {byggMeny(
             'Behandlinger',

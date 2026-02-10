@@ -1,7 +1,7 @@
 import { ExternalLinkIcon, LinkIcon } from '@navikt/aksel-icons'
 import { BodyShort, Button, CopyButton, Heading, HStack, Label, Link, Tag, Tooltip, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type LoaderFunctionArgs, Link as ReactRouterLink, useLoaderData } from 'react-router'
+import { Link as ReactRouterLink, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$aktivitetId'
 import { formatIsoTimestamp } from '~/common/date'
@@ -14,8 +14,9 @@ import { tempoUrl } from '~/loki/utils'
 import { apiGet } from '~/services/api.server'
 import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
 import type { BehandlingDto } from '~/types'
+import type { Route } from './+types/kjoring-logs'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId, kjoringId } = params
 
   invariant(behandlingId, 'Missing behandlingId param')

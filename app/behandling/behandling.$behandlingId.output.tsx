@@ -1,17 +1,17 @@
 import { Button, Modal, Textarea, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import type { LoaderFunctionArgs } from 'react-router'
-import { type ActionFunctionArgs, useFetcher, useLoaderData } from 'react-router'
+import { useFetcher, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { toNormalizedError } from '~/common/error'
 import { apiGet, apiPost } from '~/services/api.server'
+import type { Route } from './+types/behandling.$behandlingId.output'
 
 type LoaderData = {
   output?: string
   requiresBegrunnelse?: boolean
 }
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId } = params
   invariant(behandlingId, 'Missing behandlingId param')
 
@@ -26,7 +26,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ params, request }: Route.ActionArgs) => {
   const { behandlingId } = params
   invariant(behandlingId, 'Missing behandlingId param')
   const form = await request.formData()

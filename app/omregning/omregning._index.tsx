@@ -20,7 +20,7 @@ import {
 import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
 import type React from 'react'
 import { useRef, useState } from 'react'
-import type { HTMLFormMethod, LoaderFunctionArgs } from 'react-router'
+import type { HTMLFormMethod } from 'react-router'
 import { Form, useFetcher, useLoaderData, useNavigation, useSearchParams, useSubmit } from 'react-router'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
 import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
@@ -29,8 +29,9 @@ import OmregningSelector from '~/components/omregning/OmregningSelector'
 import { hentOmregningInit, hentOmregningInput } from '~/omregning/batch.omregning.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningInit, OmregningSakerPage } from '~/types'
+import type { Route } from './+types/omregning._index'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accesstoken = await requireAccessToken(request)
 
   const omregningInit = (await hentOmregningInit(accesstoken)) as OmregningInit
