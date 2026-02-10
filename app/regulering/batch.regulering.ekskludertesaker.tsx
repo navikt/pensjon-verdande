@@ -1,6 +1,6 @@
 import 'chart.js/auto'
-import { Alert, Button, Heading, HStack, Loader, Modal, Table, Tabs, Textarea, VStack } from '@navikt/ds-react'
-import { useEffect, useRef, useState } from 'react'
+import { Alert, Button, Dialog, Heading, HStack, Loader, Table, Tabs, Textarea, VStack } from '@navikt/ds-react'
+import { useEffect, useState } from 'react'
 import { useFetcher } from 'react-router'
 import type { Ekskluderinger, EkskluderingMedKommentar } from '~/regulering/regulering.types'
 
@@ -65,12 +65,12 @@ export default function EkskluderteSaker() {
           </HStack>
           <EkskluderingLeggTilInputBox
             text="Legg til følgende saker i ekskluderingsliste"
-            showModal={openEkskluderingInputBox === 'leggTilEkskluderteBox'}
+            open={openEkskluderingInputBox === 'leggTilEkskluderteBox'}
             onCancel={() => setOpenEkskluderingInputBox(null)}
           />
           <EkskluderingFjernInputBox
             text="Fjern følgende saker fra ekskluderingsliste"
-            showModal={openEkskluderingInputBox === 'fjernEkskluderteBox'}
+            open={openEkskluderingInputBox === 'fjernEkskluderteBox'}
             onCancel={() => setOpenEkskluderingInputBox(null)}
           />
         </VStack>
@@ -79,19 +79,12 @@ export default function EkskluderteSaker() {
   )
 }
 
-export function EkskluderingLeggTilInputBox(props: { text: string; showModal: boolean; onCancel: () => void }) {
-  const ref = useRef<HTMLDialogElement>(null)
+export function EkskluderingLeggTilInputBox(props: { text: string; open: boolean; onCancel: () => void }) {
   const fetcher = useFetcher()
   const [saksnummerToAddListe, setSaksnummerToAddListe] = useState('')
   const [kommentarToAdd, setKommentarToAdd] = useState('')
   const response = fetcher.data as OppdaterEksluderteSakerResponse | undefined
   const [harLagtTilSaker, setHarLagtTilSaker] = useState(false)
-
-  if (props.showModal) {
-    ref.current?.showModal()
-  } else {
-    ref.current?.close()
-  }
 
   function leggTilEkskluderteIPen() {
     const sakIder = saksnummerToAddListe
@@ -123,42 +116,36 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
   }
 
   return (
-    <div>
-      <Modal
-        ref={ref}
-        header={{ heading: 'Modifiser ekskluderingsliste', closeButton: false }}
-        onClose={props.onCancel}
-      >
-        <Modal.Body>
-          <VStack gap={'space-20'}>
-            {props.text}
-            {(!harLagtTilSaker || response?.erOppdatert) && (
-              <Alert variant="success" inline>
-                Ekskluderingsliste oppdatert
-              </Alert>
-            )}
-            {harLagtTilSaker && !response?.erOppdatert && <Loader />}
-            <Textarea
-              label="Saksnummer"
-              name="saksnummerListe"
-              value={saksnummerToAddListe}
-              onChange={(e) => setSaksnummerToAddListe(e.target.value)}
-              minRows={30}
-              style={{ width: '30em' }}
-              resize
-            />
-            <Textarea
-              label="Kommentar"
-              name="kommentar"
-              value={kommentarToAdd}
-              onChange={(e) => setKommentarToAdd(e.target.value)}
-              style={{ width: '30em' }}
-              resize
-            />
-          </VStack>
-        </Modal.Body>
-
-        <Modal.Footer>
+    <Dialog open={props.open} onOpenChange={(open) => !open && props.onCancel()}>
+      <Dialog.Popup>
+        <Dialog.Title>Modifiser ekskluderingsliste</Dialog.Title>
+        <VStack gap={'space-20'}>
+          {props.text}
+          {(!harLagtTilSaker || response?.erOppdatert) && (
+            <Alert variant="success" inline>
+              Ekskluderingsliste oppdatert
+            </Alert>
+          )}
+          {harLagtTilSaker && !response?.erOppdatert && <Loader />}
+          <Textarea
+            label="Saksnummer"
+            name="saksnummerListe"
+            value={saksnummerToAddListe}
+            onChange={(e) => setSaksnummerToAddListe(e.target.value)}
+            minRows={30}
+            style={{ width: '30em' }}
+            resize
+          />
+          <Textarea
+            label="Kommentar"
+            name="kommentar"
+            value={kommentarToAdd}
+            onChange={(e) => setKommentarToAdd(e.target.value)}
+            style={{ width: '30em' }}
+            resize
+          />
+        </VStack>
+        <Dialog.Footer>
           <Button
             type="button"
             onClick={() => {
@@ -169,27 +156,22 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
           >
             Legg til
           </Button>
-          <Button type="button" variant="secondary" onClick={props.onCancel} size="small">
-            Lukk
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary" size="small">
+              Lukk
+            </Button>
+          </Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }
 
-export function EkskluderingFjernInputBox(props: { text: string; showModal: boolean; onCancel: () => void }) {
-  const ref = useRef<HTMLDialogElement>(null)
+export function EkskluderingFjernInputBox(props: { text: string; open: boolean; onCancel: () => void }) {
   const fetcher = useFetcher()
   const [saksnummerToRemoveListe, setSaksnummerToRemoveListe] = useState('')
   const response = fetcher.data as OppdaterEksluderteSakerResponse | undefined
   const [harFjernetSaker, setHarFjernetSaker] = useState(false)
-
-  if (props.showModal) {
-    ref.current?.showModal()
-  } else {
-    ref.current?.close()
-  }
 
   function fjernEkskluderteFraPen() {
     const sakIder = saksnummerToRemoveListe
@@ -213,34 +195,28 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
   }
 
   return (
-    <div>
-      <Modal
-        ref={ref}
-        header={{ heading: 'Modifiser ekskluderingsliste', closeButton: false }}
-        onClose={props.onCancel}
-      >
-        <Modal.Body>
-          <VStack gap={'space-20'}>
-            {props.text}
-            {(!harFjernetSaker || response?.erOppdatert) && (
-              <Alert variant="success" inline>
-                Ekskluderingsliste oppdatert
-              </Alert>
-            )}
-            {harFjernetSaker && !response?.erOppdatert && <Loader />}
-            <Textarea
-              label="Saksnummer"
-              name="saksnummerListe"
-              value={saksnummerToRemoveListe}
-              onChange={(e) => setSaksnummerToRemoveListe(e.target.value)}
-              minRows={30}
-              style={{ width: '30em' }}
-              resize
-            />
-          </VStack>
-        </Modal.Body>
-
-        <Modal.Footer>
+    <Dialog open={props.open} onOpenChange={(open) => !open && props.onCancel()}>
+      <Dialog.Popup>
+        <Dialog.Title>Modifiser ekskluderingsliste</Dialog.Title>
+        <VStack gap={'space-20'}>
+          {props.text}
+          {(!harFjernetSaker || response?.erOppdatert) && (
+            <Alert variant="success" inline>
+              Ekskluderingsliste oppdatert
+            </Alert>
+          )}
+          {harFjernetSaker && !response?.erOppdatert && <Loader />}
+          <Textarea
+            label="Saksnummer"
+            name="saksnummerListe"
+            value={saksnummerToRemoveListe}
+            onChange={(e) => setSaksnummerToRemoveListe(e.target.value)}
+            minRows={30}
+            style={{ width: '30em' }}
+            resize
+          />
+        </VStack>
+        <Dialog.Footer>
           <Button
             type="button"
             onClick={() => {
@@ -251,12 +227,14 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
           >
             Fjern
           </Button>
-          <Button type="button" variant="secondary" onClick={props.onCancel} size="small">
-            Lukk
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary" size="small">
+              Lukk
+            </Button>
+          </Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }
 

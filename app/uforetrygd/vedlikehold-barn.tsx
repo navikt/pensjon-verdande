@@ -1,4 +1,4 @@
-import { BodyLong, Button, Checkbox, Heading, HStack, Modal, Table, TextField, VStack } from '@navikt/ds-react'
+import { BodyLong, Button, Checkbox, Dialog, Heading, HStack, Table, TextField, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
 import { useFetcher, useSearchParams } from 'react-router'
 import { apiGet, apiPut } from '~/services/api.server'
@@ -176,18 +176,21 @@ interface LagreOgSendInnModalProps {
 
 function LagreOgSendInnModal({ lagre, avbryt, åpen }: LagreOgSendInnModalProps) {
   return (
-    <Modal open={åpen} onClose={avbryt} header={{ heading: 'Er du sikker?', closeButton: false }}>
-      <Modal.Body>
+    <Dialog open={åpen} onOpenChange={(open) => !open && avbryt()}>
+      <Dialog.Popup>
+        <Dialog.Title>Er du sikker?</Dialog.Title>
         <BodyLong>Endringer kan påvirke brukers ytelse eller gi inkonsistent datagrunnlag.</BodyLong>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button type="button" onClick={lagre}>
-          Lagre
-        </Button>
-        <Button type="button" variant="secondary" onClick={avbryt}>
-          Avbryt
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        <Dialog.Footer>
+          <Button type="button" onClick={lagre}>
+            Lagre
+          </Button>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary">
+              Avbryt
+            </Button>
+          </Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }

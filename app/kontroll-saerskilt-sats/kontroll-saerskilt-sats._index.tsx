@@ -1,7 +1,7 @@
-import { Alert, Button, Heading, HStack, Modal, Select, TextField, VStack } from '@navikt/ds-react'
+import { Alert, Button, Dialog, Heading, HStack, Select, TextField, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfDay, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
@@ -57,7 +57,7 @@ const genererManedsalternativer = () => {
 
 export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.ComponentProps) {
   const { behandlinger } = loaderData
-  const modalRef = useRef<HTMLDialogElement>(null)
+  const [modalOpen, setModalOpen] = useState(false)
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
@@ -156,7 +156,7 @@ export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.
           </Alert>
 
           <HStack gap="space-16">
-            <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
+            <Button type="button" onClick={() => setModalOpen(true)} disabled={!kanOpprette}>
               Opprett kontroll
             </Button>
           </HStack>
@@ -174,8 +174,9 @@ export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.
           behandlingerResponse={behandlinger}
         />
       </div>
-      <Modal ref={modalRef} header={{ heading: 'Start kontroll: særskilt sats' }} size="small">
-        <Modal.Body>
+      <Dialog open={modalOpen} onOpenChange={(open) => setModalOpen(open)} size="small">
+        <Dialog.Popup>
+          <Dialog.Title>Start kontroll: særskilt sats</Dialog.Title>
           <VStack gap="space-16">
             <div>
               <b>Kjøremåned:</b> {kjoereMaanedYearMonth ? formatYearMonth(selectedKjoereMaaned) : '-'}
@@ -195,16 +196,18 @@ export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.
               Etter start kan du ikke angre denne handlingen.
             </Alert>
           </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button form="skjema" type="submit" disabled={!kanOpprette || isSubmitting} loading={isSubmitting}>
-            Start behandling
-          </Button>
-          <Button type="button" variant="secondary" onClick={() => modalRef.current?.close()}>
-            Tilbake
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Dialog.Footer>
+            <Button form="skjema" type="submit" disabled={!kanOpprette || isSubmitting} loading={isSubmitting}>
+              Start behandling
+            </Button>
+            <Dialog.CloseTrigger>
+              <Button type="button" variant="secondary">
+                Tilbake
+              </Button>
+            </Dialog.CloseTrigger>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </div>
   )
 }
