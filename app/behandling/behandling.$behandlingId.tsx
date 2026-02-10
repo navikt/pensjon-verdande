@@ -164,14 +164,13 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 export const action = async ({ params, request }: Route.ActionArgs) => {
   invariant(params.behandlingId, 'Mangler parameter: behandlingId')
   const behandlingId = params.behandlingId
+  const accessToken = await requireAccessToken(request)
 
   const form = await request.formData()
   const operation = form.get('operation')
   if (!isOperation(operation)) {
     return { errors: { operation: `Operasjon mangler eller er ukjent: ${String(operation)}` } }
   }
-
-  const accessToken = await requireAccessToken(request)
 
   const { errors, handler } = operationHandlers(accessToken, behandlingId, operation, form)
   if (Object.keys(errors).length > 0 || !handler) {
