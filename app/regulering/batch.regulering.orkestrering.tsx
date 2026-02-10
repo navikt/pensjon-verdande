@@ -3,6 +3,7 @@ import 'chart.js/auto'
 import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
 import {
   Alert,
+  BodyShort,
   Button,
   Checkbox,
   CheckboxGroup,
@@ -289,6 +290,9 @@ export function AggregerteFeilmeldingerTabell() {
       <HStack style={{ marginLeft: 'auto' }} gap="space-12">
         {aggregerteFeilmeldinger.length > 0 && (
           <Table>
+            <BodyShort as="caption" visuallyHidden>
+              Feilmeldinger
+            </BodyShort>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Antall</Table.HeaderCell>

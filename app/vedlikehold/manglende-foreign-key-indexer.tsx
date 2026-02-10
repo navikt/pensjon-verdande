@@ -62,6 +62,9 @@ function ManglendeForeignKeyIndexerTable({
 
   return (
     <Table sort={sort} onSortChange={(sortKey) => handleSort(sortKey as ScopedSortState['orderBy'])}>
+      <BodyShort as="caption" visuallyHidden>
+        Manglende fremmednøkkelindekser
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader sortKey="tableName" sortable>
