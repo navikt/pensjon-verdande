@@ -1,4 +1,4 @@
-import { Button, Modal, Textarea, VStack } from '@navikt/ds-react'
+import { Button, Dialog, Textarea, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
 import { useFetcher } from 'react-router'
 import invariant from 'tiny-invariant'
@@ -57,8 +57,9 @@ export default function BehandlingOutput({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <Modal open={open} header={{ heading: 'Begrunnelse kreves' }} onClose={() => setOpen(false)}>
-        <Modal.Body>
+      <Dialog open={open} onOpenChange={(nextOpen) => setOpen(nextOpen)}>
+        <Dialog.Popup>
+          <Dialog.Title>Begrunnelse kreves</Dialog.Title>
           <VStack gap="space-16">
             <Textarea
               label="Begrunnelse"
@@ -68,23 +69,25 @@ export default function BehandlingOutput({ loaderData }: Route.ComponentProps) {
               onChange={(e) => setBegrunnelse(e.target.value)}
             />
           </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <fetcher.Form method="post">
-            <input type="hidden" name="begrunnelse" value={begrunnelse} />
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={begrunnelse.trim().length === 0 || fetcher.state !== 'idle'}
-            >
-              Hent output
-            </Button>
-          </fetcher.Form>
-          <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <Dialog.Footer>
+            <fetcher.Form method="post">
+              <input type="hidden" name="begrunnelse" value={begrunnelse} />
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={begrunnelse.trim().length === 0 || fetcher.state !== 'idle'}
+              >
+                Hent output
+              </Button>
+            </fetcher.Form>
+            <Dialog.CloseTrigger>
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            </Dialog.CloseTrigger>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
 
       {resolvedOutput ? <pre>{JSON.stringify(resolvedOutput, null, 2)}</pre> : null}
     </>
