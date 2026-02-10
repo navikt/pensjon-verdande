@@ -36,16 +36,15 @@ export default function FastsettForventetInntekt({ loaderData }: Route.Component
   const isSubmitting = navigation.state === 'submitting'
 
   return (
-    <VStack gap={'4'}>
-      <Box.New className={'aksel-pageblock--lg'}>
+    <VStack gap={'space-16'}>
+      <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Fastsett forventet inntekt (BPEN091)
         </Heading>
         <BodyLong>Fastsette neste års forventet inntekt for uføretrygd</BodyLong>
-      </Box.New>
-
+      </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <TextField
             label={'Behandlingsår'}
             description={<BodyShort as="div">Året nye inntekter skal gjelde</BodyShort>}

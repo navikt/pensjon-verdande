@@ -92,9 +92,9 @@ export default function Dag(props: Props) {
           }}
         >
           <Link
+            data-color="neutral"
             as={ReactRouterLink}
             to={`/behandling/${behandling.behandlingId}`}
-            variant="neutral"
             underline={false}
             style={{ color: textColor }}
           >
@@ -187,7 +187,7 @@ export default function Dag(props: Props) {
         }}
       >
         <Modal.Body>
-          <VStack gap="1">
+          <VStack gap="space-4">
             {offentligFridag && (
               <HStack key="modal-kalenderHendelse" style={{ fontSize: '0.9em' }}>
                 <span style={{ color: 'red' }}>{offentligFridag}</span>

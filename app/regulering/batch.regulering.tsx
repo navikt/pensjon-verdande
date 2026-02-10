@@ -35,7 +35,7 @@ export default function OpprettReguleringBatchRoute({ loaderData }: Route.Compon
   }
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading level="1" size="medium">
         Regulering
       </Heading>

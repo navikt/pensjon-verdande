@@ -60,14 +60,14 @@ export default function BehandlingOutput({ loaderData }: Route.ComponentProps) {
                 4,
               )}]`}
             />
-            <Box.New background={'raised'}>
+            <Box background={'raised'}>
               {output.str.map((verdi: string) => (
                 <>
                   {JSON.stringify(JSON.parse(verdi), null, 4)},
                   <br />
                 </>
               ))}
-            </Box.New>
+            </Box>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>

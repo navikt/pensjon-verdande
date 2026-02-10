@@ -99,9 +99,8 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
       <Heading level="1" size="large">
         Kontroll AFP Stat etter 65 år
       </Heading>
-
       <Form id="skjema" method="post">
-        <VStack gap="4">
+        <VStack gap="space-16">
           <div
             style={{
               display: 'grid',
@@ -153,20 +152,18 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
             </Alert>
           )}
 
-          <HStack gap="4">
+          <HStack gap="space-16">
             <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
               Opprett kontroll
             </Button>
           </HStack>
         </VStack>
       </Form>
-
       {suksessmelding && (
         <Alert variant="success" size="small" style={{ marginTop: '1rem' }}>
           {suksessmelding}
         </Alert>
       )}
-
       {/* Sikrer at knappen ikke flytter seg */}
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
@@ -179,10 +176,9 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
           behandlingerResponse={behandlinger}
         />
       </div>
-
       <Modal ref={modalRef} header={{ heading: 'Start AFP Stat 65 års Kontroll' }} size="small">
         <Modal.Body>
-          <VStack gap="4">
+          <VStack gap="space-16">
             <div>
               <b>Fra og med måned:</b> {selectedFomMaaned ? formatYearMonth(selectedFomMaaned) : '-'}
             </div>

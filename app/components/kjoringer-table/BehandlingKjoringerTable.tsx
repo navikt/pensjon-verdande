@@ -72,31 +72,30 @@ export function BehandlingKjoringerTable(props: Props) {
               <Table.DataCell>{formatIsoTimestamp(it.startet)}</Table.DataCell>
               <Table.DataCell align={'right'}>{tidsbruk(it)}</Table.DataCell>
               <Table.DataCell>{aktivitet && decodeAktivitet(aktivitet.type)}</Table.DataCell>
-
               {props.erAldeKjoring && (
                 <Table.DataCell>
                   {it.aldeStartState && it.aldeEndState && (
-                    <HStack gap="2" align="center" style={{ flexWrap: 'nowrap' }}>
+                    <HStack gap="space-8" align="center" style={{ flexWrap: 'nowrap' }}>
                       {it.aldeStartState && (
-                        <Tag variant="alt1" style={{ whiteSpace: 'nowrap' }}>
+                        <Tag data-color="meta-purple" variant="outline" style={{ whiteSpace: 'nowrap' }}>
                           {decodeAldeBehandlingState(it.aldeStartState)}
                         </Tag>
                       )}
                       <ArrowRightIcon title="a11y-title" fontSize="1.5rem" />
-                      <Tag style={{ whiteSpace: 'nowrap' }} variant="alt3">
+                      <Tag data-color="info" style={{ whiteSpace: 'nowrap' }} variant="outline">
                         {decodeAldeBehandlingState(it.aldeEndState)}
                       </Tag>
                     </HStack>
                   )}
                 </Table.DataCell>
               )}
-
               <Table.DataCell>{it.feilmelding}</Table.DataCell>
               <Table.DataCell>
                 <ActionMenu>
                   <ActionMenu.Trigger>
                     <Button
-                      variant="tertiary-neutral"
+                      data-color="neutral"
+                      variant="tertiary"
                       icon={<MenuElipsisVerticalIcon title="Kjøringmeny" />}
                       size="small"
                     />

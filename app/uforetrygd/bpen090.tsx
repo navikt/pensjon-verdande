@@ -80,19 +80,18 @@ export default function LopendeInntektsavkorting({ loaderData, actionData }: Rou
   const isSubmitting = navigation.state === 'submitting'
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-16">
       <Heading size="small" level="1">
         Løpende inntektsavkorting (tidligere BPEN090)
       </Heading>
       <BodyShort>Batchkjøring for løpende inntektsavkorting av uføretrygd.</BodyShort>
-
       <Form method="post" style={{ width: '30em' }}>
-        <VStack gap="8">
+        <VStack gap="space-32">
           <TextField
             label="Kjøremåned (yyyyMM)"
             size="small"
             description={
-              <VStack gap={'2'}>
+              <VStack gap={'space-8'}>
                 <BodyShort>
                   Måneden du starter kjøringen. Inntekter hentes til og med måneden <em>før</em> kjøremåned, mens
                   virkningsdato settes til den første i måneden <em>etter</em> kjøremåned.
@@ -139,7 +138,7 @@ export default function LopendeInntektsavkorting({ loaderData, actionData }: Rou
             label="Oppdragskø"
             size="small"
             description={
-              <VStack gap={'2'}>
+              <VStack gap={'space-8'}>
                 <BodyShort>Angir hvilken kø som skal benyttes mot Oppdrag.</BodyShort>
                 <BodyShort>
                   <strong>Batch:</strong> Sender oppdragsmeldinger til Oppdrags batch-kø (HPEN). Behandles av

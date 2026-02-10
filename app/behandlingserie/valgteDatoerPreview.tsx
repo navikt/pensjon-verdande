@@ -10,9 +10,9 @@ export default function ValgteDatoerPreview({
   if (!yearMonthDayDates.length) {
     return (
       <VStack
-        gap="1"
+        gap="space-4"
         style={{
-          background: 'var(--a-surface-neutral-subtle, #f3f3f3)',
+          background: 'var(--ax-bg-neutral-soft, #f3f3f3)',
           padding: '1rem',
           borderRadius: '0.5rem',
         }}
@@ -26,13 +26,13 @@ export default function ValgteDatoerPreview({
   }
 
   const dayColors: Record<number, string> = {
-    0: 'var(--a-surface-danger-subtle, #ffe6e6)', // søndag
-    1: 'var(--a-surface-success-subtle, #e6f4ea)', // mandag
-    2: 'var(--a-surface-info-subtle, #e6f0ff)', // tirsdag
-    3: 'var(--a-surface-neutral-subtle, #f3f3f3)', // onsdag
-    4: 'var(--a-surface-warning-subtle, #fff4e5)', // torsdag
-    5: 'var(--a-surface-alt-1-subtle, #eaf7ff)', // fredag
-    6: 'var(--a-surface-alt-2-subtle, #f9e6ff)', // lørdag
+    0: 'var(--ax-bg-danger-soft, #ffe6e6)', // søndag
+    1: 'var(--ax-bg-success-soft, #e6f4ea)', // mandag
+    2: 'var(--ax-bg-info-soft, #e6f0ff)', // tirsdag
+    3: 'var(--ax-bg-neutral-soft, #f3f3f3)', // onsdag
+    4: 'var(--ax-bg-warning-soft, #fff4e5)', // torsdag
+    5: 'var(--ax-bg-meta-purple-soft, #eaf7ff)', // fredag
+    6: 'var(--ax-bg-meta-lime-soft, #f9e6ff)', // lørdag
   }
   const weekdayLabels = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR']
 
@@ -66,9 +66,9 @@ export default function ValgteDatoerPreview({
 
   return (
     <VStack
-      gap="2"
+      gap="space-8"
       style={{
-        background: 'var(--a-surface-neutral-subtle, #f3f3f3)',
+        background: 'var(--ax-bg-neutral-soft, #f3f3f3)',
         padding: '1rem',
         borderRadius: '0.5rem',
       }}
@@ -79,12 +79,11 @@ export default function ValgteDatoerPreview({
         </Heading>
         <span style={{ opacity: 0.7 }}>{yearMonthDayDates.length} stk</span>
       </HStack>
-
-      <VStack gap="3">
+      <VStack gap="space-12">
         {orderedKeys.map((key) => (
-          <VStack key={key} gap="1">
+          <VStack key={key} gap="space-4">
             <strong style={{ textTransform: 'capitalize' }}>{monthLabel(key)}</strong>
-            <HStack gap="1" wrap>
+            <HStack gap="space-4" wrap>
               {groups[key].map((yearMonthDay) => {
                 const date = parseDate(yearMonthDay)
                 const weekday = date.getDay()

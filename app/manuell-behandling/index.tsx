@@ -389,18 +389,18 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
   }
 
   return (
-    <Box paddingBlock="6" paddingInline="6">
-      <VStack gap="6">
+    <Box paddingBlock="space-24" paddingInline="space-24">
+      <VStack gap="space-24">
         <Heading level="1" size="small">
           Manuell behandling
         </Heading>
 
         <BodyShort>Tabellen viser opptelling av antall oppgaver som er opprettet av behandlingene</BodyShort>
 
-        <HStack gap="6" align="start" wrap>
-          <VStack gap="4" style={{ flex: 1, minWidth: 420 }}>
-            <Box.New padding="3" borderRadius="large" borderWidth="1" borderColor="neutral-subtleA">
-              <HStack gap="3" align="end" wrap>
+        <HStack gap="space-24" align="start" wrap>
+          <VStack gap="space-16" style={{ flex: 1, minWidth: 420 }}>
+            <Box padding="space-12" borderRadius="8" borderWidth="1" borderColor="neutral-subtleA">
+              <HStack gap="space-12" align="end" wrap>
                 <DatePicker {...datepickerProps}>
                   <HStack wrap gap="space-16" justify="center">
                     <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
@@ -410,7 +410,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
 
                 <VStack gap="space-8">
                   <Label size="small">Periode</Label>
-                  <HStack gap="1" wrap>
+                  <HStack gap="space-4" wrap>
                     <Button size="small" variant="secondary" onClick={() => presetLastNDays(7)}>
                       7 d
                     </Button>
@@ -423,13 +423,13 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                   </HStack>
                 </VStack>
               </HStack>
-            </Box.New>
+            </Box>
 
             <HStack justify="space-between" align="center">
-              <Tag size="small" variant="alt1">
+              <Tag data-color="meta-purple" size="small" variant="outline">
                 Sum antall: {total.toLocaleString('nb-NO')}
               </Tag>
-              <HStack gap="2">
+              <HStack gap="space-8">
                 <Button
                   icon={<FilterIcon aria-hidden />}
                   onClick={() => sokeModalRef.current?.showModal()}
@@ -483,7 +483,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                       <Table.Row key={rowKey(r)}>
                         <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
                         <Table.DataCell>
-                          <VStack gap="1">
+                          <VStack gap="space-4">
                             <span>{r.kategoriDecode}</span>
                             <BodyShort size="small" as="span" textColor="subtle">
                               {r.kategori}
@@ -590,7 +590,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <HStack gap="3">
+            <HStack gap="space-12">
               <Button variant="secondary" onClick={clearFacetFilters}>
                 Nullstill
               </Button>
@@ -602,7 +602,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
         </Modal>
         <Modal ref={grupperModalRef} header={{ heading: 'Gruppering' }} width={720}>
           <Modal.Body>
-            <VStack gap="4">
+            <VStack gap="space-16">
               <Box>
                 <Label size="small">Grupper etter</Label>
                 <CheckboxGroup legend="" hideLegend size="small" value={searchParams.getAll(GROUP_PARAM)}>
@@ -614,7 +614,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                 </CheckboxGroup>
               </Box>
 
-              <Box.New padding="3" borderRadius="large" borderColor="warning">
+              <Box padding="space-12" borderRadius="8" borderColor="warning">
                 <Label size="small">Rekkefølge</Label>
                 {groupBy.length === 0 ? (
                   <BodyShort size="small" textColor="subtle">
@@ -642,7 +642,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                           ≡
                         </span>
                         <span style={{ flex: 1 }}>{facetLabel(g)}</span>
-                        <HStack gap="1" align="center">
+                        <HStack gap="space-4" align="center">
                           <Button
                             size="xsmall"
                             variant="tertiary"
@@ -670,11 +670,11 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                     ))}
                   </ol>
                 )}
-              </Box.New>
+              </Box>
             </VStack>
           </Modal.Body>
           <Modal.Footer>
-            <HStack gap="3">
+            <HStack gap="space-12">
               <Button variant="secondary" onClick={clearGrouping}>
                 Nullstill gruppering
               </Button>
@@ -703,7 +703,7 @@ function FacetSection({
   onToggle: (facet: FacetKey, value: string | null) => void
 }) {
   return (
-    <VStack gap="2">
+    <VStack gap="space-8">
       <Label size="small">{title}</Label>
       <CheckboxGroup legend="" hideLegend size="small" value={[...selected]}>
         {options.map((opt) => {
@@ -711,9 +711,9 @@ function FacetSection({
           const isDisabled = opt.count === 0
           return (
             <Checkbox key={enc} disabled={isDisabled} value={enc} onChange={() => onToggle(facet, opt.value)}>
-              <HStack gap="2" align="center">
+              <HStack gap="space-8" align="center">
                 <span>{opt.label}</span>
-                <Tag size="xsmall" variant="neutral">
+                <Tag data-color="neutral" size="xsmall" variant="outline">
                   {opt.count.toLocaleString('nb-NO')}
                 </Tag>
               </HStack>

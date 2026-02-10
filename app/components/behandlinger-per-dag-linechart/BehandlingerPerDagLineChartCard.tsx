@@ -12,7 +12,7 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
   const [antallDager, setAntallDager] = useState(30)
 
   return (
-    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
+    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
       <HStack>
         <AreaChartFillIcon
           title="Antall behandlinger"
@@ -47,6 +47,6 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
         opprettetPerDag={props.opprettetPerDag}
         antallDager={antallDager}
       ></BehandlingerPerDagLineChart>
-    </Box.New>
+    </Box>
   )
 }

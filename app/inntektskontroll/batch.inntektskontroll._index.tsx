@@ -68,9 +68,8 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   return (
     <div>
       <Heading size="medium">Start inntektskontroll</Heading>
-
       <Form method="post" style={{ maxWidth: '25em' }}>
-        <VStack gap="4">
+        <VStack gap="space-16">
           <Select
             name={FELTER.aar}
             label="Velg år"

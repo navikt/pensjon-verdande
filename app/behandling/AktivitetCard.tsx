@@ -32,14 +32,13 @@ export default function AktivitetCard(props: Props) {
         {`${decodeBehandling(props.behandling.type)} - ${decodeAktivitet(props.aktivitet.type)}`}
         <Detail>{props.aktivitet.type}</Detail>
       </Heading>
-
-      <VStack gap={'4'}>
-        <Box.New
+      <VStack gap={'space-16'}>
+        <Box
           background={'raised'}
-          borderRadius={'xlarge'}
+          borderRadius={'12'}
           borderWidth={'1'}
           borderColor={'neutral-subtleA'}
-          padding={'4'}
+          padding={'space-16'}
         >
           <HGrid columns={{ md: 2, lg: 3, xl: 4 }} gap="space-24">
             <Entry labelText={'BehandlingId'}>
@@ -70,13 +69,13 @@ export default function AktivitetCard(props: Props) {
               {props.aktivitet.ventPaForegaendeAktiviteter ? 'ja' : 'nei'}
             </Entry>
           </HGrid>
-        </Box.New>
-        <Box.New
+        </Box>
+        <Box
           background={'raised'}
           style={{ padding: '6px', marginTop: '12px' }}
           borderColor={'neutral-subtle'}
           borderWidth={'1'}
-          borderRadius={'medium'}
+          borderRadius={'4'}
           shadow={'dialog'}
         >
           <Tabs
@@ -92,7 +91,7 @@ export default function AktivitetCard(props: Props) {
             </Tabs.List>
             <Outlet />
           </Tabs>
-        </Box.New>
+        </Box>
       </VStack>
     </>
   )

@@ -24,11 +24,11 @@ export const FordelingAldeStatus: React.FC<AldeOppsummeringProps> = ({ data, hid
         data: data.map((item) => (hiddenStatuses.includes(item.status) ? 0 : item.antall)),
         backgroundColor: data.map((item) => {
           const colors = statusColors[item.status]
-          return colors?.backgroundColor || 'var(--a-surface-neutral-subtle)'
+          return colors?.backgroundColor || 'var(--ax-bg-neutral-soft)'
         }),
         borderColor: data.map((item) => {
           const colors = statusColors[item.status]
-          return colors?.borderColor || 'var(--a-border-default)'
+          return colors?.borderColor || 'var(--ax-border-neutral)'
         }),
         borderWidth: 1,
       },

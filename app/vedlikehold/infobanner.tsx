@@ -57,9 +57,9 @@ export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
   const enabled = validToDate !== undefined && (isFuture(validToDate) || isToday(validToDate))
 
   return (
-    <HGrid columns={{ xs: 1, md: 1, xl: 2 }} gap="5">
+    <HGrid columns={{ xs: 1, md: 1, xl: 2 }} gap="space-20">
       <Form method="post">
-        <VStack gap="5" style={{ width: '25em' }}>
+        <VStack gap="space-20" style={{ width: '25em' }}>
           <Heading size="medium">Endre Infobanner</Heading>
           <BodyLong size="medium">Her kan infobanner i PSAK endres. </BodyLong>
           <Textarea
@@ -93,7 +93,7 @@ export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
             Aktiver infobanner
           </Switch>
           {enabled && (
-            <VStack gap="3">
+            <VStack gap="space-12">
               <Alert variant="info" inline>
                 Til og med dato for når infobanner skal være aktivt
               </Alert>
@@ -115,11 +115,11 @@ export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
           </Button>
         </VStack>
       </Form>
-      <VStack gap="5">
+      <VStack gap="space-20">
         <Heading size="medium">Forhåndsvisning</Heading>
         {beskrivelse.length > 0 ? (
           <Alert variant={toAkselVariant(valgtVariant)} size="medium">
-            <VStack gap="2">
+            <VStack gap="space-8">
               {beskrivelse}
               {urlText && url && (
                 <Link href={url}>

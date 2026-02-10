@@ -264,7 +264,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   return (
     <div>
       <h1>Omregn ytelser</h1>
-      <Box.New>
+      <Box>
         Behandling for Omregning av ytelser (tidligere BPEN093).
         <br />
         Dokumentasjon kan finnes her:
@@ -278,7 +278,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
             </Link>
           </li>
         </ul>
-      </Box.New>
+      </Box>
       <Tabs defaultValue="Omregning">
         <Tabs.List>
           <Tabs.Tab value="Omregning" label="Omregning" />
@@ -288,9 +288,9 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
         <Tabs.Panel value="Omregning">
           <br />
           <Form id={'skjema'} action="omregning" method="POST" onSubmit={handleSubmit}>
-            <VStack gap="6">
-              <HGrid columns={3} gap="12">
-                <Box.New>
+            <VStack gap="space-24">
+              <HGrid columns={3} gap="space-48">
+                <Box>
                   <TextField
                     label={'Behandlingsnøkkel'}
                     name={'behandlingsnokkel'}
@@ -350,9 +350,9 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   />
 
                   <br />
-                </Box.New>
-                <Box.New>
-                  <VStack gap="2">
+                </Box>
+                <Box>
+                  <VStack gap="space-8">
                     <CheckboxGroup size={'medium'} legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
                       <OmregningCheckbox
                         defaultChecked={behandleApneKrav}
@@ -431,12 +431,12 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                       </OmregningCheckbox>
                     </CheckboxGroup>
                   </VStack>
-                </Box.New>
-                <Box.New>
+                </Box>
+                <Box>
                   <CheckboxGroup legend={'Brevparametere'}>
                     Ved å <b>ikke</b> angi brev for berørte saker vil default brevkode bli brukt.
-                    <HGrid columns={2} gap="12">
-                      <Box.New padding="4" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
+                    <HGrid columns={2} gap="space-48">
+                      <Box padding="space-16" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
                         <OmregningSelector
                           label={'Bestill brev for'}
                           navn={'skalBestilleBrev'}
@@ -501,8 +501,8 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                           setselectedBrevKode={setselectedBrevkodeSokerAFPPrivat}
                           optionBatchbrevtyper={optionBatchbrevtyper}
                         />
-                      </Box.New>
-                      <Box.New padding="4" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
+                      </Box>
+                      <Box padding="space-16" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
                         <OmregningCheckbox
                           defaultChecked={skalSendeBrevBerorteSaker}
                           name={'sendBrevBerorteSaker'}
@@ -568,15 +568,15 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                           setselectedBrevKode={setselectedBrevkodeBerorteSakerAFPPrivat}
                           optionBatchbrevtyper={optionBatchbrevtyper}
                         />
-                      </Box.New>
+                      </Box>
                     </HGrid>
                   </CheckboxGroup>
-                </Box.New>
+                </Box>
               </HGrid>
             </VStack>
           </Form>
 
-          <Box.New>
+          <Box>
             <br />
             <Button icon={<PlayIcon aria-hidden />} onClick={() => ref.current?.showModal()}>
               Start omregning
@@ -639,7 +639,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                 <CopyButton copyText={getHumanReadableParameterText()} text="Kopier parameterliste" />
               </Modal.Footer>
             </Modal>
-          </Box.New>
+          </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="Saker til Omregning">

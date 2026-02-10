@@ -49,8 +49,8 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const lastYear = now.getFullYear() - 1
 
   return (
-    <VStack gap="8">
-      <VStack gap="4">
+    <VStack gap="space-32">
+      <VStack gap="space-16">
         <Heading size="medium">Lever samboeropplysning til Skattedirektoratet</Heading>
 
         <BodyShort>
@@ -58,9 +58,8 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
           Skattedirektoratet.
         </BodyShort>
       </VStack>
-
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap="4">
+        <VStack gap="space-16">
           <TextField
             label="Behandlingsår"
             defaultValue={lastYear}
@@ -76,7 +75,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
           </Button>
         </VStack>
       </Form>
-
       <BehandlingerTable
         visStatusSoek={true}
         visBehandlingTypeSoek={false}

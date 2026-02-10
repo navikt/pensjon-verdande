@@ -113,19 +113,18 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
   const [avstemmingsdato, setAvstemmingsdato] = useState<string | ''>('')
 
   return (
-    <VStack gap={'4'}>
-      <Box.New className={'aksel-pageblock--lg'}>
+    <VStack gap={'space-16'}>
+      <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett avstemming
         </Heading>
-        <VStack gap="2">
+        <VStack gap="space-8">
           <BodyLong>Oppretter behandlinger for konsistensavstemming mot Oppdrag</BodyLong>
           <Detail>Avstemmingsperiode fom settes til starten av angitt måned.</Detail>
         </VStack>
-      </Box.New>
-
+      </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <CheckboxGroup legend="Fagområder">
             <Checkbox name={'PENAFP'} value={'true'} defaultChecked={true}>
               PENAFP
@@ -178,11 +177,9 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
           </Button>
         </VStack>
       </Form>
-
       <Heading level="2" size="medium" style={{ marginTop: '2em' }}>
         Eksisterende avstemminger
       </Heading>
-
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
         <Await resolve={behandlinger}>
           {(it) => (

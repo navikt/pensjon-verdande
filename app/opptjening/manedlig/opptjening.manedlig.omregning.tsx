@@ -96,20 +96,17 @@ export default function OpprettEndretOpptjeningRoute({ loaderData }: Route.Compo
       <Heading level="1" size="large">
         Månedlig omregning av ytelse ved oppdaterte opptjeningsopplysninger
       </Heading>
-
       <BodyShort spacing style={{ paddingTop: '2rem', paddingBottom: '1rem' }}>
         Velg behandlingsmåned og tidspunkt for kjøring.
       </BodyShort>
-
       {!kanOverstyre && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
         </Alert>
       )}
-
       <Form action="opprett" method="post" style={{ width: '100%', maxWidth: 800 }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <div
             style={{
               display: 'grid',
@@ -175,7 +172,7 @@ export default function OpprettEndretOpptjeningRoute({ loaderData }: Route.Compo
             />
             <input type="hidden" name="avsjekkForKjoring" value={avsjekkForKjoring ? 'true' : 'false'} />
           </div>
-          <HStack gap={'4'}>
+          <HStack gap={'space-16'}>
             <Button type="submit" disabled={isSubmitting} variant="primary">
               Opprett
             </Button>
@@ -187,27 +184,23 @@ export default function OpprettEndretOpptjeningRoute({ loaderData }: Route.Compo
           </HStack>
         </VStack>
       </Form>
-
       {sisteAvsjekk === null && (
         <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Ingen avsjekk gjort
         </Alert>
       )}
-
       {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === false && (
         <Alert variant="error" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var ikke OK. PEN har mottatt{' '}
           {sisteAvsjekk.antallHendelserPen}, POPP har sendt {sisteAvsjekk.antallHendelserPopp}
         </Alert>
       )}
-
       {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
         <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {format(sisteAvsjekk.sisteAvsjekkTidspunkt, "dd.MM.yyyy 'kl.' HH:mm:ss")} var OK. Vi har mottatt{' '}
           {sisteAvsjekk.antallHendelserPen} hendelser.
         </Alert>
       )}
-
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
           Eksisterende behandlinger

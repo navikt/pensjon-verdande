@@ -97,8 +97,8 @@ export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
   const isRefreshing = revalidator.state === 'loading'
 
   return (
-    <VStack gap="6">
-      <Box.New>
+    <VStack gap="space-24">
+      <Box>
         <Heading size={'small'}>
           <HStack justify="space-between" align="center">
             <Heading size="small" level={'3'}>
@@ -114,20 +114,19 @@ export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
             </Button>
           </HStack>
         </Heading>
-        <VStack gap="4">
+        <VStack gap="space-16">
           <BodyShort>
             Totalt: <strong>{ratio(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}</strong>
           </BodyShort>
           <ProgressBar value={totalPct} aria-label="Total fremdrift" />
         </VStack>
-      </Box.New>
-
-      <Box.New>
+      </Box>
+      <Box>
         <HStack justify="space-between" align="center" wrap>
           <Heading size="small" level={'2'}>
             Detaljer per behandling
           </Heading>
-          <HStack gap="4" wrap>
+          <HStack gap="space-16" wrap>
             <Switch checked={onlyIssues} onChange={(e) => setOnlyIssues(e.target.checked)}>
               Vis kun feil/avvik
             </Switch>
@@ -185,7 +184,7 @@ export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
               return (
                 <Table.Row
                   key={`${rad.level}-${rad.behandlingCode}`}
-                  style={hasIssues ? { background: 'var(--a-surface-danger-subtle)' } : undefined}
+                  style={hasIssues ? { background: 'var(--ax-bg-danger-soft)' } : undefined}
                 >
                   <Table.DataCell>
                     <div
@@ -195,7 +194,7 @@ export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
                         marginLeft: rad.level > 1 ? 4 : 0,
                       }}
                     >
-                      <HStack gap="2" align="center" wrap={false}>
+                      <HStack gap="space-8" align="center" wrap={false}>
                         <BodyShort as="span" style={{ fontWeight: 600 }}>
                           {rad.behandlingCode}
                         </BodyShort>
@@ -203,22 +202,19 @@ export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
                       </HStack>
                     </div>
                   </Table.DataCell>
-
                   <Table.DataCell>
                     <BodyShort>{ratio(rad.ferdig, rad.totalt)}</BodyShort>
                   </Table.DataCell>
-
                   <Table.DataCell>
-                    <VStack gap="1">
+                    <VStack gap="space-4">
                       <VStack align={'end'}>
                         <BodyShort size="small">{rowPct} %</BodyShort>
                       </VStack>
                       <ProgressBar value={rowPct} aria-label={`Fremdrift ${rad.behandlingCode}`} />
                     </VStack>
                   </Table.DataCell>
-
                   <Table.DataCell>
-                    <HStack gap="2" wrap>
+                    <HStack gap="space-8" wrap>
                       {antallEtterStatus
                         .filter((it) => it.antall > 0 && rad.level > 1)
                         .map((it) => (
@@ -237,7 +233,7 @@ export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
             })}
           </Table.Body>
         </Table>
-      </Box.New>
+      </Box>
     </VStack>
   )
 }

@@ -112,7 +112,7 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
 
   return (
     <Page>
-      <VStack gap="8">
+      <VStack gap="space-32">
         <Heading size={'medium'}>Årlig omregning av ytelse ved oppdaterte opptjeningsopplysninger</Heading>
         <Form method="post">
           <Button type="submit" name="action" value={Action.kjoerUttrekk} disabled={isSubmitting}>
@@ -122,7 +122,7 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
 
         <Heading size="medium">Oppdater siste gyldige opptjeningsår</Heading>
         <Form method="post">
-          <HStack gap="4" align="end">
+          <HStack gap="space-16" align="end">
             <Select
               name="oppdaterOpptjeningsaar" // <- dette må matche action
               label="Velg opptjeningsår"
@@ -152,7 +152,7 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
 
         <Heading size="medium">Oppdater siste omsorg godskrivingsår</Heading>
         <Form method="post">
-          <HStack gap="4" align="end">
+          <HStack gap="space-16" align="end">
             <Select
               name="oppdaterOmsorgGodskrivingsaar" // <- dette må matche action
               label="Velg omsorg godskrivingsår"
@@ -183,8 +183,8 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
         <Heading size="medium">Kjør årlig omregningsendring</Heading>
 
         <Form method="post">
-          <VStack gap="4">
-            <HStack gap="4">
+          <VStack gap="space-16">
+            <HStack gap="space-16">
               <Select
                 name="opptjeningsar"
                 label="Velg opptjeningsår"
@@ -220,7 +220,7 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
           <p>Ingen saker er ekskludert fra årlig omregning.</p>
         )}
         <Form method="post">
-          <VStack gap="4">
+          <VStack gap="space-16">
             <Textarea
               label={'Saker som skal ekskluderes'}
               onChange={(e) => setEkskluderteSakIderText(e.target.value)}
@@ -233,7 +233,7 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
               value={kommentar}
               name="kommentar"
             />
-            <HStack gap="4">
+            <HStack gap="space-16">
               <Button type="submit" name="action" value={Action.ekskluderSaker} disabled={isSubmitting}>
                 Ekskluder saker fra årlig omregning
               </Button>
