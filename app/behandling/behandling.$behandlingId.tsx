@@ -81,9 +81,9 @@ function operationHandlers(
   }
   const beskrivelse = form.get('begrunnelse')
   if (form.get('operation') === 'stopp') {
-    if (beskrivelse === null || beskrivelse === undefined || (beskrivelse as string).trim().length === 0) {
+    if (typeof beskrivelse !== 'string' || beskrivelse.trim().length === 0) {
       errors.beskrivelse = 'Du må fylle ut en begrunnelse for å stoppe behandlingen.'
-    } else if ((beskrivelse as string).trim().length < 10) {
+    } else if (beskrivelse.trim().length < 10) {
       errors.beskrivelse = 'Begrunnelsen er for kort.'
     }
   }
@@ -182,13 +182,10 @@ export const action = async ({ params, request }: Route.ActionArgs) => {
   return null
 }
 
-export default function Behandling({ loaderData, actionData }: Route.ComponentProps) {
+export default function Behandling({ loaderData }: Route.ComponentProps) {
   const { aldeBehandlingUrlTemplate, behandling, detaljertFremdrift, psakSakUrlTemplate } = loaderData
 
   const me = useOutletContext<MeResponse>()
-
-  // Send errors fra actionData til BehandlingCard
-  const errors = actionData?.errors || {}
 
   return (
     <BehandlingCard
@@ -197,7 +194,6 @@ export default function Behandling({ loaderData, actionData }: Route.ComponentPr
       detaljertFremdrift={detaljertFremdrift}
       me={me}
       psakSakUrlTemplate={psakSakUrlTemplate}
-      errors={errors}
     />
   )
 }

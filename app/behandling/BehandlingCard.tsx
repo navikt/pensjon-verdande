@@ -58,7 +58,6 @@ export interface Props {
   detaljertFremdrift?: Promise<DetaljertFremdriftDTO | undefined | null> | null
   me: MeResponse
   psakSakUrlTemplate: string
-  errors?: Record<string, string>
 }
 
 function StoppButton({ behandling }: { behandling: BehandlingDto }) {
@@ -66,9 +65,9 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
   const [begrunnelse, setBegrunnelse] = useState('')
   const fetcher = useFetcher()
 
-  // Lukk modalen og reset hvis submit var vellykket
+  // Lukk modalen og reset hvis submit var vellykket (action returnerer null ved suksess)
   useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data && !fetcher.data.errors) {
+    if (fetcher.state === 'idle' && fetcher.data !== undefined && !fetcher.data?.errors) {
       setOpen(false)
       setBegrunnelse('')
     }
@@ -77,7 +76,12 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
   return (
     <>
       <Tooltip content="Stopper behandlingen, skal kun gjøres om feil ikke kan løses på annen måte">
-        <Button variant="secondary" data-color="danger" icon={<XMarkOctagonIcon aria-hidden />} onClick={() => setOpen(true)}>
+        <Button
+          variant="secondary"
+          data-color="danger"
+          icon={<XMarkOctagonIcon aria-hidden />}
+          onClick={() => setOpen(true)}
+        >
           Stopp behandling
         </Button>
       </Tooltip>
@@ -492,15 +496,15 @@ export default function BehandlingCard(props: Props) {
           gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
           columns={{ xl: 1, '2xl': props.detaljertFremdrift !== null ? 2 : 1 }}
         >
-          <VStack gap="4">
+          <VStack gap="space-16">
             <Box
               background={'raised'}
-            borderRadius={'12'}
+              borderRadius={'12'}
               borderWidth={'1'}
               borderColor={'neutral-subtleA'}
-            padding={'space-16'}
+              padding={'space-16'}
             >
-              <VStack gap={'8'}>
+              <VStack gap={'space-32'}>
                 <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
                   {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
                   {props.behandling.forrigeBehandlingId && (

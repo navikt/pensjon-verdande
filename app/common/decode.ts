@@ -15,6 +15,7 @@ const BEHANDLING_STATUS_VARIANT_MAP = {
   FULLFORT: 'success',
   OPPRETTET: 'info',
   STOPPET: 'warning',
+  STOPPET_VENTER_BEKREFTELSE: 'warning',
   UNDER_BEHANDLING: 'info',
 } as const
 
