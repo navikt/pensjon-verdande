@@ -1,70 +1,68 @@
+import { DatePicker, HStack, TextField } from '@navikt/ds-react'
 import type React from 'react'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import { Label } from '@navikt/ds-react'
-import { nb } from 'date-fns/locale'
-import styles from './DateTimePicker.module.css'
 
 interface DateTimePickerProps {
   selectedDate: Date | null
   setSelectedDate: (date: Date | null) => void
-  id?: string
-  dateFormat?: string
-  timeFormat?: string
-  timeIntervals?: number
-  timeCaption?: string
-  placeholderText?: string
-  ariaLabel?: string
   label?: string
-  tabIndex?: number
-  name?: string
   minDate?: Date
   maxDate?: Date
 }
 
-/** @deprecated Bruk aksel-komponent https://aksel.nav.no/komponenter/core/datepicker */
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
   selectedDate,
   setSelectedDate,
-  id = 'date-picker',
   label = 'Dato',
-  dateFormat = 'yyyy-MM-dd HH:mm',
-  timeFormat = 'HH:mm',
-  timeIntervals = 15,
-  timeCaption = 'Klokkeslett',
-  placeholderText = 'Velg dato',
-  ariaLabel = 'Velg dato',
-  tabIndex,
-  name,
   minDate,
   maxDate,
 }) => {
+  const timeValue = selectedDate
+    ? `${selectedDate.getHours().toString().padStart(2, '0')}:${selectedDate.getMinutes().toString().padStart(2, '0')}`
+    : ''
+
+  function handleDateSelect(date: Date | undefined) {
+    if (!date) {
+      setSelectedDate(null)
+      return
+    }
+    if (selectedDate) {
+      date.setHours(selectedDate.getHours(), selectedDate.getMinutes())
+    }
+    setSelectedDate(date)
+  }
+
+  function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const [hours, minutes] = e.target.value.split(':').map(Number)
+    const base = selectedDate ? new Date(selectedDate) : new Date()
+    base.setHours(hours, minutes, 0, 0)
+    setSelectedDate(base)
+  }
+
+  const dateLabel = label || 'Dato'
+  const hideLabels = !label
+
   return (
-    <div className="aksel-form-field aksel-form-field--small">
-      <Label htmlFor={id} size="small">
-        {label}
-      </Label>
-      <div>
-        <DatePicker
-          id={id}
-          selected={selectedDate}
-          onChange={(date: Date | null) => setSelectedDate(date)}
-          showTimeSelect
-          timeFormat={timeFormat}
-          timeIntervals={timeIntervals}
-          timeCaption={timeCaption}
-          dateFormat={dateFormat}
-          locale={nb}
-          placeholderText={placeholderText}
-          className={`${styles.akselInputEmulering}`}
-          aria-label={ariaLabel}
-          tabIndex={tabIndex}
-          name={name}
-          minDate={minDate}
-          maxDate={maxDate}
-        />
-      </div>
-    </div>
+    <HStack gap="space-8" align="end">
+      <DatePicker
+        mode="single"
+        selected={selectedDate ?? undefined}
+        defaultMonth={selectedDate ?? minDate ?? new Date()}
+        onSelect={handleDateSelect}
+        fromDate={minDate}
+        toDate={maxDate}
+      >
+        <DatePicker.Input label={dateLabel} hideLabel={hideLabels} size="small" />
+      </DatePicker>
+      <TextField
+        label="Klokkeslett"
+        hideLabel={hideLabels}
+        type="time"
+        size="small"
+        value={timeValue}
+        onChange={handleTimeChange}
+        style={{ width: '7rem' }}
+      />
+    </HStack>
   )
 }
 
