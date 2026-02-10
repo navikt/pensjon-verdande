@@ -1,5 +1,17 @@
 import 'chart.js/auto'
-import { Button, Heading, HStack, InlineMessage, Loader, Modal, Table, Tabs, Textarea, VStack } from '@navikt/ds-react'
+import {
+  BodyShort,
+  Button,
+  Heading,
+  HStack,
+  InlineMessage,
+  Loader,
+  Modal,
+  Table,
+  Tabs,
+  Textarea,
+  VStack,
+} from '@navikt/ds-react'
 import { useEffect, useRef, useState } from 'react'
 import { useFetcher } from 'react-router'
 import type { Ekskluderinger, EkskluderingMedKommentar } from '~/regulering/regulering.types'
@@ -265,6 +277,9 @@ function EkskluderingerMedKommentarTable({
 }) {
   return (
     <Table zebraStripes>
+      <BodyShort as="caption" visuallyHidden>
+        Ekskluderte saker
+      </BodyShort>
       <Table.Row>
         <Table.HeaderCell>SakId</Table.HeaderCell>
         <Table.HeaderCell align="right">Kommentar</Table.HeaderCell>

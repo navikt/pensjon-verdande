@@ -462,6 +462,9 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
 
             {groupBy.length === 0 ? (
               <Table size="small" zebraStripes>
+                <BodyShort as="caption" visuallyHidden>
+                  Manuelle oppgaver
+                </BodyShort>
                 <Table.Header>
                   <Table.Row>
                     <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
@@ -519,6 +522,9 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
               </Table>
             ) : (
               <Table size="small" zebraStripes>
+                <BodyShort as="caption" visuallyHidden>
+                  Grupperte manuelle oppgaver
+                </BodyShort>
                 <Table.Header>
                   <Table.Row>
                     {groupBy.map((g) => (
