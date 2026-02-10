@@ -1,3 +1,4 @@
+import { BodyLong, Box, Detail, Heading, VStack } from '@navikt/ds-react'
 import {
   isRouteErrorResponse,
   Links,
@@ -75,48 +76,62 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     }
 
     return (
-      <div className="p-6 space-y-3">
-        <h1 className="text-xl font-semibold">
-          {error.status} {error.statusText}
-        </h1>
+      <Box padding="space-24">
+        <VStack gap="space-12">
+          <Heading level="1" size="large">
+            {error.status} {error.statusText}
+          </Heading>
 
-        {obj?.message && <p>{obj.message}</p>}
-        {obj?.detail && <pre className="whitespace-pre-wrap">{obj.detail}</pre>}
-        {str && <pre className="whitespace-pre-wrap">{str}</pre>}
+          {obj?.message && <BodyLong>{obj.message}</BodyLong>}
+          {obj?.detail && <pre style={{ whiteSpace: 'pre-wrap' }}>{obj.detail}</pre>}
+          {str && <pre style={{ whiteSpace: 'pre-wrap' }}>{str}</pre>}
 
-        <div className="text-sm opacity-70 space-y-1">
-          {obj?.path && (
-            <div>
-              Path: <code>{obj.path}</code>
-            </div>
+          {(obj?.path || obj?.timestamp) && (
+            <VStack gap="space-4">
+              {obj?.path && (
+                <Detail>
+                  Path: <code>{obj.path}</code>
+                </Detail>
+              )}
+              {obj?.timestamp && <Detail>Tid: {obj.timestamp}</Detail>}
+            </VStack>
           )}
-          {obj?.timestamp && <div>Tid: {obj.timestamp}</div>}
-        </div>
 
-        {obj?.trace && (
-          <details className="mt-2">
-            <summary>Stack trace</summary>
-            <pre className="mt-2 overflow-auto">{obj.trace}</pre>
-          </details>
-        )}
-      </div>
+          {obj?.trace && (
+            <details>
+              <summary>Stack trace</summary>
+              <pre style={{ marginTop: '0.5rem', overflow: 'auto' }}>{obj.trace}</pre>
+            </details>
+          )}
+        </VStack>
+      </Box>
     )
   }
 
   if (error instanceof Error) {
     return (
-      <div className="p-6 space-y-2">
-        <h1 className="text-xl font-semibold">Feil</h1>
-        <p>{error.message}</p>
-        {error.stack && (
-          <details>
-            <summary>Stack trace</summary>
-            <pre className="mt-2 overflow-auto">{error.stack}</pre>
-          </details>
-        )}
-      </div>
+      <Box padding="space-24">
+        <VStack gap="space-8">
+          <Heading level="1" size="large">
+            Feil
+          </Heading>
+          <BodyLong>{error.message}</BodyLong>
+          {error.stack && (
+            <details>
+              <summary>Stack trace</summary>
+              <pre style={{ marginTop: '0.5rem', overflow: 'auto' }}>{error.stack}</pre>
+            </details>
+          )}
+        </VStack>
+      </Box>
     )
   }
 
-  return <h1>Ukjent feil</h1>
+  return (
+    <Box padding="space-24">
+      <Heading level="1" size="large">
+        Ukjent feil
+      </Heading>
+    </Box>
+  )
 }
