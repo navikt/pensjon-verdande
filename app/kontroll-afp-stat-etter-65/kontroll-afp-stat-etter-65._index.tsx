@@ -1,4 +1,4 @@
-import { Alert, Button, Heading, HStack, Modal, Select, VStack } from '@navikt/ds-react'
+import { Button, Heading, HStack, InlineMessage, Modal, Select, VStack } from '@navikt/ds-react'
 import { format, parse } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -142,14 +142,14 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
             </Select>
           </div>
 
-          <Alert variant="info" size="small" style={{ visibility: kanOpprette ? 'hidden' : 'visible' }}>
+          <InlineMessage status="info" size="small" style={{ visibility: kanOpprette ? 'hidden' : 'visible' }}>
             Fra og med måned må velges før behandlingen opprettes.
-          </Alert>
+          </InlineMessage>
 
           {feilmelding && (
-            <Alert variant="error" size="small">
+            <InlineMessage status="error" size="small">
               {feilmelding}
-            </Alert>
+            </InlineMessage>
           )}
 
           <HStack gap="space-16">
@@ -160,9 +160,9 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
         </VStack>
       </Form>
       {suksessmelding && (
-        <Alert variant="success" size="small" style={{ marginTop: '1rem' }}>
+        <InlineMessage status="success" size="small" style={{ marginTop: '1rem' }}>
           {suksessmelding}
-        </Alert>
+        </InlineMessage>
       )}
       {/* Sikrer at knappen ikke flytter seg */}
       <div style={{ marginTop: '2rem' }}>
