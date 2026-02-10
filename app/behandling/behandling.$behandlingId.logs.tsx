@@ -30,7 +30,7 @@ export default function BehandlingLogs({ loaderData }: Route.ComponentProps) {
   const { response, selectedColumns, selectedFilters, start, slutt, tempoConfiguration } = loaderData
 
   return (
-    <VStack gap="6">
+    <VStack gap="space-24">
       <LokiLogsTableLoader
         response={response}
         selectedFilters={selectedFilters}

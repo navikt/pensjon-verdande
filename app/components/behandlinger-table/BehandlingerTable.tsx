@@ -155,7 +155,7 @@ export default function BehandlingerTable({
   }
 
   return (
-    <Box.New background={'default'} style={{ padding: '6px' }} borderRadius="medium" shadow="dialog">
+    <Box background={'default'} style={{ padding: '6px' }} borderRadius="4" shadow="dialog">
       <Table
         size={'medium'}
         onSortChange={onSortChange}
@@ -301,8 +301,7 @@ export default function BehandlingerTable({
           })}
         </Table.Body>
       </Table>
-
-      <HStack align="center" marginBlock="4">
+      <HStack align="center" marginBlock="space-16">
         {inkluderFortsett && (
           <Button
             variant="primary"
@@ -326,6 +325,6 @@ export default function BehandlingerTable({
         <Spacer />
         {behandlingerResponse.totalElements} behandlinger
       </HStack>
-    </Box.New>
+    </Box>
   )
 }

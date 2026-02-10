@@ -20,7 +20,7 @@ export default function Brukere({ loaderData }: Route.ComponentProps) {
   const { brukere } = loaderData
 
   return (
-    <Box.New style={{ padding: '6px' }} borderRadius="medium">
+    <Box style={{ padding: '6px' }} borderRadius="4">
       <Table>
         <Table.Header>
           <Table.Row>
@@ -41,6 +41,6 @@ export default function Brukere({ loaderData }: Route.ComponentProps) {
           ))}
         </Table.Body>
       </Table>
-    </Box.New>
+    </Box>
   )
 }

@@ -114,9 +114,8 @@ export default function ManglendeForeignKeyIndexer({ loaderData }: Route.Compone
   const { manglendeForeignKeyIndexer } = loaderData
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading size="large">Manglende indekser for fjernnøkler</Heading>
-
       {manglendeForeignKeyIndexer.length > 0 ? (
         <>
           <BodyLong>
@@ -127,11 +126,11 @@ export default function ManglendeForeignKeyIndexer({ loaderData }: Route.Compone
           <BodyShort weight={'semibold'}>
             Trykk på en rad for å se forslag til SQL-kommando for opprettelse av manglende indeks
           </BodyShort>
-          <Box.New background={'raised'}>
+          <Box background={'raised'}>
             <ManglendeForeignKeyIndexerTable
               manglendeForeignKeyIndexer={manglendeForeignKeyIndexer}
             ></ManglendeForeignKeyIndexerTable>
-          </Box.New>
+          </Box>
         </>
       ) : (
         <BodyLong>Ingen manglende indekser ble funnet 🎉. Alle fjernnøkler har tilhørende indekser</BodyLong>

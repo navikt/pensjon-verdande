@@ -92,7 +92,7 @@ export default function FordelingStatusMedAktivitet({ data }: Props) {
                 ))}
                 <Table.Row
                   key={`${status}-subtotal`}
-                  style={{ fontWeight: 'bold', backgroundColor: 'var(--a-surface-subtle)' }}
+                  style={{ fontWeight: 'bold', backgroundColor: 'var(--ax-bg-neutral-soft)' }}
                   aria-label={`Sum ${statusLabels[status] || status}`}
                 >
                   <Table.DataCell>Sum {statusLabels[status] || status}</Table.DataCell>

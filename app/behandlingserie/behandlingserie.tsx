@@ -161,9 +161,8 @@ function RegelKontroller({ verdi, onChange }: { verdi: ReglerVerdi; onChange: (p
         <Radio value="range">Velg en range fra og til</Radio>
         <Radio value="multiple">Velg diverse datoer</Radio>
       </RadioGroup>
-
       {verdi.regelmessighet === 'multiple' && (
-        <HStack wrap gap="4">
+        <HStack wrap gap="space-16">
           <Select
             label="Dagvalg"
             value={verdi.dagvalgModus}
@@ -245,7 +244,7 @@ function AlternativerRad({
 }) {
   if (!synlig) return null
   return (
-    <HStack gap="6">
+    <HStack gap="space-24">
       <Checkbox checked={verdi.inkluderNesteAar} onChange={(e) => onChange({ inkluderNesteAar: e.target.checked })}>
         Inkluder neste år
       </Checkbox>
@@ -394,10 +393,9 @@ function EndreDialog({
           })()}
         </Heading>
       </Modal.Header>
-
       <Modal.Body>
-        <VStack gap="4">
-          <HStack gap="4" wrap>
+        <VStack gap="space-16">
+          <HStack gap="space-16" wrap>
             <DatePicker
               mode="single"
               selected={dato}
@@ -434,9 +432,8 @@ function EndreDialog({
           </div>
         </VStack>
       </Modal.Body>
-
       <Modal.Footer>
-        <HStack gap="2">
+        <HStack gap="space-8">
           <Button onClick={() => dato && tid && onSave(toYearMonthDay(dato), tid)} disabled={!dato || !tid}>
             Lagre dato
           </Button>
@@ -742,13 +739,11 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
   )
 
   return (
-    <VStack gap="6">
+    <VStack gap="space-24">
       <Heading size="medium" level="1">
         Behandlingserie
       </Heading>
-
       <SerieVelger behandlingType={behandlingType} onChange={oppdaterBehandlingType} />
-
       {behandlingType !== '' && (
         <>
           <Heading size="medium" level="1">

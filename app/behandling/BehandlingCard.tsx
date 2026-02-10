@@ -192,7 +192,7 @@ export default function BehandlingCard(props: Props) {
             </Modal.Body>
             <Modal.Footer>
               <fetcher.Form method="post">
-                <Button type="button" variant="danger" onClick={sendTilOppdragPaNytt}>
+                <Button data-color="danger" type="button" variant="primary" onClick={sendTilOppdragPaNytt}>
                   Send til oppdrag på nytt
                 </Button>
               </fetcher.Form>
@@ -325,14 +325,14 @@ export default function BehandlingCard(props: Props) {
         <>
           <Tooltip content="Stopper behandlingen, skal kun gjøres om feil ikke kan løses på annen måte">
             <Button
-              variant={'danger'}
+              data-color="danger"
+              variant={'primary'}
               icon={<XMarkOctagonIcon aria-hidden />}
               onClick={() => stopModal.current?.showModal()}
             >
               Stopp behandling
             </Button>
           </Tooltip>
-
           <Modal ref={stopModal} header={{ heading: 'Stopp behandling' }}>
             <Modal.Body>
               <BodyLong>
@@ -343,7 +343,7 @@ export default function BehandlingCard(props: Props) {
             </Modal.Body>
             <Modal.Footer>
               <fetcher.Form method="post" action="taTilDebug">
-                <Button type="button" variant="danger" onClick={stopp}>
+                <Button data-color="danger" type="button" variant="primary" onClick={stopp}>
                   Stopp behandling
                 </Button>
               </fetcher.Form>
@@ -410,17 +410,17 @@ export default function BehandlingCard(props: Props) {
         {decodeBehandling(props.behandling.type)}
         <Detail>{props.behandling.type}</Detail>
       </Heading>
-      <VStack gap={'4'}>
+      <VStack gap={'space-16'}>
         <HGrid
           gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
           columns={{ xl: 1, '2xl': props.detaljertFremdrift !== null ? 2 : 1 }}
         >
-          <Box.New
+          <Box
             background={'raised'}
-            borderRadius={'xlarge'}
+            borderRadius={'12'}
             borderWidth={'1'}
             borderColor={'neutral-subtleA'}
-            padding={'4'}
+            padding={'space-16'}
           >
             <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
               {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
@@ -496,16 +496,16 @@ export default function BehandlingCard(props: Props) {
                   )
                 })}
             </HGrid>
-          </Box.New>
+          </Box>
           <HStack gap="space-16">
             {props.detaljertFremdrift && (
               <Page.Block>
-                <Box.New
+                <Box
                   background={'raised'}
-                  borderRadius={'xlarge'}
+                  borderRadius={'12'}
                   borderWidth={'1'}
                   borderColor={'neutral-subtleA'}
-                  padding={'4'}
+                  padding={'space-16'}
                 >
                   <Suspense fallback={<Loader size="3xlarge" title="Venter..." />}>
                     <Await resolve={props.detaljertFremdrift}>
@@ -516,7 +516,7 @@ export default function BehandlingCard(props: Props) {
                       }
                     </Await>
                   </Suspense>
-                </Box.New>
+                </Box>
               </Page.Block>
             )}
           </HStack>
@@ -596,13 +596,12 @@ export default function BehandlingCard(props: Props) {
           {runButton()}
         </HStack>
       </VStack>
-
-      <Box.New
+      <Box
         background={'raised'}
         style={{ padding: '6px', marginTop: '12px' }}
         borderColor={'neutral-subtle'}
         borderWidth={'1'}
-        borderRadius={'medium'}
+        borderRadius={'4'}
         shadow={'dialog'}
       >
         <Tabs
@@ -653,7 +652,7 @@ export default function BehandlingCard(props: Props) {
           </Tabs.List>
           <Outlet />
         </Tabs>
-      </Box.New>
+      </Box>
     </Page>
   )
 }
@@ -782,7 +781,7 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
               />
             </DatePicker>
 
-            <HStack gap="4">
+            <HStack gap="space-16">
               <Select
                 label="Time"
                 value={tid.split(':')[0] ?? ''}

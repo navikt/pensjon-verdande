@@ -169,8 +169,8 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   }
 
   return (
-    <VStack gap="5">
-      <HStack gap="3">
+    <VStack gap="space-20">
+      <HStack gap="space-12">
         <Dropdown>
           <Button
             icon={<PlayFillIcon />}
@@ -281,7 +281,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
           </Tabs.List>
           <Tabs.Panel value="totaloversiktbehandlinger" style={{ paddingTop: '2em' }}>
             {uttrekkBehandlingId !== undefined ? (
-              <VStack gap="5">
+              <VStack gap="space-20">
                 <TotaloversiktBehandlinger behandlingId={uttrekkBehandlingId} />
                 <Entry labelText={'Behandling'}>
                   <Link to={`/behandling/${uttrekkBehandlingId}`} target="_blank">
@@ -499,7 +499,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
 
   const [toggleEndreAvviksgrenser, setToggleEndreAvviksgrenser] = useState(false)
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       {response?.success === true && (
         <Alert variant="success" inline>
           Avviksgrenser oppdatert
@@ -615,7 +615,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
       </Table>
       <div>
         {toggleEndreAvviksgrenser ? (
-          <HStack gap="3">
+          <HStack gap="space-12">
             <Button variant="secondary" onClick={() => setToggleEndreAvviksgrenser(false)}>
               Avbryt
             </Button>

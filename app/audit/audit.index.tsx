@@ -146,7 +146,7 @@ export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
         >
           Gruppert visning
         </Switch>
-        <HStack gap="2" align="center">
+        <HStack gap="space-8" align="center">
           <Button
             icon={<FilterIcon aria-hidden />}
             size="small"
@@ -167,18 +167,15 @@ export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
           </Button>
         </HStack>
       </VStack>
-
       {isGroupedPage(page) && <AuditGroupedTable page={page} sort={sortState} onSortChange={onSortChange} />}
       {!isGroupedPage(page) && <AuditTable page={page} sort={sortState} onSortChange={onSortChange} />}
-
       <div className={styles.pageTopMargin}>
         <Pagination page={page.number + 1} onPageChange={(p) => goToPage(p - 1)} count={page.totalPages} />
       </div>
-
       <Modal ref={filterModalRef} onClose={() => filterModalRef.current?.close()} header={{ heading: 'Filtrer audit' }}>
         <Modal.Body>
-          <VStack gap="6">
-            <HStack gap="4" wrap>
+          <VStack gap="space-24">
+            <HStack gap="space-16" wrap>
               <TextField
                 label="BehandlingId"
                 inputMode="numeric"
@@ -208,7 +205,7 @@ export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
 
             <fieldset className={styles.filterFieldset}>
               <legend className={styles.filterLegend}>Tidsrom</legend>
-              <HStack gap="6" align="start" wrap>
+              <HStack gap="space-24" align="start" wrap>
                 <DatePicker {...datepickerProps}>
                   <HStack wrap gap="space-16" justify="center">
                     <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
@@ -220,7 +217,7 @@ export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <HStack gap="2">
+          <HStack gap="space-8">
             <Button type="button" variant="secondary" onClick={clearAll}>
               Nullstill
             </Button>

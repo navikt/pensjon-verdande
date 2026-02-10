@@ -37,7 +37,7 @@ export default function ManuellKategoriBehandlinger({ loaderData }: Route.Compon
   const { behandlingManuellKategori, manuellKategoriBehandlinger } = loaderData
 
   return (
-    <VStack gap={'4'}>
+    <VStack gap={'space-16'}>
       <Heading size={'medium'} level={'2'}>
         {behandlingManuellKategori}
       </Heading>

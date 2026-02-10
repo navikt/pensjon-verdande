@@ -72,18 +72,15 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       <Heading level="1" size="large" spacing>
         Aldersovergang
       </Heading>
-
       <BodyShort spacing>Velg behandlingsmåned og tidspunkt for kjøring.</BodyShort>
-
       {!kanOverstyreBehandlingsmaned && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
         </Alert>
       )}
-
       <Form action="opprett" method="POST" style={{ width: '100%', maxWidth: 800 }}>
-        <VStack gap="4" style={{ marginBottom: '2rem' }}>
+        <VStack gap="space-16" style={{ marginBottom: '2rem' }}>
           <div
             style={{
               display: 'grid',
@@ -169,7 +166,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
           )}
         </VStack>
       </Form>
-
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
           Aldersoverganger

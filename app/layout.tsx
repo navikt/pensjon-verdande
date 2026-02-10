@@ -38,7 +38,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
   return (
     <Theme theme={isDarkmode ? 'dark' : 'light'}>
-      <Box.New asChild background={'default'}>
+      <Box asChild background={'default'}>
         <Page>
           {isNavigating && (
             <div
@@ -51,7 +51,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                 width: '100%',
                 height: '3px',
                 zIndex: 9999,
-                background: 'var(--ax-bg-brand-blue-strong, var(--a-blue-500))',
+                background: 'var(--ax-bg-brand-blue-strong, var(--ax-accent-600))',
                 animation: 'loading-bar 1.5s ease-in-out infinite',
               }}
             />
@@ -66,18 +66,18 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
             setShowIconMenu={setShowIconMenu}
           />
 
-          <HStack gap="0" wrap={false}>
+          <HStack gap="space-0" wrap={false}>
             <VenstreMeny me={me} showIconMenu={showIconMenu}></VenstreMeny>
 
             <Page.Block>
-              <Box padding={'4'}>
+              <Box padding={'space-16'}>
                 {schedulerAlert}
                 <Outlet context={me} />
               </Box>
             </Page.Block>
           </HStack>
         </Page>
-      </Box.New>
+      </Box>
     </Theme>
   )
 }

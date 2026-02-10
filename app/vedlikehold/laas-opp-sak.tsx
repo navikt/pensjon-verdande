@@ -17,18 +17,16 @@ export default function LaasOppSakPage() {
   const fetcher = useFetcher()
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading size="large">Lås opp sak</Heading>
-
       <fetcher.Form method="post">
-        <HStack gap="2" align="end">
+        <HStack gap="space-8" align="end">
           <TextField name="sakId" label="Sak ID" />
           <Button type="submit" loading={fetcher.state !== 'idle'}>
             Hent sak
           </Button>
         </HStack>
       </fetcher.Form>
-
       <Outlet />
     </VStack>
   )

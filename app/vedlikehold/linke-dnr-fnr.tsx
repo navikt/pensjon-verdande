@@ -18,7 +18,7 @@ export default function LinkeDnrFnrPage({ actionData }: Route.ComponentProps) {
 
   return (
     <div>
-      <VStack gap="5">
+      <VStack gap="space-20">
         <HStack>
           <Heading size="large">Linke Dnr Fnr</Heading>
         </HStack>
@@ -39,7 +39,7 @@ export default function LinkeDnrFnrPage({ actionData }: Route.ComponentProps) {
         )}
 
         <Form method="post">
-          <VStack gap="3">
+          <VStack gap="space-12">
             <TextField
               label="Gammelt ident"
               name="gammelIdent"

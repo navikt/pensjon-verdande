@@ -56,12 +56,12 @@ export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
   const [eksluderAvdod, setEksluderAvdod] = useState<string>('')
 
   return (
-    <VStack gap={'4'}>
-      <Box.New className={'aksel-pageblock--lg'}>
+    <VStack gap={'space-16'}>
+      <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett ad-hoc brevbestilling
         </Heading>
-        <VStack gap="2">
+        <VStack gap="space-8">
           <BodyLong>
             Oppretter brevbestillinger med oppgitt brevmal for verdiene angitt i tabellen{' '}
             <code>PEN.T_ADHOC_BREVBESTILLING</code>.
@@ -71,10 +71,9 @@ export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
             <i>{decodeBehandling(behandlingType)} behandlingen</i> er gjennomført
           </BodyLong>
         </VStack>
-      </Box.New>
-
+      </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <TextField
             label="Brevmal kode for Sak:"
             name="brevmal"
@@ -103,11 +102,9 @@ export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
           </Button>
         </VStack>
       </Form>
-
       <Heading level="2" size="medium" style={{ marginTop: '2em' }}>
         Eksisterende ad-hoc brevbestillinger
       </Heading>
-
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
         <Await resolve={behandlinger}>
           {(it) => (

@@ -123,8 +123,8 @@ export function KildeOppsummeringVisning({
   const total = data.reduce((sum, row) => sum + row.antall, 0)
 
   return (
-    <Box.New borderWidth="1" borderRadius="large" borderColor="neutral-subtleA" padding={{ xs: '4', md: '5' }}>
-      <VStack gap="4">
+    <Box borderWidth="1" borderRadius="8" borderColor="neutral-subtleA" padding={{ xs: 'space-16', md: 'space-20' }}>
+      <VStack gap="space-16">
         <HStack justify="space-between" align="center" wrap={false}>
           <Heading level="2" size="small">
             Kilde for førstegangsbehandlingskrav
@@ -134,7 +134,7 @@ export function KildeOppsummeringVisning({
           </Detail>
         </HStack>
 
-        <HStack gap="3" align="end" wrap>
+        <HStack gap="space-12" align="end" wrap>
           <DatePicker {...datepickerProps}>
             <HStack wrap gap="space-16" justify="center">
               <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
@@ -144,7 +144,7 @@ export function KildeOppsummeringVisning({
 
           <VStack gap="space-8">
             <Label size="small">Periode</Label>
-            <HStack gap="1" wrap>
+            <HStack gap="space-4" wrap>
               <Button size="small" variant="secondary" onClick={() => presetLastNDays(7)}>
                 7 d
               </Button>
@@ -230,6 +230,6 @@ export function KildeOppsummeringVisning({
           </Switch>
         </HStack>
       </VStack>
-    </Box.New>
+    </Box>
   )
 }

@@ -51,7 +51,7 @@ export function AuditGroupedTable({
           <Table.ExpandableRow
             key={`${row.sisteTidspunkt}|${row.navident}|${row.handling}|${row.behandlingId}|${row.aktivitetId ?? 'null'}`}
             content={
-              <VStack gap="4">
+              <VStack gap="space-16">
                 <VStack>
                   <Heading size="small" level="3">
                     Første tidspunkt

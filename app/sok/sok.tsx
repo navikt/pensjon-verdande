@@ -44,7 +44,7 @@ export default function Sok({ loaderData }: Route.ComponentProps) {
   const { behandlinger } = loaderData
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-16">
       {behandlinger && <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />}
     </VStack>
   )

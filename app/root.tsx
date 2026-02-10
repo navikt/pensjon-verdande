@@ -13,7 +13,7 @@ import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
 import { env } from '~/services/env.server'
 import type { Route } from '../.react-router/types/app/+types/root'
 import appStylesHref from './app.css?url'
-import '@navikt/ds-css/darkside'
+import '@navikt/ds-css'
 
 export const links: LinksFunction = () => {
   return [...[{ rel: 'stylesheet', href: appStylesHref }]]

@@ -57,9 +57,8 @@ export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) 
   const [shareUrl, setShareUrl] = useState('')
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-16">
       <Heading size={'small'}>Kjøring</Heading>
-
       <section aria-labelledby="overview-heading">
         <dl
           style={{
@@ -121,7 +120,7 @@ export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) 
             <Label as="span">Korrelasjonsid</Label>
           </dt>
           <dd>
-            <HStack gap="2" align="center">
+            <HStack gap="space-8" align="center">
               <BodyShort>{kjoring.correlationId}</BodyShort>
               <Tooltip content="Kopier korrelasjonsid">
                 <CopyButton copyText={kjoring.correlationId} iconPosition="right" size="small" />
@@ -135,7 +134,7 @@ export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) 
                 <Label as="span">TraceId</Label>
               </dt>
               <dd>
-                <HStack gap="2" align="center">
+                <HStack gap="space-8" align="center">
                   <BodyShort>{kjoring.traceId}</BodyShort>
                   <Tooltip content="Kopier TraceId">
                     <CopyButton copyText={kjoring.traceId} iconPosition="right" size="small" />
@@ -151,11 +150,11 @@ export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) 
           <dd>
             <BodyShort>
               {kjoring.feilmelding ? (
-                <Tag size="small" variant="error">
+                <Tag data-color="danger" size="small" variant="outline">
                   Feilet
                 </Tag>
               ) : (
-                <Tag size="small" variant="success">
+                <Tag data-color="success" size="small" variant="outline">
                   OK
                 </Tag>
               )}
@@ -174,7 +173,6 @@ export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) 
           )}
         </dl>
       </section>
-
       <HStack>
         <Button
           as={ReactRouterLink}
@@ -218,7 +216,6 @@ export default function BehandlingKjoring({ loaderData }: Route.ComponentProps) 
           icon={<LinkIcon />}
         />
       </HStack>
-
       <LokiLogsTableLoader
         response={response}
         selectedFilters={selectedFilters}

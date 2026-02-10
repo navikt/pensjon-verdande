@@ -19,7 +19,7 @@ export default function SokosSPKMottakPage({ actionData }: Route.ComponentProps)
 
   return (
     <div>
-      <VStack gap="5">
+      <VStack gap="space-20">
         <HStack>
           <Heading size="large">Hent antall fra MOT</Heading>
         </HStack>
@@ -40,7 +40,7 @@ export default function SokosSPKMottakPage({ actionData }: Route.ComponentProps)
         )}
 
         <Form method="post">
-          <VStack gap="3">
+          <VStack gap="space-12">
             <TextField
               label="fomYear"
               name="fomYear"

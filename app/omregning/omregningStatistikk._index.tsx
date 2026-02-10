@@ -98,7 +98,6 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
     <div>
       <h1>Omregning Statistikk</h1>
       <p>Her vil statistikk relatert til omregning bli vist.</p>
-
       <Form method={'POST'} navigate={false}>
         <Select
           label={'Behandlingsnøkler'}
@@ -117,8 +116,7 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
           Hent statistikk for nøkkel
         </Button>
       </Form>
-
-      <Box.New>
+      <Box>
         <Link
           style={{ padding: '1em', position: 'relative', right: 0, float: 'right' }}
           // this attribute sets the filename
@@ -128,8 +126,8 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
         >
           Last ned tabell
         </Link>
-      </Box.New>
-      <Box.New>
+      </Box>
+      <Box>
         <Table size="small" zebraStripes>
           <Table.Header>
             <Table.Row>
@@ -171,7 +169,7 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
           boundaryCount={1}
           siblingCount={1}
         />
-      </Box.New>
+      </Box>
     </div>
   )
 }

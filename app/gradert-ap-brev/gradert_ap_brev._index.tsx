@@ -22,10 +22,9 @@ export default function OpprettGradertAPRoute() {
       <Heading level="1" size="large">
         Finn saker som skal motta gradert AP brev (som har hatt gradert uføre)
       </Heading>
-
       <Form id="skjema" method="post">
-        <VStack gap="4">
-          <HStack gap="4">
+        <VStack gap="space-16">
+          <HStack gap="space-16">
             <Button type="submit" disabled={isSubmitting}>
               Kjør
             </Button>

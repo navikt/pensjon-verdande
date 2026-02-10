@@ -17,32 +17,31 @@ export default function Bruker(props: Props) {
         {props.bruker.fornavn} {props.bruker.etternavn}
         <BodyShort size={'small'}>{props.bruker.brukernavn}</BodyShort>
       </Heading>
-
-      <Box.New background={'raised'} style={{ padding: '6px' }} borderRadius="medium" shadow="dialog">
+      <Box background={'raised'} style={{ padding: '6px' }} borderRadius="4" shadow="dialog">
         <Tabs defaultValue="tilganger">
           <Tabs.List>
             <Tabs.Tab value="tilganger" label="Tilganger" icon={<KeyHorizontalIcon aria-hidden />} />
             <Tabs.Tab value="historikk" label="Historikk" icon={<ClockDashedIcon aria-hidden />} />
           </Tabs.List>
           <Tabs.Panel value="tilganger">
-            <Box.New padding={'4'}>
+            <Box padding={'space-16'}>
               <BrukersTilganger
                 bruker={props.bruker}
                 readonly={props.readOnly}
                 tilgangskontrollmeta={props.tilgangskontrollmeta}
               ></BrukersTilganger>
-            </Box.New>
+            </Box>
           </Tabs.Panel>
           <Tabs.Panel value="historikk">
-            <Box.New padding={'4'}>
+            <Box padding={'space-16'}>
               <BrukersTilgangsLogg
                 bruker={props.bruker}
                 tilgangskontrollmeta={props.tilgangskontrollmeta}
               ></BrukersTilgangsLogg>
-            </Box.New>
+            </Box>
           </Tabs.Panel>
         </Tabs>
-      </Box.New>
+      </Box>
     </>
   )
 }

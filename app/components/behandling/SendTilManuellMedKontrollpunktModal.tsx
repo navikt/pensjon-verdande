@@ -17,14 +17,14 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
     <>
       <Tooltip content="Fortsett videre behandling manuelt med oppgitt kontrollpunkt">
         <Button
-          variant={'danger'}
+          data-color="danger"
+          variant={'primary'}
           icon={<PersonIcon aria-hidden />}
           onClick={() => props.modalRef.current?.showModal()}
         >
           Manuell behandling
         </Button>
       </Tooltip>
-
       <Modal ref={props.modalRef} header={{ heading: 'Manuell behandling' }} placement="top">
         <Modal.Body style={{ minHeight: '550px' }}>
           Dette vil avbryte automatisk behandling og sette kravet til manuelt behandling. Kontrollpunktet vil bli lagret
@@ -54,8 +54,9 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
         </Modal.Body>
         <Modal.Footer>
           <Button
+            data-color="danger"
             type="button"
-            variant="danger"
+            variant="primary"
             disabled={valgtKontrollpunkt == null}
             onClick={() =>
               valgtKontrollpunkt ? props.sendTilManuellMedKontrollpunkt(valgtKontrollpunkt.kontrollpunkt) : null
