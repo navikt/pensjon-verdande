@@ -273,7 +273,7 @@ export default function Alderspensjonssoknader({ loaderData }: Route.ComponentPr
 
         {navigation.state === 'loading' ? (
           <HStack justify="center">
-            <Loader size="xlarge" />
+            <Loader size="xlarge" title="Laster søknader…" />
           </HStack>
         ) : page.content.length === 0 ? (
           <EmptyState />

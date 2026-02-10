@@ -462,7 +462,7 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
 
           {fetcher.state === 'loading' && (
             <HStack gap="space-8">
-              <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
+              <Loader size="small" title="Henter data…" /> <Detail>Henter ytelsekomponenter...</Detail>
             </HStack>
           )}
 

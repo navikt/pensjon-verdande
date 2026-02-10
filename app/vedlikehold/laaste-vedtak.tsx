@@ -343,7 +343,7 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string; vedtak:
           </option>
         ))}
       </Select>
-      {fetcher.state === 'submitting' && <Loader size="xsmall" />}
+      {fetcher.state === 'submitting' && <Loader size="xsmall" title="Sender…" />}
     </HStack>
   )
 }
@@ -386,7 +386,7 @@ function Aksjonspunkt({ behandlingId, vedtak }: { behandlingId: string; vedtak: 
           </option>
         ))}
       </Select>
-      {fetcher.state === 'submitting' && <Loader size="xsmall" />}
+      {fetcher.state === 'submitting' && <Loader size="xsmall" title="Sender…" />}
     </HStack>
   )
 }
@@ -538,7 +538,7 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Laa
 
           {fetcher.state === 'loading' && (
             <HStack gap="space-8">
-              <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
+              <Loader size="small" title="Henter data…" /> <Detail>Henter ytelsekomponenter...</Detail>
             </HStack>
           )}
 
@@ -628,7 +628,7 @@ function Kommentar({ behandlingId, vedtak }: { behandlingId: string; vedtak: Laa
         hideLabel
         resize
       />
-      {fetcher.state === 'submitting' && <Loader size="xsmall" />}
+      {fetcher.state === 'submitting' && <Loader size="xsmall" title="Sender…" />}
     </HStack>
   )
 }

@@ -299,21 +299,21 @@ export default function AdministrerTilknyttetdeBehandlinger() {
             {arbeidstabellStatistikk !== undefined ? (
               <ArbeidstabellStatistikkTable arbeidstabellStatistikk={arbeidstabellStatistikk} />
             ) : (
-              <Loader />
+              <Loader title="Laster arbeidstabell…" />
             )}
           </Tabs.Panel>
           <Tabs.Panel value="faktomregningArsak" style={{ paddingTop: '2em' }}>
             {faktoromregningerMedAarsak !== undefined ? (
               <FaktoromregningArsakTable faktoromregningerMedAarsak={faktoromregningerMedAarsak} />
             ) : (
-              <Loader />
+              <Loader title="Laster faktoromregninger…" />
             )}
           </Tabs.Panel>
           <Tabs.Panel value="beregningsavvik" style={{ paddingTop: '2em' }}>
             {beregningsavvikStatistikk !== undefined ? (
               <BeregningsavvikStatistikkTable beregningsavvikStatistikk={beregningsavvikStatistikk} />
             ) : (
-              <Loader />
+              <Loader title="Laster beregningsavvik…" />
             )}
           </Tabs.Panel>
           <Tabs.Panel value="avviksgrenser" style={{ paddingTop: '2em' }}>

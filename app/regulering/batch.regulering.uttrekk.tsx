@@ -40,7 +40,7 @@ export default function Uttrekk() {
                 <VStack gap="space-8">
                   <HStack gap="space-8">
                     <div>Uttrekk er under behandling: {uttrekk.steg}</div>
-                    <Loader />
+                    <Loader title="Behandler uttrekk…" />
                   </HStack>
                   <ProgressBar
                     title={uttrekk.steg}

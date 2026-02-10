@@ -161,7 +161,7 @@ export function OrkestreringDetaljer({
           {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
             <Alert variant="info" size="small" inline>
               <HStack gap="space-8">
-                Under behandling <Loader size="small" />
+                Under behandling <Loader size="small" title="Under behandling…" />
               </HStack>
             </Alert>
           )}
@@ -272,7 +272,7 @@ export function AggregerteFeilmeldingerTabell() {
   const aggregerteFeilmeldingerWrapper = fetcher.data as AggregerteFeilmeldinger | undefined
 
   if (aggregerteFeilmeldingerWrapper === undefined && fetcher.state === 'loading') {
-    return <Loader size="small" />
+    return <Loader size="small" title="Laster feilmeldinger…" />
   }
 
   if (aggregerteFeilmeldingerWrapper === undefined) {
