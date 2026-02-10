@@ -80,7 +80,10 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
           variant="secondary"
           data-color="danger"
           icon={<XMarkOctagonIcon aria-hidden />}
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            fetcher.reset()
+            setOpen(true)
+          }}
         >
           Stopp behandling
         </Button>
@@ -156,7 +159,14 @@ function BekreftStoppBehandlingButton() {
   return (
     <>
       <Tooltip content="Bekreft at nødvendig oppfølging er gjort for stoppet behandling">
-        <Button variant={'secondary'} icon={<PlayIcon aria-hidden />} onClick={() => setOpen(true)}>
+        <Button
+          variant={'secondary'}
+          icon={<PlayIcon aria-hidden />}
+          onClick={() => {
+            fetcher.reset()
+            setOpen(true)
+          }}
+        >
           Bekreft oppfølging
         </Button>
       </Tooltip>
