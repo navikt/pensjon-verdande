@@ -1,6 +1,6 @@
 import { Alert, Box, CopyButton, HStack, Page, Theme } from '@navikt/ds-react'
 import { useState } from 'react'
-import { createCookie, isRouteErrorResponse, Outlet } from 'react-router'
+import { createCookie, isRouteErrorResponse, Outlet, useNavigation } from 'react-router'
 import { hentMe } from '~/brukere/brukere.server'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
@@ -27,6 +27,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const { env, me, schedulerStatus, darkmode } = loaderData
   const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
   const [showIconMenu, setShowIconMenu] = useState<boolean>(false)
+  const navigation = useNavigation()
+  const isNavigating = navigation.state !== 'idle'
 
   const schedulerAlert = schedulerStatus && !schedulerStatus.schedulerEnabled && !schedulerStatus.schedulerLocal && (
     <Alert variant="error" style={{ marginBottom: '1rem' }}>
@@ -38,6 +40,22 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
     <Theme theme={isDarkmode ? 'dark' : 'light'}>
       <Box.New asChild background={'default'}>
         <Page>
+          {isNavigating && (
+            <div
+              role="progressbar"
+              aria-label="Laster side"
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '3px',
+                zIndex: 9999,
+                background: 'var(--ax-bg-brand-blue-strong, var(--a-blue-500))',
+                animation: 'loading-bar 1.5s ease-in-out infinite',
+              }}
+            />
+          )}
           <NavHeader
             erProduksjon={env === 'p'}
             env={env}
