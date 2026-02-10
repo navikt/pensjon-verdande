@@ -1,4 +1,4 @@
-import { Button, Dialog, HStack, Link, Spacer, VStack } from '@navikt/ds-react'
+import { Button, Dialog, HStack, Link, VStack } from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useMemo, useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router'
@@ -60,7 +60,7 @@ export default function Dag(props: Props) {
   function dayRow() {
     if (props.dato.getDay() === 1) {
       return (
-        <HStack>
+        <HStack justify="space-between">
           <span
             style={{
               textAlign: 'left',
@@ -70,7 +70,6 @@ export default function Dag(props: Props) {
           >
             {getWeek(props.dato)}
           </span>
-          <Spacer></Spacer>
           <span style={{ textAlign: 'right', color: textColor }}>{dagLabel}</span>
         </HStack>
       )
@@ -81,7 +80,7 @@ export default function Dag(props: Props) {
 
   function behandlingElement(behandling: KalenderBehandling, textColor: string, visKlokkeSlett: boolean) {
     return (
-      <HStack key={`behandling-${behandling.behandlingId}`} style={{ fontSize: '0.8em' }}>
+      <HStack key={`behandling-${behandling.behandlingId}`} justify="space-between" style={{ fontSize: '0.8em' }}>
         <span
           style={{
             textAlign: 'left',
@@ -101,7 +100,6 @@ export default function Dag(props: Props) {
             {decodeBehandling(behandling.type)}
           </Link>
         </span>
-        <Spacer></Spacer>
         <span>
           {visKlokkeSlett && (
             <span
