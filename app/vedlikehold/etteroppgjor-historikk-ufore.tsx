@@ -1,4 +1,4 @@
-import { Alert, Button, Heading, TextField, VStack } from '@navikt/ds-react'
+import { Button, Heading, LocalAlert, TextField, VStack } from '@navikt/ds-react'
 import { Form, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { ugyldiggjorEtteroppgjorHistorikkUfore } from '~/vedlikehold/vedlikehold.server'
@@ -42,11 +42,17 @@ export default function EtteroppgjorHistorikkUforePage({ actionData }: Route.Com
       {actionData && (
         <>
           {success && 'sakId' in actionData && (
-            <Alert variant="success">
-              Oppdatert historikk for sakid {actionData.sakId} og etteroppgjort år {actionData.etteroppgjortAr}
-            </Alert>
+            <LocalAlert status="success">
+              <LocalAlert.Content>
+                Oppdatert historikk for sakid {actionData.sakId} og etteroppgjort år {actionData.etteroppgjortAr}
+              </LocalAlert.Content>
+            </LocalAlert>
           )}
-          {!success && <Alert variant="error">Feilmelding: {error}</Alert>}
+          {!success && (
+            <LocalAlert status="error">
+              <LocalAlert.Content>Feilmelding: {error}</LocalAlert.Content>
+            </LocalAlert>
+          )}
         </>
       )}
       <Heading size="small">Ugyldiggjør EtteroppgjørHistorikk Uføretrygd</Heading>
