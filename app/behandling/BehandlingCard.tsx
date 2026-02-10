@@ -64,10 +64,12 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
   const [open, setOpen] = useState(false)
   const [begrunnelse, setBegrunnelse] = useState('')
   const fetcher = useFetcher()
+  const prevState = useRef(fetcher.state)
 
-  // Lukk modalen og reset hvis submit var vellykket (action returnerer null ved suksess)
   useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data !== undefined && !fetcher.data?.errors) {
+    const wasSubmitting = prevState.current === 'submitting' || prevState.current === 'loading'
+    prevState.current = fetcher.state
+    if (fetcher.state === 'idle' && wasSubmitting && !fetcher.data?.errors) {
       setOpen(false)
       setBegrunnelse('')
     }
@@ -80,10 +82,7 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
           variant="secondary"
           data-color="danger"
           icon={<XMarkOctagonIcon aria-hidden />}
-          onClick={() => {
-            fetcher.reset()
-            setOpen(true)
-          }}
+          onClick={() => setOpen(true)}
         >
           Stopp behandling
         </Button>
@@ -149,9 +148,12 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
 function BekreftStoppBehandlingButton() {
   const fetcher = useFetcher()
   const [open, setOpen] = useState(false)
+  const prevState = useRef(fetcher.state)
 
   useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data === null) {
+    const wasSubmitting = prevState.current === 'submitting' || prevState.current === 'loading'
+    prevState.current = fetcher.state
+    if (fetcher.state === 'idle' && wasSubmitting && !fetcher.data?.errors) {
       setOpen(false)
     }
   }, [fetcher.state, fetcher.data])
@@ -159,14 +161,7 @@ function BekreftStoppBehandlingButton() {
   return (
     <>
       <Tooltip content="Bekreft at nødvendig oppfølging er gjort for stoppet behandling">
-        <Button
-          variant={'secondary'}
-          icon={<PlayIcon aria-hidden />}
-          onClick={() => {
-            fetcher.reset()
-            setOpen(true)
-          }}
-        >
+        <Button variant={'secondary'} icon={<PlayIcon aria-hidden />} onClick={() => setOpen(true)}>
           Bekreft oppfølging
         </Button>
       </Tooltip>
