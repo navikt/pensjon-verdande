@@ -10,8 +10,7 @@ export async function opprettKonsistensavstemmingBehandling(
   PENGJ: boolean,
   PENGY: boolean,
   PENKP: boolean,
-  PENUP: boolean,
-  // UFOREUT: boolean,
+  UFOREUT: boolean,
   avstemmingsdato: string,
 ): Promise<StartKonsistensavstemmingResponse> {
   const response = await fetch(`${env.penUrl}/api/vedtak/avstemming/konsistens/start`, {
@@ -30,8 +29,7 @@ export async function opprettKonsistensavstemmingBehandling(
       penPengj: PENGJ,
       penPengy: PENGY,
       penPenkp: PENKP,
-      penPenup: PENUP,
-      // penUforeut: UFOREUT,
+      penUforeut: UFOREUT,
       avstemmingsdato: avstemmingsdato,
     }),
   })
