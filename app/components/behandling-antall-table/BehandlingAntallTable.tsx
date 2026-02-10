@@ -19,6 +19,7 @@ export default function BehandlingAntallTable(props: Props) {
 
   return (
     <Table size={'small'} zebraStripes>
+      <caption>Antall per behandlingstype</caption>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader align={'right'}>#</Table.ColumnHeader>

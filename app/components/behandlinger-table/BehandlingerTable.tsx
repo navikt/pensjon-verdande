@@ -165,6 +165,7 @@ export default function BehandlingerTable({
         }}
         zebraStripes
       >
+        <caption>Behandlinger</caption>
         <Table.Header>
           <Table.Row>
             {inkluderFortsett && (

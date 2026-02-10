@@ -32,6 +32,7 @@ export default function BehandlingAktivitetTable(props: Props) {
       }}
       zebraStripes
     >
+      <caption>Aktiviteter</caption>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader sortable sortKey="aktivitetId">

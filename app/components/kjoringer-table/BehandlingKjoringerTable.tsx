@@ -47,6 +47,7 @@ export function BehandlingKjoringerTable(props: Props) {
       }}
       zebraStripes
     >
+      <caption>Kjøringer</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell />

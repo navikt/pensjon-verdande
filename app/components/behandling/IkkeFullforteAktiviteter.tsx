@@ -8,6 +8,7 @@ export interface Props {
 export default function IkkeFullforteAktiviteter(props: Props) {
   return (
     <Table>
+      <caption>Ikke fullførte aktiviteter</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandling</Table.HeaderCell>

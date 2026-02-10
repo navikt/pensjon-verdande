@@ -56,6 +56,7 @@ export default function FordelingStatusMedAktivitet({ data }: Props) {
         Statusfordeling med aktivitet
       </Heading>
       <Table size="medium" zebraStripes>
+        <caption>Statusfordeling med aktivitet</caption>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader>Status</Table.ColumnHeader>
