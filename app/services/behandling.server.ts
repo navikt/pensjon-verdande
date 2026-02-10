@@ -220,8 +220,12 @@ export async function godkjennOpprettelse(accessToken: string, behandlingId: str
   await apiPut(`/api/behandling/${behandlingId}/godkjennOpprettelse`, {}, { accessToken })
 }
 
-export async function stopp(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/stopp`, {}, { accessToken })
+export async function bekreftStoppBehandling(accessToken: string, behandlingId: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/bekreftStoppBehandling`, {}, { accessToken })
+}
+
+export async function stopp(accessToken: string, behandlingId: string, begrunnelse: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/stopp`, { begrunnelse }, { accessToken })
 }
 
 export async function endrePlanlagtStartet(

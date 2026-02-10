@@ -9,6 +9,7 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "dev": "react-router dev",
+    "dev:q2": "PEN_URL=https://pensjon-pen-q2.dev.adeo.no react-router dev",
     "fetch-secrets": "./fetch-secrets.sh",
     "format": "biome format .",
     "format:fix": "biome format --write .",
