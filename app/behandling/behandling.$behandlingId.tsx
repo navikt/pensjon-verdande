@@ -61,16 +61,13 @@ function requireField(
   return { value: v }
 }
 
-// Endret: operationHandlers returnerer errors og handler
 function operationHandlers(
   accessToken: string,
   behandlingId: string,
   form: FormData,
 ): { errors: Record<string, string>; handler?: () => Promise<void> } {
-  // Hjelpefunksjon for å samle errors
   const errors: Record<string, string> = {}
 
-  // For operasjoner med påkrevde felter
   const ansvarligTeam = requireField(form, 'ansvarligTeam')
   if (form.get('operation') === 'oppdaterAnsvarligTeam' && ansvarligTeam.error) {
     errors.ansvarligTeam = ansvarligTeam.error
@@ -80,15 +77,18 @@ function operationHandlers(
     errors.kontrollpunkt = kontrollpunkt.error
   }
   const beskrivelse = form.get('begrunnelse')
+  let trimmedBegrunnelse = ''
   if (form.get('operation') === 'stopp') {
     if (typeof beskrivelse !== 'string' || beskrivelse.trim().length === 0) {
       errors.beskrivelse = 'Du må fylle ut en begrunnelse for å stoppe behandlingen.'
     } else if (beskrivelse.trim().length < 10) {
       errors.beskrivelse = 'Begrunnelsen er for kort.'
+    } else {
+      trimmedBegrunnelse = beskrivelse.trim()
     }
   }
 
-  // Handler-funksjon kun hvis ingen errors
+  // Endret: operationHandlers returnerer errors og handler
   let handler: (() => Promise<void>) | undefined
   if (Object.keys(errors).length === 0) {
     const op = form.get('operation')
@@ -117,7 +117,7 @@ function operationHandlers(
         handler = () => sendTilOppdragPaNytt(accessToken, behandlingId)
         break
       case 'stopp':
-        handler = () => stopp(accessToken, behandlingId, String(form.get('begrunnelse')))
+        handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)
         break
       case 'godkjennOpprettelse':
         handler = () => godkjennOpprettelse(accessToken, behandlingId)
