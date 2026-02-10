@@ -102,7 +102,6 @@ export default function LopendeInntektsavkorting({ loaderData, actionData }: Rou
             name="kjoremaaned"
             type="number"
             inputMode="numeric"
-            placeholder="yyyyMM"
             defaultValue={kjoremaaned}
             error={errors?.kjoremaaned}
           />

@@ -407,7 +407,6 @@ function EndreDialog({
             >
               <DatePicker.Input
                 label="Ny dato"
-                placeholder="dd.mm.åååå"
                 value={input}
                 onChange={(e) => {
                   const v = e.target.value

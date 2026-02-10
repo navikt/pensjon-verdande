@@ -52,7 +52,6 @@ export default function FastsettForventetInntekt({ loaderData }: Route.Component
             aria-label="År"
             name="behandlingsAr"
             type="number"
-            placeholder="År"
           />
           <Select
             label="Begrens utplukk"
