@@ -114,7 +114,7 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
                 label="Begrunnelse"
                 value={begrunnelse}
                 onChange={(e) => setBegrunnelse(e.target.value)}
-                error={fetcher.data?.errors?.beskrivelse}
+                error={fetcher.data?.errors?.begrunnelse}
                 name="begrunnelse"
               />
             </VStack>

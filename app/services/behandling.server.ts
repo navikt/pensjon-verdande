@@ -221,7 +221,7 @@ export async function godkjennOpprettelse(accessToken: string, behandlingId: str
 }
 
 export async function bekreftStoppBehandling(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/bekreftStoppBehandling`, undefined, { accessToken })
+  await apiPut(`/api/behandling/${behandlingId}/bekreftStoppBehandling`, {}, { accessToken })
 }
 
 export async function stopp(accessToken: string, behandlingId: string, begrunnelse: string): Promise<void> {

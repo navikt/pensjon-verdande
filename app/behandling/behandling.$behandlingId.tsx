@@ -64,71 +64,70 @@ function requireField(
 function operationHandlers(
   accessToken: string,
   behandlingId: string,
+  operation: Operation,
   form: FormData,
 ): { errors: Record<string, string>; handler?: () => Promise<void> } {
   const errors: Record<string, string> = {}
 
   const ansvarligTeam = requireField(form, 'ansvarligTeam')
-  if (form.get('operation') === 'oppdaterAnsvarligTeam' && ansvarligTeam.error) {
+  if (operation === OPERATION.oppdaterAnsvarligTeam && ansvarligTeam.error) {
     errors.ansvarligTeam = ansvarligTeam.error
   }
   const kontrollpunkt = requireField(form, 'kontrollpunkt')
-  if (form.get('operation') === 'sendTilManuellMedKontrollpunkt' && kontrollpunkt.error) {
+  if (operation === OPERATION.sendTilManuellMedKontrollpunkt && kontrollpunkt.error) {
     errors.kontrollpunkt = kontrollpunkt.error
   }
   const beskrivelse = form.get('begrunnelse')
   let trimmedBegrunnelse = ''
-  if (form.get('operation') === 'stopp') {
+  if (operation === OPERATION.stopp) {
     if (typeof beskrivelse !== 'string' || beskrivelse.trim().length === 0) {
-      errors.beskrivelse = 'Du må fylle ut en begrunnelse for å stoppe behandlingen.'
+      errors.begrunnelse = 'Du må fylle ut en begrunnelse for å stoppe behandlingen.'
     } else if (beskrivelse.trim().length < 10) {
-      errors.beskrivelse = 'Begrunnelsen er for kort.'
+      errors.begrunnelse = 'Begrunnelsen er for kort.'
     } else {
       trimmedBegrunnelse = beskrivelse.trim()
     }
   }
 
-  // Endret: operationHandlers returnerer errors og handler
   let handler: (() => Promise<void>) | undefined
   if (Object.keys(errors).length === 0) {
-    const op = form.get('operation')
-    switch (op) {
-      case 'fjernFraDebug':
+    switch (operation) {
+      case OPERATION.fjernFraDebug:
         handler = () => fjernFraDebug(accessToken, behandlingId)
         break
-      case 'fortsett':
+      case OPERATION.fortsett:
         handler = () => fortsettBehandling(accessToken, behandlingId, getBool(form.get('nullstillPlanlagtStartet')))
         break
-      case 'fortsettAvhengigeBehandlinger':
+      case OPERATION.fortsettAvhengigeBehandlinger:
         handler = () => fortsettAvhengigeBehandlinger(accessToken, behandlingId)
         break
-      case 'oppdaterAnsvarligTeam':
+      case OPERATION.oppdaterAnsvarligTeam:
         if (ansvarligTeam.value)
           handler = () => patchBehandling(accessToken, behandlingId, { ansvarligTeam: ansvarligTeam.value })
         break
-      case 'runBehandling':
+      case OPERATION.runBehandling:
         handler = () => runBehandling(accessToken, behandlingId)
         break
-      case 'sendTilManuellMedKontrollpunkt':
+      case OPERATION.sendTilManuellMedKontrollpunkt:
         if (kontrollpunkt.value)
           handler = () => sendTilManuellMedKontrollpunkt(accessToken, behandlingId, kontrollpunkt.value)
         break
-      case 'sendTilOppdragPaNytt':
+      case OPERATION.sendTilOppdragPaNytt:
         handler = () => sendTilOppdragPaNytt(accessToken, behandlingId)
         break
-      case 'stopp':
+      case OPERATION.stopp:
         handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)
         break
-      case 'godkjennOpprettelse':
+      case OPERATION.godkjennOpprettelse:
         handler = () => godkjennOpprettelse(accessToken, behandlingId)
         break
-      case 'bekreftStoppBehandling':
+      case OPERATION.bekreftStoppBehandling:
         handler = () => bekreftStoppBehandling(accessToken, behandlingId)
         break
-      case 'endrePlanlagtStartet':
+      case OPERATION.endrePlanlagtStartet:
         handler = () => endrePlanlagtStartet(accessToken, behandlingId, String(form.get('nyPlanlagtStartet')))
         break
-      case 'taTilDebug':
+      case OPERATION.taTilDebug:
         handler = () => taTilDebug(accessToken, behandlingId)
         break
     }
@@ -174,7 +173,7 @@ export const action = async ({ params, request }: Route.ActionArgs) => {
 
   const accessToken = await requireAccessToken(request)
 
-  const { errors, handler } = operationHandlers(accessToken, behandlingId, form)
+  const { errors, handler } = operationHandlers(accessToken, behandlingId, operation, form)
   if (Object.keys(errors).length > 0 || !handler) {
     return { errors }
   }
