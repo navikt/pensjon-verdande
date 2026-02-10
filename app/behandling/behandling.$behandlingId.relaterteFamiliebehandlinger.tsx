@@ -21,6 +21,7 @@ export default function RelaterteFamiliebehandlingerehandlinger({ loaderData }: 
 
   return (
     <Table>
+      <caption>Relaterte familiebehandlinger</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandlingid</Table.HeaderCell>
