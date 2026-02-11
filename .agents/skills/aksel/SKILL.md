@@ -79,7 +79,8 @@ For detaljert informasjon, se filene i `docs/`-mappen:
 - **Dialog/modal** → `Dialog`
 - **Tooltip** → `Tooltip`
 - **Kopiering** → `CopyButton`
-- **Lasting** → `Skeleton`
+- **Lasting (spinner)** → `Loader` (med `title`-prop for tilgjengelighet)
+- **Lasting (plassholder)** → `Skeleton`
 
 ### Typografi
 - **Overskrifter** → `Heading` (med `level` og `size`)

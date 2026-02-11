@@ -508,6 +508,29 @@ Kontekstuell varsel. Compound API.
 
 ---
 
+### Loader
+
+Spinner som indikerer lasting.
+
+```tsx
+<Loader size="xlarge" title="Laster data…" />
+<Loader size="small" title="Sender…" />
+```
+
+**Props:**
+- `size?: "3xlarge" | "2xlarge" | "xlarge" | "large" | "medium" | "small" | "xsmall"` (default: `"medium"`)
+- `title?: string` — Tilgjengelighetstekst for skjermlesere
+- `transparent?: boolean` — Gjennomsiktig bakgrunn
+
+**Retningslinjer:**
+- **Alltid** sett `title`-prop med beskrivende tekst for hva som lastes
+- Bruk `…` (Unicode ellipsis U+2026), **ikke** `...` (tre punktum) i title-teksten
+- Titelen bør være konsistent med eventuell synlig tekst i nærheten
+- For fullskjerm-lasting: bruk `size="xlarge"` eller større
+- For inline-lasting (ved knapper etc.): bruk `size="xsmall"` eller `size="small"`
+
+---
+
 ### Pagination
 
 Sidenavigering for lister.

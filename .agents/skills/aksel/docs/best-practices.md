@@ -13,6 +13,7 @@ Alle løsninger i Nav skal oppfylle WCAG 2.1 nivå AA. Aksel-komponentene er byg
 5. **Tastaturnavigasjon** — Alt interaktivt innhold skal være tilgjengelig med tastatur.
 6. **Bruk semantisk HTML** — Riktige HTML-elementer gir skjermlesere og hjelpeteknologi bedre kontekst.
 7. **Bruk mer enn bare farge** — Feil skal også markeres med tekst, grafisk markering og `aria-invalid`.
+8. **Bruk `…` (Unicode ellipsis)** — I tekst som indikerer lasting eller uferdig tilstand, bruk `…` (U+2026), **ikke** `...` (tre punktum). Eksempel: `"Laster data…"`, `"Sender…"`.
 
 ### Vanlige WCAG-krav
 
