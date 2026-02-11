@@ -16,7 +16,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   return HentRelaterteFamiliebehandlinger(accessToken, +behandlingId)
 }
 
-export default function RelaterteFamiliebehandlingerehandlinger({ loaderData }: Route.ComponentProps) {
+export default function RelaterteFamiliebehandlinger({ loaderData }: Route.ComponentProps) {
   const relaterteFamiliebehandlinger = loaderData
 
   return (
