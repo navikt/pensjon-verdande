@@ -1,45 +1,59 @@
-import { Button, Modal, Textarea, VStack } from '@navikt/ds-react'
-import { useEffect, useState } from 'react'
+import { Button, Dialog, Textarea } from '@navikt/ds-react'
+import { useEffect, useId, useState } from 'react'
 import { useFetcher } from 'react-router'
-import invariant from 'tiny-invariant'
+import { z } from 'zod'
 import { toNormalizedError } from '~/common/error'
 import { apiGet, apiPost } from '~/services/api.server'
 import type { Route } from './+types/behandling.$behandlingId.input'
 
-type LoaderData = {
-  input?: string
-  requiresBegrunnelse?: boolean
-}
+const minimumLengdeBegrunnelse = 10
+
+const formSchema = z.object({
+  begrunnelse: z
+    .string()
+    .trim()
+    .min(minimumLengdeBegrunnelse, `Begrunnelse må minimum være ${minimumLengdeBegrunnelse} tegn`),
+})
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
-  invariant(params.behandlingId, 'Missing behandlingId param')
-
   try {
-    const input: string = await apiGet(`/api/behandling/${params.behandlingId}/input`, request)
-    return { input } satisfies LoaderData
-  } catch (e) {
-    // api.server.ts kaster ofte DataWithResponseInit via `throw data(...)`
-    if (toNormalizedError(e)?.status === 422) {
-      return { requiresBegrunnelse: true } satisfies LoaderData
+    return {
+      input: await apiGet(`/api/behandling/${params.behandlingId}/input`, request),
     }
-    throw e
+  } catch (e) {
+    if (toNormalizedError(e)?.status === 422) {
+      return {
+        requiresBegrunnelse: true,
+      }
+    } else {
+      throw e
+    }
   }
 }
 
 export const action = async ({ params, request }: Route.ActionArgs) => {
-  invariant(params.behandlingId, 'Missing behandlingId param')
-  const form = await request.formData()
-  const begrunnelse = String(form.get('begrunnelse') ?? '')
+  const data = formSchema.safeParse(Object.fromEntries((await request.formData()).entries()))
 
-  const input = await apiPost<string>(`/api/behandling/${params.behandlingId}/input`, { begrunnelse }, request)
-  return { input }
+  if (!data.success) {
+    return {
+      errors: z.flattenError(data.error),
+    }
+  } else {
+    return {
+      input: await apiPost<string>(
+        `/api/behandling/${params.behandlingId}/input`,
+        { begrunnelse: data.data.begrunnelse },
+        request,
+      ),
+    }
+  }
 }
 
-export default function Input({ loaderData }: Route.ComponentProps) {
+export default function BehandlingInput({ loaderData }: Route.ComponentProps) {
   const { input, requiresBegrunnelse } = loaderData
   const fetcher = useFetcher<typeof action>()
-  const [open, setOpen] = useState(false)
-  const [begrunnelse, setBegrunnelse] = useState('')
+  const [open, setOpen] = useState(true)
+  const formId = useId()
 
   const resolvedInput = fetcher.data?.input ?? input
 
@@ -47,43 +61,33 @@ export default function Input({ loaderData }: Route.ComponentProps) {
     setOpen(Boolean(requiresBegrunnelse) && !resolvedInput)
   }, [requiresBegrunnelse, resolvedInput])
 
-  useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data?.input) {
-      setOpen(false)
-      setBegrunnelse('')
-    }
-  }, [fetcher.state, fetcher.data])
-
   return (
     <>
-      <Modal open={open} header={{ heading: 'Begrunnelse kreves' }} onClose={() => setOpen(false)}>
-        <Modal.Body>
-          <VStack gap="space-16">
-            <Textarea
-              label="Begrunnelse"
-              description="Du må oppgi en begrunnelse første gang du ser input. Legg gjerne ved lenke til Jira, Slack eller liknende."
-              name="begrunnelse"
-              value={begrunnelse}
-              onChange={(e) => setBegrunnelse(e.target.value)}
-            />
-          </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <fetcher.Form method="post">
-            <input type="hidden" name="begrunnelse" value={begrunnelse} />
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={begrunnelse.trim().length === 0 || fetcher.state !== 'idle'}
-            >
+      <Dialog open={open} onOpenChange={(nextOpen) => setOpen(nextOpen)}>
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>Begrunnelse kreves</Dialog.Title>
+            <Dialog.Description>
+              Du må oppgi en begrunnelse første gang du ser input. Legg gjerne ved lenke til Jira, Slack eller liknende.
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Body>
+            <fetcher.Form id={formId} method="post">
+              <Textarea label="Begrunnelse" name="begrunnelse" error={fetcher.data?.errors?.fieldErrors?.begrunnelse} />
+            </fetcher.Form>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Dialog.CloseTrigger>
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            </Dialog.CloseTrigger>
+            <Button type="submit" form={formId} variant="primary" loading={fetcher.state === 'submitting'}>
               Hent input
             </Button>
-          </fetcher.Form>
-          <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
 
       {resolvedInput ? <pre>{JSON.stringify(resolvedInput, null, 2)}</pre> : null}
     </>
