@@ -487,6 +487,8 @@ export default function BehandlingCard(props: Props) {
         return 'ManedligAvstemming'
       case 'E500FilleveringBatchBehandling':
         return 'E500Fillevering'
+      case 'LeveattestGrunnlagBehandling':
+        return 'LeveattestGrunnlag'
       default:
         return type
     }

@@ -75,6 +75,7 @@ const BEHANDLINGSTYPER = [
   'KontrollerOppgaver',
   'PersonAjourhold',
   'E500Fillevering',
+  'LeveattestGrunnlag',
 ]
 
 export function meta(): Route.MetaDescriptors {
