@@ -31,7 +31,6 @@ export default function BehandlingManuellOpptelling({ loaderData }: Route.Compon
 
   return (
     <Table>
-      <caption>Manuell opptelling per behandlingstype</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandlingstype</Table.HeaderCell>

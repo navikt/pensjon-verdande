@@ -21,7 +21,6 @@ export default function RelaterteFamiliebehandlinger({ loaderData }: Route.Compo
 
   return (
     <Table>
-      <caption>Relaterte familiebehandlinger</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandlingid</Table.HeaderCell>
