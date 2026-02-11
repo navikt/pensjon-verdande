@@ -61,6 +61,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const navigation = useNavigation()
 
   const [kjøreår, setKjøreår] = useState<number | ''>('')
+  const [eps2gChecked, setEps2gChecked] = useState(false)
   const muligeÅr = Array.from({ length: 5 }, (_, i) => detteÅret - i)
 
   const isSubmitting = navigation.state === 'submitting'
@@ -91,12 +92,19 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
           </Select>
 
           <CheckboxGroup legend="Behandlingsparametere" style={{ padding: 0 }}>
-            <Checkbox name={FELTER.eps2g} value={checkboxTrueValue}>
+            <Checkbox
+              name={FELTER.eps2g}
+              value={checkboxTrueValue}
+              checked={eps2gChecked}
+              onChange={(e) => setEps2gChecked(e.target.checked)}
+            >
               Inntektskontroll for ektefelle/samboer (2G)
             </Checkbox>
-            <Checkbox name={FELTER.opprettOppgave} value={checkboxTrueValue}>
-              Opprett oppgave for Eps2G
-            </Checkbox>
+            {eps2gChecked && (
+              <Checkbox name={FELTER.opprettOppgave} value={checkboxTrueValue}>
+                Opprett oppgave for Eps2G
+              </Checkbox>
+            )}
             <Checkbox name={FELTER.gjenlevende} value={checkboxTrueValue}>
               Inntektskontroll for gjenlevende
             </Checkbox>
