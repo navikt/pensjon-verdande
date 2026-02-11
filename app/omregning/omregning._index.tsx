@@ -115,6 +115,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
   const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
+  const [regelendring2026, setRegelendring2026] = useState(false)
 
   const [hasError, setHasError] = useState(false)
   const fetcher = useFetcher()
@@ -428,6 +429,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         onChange={setSkalDistribuereUforevedtak}
                       >
                         Skal distribuere uførevedtak
+                      </OmregningCheckbox>
+                      <OmregningCheckbox
+                        defaultChecked={regelendring2026}
+                        name={'Regelendringer UT 2026'}
+                        value={regelendring2026}
+                        onChange={setRegelendring2026}
+                      >
+                        Regelendringer UT 2026
                       </OmregningCheckbox>
                     </CheckboxGroup>
                   </VStack>
