@@ -77,7 +77,6 @@ export default function HentOpplysningerFraSkatt({ actionData }: Route.Component
             aria-label="maxSekvensnummer"
             name="maksAntallSekvensnummer"
             type="number"
-            placeholder="maxSekvensnummer"
           />
 
           <TextField
@@ -86,7 +85,6 @@ export default function HentOpplysningerFraSkatt({ actionData }: Route.Component
             aria-label="sekvensnummerPerBehandling"
             name="sekvensnummerPerBehandling"
             type="number"
-            placeholder="sekvensnummerPerBehandling"
           />
 
           <Select

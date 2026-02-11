@@ -67,7 +67,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
             name="behandlingsAr"
             size="medium"
             type="number"
-            placeholder="År"
           />
 
           <Button loading={isSubmitting} size="medium" type="submit">

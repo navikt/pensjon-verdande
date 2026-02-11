@@ -881,7 +881,6 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
             >
               <DatePicker.Input
                 label="Ny planlagt startdato"
-                placeholder="dd.mm.åååå"
                 value={inputValue}
                 error={inputError}
                 onChange={(e) => handleInputChange(e.target.value)}

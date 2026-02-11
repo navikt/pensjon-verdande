@@ -78,7 +78,6 @@ export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
             label="Brevmal kode for Sak:"
             name="brevmal"
             type="text"
-            placeholder="Brevmal"
             onChange={(e) => {
               const v = e.currentTarget.value
               setBrevmal(v === '' ? '' : v)
