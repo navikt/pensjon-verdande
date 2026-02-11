@@ -19,7 +19,6 @@ import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 import { Form, useFetcher } from 'react-router'
 import { apiGet } from '~/services/api.server'
-import { requireAccessToken } from '~/services/auth.server'
 import { oppdaterInfoBanner } from '~/vedlikehold/vedlikehold.server'
 import type { Infobanner, InfobannerVariant, OppdaterInfoBannerResponse } from '~/vedlikehold/vedlikehold.types'
 import type { Route } from './+types/infobanner'
@@ -33,9 +32,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
   const infoBanner = (await request.json()) as Infobanner
-  return await oppdaterInfoBanner(infoBanner, accessToken)
+  return await oppdaterInfoBanner(infoBanner, request)
 }
 
 export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {

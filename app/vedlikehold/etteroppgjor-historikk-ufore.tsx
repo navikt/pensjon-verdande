@@ -1,6 +1,5 @@
 import { Alert, Button, Heading, TextField, VStack } from '@navikt/ds-react'
 import { Form, useNavigation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
 import { ugyldiggjorEtteroppgjorHistorikkUfore } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/etteroppgjor-historikk-ufore'
 
@@ -9,7 +8,6 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const sakId = Number(formData.get('sakId'))
   const etteroppgjortAr = Number(formData.get('etteroppgjortAr'))
@@ -21,7 +19,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     }
   }
 
-  const response = await ugyldiggjorEtteroppgjorHistorikkUfore(accessToken, sakId, etteroppgjortAr)
+  const response = await ugyldiggjorEtteroppgjorHistorikkUfore(request, sakId, etteroppgjortAr)
 
   return {
     ...response,

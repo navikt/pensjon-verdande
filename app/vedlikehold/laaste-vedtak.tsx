@@ -33,7 +33,6 @@ import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import { useSort } from '~/hooks/useSort'
-import { requireAccessToken } from '~/services/auth.server'
 import type { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import {
   type LaasteVedtakBehandlingSummary,
@@ -54,8 +53,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const team = searchParams.get('team')
   const aksjonspunkt = searchParams.get('aksjonspunkt')
 
-  const accessToken = await requireAccessToken(request)
-  const laasteVedtakSummary = await getLaasteVedtakSummary(accessToken, team, aksjonspunkt)
+  const laasteVedtakSummary = await getLaasteVedtakSummary(request, team, aksjonspunkt)
   if (!laasteVedtakSummary) {
     throw new Response('Not Found', { status: 404 })
   }

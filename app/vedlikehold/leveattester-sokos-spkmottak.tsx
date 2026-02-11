@@ -2,7 +2,6 @@ import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-re
 import { useState } from 'react'
 import { Form } from 'react-router'
 import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
 import { hentMot } from '~/vedlikehold/vedlikehold.server'
 import type { Route } from './+types/leveattester-sokos-spkmottak'
 
@@ -67,7 +66,6 @@ export default function SokosSPKMottakPage({ actionData }: Route.ComponentProps)
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
-  const accessToken = await requireAccessToken(request)
 
   const fomYear = formData.get('fomYear')
   const fomMonth = formData.get('fomMonth')
@@ -75,5 +73,5 @@ export const action = async ({ request }: Route.ActionArgs) => {
   invariant(typeof fomYear === 'string' && fomYear.length > 0, "Parameteret 'fomYear' mangler")
   invariant(typeof fomMonth === 'string' && fomMonth.length > 0, "Parameteret 'fomMonth' mangler")
 
-  return await hentMot(accessToken, fomYear, fomMonth)
+  return await hentMot(request, fomYear, fomMonth)
 }
