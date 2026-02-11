@@ -34,6 +34,7 @@ export default function ManuelleBehandlinger({ loaderData }: Route.ComponentProp
 
   return (
     <Table>
+      <caption>Manuelle oppgaver</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Aktivitet</Table.HeaderCell>

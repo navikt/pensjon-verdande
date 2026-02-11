@@ -24,6 +24,7 @@ export function AuditTable({
         onSortChange(sortKey as AuditSortState['orderBy'])
       }}
     >
+      <caption>Auditlogg</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell />
