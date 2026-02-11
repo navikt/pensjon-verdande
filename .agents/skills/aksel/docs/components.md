@@ -172,23 +172,125 @@ Midlertidig vindu (modal/drawer).
 **Egnet til:** Fokusere brukeren på en oppgave, viktig informasjon.
 **Uegnet til:** Langvarig interaksjon.
 
+**Sub-komponenter:** `Dialog.Trigger`, `Dialog.Popup`, `Dialog.Header`, `Dialog.Title`, `Dialog.Description`, `Dialog.Body`, `Dialog.Footer`, `Dialog.CloseTrigger`
+
+> **VIKTIG:** Det heter `Dialog.CloseTrigger`, IKKE `Dialog.Close`.
+
+#### Grunnleggende eksempel
+
 ```tsx
 <Dialog>
   <Dialog.Trigger>
-    <Button>Åpne dialog</Button>
+    <Button>Bekreft handling</Button>
   </Dialog.Trigger>
   <Dialog.Popup>
-    <Dialog.Title>Bekreft handling</Dialog.Title>
-    <Dialog.Description>Er du sikker?</Dialog.Description>
+    <Dialog.Header>
+      <Dialog.Title>Bekreft handling</Dialog.Title>
+      <Dialog.Description>Er du sikker?</Dialog.Description>
+    </Dialog.Header>
+    <Dialog.Body>
+      <BodyLong>Innhold som forklarer konsekvensen av handlingen.</BodyLong>
+    </Dialog.Body>
     <Dialog.Footer>
-      <Button>Bekreft</Button>
-      <Dialog.Close>
+      <Dialog.CloseTrigger>
         <Button variant="secondary">Avbryt</Button>
-      </Dialog.Close>
+      </Dialog.CloseTrigger>
+      <Button>Bekreft</Button>
     </Dialog.Footer>
   </Dialog.Popup>
 </Dialog>
 ```
+
+#### Dialog med skjema (form)
+
+Når Dialog inneholder et skjema, plasser `<form>` i `Dialog.Body` med en `id`,
+og bruk `form`-attributtet på submit-knappen i `Dialog.Footer`.
+Dette er nødvendig fordi `Dialog.Body` og `Dialog.Footer` er separate DOM-elementer.
+
+```tsx
+<Dialog open={open} onOpenChange={setOpen}>
+  <Dialog.Popup>
+    <Dialog.Header>
+      <Dialog.Title>Kontaktskjema</Dialog.Title>
+      <Dialog.Description>Fyll ut skjemaet for å kontakte oss.</Dialog.Description>
+    </Dialog.Header>
+    <Dialog.Body>
+      <form id="contact-form" onSubmit={handleSubmit}>
+        <VStack gap="space-8">
+          <TextField label="Navn" name="name" />
+          <TextField label="E-post" name="email" type="email" />
+        </VStack>
+      </form>
+    </Dialog.Body>
+    <Dialog.Footer>
+      <Dialog.CloseTrigger>
+        <Button type="button" variant="secondary">Avbryt</Button>
+      </Dialog.CloseTrigger>
+      <Button type="submit" form="contact-form">Send inn</Button>
+    </Dialog.Footer>
+  </Dialog.Popup>
+</Dialog>
+```
+
+Med React Router `fetcher.Form` / `Form`:
+
+```tsx
+<Dialog.Body>
+  <fetcher.Form id={formId} method="post">
+    <Textarea label="Begrunnelse" name="begrunnelse" error={fetcher.data?.errors?.fieldErrors?.begrunnelse} />
+  </fetcher.Form>
+</Dialog.Body>
+<Dialog.Footer>
+  <Dialog.CloseTrigger>
+    <Button type="button" variant="secondary">Avbryt</Button>
+  </Dialog.CloseTrigger>
+  <Button type="submit" form={formId} variant="primary" loading={fetcher.state === 'submitting'}>
+    Send inn
+  </Button>
+</Dialog.Footer>
+```
+
+> **Tips:** Når `<form>`/`fetcher.Form` er i `Dialog.Body`, trenger du IKKE `useState` for skjemafelt.
+> `name`-attributtet på feltene sender verdien automatisk via `FormData`.
+> Bruk `useId()` fra React for å generere unik form-id.
+
+#### Påkrevd compound-struktur
+
+Dialog **krever** følgende nesting-struktur. Aldri legg innhold direkte i `Dialog.Popup`:
+
+```
+Dialog.Popup
+├── Dialog.Header          ← PÅKREVD wrapper for Title/Description
+│   ├── Dialog.Title       ← gir automatisk aria-labelledby
+│   └── Dialog.Description ← valgfri
+├── Dialog.Body            ← PÅKREVD wrapper for innhold
+│   └── (innhold/skjema)
+└── Dialog.Footer          ← valgfri, for knapper
+    ├── Dialog.CloseTrigger ← wrapper for lukkeknapp
+    │   └── <Button>
+    └── <Button>           ← andre handlingsknapper
+```
+
+**FEIL** — aldri gjør dette:
+```tsx
+// ❌ Title/Description direkte i Popup (mangler Header)
+<Dialog.Popup>
+  <Dialog.Title>Tittel</Dialog.Title>
+  <Textarea ... />        {/* ← mangler Dialog.Body */}
+  <Dialog.Footer>...</Dialog.Footer>
+</Dialog.Popup>
+```
+
+#### Migrering fra Modal → Dialog
+
+| Modal (gammel) | Dialog (ny) |
+|---|---|
+| `<Modal open={open} onClose={fn}>` | `<Dialog open={open} onOpenChange={fn}>` |
+| `header={{ heading: 'Tittel' }}` | `<Dialog.Header><Dialog.Title>Tittel</Dialog.Title></Dialog.Header>` |
+| `<Modal.Body>` | `<Dialog.Body>` |
+| `<Modal.Footer>` | `<Dialog.Footer>` |
+| `onClick={() => setOpen(false)}` (avbryt-knapp) | `<Dialog.CloseTrigger><Button>Avbryt</Button></Dialog.CloseTrigger>` |
+| `ref.current?.showModal()` | `setOpen(true)` (kontrollert) eller `<Dialog.Trigger>` |
 
 **Props (Dialog):**
 - `open?: boolean`
@@ -201,13 +303,18 @@ Midlertidig vindu (modal/drawer).
 - `modal?: true | "trap-focus"` (default: `true`)
 - `position?: "center" | "bottom" | "left" | "right" | "fullscreen"` (default: `"center"`)
 - `width?: "small" | "medium" | "large" | string` (default: `"medium"`)
+- `height?: "small" | "medium" | "large" | string`
 - `closeOnOutsideClick?: boolean` (default: `true`)
+- `withClosebutton?: boolean` (default: `true`)
 - `role?: "dialog" | "alertdialog"` (default: `"dialog"`)
+- `initialFocusTo?: RefObject | () => HTMLElement` — Override initial focus
+- `returnFocusTo?: RefObject | () => HTMLElement` — Override return focus
 
 **Retningslinjer:**
-- Alltid en synlig lukke-metode
+- Alltid en synlig lukke-metode (closebutton i header eller CloseTrigger i footer)
 - `trap-focus` kun i ekspertsystemer (drawer-konfigurasjon)
 - Bruk `Dialog.Title` for automatisk `aria-labelledby`
+- Uten `Dialog.Title`: legg til `aria-label` eller `aria-labelledby` på `Dialog.Popup`
 - For testing: sett `AKSEL_NO_EXIT_ANIMATIONS=true` i testmiljø
 
 ---
@@ -296,13 +403,24 @@ Oppsummering av utfylte skjemadata.
 
 ### GlobalAlert
 
-Systemmelding som vises øverst på hele siden.
+Systemmelding som vises øverst på hele siden. Compound API.
 
 ```tsx
-<GlobalAlert variant="warning">
-  Vi opplever tekniske problemer. Prøv igjen senere.
+<GlobalAlert status="warning" centered>
+  <GlobalAlert.Header>
+    <GlobalAlert.Title>Tekniske problemer</GlobalAlert.Title>
+  </GlobalAlert.Header>
+  <GlobalAlert.Content>
+    Vi opplever tekniske problemer. Prøv igjen senere.
+  </GlobalAlert.Content>
 </GlobalAlert>
 ```
+
+**Props:**
+- `status: "info" | "warning" | "success" | "error" | "announcement"` — Påkrevd
+- `centered?: boolean` — Sentrerer innhold
+
+> **VIKTIG:** Bruker `status`-prop, IKKE `variant`.
 
 ---
 
@@ -349,22 +467,44 @@ Informasjonskort.
 Liten inline-statusmelding.
 
 ```tsx
-<InlineMessage variant="info">Dette er en informasjonsmelding.</InlineMessage>
+<InlineMessage status="info">Dette er en informasjonsmelding.</InlineMessage>
 ```
+
+**Props:**
+- `status: "info" | "warning" | "success" | "error"` — Påkrevd
+- `size?: "medium" | "small"` (default: `"medium"`)
+
+> **VIKTIG:** Bruker `status`-prop, IKKE `variant`.
 
 ---
 
 ### LocalAlert
 
-Kontekstuell varsel.
+Kontekstuell varsel. Compound API.
 
 ```tsx
-<LocalAlert variant="warning">
-  Søknadsfristen er snart ute.
+<LocalAlert status="warning">
+  <LocalAlert.Header>
+    <LocalAlert.Title>Frist</LocalAlert.Title>
+  </LocalAlert.Header>
+  <LocalAlert.Content>
+    Søknadsfristen er snart ute.
+  </LocalAlert.Content>
 </LocalAlert>
 ```
 
-**Varianter for Alert/InlineMessage/InfoCard/LocalAlert/GlobalAlert:** `info`, `warning`, `success`, `danger`
+**Props:**
+- `status: "info" | "warning" | "success" | "error" | "announcement"` — Påkrevd
+
+> **VIKTIG:** Bruker `status`-prop, IKKE `variant`.
+>
+> **Migrering fra Alert:**
+> | Alert (gammel) | LocalAlert/InlineMessage (ny) |
+> |---|---|
+> | `variant="info"` | `status="info"` |
+> | `variant="warning"` | `status="warning"` |
+> | `variant="success"` | `status="success"` |
+> | `variant="error"` | `status="error"` (IKKE `"danger"`) |
 
 ---
 
