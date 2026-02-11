@@ -66,8 +66,8 @@
 #venstreMeny .mainmenu li.open .submenu {
   display: block;
   max-height: 1000px;
-  border-top: solid 1px rgb(50, 50, 50);
-  border-bottom: solid 1px rgb(50, 50, 50);
+  border-top: solid 1px var(--ax-border-neutral-strong);
+  border-bottom: solid 1px var(--ax-border-neutral-strong);
 }
 
 #venstreMeny .submenu a.active {
