@@ -1,4 +1,4 @@
-import { Link, Table } from '@navikt/ds-react'
+import { BodyShort, Link, Table } from '@navikt/ds-react'
 import { NavLink } from 'react-router'
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
@@ -21,7 +21,9 @@ export default function RelaterteFamiliebehandlinger({ loaderData }: Route.Compo
 
   return (
     <Table>
-      <caption>Relaterte familiebehandlinger</caption>
+      <BodyShort as="caption" visuallyHidden>
+        Relaterte familiebehandlinger
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandlingid</Table.HeaderCell>
