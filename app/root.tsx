@@ -1,3 +1,5 @@
+import { Provider } from '@navikt/ds-react'
+import { nb } from '@navikt/ds-react/locales'
 import {
   isRouteErrorResponse,
   Links,
@@ -40,7 +42,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <div style={{ width: '100%' }}>{children}</div>
+        <Provider locale={nb}>
+          <div style={{ width: '100%' }}>{children}</div>
+        </Provider>
         <ScrollRestoration />
         <Scripts />
       </body>
