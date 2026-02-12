@@ -73,9 +73,46 @@ Repoet bruker Lefthook (`lefthook.yml`). Hvis hooks feiler: kjør samme kommando
 - Unngå å sende sensitiv info i URL (query params). Bruk POST body ved behov.
 
 ## React Router patterns
-- For routes som trenger både lesing og handling:
-  - `loader` henter data
-  - `action` håndterer POST/sideeffekter
+
+### Typegen (auto-genererte typer)
+Kodebasen bruker React Router typegen for typesikre route-moduler. Bruk alltid typegen-typene:
+
+```tsx
+// ✅ Riktig — bruk Route-typer fra +types
+import type { Route } from './+types/min-route'
+
+export const loader = async ({ request }: Route.LoaderArgs) => { ... }
+export const action = async ({ request }: Route.ActionArgs) => { ... }
+
+export default function MinSide({ loaderData, actionData }: Route.ComponentProps) { ... }
+
+export function meta({ loaderData }: Route.MetaArgs): Route.MetaDescriptors {
+  return [{ title: 'Sidenavn | Verdande' }]
+}
+```
+
+```tsx
+// ❌ Feil — IKKE bruk generiske typer eller hooks
+import type { LoaderFunctionArgs } from 'react-router'
+const data = useLoaderData<typeof loader>()  // Ikke bruk dette
+```
+
+### root.tsx og Layout
+- `root.tsx` har en `Layout`-export som wrapper hele HTML-dokumentet (inkl. `<head>`, `<Scripts>`, etc.)
+- `Layout` bruker `useRouteLoaderData('root')` (returnerer `undefined` når loader feiler — trygt for ErrorBoundary)
+- `ErrorBoundary` i root.tsx rendres automatisk innenfor `Layout`
+
+### Sidetitler (meta)
+- Alle routes har `meta()`-eksport med format `'Sidenavn | Verdande'`
+- Bruk `Route.MetaArgs` for typesikker tilgang til `loaderData` i meta
+
+### Loading-indikator
+- `layout.tsx` har en global loading-bar som vises ved navigasjon (`useNavigation()`)
+- Ikke legg til egne loading-indikatorer for sidenavigasjon — den globale dekker dette
+
+### Loaders og actions
+- `loader` henter data server-side
+- `action` håndterer POST/sideeffekter
 - Foretrekk vanlig form submit (`<Form method="post">`) når submit skal navigere/refresh'e data naturlig.
 - Bruk `useFetcher()` når du eksplisitt ønsker submit uten navigasjon (f.eks. inline-knapper, modaler, autosave).
 - For on-demand data i UI (f.eks. når en modal åpnes):

@@ -9,8 +9,8 @@ type Props = {
 
 export function BehandlingAntallTableCard(props: Props) {
   return (
-    <Box.New background={'raised'} borderRadius="medium" shadow="dialog" style={{ padding: '6px' }}>
-      <Box.New>
+    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
+      <Box>
         <div style={{ float: 'left', textAlign: 'center' }}>
           <NumberListIcon
             title="a11y-title"
@@ -19,8 +19,8 @@ export function BehandlingAntallTableCard(props: Props) {
           />
           Antall etter type
         </div>
-      </Box.New>
+      </Box>
       <BehandlingAntallTable oppsummering={props.behandlingAntall} />
-    </Box.New>
+    </Box>
   )
 }

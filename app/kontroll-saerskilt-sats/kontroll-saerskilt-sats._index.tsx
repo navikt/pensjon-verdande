@@ -2,16 +2,20 @@ import { Alert, Button, Heading, HStack, Modal, Select, TextField, VStack } from
 import { endOfMonth, format, parse, startOfDay, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useRef, useState } from 'react'
-import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
-import { Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { opprettKontrollereSaerskiltSatsBehandling } from '~/kontroll-saerskilt-sats/kontroll-saerskilt-sats.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/kontroll-saerskilt-sats._index'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Kontroll særskilt sats | Verdande' }]
+}
+
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
@@ -28,7 +32,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(`/behandling/${response?.behandlingId}`)
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const { searchParams } = new URL(request.url)
 
@@ -51,8 +55,8 @@ const genererManedsalternativer = () => {
   })
 }
 
-export default function OpprettKontrollSaerskiltSatsRoute() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const modalRef = useRef<HTMLDialogElement>(null)
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
@@ -84,9 +88,8 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
       <Heading level="1" size="large">
         Kontrollere særskilt sats
       </Heading>
-
       <Form id="skjema" method="post">
-        <VStack gap="4">
+        <VStack gap="space-16">
           <div
             style={{
               display: 'grid',
@@ -152,14 +155,13 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
             Kjøremåned må velges før behandlingen opprettes.
           </Alert>
 
-          <HStack gap="4">
+          <HStack gap="space-16">
             <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
               Opprett kontroll
             </Button>
           </HStack>
         </VStack>
       </Form>
-
       {/* Sikrer at knappen ikke flytter seg */}
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
@@ -172,10 +174,9 @@ export default function OpprettKontrollSaerskiltSatsRoute() {
           behandlingerResponse={behandlinger}
         />
       </div>
-
       <Modal ref={modalRef} header={{ heading: 'Start kontroll: særskilt sats' }} size="small">
         <Modal.Body>
-          <VStack gap="4">
+          <VStack gap="space-16">
             <div>
               <b>Kjøremåned:</b> {kjoereMaanedYearMonth ? formatYearMonth(selectedKjoereMaaned) : '-'}
             </div>

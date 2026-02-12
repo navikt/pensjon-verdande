@@ -1,23 +1,20 @@
 import { BodyLong, Box, Button, Heading, Select, Skeleton, TextField, VStack } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import {
-  type ActionFunctionArgs,
-  Await,
-  Form,
-  type LoaderFunctionArgs,
-  redirect,
-  useLoaderData,
-  useNavigation,
-} from 'react-router'
+import { Await, Form, redirect, useNavigation } from 'react-router'
 import { opprettAdhocBrevBehandling } from '~/adhocbrev/adhoc-brev.server'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/adhoc-brev'
 
 const behandlingType = 'AdhocBrevBestillingBatchBehandling'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Adhoc-brev | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -36,7 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
@@ -50,8 +47,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function AdhocBrev() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
@@ -59,12 +56,12 @@ export default function AdhocBrev() {
   const [eksluderAvdod, setEksluderAvdod] = useState<string>('')
 
   return (
-    <VStack gap={'4'}>
-      <Box.New className={'aksel-pageblock--lg'}>
+    <VStack gap={'space-16'}>
+      <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett ad-hoc brevbestilling
         </Heading>
-        <VStack gap="2">
+        <VStack gap="space-8">
           <BodyLong>
             Oppretter brevbestillinger med oppgitt brevmal for verdiene angitt i tabellen{' '}
             <code>PEN.T_ADHOC_BREVBESTILLING</code>.
@@ -74,15 +71,13 @@ export default function AdhocBrev() {
             <i>{decodeBehandling(behandlingType)} behandlingen</i> er gjennomført
           </BodyLong>
         </VStack>
-      </Box.New>
-
+      </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <TextField
             label="Brevmal kode for Sak:"
             name="brevmal"
             type="text"
-            placeholder="Brevmal"
             onChange={(e) => {
               const v = e.currentTarget.value
               setBrevmal(v === '' ? '' : v)
@@ -106,11 +101,9 @@ export default function AdhocBrev() {
           </Button>
         </VStack>
       </Form>
-
       <Heading level="2" size="medium" style={{ marginTop: '2em' }}>
         Eksisterende ad-hoc brevbestillinger
       </Heading>
-
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
         <Await resolve={behandlinger}>
           {(it) => (

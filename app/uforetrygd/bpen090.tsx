@@ -1,7 +1,8 @@
 import { BodyShort, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
+import type { Route } from './+types/bpen090'
 
 type ActionErrors = {
   kjoremaaned?: string
@@ -12,6 +13,10 @@ const toYyyyMM = (d = new Date()) => {
   const y = d.getFullYear()
   const m = d.getMonth() + 1
   return y * 100 + m
+}
+
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'BPEN090 | Verdande' }]
 }
 
 export const loader = async () => {
@@ -29,7 +34,7 @@ const isBetweenAprilAndOctober = (n: number) => {
   return mm >= 4 && mm <= 10
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
 
   const kjoremaanedStr = String(formData.get('kjoremaaned') ?? '')
@@ -67,27 +72,26 @@ enum OppdragsPrioritet {
   Batch = 2,
 }
 
-export default function LopendeInntektsavkorting() {
-  const { kjoremaaned } = useLoaderData<typeof loader>()
+export default function LopendeInntektsavkorting({ loaderData, actionData }: Route.ComponentProps) {
+  const { kjoremaaned } = loaderData
   const navigation = useNavigation()
-  const errors = useActionData() as ActionErrors | undefined
+  const errors = actionData as ActionErrors | undefined
 
   const isSubmitting = navigation.state === 'submitting'
 
   return (
-    <VStack gap="4">
+    <VStack gap="space-16">
       <Heading size="small" level="1">
         Løpende inntektsavkorting (tidligere BPEN090)
       </Heading>
       <BodyShort>Batchkjøring for løpende inntektsavkorting av uføretrygd.</BodyShort>
-
       <Form method="post" style={{ width: '30em' }}>
-        <VStack gap="8">
+        <VStack gap="space-32">
           <TextField
             label="Kjøremåned (yyyyMM)"
             size="small"
             description={
-              <VStack gap={'2'}>
+              <VStack gap={'space-8'}>
                 <BodyShort>
                   Måneden du starter kjøringen. Inntekter hentes til og med måneden <em>før</em> kjøremåned, mens
                   virkningsdato settes til den første i måneden <em>etter</em> kjøremåned.
@@ -98,7 +102,6 @@ export default function LopendeInntektsavkorting() {
             name="kjoremaaned"
             type="number"
             inputMode="numeric"
-            placeholder="yyyyMM"
             defaultValue={kjoremaaned}
             error={errors?.kjoremaaned}
           />
@@ -134,7 +137,7 @@ export default function LopendeInntektsavkorting() {
             label="Oppdragskø"
             size="small"
             description={
-              <VStack gap={'2'}>
+              <VStack gap={'space-8'}>
                 <BodyShort>Angir hvilken kø som skal benyttes mot Oppdrag.</BodyShort>
                 <BodyShort>
                   <strong>Batch:</strong> Sender oppdragsmeldinger til Oppdrags batch-kø (HPEN). Behandles av

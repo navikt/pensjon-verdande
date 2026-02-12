@@ -1,6 +1,6 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
 import {
   ekskluderSakerFraArligOmregning,
@@ -13,8 +13,13 @@ import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
 import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
 import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/opptjening.arlig.omregning'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Årlig opptjening | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)
 
@@ -40,7 +45,7 @@ enum Action {
   oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const fromEntries = Object.fromEntries(formData)
   const accessToken = await requireAccessToken(request)
@@ -92,9 +97,9 @@ function konverterTilListe(ekskluderteSakIderText: string): string[] {
     .filter((id) => id !== '')
 }
 
-export default function EndretOpptjeningArligUttrekk() {
-  const data = useActionData<typeof action>()
-  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = useLoaderData<typeof loader>()
+export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }: Route.ComponentProps) {
+  const data = actionData
+  const { ekskluderteSaker, innevaerendeAar, aarListe, defaultOpptjeningsaar } = loaderData
   const navigation = useNavigation()
 
   const [selectedOpptjeningsaar, setSelectedOpptjeningsaar] = useState(defaultOpptjeningsaar)
@@ -107,7 +112,7 @@ export default function EndretOpptjeningArligUttrekk() {
 
   return (
     <Page>
-      <VStack gap="8">
+      <VStack gap="space-32">
         <Heading size={'medium'}>Årlig omregning av ytelse ved oppdaterte opptjeningsopplysninger</Heading>
         <Form method="post">
           <Button type="submit" name="action" value={Action.kjoerUttrekk} disabled={isSubmitting}>
@@ -117,7 +122,7 @@ export default function EndretOpptjeningArligUttrekk() {
 
         <Heading size="medium">Oppdater siste gyldige opptjeningsår</Heading>
         <Form method="post">
-          <HStack gap="4" align="end">
+          <HStack gap="space-16" align="end">
             <Select
               name="oppdaterOpptjeningsaar" // <- dette må matche action
               label="Velg opptjeningsår"
@@ -147,7 +152,7 @@ export default function EndretOpptjeningArligUttrekk() {
 
         <Heading size="medium">Oppdater siste omsorg godskrivingsår</Heading>
         <Form method="post">
-          <HStack gap="4" align="end">
+          <HStack gap="space-16" align="end">
             <Select
               name="oppdaterOmsorgGodskrivingsaar" // <- dette må matche action
               label="Velg omsorg godskrivingsår"
@@ -178,8 +183,8 @@ export default function EndretOpptjeningArligUttrekk() {
         <Heading size="medium">Kjør årlig omregningsendring</Heading>
 
         <Form method="post">
-          <VStack gap="4">
-            <HStack gap="4">
+          <VStack gap="space-16">
+            <HStack gap="space-16">
               <Select
                 name="opptjeningsar"
                 label="Velg opptjeningsår"
@@ -215,7 +220,7 @@ export default function EndretOpptjeningArligUttrekk() {
           <p>Ingen saker er ekskludert fra årlig omregning.</p>
         )}
         <Form method="post">
-          <VStack gap="4">
+          <VStack gap="space-16">
             <Textarea
               label={'Saker som skal ekskluderes'}
               onChange={(e) => setEkskluderteSakIderText(e.target.value)}
@@ -228,7 +233,7 @@ export default function EndretOpptjeningArligUttrekk() {
               value={kommentar}
               name="kommentar"
             />
-            <HStack gap="4">
+            <HStack gap="space-16">
               <Button type="submit" name="action" value={Action.ekskluderSaker} disabled={isSubmitting}>
                 Ekskluder saker fra årlig omregning
               </Button>

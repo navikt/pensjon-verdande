@@ -1,10 +1,15 @@
 import { Button, Checkbox, CheckboxGroup, Heading, Select, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, redirect, useLoaderData, useNavigation } from 'react-router'
+import { Form, redirect, useNavigation } from 'react-router'
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
 import { opprettBpen014 } from '~/inntektskontroll/batch.bpen014.server'
 import { requireAccessToken } from '~/services/auth.server'
+import type { Route } from './+types/batch.inntektskontroll._index'
+
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Inntektskontroll | Verdande' }]
+}
 
 export const FELTER = {
   aar: 'aar',
@@ -22,7 +27,7 @@ export const loader = async () => {
     detteÅret,
   }
 }
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const fd = await request.formData()
   const accessToken = await requireAccessToken(request)
 
@@ -51,11 +56,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function BatchOpprett_index() {
-  const { detteÅret } = useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { detteÅret } = loaderData
   const navigation = useNavigation()
 
   const [kjøreår, setKjøreår] = useState<number | ''>('')
+  const [eps2gChecked, setEps2gChecked] = useState(false)
   const muligeÅr = Array.from({ length: 5 }, (_, i) => detteÅret - i)
 
   const isSubmitting = navigation.state === 'submitting'
@@ -63,9 +69,8 @@ export default function BatchOpprett_index() {
   return (
     <div>
       <Heading size="medium">Start inntektskontroll</Heading>
-
       <Form method="post" style={{ maxWidth: '25em' }}>
-        <VStack gap="4">
+        <VStack gap="space-16">
           <Select
             name={FELTER.aar}
             label="Velg år"
@@ -87,12 +92,19 @@ export default function BatchOpprett_index() {
           </Select>
 
           <CheckboxGroup legend="Behandlingsparametere" style={{ padding: 0 }}>
-            <Checkbox name={FELTER.eps2g} value={checkboxTrueValue}>
+            <Checkbox
+              name={FELTER.eps2g}
+              value={checkboxTrueValue}
+              checked={eps2gChecked}
+              onChange={(e) => setEps2gChecked(e.target.checked)}
+            >
               Inntektskontroll for ektefelle/samboer (2G)
             </Checkbox>
-            <Checkbox name={FELTER.opprettOppgave} value={checkboxTrueValue}>
-              Opprett oppgave for Eps2G
-            </Checkbox>
+            {eps2gChecked && (
+              <Checkbox name={FELTER.opprettOppgave} value={checkboxTrueValue}>
+                Opprett oppgave for Eps2G
+              </Checkbox>
+            )}
             <Checkbox name={FELTER.gjenlevende} value={checkboxTrueValue}>
               Inntektskontroll for gjenlevende
             </Checkbox>

@@ -1,24 +1,24 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
-import { Form, useActionData } from 'react-router'
+import { Form } from 'react-router'
 import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
 import { hentMot } from '~/vedlikehold/vedlikehold.server'
-import type { ActionData } from '~/vedlikehold/vedlikehold.types'
+import type { Route } from './+types/leveattester-sokos-spkmottak'
 
-export default function SokosSPKMottakPage() {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Leveattester SOKOS/SPK-mottak | Verdande' }]
+}
+
+export default function SokosSPKMottakPage({ actionData }: Route.ComponentProps) {
   const [fomYear, setFomYear] = useState('')
   const [fomMonth, setFomMonth] = useState('')
-
-  const actionData = useActionData() as ActionData | undefined
 
   const antall = actionData?.antall
   const error = actionData?.error
 
   return (
     <div>
-      <VStack gap="5">
+      <VStack gap="space-20">
         <HStack>
           <Heading size="large">Hent antall fra MOT</Heading>
         </HStack>
@@ -39,7 +39,7 @@ export default function SokosSPKMottakPage() {
         )}
 
         <Form method="post">
-          <VStack gap="3">
+          <VStack gap="space-12">
             <TextField
               label="fomYear"
               name="fomYear"
@@ -64,9 +64,8 @@ export default function SokosSPKMottakPage() {
   )
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
-  const accessToken = await requireAccessToken(request)
 
   const fomYear = formData.get('fomYear')
   const fomMonth = formData.get('fomMonth')
@@ -74,5 +73,5 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   invariant(typeof fomYear === 'string' && fomYear.length > 0, "Parameteret 'fomYear' mangler")
   invariant(typeof fomMonth === 'string' && fomMonth.length > 0, "Parameteret 'fomMonth' mangler")
 
-  return await hentMot(accessToken, fomYear, fomMonth)
+  return await hentMot(request, fomYear, fomMonth)
 }

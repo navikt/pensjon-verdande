@@ -6,6 +6,7 @@ import type {
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
 import { env } from '~/services/env.server'
+import { logger } from '~/services/logger.server'
 import type { DetaljertFremdriftDTO } from '~/types'
 
 export async function avbrytBehandlinger(
@@ -176,7 +177,7 @@ export const getReguleringDetaljer = async (accessToken: string): Promise<Regule
     return (await response.json()) as ReguleringDetaljer
   } else {
     const body = await response.json()
-    console.log(`Feil ved kall til pen ${response.status}`, body)
+    logger.error(`Feil ved kall til pen ${response.status}`, { body })
     throw new Error()
   }
 }

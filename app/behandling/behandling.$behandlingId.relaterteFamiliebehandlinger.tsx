@@ -1,11 +1,12 @@
 import { Link, Table } from '@navikt/ds-react'
-import { type LoaderFunctionArgs, NavLink, useLoaderData } from 'react-router'
+import { NavLink } from 'react-router'
 import invariant from 'tiny-invariant'
 import { requireAccessToken } from '~/services/auth.server'
 import { HentRelaterteFamiliebehandlinger } from '~/services/behandling.server'
 import type { RelatertFamilieBehandling } from '~/types'
+import type { Route } from './+types/behandling.$behandlingId.relaterteFamiliebehandlinger'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId } = params
 
   invariant(behandlingId, 'Missing behandlingId param')
@@ -15,11 +16,12 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   return HentRelaterteFamiliebehandlinger(accessToken, +behandlingId)
 }
 
-export default function RelaterteFamiliebehandlingerehandlinger() {
-  const relaterteFamiliebehandlinger = useLoaderData<typeof loader>()
+export default function RelaterteFamiliebehandlinger({ loaderData }: Route.ComponentProps) {
+  const relaterteFamiliebehandlinger = loaderData
 
   return (
     <Table>
+      <caption>Relaterte familiebehandlinger</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandlingid</Table.HeaderCell>

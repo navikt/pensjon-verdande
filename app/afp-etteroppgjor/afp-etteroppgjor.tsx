@@ -15,15 +15,20 @@ import {
 import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useState } from 'react'
-import { type ActionFunctionArgs, Form, NavLink, redirect, useLoaderData } from 'react-router'
+import { Form, NavLink, redirect } from 'react-router'
 import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import type { Behandlingstatus } from '~/types'
+import type { Route } from './+types/afp-etteroppgjor'
 import styles from './afp-etteroppgjor.module.css'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'AFP etteroppgjør | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const behandlinger = await apiGet<HentAlleResponse>(`/api/afpoffentlig/etteroppgjor/behandling`, request)
 
   const etteroppgjor: AfpEtteroppgjorResponse[] = behandlinger.etteroppgjor
@@ -33,7 +38,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
 
   const formData = Object.fromEntries(await request.formData())
@@ -53,43 +58,47 @@ function statusTag(status: Behandlingstatus) {
   switch (status) {
     case 'OPPRETTET':
       return (
-        <Tag variant="info" icon={<ClockIcon aria-hidden />}>
+        <Tag data-color="info" variant="outline" icon={<ClockIcon aria-hidden />}>
           Opprettet
         </Tag>
       )
     case 'UNDER_BEHANDLING':
       return (
-        <Tag variant="warning" icon={<HourglassIcon aria-hidden />}>
+        <Tag data-color="warning" variant="outline" icon={<HourglassIcon aria-hidden />}>
           Under behandling
         </Tag>
       )
     case 'FULLFORT':
       return (
-        <Tag variant="success" icon={<CheckmarkCircleIcon aria-hidden />}>
+        <Tag data-color="success" variant="outline" icon={<CheckmarkCircleIcon aria-hidden />}>
           Fullført
         </Tag>
       )
     case 'STOPPET':
       return (
-        <Tag variant="error" icon={<StopIcon aria-hidden />}>
+        <Tag data-color="danger" variant="outline" icon={<StopIcon aria-hidden />}>
           Stoppet
         </Tag>
       )
     case 'DEBUG':
       return (
-        <Tag variant="neutral" icon={<BugIcon aria-hidden />}>
+        <Tag data-color="neutral" variant="outline" icon={<BugIcon aria-hidden />}>
           Debug
         </Tag>
       )
     default:
-      return <Tag variant="neutral">{status}</Tag>
+      return (
+        <Tag data-color="neutral" variant="outline">
+          {status}
+        </Tag>
+      )
   }
 }
 
 function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
   return (
-    <Box className={styles.etteroppgjorBox} padding={'4'}>
-      <VStack gap="2">
+    <Box className={styles.etteroppgjorBox} padding={'space-16'}>
+      <VStack gap="space-8">
         <HStack justify="space-between" align="center">
           <Heading size="small">
             <Link as={NavLink} to={`/behandling/${item.behandlingId}`}>
@@ -99,7 +108,7 @@ function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
           {statusTag(item.status)}
         </HStack>
 
-        <HStack gap="6" wrap>
+        <HStack gap="space-24" wrap>
           <Tidspunkt label="Opprettet" verdi={item.opprettet} />
           <Tidspunkt label="Siste kjøring" verdi={item.sisteKjoring} />
           <Tidspunkt label="Planlagt startet" verdi={item.planlagtStartet} />
@@ -114,15 +123,15 @@ function EtteroppgjorRad({ item }: { item: AfpEtteroppgjorResponse }) {
 
 function Tidspunkt({ label, verdi }: { label: string; verdi?: string }) {
   return (
-    <VStack gap="1" style={{ minWidth: '10rem' }}>
+    <VStack gap="space-4" style={{ minWidth: '10rem' }}>
       <Label>{label}</Label>
       <BodyShort>{formaterTidspunkt(verdi)}</BodyShort>
     </VStack>
   )
 }
 
-export default function EtteroppgjorOversikt() {
-  const { etteroppgjor } = useLoaderData<typeof loader>()
+export default function EtteroppgjorOversikt({ loaderData }: Route.ComponentProps) {
+  const { etteroppgjor } = loaderData
 
   const [kjøreår, setKjøreår] = useState<number | undefined>(undefined)
 
@@ -137,10 +146,9 @@ export default function EtteroppgjorOversikt() {
     <div>
       <Heading size="large">AFP Etteroppgjør</Heading>
       <p>Velkommen til AFP Etteroppgjør!</p>
-
       <div style={{ maxWidth: '20em' }}>
         <Form method="post">
-          <VStack gap="4">
+          <VStack gap="space-16">
             <Select
               name="kjorear"
               label="Velg kjøreår"
@@ -166,12 +174,9 @@ export default function EtteroppgjorOversikt() {
           </VStack>
         </Form>
       </div>
-
       <div style={{ padding: '2rem' }}></div>
-
       <Heading size="medium">Eksisterende etteroppgjør</Heading>
-
-      <VStack gap="4">
+      <VStack gap="space-16">
         <VStack>
           {etteroppgjor.length > 0 ? (
             etteroppgjor

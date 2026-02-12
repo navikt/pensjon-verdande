@@ -14,6 +14,6 @@ export function linkifyText(text?: string | null): React.ReactNode[] {
         </Link>
       )
     }
-    return <span key={`span-${part}`}>{part}</span>
+    return <span key={`span-${i}-${part}`}>{part}</span>
   })
 }

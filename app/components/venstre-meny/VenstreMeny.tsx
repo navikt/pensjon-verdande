@@ -47,6 +47,7 @@ const batcherMeny = [
   ['AVSTEMMING_LES', '/konsistensavstemming', 'Konsistensavstemming'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
+  ['GRADERT_AP_FRA_GRADERT_UP', '/gradert-ap-brev', 'Utplukk gradert AP brev'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
   ['HVILENDE_RETT_UFORETRYGD', `/hvilenderett`, 'Hvilende rett av Uføretrygd'],
   ['LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning'],
@@ -61,21 +62,9 @@ const batcherMeny = [
 ]
 
 const kontrollMeny = [
-  [
-    'INNTEKTSKONTROLL',
-    '/batch/inntektskontroll',
-    'Inntektskontroll',
-  ],
-  [
-    'KONTROLLERE_SAERSKILT_SATS',
-    '/kontroll-saerskilt-sats',
-    'Kontroll særskilt sats',
-  ],
-  [
-    'KONTROLLER_AFP_STAT_ETTER_65',
-    '/kontroll-afp-stat-etter-65',
-    'Kontroll AFP Stat etter 65 år',
-  ],
+  ['INNTEKTSKONTROLL', '/batch/inntektskontroll', 'Inntektskontroll'],
+  ['KONTROLLERE_SAERSKILT_SATS', '/kontroll-saerskilt-sats', 'Kontroll særskilt sats'],
+  ['KONTROLLER_AFP_STAT_ETTER_65', '/kontroll-afp-stat-etter-65', 'Kontroll AFP Stat etter 65 år'],
 ]
 
 const omregningMeny = [
@@ -270,11 +259,7 @@ export default function VenstreMeny(props: Props) {
             'Kontroll',
             kontrollMeny,
             indexSupplier,
-            <GavelIcon
-              title="Kontroll"
-              fontSize="1.5rem"
-              className={styles.menyIkon}
-            />,
+            <GavelIcon title="Kontroll" fontSize="1.5rem" className={styles.menyIkon} />,
           )}
           {byggMeny(
             'Behandlinger',

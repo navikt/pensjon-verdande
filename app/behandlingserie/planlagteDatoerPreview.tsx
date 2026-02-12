@@ -78,7 +78,7 @@ function dayLabel(weekday: number) {
 export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Props) {
   if (!items || items.length === 0) {
     return (
-      <VStack gap="2">
+      <VStack gap="space-8">
         {title && <Heading size="xsmall">{title}</Heading>}
         <span style={{ opacity: 0.7 }}>Ingen planlagte kjøringer.</span>
       </VStack>
@@ -108,9 +108,9 @@ export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Pr
 
   return (
     <VStack
-      gap="2"
+      gap="space-8"
       style={{
-        background: 'var(--a-surface-neutral-subtle, #f3f3f3)',
+        background: 'var(--ax-bg-neutral-soft, #f3f3f3)',
         padding: '1rem',
         borderRadius: '0.5rem',
       }}
@@ -121,7 +121,7 @@ export default function PlanlagteDatoerPreview({ title, items, onClickItem }: Pr
           .slice()
           .sort((a, b) => (a.yearMonthDay + (a.time ?? '') < b.yearMonthDay + (b.time ?? '') ? -1 : 1))
         return (
-          <VStack key={key} gap="1">
+          <VStack key={key} gap="space-4">
             <strong style={{ textTransform: 'capitalize' }}>{monthLabel(key)}</strong>
             <div className={styles.previewContainer}>
               {list.map((item) => {

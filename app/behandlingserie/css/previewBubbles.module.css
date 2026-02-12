@@ -1,7 +1,7 @@
 .previewContainer {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--ax-space-8);
 }
 
 .previewBubble {
@@ -10,18 +10,18 @@
   align-items: center;
   justify-content: center;
   padding: 0.45rem 0.6rem;
-  border-radius: 8px;
+  border-radius: var(--ax-radius-8);
   min-width: 74px;
-  background: #f4f4f4;
+  background: var(--ax-bg-neutral-soft);
   cursor: pointer;
-  border: 1px solid #ddd;
+  border: 1px solid var(--ax-border-subtle);
   transition:
     background 0.15s ease,
     transform 0.05s ease;
 }
 
 .previewBubble:hover {
-  background: #ececec;
+  background: var(--ax-bg-neutral-moderate-hover);
 }
 
 .previewBubble:active {
@@ -41,8 +41,8 @@
 
 .timeLabel {
   font-size: 0.8rem;
-  color: #333;
-  margin-top: 2px;
+  color: var(--ax-text-subtle);
+  margin-top: var(--ax-space-2);
 }
 
 .serieTag {
@@ -50,33 +50,33 @@
   font-size: 0.7rem;
   font-weight: 600;
   border-radius: 6px;
-  padding: 0 6px;
-  margin-top: 4px;
-  background-color: var(--serie-bg, #eee);
-  color: var(--serie-fg, #111);
+  padding: 0 var(--ax-space-6);
+  margin-top: var(--ax-space-4);
+  background-color: var(--serie-bg, var(--ax-bg-neutral-soft));
+  color: var(--serie-fg, var(--ax-text-default));
   border: 1px solid transparent;
   transition: background-color 0.2s ease;
 }
 
 /* Ulike bakgrunnsfarger per ukedag */
 .day-1 {
-  background: #e6f4ea;
+  background: var(--ax-bg-success-soft);
 } /* man */
 .day-2 {
-  background: #e6f0ff;
+  background: var(--ax-bg-info-soft);
 } /* tir */
 .day-3 {
-  background: #f3f3f3;
+  background: var(--ax-bg-neutral-soft);
 } /* ons */
 .day-4 {
-  background: #fff4e5;
+  background: var(--ax-bg-warning-soft);
 } /* tor */
 .day-5 {
-  background: #eaf7ff;
+  background: var(--ax-bg-accent-soft);
 } /* fre */
 .day-6 {
-  background: #f9e6ff;
+  background: var(--ax-bg-meta-purple-soft);
 } /* lør */
 .day-0 {
-  background: #ffe6e6;
+  background: var(--ax-bg-danger-soft);
 } /* søn */

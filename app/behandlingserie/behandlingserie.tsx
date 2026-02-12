@@ -13,13 +13,13 @@ import {
 } from '@navikt/ds-react'
 import {useCallback, useEffect, useId, useMemo, useState} from 'react'
 import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  redirect,
-  useFetcher,
-  useLoaderData,
-  useNavigate,
-  useSearchParams,
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    redirect,
+    useFetcher,
+    useLoaderData,
+    useNavigate,
+    useSearchParams,
 } from 'react-router'
 import 'chart.js/auto'
 import {ExternalLinkIcon} from '@navikt/aksel-icons'
@@ -35,6 +35,7 @@ import PlanlagteDatoerPreview, {type PlannedItem} from '~/behandlingserie/planla
 import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview'
 import {requireAccessToken} from '~/services/auth.server'
 import type {BehandlingInfoDTO, BehandlingSerieDTO} from '~/types'
+import type { Route } from './+types/behandlingserie'
 import {byggRegelAdvarsler, filtrerDatoerMedRegler, type SerieValg, tellDatoerPerMaaned,} from './serieValg'
 import {
   addMonths,
@@ -99,7 +100,11 @@ function getTilgjengeligeTider(forhandsvisDatoer: string[]): string[] {
   })
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Behandlingserier | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const behandlingType = searchParams.get('behandlingType') ?? ''
   const accessToken = await requireAccessToken(request)
@@ -111,7 +116,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return { behandlingSerier, serieValg, tillateBehandlinger }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const intent = String(formData.get('_intent') ?? '')
@@ -188,9 +193,8 @@ function RegelKontroller({ verdi, onChange, serieValg }: { verdi: ReglerVerdi; o
         {serieValg.enableRangeVelger && (<Radio value="range">Velg en range fra og til</Radio>)}
         <Radio value="multiple">Velg diverse datoer</Radio>
       </RadioGroup>
-
       {verdi.regelmessighet === 'multiple' && (
-        <HStack wrap gap="4">
+        <HStack wrap gap="space-16">
           <Select
             label="Dagvalg"
             value={verdi.dagvalgModus}
@@ -272,7 +276,7 @@ function AlternativerRad({
 }) {
   if (!synlig) return null
   return (
-    <HStack gap="6">
+    <HStack gap="space-24">
       <Checkbox checked={verdi.inkluderNesteAar} onChange={(e) => onChange({ inkluderNesteAar: e.target.checked })}>
         Inkluder neste år
       </Checkbox>
@@ -447,10 +451,9 @@ function EndreDialog({
           })()}
         </Heading>
       </Modal.Header>
-
       <Modal.Body>
-        <VStack gap="4">
-          <HStack gap="4" wrap>
+        <VStack gap="space-16">
+          <HStack gap="space-16" wrap>
             <DatePicker
               mode="single"
               selected={dato}
@@ -462,7 +465,6 @@ function EndreDialog({
             >
               <DatePicker.Input
                 label="Ny dato"
-                placeholder="dd.mm.åååå"
                 value={input}
                 onChange={(e) => {
                   const v = e.target.value
@@ -487,9 +489,8 @@ function EndreDialog({
           </div>
         </VStack>
       </Modal.Body>
-
       <Modal.Footer>
-        <HStack gap="2">
+        <HStack gap="space-8">
           <Button onClick={() => dato && tid && onSave(toYearMonthDay(dato), tid)} disabled={!dato || !tid}>
             Lagre dato
           </Button>
@@ -509,7 +510,7 @@ function EndreDialog({
   )
 }
 
-export default function BehandlingOpprett_index() {
+export default function BehandlingOpprett_index({ loaderData }: Route.ComponentProps) {
   const [now] = useState(() => new Date())
   const [inkluderNesteAar, setInkluderNesteAar] = useState(false)
   const horisontSlutt = useMemo(() => {
@@ -531,11 +532,7 @@ export default function BehandlingOpprett_index() {
   const createFetcher = useFetcher()
   const [searchParams, setSearchParams] = useSearchParams()
   const [behandlingType, setBehandlingType] = useState(searchParams.get('behandlingType') || '')
-  const { behandlingSerier, serieValg, tillateBehandlinger } = useLoaderData<{
-    behandlingSerier: BehandlingSerieDTO[]
-    serieValg: SerieValg,
-    tillateBehandlinger: string[]
-  }>()
+  const { behandlingSerier, serieValg, tillateBehandlinger } = loaderData
 
   const helligdagsdata = useMemo(() => byggHelligdagsdata(inkluderNesteAar), [inkluderNesteAar])
   const booketData = useMemo(() => byggBookedeDatoer(behandlingSerier || []), [behandlingSerier])
@@ -830,13 +827,11 @@ export default function BehandlingOpprett_index() {
   )
 
   return (
-    <VStack gap="6">
+    <VStack gap="space-24">
       <Heading size="medium" level="1">
         Behandlingserie
       </Heading>
-
       <SerieVelger behandlingType={behandlingType} tillateBehandlinger={tillateBehandlinger} onChange={oppdaterBehandlingType} />
-
       {behandlingType !== '' && (
         <>
           <Heading size="medium" level="1">

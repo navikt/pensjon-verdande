@@ -81,7 +81,12 @@ function FieldActionMenu({
   return (
     <ActionMenu>
       <ActionMenu.Trigger>
-        <Button variant="tertiary-neutral" icon={<MenuElipsisVerticalIcon title="Feltmeny" />} size="small" />
+        <Button
+          data-color="neutral"
+          variant="tertiary"
+          icon={<MenuElipsisVerticalIcon title="Feltmeny" />}
+          size="small"
+        />
       </ActionMenu.Trigger>
       <ActionMenu.Content>
         <ActionMenu.Item onSelect={() => addFilter('in', col, value)} icon={<PlusCircleIcon />}>
@@ -135,7 +140,8 @@ function MessageTable({
                   <ActionMenu>
                     <ActionMenu.Trigger>
                       <Button
-                        variant="tertiary-neutral"
+                        data-color="neutral"
+                        variant="tertiary"
                         icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
                         size="small"
                       />
@@ -189,7 +195,12 @@ function HeaderActionMenu({
   return (
     <ActionMenu>
       <ActionMenu.Trigger>
-        <Button variant="tertiary-neutral" icon={<MenuElipsisVerticalIcon title="Saksmeny" />} size="small" />
+        <Button
+          data-color="neutral"
+          variant="tertiary"
+          icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+          size="small"
+        />
       </ActionMenu.Trigger>
       <ActionMenu.Content>
         {(() => {
@@ -247,7 +258,7 @@ function MessageDetails({
   addFilter: (mode: FilterMode, key: string, value: string) => void
 }) {
   return (
-    <VStack gap="16">
+    <VStack gap="space-64">
       {tempoConfiguration && s.stream.trace_id && (
         <HStack>
           <Button
@@ -263,7 +274,6 @@ function MessageDetails({
           </Button>
         </HStack>
       )}
-
       <MessageTable
         s={s}
         isSelected={isSelected}
@@ -460,7 +470,7 @@ export default function LokiLogsTable({
 
   return (
     <>
-      <HStack gap="2" align="center" wrap>
+      <HStack gap="space-8" align="center" wrap>
         {filters.length > 0 && (
           <Chips>
             {filters.map((f, i) => (
@@ -471,8 +481,7 @@ export default function LokiLogsTable({
           </Chips>
         )}
       </HStack>
-
-      <HStack gap="2" align="center" justify="end">
+      <HStack gap="space-8" align="center" justify="end">
         <Button
           size="xsmall"
           variant="tertiary"
@@ -482,7 +491,6 @@ export default function LokiLogsTable({
           Nullstill kolonner
         </Button>
       </HStack>
-
       <HStack as="div" className={styles.tableScroller} wrap={false} align="stretch">
         <Table className={styles.table} size="small" sort={sort ?? undefined} onSortChange={onSortChange}>
           <Table.Header>

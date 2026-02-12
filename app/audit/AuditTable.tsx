@@ -24,6 +24,7 @@ export function AuditTable({
         onSortChange(sortKey as AuditSortState['orderBy'])
       }}
     >
+      <caption>Auditlogg</caption>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell />
@@ -49,7 +50,7 @@ export function AuditTable({
           <Table.ExpandableRow
             key={`${row.tidspunkt}|${row.navident}|${row.handling}|${row.behandlingId}|${row.aktivitetId ?? 'null'}`}
             content={
-              <VStack gap="4">
+              <VStack gap="space-16">
                 <VStack>
                   <Heading size="small" level="3">
                     Issue

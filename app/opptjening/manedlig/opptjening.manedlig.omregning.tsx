@@ -13,7 +13,7 @@ import {
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useState } from 'react'
-import { type ActionFunctionArgs, Form, type LoaderFunctionArgs, useLoaderData, useNavigation } from 'react-router'
+import { Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import {
@@ -25,6 +25,7 @@ import {
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/opptjening.manedlig.omregning'
 
 type LoaderData = {
   behandlinger: BehandlingerPage
@@ -34,7 +35,11 @@ type LoaderData = {
   sisteAvsjekk: SisteAvsjekkResponse | null
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Månedlig opptjening | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -67,14 +72,14 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   await opprettAvsjekk(accessToken)
   return null
 }
 
-export default function OpprettEndretOpptjeningRoute() {
-  const { behandlinger, maneder, kanOverstyre, defaultMonth, sisteAvsjekk } = useLoaderData<typeof loader>()
+export default function OpprettEndretOpptjeningRoute({ loaderData }: Route.ComponentProps) {
+  const { behandlinger, maneder, kanOverstyre, defaultMonth, sisteAvsjekk } = loaderData
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
@@ -91,20 +96,17 @@ export default function OpprettEndretOpptjeningRoute() {
       <Heading level="1" size="large">
         Månedlig omregning av ytelse ved oppdaterte opptjeningsopplysninger
       </Heading>
-
       <BodyShort spacing style={{ paddingTop: '2rem', paddingBottom: '1rem' }}>
         Velg behandlingsmåned og tidspunkt for kjøring.
       </BodyShort>
-
       {!kanOverstyre && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
         </Alert>
       )}
-
       <Form action="opprett" method="post" style={{ width: '100%', maxWidth: 800 }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <div
             style={{
               display: 'grid',
@@ -170,7 +172,7 @@ export default function OpprettEndretOpptjeningRoute() {
             />
             <input type="hidden" name="avsjekkForKjoring" value={avsjekkForKjoring ? 'true' : 'false'} />
           </div>
-          <HStack gap={'4'}>
+          <HStack gap={'space-16'}>
             <Button type="submit" disabled={isSubmitting} variant="primary">
               Opprett
             </Button>
@@ -182,27 +184,23 @@ export default function OpprettEndretOpptjeningRoute() {
           </HStack>
         </VStack>
       </Form>
-
       {sisteAvsjekk === null && (
         <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Ingen avsjekk gjort
         </Alert>
       )}
-
       {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === false && (
         <Alert variant="error" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var ikke OK. PEN har mottatt{' '}
           {sisteAvsjekk.antallHendelserPen}, POPP har sendt {sisteAvsjekk.antallHendelserPopp}
         </Alert>
       )}
-
       {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
         <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {format(sisteAvsjekk.sisteAvsjekkTidspunkt, "dd.MM.yyyy 'kl.' HH:mm:ss")} var OK. Vi har mottatt{' '}
           {sisteAvsjekk.antallHendelserPen} hendelser.
         </Alert>
       )}
-
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
           Eksisterende behandlinger

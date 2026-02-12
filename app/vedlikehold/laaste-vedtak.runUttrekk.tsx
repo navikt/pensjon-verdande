@@ -1,11 +1,8 @@
-import type { ActionFunctionArgs } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
 import { runUttrekk } from '~/vedlikehold/vedlikehold.server'
+import type { Route } from './+types/laaste-vedtak.runUttrekk'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
+export const action = async ({ request }: Route.ActionArgs) => {
   const nullstill = false
-  await runUttrekk(accessToken, nullstill)
+  await runUttrekk(request, nullstill)
   return null
 }

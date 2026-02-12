@@ -24,7 +24,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { isRouteErrorResponse, Link, useFetcher, useLoaderData } from 'react-router'
+import { isRouteErrorResponse, Link, useFetcher } from 'react-router'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { Entry } from '~/components/entry/Entry'
 import { apiPost } from '~/services/api.server'
@@ -41,8 +41,8 @@ export const loader = async ({ params: { sakId }, request }: Route.LoaderArgs) =
   sak: await apiPost<SakOppsummeringLaasOpp>('/api/behandling/laas-opp/hentSak', { sakId }, request),
 })
 
-export default function LaasOppSakSakIdPage() {
-  const { sak } = useLoaderData<typeof loader>()
+export default function LaasOppSakSakIdPage({ loaderData }: Route.ComponentProps) {
+  const { sak } = loaderData
   const [laasOppVedtak, setLaasOppVedtak] = useState<VedtakLaasOpp | null>(null)
   const [kravTilManuell, setKravTilManuell] = useState<string | null>(null)
   const [verifiserOppdragsmeldingManuelt, setVerifiserOppdragsmeldingManuelt] = useState<VedtakLaasOpp | null>(null)
@@ -51,8 +51,8 @@ export default function LaasOppSakSakIdPage() {
     <>
       <HStack>
         {!!sak && (
-          <VStack gap="5">
-            <HStack gap="4" align="end" justify="start">
+          <VStack gap="space-20">
+            <HStack gap="space-16" align="end" justify="start">
               <Entry labelText={'Saktype'}>{sak.sakType}</Entry>
               <Entry labelText={'Sakstatus'}>{sak.sakStatus}</Entry>
             </HStack>
@@ -89,7 +89,7 @@ export default function LaasOppSakSakIdPage() {
                             <Behandlinger kravid={vedtak.kravId} behandlinger={vedtak.behandlinger} />
                           </Table.DataCell>
                           <Table.DataCell>
-                            <HStack gap="3">
+                            <HStack gap="space-12">
                               {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
                                 <Button
                                   onClick={() => setKravTilManuell(vedtak.kravId)}
@@ -241,7 +241,7 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string; behandlinger: 
   return (
     <VStack>
       {behandlinger.map((behandling) => (
-        <HStack key={kravid + behandling.behandlingId} gap="1" align="center">
+        <HStack key={kravid + behandling.behandlingId} gap="space-4" align="center">
           <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">
             {decodeBehandling(behandling.type)}
           </Link>
@@ -303,7 +303,7 @@ function SettTilManuellModal({ kravId, onClose }: { kravId: string; onClose: () 
   return (
     <Modal header={{ heading: 'Sett til manuell' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-20">
           <BodyLong>
             Er du sikker på at du vil sette kravet til manuell? Dette fører til merarbeid for saksbehandler, sørg for at
             fag er innvolvert og at saksbehandler får nødvendig informasjon.
@@ -316,7 +316,13 @@ function SettTilManuellModal({ kravId, onClose }: { kravId: string; onClose: () 
         </VStack>
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={settTilManuell}>
+        <Button
+          data-color="danger"
+          type="button"
+          loading={fetcher.state === 'submitting'}
+          variant="primary"
+          onClick={settTilManuell}
+        >
           Sett til manuell
         </Button>
         <Button type="button" variant="secondary" onClick={onClose}>
@@ -359,7 +365,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClos
   return (
     <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-20">
           <BodyLong>
             Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
             innvolvert og at saksbehandler får nødvendig informasjon.
@@ -397,7 +403,13 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClos
         </VStack>
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={laasOppVedtak}>
+        <Button
+          data-color="danger"
+          type="button"
+          loading={fetcher.state === 'submitting'}
+          variant="primary"
+          onClick={laasOppVedtak}
+        >
           Lås opp
         </Button>
         <Button type="button" variant="secondary" onClick={onClose}>
@@ -443,13 +455,13 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
   return (
     <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-20">
           <BodyLong>
             Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>
 
           {fetcher.state === 'loading' && (
-            <HStack gap="2">
+            <HStack gap="space-8">
               <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
             </HStack>
           )}

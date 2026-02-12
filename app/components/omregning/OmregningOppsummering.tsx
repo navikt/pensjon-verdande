@@ -59,7 +59,7 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
 
           <FormSummary.Answer>
             <FormSummary.Label>Omregning</FormSummary.Label>
-            <HGrid columns={3} gap="10">
+            <HGrid columns={3} gap="space-40">
               <FormSummary.Value>
                 <FormSummary.Answers>
                   <FormSummary.Answer>
@@ -135,7 +135,7 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
 
           <FormSummary.Answer>
             <FormSummary.Label>Omregning brev</FormSummary.Label>
-            <HGrid columns={2} gap="10">
+            <HGrid columns={2} gap="space-40">
               <FormSummary.Value>
                 <FormSummary.Answers>
                   <FormSummary.Answer>

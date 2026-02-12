@@ -28,39 +28,40 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import React, { useEffect, useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
-import { Link, useFetcher, useLoaderData, useSearchParams } from 'react-router'
+import { Link, useFetcher, useSearchParams } from 'react-router'
 import { formatIsoDate, formatIsoTimestamp } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import { useSort } from '~/hooks/useSort'
-import { requireAccessToken } from '~/services/auth.server'
 import type { LaasOppResultat } from '~/vedlikehold/laas-opp.types'
 import {
   type LaasteVedtakBehandlingSummary,
   type LaasteVedtakRow,
   type LaasteVedtakUttrekkStatus,
-  type LaasteVedtakUttrekkSummary,
   muligeAksjonspunkt,
   type VedtakYtelsekomponenter,
 } from '~/vedlikehold/laaste-vedtak.types'
 import { getLaasteVedtakSummary } from '~/vedlikehold/vedlikehold.server'
+import type { Route } from './+types/laaste-vedtak'
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Låste vedtak | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const team = searchParams.get('team')
   const aksjonspunkt = searchParams.get('aksjonspunkt')
 
-  const accessToken = await requireAccessToken(request)
-  const laasteVedtakSummary = await getLaasteVedtakSummary(accessToken, team, aksjonspunkt)
+  const laasteVedtakSummary = await getLaasteVedtakSummary(request, team, aksjonspunkt)
   if (!laasteVedtakSummary) {
     throw new Response('Not Found', { status: 404 })
   }
   return laasteVedtakSummary
 }
 
-export default function LaasteVedtakPage() {
-  const laasteVedtakSummary = useLoaderData() as LaasteVedtakUttrekkSummary
+export default function LaasteVedtakPage({ loaderData }: Route.ComponentProps) {
+  const laasteVedtakSummary = loaderData
   const [uttrekkStatus, setUttrekkStatus] = useState<LaasteVedtakUttrekkStatus | null>(
     laasteVedtakSummary.uttrekkStatus,
   )
@@ -75,15 +76,15 @@ export default function LaasteVedtakPage() {
 
   return (
     <div>
-      <VStack gap="5">
-        <HStack align="center" justify="center" gap="2">
+      <VStack gap="space-20">
+        <HStack align="center" justify="center" gap="space-8">
           <Heading size="large">Låste vedtak</Heading>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
             <Detail>Antall låst: {laasteVedtakSummary.laasteVedtak.length}</Detail>
           )}
 
           <div style={{ marginLeft: 'auto' }}>
-            <HStack gap="4" align="center">
+            <HStack gap="space-16" align="center">
               {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
                 <Alert variant="success" size="small" inline>
                   Sist kjørt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}
@@ -111,8 +112,8 @@ export default function LaasteVedtakPage() {
         </HStack>
         <HStack>
           {laasteVedtakSummary.uttrekkStatus?.isFerdig === true && (
-            <VStack gap="5">
-              <HStack gap="4" align="end" justify="start">
+            <VStack gap="space-20">
+              <HStack gap="space-16" align="end" justify="start">
                 <VelgTeam />
                 <VelgAksjonspunkt />
                 <Switch checked={avansertVisning} onChange={() => setAvansertVisning(!avansertVisning)}>
@@ -209,7 +210,7 @@ export default function LaasteVedtakPage() {
                           </Table.DataCell>
                         )}
                         <Table.DataCell>
-                          <HStack align="center" gap="1">
+                          <HStack align="center" gap="space-4">
                             {vedtak.sakType}{' '}
                             {vedtak.isAutomatisk ? (
                               <Tooltip content="Automatisk krav">
@@ -306,7 +307,6 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string; vedtak:
   const fetcher = useFetcher()
 
   function oppdaterTeam(nyttTeam: string) {
-    console.log('oppdater team', nyttTeam, behandlingId, vedtak)
     fetcher.submit(
       {
         behandlingId,
@@ -349,7 +349,6 @@ function Aksjonspunkt({ behandlingId, vedtak }: { behandlingId: string; vedtak: 
   const fetcher = useFetcher()
 
   function oppdaterAksjonspunkt(nyttAksjonspunkt: string) {
-    console.log('oppdater aksjonspunkt', nyttAksjonspunkt, behandlingId, vedtak)
     fetcher.submit(
       {
         behandlingId,
@@ -448,7 +447,7 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow; onCl
   return (
     <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-20">
           <BodyLong>
             Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
             innvolvert og at saksbehandler får nødvendig informasjon.
@@ -477,7 +476,13 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow; onCl
         </VStack>
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" loading={fetcher.state === 'submitting'} variant="danger" onClick={laasOppVedtak}>
+        <Button
+          data-color="danger"
+          type="button"
+          loading={fetcher.state === 'submitting'}
+          variant="primary"
+          onClick={laasOppVedtak}
+        >
           Lås opp
         </Button>
         <Button type="button" variant="secondary" onClick={onClose}>
@@ -522,13 +527,13 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Laa
   return (
     <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
       <Modal.Body>
-        <VStack gap="5">
+        <VStack gap="space-20">
           <BodyLong>
             Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
           </BodyLong>
 
           {fetcher.state === 'loading' && (
-            <HStack gap="2">
+            <HStack gap="space-8">
               <Loader size="small" /> <Detail>Henter ytelsekomponenter...</Detail>
             </HStack>
           )}
@@ -589,7 +594,6 @@ function Kommentar({ behandlingId, vedtak }: { behandlingId: string; vedtak: Laa
     if (kommentar === vedtak.kommentar) {
       return
     }
-    console.log('oppdater kommentar', kommentar, behandlingId, vedtak)
     fetcher.submit(
       {
         behandlingId,
@@ -628,7 +632,7 @@ function Behandlinger({ kravid, behandlinger }: { kravid: string; behandlinger: 
   return (
     <VStack>
       {behandlinger.map((behandling) => (
-        <HStack key={kravid + behandling.behandlingId} gap="1" align="center">
+        <HStack key={kravid + behandling.behandlingId} gap="space-4" align="center">
           <Link to={`/behandling/${behandling.behandlingId}`} target="_blank">
             {decodeBehandling(behandling.type)}
           </Link>

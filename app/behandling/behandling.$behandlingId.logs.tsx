@@ -1,13 +1,13 @@
 import { VStack } from '@navikt/ds-react'
-import { type LoaderFunctionArgs, useLoaderData } from 'react-router'
 import invariant from 'tiny-invariant'
 import { selectedColumns, selectedFilters } from '~/loki/LokiLogsTable'
 import { LokiLogsTableLoader } from '~/loki/LokiLogsTableLoader'
 import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
 import { apiGet } from '~/services/api.server'
 import type { BehandlingDto } from '~/types'
+import type { Route } from './+types/behandling.$behandlingId.logs'
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId } = params
 
   invariant(behandlingId, 'Missing behandlingId param')
@@ -26,12 +26,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 }
 
-export default function BehandlingLogs() {
-  const { response, selectedColumns, selectedFilters, start, slutt, tempoConfiguration } =
-    useLoaderData<typeof loader>()
+export default function BehandlingLogs({ loaderData }: Route.ComponentProps) {
+  const { response, selectedColumns, selectedFilters, start, slutt, tempoConfiguration } = loaderData
 
   return (
-    <VStack gap="6">
+    <VStack gap="space-24">
       <LokiLogsTableLoader
         response={response}
         selectedFilters={selectedFilters}

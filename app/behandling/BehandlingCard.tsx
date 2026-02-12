@@ -30,17 +30,20 @@ import {
   ProgressBar,
   Select,
   Tabs,
+  Tag,
+  Textarea,
   Tooltip,
   VStack,
 } from '@navikt/ds-react'
-import { Suspense, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 'react-router'
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
 import type { MeResponse } from '~/brukere/brukere'
 import { formatIsoTimestamp } from '~/common/date'
-import { decodeBehandlingStatus } from '~/common/decode'
+import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import type { Team } from '~/common/decodeTeam'
+import { linkifyText } from '~/common/linkifyText'
 import { replaceTemplates } from '~/common/replace-templates'
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
@@ -57,12 +60,142 @@ export interface Props {
   psakSakUrlTemplate: string
 }
 
+function StoppButton({ behandling }: { behandling: BehandlingDto }) {
+  const [open, setOpen] = useState(false)
+  const [begrunnelse, setBegrunnelse] = useState('')
+  const fetcher = useFetcher()
+  const prevState = useRef(fetcher.state)
+
+  useEffect(() => {
+    const wasSubmitting = prevState.current === 'submitting' || prevState.current === 'loading'
+    prevState.current = fetcher.state
+    if (fetcher.state === 'idle' && wasSubmitting && !fetcher.data?.errors) {
+      setOpen(false)
+      setBegrunnelse('')
+    }
+  }, [fetcher.state, fetcher.data])
+
+  return (
+    <>
+      <Tooltip content="Stopper behandlingen, skal kun gjøres om feil ikke kan løses på annen måte">
+        <Button
+          variant="secondary"
+          data-color="danger"
+          icon={<XMarkOctagonIcon aria-hidden />}
+          onClick={() => setOpen(true)}
+        >
+          Stopp behandling
+        </Button>
+      </Tooltip>
+      <Modal
+        open={open}
+        onClose={() => {
+          setOpen(false)
+          setBegrunnelse('')
+          fetcher.reset()
+        }}
+        header={{ heading: 'Stopp behandling' }}
+      >
+        <Modal.Body>
+          <VStack gap={'space-16'}>
+            <BodyLong>
+              Bekreft at du ønsker å stoppe <i>{decodeBehandling(behandling)}</i> behandlingen med status{' '}
+              <i>{decodeBehandlingStatus(behandling.status)}</i>. <b>Denne handlingen kan ikke angres.</b>
+            </BodyLong>
+            <BodyLong>
+              Saken, kravet, vedtaket eller liknende, som behandlinger er knyttet til må mest sannsynlig rapporteres til
+              linja. Stopping av en behandling skal kun gjøres om feil ikke kan løses på annen måte.
+            </BodyLong>
+            <BodyLong>
+              Du må gi en begrunnelse for hvorfor du stopper behandlingen. I tillegg må noen andre bekrefte at
+              behandlingen er blitt tilstrekkelig fulgt opp. Legg gjerne ved en lenke til Slacktråd, Jira eller
+              liknende.
+            </BodyLong>
+            <Textarea
+              label="Begrunnelse"
+              value={begrunnelse}
+              onChange={(e) => setBegrunnelse(e.target.value)}
+              error={fetcher.data?.errors?.begrunnelse}
+            />
+          </VStack>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            type="button"
+            variant="danger"
+            disabled={fetcher.state !== 'idle'}
+            onClick={() => fetcher.submit({ operation: OPERATION.stopp, begrunnelse }, { method: 'POST' })}
+          >
+            Stopp behandling
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setOpen(false)
+              setBegrunnelse('')
+              fetcher.reset()
+            }}
+          >
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  )
+}
+
+function BekreftStoppBehandlingButton() {
+  const fetcher = useFetcher()
+  const [open, setOpen] = useState(false)
+  const prevState = useRef(fetcher.state)
+
+  useEffect(() => {
+    const wasSubmitting = prevState.current === 'submitting' || prevState.current === 'loading'
+    prevState.current = fetcher.state
+    if (fetcher.state === 'idle' && wasSubmitting && !fetcher.data?.errors) {
+      setOpen(false)
+    }
+  }, [fetcher.state, fetcher.data])
+
+  return (
+    <>
+      <Tooltip content="Bekreft at nødvendig oppfølging er gjort for stoppet behandling">
+        <Button variant={'secondary'} icon={<PlayIcon aria-hidden />} onClick={() => setOpen(true)}>
+          Bekreft oppfølging
+        </Button>
+      </Tooltip>
+
+      <Modal open={open} header={{ heading: 'Bekreft oppfølging' }} onClose={() => setOpen(false)}>
+        <Modal.Body>
+          <BodyLong>
+            Bekreft at nødvendig oppfølging er gjort. Denne handlingen kan ikke angres, og vil fjerne behovet for videre
+            bekreftelse av stopp.
+          </BodyLong>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={() => fetcher.submit({ operation: OPERATION.bekreftStoppBehandling }, { method: 'POST' })}
+            disabled={fetcher.state !== 'idle'}
+          >
+            Bekreft
+          </Button>
+          <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+            Avbryt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  )
+}
+
 export default function BehandlingCard(props: Props) {
   const fetcher = useFetcher()
   const location = useLocation()
   const navigate = useNavigate()
 
-  const stopModal = useRef<HTMLDialogElement>(null)
   const fortsettModal = useRef<HTMLDialogElement>(null)
   const sendTilManuellMedKontrollpunktModal = useRef<HTMLDialogElement>(null)
   const sendTilOppdragPaNyttModal = useRef<HTMLDialogElement>(null)
@@ -90,19 +223,6 @@ export default function BehandlingCard(props: Props) {
         method: 'POST',
       },
     )
-  }
-
-  function stopp() {
-    fetcher.submit(
-      {
-        operation: OPERATION.stopp,
-      },
-      {
-        method: 'POST',
-      },
-    )
-
-    stopModal.current?.close()
   }
 
   function sendTilManuellMedKontrollpunkt(kontrollpunkt: string) {
@@ -192,7 +312,7 @@ export default function BehandlingCard(props: Props) {
             </Modal.Body>
             <Modal.Footer>
               <fetcher.Form method="post">
-                <Button type="button" variant="danger" onClick={sendTilOppdragPaNytt}>
+                <Button data-color="danger" type="button" variant="primary" onClick={sendTilOppdragPaNytt}>
                   Send til oppdrag på nytt
                 </Button>
               </fetcher.Form>
@@ -281,6 +401,12 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
+  function bekreftStoppBehandling() {
+    if (hasLink('bekreftStoppBehandling')) {
+      return <BekreftStoppBehandlingButton />
+    }
+  }
+
   function fortsettAvhengigeBehandlinger() {
     if (hasLink('fortsettAvhengigeBehandlinger')) {
       return (
@@ -315,44 +441,6 @@ export default function BehandlingCard(props: Props) {
             </Button>
           </fetcher.Form>
         </Tooltip>
-      )
-    }
-  }
-
-  function stoppButton() {
-    if (hasLink('stopp')) {
-      return (
-        <>
-          <Tooltip content="Stopper behandlingen, skal kun gjøres om feil ikke kan løses på annen måte">
-            <Button
-              variant={'danger'}
-              icon={<XMarkOctagonIcon aria-hidden />}
-              onClick={() => stopModal.current?.showModal()}
-            >
-              Stopp behandling
-            </Button>
-          </Tooltip>
-
-          <Modal ref={stopModal} header={{ heading: 'Stopp behandling' }}>
-            <Modal.Body>
-              <BodyLong>
-                Ønsker du virkerlig å stoppe denne behandlingen. Saken, kravet, vedtaket eller liknende, som
-                behandlinger er knyttet til må mest sannsynlig rapporteres til linja. Stopping av en behandling skal kun
-                gjøres om feil ikke kan løses på annen måte. Denne handlingen kan ikke angres
-              </BodyLong>
-            </Modal.Body>
-            <Modal.Footer>
-              <fetcher.Form method="post" action="taTilDebug">
-                <Button type="button" variant="danger" onClick={stopp}>
-                  Stopp behandling
-                </Button>
-              </fetcher.Form>
-              <Button type="button" variant="secondary" onClick={() => stopModal.current?.close()}>
-                Avbryt
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </>
       )
     }
   }
@@ -395,8 +483,12 @@ export default function BehandlingCard(props: Props) {
         return 'IdentAjourhold'
       case 'DagligAvstemmingBehandling':
         return 'DagligAvstemming'
+      case 'ManedligAvstemmingBehandling':
+        return 'ManedligAvstemming'
       case 'E500FilleveringBatchBehandling':
         return 'E500Fillevering'
+      case 'LeveattestGrunnlagBehandling':
+        return 'LeveattestGrunnlag'
       default:
         return type
     }
@@ -404,106 +496,121 @@ export default function BehandlingCard(props: Props) {
 
   return (
     <Page>
-      <Heading size={'large'}>
+      <Heading size={'large'} spacing>
         {decodeBehandling(props.behandling.type)}
         <Detail>{props.behandling.type}</Detail>
       </Heading>
-      <VStack gap={'4'}>
+      <VStack gap={'space-16'}>
         <HGrid
           gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
           columns={{ xl: 1, '2xl': props.detaljertFremdrift !== null ? 2 : 1 }}
         >
-          <Box.New
-            background={'raised'}
-            borderRadius={'xlarge'}
-            borderWidth={'1'}
-            borderColor={'neutral-subtleA'}
-            padding={'4'}
-          >
-            <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
-              {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
-              {props.behandling.forrigeBehandlingId && (
-                <Entry labelText={'Opprettet av behandling'}>
-                  <Link as={NavLink} to={`/behandling/${props.behandling.forrigeBehandlingId}`}>
-                    {props.behandling.forrigeBehandlingId}
-                  </Link>
-                </Entry>
-              )}
-              <Entry labelText={'Status'}>{decodeBehandlingStatus(props.behandling.status)}</Entry>
-              <Await resolve={props.detaljertFremdrift}>
-                {(detaljertFremdrift) =>
-                  detaljertFremdrift && (
-                    <Entry labelText={'Fremdrift'}>
-                      <Tooltip
-                        content={`${beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)} % ferdig`}
-                      >
-                        <ProgressBar
-                          value={+beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}
-                          valueMax={100}
-                          size={'large'}
-                          aria-labelledby="progress-bar-fremdrift"
-                        ></ProgressBar>
-                      </Tooltip>
+          <VStack gap="space-16">
+            <Box
+              background={'raised'}
+              borderRadius={'12'}
+              borderWidth={'1'}
+              borderColor={'neutral-subtleA'}
+              padding={'space-16'}
+            >
+              <VStack gap={'space-32'}>
+                <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
+                  {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
+                  {props.behandling.forrigeBehandlingId && (
+                    <Entry labelText={'Opprettet av behandling'}>
+                      <Link as={NavLink} to={`/behandling/${props.behandling.forrigeBehandlingId}`}>
+                        {props.behandling.forrigeBehandlingId}
+                      </Link>
                     </Entry>
-                  )
-                }
-              </Await>
+                  )}
+                  <Entry labelText={'Status'}>
+                    <Tag variant={decodeBehandlingStatusToVariant(props.behandling.status)}>
+                      {decodeBehandlingStatus(props.behandling.status)}
+                    </Tag>
+                  </Entry>
+                  <Await resolve={props.detaljertFremdrift}>
+                    {(detaljertFremdrift) =>
+                      detaljertFremdrift && (
+                        <Entry labelText={'Fremdrift'}>
+                          <Tooltip
+                            content={`${beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)} % ferdig`}
+                          >
+                            <ProgressBar
+                              value={+beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}
+                              valueMax={100}
+                              size={'large'}
+                              aria-labelledby="progress-bar-fremdrift"
+                            ></ProgressBar>
+                          </Tooltip>
+                        </Entry>
+                      )
+                    }
+                  </Await>
 
-              <Entry labelText={'Ansvarlig team'}>
-                <AnsvarligTeamSelector
-                  ansvarligTeam={props.behandling.ansvarligTeam}
-                  onAnsvarligTeamChange={oppdaterAnsvarligTeam}
-                />
-              </Entry>
-              <Entry labelText={'Funksjonell identifikator'}>{props.behandling.funksjonellIdentifikator}</Entry>
+                  <Entry labelText={'Ansvarlig team'}>
+                    <AnsvarligTeamSelector
+                      ansvarligTeam={props.behandling.ansvarligTeam}
+                      onAnsvarligTeamChange={oppdaterAnsvarligTeam}
+                    />
+                  </Entry>
+                  <Entry labelText={'Funksjonell identifikator'}>{props.behandling.funksjonellIdentifikator}</Entry>
 
-              {props.behandling.stoppet && (
-                <Entry labelText={'Stoppet'}>{formatIsoTimestamp(props.behandling.stoppet)}</Entry>
-              )}
-              <Entry labelText={'Prioritet'}>{props.behandling.prioritet}</Entry>
+                  <Entry labelText={'Prioritet'}>{props.behandling.prioritet}</Entry>
 
-              <Entry labelText={'Opprettet'}>{formatIsoTimestamp(props.behandling.opprettet)}</Entry>
-              {props.behandling.opprettetAv && <Entry labelText={'Opprettet av'}>{props.behandling.opprettetAv}</Entry>}
-              <Entry labelText={'Siste kjøring'}>{formatIsoTimestamp(props.behandling.sisteKjoring)}</Entry>
-              {props.behandling.ferdig ? (
-                <Entry labelText={'Ferdig'}>{formatIsoTimestamp(props.behandling.ferdig)}</Entry>
-              ) : (
-                <Entry labelText={'Utsatt til'}>{formatIsoTimestamp(props.behandling.utsattTil)}</Entry>
-              )}
-              {props.behandling.slettes && (
-                <Entry labelText={'Slettes'}>{formatIsoTimestamp(props.behandling.slettes)}</Entry>
-              )}
-              {props.behandling.planlagtStartet && (
-                <Entry labelText={'Planlagt kjøring frem i tid'}>
-                  {formatIsoTimestamp(props.behandling.planlagtStartet)}
-                </Entry>
-              )}
-
-              {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
-              {copyPasteEntry('SakId', props.behandling.sakId)}
-              {copyPasteEntry('KravId', props.behandling.kravId)}
-              {copyPasteEntry('VedtakId', props.behandling.vedtakId)}
-              {copyPasteEntry('JournalpostId', props.behandling.journalpostId)}
-
-              {props.behandling.parametere &&
-                Object.entries(props.behandling.parametere).map(([key, value]) => {
-                  return (
-                    <Entry key={key} labelText={`${key}`}>
-                      {value as string}
+                  <Entry labelText={'Opprettet'}>{formatIsoTimestamp(props.behandling.opprettet)}</Entry>
+                  {props.behandling.stoppet && (
+                    <Entry labelText={'Stoppet'}>{formatIsoTimestamp(props.behandling.stoppet)}</Entry>
+                  )}
+                  {props.behandling.opprettetAv && (
+                    <Entry labelText={'Opprettet av'}>{props.behandling.opprettetAv}</Entry>
+                  )}
+                  {props.behandling.stoppetAv && <Entry labelText={'Stoppet av'}>{props.behandling.stoppetAv}</Entry>}
+                  <Entry labelText={'Siste kjøring'}>{formatIsoTimestamp(props.behandling.sisteKjoring)}</Entry>
+                  {props.behandling.ferdig ? (
+                    <Entry labelText={'Ferdig'}>{formatIsoTimestamp(props.behandling.ferdig)}</Entry>
+                  ) : (
+                    <Entry labelText={'Utsatt til'}>{formatIsoTimestamp(props.behandling.utsattTil)}</Entry>
+                  )}
+                  {props.behandling.slettes && (
+                    <Entry labelText={'Slettes'}>{formatIsoTimestamp(props.behandling.slettes)}</Entry>
+                  )}
+                  {props.behandling.planlagtStartet && (
+                    <Entry labelText={'Planlagt kjøring frem i tid'}>
+                      {formatIsoTimestamp(props.behandling.planlagtStartet)}
                     </Entry>
-                  )
-                })}
-            </HGrid>
-          </Box.New>
+                  )}
+
+                  {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
+                  {copyPasteEntry('SakId', props.behandling.sakId)}
+                  {copyPasteEntry('KravId', props.behandling.kravId)}
+                  {copyPasteEntry('VedtakId', props.behandling.vedtakId)}
+                  {copyPasteEntry('JournalpostId', props.behandling.journalpostId)}
+                </HGrid>
+                <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
+                  {props.behandling.parametere &&
+                    Object.entries(props.behandling.parametere).map(([key, value]) => {
+                      return (
+                        <Entry key={key} labelText={`${key}`}>
+                          {value as string}
+                        </Entry>
+                      )
+                    })}
+                </HGrid>
+                {props.behandling.stoppBegrunnelse && (
+                  <Entry labelText={'Stopp begrunnelse'}>{linkifyText(props.behandling.stoppBegrunnelse)}</Entry>
+                )}
+              </VStack>
+            </Box>
+          </VStack>
           <HStack gap="space-16">
             {props.detaljertFremdrift && (
               <Page.Block>
-                <Box.New
+                <Box
                   background={'raised'}
-                  borderRadius={'xlarge'}
+                  borderRadius={'12'}
                   borderWidth={'1'}
                   borderColor={'neutral-subtleA'}
-                  padding={'4'}
+                  padding={'space-16'}
                 >
                   <Suspense fallback={<Loader size="3xlarge" title="Venter..." />}>
                     <Await resolve={props.detaljertFremdrift}>
@@ -514,7 +621,7 @@ export default function BehandlingCard(props: Props) {
                       }
                     </Await>
                   </Suspense>
-                </Box.New>
+                </Box>
               </Page.Block>
             )}
           </HStack>
@@ -559,6 +666,8 @@ export default function BehandlingCard(props: Props) {
 
           {godkjennOpprettelse()}
 
+          {bekreftStoppBehandling()}
+
           {fortsettAvhengigeBehandlinger()}
 
           {props.behandling.behandlingKjoringer.length === 0 && (
@@ -569,7 +678,7 @@ export default function BehandlingCard(props: Props) {
 
           {sendTilOppdragPaNyttButton()}
 
-          {stoppButton()}
+          {hasLink('stopp') && <StoppButton behandling={props.behandling} />}
 
           {props.behandling.behandlingSerieId !== null && (
             <Button
@@ -594,13 +703,12 @@ export default function BehandlingCard(props: Props) {
           {runButton()}
         </HStack>
       </VStack>
-
-      <Box.New
+      <Box
         background={'raised'}
         style={{ padding: '6px', marginTop: '12px' }}
         borderColor={'neutral-subtle'}
         borderWidth={'1'}
-        borderRadius={'medium'}
+        borderRadius={'4'}
         shadow={'dialog'}
       >
         <Tabs
@@ -651,7 +759,7 @@ export default function BehandlingCard(props: Props) {
           </Tabs.List>
           <Outlet />
         </Tabs>
-      </Box.New>
+      </Box>
     </Page>
   )
 }
@@ -773,14 +881,13 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
             >
               <DatePicker.Input
                 label="Ny planlagt startdato"
-                placeholder="dd.mm.åååå"
                 value={inputValue}
                 error={inputError}
                 onChange={(e) => handleInputChange(e.target.value)}
               />
             </DatePicker>
 
-            <HStack gap="4">
+            <HStack gap="space-16">
               <Select
                 label="Time"
                 value={tid.split(':')[0] ?? ''}

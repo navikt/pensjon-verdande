@@ -3,13 +3,14 @@ import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import type React from 'react'
 import { useMemo, useState } from 'react'
-import { Form, type LoaderFunctionArgs, useLoaderData, useSubmit } from 'react-router'
+import { Form, useSubmit } from 'react-router'
 import { hentMuligeAldersoverganger } from '~/aldersovergang/behandling.aldersovergang.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
+import type { Route } from './+types/aldersovergang._index'
 
 type LoaderData = {
   behandlinger: BehandlingerPage
@@ -18,7 +19,11 @@ type LoaderData = {
   kanOverstyreBehandlingsmaned: boolean
   defaultMonth: string
 }
-export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderData> => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Aldersovergang | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData> => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -47,9 +52,8 @@ export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderDat
   }
 }
 
-export default function BatchOpprett_index() {
-  const { behandlinger, maneder, erBegrensUtplukkLovlig, kanOverstyreBehandlingsmaned, defaultMonth } =
-    useLoaderData<typeof loader>()
+export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
+  const { behandlinger, maneder, erBegrensUtplukkLovlig, kanOverstyreBehandlingsmaned, defaultMonth } = loaderData
 
   const [selectedMonthStr, setSelectedMonthStr] = useState(defaultMonth)
   const selectedMonthDate = useMemo(() => parse(selectedMonthStr, 'yyyy-MM', new Date()), [selectedMonthStr])
@@ -68,18 +72,15 @@ export default function BatchOpprett_index() {
       <Heading level="1" size="large" spacing>
         Aldersovergang
       </Heading>
-
       <BodyShort spacing>Velg behandlingsmåned og tidspunkt for kjøring.</BodyShort>
-
       {!kanOverstyreBehandlingsmaned && (
         <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
         </Alert>
       )}
-
       <Form action="opprett" method="POST" style={{ width: '100%', maxWidth: 800 }}>
-        <VStack gap="4" style={{ marginBottom: '2rem' }}>
+        <VStack gap="space-16" style={{ marginBottom: '2rem' }}>
           <div
             style={{
               display: 'grid',
@@ -165,7 +166,6 @@ export default function BatchOpprett_index() {
           )}
         </VStack>
       </Form>
-
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
           Aldersoverganger

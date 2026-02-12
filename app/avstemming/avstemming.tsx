@@ -11,22 +11,20 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import {
-  type ActionFunctionArgs,
-  Await,
-  Form,
-  type LoaderFunctionArgs,
-  useLoaderData,
-  useNavigation,
-} from 'react-router'
+import { Await, Form, useNavigation } from 'react-router'
 import { opprettAvstemmingGrensesnittBehandling } from '~/avstemming/avstemming.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/avstemming'
 
 const behandlingType = 'AvstemmingGrensesnittBehandling'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Avstemming | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -45,7 +43,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const PENAFP = (formData.get('PENAFP') as string) === 'true'
   const PENAFPP = (formData.get('PENAFPP') as string) === 'true'
@@ -106,8 +104,8 @@ function areDatesValid(dateFom: string, dateTom: string) {
   }
 }
 
-export default function Avstemming() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function Avstemming({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
@@ -116,22 +114,21 @@ export default function Avstemming() {
   const [avstemmingsperiodeEnd, setAvstemmingsperiodeEnd] = useState<string | ''>('')
 
   return (
-    <VStack gap={'4'}>
-      <Box.New className={'aksel-pageblock--lg'}>
+    <VStack gap={'space-16'}>
+      <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett avstemming
         </Heading>
-        <VStack gap="2">
+        <VStack gap="space-8">
           <BodyLong>Oppretter behandlinger for grensesnittavstemming mot Oppdrag</BodyLong>
           <Detail>
             Avstemmingsperiode fom settes til starten av angitt dag. Avstemmingsperiode tom settes til slutten av angitt
             dag. For å avstemme for én dag skal altså fom og tom være satt til samme dag.
           </Detail>
         </VStack>
-      </Box.New>
-
+      </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <CheckboxGroup legend="Fagområder">
             <Checkbox name={'PENAFP'} value={'true'} defaultChecked={true}>
               PENAFP
@@ -196,11 +193,9 @@ export default function Avstemming() {
           </Button>
         </VStack>
       </Form>
-
       <Heading level="2" size="medium" style={{ marginTop: '2em' }}>
         Eksisterende avstemminger
       </Heading>
-
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
         <Await resolve={behandlinger}>
           {(it) => (

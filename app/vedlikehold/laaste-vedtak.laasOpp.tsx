@@ -1,11 +1,7 @@
-import type { ActionFunctionArgs } from 'react-router'
-
-import { requireAccessToken } from '~/services/auth.server'
 import { laasOpp } from '~/vedlikehold/vedlikehold.server'
+import type { Route } from './+types/laaste-vedtak.laasOpp'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
+export const action = async ({ request }: Route.ActionArgs) => {
   const data = await request.json()
-  return await laasOpp(accessToken, data.vedtakId)
+  return await laasOpp(request, data.vedtakId)
 }

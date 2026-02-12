@@ -1,18 +1,20 @@
 import { Alert, Button, Heading, HStack, Modal, Select, VStack } from '@navikt/ds-react'
 import { format, parse } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import { useMemo, useRef, useState, useEffect } from 'react'
-import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router'
-import { Form, redirect, useActionData, useLoaderData, useNavigation } from 'react-router'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Form, redirect, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { opprettKontrollereAfpStatEtter65Behandling } from '~/kontroll-afp-stat-etter-65/kontroll-afp-stat-etter-65.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
-import {
-  opprettKontrollereAfpStatEtter65Behandling
-} from '~/kontroll-afp-stat-etter-65/kontroll-afp-stat-etter-65.server'
+import type { Route } from './+types/kontroll-afp-stat-etter-65._index'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Kontroll AFP stat etter 65 | Verdande' }]
+}
+
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
@@ -40,7 +42,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return { success: true, antallOpprettet: behandlingIds.length }
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const accessToken = await requireAccessToken(request)
   const { searchParams } = new URL(request.url)
 
@@ -66,9 +68,8 @@ const genererManedsalternativer = () => {
   })
 }
 
-export default function OpprettKontrollAfpStatEtter65Route() {
-  const { behandlinger } = useLoaderData<typeof loader>()
-  const actionData = useActionData<typeof action>()
+export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const modalRef = useRef<HTMLDialogElement>(null)
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
@@ -83,9 +84,8 @@ export default function OpprettKontrollAfpStatEtter65Route() {
   const formatYearMonth = (mnd: string) => format(parse(mnd, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: nb })
 
   const feilmelding = actionData && 'error' in actionData ? actionData.error : null
-  const suksessmelding = actionData && 'success' in actionData
-    ? `${actionData.antallOpprettet} behandlinger ble opprettet.`
-    : null
+  const suksessmelding =
+    actionData && 'success' in actionData ? `${actionData.antallOpprettet} behandlinger ble opprettet.` : null
 
   // Lukk modal ved oppretting av flere behandlinger samtidig
   useEffect(() => {
@@ -99,9 +99,8 @@ export default function OpprettKontrollAfpStatEtter65Route() {
       <Heading level="1" size="large">
         Kontroll AFP Stat etter 65 år
       </Heading>
-
       <Form id="skjema" method="post">
-        <VStack gap="4">
+        <VStack gap="space-16">
           <div
             style={{
               display: 'grid',
@@ -153,24 +152,18 @@ export default function OpprettKontrollAfpStatEtter65Route() {
             </Alert>
           )}
 
-          <HStack gap="4">
-            <Button
-              type="button"
-              onClick={() => modalRef.current?.showModal()}
-              disabled={!kanOpprette}
-            >
+          <HStack gap="space-16">
+            <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
               Opprett kontroll
             </Button>
           </HStack>
         </VStack>
       </Form>
-
       {suksessmelding && (
         <Alert variant="success" size="small" style={{ marginTop: '1rem' }}>
           {suksessmelding}
         </Alert>
       )}
-
       {/* Sikrer at knappen ikke flytter seg */}
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>
@@ -183,17 +176,11 @@ export default function OpprettKontrollAfpStatEtter65Route() {
           behandlingerResponse={behandlinger}
         />
       </div>
-
-      <Modal
-        ref={modalRef}
-        header={{ heading: 'Start AFP Stat 65 års Kontroll' }}
-        size="small"
-      >
+      <Modal ref={modalRef} header={{ heading: 'Start AFP Stat 65 års Kontroll' }} size="small">
         <Modal.Body>
-          <VStack gap="4">
+          <VStack gap="space-16">
             <div>
-              <b>Fra og med måned:</b>{' '}
-              {selectedFomMaaned ? formatYearMonth(selectedFomMaaned) : '-'}
+              <b>Fra og med måned:</b> {selectedFomMaaned ? formatYearMonth(selectedFomMaaned) : '-'}
             </div>
             <div>
               <b>Antall måneder å opprette:</b> {antallMaaneder}
@@ -206,7 +193,7 @@ export default function OpprettKontrollAfpStatEtter65Route() {
                     const startDate = parse(selectedFomMaaned, 'yyyy-MM', new Date())
                     const d = new Date(startDate)
                     d.setMonth(d.getMonth() + i)
-                    return <li key={i}>{format(d, 'MMMM yyyy', { locale: nb })}</li>
+                    return <li key={format(d, 'yyyy-MM')}>{format(d, 'MMMM yyyy', { locale: nb })}</li>
                   })}
                 </ul>
               </div>
@@ -214,19 +201,10 @@ export default function OpprettKontrollAfpStatEtter65Route() {
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            form="skjema"
-            type="submit"
-            disabled={!kanOpprette || isSubmitting}
-            loading={isSubmitting}
-          >
+          <Button form="skjema" type="submit" disabled={!kanOpprette || isSubmitting} loading={isSubmitting}>
             Start behandling{parseInt(antallMaaneder, 10) > 1 ? 'er' : ''}
           </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => modalRef.current?.close()}
-          >
+          <Button type="button" variant="secondary" onClick={() => modalRef.current?.close()}>
             Tilbake
           </Button>
         </Modal.Footer>

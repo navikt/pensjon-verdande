@@ -1,12 +1,14 @@
 import { Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useRef, useState } from 'react'
-import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
+import { redirect, useFetcher } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { parseSakIds, SakIdTextArea } from '~/uforetrygd/components/input/SakIdTextArea'
 import {
+  HvilendeRettVarselModus,
   opprettHvilendeRettOpphorBehandlinger,
   opprettHvilendeRettVarselbrevBehandlinger,
 } from '~/uforetrygd/hvilende-rett.server'
+import type { Route } from './+types/hvilende-rett'
 
 type Action = {
   type: string
@@ -28,15 +30,28 @@ const hvilendeRettVarselAction: Action = {
     'Dette vil opprette behandlinger for varselbrev for saker med hvilende rett. Er du sikker på at du vil fortsette?',
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Hvilende rett | Verdande' }]
+}
+
+export async function action({ request }: Route.ActionArgs) {
   const formData = Object.fromEntries(await request.formData())
   let response: HvilendeRettBehandlingResponse | undefined
 
   if (formData.action === hvilendeRettVarselAction.type) {
+    const varselmodus = formData.varselmodus as string
+    if (
+      varselmodus !== HvilendeRettVarselModus.FramtidigOpphor &&
+      varselmodus !== HvilendeRettVarselModus.EndeligOpphor
+    ) {
+      throw new Response('Ugyldig varselmodus', { status: 400 })
+    }
+
     response = await opprettHvilendeRettVarselbrevBehandlinger(
       Number(formData.senesteHvilendeAr),
       parseSakIds(formData.sakIds),
       formData.dryRun === 'true',
+      varselmodus as HvilendeRettVarselModus,
       request,
     )
   } else if (formData.action === hvilendeRettOpphorAction.type) {
@@ -56,7 +71,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function HvilendeRettPage() {
   return (
-    <VStack gap="20" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-80" style={{ maxWidth: '50em', margin: '2em' }}>
       {hvilendeRettVarselForm()}
       {hvilendeRettOpphorForm()}
     </VStack>
@@ -80,14 +95,14 @@ function hvilendeRettVarselForm() {
     const newFormData = new FormData(varselFormRef.current)
     newFormData.set('action', hvilendeRettVarselAction.type)
 
-    fetcher.submit(newFormData, { method: 'post' }).catch(console.error)
+    fetcher.submit(newFormData, { method: 'post' })
   }
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading size="medium">Opprett behandlinger for varselbrev for hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={varselFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
             <option value="true">Ja</option>
             <option value="false">Nei</option>
@@ -100,6 +115,13 @@ function hvilendeRettVarselForm() {
             type="text"
             inputMode="numeric"
           />
+          <Select label="Varselmodus" size={'medium'} name={'varselmodus'} defaultValue={''} style={{ width: '20em' }}>
+            <option value="" disabled>
+              Velg
+            </option>
+            <option value="framtidigOpphor">Varsel om framtidig opphør</option>
+            <option value="endeligOpphor">Varsel om endelig opphør</option>
+          </Select>
           <SakIdTextArea fieldName="sakIds" />
           <Button type="submit" style={{ width: '10em' }} disabled={fetcher.state === 'submitting'}>
             Opprett
@@ -133,14 +155,14 @@ function hvilendeRettOpphorForm() {
     const newFormData = new FormData(opphorFormRef.current)
     newFormData.set('action', hvilendeRettOpphorAction.type)
 
-    fetcher.submit(newFormData, { method: 'post' }).catch(console.error)
+    fetcher.submit(newFormData, { method: 'post' })
   }
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading size="medium">Opprett behandlinger for opphør av hvilende rett av Uføretrygd</Heading>
       <fetcher.Form method="post" ref={opphorFormRef} onSubmit={onFormSubmit} style={{ width: '40em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <Select label="Dry Run" size={'medium'} name={'dryRun'} defaultValue={'true'} style={{ width: '10em' }}>
             <option value="true">Ja</option>
             <option value="false">Nei</option>

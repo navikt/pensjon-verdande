@@ -1,17 +1,13 @@
 import { Alert, Button, Heading, TextField, VStack } from '@navikt/ds-react'
-import { type ActionFunctionArgs, Form, useActionData, useNavigation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
+import { Form, useNavigation } from 'react-router'
 import { ugyldiggjorEtteroppgjorHistorikkUfore } from '~/vedlikehold/vedlikehold.server'
+import type { Route } from './+types/etteroppgjor-historikk-ufore'
 
-type ActionData = {
-  success: boolean
-  error: string | null
-  sakId: number | null
-  etteroppgjortAar: number | null
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Etteroppgjør historikk uføre | Verdande' }]
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const accessToken = await requireAccessToken(request)
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const sakId = Number(formData.get('sakId'))
   const etteroppgjortAr = Number(formData.get('etteroppgjortAr'))
@@ -23,7 +19,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
   }
 
-  const response = await ugyldiggjorEtteroppgjorHistorikkUfore(accessToken, sakId, etteroppgjortAr)
+  const response = await ugyldiggjorEtteroppgjorHistorikkUfore(request, sakId, etteroppgjortAr)
 
   return {
     ...response,
@@ -32,8 +28,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 }
 
-export default function EtteroppgjorHistorikkUforePage() {
-  const actionData = useActionData() as ActionData | undefined
+export default function EtteroppgjorHistorikkUforePage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
@@ -41,21 +36,20 @@ export default function EtteroppgjorHistorikkUforePage() {
   const error = actionData?.error
 
   return (
-    <VStack gap="5" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-20" style={{ maxWidth: '50em', margin: '2em' }}>
       {actionData && (
         <>
-          {success && (
+          {success && 'sakId' in actionData && (
             <Alert variant="success">
-              Oppdatert historikk for sakid {actionData.sakId} og etteroppgjort år {actionData.etteroppgjortAar}
+              Oppdatert historikk for sakid {actionData.sakId} og etteroppgjort år {actionData.etteroppgjortAr}
             </Alert>
           )}
           {!success && <Alert variant="error">Feilmelding: {error}</Alert>}
         </>
       )}
       <Heading size="small">Ugyldiggjør EtteroppgjørHistorikk Uføretrygd</Heading>
-
       <Form method="post" style={{ width: '10em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <TextField label="Sak Id" aria-label="sakId" name="sakId" type="text" inputMode="numeric" />
           <TextField
             label="Etteroppgjort År"

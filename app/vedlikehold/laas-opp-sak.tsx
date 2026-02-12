@@ -1,8 +1,12 @@
 import { Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
-import type { ActionFunctionArgs } from 'react-router'
 import { Outlet, redirect, useFetcher } from 'react-router'
+import type { Route } from './+types/laas-opp-sak'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Lås opp sak | Verdande' }]
+}
+
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const sakId = formData.get('sakId')?.toString()
 
@@ -13,18 +17,16 @@ export default function LaasOppSakPage() {
   const fetcher = useFetcher()
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading size="large">Lås opp sak</Heading>
-
       <fetcher.Form method="post">
-        <HStack gap="2" align="end">
+        <HStack gap="space-8" align="end">
           <TextField name="sakId" label="Sak ID" />
           <Button type="submit" loading={fetcher.state !== 'idle'}>
             Hent sak
           </Button>
         </HStack>
       </fetcher.Form>
-
       <Outlet />
     </VStack>
   )

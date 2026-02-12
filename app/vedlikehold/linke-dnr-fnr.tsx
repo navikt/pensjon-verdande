@@ -1,22 +1,23 @@
 import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import type { ActionFunctionArgs } from 'react-router'
-import { Form, useActionData } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
+import { Form } from 'react-router'
 import { linkDnrFnr } from '~/vedlikehold/vedlikehold.server'
+import type { Route } from './+types/linke-dnr-fnr'
 
-export default function LinkeDnrFnrPage() {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Linke D-nr/F-nr | Verdande' }]
+}
+
+export default function LinkeDnrFnrPage({ actionData }: Route.ComponentProps) {
   const [gammeltIdent, setGammelIdent] = useState('')
   const [nyIdent, setNyIdent] = useState('')
-
-  const actionData = useActionData() as ActionData | undefined
 
   const success = actionData?.success
   const error = actionData?.error
 
   return (
     <div>
-      <VStack gap="5">
+      <VStack gap="space-20">
         <HStack>
           <Heading size="large">Linke Dnr Fnr</Heading>
         </HStack>
@@ -37,7 +38,7 @@ export default function LinkeDnrFnrPage() {
         )}
 
         <Form method="post">
-          <VStack gap="3">
+          <VStack gap="space-12">
             <TextField
               label="Gammelt ident"
               name="gammelIdent"
@@ -64,14 +65,8 @@ export default function LinkeDnrFnrPage() {
   )
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
-  const accessToken = await requireAccessToken(request)
 
-  return await linkDnrFnr(accessToken, formData.get('gammelIdent'), formData.get('nyIdent'))
-}
-
-type ActionData = {
-  success: boolean
-  error: string | null
+  return await linkDnrFnr(request, formData.get('gammelIdent'), formData.get('nyIdent'))
 }

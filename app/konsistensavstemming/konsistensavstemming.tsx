@@ -11,22 +11,20 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
-import {
-  type ActionFunctionArgs,
-  Await,
-  Form,
-  type LoaderFunctionArgs,
-  useLoaderData,
-  useNavigation,
-} from 'react-router'
+import { Await, Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { opprettKonsistensavstemmingBehandling } from '~/konsistensavstemming/konsistensavstemming.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { Route } from './+types/konsistensavstemming'
 
 const behandlingType = 'KonsistensavstemmingBehandling'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Konsistensavstemming | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const size = searchParams.get('size')
   const page = searchParams.get('page')
@@ -36,7 +34,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const behandlinger = getBehandlinger(accessToken, {
     behandlingType: behandlingType,
     page: page ? +page : 0,
-    size: size ? +size : 10,
+    size: size ? +size : 9,
     sort: searchParams.get('sort'),
   })
 
@@ -45,7 +43,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const PENAFP = (formData.get('PENAFP') as string) === 'true'
   const PENAFPP = (formData.get('PENAFPP') as string) === 'true'
@@ -55,8 +53,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const PENGJ = (formData.get('PENGJ') as string) === 'true'
   const PENGY = (formData.get('PENGY') as string) === 'true'
   const PENKP = (formData.get('PENKP') as string) === 'true'
-  const PENUP = (formData.get('PENUP') as string) === 'true'
-  // const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
+  const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
   const accessToken = await requireAccessToken(request)
 
@@ -70,8 +67,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     PENGJ,
     PENGY,
     PENKP,
-    PENUP,
-    // UFOREUT,
+    UFOREUT,
     avstemmingsdato,
   )
 
@@ -106,8 +102,8 @@ function areDatesValid(dateFom: string) {
   }
 }
 
-export default function Konsistensavstemming() {
-  const { behandlinger } = useLoaderData<typeof loader>()
+export default function Konsistensavstemming({ loaderData }: Route.ComponentProps) {
+  const { behandlinger } = loaderData
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
@@ -115,19 +111,18 @@ export default function Konsistensavstemming() {
   const [avstemmingsdato, setAvstemmingsdato] = useState<string | ''>('')
 
   return (
-    <VStack gap={'4'}>
-      <Box.New className={'aksel-pageblock--lg'}>
+    <VStack gap={'space-16'}>
+      <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
           Opprett avstemming
         </Heading>
-        <VStack gap="2">
+        <VStack gap="space-8">
           <BodyLong>Oppretter behandlinger for konsistensavstemming mot Oppdrag</BodyLong>
           <Detail>Avstemmingsperiode fom settes til starten av angitt måned.</Detail>
         </VStack>
-      </Box.New>
-
+      </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'4'}>
+        <VStack gap={'space-16'}>
           <CheckboxGroup legend="Fagområder">
             <Checkbox name={'PENAFP'} value={'true'} defaultChecked={true}>
               PENAFP
@@ -153,12 +148,9 @@ export default function Konsistensavstemming() {
             <Checkbox name={'PENKP'} value={'true'} defaultChecked={true}>
               PENKP
             </Checkbox>
-            <Checkbox name={'PENUP'} value={'true'} defaultChecked={true}>
-              PENUP
+            <Checkbox name={'UFOREUT'} value={'true'} defaultChecked={true}>
+              UFOREUT
             </Checkbox>
-            {/*<Checkbox name={'UFOREUT'} value={'true'} defaultChecked={true}>*/}
-            {/*  UFOREUT*/}
-            {/*</Checkbox>*/}
           </CheckboxGroup>
           <TextField
             label="Avstemmingsdato:"
@@ -180,11 +172,9 @@ export default function Konsistensavstemming() {
           </Button>
         </VStack>
       </Form>
-
       <Heading level="2" size="medium" style={{ marginTop: '2em' }}>
         Eksisterende avstemminger
       </Heading>
-
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
         <Await resolve={behandlinger}>
           {(it) => (

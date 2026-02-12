@@ -3,8 +3,8 @@ export const BEHANDLING_STATUS_MAP = {
   FEILENDE: 'Feilende',
   FULLFORT: 'Fullført',
   OPPRETTET: 'Opprettet',
-  OPPRETTET_VENTER_TO_TRINNS_GODKJENNING: 'Venter godkjenning',
   STOPPET: 'Stoppet',
+  STOPPET_VENTER_BEKREFTELSE: 'Stoppet, venter bekreftelse',
   UNDER_BEHANDLING: 'Under behandling',
 } as const
 
@@ -14,6 +14,7 @@ const BEHANDLING_STATUS_VARIANT_MAP = {
   FULLFORT: 'success',
   OPPRETTET: 'info',
   STOPPET: 'warning',
+  STOPPET_VENTER_BEKREFTELSE: 'warning',
   UNDER_BEHANDLING: 'info',
 } as const
 

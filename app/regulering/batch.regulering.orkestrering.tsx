@@ -1,4 +1,3 @@
-import type { ActionFunctionArgs } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
@@ -23,8 +22,9 @@ import { Entry } from '~/components/entry/Entry'
 import { startOrkestrering } from '~/regulering/regulering.server'
 import type { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering/regulering.types'
 import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
+import type { Route } from './+types/batch.regulering.orkestrering'
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const antallFamilier = formData.get('antallFamilier') as string
@@ -54,15 +54,15 @@ export default function Orkestrering() {
 
   return (
     <>
-      <HStack gap="5">
-        <VStack gap="5">
+      <HStack gap="space-20">
+        <VStack gap="space-20">
           <Heading level="2" size="medium">
             Start orkestrering
           </Heading>
           <Entry labelText="Antall ubehandlede familier">{uttrekk.antallUbehandlede}</Entry>
           <Entry labelText="Antall ekskluderte saker">{uttrekk.antallEkskluderteSaker}</Entry>
           <Form method="post">
-            <VStack gap="3">
+            <VStack gap="space-12">
               <TextField
                 label="Antall familier"
                 name="antallFamilier"
@@ -80,7 +80,7 @@ export default function Orkestrering() {
                   Send til samordning
                 </Checkbox>
               </CheckboxGroup>
-              <HStack gap="3" align="center">
+              <HStack gap="space-12" align="center">
                 <div>
                   <Button loading={navigation.state === 'submitting'} type="submit">
                     Start orkestrering
@@ -94,9 +94,9 @@ export default function Orkestrering() {
           </Form>
         </VStack>
       </HStack>
-      <VStack gap="5">
-        <HStack gap="10">
-          <VStack gap="4" style={{ paddingRight: '5rem' }}>
+      <VStack gap="space-20">
+        <HStack gap="space-40">
+          <VStack gap="space-16" style={{ paddingRight: '5rem' }}>
             <Heading level="2" size="medium">
               Orkestreringer
             </Heading>
@@ -113,7 +113,7 @@ export default function Orkestrering() {
               />
             ))}
           </VStack>
-          <VStack gap="5">{orkestreringer.length !== 0 && <AggregerteFeilmeldingerTabell />}</VStack>
+          <VStack gap="space-20">{orkestreringer.length !== 0 && <AggregerteFeilmeldingerTabell />}</VStack>
         </HStack>
       </VStack>
     </>
@@ -150,8 +150,8 @@ export function OrkestreringDetaljer({
   }
 
   return (
-    <VStack gap="5">
-      <HStack gap="5" align="end">
+    <VStack gap="space-20">
+      <HStack gap="space-20" align="end">
         <Entry labelText="Status">
           {orkestrering.status === Behandlingstatus.OPPRETTET && (
             <Alert variant="info" size="small" inline>
@@ -160,7 +160,7 @@ export function OrkestreringDetaljer({
           )}
           {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
             <Alert variant="info" size="small" inline>
-              <HStack gap="2">
+              <HStack gap="space-8">
                 Under behandling <Loader size="small" />
               </HStack>
             </Alert>
@@ -193,8 +193,9 @@ export function OrkestreringDetaljer({
         {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
           <div>
             <Button
+              data-color="neutral"
               size="xsmall"
-              variant="secondary-neutral"
+              variant="secondary"
               loading={fetcher.state === 'submitting'}
               icon={<PauseIcon />}
               onClick={() => pauseOrkestrering()}
@@ -281,11 +282,11 @@ export function AggregerteFeilmeldingerTabell() {
   const { aggregerteFeilmeldinger } = aggregerteFeilmeldingerWrapper
 
   return (
-    <VStack gap="5">
+    <VStack gap="space-20">
       <Heading level="2" size="medium">
         Feilmeldinger
       </Heading>
-      <HStack style={{ marginLeft: 'auto' }} gap="3">
+      <HStack style={{ marginLeft: 'auto' }} gap="space-12">
         {aggregerteFeilmeldinger.length > 0 && (
           <Table>
             <Table.Header>

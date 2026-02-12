@@ -13,7 +13,12 @@ export function AuditTableActionMenu({ row }: Props) {
   return (
     <ActionMenu>
       <ActionMenu.Trigger>
-        <Button variant="tertiary-neutral" icon={<MenuElipsisVerticalIcon title="Saksmeny" />} size="small" />
+        <Button
+          data-color="neutral"
+          variant="tertiary"
+          icon={<MenuElipsisVerticalIcon title="Saksmeny" />}
+          size="small"
+        />
       </ActionMenu.Trigger>
       <ActionMenu.Content>
         <ActionMenu.Group label={`Behandling ${row.behandlingId}`}>
@@ -25,7 +30,7 @@ export function AuditTableActionMenu({ row }: Props) {
         </ActionMenu.Group>
         {row.aktivitetId && (
           <ActionMenu.Group label={`Aktivitet ${row.aktivitetId}`}>
-            <ActionMenu.Item onSelect={console.info}>
+            <ActionMenu.Item>
               <Link as={NavLink} to={`/behandling/${row.behandlingId}/aktivitet/${row.aktivitetId}`}>
                 Åpne aktivitet
               </Link>

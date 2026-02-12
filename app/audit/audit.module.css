@@ -1,14 +1,14 @@
 .pageTopMargin {
-  margin-top: 1.5rem;
+  margin-top: var(--ax-space-24);
 }
 
 .filterFieldset {
-  border: 1px solid var(--a-border-default);
-  border-radius: 12px;
-  padding: 1rem;
+  border: 1px solid var(--ax-border-neutral);
+  border-radius: var(--ax-radius-12);
+  padding: var(--ax-space-16);
 }
 
 .filterLegend {
-  padding-inline: 0.5rem;
+  padding-inline: var(--ax-space-8);
   font-size: 0.875rem;
 }
