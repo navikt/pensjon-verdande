@@ -24,4 +24,4 @@ export const env = ensureEnv({
 })
 
 export const isAldeLinkEnabled = env.aldeLinkEnabled === 'true'
-export const isLocalEnv = process.env.IS_LOCAL_ENV === 'true'
+export const isDevelopment = process.env.NODE_ENV === 'development'

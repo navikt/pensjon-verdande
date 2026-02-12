@@ -1,6 +1,5 @@
 import winston from 'winston'
-
-const isDevelopment = process.env.ENV === 'local'
+import { isDevelopment } from '~/services/env.server'
 
 export const logger = winston.createLogger({
   level: isDevelopment ? 'debug' : 'info',

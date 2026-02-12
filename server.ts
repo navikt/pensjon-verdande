@@ -3,8 +3,7 @@ import compression from 'compression'
 import express, { type Request, type Response } from 'express'
 import winston from 'winston'
 import * as build from './build/server/index.js'
-
-const isDevelopment = process.env.ENV === 'local'
+import {isDevelopment} from "~/services/env.server";
 
 const logger = winston.createLogger({
   level: isDevelopment ? 'debug' : 'info',

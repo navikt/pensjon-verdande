@@ -100,7 +100,6 @@ fetch_kubernetes_secrets "AzureAD" "dev-gcp" "pensjon-$env" "azure-pensjon-verda
   echo AZURE_CALLBACK_URL=http://localhost:3000/auth/callback
   echo ENABLE_OAUTH20_CODE_FLOW=true
   echo ENV=q2
-  echo IS_LOCAL_ENV="'true'"
   echo LOKI_API_BASE_URL='https://loki.dev.nav.cloud.nais.io'
   echo PEN_APPLICATION=pensjon-pen-q2
   echo PEN_SCOPE=api://dev-fss.pensjon-q2.pensjon-pen-q2/.default
