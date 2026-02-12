@@ -33,7 +33,7 @@ export default function EkskluderteSaker() {
               {ekskluderteSakerMedKommentar !== undefined ? (
                 <EkskluderingerMedKommentarTable ekskluderingerMedKommentar={ekskluderteSakerMedKommentar} />
               ) : (
-                <Loader />
+                <Loader title="Laster ekskluderte saker…" />
               )}
             </Tabs.Panel>
           </Tabs>
@@ -137,7 +137,7 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
                 Ekskluderingsliste oppdatert
               </Alert>
             )}
-            {harLagtTilSaker && !response?.erOppdatert && <Loader />}
+            {harLagtTilSaker && !response?.erOppdatert && <Loader title="Oppdaterer liste…" />}
             <Textarea
               label="Saksnummer"
               name="saksnummerListe"
@@ -227,7 +227,7 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
                 Ekskluderingsliste oppdatert
               </Alert>
             )}
-            {harFjernetSaker && !response?.erOppdatert && <Loader />}
+            {harFjernetSaker && !response?.erOppdatert && <Loader title="Oppdaterer liste…" />}
             <Textarea
               label="Saksnummer"
               name="saksnummerListe"

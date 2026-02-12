@@ -328,7 +328,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                 zIndex: 10,
               }}
             >
-              <Loader size="xlarge" />
+              <Loader size="xlarge" title="Laster data…" />
             </Box>
           )}
           <VStack gap="space-16">
