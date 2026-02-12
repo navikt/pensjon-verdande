@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
+import { BodyShort, Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { Link, useFetcher, useSearchParams } from 'react-router'
@@ -165,7 +165,9 @@ export default function BehandlingerTable({
         }}
         zebraStripes
       >
-        <caption>Behandlinger</caption>
+        <BodyShort as="caption" visuallyHidden>
+          Behandlinger
+        </BodyShort>
         <Table.Header>
           <Table.Row>
             {inkluderFortsett && (

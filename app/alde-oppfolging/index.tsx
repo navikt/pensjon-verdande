@@ -416,7 +416,9 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                   Avbrutte behandlinger
                 </Heading>
                 <Table size="medium" zebraStripes>
-                  <caption>Avbrutte behandlinger</caption>
+                  <BodyShort as="caption" visuallyHidden>
+                    Avbrutte behandlinger
+                  </BodyShort>
                   <Table.Header>
                     <Table.Row>
                       <Table.ColumnHeader style={{ width: '10rem' }}>Tid</Table.ColumnHeader>

@@ -1,4 +1,4 @@
-import { Table } from '@navikt/ds-react'
+import { BodyShort, Table } from '@navikt/ds-react'
 import type { IkkeFullforteAktiviteterDTO } from '~/types'
 
 export interface Props {
@@ -8,7 +8,9 @@ export interface Props {
 export default function IkkeFullforteAktiviteter(props: Props) {
   return (
     <Table>
-      <caption>Ikke fullførte aktiviteter</caption>
+      <BodyShort as="caption" visuallyHidden>
+        Ikke fullførte aktiviteter
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandling</Table.HeaderCell>
