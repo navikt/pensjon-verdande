@@ -307,7 +307,6 @@ function AnsvarligTeam({ behandlingId, vedtak }: { behandlingId: string; vedtak:
   const fetcher = useFetcher()
 
   function oppdaterTeam(nyttTeam: string) {
-    console.log('oppdater team', nyttTeam, behandlingId, vedtak)
     fetcher.submit(
       {
         behandlingId,
@@ -350,7 +349,6 @@ function Aksjonspunkt({ behandlingId, vedtak }: { behandlingId: string; vedtak: 
   const fetcher = useFetcher()
 
   function oppdaterAksjonspunkt(nyttAksjonspunkt: string) {
-    console.log('oppdater aksjonspunkt', nyttAksjonspunkt, behandlingId, vedtak)
     fetcher.submit(
       {
         behandlingId,
@@ -596,7 +594,6 @@ function Kommentar({ behandlingId, vedtak }: { behandlingId: string; vedtak: Laa
     if (kommentar === vedtak.kommentar) {
       return
     }
-    console.log('oppdater kommentar', kommentar, behandlingId, vedtak)
     fetcher.submit(
       {
         behandlingId,

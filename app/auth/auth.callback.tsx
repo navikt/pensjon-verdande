@@ -1,11 +1,12 @@
 import { redirect } from 'react-router'
 import invariant from 'tiny-invariant'
 import { authenticator, returnToCookie, sessionStorage } from '~/services/auth.server'
-import { isLocalEnv } from '~/services/env.server'
+import { isDevelopment } from '~/services/env.server'
+import { logger } from '~/services/logger.server'
 import type { Route } from './+types/auth.callback'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  if (!isLocalEnv) {
+  if (!isDevelopment) {
     throw new Error('OAuth 2.0 code flyt er kun tilgjengelig ved lokal utvikling')
   }
 
@@ -26,7 +27,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       headers: { 'Set-Cookie': await sessionStorage.commitSession(session) },
     })
   } catch (error) {
-    console.error('Feil ved autentisering', error)
+    logger.error('Feil ved autentisering', { error })
 
     throw error
   }

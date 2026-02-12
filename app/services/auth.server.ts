@@ -8,7 +8,8 @@ import {
 } from 'react-router'
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
-import { env, isLocalEnv } from '~/services/env.server'
+import { env, isDevelopment } from '~/services/env.server'
+import { logger } from '~/services/logger.server'
 import { exchange } from '~/services/obo.server'
 
 type User = {
@@ -20,11 +21,11 @@ export let sessionStorage: SessionStorage<SessionData, SessionData> | undefined
 export let returnToCookie: Cookie | undefined
 export let authenticator: Authenticator<User> | undefined
 
-if (isLocalEnv) {
+if (isDevelopment) {
   const azureCallbackUrl = process.env.AZURE_CALLBACK_URL
 
   if (azureCallbackUrl === undefined) {
-    console.error(`Må definere AZURE_CALLBACK_URL ved lokal utvikling`)
+    logger.error('Må definere AZURE_CALLBACK_URL ved lokal utvikling')
     process.exit(1)
   }
 
@@ -91,7 +92,7 @@ export async function requireAccessToken(request: Request) {
   if (authorization?.toLowerCase().startsWith('bearer')) {
     const tokenResponse = await exchange(authorization?.substring('bearer '.length), env.penScope)
     return tokenResponse.access_token
-  } else if (isLocalEnv) {
+  } else if (isDevelopment) {
     // biome-ignore lint/style/noNonNullAssertion: Skal være satt før man kommer hit
     const session = await sessionStorage!.getSession(request.headers.get('cookie'))
 

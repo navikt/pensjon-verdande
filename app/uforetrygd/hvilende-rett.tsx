@@ -95,7 +95,7 @@ function hvilendeRettVarselForm() {
     const newFormData = new FormData(varselFormRef.current)
     newFormData.set('action', hvilendeRettVarselAction.type)
 
-    fetcher.submit(newFormData, { method: 'post' }).catch(console.error)
+    fetcher.submit(newFormData, { method: 'post' })
   }
 
   return (
@@ -155,7 +155,7 @@ function hvilendeRettOpphorForm() {
     const newFormData = new FormData(opphorFormRef.current)
     newFormData.set('action', hvilendeRettOpphorAction.type)
 
-    fetcher.submit(newFormData, { method: 'post' }).catch(console.error)
+    fetcher.submit(newFormData, { method: 'post' })
   }
 
   return (
