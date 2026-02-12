@@ -1,4 +1,4 @@
-import { Link, Table } from '@navikt/ds-react'
+import { BodyShort, Link, Table } from '@navikt/ds-react'
 import { NavLink } from 'react-router'
 
 import invariant from 'tiny-invariant'
@@ -31,7 +31,9 @@ export default function BehandlingManuellOpptelling({ loaderData }: Route.Compon
 
   return (
     <Table>
-      <caption>Manuell opptelling per behandlingstype</caption>
+      <BodyShort as="caption" visuallyHidden>
+        Manuell opptelling per behandlingstype
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Behandlingstype</Table.HeaderCell>

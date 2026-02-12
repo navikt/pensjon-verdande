@@ -1,4 +1,4 @@
-import { Table } from '@navikt/ds-react'
+import { BodyShort, Table } from '@navikt/ds-react'
 import { Link } from 'react-router'
 
 import invariant from 'tiny-invariant'
@@ -34,7 +34,9 @@ export default function ManuelleBehandlinger({ loaderData }: Route.ComponentProp
 
   return (
     <Table>
-      <caption>Manuelle oppgaver</caption>
+      <BodyShort as="caption" visuallyHidden>
+        Manuelle oppgaver
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Aktivitet</Table.HeaderCell>

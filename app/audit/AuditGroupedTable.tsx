@@ -23,7 +23,9 @@ export function AuditGroupedTable({
         onSortChange(sortKey as AuditGroupedSortState['orderBy'])
       }}
     >
-      <caption>Gruppert auditlogg</caption>
+      <BodyShort as="caption" visuallyHidden>
+        Gruppert auditlogg
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell />

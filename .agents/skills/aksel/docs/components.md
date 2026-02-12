@@ -681,7 +681,7 @@ Tabell for strukturert data.
 **Retningslinjer:**
 - Venstrejuster tekst, høyrejuster tall
 - Bruk `Table.HeaderCell` (th) for overskriftceller, ikke DataCell
-- Bruk `caption` for skjermlesere
+- Bruk `<BodyShort as="caption" visuallyHidden>` for skjermlesere
 - Bruk ActionMenu for handlinger i rader
 
 ---
