@@ -1,4 +1,12 @@
 import type { DateRange as RDDateRange } from 'react-day-picker'
+import {
+  erDatoEkskludertAvRegler,
+  erDatoIEkskludertMnd,
+  erMaanedFull,
+  getMaksBehandlingerPerMnd,
+  type SerieValg,
+} from './serieValg'
+
 export type DateRange = RDDateRange
 
 export function toYearMonthDay(date: Date): string {
@@ -6,6 +14,17 @@ export function toYearMonthDay(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+export function toYearMonth(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  return `${year}-${month}`
+}
+
+export function parseYmd(ymd: string): Date {
+  const [year, month, day] = ymd.split('-').map(Number)
+  return new Date(year, month - 1, day)
 }
 
 function startOfDay(date: Date): Date {
@@ -225,8 +244,8 @@ export function buildValgteDatoer(
     const date = new Date(year, month - 1, day)
     if (ekskluderHelg && isWeekend(date)) return false
     if (!ekskluderHelg && ekskluderSondag && date.getDay() === 0) return false
-    if (ekskluderHelligdager && helligdagerYearMonthDaySet.has(yearMonthDay)) return false
-    return true
+    return !(ekskluderHelligdager && helligdagerYearMonthDaySet.has(yearMonthDay));
+
   })
 }
 
@@ -235,6 +254,8 @@ type DeaktiverteDatoerOptions = {
   toDate: Date
   bookedDates: Date[]
   helligdagsdatoer: Date[]
+  serieValg: SerieValg
+  antallPerMaaned: Map<string, number>
   ekskluderHelg: boolean
   ekskluderHelligdager: boolean
   ekskluderSondag: boolean
@@ -245,6 +266,8 @@ export function buildDisabledDates({
   toDate,
   bookedDates,
   helligdagsdatoer,
+  serieValg,
+  antallPerMaaned,
   ekskluderHelg,
   ekskluderHelligdager,
   ekskluderSondag,
@@ -252,11 +275,17 @@ export function buildDisabledDates({
   const disabledSet = new Set<number>()
   const addDisabled = (date: Date) => disabledSet.add(startOfDay(date).getTime())
 
+  const maksValgtePerMnd = getMaksBehandlingerPerMnd(serieValg)
+
   const start = startOfDay(fromDate)
   const end = startOfDay(toDate)
   for (let d = start; d.getTime() <= end.getTime(); d = addDays(d, 1)) {
     if (ekskluderHelg && isWeekend(d)) addDisabled(d)
     else if (!ekskluderHelg && ekskluderSondag && d.getDay() === 0) addDisabled(d)
+
+    if (erDatoEkskludertAvRegler(d, serieValg)) addDisabled(d)
+    if (erDatoIEkskludertMnd(d, serieValg)) addDisabled(d)
+    if (erMaanedFull(d, antallPerMaaned, maksValgtePerMnd)) addDisabled(d)
   }
 
   if (ekskluderHelligdager) for (const date of helligdagsdatoer) addDisabled(date)

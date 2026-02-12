@@ -1,5 +1,6 @@
 import { env } from '~/services/env.server'
 import type { BehandlingSerieDTO } from '~/types'
+import { DEFAULT_SERIE_VALG, type SerieValg } from './serieValg'
 
 const BASE = env.penUrl
 
@@ -23,6 +24,23 @@ async function req(url: string, init: RequestInit & { accessToken: string }) {
 export async function getBehandlingSerier(accessToken: string, behandlingCode: string): Promise<BehandlingSerieDTO[]> {
   if (!behandlingCode) return []
   const res = await req(`/api/behandling/serier?behandlingCode=${encodeURIComponent(behandlingCode)}`, {
+    method: 'GET',
+    accessToken,
+  })
+  return res.json()
+}
+
+export async function hentSerieValg(accessToken: string, behandlingCode: string): Promise<SerieValg> {
+  if (!behandlingCode) return DEFAULT_SERIE_VALG
+  const res = await req(`/api/behandling/serier/valg?behandlingCode=${encodeURIComponent(behandlingCode)}`, {
+    method: 'GET',
+    accessToken,
+  })
+  return res.json()
+}
+
+export async function getTillateBehandlinger(accessToken: string): Promise<string[]> {
+  const res = await req(`/api/behandling/serier/tillateBehandlinger`, {
     method: 'GET',
     accessToken,
   })
