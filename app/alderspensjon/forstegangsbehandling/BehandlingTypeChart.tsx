@@ -1,5 +1,5 @@
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip, type TooltipModel } from 'chart.js'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Bar } from 'react-chartjs-2'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
@@ -27,10 +27,6 @@ export function BehandlingTypeChart({ behandlingTyper }: BehandlingTypeChartProp
   } | null>(null)
 
   const total = behandlingTyper.auto + behandlingTyper.manuell + behandlingTyper.delAuto + behandlingTyper.ikkeFullort
-
-  useEffect(() => {
-    console.log('BehandlingTypeChart mounted with data:', behandlingTyper, 'total:', total)
-  }, [behandlingTyper, total])
 
   if (total === 0) {
     return <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>Ingen data</span>

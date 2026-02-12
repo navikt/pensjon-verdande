@@ -123,7 +123,6 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  console.log({ error })
   if (error instanceof Error && error.message === 'Server Timeout') {
     return (
       <Box style={{ paddingTop: '0.5em' }}>

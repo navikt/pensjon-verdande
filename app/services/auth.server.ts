@@ -9,6 +9,7 @@ import {
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
 import { env, isLocalEnv } from '~/services/env.server'
+import { logger } from '~/services/logger.server'
 import { exchange } from '~/services/obo.server'
 
 type User = {
@@ -24,7 +25,7 @@ if (isLocalEnv) {
   const azureCallbackUrl = process.env.AZURE_CALLBACK_URL
 
   if (azureCallbackUrl === undefined) {
-    console.error(`Må definere AZURE_CALLBACK_URL ved lokal utvikling`)
+    logger.error('Må definere AZURE_CALLBACK_URL ved lokal utvikling')
     process.exit(1)
   }
 

@@ -55,23 +55,20 @@ process.on('unhandledRejection', (reason: unknown) => {
     stack = inspect(unwrap, { depth: 2, breakLength: 120 })
   }
 
-  console.error('Unhandled rejection', { reason: unwrap, stack })
+  logger.error('Unhandled rejection', { reason: unwrap, stack })
 })
 
 process.on('uncaughtException', (error: Error) => {
   const stack = `${error.name}: ${error.message}\n${error.stack ?? ''}`
 
-  console.error('Uncaught exception', {
-    error,
-    stack,
-  })
+  logger.error('Uncaught exception', { error, stack })
 
   process.exit(1)
 })
 
 export function handleError(error: unknown, { request }: LoaderFunctionArgs | ActionFunctionArgs) {
   if (!request.signal.aborted) {
-    logger.error({ err: error }, 'Unhandled error')
+    logger.error('Unhandled error', { error })
   }
 }
 
@@ -134,7 +131,7 @@ function handleBotRequest(
         // errors encountered during initial shell rendering since they'll
         // reject and get logged in handleDocumentRequest.
         if (shellRendered) {
-          console.error(error)
+          logger.error('Streaming render error', { error })
         }
       },
     })
@@ -177,7 +174,7 @@ function handleBrowserRequest(
         // errors encountered during initial shell rendering since they'll
         // reject and get logged in handleDocumentRequest.
         if (shellRendered) {
-          console.error(error)
+          logger.error('Streaming render error', { error })
         }
       },
     })

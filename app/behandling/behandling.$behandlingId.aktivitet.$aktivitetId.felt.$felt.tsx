@@ -35,16 +35,13 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
 export default function Felt({ loaderData }: Route.ComponentProps) {
   const { value } = loaderData
-  console.log(value)
 
   try {
     if (!value) {
       return <pre></pre>
     } else if (value.startsWith('<?xml')) {
-      console.log(value.substring(0, 10))
       return <pre>{xmlFormat(value)}</pre>
     } else {
-      console.log(value.substring(0, 10))
       return <pre>{JSON.stringify(value, null, 2)}</pre>
     }
   } catch (_error) {
