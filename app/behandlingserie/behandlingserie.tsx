@@ -13,11 +13,8 @@ import {
 } from '@navikt/ds-react'
 import {useCallback, useEffect, useId, useMemo, useState} from 'react'
 import {
-    type ActionFunctionArgs,
-    type LoaderFunctionArgs,
     redirect,
     useFetcher,
-    useLoaderData,
     useNavigate,
     useSearchParams,
 } from 'react-router'
@@ -38,7 +35,6 @@ import type {BehandlingInfoDTO, BehandlingSerieDTO} from '~/types'
 import type { Route } from './+types/behandlingserie'
 import {byggRegelAdvarsler, filtrerDatoerMedRegler, type SerieValg, tellDatoerPerMaaned,} from './serieValg'
 import {
-  addMonths,
   allWeekdaysInRange,
   buildDisabledDates,
   buildValgteDatoer,
@@ -51,6 +47,7 @@ import {
   tertialStartDates,
   toYearMonthDay,
 } from './seriekalenderUtils'
+import {addMonths} from "date-fns";
 
 type RegelmessighetModus = 'range' | 'multiple'
 type Utvalg = Date[] | DateRange | undefined
@@ -320,7 +317,7 @@ function KalenderSeksjon({
   kanTomme: boolean
 }) {
   return (
-    <VStack gap="4">
+    <VStack>
       {regelAdvarsler.length > 0 && (
         <Alert variant="info" size="small">
           {regelAdvarsler.length === 1 ? (
