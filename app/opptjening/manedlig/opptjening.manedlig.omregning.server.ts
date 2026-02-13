@@ -6,11 +6,15 @@ export async function opprettOpptjeningsendringMandeligOmregning(
   kjoeretidspunkt: string,
   avsjekkForKjoring: boolean,
 ): Promise<StartBatchResponse> {
-  const result = await apiPost<StartBatchResponse>('/api/opptjening/mandeliguttrekk/opprett', {
-    behandlingsmaned,
-    kjoeretidspunkt,
-    avsjekkForKjoring,
-  }, request)
+  const result = await apiPost<StartBatchResponse>(
+    '/api/opptjening/mandeliguttrekk/opprett',
+    {
+      behandlingsmaned,
+      kjoeretidspunkt,
+      avsjekkForKjoring,
+    },
+    request,
+  )
   return result as StartBatchResponse
 }
 

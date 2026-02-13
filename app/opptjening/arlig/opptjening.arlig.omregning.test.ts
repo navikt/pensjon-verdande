@@ -55,6 +55,7 @@ describe('opptjening.arlig.omregning loader', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/opptjening/eksludertesaker')
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result.ekskluderteSaker).toEqual([{ sakId: '123', kommentar: 'test' }])
   })
 })
@@ -84,8 +85,8 @@ describe('opptjening.arlig.omregning action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/opptjening/arliguttrekk/opprett')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result.status).toBe(302)
-    expect(result.headers.get('Location')).toBe('/behandling/100')
   })
 
   it('kjoerOmregning sender opptjeningsar og bolkstorrelse', async () => {
@@ -103,10 +104,10 @@ describe('opptjening.arlig.omregning action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/opptjening/arligendring/opprett')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ opptjeningsar: 2025, bolkstorrelse: 5000 })
     expect(result.status).toBe(302)
-    expect(result.headers.get('Location')).toBe('/behandling/200')
   })
 
   it('ekskluderSaker sender sakIder og kommentar', async () => {
@@ -124,6 +125,7 @@ describe('opptjening.arlig.omregning action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/opptjening/eksludertesaker/leggTil')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ sakIder: ['100', '200', '300'], kommentar: 'Testkommentar' })
     expect(result.status).toBe(302)

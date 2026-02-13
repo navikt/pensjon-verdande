@@ -56,6 +56,7 @@ describe('opptjening.manedlig.omregning.opprett action', () => {
     expect(url).toBe('http://pen-test/api/opptjening/mandeliguttrekk/opprett')
     expect(init.method).toBe('POST')
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
+    expect(init.signal).toBeInstanceOf(AbortSignal)
 
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({
