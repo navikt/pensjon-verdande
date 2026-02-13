@@ -1,6 +1,6 @@
 import 'chart.js/auto'
 import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
-import { Alert, Button, Dropdown, HStack, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
+import { Button, Dropdown, HStack, InlineMessage, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
 import { Link, useFetcher, useOutletContext } from 'react-router'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
@@ -290,9 +290,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
                 </Entry>
               </VStack>
             ) : (
-              <Alert variant="info" inline>
-                Uttrekk ikke kjørt enda
-              </Alert>
+              <InlineMessage status="info">Uttrekk ikke kjørt enda</InlineMessage>
             )}
           </Tabs.Panel>
           <Tabs.Panel value="arbeidstabell" style={{ paddingTop: '2em' }}>
@@ -500,11 +498,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
   const [toggleEndreAvviksgrenser, setToggleEndreAvviksgrenser] = useState(false)
   return (
     <VStack gap="space-20">
-      {response?.success === true && (
-        <Alert variant="success" inline>
-          Avviksgrenser oppdatert
-        </Alert>
-      )}
+      {response?.success === true && <InlineMessage status="success">Avviksgrenser oppdatert</InlineMessage>}
       <Table zebraStripes>
         <Table.Row>
           <Table.HeaderCell>Sakstype</Table.HeaderCell>
