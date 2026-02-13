@@ -106,4 +106,26 @@ describe('omregningStatistikk._index', () => {
     expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result).toEqual({ omregningStatistikkPage: mockStatistikk })
   })
+
+  it('action kaster feil ved 204/tom body fra backend', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+    const formData = new FormData()
+    formData.set('behandlingsnoekler', 'KEY-2')
+
+    const request = new Request('http://localhost/omregningStatistikk?page=1&size=5', {
+      method: 'POST',
+      body: formData,
+    })
+    await expect(action(actionArgs(request))).rejects.toThrow(
+      'Henting av omregningsstatistikk returnerte ingen respons',
+    )
+  })
+
+  it('loader kaster feil ved 500 fra statistikk-endepunkt', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
+
+    const request = new Request('http://localhost/omregningStatistikk?behandlingsnoekler=KEY-1&page=0&size=10')
+    await expect(loader(loaderArgs(request))).rejects.toBeDefined()
+  })
 })
