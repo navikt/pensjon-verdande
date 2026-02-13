@@ -1,4 +1,4 @@
-import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
+import { Button, Heading, HStack, InlineMessage, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form } from 'react-router'
 import invariant from 'tiny-invariant'
@@ -25,16 +25,8 @@ export default function SokosSPKMottakPage({ actionData }: Route.ComponentProps)
 
         {actionData !== undefined && (
           <>
-            {antall && (
-              <Alert variant="success" inline>
-                {antall} i svar fra MOT
-              </Alert>
-            )}
-            {!antall && (
-              <Alert variant="error" inline>
-                {error}
-              </Alert>
-            )}
+            {antall && <InlineMessage status="success">{antall} i svar fra MOT</InlineMessage>}
+            {!antall && <InlineMessage status="error">{error}</InlineMessage>}
           </>
         )}
 

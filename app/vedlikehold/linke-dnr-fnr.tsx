@@ -1,4 +1,4 @@
-import { Alert, Button, Heading, HStack, TextField, VStack } from '@navikt/ds-react'
+import { Button, Heading, HStack, InlineMessage, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form } from 'react-router'
 import { linkDnrFnr } from '~/vedlikehold/vedlikehold.server'
@@ -24,16 +24,8 @@ export default function LinkeDnrFnrPage({ actionData }: Route.ComponentProps) {
 
         {actionData !== undefined && (
           <>
-            {success && (
-              <Alert variant="success" inline>
-                Fødselsnummer oppdatert
-              </Alert>
-            )}
-            {!success && (
-              <Alert variant="error" inline>
-                {error}
-              </Alert>
-            )}
+            {success && <InlineMessage status="success">Fødselsnummer oppdatert</InlineMessage>}
+            {!success && <InlineMessage status="error">{error}</InlineMessage>}
           </>
         )}
 
