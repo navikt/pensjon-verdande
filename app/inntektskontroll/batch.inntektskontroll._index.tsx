@@ -4,7 +4,6 @@ import { Form, redirect, useNavigation } from 'react-router'
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
 import { opprettBpen014 } from '~/inntektskontroll/batch.bpen014.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/batch.inntektskontroll._index'
 
 export function meta(): Route.MetaDescriptors {
@@ -29,7 +28,6 @@ export const loader = async () => {
 }
 export const action = async ({ request }: Route.ActionArgs) => {
   const fd = await request.formData()
-  const accessToken = await requireAccessToken(request)
 
   const detteÅret = new Date().getFullYear()
   const skjema = zfd.formData({
@@ -52,7 +50,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     [FELTER.opprettOppgave]: opprettoppgave,
   } = skjema.parse(fd)
 
-  const response = await opprettBpen014(accessToken, aar, eps2g, gjenlevende, opprettoppgave)
+  const response = await opprettBpen014(request, aar, eps2g, gjenlevende, opprettoppgave)
   return redirect(`/behandling/${response.behandlingId}`)
 }
 

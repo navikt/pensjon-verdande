@@ -36,10 +36,9 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
-  const accessToken = await requireAccessToken(request)
 
   const response = await opprettAdhocBrevBehandling(
-    accessToken,
+    request,
     updates.brevmal as string,
     updates.ekskluderAvdoed === 'true',
   )

@@ -56,10 +56,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsperiodeStart = formData.get('fom') as string
   const avstemmingsperiodeEnd = formData.get('tom') as string
-  const accessToken = await requireAccessToken(request)
 
   await opprettAvstemmingGrensesnittBehandling(
-    accessToken,
+    request,
     PENAFP,
     PENAFPP,
     PENAP,

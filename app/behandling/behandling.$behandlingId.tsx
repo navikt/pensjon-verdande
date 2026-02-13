@@ -60,6 +60,7 @@ function getField(form: FormData, name: string): { value: string; error?: never 
 
 function operationHandlers(
   accessToken: string,
+  request: Request,
   behandlingId: string,
   operation: Operation,
   form: FormData,
@@ -110,7 +111,7 @@ function operationHandlers(
           handler = () => sendTilManuellMedKontrollpunkt(accessToken, behandlingId, kontrollpunkt.value)
         break
       case OPERATION.sendTilOppdragPaNytt:
-        handler = () => sendTilOppdragPaNytt(accessToken, behandlingId)
+        handler = () => sendTilOppdragPaNytt(request, behandlingId)
         break
       case OPERATION.stopp:
         handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)
@@ -169,7 +170,7 @@ export const action = async ({ params, request }: Route.ActionArgs) => {
     return { errors: { operation: `Operasjon mangler eller er ukjent: ${String(operation)}` } }
   }
 
-  const { errors, handler } = operationHandlers(accessToken, behandlingId, operation, form)
+  const { errors, handler } = operationHandlers(accessToken, request, behandlingId, operation, form)
   if (Object.keys(errors).length > 0 || !handler) {
     return { errors }
   }

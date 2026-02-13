@@ -55,10 +55,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const PENKP = (formData.get('PENKP') as string) === 'true'
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
-  const accessToken = await requireAccessToken(request)
 
   await opprettKonsistensavstemmingBehandling(
-    accessToken,
+    request,
     PENAFP,
     PENAFPP,
     PENAP,

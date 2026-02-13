@@ -1,7 +1,7 @@
-import { env } from '~/services/env.server'
+import { apiPost } from '~/services/api.server'
 
 export async function opprettKonsistensavstemmingBehandling(
-  accessToken: string,
+  request: Request,
   PENAFP: boolean,
   PENAFPP: boolean,
   PENAP: boolean,
@@ -13,14 +13,9 @@ export async function opprettKonsistensavstemmingBehandling(
   UFOREUT: boolean,
   avstemmingsdato: string,
 ): Promise<StartKonsistensavstemmingResponse> {
-  const response = await fetch(`${env.penUrl}/api/vedtak/avstemming/konsistens/start`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
+  const response = await apiPost<StartKonsistensavstemmingResponse>(
+    '/api/vedtak/avstemming/konsistens/start',
+    {
       penAfp: PENAFP,
       penAfpp: PENAFPP,
       penPenap: PENAP,
@@ -30,15 +25,11 @@ export async function opprettKonsistensavstemmingBehandling(
       penPengy: PENGY,
       penPenkp: PENKP,
       penUforeut: UFOREUT,
-      avstemmingsdato: avstemmingsdato,
-    }),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as StartKonsistensavstemmingResponse
-  } else {
-    throw new Error()
-  }
+      avstemmingsdato,
+    },
+    request,
+  )
+  return response!
 }
 
 type StartKonsistensavstemmingResponse = {

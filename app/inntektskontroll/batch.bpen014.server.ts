@@ -1,34 +1,21 @@
-import { env } from '~/services/env.server'
+import { apiPost } from '~/services/api.server'
 
 type StartBatchResponse = {
   behandlingId: number
 }
 
 export async function opprettBpen014(
-  accessToken: string,
+  request: Request,
   aar: number,
   eps2g: boolean,
   gjenlevende: boolean,
   opprettOppgave: boolean,
 ): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/pen/api/inntektskontroll/opprett`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      aar: aar,
-      eps2g: eps2g,
-      gjenlevende: gjenlevende,
-      opprettOppgave: opprettOppgave,
-    }),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as StartBatchResponse
-  } else {
-    throw new Error()
-  }
+  const response = await apiPost<StartBatchResponse>('/pen/api/inntektskontroll/opprett', {
+    aar,
+    eps2g,
+    gjenlevende,
+    opprettOppgave,
+  }, request)
+  return response!
 }

@@ -1,19 +1,5 @@
-import { data } from 'react-router'
-import { env } from '~/services/env.server'
+import { apiPost } from '~/services/api.server'
 
-export async function sendTilOppdragPaNytt(accessToken: string, behandlingId: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    throw data(`Feil ved sending til oppdrag på nytt. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+export async function sendTilOppdragPaNytt(request: Request, behandlingId: string): Promise<void> {
+  await apiPost(`/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, undefined, request)
 }

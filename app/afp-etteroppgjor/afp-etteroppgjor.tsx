@@ -19,7 +19,6 @@ import { Form, NavLink, redirect } from 'react-router'
 import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
 import { apiGet } from '~/services/api.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { Behandlingstatus } from '~/types'
 import type { Route } from './+types/afp-etteroppgjor'
 import styles from './afp-etteroppgjor.module.css'
@@ -39,11 +38,9 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
   const formData = Object.fromEntries(await request.formData())
 
-  const response = await startAfpEtteroppgjor(accessToken, {
+  const response = await startAfpEtteroppgjor(request, {
     kjøreår: +(formData.kjorear as string),
   })
 

@@ -1,27 +1,10 @@
-import { data } from 'react-router'
-import { env } from '~/services/env.server'
+import { apiPost } from '~/services/api.server'
 
-export async function startVurderSamboereBatch(accessToken: string, beregningsAr: number): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/api/samboer/vurder-samboere/batch`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      beregningsAr: beregningsAr,
-    }),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as StartBatchResponse
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved opprettelse av behandling Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+export async function startVurderSamboereBatch(request: Request, beregningsAr: number): Promise<StartBatchResponse> {
+  const response = await apiPost<StartBatchResponse>('/api/samboer/vurder-samboere/batch', {
+    beregningsAr,
+  }, request)
+  return response!
 }
 
 type StartBatchResponse = {

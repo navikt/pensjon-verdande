@@ -38,7 +38,7 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData>
     sort: searchParams.get('sort'),
   })
 
-  const aldersoverganger = await hentMuligeAldersoverganger(accessToken)
+  const aldersoverganger = await hentMuligeAldersoverganger(request)
 
   const currentMonth = format(new Date(), 'yyyy-MM')
   const defaultMonth = aldersoverganger.maneder.includes(currentMonth) ? currentMonth : aldersoverganger.maneder[0]
