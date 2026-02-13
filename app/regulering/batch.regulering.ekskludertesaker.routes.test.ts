@@ -76,6 +76,7 @@ describe('ekskludertesaker routes', () => {
       const sentBody = JSON.parse(init.body)
       expect(sentBody.sakIder).toEqual([100, 200])
       expect(sentBody.kommentar).toBe('Testkommentar')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ erOppdatert: true })
     })
 
@@ -122,6 +123,7 @@ describe('ekskludertesaker routes', () => {
       expect(init.method).toBe('POST')
       const sentBody = JSON.parse(init.body)
       expect(sentBody.sakIder).toEqual([300, 400])
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ erOppdatert: true })
     })
 

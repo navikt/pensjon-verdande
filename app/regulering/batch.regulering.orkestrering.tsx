@@ -29,7 +29,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const kjorOnline = (formData.get('kjorOnline') as string) === 'true'
   const brukKjoreplan = (formData.get('brukKjoreplan') as string) === 'true'
   const skalSamordne = (formData.get('skalSamordne') as string) === 'true'
-  await apiPost('/api/vedtak/regulering/orkestrering/start', { antallFamilier, kjorOnline, brukKjoreplan, skalSamordne }, request)
+  await apiPost(
+    '/api/vedtak/regulering/orkestrering/start',
+    { antallFamilier, kjorOnline, brukKjoreplan, skalSamordne },
+    request,
+  )
   return { success: true }
 }
 

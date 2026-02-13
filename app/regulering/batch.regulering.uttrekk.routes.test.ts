@@ -52,6 +52,7 @@ describe('uttrekk routes', () => {
       const sentBody = JSON.parse(init.body)
       expect(sentBody.satsDato).toBe('2025-05-01')
       expect(sentBody.reguleringsDato).toBe('2025-05-01')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
   })
@@ -73,6 +74,7 @@ describe('uttrekk routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/uttrekk/oppdater')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
   })

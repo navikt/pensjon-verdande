@@ -63,6 +63,7 @@ describe('orkestrering routes', () => {
       expect(sentBody.kjorOnline).toBe(true)
       expect(sentBody.brukKjoreplan).toBe(false)
       expect(sentBody.skalSamordne).toBe(true)
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
   })
@@ -84,6 +85,7 @@ describe('orkestrering routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/orkestrering/456/fortsett')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
 
@@ -120,6 +122,7 @@ describe('orkestrering routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/orkestrering/789/pause')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
 

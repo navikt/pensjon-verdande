@@ -49,6 +49,7 @@ describe('batch.regulering.avsluttendeaktiviteter action', () => {
     expect(url).toBe('http://pen-test/api/vedtak/regulering/avbryt/oppdaterpopp')
     expect(init.method).toBe('POST')
     expect(init.headers.Authorization).toBe('Bearer test-token')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result).toEqual({ success: true, action: 'avbrytBehandlingerFeiletMotPOPP' })
   })
 

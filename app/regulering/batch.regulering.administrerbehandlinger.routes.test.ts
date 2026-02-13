@@ -52,6 +52,7 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/endre/prioritet/batch')
       expect(init.method).toBe('PUT')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
   })
@@ -73,6 +74,7 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/endre/prioritet/online')
       expect(init.method).toBe('PUT')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
   })
@@ -94,13 +96,16 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/nyeavviksgrenser/faktormodus')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toBe(true)
     })
   })
 
   describe('fortsettFamilieReguleringerTilBehandling', () => {
     it('POST fortsetter familiereguleringer til behandling', async () => {
-      const { action } = await import('./batch.regulering.administrerbehandlinger.fortsettFamilieReguleringerTilBehandling')
+      const { action } = await import(
+        './batch.regulering.administrerbehandlinger.fortsettFamilieReguleringerTilBehandling'
+      )
       fetchSpy.mockResolvedValueOnce(okResponse())
 
       const request = new Request('http://localhost/x', { method: 'POST' })
@@ -115,6 +120,7 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/familiereguleringertilbehandling')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toBe(true)
     })
   })
@@ -136,6 +142,7 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/familiereguleringer')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toBe(true)
     })
   })
@@ -157,6 +164,7 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/iverksettvedtak')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toBe(true)
     })
   })
@@ -178,6 +186,7 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/faktorogfeilmodus')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toBe(true)
     })
   })
@@ -199,6 +208,7 @@ describe('administrerbehandlinger action-routes', () => {
       const [url, init] = fetchSpy.mock.calls[0]
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/nyeavviksgrenser')
       expect(init.method).toBe('POST')
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toBe(true)
     })
   })
@@ -237,8 +247,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: { behandlingId: '123' },
         context: {},
-        unstable_pattern:
-          '/batch/regulering/administrerbehandlinger/hentTotaloversiktBehandlinger/:behandlingId',
+        unstable_pattern: '/batch/regulering/administrerbehandlinger/hentTotaloversiktBehandlinger/:behandlingId',
       } as Parameters<typeof loader>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -272,6 +281,7 @@ describe('administrerbehandlinger action-routes', () => {
       expect(init.method).toBe('PUT')
       const sentBody = JSON.parse(init.body)
       expect(sentBody.avviksgrenser).toEqual(newAvviksgrenser)
+      expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
   })

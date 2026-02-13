@@ -52,6 +52,7 @@ describe('batch.regulering loader', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toContain('/api/vedtak/regulering/detaljer')
     expect(init.headers.Authorization).toBe('Bearer test-token')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result).toEqual({ regulering: mockDetaljer })
   })
 
