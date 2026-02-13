@@ -112,7 +112,7 @@ function operationHandlers(
         break
       case OPERATION.sendTilOppdragPaNytt:
         handler = () =>
-          apiPost(`/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, undefined, request).then(() => {})
+          apiPost(`/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, {}, request).then(() => {})
         break
       case OPERATION.stopp:
         handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)

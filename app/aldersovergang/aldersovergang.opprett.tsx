@@ -19,5 +19,5 @@ export const action = async ({ request }: Route.ActionArgs) => {
   if (!response) {
     throw new Error('Opprettelse av aldersovergang returnerte ingen respons')
   }
-  return redirect(`/behandling/${response.behandlingId}`)}
-
+  return redirect(`/behandling/${response.behandlingId}`)
+}
