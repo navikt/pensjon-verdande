@@ -53,6 +53,7 @@ describe('omregning.omregningsaker action', () => {
     expect(init.method).toBe('POST')
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ saker: [100, 200, 300] })
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result).toEqual(mockResponse)
   })
 

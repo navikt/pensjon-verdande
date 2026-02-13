@@ -72,6 +72,7 @@ describe('omregning.omregning action', () => {
     expect(sentBody.omregneAFP).toBe(true)
     expect(sentBody.skalSamordne).toBe(true)
     expect(sentBody.brukFaktoromregning).toBe(false)
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result.status).toBe(302)
     expect(result.headers.get('Location')).toBe('/behandling/42')
   })

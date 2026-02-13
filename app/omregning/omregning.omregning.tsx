@@ -50,7 +50,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
     prioritet: updates.prioritet,
   } as OmregningRequest
 
-  const response = await apiPost<{ behandlingId: number }>('/api/behandling/omregning/opprett', omregningRequest, request)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/behandling/omregning/opprett',
+    omregningRequest,
+    request,
+  )
 
   return redirect(`/behandling/${response?.behandlingId}`)
 }

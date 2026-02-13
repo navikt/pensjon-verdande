@@ -68,21 +68,19 @@ describe('omregningStatistikk._index', () => {
 
     // hentOmregningStatistikk
     const [statUrl, statInit] = fetchSpy.mock.calls[0]
-    expect(statUrl).toBe(
-      'http://pen-test/api/behandling/omregning/statistikk?behandlingsnoekkel=KEY-1&page=0&size=10',
-    )
+    expect(statUrl).toBe('http://pen-test/api/behandling/omregning/statistikk?behandlingsnoekkel=KEY-1&page=0&size=10')
     expect(statInit.method).toBe('POST')
-
+    expect(statInit.signal).toBeInstanceOf(AbortSignal)
     // hentOmregningStatistikkCsv
     const [csvUrl, csvInit] = fetchSpy.mock.calls[1]
     expect(csvUrl).toBe('http://pen-test/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=KEY-1')
     expect(csvInit.method).toBe('GET')
-
+    expect(csvInit.signal).toBeInstanceOf(AbortSignal)
     // hentOmregningbehandlingsnokler
     const [noeklerUrl, noeklerInit] = fetchSpy.mock.calls[2]
     expect(noeklerUrl).toBe('http://pen-test/api/behandling/omregning/statistikk/behandlingsnoekler')
     expect(noeklerInit.method).toBe('GET')
-
+    expect(noeklerInit.signal).toBeInstanceOf(AbortSignal)
     expect(result.omregningStatistikkPage).toEqual(mockStatistikk)
     expect(result.omregningStatistikkCsv).toBe(mockCsv)
     expect(result.omregningStatistikkInit).toEqual(mockNoekler)
@@ -105,6 +103,7 @@ describe('omregningStatistikk._index', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/behandling/omregning/statistikk?behandlingsnoekkel=KEY-2&page=1&size=5')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result).toEqual({ omregningStatistikkPage: mockStatistikk })
   })
 })
