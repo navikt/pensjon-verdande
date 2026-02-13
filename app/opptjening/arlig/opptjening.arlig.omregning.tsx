@@ -52,7 +52,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return redirect(request.url)
   } else if (fromEntries.action === Action.kjoerUttrekk) {
     const response = await apiPost<StartBatchResponse>('/api/opptjening/arliguttrekk/opprett', {}, request)
-    return redirect(`/behandling/${response?.behandlingId}`)
+    if (!response) {
+      throw new Error('Opprettelse av årlig uttrekk returnerte ingen respons')
+    }
+    return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.kjoerOmregning) {
     const response = await apiPost<StartBatchResponse>(
       '/api/opptjening/arligendring/opprett',
@@ -62,7 +65,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       },
       request,
     )
-    return redirect(`/behandling/${response?.behandlingId}`)
+    if (!response) {
+      throw new Error('Opprettelse av årlig omregning returnerte ingen respons')
+    }
+    return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
     await apiPost(
       `/api/opptjening/opptjeningsaar/oppdater?opptjeningsar=${fromEntries.oppdaterOpptjeningsaar}`,

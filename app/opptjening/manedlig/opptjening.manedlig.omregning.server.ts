@@ -15,7 +15,10 @@ export async function opprettOpptjeningsendringMandeligOmregning(
     },
     request,
   )
-  return result as StartBatchResponse
+  if (!result) {
+    throw new Error('Opprettelse av månedlig uttrekk returnerte ingen respons')
+  }
+  return result
 }
 
 export async function hentMuligeManedligeKjoringer(request: Request): Promise<MuligeManedligeKjoringerResponse> {
