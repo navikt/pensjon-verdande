@@ -55,6 +55,7 @@ describe('adhoc-brev action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/brev/adhoc/start')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ brevmal: 'PE_BA_TESTBREV', ekskluderAvdoed: true })
     expect(result.status).toBe(302)
@@ -70,11 +71,6 @@ describe('adhoc-brev action', () => {
 
     const request = new Request('http://localhost/adhoc-brev', { method: 'POST', body: formData })
 
-    try {
-      await action(actionArgs(request))
-      expect.unreachable('Skulle ha kastet feil')
-    } catch {
-      // Forventet feil
-    }
+    await expect(action(actionArgs(request))).rejects.toBeDefined()
   })
 })

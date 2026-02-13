@@ -54,6 +54,7 @@ describe('lever-samboeropplysning action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/samboer/vurder-samboere/batch')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ beregningsAr: 2024 })
   })
@@ -66,11 +67,6 @@ describe('lever-samboeropplysning action', () => {
 
     const request = new Request('http://localhost/lever-samboeropplysning', { method: 'POST', body: formData })
 
-    try {
-      await action(actionArgs(request))
-      expect.unreachable('Skulle ha kastet feil')
-    } catch {
-      // Forventet feil
-    }
+    await expect(action(actionArgs(request))).rejects.toBeDefined()
   })
 })

@@ -56,6 +56,7 @@ describe('aldersovergang._index loader', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/aldersovergang/muligeAldersoverganger')
     expect(init.method).toBe('GET')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result.maneder).toEqual(['2025-06', '2025-07'])
     expect(result.erBegrensUtplukkLovlig).toBe(true)
   })
@@ -97,6 +98,7 @@ describe('aldersovergang.opprett action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/aldersovergang/utplukk')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({
       behandlingsmaned: 202507,

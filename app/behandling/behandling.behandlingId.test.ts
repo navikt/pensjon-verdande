@@ -27,13 +27,6 @@ vi.mock('~/services/behandling.server', () => ({
 
 const { action } = await import('./behandling.$behandlingId')
 
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  })
-}
-
 const actionArgs = (request: Request) =>
   ({
     request,
@@ -67,6 +60,7 @@ describe('behandling.$behandlingId action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/vedtak/iverksett/123/sendtiloppdragpanytt')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
   })
 
   it('ukjent operasjon returnerer feil', async () => {

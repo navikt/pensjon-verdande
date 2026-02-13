@@ -51,6 +51,7 @@ describe('afp-etteroppgjor action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/afpoffentlig/etteroppgjor/behandling/start')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ kjorear: 2025 })
     expect(result.status).toBe(302)
@@ -65,11 +66,6 @@ describe('afp-etteroppgjor action', () => {
 
     const request = new Request('http://localhost/afp-etteroppgjor', { method: 'POST', body: formData })
 
-    try {
-      await action(actionArgs(request))
-      expect.unreachable('Skulle ha kastet feil')
-    } catch {
-      // Forventet feil
-    }
+    await expect(action(actionArgs(request))).rejects.toBeDefined()
   })
 })

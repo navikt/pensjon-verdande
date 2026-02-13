@@ -56,18 +56,22 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
 
-  await apiPost('/api/vedtak/avstemming/konsistens/start', {
-    penAfp: PENAFP,
-    penAfpp: PENAFPP,
-    penPenap: PENAP,
-    penPenbp: PENBP,
-    penPenfp: PENFP,
-    penPengj: PENGJ,
-    penPengy: PENGY,
-    penPenkp: PENKP,
-    penUforeut: UFOREUT,
-    avstemmingsdato,
-  }, request)
+  await apiPost(
+    '/api/vedtak/avstemming/konsistens/start',
+    {
+      penAfp: PENAFP,
+      penAfpp: PENAFPP,
+      penPenap: PENAP,
+      penPenbp: PENBP,
+      penPenfp: PENFP,
+      penPengj: PENGJ,
+      penPengy: PENGY,
+      penPenkp: PENKP,
+      penUforeut: UFOREUT,
+      avstemmingsdato,
+    },
+    request,
+  )
 
   return
 }

@@ -41,11 +41,12 @@ describe('uttrekk loader', () => {
     fetchSpy.mockResolvedValueOnce(jsonResponse({ content: [{ id: 1 }] }))
 
     const request = new Request('http://localhost/manuell-behandling/uttrekk?page=0&size=10')
-    const result = await loader(loaderArgs(request))
+    const _result = await loader(loaderArgs(request))
 
     expect(fetchSpy).toHaveBeenCalledOnce()
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/behandling/manuell-behandling/behandlinger?page=0&size=10')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
   })
 })

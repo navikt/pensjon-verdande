@@ -53,6 +53,7 @@ describe('batch.inntektskontroll action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/pen/api/inntektskontroll/opprett')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ aar: 2025, eps2g: true, gjenlevende: true, opprettOppgave: true })
     expect(result.status).toBe(302)
@@ -70,11 +71,6 @@ describe('batch.inntektskontroll action', () => {
 
     const request = new Request('http://localhost/batch/inntektskontroll', { method: 'POST', body: formData })
 
-    try {
-      await action(actionArgs(request))
-      expect.unreachable('Skulle ha kastet feil')
-    } catch {
-      // Forventet feil
-    }
+    await expect(action(actionArgs(request))).rejects.toBeDefined()
   })
 })

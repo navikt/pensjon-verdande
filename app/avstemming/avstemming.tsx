@@ -57,19 +57,23 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const avstemmingsperiodeStart = formData.get('fom') as string
   const avstemmingsperiodeEnd = formData.get('tom') as string
 
-  await apiPost('/api/vedtak/avstemming/grensesnitt/start', {
-    penAfp: PENAFP,
-    penAfpp: PENAFPP,
-    penPenap: PENAP,
-    penPenbp: PENBP,
-    penPengj: PENGJ,
-    penPengy: PENGY,
-    penPenkp: PENKP,
-    penPenup: PENUP,
-    penUforeut: UFOREUT,
-    avstemmingsperiodeStart,
-    avstemmingsperiodeEnd,
-  }, request)
+  await apiPost(
+    '/api/vedtak/avstemming/grensesnitt/start',
+    {
+      penAfp: PENAFP,
+      penAfpp: PENAFPP,
+      penPenap: PENAP,
+      penPenbp: PENBP,
+      penPengj: PENGJ,
+      penPengy: PENGY,
+      penPenkp: PENKP,
+      penPenup: PENUP,
+      penUforeut: UFOREUT,
+      avstemmingsperiodeStart,
+      avstemmingsperiodeEnd,
+    },
+    request,
+  )
 
   return
 }

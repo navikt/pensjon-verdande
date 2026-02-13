@@ -50,12 +50,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
     [FELTER.opprettOppgave]: opprettoppgave,
   } = skjema.parse(fd)
 
-  const response = await apiPost<{ behandlingId: number }>('/pen/api/inntektskontroll/opprett', {
-    aar,
-    eps2g,
-    gjenlevende,
-    opprettOppgave: opprettoppgave,
-  }, request)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/pen/api/inntektskontroll/opprett',
+    {
+      aar,
+      eps2g,
+      gjenlevende,
+      opprettOppgave: opprettoppgave,
+    },
+    request,
+  )
   return redirect(`/behandling/${response?.behandlingId}`)
 }
 

@@ -6,11 +6,15 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
-  const response = await apiPost<{ behandlingId: number }>('/api/aldersovergang/utplukk', {
-    behandlingsmaned: +updates.behandlingsmaned,
-    kjoeretidspunkt: updates.kjoeretidspunkt as string,
-    begrensetUtplukk: updates.begrensetUtplukk === 'true',
-  }, request)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/aldersovergang/utplukk',
+    {
+      behandlingsmaned: +updates.behandlingsmaned,
+      kjoeretidspunkt: updates.kjoeretidspunkt as string,
+      begrensetUtplukk: updates.begrensetUtplukk === 'true',
+    },
+    request,
+  )
 
   return redirect(`/behandling/${response?.behandlingId}`)
 }
