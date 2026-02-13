@@ -55,6 +55,25 @@ describe('uttrekk routes', () => {
       expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
     })
+
+    it('backend 500 kaster feil', async () => {
+      const { action } = await import('./batch.regulering.uttrekk.startUttrekk')
+      fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
+
+      const request = new Request('http://localhost/x', {
+        method: 'POST',
+        body: JSON.stringify({ satsDato: '2025-05-01' }),
+        headers: { 'Content-Type': 'application/json' },
+      })
+      await expect(
+        action({
+          request,
+          params: {},
+          context: {},
+          unstable_pattern: '/batch/regulering/uttrekk/startUttrekk',
+        } as Parameters<typeof action>[0]),
+      ).rejects.toBeDefined()
+    })
   })
 
   describe('oppdaterUttrekk', () => {
@@ -76,6 +95,21 @@ describe('uttrekk routes', () => {
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })
+    })
+
+    it('backend 500 kaster feil', async () => {
+      const { action } = await import('./batch.regulering.uttrekk.oppdaterUttrekk')
+      fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
+
+      const request = new Request('http://localhost/x', { method: 'POST' })
+      await expect(
+        action({
+          request,
+          params: {},
+          context: {},
+          unstable_pattern: '/batch/regulering/uttrekk/oppdaterUttrekk',
+        } as Parameters<typeof action>[0]),
+      ).rejects.toBeDefined()
     })
   })
 })
