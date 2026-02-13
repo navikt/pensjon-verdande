@@ -1,7 +1,6 @@
 import { Alert, Button, Checkbox, Heading, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
 import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
 import type { Route } from './+types/bestem-etteroppgjor-resultat._index'
 
@@ -36,10 +35,9 @@ export function meta(): Route.MetaDescriptors {
 
 export const action = async ({ request }: Route.ActionArgs) => {
   try {
-    const accessToken = await requireAccessToken(request)
     const formData = await request.formData()
     const { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
-    const response = await startBestemEtteroppgjorResultat(accessToken, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr)
+    const response = await startBestemEtteroppgjorResultat(request, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr)
     return redirect(`/behandling/${response.behandlingId}`)
   } catch (error) {
     return {

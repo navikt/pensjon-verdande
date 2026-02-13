@@ -1,70 +1,33 @@
-import { env } from '~/services/env.server'
+import { apiGet, apiPost } from '~/services/api.server'
 
 export async function opprettBpen096(
-  accessToken: string,
+  request: Request,
   maksAntallSekvensnummer: number,
   sekvensnummerPerBehandling: number,
   debug: boolean,
 ): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      maksAntallSekvensnummer: maksAntallSekvensnummer,
-      sekvensnummerPerBehandling: sekvensnummerPerBehandling,
-      debug: debug,
-    }),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as StartBatchResponse
-  } else {
-    throw new Error()
-  }
+  const result = await apiPost<StartBatchResponse>('/api/uforetrygd/etteroppgjor/skattehendelser', {
+    maksAntallSekvensnummer,
+    sekvensnummerPerBehandling,
+    debug,
+  }, request)
+  return result as StartBatchResponse
 }
 
 export async function hentSkattehendelserManuelt(
   sekvensnr: number[],
-  accessToken: string,
+  request: Request,
 ): Promise<HentSkattehendelserManueltResponse> {
-  const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser/kjor-hendelser-manuelt`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      sekvensnummer: sekvensnr,
-    }),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as HentSkattehendelserManueltResponse
-  } else {
-    throw new Error()
-  }
+  const result = await apiPost<HentSkattehendelserManueltResponse>(
+    '/api/uforetrygd/etteroppgjor/skattehendelser/kjor-hendelser-manuelt',
+    { sekvensnummer: sekvensnr },
+    request,
+  )
+  return result as HentSkattehendelserManueltResponse
 }
 
-export async function hentAntallSkattehendelser(accessToken: string): Promise<HentAntallSkattehendelserResponse> {
-  const response = await fetch(`${env.penUrl}/api/uforetrygd/etteroppgjor/skattehendelser/antall`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as HentAntallSkattehendelserResponse
-  } else {
-    throw new Error()
-  }
+export async function hentAntallSkattehendelser(request: Request): Promise<HentAntallSkattehendelserResponse> {
+  return apiGet<HentAntallSkattehendelserResponse>('/api/uforetrygd/etteroppgjor/skattehendelser/antall', request)
 }
 
 type StartBatchResponse = {

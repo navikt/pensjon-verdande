@@ -1,7 +1,6 @@
 import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, Link, redirect, useNavigation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
 import {
   hentAntallSkattehendelser,
   hentSkattehendelserManuelt,
@@ -21,11 +20,10 @@ export function meta(): Route.MetaDescriptors {
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = Object.fromEntries(await request.formData())
-  const accessToken = await requireAccessToken(request)
 
   if (formData.action === Action.HentSkattehendelser) {
     const response = await opprettBpen096(
-      accessToken,
+      request,
       +formData.maksAntallSekvensnummer,
       +formData.sekvensnummerPerBehandling,
       formData.debug === 'true',
@@ -47,10 +45,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
     }
 
-    const response = await hentSkattehendelserManuelt(sekvensnr, accessToken)
+    const response = await hentSkattehendelserManuelt(sekvensnr, request)
     return { behandlingIder: response.behandlingIder }
   } else if (formData.action === Action.HentAntallSkattehendelser) {
-    const response = await hentAntallSkattehendelser(accessToken)
+    const response = await hentAntallSkattehendelser(request)
     return { antall: response.antall }
   }
 }

@@ -1,6 +1,5 @@
 import { BodyShort, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
 import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
 import type { Route } from './+types/bpen090'
 
@@ -61,8 +60,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return errors
   }
 
-  const accessToken = await requireAccessToken(request)
-  const response = await opprettBpen090(accessToken, kjoremaaned, begrensUtplukk, dryRun, prioritet)
+  const response = await opprettBpen090(request, kjoremaaned, begrensUtplukk, dryRun, prioritet)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }
