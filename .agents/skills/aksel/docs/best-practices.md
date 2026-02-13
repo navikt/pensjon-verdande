@@ -154,13 +154,13 @@ Bruk korrekt heading-hierarki med `level`-prop:
 ### Tabell-tilgjengelighet
 
 - Bruk `Table.HeaderCell` (th) for overskriftsceller, ikke `DataCell`
-- Bruk `caption` for å gi tabellen et tilgjengelig navn
+- Bruk `<BodyShort as="caption" visuallyHidden>` for å gi tabellen et tilgjengelig navn som kun er synlig for skjermlesere
 - Unngå sammenslåing av celler
 - Maks ett interaktivt element per celle
 
 ```tsx
 <Table>
-  <caption>Utbetalinger siste 3 måneder</caption>
+  <BodyShort as="caption" visuallyHidden>Utbetalinger siste 3 måneder</BodyShort>
   <Table.Header>
     <Table.Row>
       <Table.HeaderCell scope="col">Dato</Table.HeaderCell>

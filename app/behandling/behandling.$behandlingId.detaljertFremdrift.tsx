@@ -146,7 +146,9 @@ export default function FremdriftRoute({ loaderData }: Route.ComponentProps) {
         </HStack>
 
         <Table>
-          <caption>Detaljert fremdrift</caption>
+          <BodyShort as="caption" visuallyHidden>
+            Detaljert fremdrift
+          </BodyShort>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell scope="col">Behandling</Table.HeaderCell>
