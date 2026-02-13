@@ -1,5 +1,5 @@
 import { ArrowRightIcon, ExternalLinkIcon, FilesIcon, MenuElipsisVerticalIcon } from '@navikt/aksel-icons'
-import { ActionMenu, Button, HStack, Table, Tag } from '@navikt/ds-react'
+import { ActionMenu, BodyShort, Button, HStack, Table, Tag } from '@navikt/ds-react'
 import React from 'react'
 import { Link as ReactRouterLink } from 'react-router'
 import copy from '~/common/clipboard'
@@ -47,6 +47,9 @@ export function BehandlingKjoringerTable(props: Props) {
       }}
       zebraStripes
     >
+      <BodyShort as="caption" visuallyHidden>
+        Kjøringer
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell />
