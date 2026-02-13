@@ -163,7 +163,7 @@ export function allWeekdaysInRange(
   const first = firstWeekdayOnOrAfter(start, weekdayNumber)
   const out: Date[] = []
   for (let d = first; d.getTime() <= end.getTime(); d = addDays(d, 7)) {
-    // Filter vekk datoer som bryter emd SerieValg
+    // Filter vekk datoer som bryter med SerieValg
     if (serieValg && erDatoEkskludertAvRegler(d, serieValg)) continue
     if (serieValg && erDatoIEkskludertMnd(d, serieValg)) continue
     // Helligdager
