@@ -20,7 +20,7 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 function okResponse(status = 200) {
-  return new Response('OK', { status })
+  return new Response('', { status })
 }
 
 describe('administrerbehandlinger action-routes', () => {

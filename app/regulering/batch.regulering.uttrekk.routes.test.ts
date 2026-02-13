@@ -13,7 +13,7 @@ vi.mock('~/services/logger.server', () => ({
 }))
 
 function okResponse(status = 200) {
-  return new Response('OK', { status })
+  return new Response('', { status })
 }
 
 describe('uttrekk routes', () => {

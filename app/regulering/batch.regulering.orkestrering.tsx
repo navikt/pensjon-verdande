@@ -1,4 +1,3 @@
-import { requireAccessToken } from '~/services/auth.server'
 import 'chart.js/auto'
 import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
 import {
@@ -25,13 +24,12 @@ import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
 import type { Route } from './+types/batch.regulering.orkestrering'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const antallFamilier = formData.get('antallFamilier') as string
   const kjorOnline = (formData.get('kjorOnline') as string) === 'true'
   const brukKjoreplan = (formData.get('brukKjoreplan') as string) === 'true'
   const skalSamordne = (formData.get('skalSamordne') as string) === 'true'
-  return await startOrkestrering(accessToken, antallFamilier, kjorOnline, brukKjoreplan, skalSamordne)
+  return await startOrkestrering(request, antallFamilier, kjorOnline, brukKjoreplan, skalSamordne)
 }
 
 export default function Orkestrering() {

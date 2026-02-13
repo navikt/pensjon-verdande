@@ -5,13 +5,12 @@ import type {
   ReguleringDetaljer,
   ReguleringStatistikk,
 } from '~/regulering/regulering.types'
-import { env } from '~/services/env.server'
-import { logger } from '~/services/logger.server'
+import { apiGet, apiPost, apiPut } from '~/services/api.server'
 import type { DetaljertFremdriftDTO } from '~/types'
 
 export async function avbrytBehandlinger(
   action: 'avbrytBehandlingerFeiletMotPOPP' | 'avbrytBehandlingerFeiletIBeregnYtelse' | null,
-  accessToken: string,
+  request: Request,
 ) {
   let urlPostfix: string
 
@@ -27,361 +26,118 @@ export async function avbrytBehandlinger(
       break
   }
 
-  return await fetch(`${env.penUrl}/api/vedtak/regulering${urlPostfix}`, {
-    method: 'POST',
-    body: JSON.stringify({}),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
+  return await apiPost(`/api/vedtak/regulering${urlPostfix}`, {}, request)
 }
 
-export const fortsettFaktoromregningModus = async (accessToken: string) => {
-  await fetch(`${env.penUrl}/api/vedtak/regulering/fortsett/nyeavviksgrenser/faktormodus`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
+export const fortsettFaktoromregningModus = async (request: Request) => {
+  await apiPost('/api/vedtak/regulering/fortsett/nyeavviksgrenser/faktormodus', undefined, request)
   return true
 }
 
-export const fortsettFamilieReguleringerTilBehandling = async (accessToken: string) => {
-  await fetch(`${env.penUrl}/api/vedtak/regulering/fortsett/familiereguleringertilbehandling`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
+export const fortsettFamilieReguleringerTilBehandling = async (request: Request) => {
+  await apiPost('/api/vedtak/regulering/fortsett/familiereguleringertilbehandling', undefined, request)
   return true
 }
 
-export const fortsettFeilendeIverksettVedtak = async (accessToken: string) => {
-  await fetch(`${env.penUrl}/api/vedtak/regulering/fortsett/iverksettvedtak`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
+export const fortsettFeilendeIverksettVedtak = async (request: Request) => {
+  await apiPost('/api/vedtak/regulering/fortsett/iverksettvedtak', undefined, request)
   return true
 }
 
-export const fortsettFeilendeFamilieReguleringer = async (accessToken: string) => {
-  await fetch(`${env.penUrl}/api/vedtak/regulering/fortsett/familiereguleringer`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
+export const fortsettFeilendeFamilieReguleringer = async (request: Request) => {
+  await apiPost('/api/vedtak/regulering/fortsett/familiereguleringer', undefined, request)
   return true
 }
 
-export const fortsettFeilhandteringmodus = async (accessToken: string) => {
-  await fetch(`${env.penUrl}/api/vedtak/regulering/fortsett/faktorogfeilmodus`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
+export const fortsettFeilhandteringmodus = async (request: Request) => {
+  await apiPost('/api/vedtak/regulering/fortsett/faktorogfeilmodus', undefined, request)
   return true
 }
 
-export const fortsettOrkestrering = async (accessToken: string, behandlingId: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/fortsett`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return { success: true }
-  } else {
-    const error = await response.text()
-    throw new Error(error)
-  }
+export const fortsettOrkestrering = async (request: Request, behandlingId: string) => {
+  await apiPost(`/api/vedtak/regulering/orkestrering/${behandlingId}/fortsett`, undefined, request)
+  return { success: true }
 }
 
-export const fortsettNyeavviksgrenser = async (accessToken: string) => {
-  await fetch(`${env.penUrl}/api/vedtak/regulering/fortsett/nyeavviksgrenser`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
+export const fortsettNyeavviksgrenser = async (request: Request) => {
+  await apiPost('/api/vedtak/regulering/fortsett/nyeavviksgrenser', undefined, request)
   return true
 }
 
-export const endrePrioritetTilBatch = async (accessToken: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/endre/prioritet/batch`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  return {
-    success: response.ok,
-  }
+export const endrePrioritetTilBatch = async (request: Request) => {
+  await apiPut('/api/vedtak/regulering/endre/prioritet/batch', undefined, request)
+  return { success: true }
 }
 
-export const endrePrioritetTilOnline = async (accessToken: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/endre/prioritet/online`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  return {
-    success: response.ok,
-  }
+export const endrePrioritetTilOnline = async (request: Request) => {
+  await apiPut('/api/vedtak/regulering/endre/prioritet/online', undefined, request)
+  return { success: true }
 }
 
-export const getReguleringDetaljer = async (accessToken: string): Promise<ReguleringDetaljer> => {
-  const url = new URL(`${env.penUrl}/api/vedtak/regulering/detaljer`)
-  const response = await fetch(url.toString(), {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as ReguleringDetaljer
-  } else {
-    const body = await response.json()
-    logger.error(`Feil ved kall til pen ${response.status}`, { body })
-    throw new Error()
-  }
+export const getReguleringDetaljer = async (request: Request): Promise<ReguleringDetaljer> => {
+  return await apiGet<ReguleringDetaljer>('/api/vedtak/regulering/detaljer', request)
 }
 
-export const hentAggregerteFeilmeldinger = async (accessToken: string): Promise<AggregerteFeilmeldinger> => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/aggregerteFeilmeldinger`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    priority: 'low',
-  })
-
-  if (response.ok) {
-    return (await response.json()) as AggregerteFeilmeldinger
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
-  }
+export const hentAggregerteFeilmeldinger = async (request: Request): Promise<AggregerteFeilmeldinger> => {
+  return await apiGet<AggregerteFeilmeldinger>('/api/vedtak/regulering/aggregerteFeilmeldinger', request)
 }
 
-export const hentEksluderteSaker = async (accessToken: string): Promise<Ekskluderinger> => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as Ekskluderinger
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
-  }
+export const hentEksluderteSaker = async (request: Request): Promise<Ekskluderinger> => {
+  return await apiGet<Ekskluderinger>('/api/vedtak/regulering/eksludertesaker', request)
 }
 
 export const hentOrkestreringsStatistikk = async (
-  accessToken: string,
+  request: Request,
   behandlingId: string,
 ): Promise<DetaljertFremdriftDTO> => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/detaljer`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as DetaljertFremdriftDTO
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
-  }
+  return await apiGet<DetaljertFremdriftDTO>(`/api/vedtak/regulering/orkestrering/${behandlingId}/detaljer`, request)
 }
 
-export const hentReguleringStatistikk = async (accessToken: string): Promise<ReguleringStatistikk> => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/arbeidstabell/statistikk`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return (await response.json()) as ReguleringStatistikk
-  } else {
-    const body = await response.text()
-    throw new Error(`Feil ved kall til pen ${response.status} ${body}`)
-  }
+export const hentReguleringStatistikk = async (request: Request): Promise<ReguleringStatistikk> => {
+  return await apiGet<ReguleringStatistikk>('/api/vedtak/regulering/arbeidstabell/statistikk', request)
 }
 
-export const oppdaterAvviksgrenser = async (accessToken: string, newAvviksgrenser: AvviksGrense[]) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/avviksgrenser`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      avviksgrenser: newAvviksgrenser,
-    }),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  return {
-    success: response.ok,
-  }
+export const oppdaterAvviksgrenser = async (request: Request, newAvviksgrenser: AvviksGrense[]) => {
+  await apiPut('/api/vedtak/regulering/avviksgrenser', { avviksgrenser: newAvviksgrenser }, request)
+  return { success: true }
 }
 
-export const leggTilEkskluderteSaker = async (accessToken: string, sakIder: number[], kommentar: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker/leggTil`, {
-    method: 'POST',
-    body: JSON.stringify({
-      sakIder: sakIder,
-      kommentar: kommentar,
-    }),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(response.statusText)
-  }
+export const leggTilEkskluderteSaker = async (request: Request, sakIder: number[], kommentar: string) => {
+  await apiPost('/api/vedtak/regulering/eksludertesaker/leggTil', { sakIder, kommentar }, request)
   return { erOppdatert: true }
 }
 
-export const fjernEkskluderteSaker = async (accessToken: string, sakIder: number[]) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/eksludertesaker/fjern`, {
-    method: 'POST',
-    body: JSON.stringify({
-      sakIder: sakIder,
-    }),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(response.statusText)
-  }
+export const fjernEkskluderteSaker = async (request: Request, sakIder: number[]) => {
+  await apiPost('/api/vedtak/regulering/eksludertesaker/fjern', { sakIder }, request)
   return { erOppdatert: true }
 }
 
-export const pauseOrkestrering = async (accessToken: string, behandlingId: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/orkestrering/${behandlingId}/pause`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return { success: true }
-  } else {
-    const error = await response.text()
-    throw new Error(error)
-  }
+export const pauseOrkestrering = async (request: Request, behandlingId: string) => {
+  await apiPost(`/api/vedtak/regulering/orkestrering/${behandlingId}/pause`, undefined, request)
+  return { success: true }
 }
 
 export const startOrkestrering = async (
-  accessToken: string,
+  request: Request,
   antallFamilier: string | undefined,
   kjorOnline: boolean,
   brukKjoreplan: boolean,
   skalSamordne: boolean,
 ) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/orkestrering/start`, {
-    method: 'POST',
-    body: JSON.stringify({
-      antallFamilier,
-      kjorOnline,
-      brukKjoreplan,
-      skalSamordne,
-    }),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  return {
-    success: response.ok,
-  }
+  await apiPost(
+    '/api/vedtak/regulering/orkestrering/start',
+    { antallFamilier, kjorOnline, brukKjoreplan, skalSamordne },
+    request,
+  )
+  return { success: true }
 }
 
-export const startUttrekk = async (accessToken: string, satsDato: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/uttrekk/start`, {
-    method: 'POST',
-    body: JSON.stringify({
-      satsDato,
-      reguleringsDato: satsDato,
-    }),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  return {
-    success: response.ok,
-  }
+export const startUttrekk = async (request: Request, satsDato: string) => {
+  await apiPost('/api/vedtak/regulering/uttrekk/start', { satsDato, reguleringsDato: satsDato }, request)
+  return { success: true }
 }
 
-export const oppdaterUttrekk = async (accessToken: string) => {
-  const response = await fetch(`${env.penUrl}/api/vedtak/regulering/uttrekk/oppdater`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  return {
-    success: response.ok,
-  }
+export const oppdaterUttrekk = async (request: Request) => {
+  await apiPost('/api/vedtak/regulering/uttrekk/oppdater', undefined, request)
+  return { success: true }
 }

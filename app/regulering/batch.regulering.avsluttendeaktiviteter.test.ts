@@ -35,7 +35,7 @@ describe('batch.regulering.avsluttendeaktiviteter action', () => {
   })
 
   it('POST avbryter behandlinger feilet mot POPP', async () => {
-    fetchSpy.mockResolvedValueOnce(new Response('OK', { status: 200 }))
+    fetchSpy.mockResolvedValueOnce(new Response('', { status: 200 }))
 
     const request = new Request('http://localhost/batch/regulering/avsluttendeaktiviteter', {
       method: 'POST',

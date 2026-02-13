@@ -55,7 +55,7 @@ describe('ekskludertesaker routes', () => {
   describe('leggTil', () => {
     it('POST legger til ekskluderte saker', async () => {
       const { action } = await import('./batch.regulering.ekskludertesaker.leggTil')
-      fetchSpy.mockResolvedValueOnce(new Response('OK', { status: 200 }))
+      fetchSpy.mockResolvedValueOnce(new Response('', { status: 200 }))
 
       const request = new Request('http://localhost/x', {
         method: 'POST',
@@ -102,7 +102,7 @@ describe('ekskludertesaker routes', () => {
   describe('fjern', () => {
     it('POST fjerner ekskluderte saker', async () => {
       const { action } = await import('./batch.regulering.ekskludertesaker.fjern')
-      fetchSpy.mockResolvedValueOnce(new Response('OK', { status: 200 }))
+      fetchSpy.mockResolvedValueOnce(new Response('', { status: 200 }))
 
       const request = new Request('http://localhost/x', {
         method: 'POST',

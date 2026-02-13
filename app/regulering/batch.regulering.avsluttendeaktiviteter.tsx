@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useSubmit } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
 import { avbrytBehandlinger } from '~/regulering/regulering.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/batch.regulering.avsluttendeaktiviteter'
 
 export const loader = async () => {
@@ -11,14 +10,9 @@ export const loader = async () => {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
   const data = (await request.json()) as FormType
 
-  const res = await avbrytBehandlinger(data.action, accessToken)
-
-  if (res.status !== 200) {
-    throw new Error(await res.text())
-  }
+  await avbrytBehandlinger(data.action, request)
 
   return { success: true, action: data.action }
 }
