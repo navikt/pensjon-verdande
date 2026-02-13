@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Button, Heading, Label, Radio, RadioGroup, Select, VStack } from '@navikt/ds-react'
+import { BodyShort, Button, Heading, InlineMessage, Label, Radio, RadioGroup, Select, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import type React from 'react'
@@ -74,10 +74,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       </Heading>
       <BodyShort spacing>Velg behandlingsmåned og tidspunkt for kjøring.</BodyShort>
       {!kanOverstyreBehandlingsmaned && (
-        <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
+        <InlineMessage status="info" style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
-        </Alert>
+        </InlineMessage>
       )}
       <Form action="opprett" method="POST" style={{ width: '100%', maxWidth: 800 }}>
         <VStack gap="space-16" style={{ marginBottom: '2rem' }}>

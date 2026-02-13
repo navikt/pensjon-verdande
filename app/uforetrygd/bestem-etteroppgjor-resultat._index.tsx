@@ -1,4 +1,4 @@
-import { Alert, Button, Checkbox, Heading, TextField, VStack } from '@navikt/ds-react'
+import { Button, Checkbox, Heading, LocalAlert, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
@@ -62,7 +62,11 @@ export default function BestemEtteroppgjorResultatPage({ actionData }: Route.Com
 
   return (
     <VStack gap="space-16" style={{ maxWidth: '50em', margin: '2em' }}>
-      {actionData && error && <Alert variant="error">Feilmelding: {error}</Alert>}
+      {actionData && error && (
+        <LocalAlert status="error">
+          <LocalAlert.Content>Feilmelding: {error}</LocalAlert.Content>
+        </LocalAlert>
+      )}
       <Heading size="small" level="1">
         Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
