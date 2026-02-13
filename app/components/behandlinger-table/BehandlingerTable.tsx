@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
+import { Box, Button, Checkbox, HStack, Pagination, Select, Table } from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { Link, useFetcher, useSearchParams } from 'react-router'
@@ -301,7 +301,7 @@ export default function BehandlingerTable({
           })}
         </Table.Body>
       </Table>
-      <HStack align="center" marginBlock="space-16">
+      <HStack align="center" justify="space-between" marginBlock="space-16">
         {inkluderFortsett && (
           <Button
             variant="primary"
@@ -312,7 +312,6 @@ export default function BehandlingerTable({
             Fortsett valgte behandlinger
           </Button>
         )}
-        <Spacer />
         <Pagination
           size="small"
           page={behandlingerResponse.number + 1}
@@ -322,7 +321,6 @@ export default function BehandlingerTable({
           prevNextTexts={true}
           onPageChange={onPageChange}
         />
-        <Spacer />
         {behandlingerResponse.totalElements} behandlinger
       </HStack>
     </Box>
