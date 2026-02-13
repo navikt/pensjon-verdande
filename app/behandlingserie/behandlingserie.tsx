@@ -82,7 +82,7 @@ function getTilgjengeligeTider(forhandsvisDatoer: string[]): string[] {
   if (forhandsvisDatoer.length === 0) return TIDER
 
   const now = new Date()
-  const todayYmd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  const todayYmd = toYearMonthDay(now)
 
   const harValgtIDagEllerTidligere = forhandsvisDatoer.some((ymd) => ymd <= todayYmd)
   if (!harValgtIDagEllerTidligere) return TIDER
