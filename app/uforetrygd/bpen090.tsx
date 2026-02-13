@@ -1,6 +1,6 @@
 import { BodyShort, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { opprettBpen090 } from '~/uforetrygd/batch.bpen090.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/bpen090'
 
 type ActionErrors = {
@@ -60,9 +60,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return errors
   }
 
-  const response = await opprettBpen090(request, kjoremaaned, begrensUtplukk, dryRun, prioritet)
+  const response = await apiPost<{ behandlingId: number }>('/api/uforetrygd/lopendeinntektsavkorting/batch', {
+    kjoremaaned,
+    begrensUtplukk,
+    dryRun,
+    prioritet,
+  }, request)
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  return redirect(`/behandling/${response!.behandlingId}`)
 }
 
 enum OppdragsPrioritet {

@@ -1,6 +1,6 @@
 import { BodyLong, BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/bpen091'
 
 export function meta(): Route.MetaDescriptors {
@@ -22,9 +22,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const begrensUtplukk = begrensUtplukkStr === 'true'
   const dryRun = dryRunStr === 'true'
 
-  const response = await opprettBpen091(request, +updates.behandlingsAr, begrensUtplukk, dryRun)
+  const response = await apiPost<{ behandlingId: number }>('/api/uforetrygd/fastsettforventetinntekt/batch', {
+    beregningsAr: +updates.behandlingsAr,
+    begrensUtplukk,
+    dryRun,
+  }, request)
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  return redirect(`/behandling/${response!.behandlingId}`)
 }
 
 export default function FastsettForventetInntekt({ loaderData }: Route.ComponentProps) {

@@ -1,11 +1,7 @@
 import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, Link, redirect, useNavigation } from 'react-router'
-import {
-  hentAntallSkattehendelser,
-  hentSkattehendelserManuelt,
-  opprettBpen096,
-} from '~/uforetrygd/batch.bpen096.server'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { Route } from './+types/bpen096'
 
 enum Action {
@@ -22,13 +18,12 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const formData = Object.fromEntries(await request.formData())
 
   if (formData.action === Action.HentSkattehendelser) {
-    const response = await opprettBpen096(
-      request,
-      +formData.maksAntallSekvensnummer,
-      +formData.sekvensnummerPerBehandling,
-      formData.debug === 'true',
-    )
-    return redirect(`/behandling/${response.behandlingId}`)
+    const response = await apiPost<{ behandlingId: number }>('/api/uforetrygd/etteroppgjor/skattehendelser', {
+      maksAntallSekvensnummer: +formData.maksAntallSekvensnummer,
+      sekvensnummerPerBehandling: +formData.sekvensnummerPerBehandling,
+      debug: formData.debug === 'true',
+    }, request)
+    return redirect(`/behandling/${response!.behandlingId}`)
   } else if (formData.action === Action.HentSkattehendelserManuelt) {
     const sekvensnr: number[] = formData.sekvensnr
       .toString()
@@ -45,10 +40,17 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
     }
 
-    const response = await hentSkattehendelserManuelt(sekvensnr, request)
-    return { behandlingIder: response.behandlingIder }
+    const response = await apiPost<{ behandlingIder: number[] }>(
+      '/api/uforetrygd/etteroppgjor/skattehendelser/kjor-hendelser-manuelt',
+      { sekvensnummer: sekvensnr },
+      request,
+    )
+    return { behandlingIder: response!.behandlingIder }
   } else if (formData.action === Action.HentAntallSkattehendelser) {
-    const response = await hentAntallSkattehendelser(request)
+    const response = await apiGet<{ antall: number }>(
+      '/api/uforetrygd/etteroppgjor/skattehendelser/antall',
+      request,
+    )
     return { antall: response.antall }
   }
 }

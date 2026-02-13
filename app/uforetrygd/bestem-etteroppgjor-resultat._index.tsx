@@ -1,7 +1,7 @@
 import { Alert, Button, Checkbox, Heading, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { startBestemEtteroppgjorResultat } from '~/uforetrygd/bestem-etteroppgjor-resultat.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/bestem-etteroppgjor-resultat._index'
 
 function parseSakIds(sakIds: FormDataEntryValue | null): number[] {
@@ -37,8 +37,12 @@ export const action = async ({ request }: Route.ActionArgs) => {
   try {
     const formData = await request.formData()
     const { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
-    const response = await startBestemEtteroppgjorResultat(request, ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr)
-    return redirect(`/behandling/${response.behandlingId}`)
+    const response = await apiPost<{ behandlingId: number }>('/api/uforetrygd/bestemetteroppgjor/start', {
+      sakIds,
+      ar,
+      oppdaterSisteGyldigeEtteroppgjørsÅr,
+    }, request)
+    return redirect(`/behandling/${response!.behandlingId}`)
   } catch (error) {
     return {
       success: false,
