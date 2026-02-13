@@ -20,7 +20,10 @@ async function hentOmregningStatistikk(
     undefined,
     request,
   )
-  return response!
+  if (!response) {
+    throw new Error('Henting av omregningsstatistikk returnerte ingen respons')
+  }
+  return response
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

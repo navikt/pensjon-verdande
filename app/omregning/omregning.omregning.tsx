@@ -56,5 +56,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
     request,
   )
 
-  return redirect(`/behandling/${response?.behandlingId}`)
+  if (!response) {
+    throw new Error('Opprettelse av omregningsbehandling returnerte ingen respons')
+  }
+  return redirect(`/behandling/${response.behandlingId}`)
 }
