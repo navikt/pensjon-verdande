@@ -60,14 +60,18 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return errors
   }
 
-  const response = await apiPost<{ behandlingId: number }>('/api/uforetrygd/lopendeinntektsavkorting/batch', {
-    kjoremaaned,
-    begrensUtplukk,
-    dryRun,
-    prioritet,
-  }, request)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/uforetrygd/lopendeinntektsavkorting/batch',
+    {
+      kjoremaaned,
+      begrensUtplukk,
+      dryRun,
+      prioritet,
+    },
+    request,
+  )
 
-  return redirect(`/behandling/${response!.behandlingId}`)
+  return redirect(`/behandling/${response?.behandlingId}`)
 }
 
 enum OppdragsPrioritet {

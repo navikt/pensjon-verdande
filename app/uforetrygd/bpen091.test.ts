@@ -48,6 +48,7 @@ describe('bpen091 action', () => {
     expect(url).toBe('http://pen-test/api/uforetrygd/fastsettforventetinntekt/batch')
     expect(init.method).toBe('POST')
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
+    expect(init.signal).toBeInstanceOf(AbortSignal)
 
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({
@@ -60,7 +61,7 @@ describe('bpen091 action', () => {
     expect(result.headers.get('Location')).toBe('/behandling/456')
   })
 
-  it('backend 500 kaster feil', async () => {
+  it('backend 500 kaster NormalizedError', async () => {
     fetchSpy.mockResolvedValueOnce(
       new Response(JSON.stringify({ status: 500, error: 'Internal Server Error' }), {
         status: 500,
@@ -79,8 +80,10 @@ describe('bpen091 action', () => {
     try {
       await action(actionArgs(request))
       expect.unreachable('Skulle ha kastet feil')
-    } catch {
-      // Forventet feil — nåværende kode kaster Error()
+    } catch (err: unknown) {
+      const e = err as { data: { status: number; title: string }; init: { status: number } }
+      expect(e.data.status).toBe(500)
+      expect(e.init.status).toBe(500)
     }
   })
 })

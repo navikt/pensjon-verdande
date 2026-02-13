@@ -42,13 +42,14 @@ describe('bpen096 action', () => {
     formData.set('debug', 'false')
 
     const request = new Request('http://localhost/bpen096', { method: 'POST', body: formData })
-    const result = await action(actionArgs(request))
+    const result = (await action(actionArgs(request))) as Response
 
     expect(fetchSpy).toHaveBeenCalledOnce()
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/uforetrygd/etteroppgjor/skattehendelser')
     expect(init.method).toBe('POST')
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
+    expect(init.signal).toBeInstanceOf(AbortSignal)
 
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({
@@ -75,6 +76,7 @@ describe('bpen096 action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/uforetrygd/etteroppgjor/skattehendelser/kjor-hendelser-manuelt')
     expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
 
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ sekvensnummer: [1, 2, 3] })
@@ -107,6 +109,7 @@ describe('bpen096 action', () => {
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/uforetrygd/etteroppgjor/skattehendelser/antall')
     expect(init.method).toBe('GET')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
 
     expect(result).toEqual({ antall: 42 })
   })

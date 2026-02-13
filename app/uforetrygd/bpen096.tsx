@@ -18,12 +18,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const formData = Object.fromEntries(await request.formData())
 
   if (formData.action === Action.HentSkattehendelser) {
-    const response = await apiPost<{ behandlingId: number }>('/api/uforetrygd/etteroppgjor/skattehendelser', {
-      maksAntallSekvensnummer: +formData.maksAntallSekvensnummer,
-      sekvensnummerPerBehandling: +formData.sekvensnummerPerBehandling,
-      debug: formData.debug === 'true',
-    }, request)
-    return redirect(`/behandling/${response!.behandlingId}`)
+    const response = await apiPost<{ behandlingId: number }>(
+      '/api/uforetrygd/etteroppgjor/skattehendelser',
+      {
+        maksAntallSekvensnummer: +formData.maksAntallSekvensnummer,
+        sekvensnummerPerBehandling: +formData.sekvensnummerPerBehandling,
+        debug: formData.debug === 'true',
+      },
+      request,
+    )
+    return redirect(`/behandling/${response?.behandlingId}`)
   } else if (formData.action === Action.HentSkattehendelserManuelt) {
     const sekvensnr: number[] = formData.sekvensnr
       .toString()
@@ -45,12 +49,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
       { sekvensnummer: sekvensnr },
       request,
     )
-    return { behandlingIder: response!.behandlingIder }
+    return { behandlingIder: response?.behandlingIder }
   } else if (formData.action === Action.HentAntallSkattehendelser) {
-    const response = await apiGet<{ antall: number }>(
-      '/api/uforetrygd/etteroppgjor/skattehendelser/antall',
-      request,
-    )
+    const response = await apiGet<{ antall: number }>('/api/uforetrygd/etteroppgjor/skattehendelser/antall', request)
     return { antall: response.antall }
   }
 }

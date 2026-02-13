@@ -46,13 +46,14 @@ describe('bestem-etteroppgjor-resultat action', () => {
     formData.set('oppdaterSisteGyldigeEtteroppgjørsÅr', 'checked')
 
     const request = new Request('http://localhost/bestem-etteroppgjor-resultat', { method: 'POST', body: formData })
-    const result = await action(actionArgs(request))
+    const result = (await action(actionArgs(request))) as Response
 
     expect(fetchSpy).toHaveBeenCalledOnce()
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/uforetrygd/bestemetteroppgjor/start')
     expect(init.method).toBe('POST')
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
+    expect(init.signal).toBeInstanceOf(AbortSignal)
 
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({

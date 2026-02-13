@@ -42,13 +42,14 @@ describe('bpen090 action', () => {
     formData.set('prioritet', '2')
 
     const request = new Request('http://localhost/bpen090', { method: 'POST', body: formData })
-    const result = await action(actionArgs(request))
+    const result = (await action(actionArgs(request))) as Response
 
     expect(fetchSpy).toHaveBeenCalledOnce()
     const [url, init] = fetchSpy.mock.calls[0]
     expect(url).toBe('http://pen-test/api/uforetrygd/lopendeinntektsavkorting/batch')
     expect(init.method).toBe('POST')
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
+    expect(init.signal).toBeInstanceOf(AbortSignal)
 
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({
@@ -74,7 +75,7 @@ describe('bpen090 action', () => {
     expect(result).toMatchObject({ kjoremaaned: expect.any(String) })
   })
 
-  it('backend 500 kaster feil', async () => {
+  it('backend 500 kaster NormalizedError', async () => {
     fetchSpy.mockResolvedValueOnce(
       new Response(JSON.stringify({ status: 500, error: 'Internal Server Error' }), {
         status: 500,
@@ -94,8 +95,10 @@ describe('bpen090 action', () => {
     try {
       await action(actionArgs(request))
       expect.unreachable('Skulle ha kastet feil')
-    } catch {
-      // Forventet feil — nåværende kode kaster Error()
+    } catch (err: unknown) {
+      const e = err as { data: { status: number; title: string }; init: { status: number } }
+      expect(e.data.status).toBe(500)
+      expect(e.init.status).toBe(500)
     }
   })
 })
