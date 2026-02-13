@@ -11,16 +11,12 @@ import {
   Select,
   VStack,
 } from '@navikt/ds-react'
-import {useCallback, useEffect, useId, useMemo, useState} from 'react'
-import {
-    redirect,
-    useFetcher,
-    useNavigate,
-    useSearchParams,
-} from 'react-router'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { redirect, useFetcher, useNavigate, useSearchParams } from 'react-router'
 import 'chart.js/auto'
-import {ExternalLinkIcon} from '@navikt/aksel-icons'
-import type {DateRange} from 'react-day-picker'
+import { ExternalLinkIcon } from '@navikt/aksel-icons'
+import { addMonths } from 'date-fns'
+import type { DateRange } from 'react-day-picker'
 import {
   endrePlanlagtStartet,
   getBehandlingSerier,
@@ -28,12 +24,11 @@ import {
   hentSerieValg,
   opprettBehandlingSerie,
 } from '~/behandlingserie/behandlingserie.server'
-import PlanlagteDatoerPreview, {type PlannedItem} from '~/behandlingserie/planlagteDatoerPreview'
+import PlanlagteDatoerPreview, { type PlannedItem } from '~/behandlingserie/planlagteDatoerPreview'
 import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview'
-import {requireAccessToken} from '~/services/auth.server'
-import type {BehandlingInfoDTO, BehandlingSerieDTO} from '~/types'
+import { requireAccessToken } from '~/services/auth.server'
+import type { BehandlingInfoDTO, BehandlingSerieDTO } from '~/types'
 import type { Route } from './+types/behandlingserie'
-import {byggRegelAdvarsler, filtrerDatoerMedRegler, type SerieValg, tellDatoerPerMaaned,} from './serieValg'
 import {
   allWeekdaysInRange,
   buildDisabledDates,
@@ -47,7 +42,7 @@ import {
   tertialStartDates,
   toYearMonthDay,
 } from './seriekalenderUtils'
-import {addMonths} from "date-fns";
+import { byggRegelAdvarsler, filtrerDatoerMedRegler, type SerieValg, tellDatoerPerMaaned } from './serieValg'
 
 type RegelmessighetModus = 'range' | 'multiple'
 type Utvalg = Date[] | DateRange | undefined
@@ -108,7 +103,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const [behandlingSerier, serieValg, tillateBehandlinger] = await Promise.all([
     getBehandlingSerier(accessToken, behandlingType),
     hentSerieValg(accessToken, behandlingType),
-    getTillateBehandlinger(accessToken)
+    getTillateBehandlinger(accessToken),
   ])
   return { behandlingSerier, serieValg, tillateBehandlinger }
 }
@@ -163,7 +158,15 @@ export function erDateRange(x: unknown): x is DateRange {
   return ('from' in obj || 'to' in obj) && erDato(obj.from) && erDato(obj.to)
 }
 
-function SerieVelger({behandlingType, onChange, tillateBehandlinger}: { behandlingType: string; onChange: (value: string) => void; tillateBehandlinger: string[]}) {
+function SerieVelger({
+  behandlingType,
+  onChange,
+  tillateBehandlinger,
+}: {
+  behandlingType: string
+  onChange: (value: string) => void
+  tillateBehandlinger: string[]
+}) {
   return (
     <HStack>
       <Select label="Velg behandling" value={behandlingType} onChange={(e) => onChange(e.target.value)}>
@@ -178,7 +181,15 @@ function SerieVelger({behandlingType, onChange, tillateBehandlinger}: { behandli
   )
 }
 
-function RegelKontroller({ verdi, onChange, serieValg }: { verdi: ReglerVerdi; onChange: (patch: ReglerPatch) => void , serieValg: SerieValg}) {
+function RegelKontroller({
+  verdi,
+  onChange,
+  serieValg,
+}: {
+  verdi: ReglerVerdi
+  onChange: (patch: ReglerPatch) => void
+  serieValg: SerieValg
+}) {
   const maanedLabel = verdi.dagvalgModus === 'first-weekday' ? 'Hver N. måned (første virkedag)' : 'i antall måneder'
   return (
     <VStack>
@@ -187,7 +198,7 @@ function RegelKontroller({ verdi, onChange, serieValg }: { verdi: ReglerVerdi; o
         value={verdi.regelmessighet}
         onChange={(v) => onChange({ regelmessighet: v as RegelmessighetModus })}
       >
-        {serieValg.enableRangeVelger && (<Radio value="range">Velg en range fra og til</Radio>)}
+        {serieValg.enableRangeVelger && <Radio value="range">Velg en range fra og til</Radio>}
         <Radio value="multiple">Velg diverse datoer</Radio>
       </RadioGroup>
       {verdi.regelmessighet === 'multiple' && (
@@ -630,9 +641,13 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
       const ukedagNummer = getWeekdayNumber(valgtUkedag)
       if (ukedagNummer == null) return
       if (intervallModus === 'quarterly') {
-        datoer = quarterlyStartDates(quarterStart, horisontSlutt).map((start) => firstWeekdayOnOrAfter(start, ukedagNummer))
+        datoer = quarterlyStartDates(quarterStart, horisontSlutt).map((start) =>
+          firstWeekdayOnOrAfter(start, ukedagNummer),
+        )
       } else if (intervallModus === 'tertial') {
-        datoer = tertialStartDates(tertialStart, horisontSlutt).map((start) => firstWeekdayOnOrAfter(start, ukedagNummer))
+        datoer = tertialStartDates(tertialStart, horisontSlutt).map((start) =>
+          firstWeekdayOnOrAfter(start, ukedagNummer),
+        )
       } else if (maanedsSteg) {
         const m = parseInt(maanedsSteg, 10)
         if (m > 0) {
@@ -828,7 +843,11 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
       <Heading size="medium" level="1">
         Behandlingserie
       </Heading>
-      <SerieVelger behandlingType={behandlingType} tillateBehandlinger={tillateBehandlinger} onChange={oppdaterBehandlingType} />
+      <SerieVelger
+        behandlingType={behandlingType}
+        tillateBehandlinger={tillateBehandlinger}
+        onChange={oppdaterBehandlingType}
+      />
       {behandlingType !== '' && (
         <>
           <Heading size="medium" level="1">

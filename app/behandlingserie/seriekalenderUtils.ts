@@ -244,8 +244,7 @@ export function buildValgteDatoer(
     const date = new Date(year, month - 1, day)
     if (ekskluderHelg && isWeekend(date)) return false
     if (!ekskluderHelg && ekskluderSondag && date.getDay() === 0) return false
-    return !(ekskluderHelligdager && helligdagerYearMonthDaySet.has(yearMonthDay));
-
+    return !(ekskluderHelligdager && helligdagerYearMonthDaySet.has(yearMonthDay))
   })
 }
 
