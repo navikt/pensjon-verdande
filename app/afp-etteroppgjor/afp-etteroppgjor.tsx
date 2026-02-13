@@ -45,7 +45,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     request,
   )
 
-  return redirect(`/behandling/${response?.behandlingId}`)
+  if (!response) {
+    throw new Error('Opprettelse av AFP etteroppgjør returnerte ingen respons')
+  }
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 function formaterTidspunkt(isoTid?: string): string {

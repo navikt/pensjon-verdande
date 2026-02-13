@@ -60,7 +60,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     },
     request,
   )
-  return redirect(`/behandling/${response?.behandlingId}`)
+  if (!response) {
+    throw new Error('Opprettelse av inntektskontroll returnerte ingen respons')
+  }
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
