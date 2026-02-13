@@ -86,7 +86,9 @@ export function filtrerDatoerMedRegler({
 
   return datoer.filter((ymd) => {
     if (booketYmdSet.has(ymd)) return false
-    if (erDatoEkskludertAvRegler(parseYmd(ymd), serieValg)) return false
+    const date = parseYmd(ymd)
+    if (erDatoEkskludertAvRegler(date, serieValg)) return false
+    if (erDatoIEkskludertMnd(date, serieValg)) return false
 
     const yearMonth = ymd.slice(0, 7)
     const count = antallValgt.get(yearMonth) ?? 0

@@ -15,7 +15,6 @@ import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { redirect, useFetcher, useNavigate, useSearchParams } from 'react-router'
 import 'chart.js/auto'
 import { ExternalLinkIcon } from '@navikt/aksel-icons'
-import { addMonths } from 'date-fns'
 import type { DateRange } from 'react-day-picker'
 import {
   endrePlanlagtStartet,
@@ -30,6 +29,7 @@ import { requireAccessToken } from '~/services/auth.server'
 import type { BehandlingInfoDTO, BehandlingSerieDTO } from '~/types'
 import type { Route } from './+types/behandlingserie'
 import {
+  addMonths,
   allWeekdaysInRange,
   buildDisabledDates,
   buildValgteDatoer,
@@ -42,7 +42,13 @@ import {
   tertialStartDates,
   toYearMonthDay,
 } from './seriekalenderUtils'
-import { byggRegelAdvarsler, filtrerDatoerMedRegler, type SerieValg, tellDatoerPerMaaned } from './serieValg'
+import {
+  byggRegelAdvarsler,
+  erDatoIEkskludertMnd,
+  filtrerDatoerMedRegler,
+  type SerieValg,
+  tellDatoerPerMaaned,
+} from './serieValg'
 
 type RegelmessighetModus = 'range' | 'multiple'
 type Utvalg = Date[] | DateRange | undefined
@@ -426,7 +432,13 @@ function EndreDialog({
 
   useEffect(() => {
     setInput(
-      dato ? new Intl.DateTimeFormat('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(dato) : '',
+      dato
+        ? new Intl.DateTimeFormat('no-NO', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }).format(dato)
+        : '',
     )
   }, [dato])
 
@@ -563,6 +575,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     const monthStart = new Date(idag.getFullYear(), idag.getMonth(), 1)
     const firstBusinessThisMonth = firstPossibleDayOnOrAfter(
       monthStart,
+      serieValg,
       helligdagsdata.yearMonthDaySet,
       ekskluderHelg,
       ekskluderHelligdager,
@@ -574,6 +587,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     const quarterStart = new Date(idag.getFullYear(), Math.floor(idag.getMonth() / 3) * 3, 1)
     const firstBusinessThisQuarter = firstPossibleDayOnOrAfter(
       quarterStart,
+      serieValg,
       helligdagsdata.yearMonthDaySet,
       ekskluderHelg,
       ekskluderHelligdager,
@@ -587,6 +601,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     const tertialStart = new Date(idag.getFullYear(), currentTertialMonth, 1)
     const firstBusinessThisTertial = firstPossibleDayOnOrAfter(
       tertialStart,
+      serieValg,
       helligdagsdata.yearMonthDaySet,
       ekskluderHelg,
       ekskluderHelligdager,
@@ -597,64 +612,63 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
 
     let datoer: Date[] = []
 
-    if (dagvalgModus === 'first-weekday') {
+    const hentStartDatoer = (): Date[] => {
       if (intervallModus === 'quarterly') {
         const base = includeCurrentQuarter ? quarterStart : nextQuarterStart
-        datoer = quarterlyStartDates(base, horisontSlutt).map((start) =>
-          firstPossibleDayOnOrAfter(
-            start,
-            helligdagsdata.yearMonthDaySet,
-            ekskluderHelg,
-            ekskluderHelligdager,
-            ekskluderSondag,
-          ),
-        )
-      } else if (intervallModus === 'tertial') {
+        return quarterlyStartDates(base, horisontSlutt)
+      }
+      if (intervallModus === 'tertial') {
         const base = includeCurrentTertial ? tertialStart : nextTertialStart
-        datoer = tertialStartDates(base, horisontSlutt).map((start) =>
-          firstPossibleDayOnOrAfter(
-            start,
-            helligdagsdata.yearMonthDaySet,
-            ekskluderHelg,
-            ekskluderHelligdager,
-            ekskluderSondag,
-          ),
-        )
-      } else if (maanedsSteg) {
+        return tertialStartDates(base, horisontSlutt)
+      }
+      if (maanedsSteg) {
         const m = parseInt(maanedsSteg, 10)
         if (m > 0) {
           const base = includeCurrentMonth ? monthStart : nextMonthStart
-          const starts = monthlyAnchoredStartDates(base, m, horisontSlutt)
-          datoer = starts.map((start) =>
-            firstPossibleDayOnOrAfter(
-              start,
-              helligdagsdata.yearMonthDaySet,
-              ekskluderHelg,
-              ekskluderHelligdager,
-              ekskluderSondag,
-            ),
-          )
+          return monthlyAnchoredStartDates(base, m, horisontSlutt)
         }
       }
+      return []
+    }
+
+    if (dagvalgModus === 'first-weekday') {
+      datoer = hentStartDatoer()
+        .filter((start) => !erDatoIEkskludertMnd(start, serieValg))
+        .map((start) =>
+          firstPossibleDayOnOrAfter(
+            start,
+            serieValg,
+            helligdagsdata.yearMonthDaySet,
+            ekskluderHelg,
+            ekskluderHelligdager,
+            ekskluderSondag,
+          ),
+        )
     } else {
       if (!valgtUkedag) return
       const ukedagNummer = getWeekdayNumber(valgtUkedag)
       if (ukedagNummer == null) return
-      if (intervallModus === 'quarterly') {
-        datoer = quarterlyStartDates(quarterStart, horisontSlutt).map((start) =>
-          firstWeekdayOnOrAfter(start, ukedagNummer),
-        )
-      } else if (intervallModus === 'tertial') {
-        datoer = tertialStartDates(tertialStart, horisontSlutt).map((start) =>
-          firstWeekdayOnOrAfter(start, ukedagNummer),
-        )
-      } else if (maanedsSteg) {
+
+      if (!intervallModus && maanedsSteg) {
         const m = parseInt(maanedsSteg, 10)
         if (m > 0) {
           const slutt = addMonths(idag, m)
           const klippetSlutt = slutt > horisontSlutt ? horisontSlutt : slutt
-          datoer = allWeekdaysInRange(ukedagNummer, idag, klippetSlutt)
+          datoer = allWeekdaysInRange(
+            ukedagNummer,
+            idag,
+            klippetSlutt,
+            serieValg,
+            helligdagsdata.yearMonthDaySet,
+            ekskluderHelligdager,
+          )
         }
+      } else {
+        datoer = hentStartDatoer()
+          .filter((start) => !erDatoIEkskludertMnd(start, serieValg))
+          .map((start) =>
+            firstWeekdayOnOrAfter(start, ukedagNummer, serieValg, helligdagsdata.yearMonthDaySet, ekskluderHelligdager),
+          )
       }
     }
 
@@ -676,6 +690,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     helligdagsdata.yearMonthDaySet,
     ekskluderHelligdager,
     ekskluderSondag,
+    serieValg,
   ])
 
   useEffect(() => {
