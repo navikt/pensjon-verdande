@@ -201,12 +201,51 @@ const data = useLoaderData<typeof loader>()  // Don't use this
 - **Form Submission**: Use `<Form method="post">` for navigation-based submits
 - **Fetcher**: Use `useFetcher()` for non-navigation submits (modals, inline actions)
 
-### API Calls (Server-Side)
-**ALWAYS use `api.server.ts` functions instead of `fetch` directly**:
-- `apiGet<T>(path, request)` - GET requests
-- `apiPost<T>(path, request, body)` - POST requests
-- `apiGetOrUndefined<T>(path, request)` - GET with 404 as undefined
-- `apiGetRawStringOrUndefined(path, request)` - Raw string response
+### API Calls (Server-Side) — CRITICAL
+**ALWAYS use `app/services/api.server.ts` functions for ALL HTTP calls to the backend (pensjon-pen). NEVER use `fetch` directly or create custom fetch wrappers.**
+
+Available functions:
+- `apiGet<T>(path, requestCtx)` — GET with JSON response
+- `apiGetOrUndefined<T>(path, requestCtx)` — GET where 404 returns `undefined`
+- `apiGetRawStringOrUndefined(path, requestCtx)` — GET with text response
+- `apiPost<T>(path, body, requestCtx)` — POST with JSON body
+- `apiPut<T>(path, body, requestCtx)` — PUT with JSON body
+- `apiPatch<T>(path, body, requestCtx)` — PATCH with JSON body
+- `apiDelete<T>(path, bodyOrRequestCtx, requestCtx?)` — DELETE with optional body
+
+`requestCtx` can be either `Request` (from loader/action args) or `{ accessToken: string }`.
+
+**What NOT to do:**
+- **Do NOT use `fetch()` directly** for backend calls.
+- **Do NOT create custom fetch wrappers** (e.g., local `req()` functions in `.server.ts` files). Use the `api.server.ts` functions instead.
+- **Do NOT call `requireAccessToken()` manually** for API calls — `api.server.ts` handles auth automatically when you pass a `Request` object.
+
+**Why:** `api.server.ts` provides consistent auth, 15s timeout, error normalization via `normalizeAndThrow`, and network error handling (ECONNREFUSED → 503, timeout → 504). Direct `fetch` or custom wrappers typically lack timeout and proper error normalization.
+
+**Exception:** Only use `fetch` directly with a documented reason (e.g., streaming, binary data, or calls to services other than pensjon-pen), and ensure equivalent timeout and error handling.
+
+```tsx
+// ✅ Correct — use api.server.ts
+import { apiGet, apiPost } from '~/services/api.server'
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const data = await apiGet<MyType>('/api/my-endpoint', request)
+  return { data }
+}
+```
+
+```tsx
+// ❌ Wrong — do NOT create custom fetch wrappers
+async function req(url: string, init: RequestInit & { accessToken: string }) {
+  const res = await fetch(url, { ... })  // Missing timeout, error normalization
+  return res
+}
+
+// ❌ Wrong — do NOT use fetch directly for backend calls
+const res = await fetch(`${env.penUrl}/api/...`, {
+  headers: { Authorization: `Bearer ${token}` },
+})
+```
 
 Benefits: Consistent auth via `requireAccessToken`, 15s timeout, error normalization via `normalizeAndThrow`.
 

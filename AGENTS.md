@@ -130,10 +130,66 @@ const data = useLoaderData<typeof loader>()  // Ikke bruk dette
   - `import { someServerFn } from '~/.../*.server'`
 - Unntak: Moduler som *må* lazy-loades og som **ikke** er statisk importert andre steder (må verifiseres), eller spesielle runtime-behov.
 
-## API-kall (server-side)
-- Foretrekk metodene i `app/services/api.server.ts` (`apiGet`, `apiPost`, `apiGetOrUndefined`, `apiGetRawStringOrUndefined`) fremfor å bruke `fetch` direkte.
-  - Gir konsistent auth (`requireAccessToken`), tidsavbrudd, headers og feilnormalisering via `normalizeAndThrow`.
-  - Bruk kun `fetch` direkte når du har en god grunn (f.eks. streaming/binary eller helt spesielle behov), og sørg da for samme nivå av timeout og feilhåndtering.
+## API-kall (server-side) — KRITISK
+
+**ALLTID bruk funksjonene fra `app/services/api.server.ts` for alle HTTP-kall mot backend (pensjon-pen).**
+
+Tilgjengelige funksjoner:
+- `apiGet<T>(path, requestCtx)` — GET med JSON-respons
+- `apiGetOrUndefined<T>(path, requestCtx)` — GET der 404 returnerer `undefined`
+- `apiGetRawStringOrUndefined(path, requestCtx)` — GET med tekst-respons
+- `apiPost<T>(path, body, requestCtx)` — POST med JSON body
+- `apiPut<T>(path, body, requestCtx)` — PUT med JSON body
+- `apiPatch<T>(path, body, requestCtx)` — PATCH med JSON body
+- `apiDelete<T>(path, bodyOrRequestCtx, requestCtx?)` — DELETE med valgfri body
+
+`requestCtx` kan være enten `Request` (fra loader/action) eller `{ accessToken: string }`.
+
+### Hva du IKKE skal gjøre
+- **IKKE bruk `fetch()` direkte** for kall mot backend.
+- **IKKE lag egne fetch-wrappere** (f.eks. lokale `req()`-funksjoner i `.server.ts`-filer). Bruk `api.server.ts`-funksjonene i stedet.
+- **IKKE kall `requireAccessToken()` manuelt** for API-kall — `api.server.ts` gjør dette automatisk når du sender inn `Request`.
+
+### Hvorfor
+`api.server.ts` gir konsistent:
+- Auth via `requireAccessToken`
+- 15 sekunders timeout (AbortController)
+- Feilnormalisering via `normalizeAndThrow` (korrekt status, tittel, detaljer)
+- Nettverksfeilhåndtering (ECONNREFUSED → 503, timeout → 504)
+
+Direkte `fetch` eller egne wrappere mangler typisk timeout og riktig feilnormalisering, noe som gir inkonsistent feilhåndtering i appen.
+
+### Unntak
+Bruk kun `fetch` direkte hvis du har et dokumentert behov (f.eks. streaming, binary data, eller kall mot andre tjenester enn pensjon-pen), og sørg da for tilsvarende timeout og feilhåndtering.
+
+### Eksempel
+```tsx
+// ✅ Riktig — bruk api.server.ts
+import { apiGet, apiPost } from '~/services/api.server'
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const data = await apiGet<MyType>('/api/my-endpoint', request)
+  return { data }
+}
+
+export const action = async ({ request }: Route.ActionArgs) => {
+  const result = await apiPost<MyResult>('/api/my-endpoint', { key: 'value' }, request)
+  return { result }
+}
+```
+
+```tsx
+// ❌ Feil — IKKE lag egne fetch-wrappere
+async function req(url: string, init: RequestInit & { accessToken: string }) {
+  const res = await fetch(url, { ... })  // Mangler timeout, feilnormalisering
+  return res
+}
+
+// ❌ Feil — IKKE bruk fetch direkte mot backend
+const res = await fetch(`${env.penUrl}/api/...`, {
+  headers: { Authorization: `Bearer ${token}` },
+})
+```
 
 ## Nav Designsystem (Aksel)
 - Bruk komponenter fra `@navikt/ds-react`.
