@@ -1,7 +1,8 @@
-import { fjernEkskluderteSaker } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.ekskludertesaker.fjern'
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const data = await request.json()
-  return await fjernEkskluderteSaker(request, data.sakIder)
+  await apiPost('/api/vedtak/regulering/eksludertesaker/fjern', { sakIder: data.sakIder }, request)
+  return { erOppdatert: true }
 }

@@ -18,8 +18,8 @@ import { formatIsoTimestamp } from '~/common/date'
 import { useRevalidateOnInterval } from '~/common/useRevalidateOnInterval'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { Entry } from '~/components/entry/Entry'
-import { startOrkestrering } from '~/regulering/regulering.server'
 import type { AggregerteFeilmeldinger, ReguleringDetaljer, ReguleringOrkestrering } from '~/regulering/regulering.types'
+import { apiPost } from '~/services/api.server'
 import { Behandlingstatus, type DetaljertFremdriftDTO } from '~/types'
 import type { Route } from './+types/batch.regulering.orkestrering'
 
@@ -29,7 +29,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const kjorOnline = (formData.get('kjorOnline') as string) === 'true'
   const brukKjoreplan = (formData.get('brukKjoreplan') as string) === 'true'
   const skalSamordne = (formData.get('skalSamordne') as string) === 'true'
-  return await startOrkestrering(request, antallFamilier, kjorOnline, brukKjoreplan, skalSamordne)
+  await apiPost('/api/vedtak/regulering/orkestrering/start', { antallFamilier, kjorOnline, brukKjoreplan, skalSamordne }, request)
+  return { success: true }
 }
 
 export default function Orkestrering() {

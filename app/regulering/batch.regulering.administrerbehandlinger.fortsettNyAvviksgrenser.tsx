@@ -1,6 +1,7 @@
-import { fortsettNyeavviksgrenser } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.fortsettNyAvviksgrenser'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  return await fortsettNyeavviksgrenser(request)
+  await apiPost('/api/vedtak/regulering/fortsett/nyeavviksgrenser', undefined, request)
+  return true
 }

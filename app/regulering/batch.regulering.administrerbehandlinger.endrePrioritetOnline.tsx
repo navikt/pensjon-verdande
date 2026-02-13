@@ -1,6 +1,7 @@
-import { endrePrioritetTilOnline } from '~/regulering/regulering.server'
+import { apiPut } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.endrePrioritetOnline'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  return await endrePrioritetTilOnline(request)
+  await apiPut('/api/vedtak/regulering/endre/prioritet/online', undefined, request)
+  return { success: true }
 }

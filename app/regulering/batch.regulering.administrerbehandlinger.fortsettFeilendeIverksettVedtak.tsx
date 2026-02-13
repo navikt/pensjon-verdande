@@ -1,6 +1,7 @@
-import { fortsettFeilendeIverksettVedtak } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.fortsettFeilendeIverksettVedtak'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  return await fortsettFeilendeIverksettVedtak(request)
+  await apiPost('/api/vedtak/regulering/fortsett/iverksettvedtak', undefined, request)
+  return true
 }

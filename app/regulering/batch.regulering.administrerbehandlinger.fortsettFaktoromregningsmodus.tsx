@@ -1,6 +1,7 @@
-import { fortsettFaktoromregningModus } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.fortsettFaktoromregningsmodus'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  return await fortsettFaktoromregningModus(request)
+  await apiPost('/api/vedtak/regulering/fortsett/nyeavviksgrenser/faktormodus', undefined, request)
+  return true
 }

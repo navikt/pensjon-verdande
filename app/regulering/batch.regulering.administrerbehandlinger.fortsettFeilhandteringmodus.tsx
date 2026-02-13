@@ -1,6 +1,7 @@
-import { fortsettFeilhandteringmodus } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.fortsettFeilhandteringmodus'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  return await fortsettFeilhandteringmodus(request)
+  await apiPost('/api/vedtak/regulering/fortsett/faktorogfeilmodus', undefined, request)
+  return true
 }
