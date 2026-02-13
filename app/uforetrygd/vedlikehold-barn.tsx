@@ -1,4 +1,15 @@
-import { BodyLong, Button, Checkbox, Heading, HStack, Modal, Table, TextField, VStack } from '@navikt/ds-react'
+import {
+  BodyLong,
+  BodyShort,
+  Button,
+  Checkbox,
+  Heading,
+  HStack,
+  Modal,
+  Table,
+  TextField,
+  VStack,
+} from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
 import { useFetcher, useSearchParams } from 'react-router'
 import { apiGet, apiPut } from '~/services/api.server'
@@ -73,6 +84,9 @@ export default function VedlikeholdBarnPage() {
         <>
           <BodyLong>Tabellen viser alle barn på åpne krav. Her kan du velge om barnet skal være i bruk.</BodyLong>
           <Table>
+            <BodyShort as="caption" visuallyHidden>
+              Barn på åpne krav
+            </BodyShort>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Persondetalj ID</Table.HeaderCell>

@@ -10,6 +10,7 @@ import {
 import {
   Alert,
   BodyLong,
+  BodyShort,
   Button,
   Checkbox,
   CopyButton,
@@ -130,6 +131,9 @@ export default function LaasteVedtakPage({ loaderData }: Route.ComponentProps) {
                   }}
                   zebraStripes
                 >
+                  <BodyShort as="caption" visuallyHidden>
+                    Låste vedtak
+                  </BodyShort>
                   <Table.Header>
                     <Table.Row>
                       <Table.ColumnHeader sortKey="datoRegistrert" sortable>
@@ -540,6 +544,9 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Laa
 
           {vedtakIOppdrag !== undefined && (
             <Table size="small" zebraStripes>
+              <BodyShort as="caption" visuallyHidden>
+                Ytelsekomponenter oversendt oppdrag
+              </BodyShort>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeader>Ytelse type</Table.ColumnHeader>
