@@ -1,17 +1,8 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
-import {
-  ekskluderSakerFraArligOmregning,
-  fjernAlleEkskluderteSakerFraArligOmregning,
-  fjernEkskluderteSakerFraArligOmregning,
-  hentEkskluderSakerFraArligOmregning,
-} from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
-import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/opptjening.arlig.omregning.server'
-import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
-import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
-import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
+import type { EkskluderteSakerResponse, EkskludertSak, StartBatchResponse } from '~/opptjening/arlig/opptjening.types'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { Route } from './+types/opptjening.arlig.omregning'
 
 export function meta(): Route.MetaDescriptors {
@@ -19,7 +10,8 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(request)
+  const result = await apiGet<EkskluderteSakerResponse>('/api/opptjening/eksludertesaker', request)
+  const ekskluderteSaker = result.ekskluderteSaker
 
   const innevaerendeAar = new Date().getFullYear()
   const defaultOpptjeningsaar = innevaerendeAar - 1
@@ -48,38 +40,45 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const fromEntries = Object.fromEntries(formData)
 
   if (fromEntries.action === Action.ekskluderSaker) {
-    const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
-    const sakIder = konverterTilListe(ekskluderteSakIderText)
-
-    await ekskluderSakerFraArligOmregning(request, sakIder, fromEntries.kommentar as string | undefined)
+    const sakIder = konverterTilListe(fromEntries.ekskluderteSakIderText as string)
+    await apiPost('/api/opptjening/eksludertesaker/leggTil', { sakIder, kommentar: fromEntries.kommentar }, request)
     return redirect(request.url)
   } else if (fromEntries.action === Action.fjernEkskluderSaker) {
-    const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
-    const sakIder = konverterTilListe(ekskluderteSakIderText)
-
-    await fjernEkskluderteSakerFraArligOmregning(request, sakIder)
+    const sakIder = konverterTilListe(fromEntries.ekskluderteSakIderText as string)
+    await apiPost('/api/opptjening/eksludertesaker/fjern', { sakIder }, request)
     return redirect(request.url)
   } else if (fromEntries.action === Action.fjernAlleEkskluderSaker) {
-    await fjernAlleEkskluderteSakerFraArligOmregning(request)
+    await apiPost('/api/opptjening/eksludertesaker/fjernAlle', {}, request)
     return redirect(request.url)
   } else if (fromEntries.action === Action.kjoerUttrekk) {
-    const response = await opprettOpptjeningsendringArligUttrekk(request)
-    return redirect(`/behandling/${response.behandlingId}`)
+    const response = await apiPost<StartBatchResponse>('/api/opptjening/arliguttrekk/opprett', {}, request)
+    return redirect(`/behandling/${response?.behandlingId}`)
   } else if (fromEntries.action === Action.kjoerOmregning) {
-    const response = await opprettOpptjeningsendringArligOmregning(
+    const response = await apiPost<StartBatchResponse>(
+      '/api/opptjening/arligendring/opprett',
+      {
+        opptjeningsar: +fromEntries.opptjeningsar,
+        bolkstorrelse: +fromEntries.bolkstorrelse,
+      },
       request,
-      +fromEntries.opptjeningsar,
-      +fromEntries.bolkstorrelse,
     )
-    return redirect(`/behandling/${response.behandlingId}`)
+    return redirect(`/behandling/${response?.behandlingId}`)
   } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
-    await oppdaterSisteGyldigOpptjeningsaar(request, +fromEntries.oppdaterOpptjeningsaar)
+    await apiPost(
+      `/api/opptjening/opptjeningsaar/oppdater?opptjeningsar=${fromEntries.oppdaterOpptjeningsaar}`,
+      {},
+      request,
+    )
     return JSON.stringify({
       melding: `✅ Siste gyldige opptjeningsår er oppdatert til ${fromEntries.oppdaterOpptjeningsaar}`,
       action: Action.oppdaterSisteGyldigeOpptjeningsaar,
     })
   } else if (fromEntries.action === Action.oppdaterSisteOmsorgGodskrivingsaar) {
-    await oppdaterSisteOmsorgGodskrivingsaar(request, +fromEntries.oppdaterOmsorgGodskrivingsaar)
+    await apiPost(
+      `/api/opptjening/omsorggodskrivingsaar/oppdater?godskrivingsaar=${fromEntries.oppdaterOmsorgGodskrivingsaar}`,
+      {},
+      request,
+    )
     return JSON.stringify({
       melding: `✅ Siste godskrivingsår for omsorg er oppdatert til ${fromEntries.oppdaterOmsorgGodskrivingsaar}`,
       action: Action.oppdaterSisteOmsorgGodskrivingsaar,
