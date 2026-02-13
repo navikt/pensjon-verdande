@@ -211,14 +211,15 @@ Available functions:
 - `apiPost<T>(path, body, requestCtx)` — POST with JSON body
 - `apiPut<T>(path, body, requestCtx)` — PUT with JSON body
 - `apiPatch<T>(path, body, requestCtx)` — PATCH with JSON body
-- `apiDelete<T>(path, bodyOrRequestCtx, requestCtx?)` — DELETE with optional body
+- `apiDelete<T>(path, requestCtx)` — DELETE without body
+- `apiDelete<T>(path, body, requestCtx)` — DELETE with JSON body
 
 `requestCtx` can be either `Request` (from loader/action args) or `{ accessToken: string }`.
 
 **What NOT to do:**
 - **Do NOT use `fetch()` directly** for backend calls.
 - **Do NOT create custom fetch wrappers** (e.g., local `req()` functions in `.server.ts` files). Use the `api.server.ts` functions instead.
-- **Do NOT call `requireAccessToken()` manually** for API calls — `api.server.ts` handles auth automatically when you pass a `Request` object.
+- **Avoid calling `requireAccessToken()` manually when you already have a `Request`** — prefer passing the `Request` directly to `api.server.ts`. Only obtain/pass `{ accessToken }` (via `requireAccessToken`) in helpers/services that don't have access to a `Request`.
 
 **Why:** `api.server.ts` provides consistent auth, 15s timeout, error normalization via `normalizeAndThrow`, and network error handling (ECONNREFUSED → 503, timeout → 504). Direct `fetch` or custom wrappers typically lack timeout and proper error normalization.
 
@@ -226,6 +227,7 @@ Available functions:
 
 ```tsx
 // ✅ Correct — use api.server.ts
+import type { Route } from './+types/my-route'
 import { apiGet, apiPost } from '~/services/api.server'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

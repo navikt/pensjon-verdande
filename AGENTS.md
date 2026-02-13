@@ -141,14 +141,15 @@ Tilgjengelige funksjoner:
 - `apiPost<T>(path, body, requestCtx)` — POST med JSON body
 - `apiPut<T>(path, body, requestCtx)` — PUT med JSON body
 - `apiPatch<T>(path, body, requestCtx)` — PATCH med JSON body
-- `apiDelete<T>(path, bodyOrRequestCtx, requestCtx?)` — DELETE med valgfri body
+- `apiDelete<T>(path, requestCtx)` — DELETE uten body
+- `apiDelete<T>(path, body, requestCtx)` — DELETE med JSON body
 
 `requestCtx` kan være enten `Request` (fra loader/action) eller `{ accessToken: string }`.
 
 ### Hva du IKKE skal gjøre
 - **IKKE bruk `fetch()` direkte** for kall mot backend.
 - **IKKE lag egne fetch-wrappere** (f.eks. lokale `req()`-funksjoner i `.server.ts`-filer). Bruk `api.server.ts`-funksjonene i stedet.
-- **IKKE kall `requireAccessToken()` manuelt** for API-kall — `api.server.ts` gjør dette automatisk når du sender inn `Request`.
+- **IKKE kall `requireAccessToken()` manuelt kun for å gjøre backend-kall i en loader/action** – send heller `request` direkte til `api.server.ts`. Kall `requireAccessToken()` eksplisitt bare når du ikke har en `Request` tilgjengelig (f.eks. i et service-lag som kun får `{ accessToken }`).
 
 ### Hvorfor
 `api.server.ts` gir konsistent:
@@ -165,6 +166,7 @@ Bruk kun `fetch` direkte hvis du har et dokumentert behov (f.eks. streaming, bin
 ### Eksempel
 ```tsx
 // ✅ Riktig — bruk api.server.ts
+import type { Route } from './+types/min-route'
 import { apiGet, apiPost } from '~/services/api.server'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
