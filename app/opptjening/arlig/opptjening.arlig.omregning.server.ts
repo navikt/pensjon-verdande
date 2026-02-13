@@ -1,32 +1,15 @@
-import { data } from 'react-router'
-import { env } from '~/services/env.server'
+import { apiPost } from '~/services/api.server'
 
 export async function opprettOpptjeningsendringArligOmregning(
-  accessToken: string,
+  request: Request,
   opptjeningsar: number,
   bolkstorrelse: number,
 ): Promise<StartBatchResponse> {
-  const response = await fetch(`${env.penUrl}/api/opptjening/arligendring/opprett`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      opptjeningsar: opptjeningsar,
-      bolkstorrelse: bolkstorrelse,
-    }),
-  })
-
-  if (response.ok) {
-    return (await response.json()) as StartBatchResponse
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved start av årlig omregning. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  const result = await apiPost<StartBatchResponse>('/api/opptjening/arligendring/opprett', {
+    opptjeningsar,
+    bolkstorrelse,
+  }, request)
+  return result as StartBatchResponse
 }
 
 type StartBatchResponse = {

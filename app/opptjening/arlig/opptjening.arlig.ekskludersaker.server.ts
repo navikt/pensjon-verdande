@@ -1,94 +1,23 @@
-import { data } from 'react-router'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { EkskluderteSakerResponse, EkskludertSak } from '~/opptjening/arlig/opptjening.types'
-import { env } from '~/services/env.server'
 
-export async function hentEkskluderSakerFraArligOmregning(accessToken: string): Promise<EkskludertSak[]> {
-  const response = await fetch(`${env.penUrl}/api/opptjening/eksludertesaker`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return ((await response.json()) as EkskluderteSakerResponse).ekskluderteSaker
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved start av årlig omregning. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+export async function hentEkskluderSakerFraArligOmregning(request: Request): Promise<EkskludertSak[]> {
+  const result = await apiGet<EkskluderteSakerResponse>('/api/opptjening/eksludertesaker', request)
+  return result.ekskluderteSaker
 }
 
 export async function ekskluderSakerFraArligOmregning(
-  accessToken: string,
+  request: Request,
   sakIder: string[],
   kommentar: string | undefined,
 ): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/opptjening/eksludertesaker/leggTil`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      sakIder: sakIder,
-      kommentar: kommentar,
-    }),
-  })
-
-  if (response.ok) {
-    return
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved å legge til ekskluderte saker. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+  await apiPost('/api/opptjening/eksludertesaker/leggTil', { sakIder, kommentar }, request)
 }
 
-export async function fjernEkskluderteSakerFraArligOmregning(accessToken: string, sakIder: string[]): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/opptjening/eksludertesaker/fjern`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-    body: JSON.stringify({
-      sakIder: sakIder,
-    }),
-  })
-
-  if (response.ok) {
-    return
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved å fjerne ekskluderte saker. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+export async function fjernEkskluderteSakerFraArligOmregning(request: Request, sakIder: string[]): Promise<void> {
+  await apiPost('/api/opptjening/eksludertesaker/fjern', { sakIder }, request)
 }
 
-export async function fjernAlleEkskluderteSakerFraArligOmregning(accessToken: string): Promise<void> {
-  const response = await fetch(`${env.penUrl}/api/opptjening/eksludertesaker/fjernAlle`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'X-Request-ID': crypto.randomUUID(),
-    },
-  })
-
-  if (response.ok) {
-    return
-  } else {
-    const text = await response.text()
-    throw data(`Feil ved å fjerne alle ekskluderte saker. Feil var\n${text}`, {
-      status: response.status,
-    })
-  }
+export async function fjernAlleEkskluderteSakerFraArligOmregning(request: Request): Promise<void> {
+  await apiPost('/api/opptjening/eksludertesaker/fjernAlle', {}, request)
 }

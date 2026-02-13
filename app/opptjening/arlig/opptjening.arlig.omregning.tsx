@@ -12,7 +12,6 @@ import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/oppt
 import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
 import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
 import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/opptjening.arlig.omregning'
 
 export function meta(): Route.MetaDescriptors {
@@ -20,8 +19,7 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const accessToken = await requireAccessToken(request)
-  const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)
+  const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(request)
 
   const innevaerendeAar = new Date().getFullYear()
   const defaultOpptjeningsaar = innevaerendeAar - 1
@@ -48,41 +46,40 @@ enum Action {
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const fromEntries = Object.fromEntries(formData)
-  const accessToken = await requireAccessToken(request)
 
   if (fromEntries.action === Action.ekskluderSaker) {
     const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
     const sakIder = konverterTilListe(ekskluderteSakIderText)
 
-    await ekskluderSakerFraArligOmregning(accessToken, sakIder, fromEntries.kommentar as string | undefined)
+    await ekskluderSakerFraArligOmregning(request, sakIder, fromEntries.kommentar as string | undefined)
     return redirect(request.url)
   } else if (fromEntries.action === Action.fjernEkskluderSaker) {
     const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
     const sakIder = konverterTilListe(ekskluderteSakIderText)
 
-    await fjernEkskluderteSakerFraArligOmregning(accessToken, sakIder)
+    await fjernEkskluderteSakerFraArligOmregning(request, sakIder)
     return redirect(request.url)
   } else if (fromEntries.action === Action.fjernAlleEkskluderSaker) {
-    await fjernAlleEkskluderteSakerFraArligOmregning(accessToken)
+    await fjernAlleEkskluderteSakerFraArligOmregning(request)
     return redirect(request.url)
   } else if (fromEntries.action === Action.kjoerUttrekk) {
-    const response = await opprettOpptjeningsendringArligUttrekk(accessToken)
+    const response = await opprettOpptjeningsendringArligUttrekk(request)
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.kjoerOmregning) {
     const response = await opprettOpptjeningsendringArligOmregning(
-      accessToken,
+      request,
       +fromEntries.opptjeningsar,
       +fromEntries.bolkstorrelse,
     )
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
-    await oppdaterSisteGyldigOpptjeningsaar(accessToken, +fromEntries.oppdaterOpptjeningsaar)
+    await oppdaterSisteGyldigOpptjeningsaar(request, +fromEntries.oppdaterOpptjeningsaar)
     return JSON.stringify({
       melding: `✅ Siste gyldige opptjeningsår er oppdatert til ${fromEntries.oppdaterOpptjeningsaar}`,
       action: Action.oppdaterSisteGyldigeOpptjeningsaar,
     })
   } else if (fromEntries.action === Action.oppdaterSisteOmsorgGodskrivingsaar) {
-    await oppdaterSisteOmsorgGodskrivingsaar(accessToken, +fromEntries.oppdaterOmsorgGodskrivingsaar)
+    await oppdaterSisteOmsorgGodskrivingsaar(request, +fromEntries.oppdaterOmsorgGodskrivingsaar)
     return JSON.stringify({
       melding: `✅ Siste godskrivingsår for omsorg er oppdatert til ${fromEntries.oppdaterOmsorgGodskrivingsaar}`,
       action: Action.oppdaterSisteOmsorgGodskrivingsaar,
