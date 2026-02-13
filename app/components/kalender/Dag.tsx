@@ -1,4 +1,4 @@
-import { Button, HStack, Link, Modal, Spacer, VStack } from '@navikt/ds-react'
+import { Button, Dialog, HStack, Link, Spacer, VStack } from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useMemo, useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router'
@@ -173,42 +173,42 @@ export default function Dag(props: Props) {
           </tr>
         </tbody>
       </table>
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        width="small"
-        header={{
-          heading: props.dato.toLocaleDateString('no-NO', {
-            weekday: 'long',
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-          }),
-        }}
-      >
-        <Modal.Body>
-          <VStack gap="space-4">
-            {offentligFridag && (
-              <HStack key="modal-kalenderHendelse" style={{ fontSize: '0.9em' }}>
-                <span style={{ color: 'red' }}>{offentligFridag}</span>
-              </HStack>
-            )}
+      <Dialog open={modalOpen} onOpenChange={(open) => setModalOpen(open)} size="small">
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>
+              {props.dato.toLocaleDateString('no-NO', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            <VStack gap="space-4">
+              {offentligFridag && (
+                <HStack key="modal-kalenderHendelse" style={{ fontSize: '0.9em' }}>
+                  <span style={{ color: 'red' }}>{offentligFridag}</span>
+                </HStack>
+              )}
 
-            {dagens.length === 0 && (
-              <span style={{ color: 'var(--ax-neutral-700)' }}>Ingen behandlinger denne dagen.</span>
-            )}
+              {dagens.length === 0 && (
+                <span style={{ color: 'var(--ax-neutral-700)' }}>Ingen behandlinger denne dagen.</span>
+              )}
 
-            <div style={{ maxHeight: 360, overflow: 'auto', paddingRight: 4 }}>
-              {dagens.map((b) => behandlingElement(b, textColor, props.visKlokkeSlett))}
-            </div>
-          </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button size="small" onClick={() => setModalOpen(false)}>
-            Lukk
-          </Button>
-        </Modal.Footer>
-      </Modal>
+              <div style={{ maxHeight: 360, overflow: 'auto', paddingRight: 4 }}>
+                {dagens.map((b) => behandlingElement(b, textColor, props.visKlokkeSlett))}
+              </div>
+            </VStack>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Dialog.CloseTrigger>
+              <Button size="small">Lukk</Button>
+            </Dialog.CloseTrigger>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </>
   )
 }
