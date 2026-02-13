@@ -1,17 +1,16 @@
 import { redirect } from 'react-router'
-import { opprettAldersovergang } from '~/aldersovergang/behandling.aldersovergang.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/aldersovergang.opprett'
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
-  const response = await opprettAldersovergang(
-    request,
-    +updates.behandlingsmaned,
-    updates.kjoeretidspunkt as string,
-    updates.begrensetUtplukk === 'true',
-  )
+  const response = await apiPost<{ behandlingId: number }>('/api/aldersovergang/utplukk', {
+    behandlingsmaned: +updates.behandlingsmaned,
+    kjoeretidspunkt: updates.kjoeretidspunkt as string,
+    begrensetUtplukk: updates.begrensetUtplukk === 'true',
+  }, request)
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  return redirect(`/behandling/${response?.behandlingId}`)
 }

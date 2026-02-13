@@ -1,10 +1,10 @@
 import { useOutletContext } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingCard from '~/behandling/BehandlingCard'
-import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import type { MeResponse } from '~/brukere/brukere'
 import { replaceTemplates } from '~/common/replace-templates'
 import { subdomain } from '~/common/utils'
+import { apiPost } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import {
   bekreftStoppBehandling,
@@ -111,7 +111,8 @@ function operationHandlers(
           handler = () => sendTilManuellMedKontrollpunkt(accessToken, behandlingId, kontrollpunkt.value)
         break
       case OPERATION.sendTilOppdragPaNytt:
-        handler = () => sendTilOppdragPaNytt(request, behandlingId)
+        handler = () =>
+          apiPost(`/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, undefined, request).then(() => {})
         break
       case OPERATION.stopp:
         handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)

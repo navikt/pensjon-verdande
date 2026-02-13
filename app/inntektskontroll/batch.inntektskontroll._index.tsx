@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
-import { opprettBpen014 } from '~/inntektskontroll/batch.bpen014.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.inntektskontroll._index'
 
 export function meta(): Route.MetaDescriptors {
@@ -50,8 +50,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
     [FELTER.opprettOppgave]: opprettoppgave,
   } = skjema.parse(fd)
 
-  const response = await opprettBpen014(request, aar, eps2g, gjenlevende, opprettoppgave)
-  return redirect(`/behandling/${response.behandlingId}`)
+  const response = await apiPost<{ behandlingId: number }>('/pen/api/inntektskontroll/opprett', {
+    aar,
+    eps2g,
+    gjenlevende,
+    opprettOppgave: opprettoppgave,
+  }, request)
+  return redirect(`/behandling/${response?.behandlingId}`)
 }
 
 export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {

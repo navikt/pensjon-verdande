@@ -16,9 +16,8 @@ import { format } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useState } from 'react'
 import { Form, NavLink, redirect } from 'react-router'
-import { startAfpEtteroppgjor } from '~/afp-etteroppgjor/afp-etteroppgjor.server'
 import type { AfpEtteroppgjorResponse, HentAlleResponse } from '~/afp-etteroppgjor/types'
-import { apiGet } from '~/services/api.server'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { Behandlingstatus } from '~/types'
 import type { Route } from './+types/afp-etteroppgjor'
 import styles from './afp-etteroppgjor.module.css'
@@ -40,11 +39,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = Object.fromEntries(await request.formData())
 
-  const response = await startAfpEtteroppgjor(request, {
-    kjøreår: +(formData.kjorear as string),
-  })
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/afpoffentlig/etteroppgjor/behandling/start',
+    { kjorear: +(formData.kjorear as string) },
+    request,
+  )
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  return redirect(`/behandling/${response?.behandlingId}`)
 }
 
 function formaterTidspunkt(isoTid?: string): string {

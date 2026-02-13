@@ -1,7 +1,7 @@
 import { BodyShort, Button, Heading, TextField, VStack } from '@navikt/ds-react'
 import { Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { startVurderSamboereBatch } from '~/samboeropplysninger/samboeropplysninger.server'
+import { apiPost } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/lever-samboeropplysning._index'
@@ -36,7 +36,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
 
-  await startVurderSamboereBatch(request, +updates.behandlingsAr)
+  await apiPost('/api/samboer/vurder-samboere/batch', { beregningsAr: +updates.behandlingsAr }, request)
 }
 
 export default function BatchOpprett_index({ loaderData }: Route.ComponentProps) {
