@@ -6,7 +6,6 @@ import {
   hentOmregningStatistikk,
   hentOmregningStatistikkCsv,
 } from '~/omregning/batch.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningStatistikkPage } from '~/types'
 import type { Route } from './+types/omregningStatistikk._index'
 
@@ -15,21 +14,19 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const accesstoken = await requireAccessToken(request)
-
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
   const omregningStatistikkPage = (await hentOmregningStatistikk(
-    accesstoken,
+    request,
     behandlingsNoekkel,
     Number(page),
     Number(size),
   )) as OmregningStatistikkPage
-  const content = await hentOmregningStatistikkCsv(accesstoken, behandlingsNoekkel)
+  const content = await hentOmregningStatistikkCsv(request, behandlingsNoekkel)
 
-  const omregningStatistikkInit = await hentOmregningbehandlingsnokler(accesstoken)
+  const omregningStatistikkInit = await hentOmregningbehandlingsnokler(request)
   return {
     omregningStatistikkInit: omregningStatistikkInit,
     omregningStatistikkPage: omregningStatistikkPage,
@@ -38,7 +35,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accesstoken = await requireAccessToken(request)
   const formData = await request.formData()
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
@@ -46,7 +42,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string)
 
   const omregningStatistikkPage = (await hentOmregningStatistikk(
-    accesstoken,
+    request,
     behandlingsNoekkel,
     Number(page),
     Number(size),

@@ -1,6 +1,5 @@
 import { redirect } from 'react-router'
 import { opprettOmregningbehandling } from '~/omregning/batch.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningRequest } from '~/types'
 import type { Route } from './+types/omregning.omregning'
 
@@ -51,9 +50,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     prioritet: updates.prioritet,
   } as OmregningRequest
 
-  const accessToken = await requireAccessToken(request)
-
-  const response = await opprettOmregningbehandling(accessToken, omregningRequest)
+  const response = await opprettOmregningbehandling(request, omregningRequest)
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

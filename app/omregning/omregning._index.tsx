@@ -27,7 +27,6 @@ import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
 import { OmregningOppsummering } from '~/components/omregning/OmregningOppsummering'
 import OmregningSelector from '~/components/omregning/OmregningSelector'
 import { hentOmregningInit, hentOmregningInput } from '~/omregning/batch.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { OmregningInit, OmregningSakerPage } from '~/types'
 import type { Route } from './+types/omregning._index'
 
@@ -36,15 +35,13 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const accesstoken = await requireAccessToken(request)
-
-  const omregningInit = (await hentOmregningInit(accesstoken)) as OmregningInit
+  const omregningInit = (await hentOmregningInit(request)) as OmregningInit
 
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
 
-  const omregningSakerPage = (await hentOmregningInput(accesstoken, Number(page), Number(size))) as OmregningSakerPage
+  const omregningSakerPage = (await hentOmregningInput(request, Number(page), Number(size))) as OmregningSakerPage
 
   if (!omregningInit) {
     throw new Response('Not Found', { status: 404 })
