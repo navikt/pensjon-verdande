@@ -139,7 +139,7 @@ export function firstWeekdayOnOrAfter(
   let currentDate = startOfDay(anchorDate)
   while (
     currentDate.getDay() !== weekdayNumber ||
-    //Skipper bevist ikke til neste mnd med
+    // Skipper bevisst ikke til neste mnd med
     // dagIMaanedRegler (ex. må være mellom 10-20.)
     (serieValg && erDatoEkskludertAvRegler(currentDate, serieValg)) ||
     // Helligdager
