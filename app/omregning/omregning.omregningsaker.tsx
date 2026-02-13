@@ -1,4 +1,4 @@
-import { oppdaterOmregningInput } from '~/omregning/batch.omregning.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/omregning.omregningsaker'
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -13,5 +13,5 @@ export const action = async ({ request }: Route.ActionArgs) => {
     saker: omregnedeSaker,
   }
 
-  return await oppdaterOmregningInput(request, requestPen)
+  return await apiPost('/api/behandling/omregning/input', requestPen, request)
 }

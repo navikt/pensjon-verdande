@@ -1,5 +1,5 @@
 import { redirect } from 'react-router'
-import { opprettOmregningbehandling } from '~/omregning/batch.omregning.server'
+import { apiPost } from '~/services/api.server'
 import type { OmregningRequest } from '~/types'
 import type { Route } from './+types/omregning.omregning'
 
@@ -50,7 +50,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     prioritet: updates.prioritet,
   } as OmregningRequest
 
-  const response = await opprettOmregningbehandling(request, omregningRequest)
+  const response = await apiPost<{ behandlingId: number }>('/api/behandling/omregning/opprett', omregningRequest, request)
 
-  return redirect(`/behandling/${response.behandlingId}`)
+  return redirect(`/behandling/${response?.behandlingId}`)
 }
