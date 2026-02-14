@@ -35,16 +35,16 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const omregningInit = (await apiGet<OmregningInit>('/api/behandling/omregning/init', request)) as OmregningInit
+  const omregningInit = await apiGet<OmregningInit>('/api/behandling/omregning/init', request)
 
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
 
-  const omregningSakerPage = (await apiGet<OmregningSakerPage>(
+  const omregningSakerPage = await apiGet<OmregningSakerPage>(
     `/api/behandling/omregning/input?page=${page}&size=${size}`,
     request,
-  )) as OmregningSakerPage
+  )
 
   if (!omregningInit) {
     throw new Response('Not Found', { status: 404 })

@@ -31,12 +31,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
-  const omregningStatistikkPage = (await hentOmregningStatistikk(
-    request,
-    behandlingsNoekkel,
-    Number(page),
-    Number(size),
-  )) as OmregningStatistikkPage
+  const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
   const content = await apiGetRawStringOrUndefined(
     `/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsNoekkel}`,
     request,
@@ -60,12 +55,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string)
 
-  const omregningStatistikkPage = (await hentOmregningStatistikk(
-    request,
-    behandlingsNoekkel,
-    Number(page),
-    Number(size),
-  )) as OmregningStatistikkPage
+  const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
   return { omregningStatistikkPage }
 }
 

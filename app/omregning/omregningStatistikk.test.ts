@@ -47,6 +47,7 @@ describe('omregningStatistikk._index', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('loader henter statistikk, csv og behandlingsnøkler', async () => {
@@ -127,5 +128,22 @@ describe('omregningStatistikk._index', () => {
 
     const request = new Request('http://localhost/omregningStatistikk?behandlingsnoekler=KEY-1&page=0&size=10')
     await expect(loader(loaderArgs(request))).rejects.toBeDefined()
+  })
+
+  it('loader håndterer 404 fra CSV-endepunktet', async () => {
+    const mockStatistikk = { content: [{ id: 1 }], totalElements: 1 }
+    const mockNoekler = { behandlingsnoekler: ['KEY-1'] }
+
+    fetchSpy
+      .mockResolvedValueOnce(jsonResponse(mockStatistikk))
+      .mockResolvedValueOnce(new Response('Not found', { status: 404 }))
+      .mockResolvedValueOnce(jsonResponse(mockNoekler))
+
+    const request = new Request('http://localhost/omregningStatistikk?behandlingsnoekler=KEY-1&page=0&size=10')
+    const result = await loader(loaderArgs(request))
+
+    expect(fetchSpy).toHaveBeenCalledTimes(3)
+    expect(result.omregningStatistikkCsv).toBeUndefined()
+    expect(result.omregningStatistikkPage).toEqual(mockStatistikk)
   })
 })
