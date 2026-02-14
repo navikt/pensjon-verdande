@@ -1,7 +1,6 @@
 import { BodyLong, BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
-import { opprettBpen091 } from '~/uforetrygd/batch.bpen091.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/bpen091'
 
 export function meta(): Route.MetaDescriptors {
@@ -23,9 +22,19 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const begrensUtplukk = begrensUtplukkStr === 'true'
   const dryRun = dryRunStr === 'true'
 
-  const accessToken = await requireAccessToken(request)
-  const response = await opprettBpen091(accessToken, +updates.behandlingsAr, begrensUtplukk, dryRun)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/uforetrygd/fastsettforventetinntekt/batch',
+    {
+      beregningsAr: +updates.behandlingsAr,
+      begrensUtplukk,
+      dryRun,
+    },
+    request,
+  )
 
+  if (!response?.behandlingId) {
+    throw new Error('Missing behandlingId')
+  }
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
