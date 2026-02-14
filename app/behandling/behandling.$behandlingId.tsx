@@ -111,8 +111,9 @@ function operationHandlers(
           handler = () => sendTilManuellMedKontrollpunkt(accessToken, behandlingId, kontrollpunkt.value)
         break
       case OPERATION.sendTilOppdragPaNytt:
-        handler = () =>
-          apiPost(`/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, {}, request).then(() => {})
+        handler = async () => {
+          await apiPost(`/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, {}, request)
+        }
         break
       case OPERATION.stopp:
         handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)
