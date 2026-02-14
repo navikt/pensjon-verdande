@@ -32,6 +32,7 @@ describe('batch.regulering.avsluttendeaktiviteter action', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('POST avbryter behandlinger feilet mot POPP', async () => {

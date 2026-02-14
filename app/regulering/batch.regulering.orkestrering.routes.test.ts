@@ -33,6 +33,7 @@ describe('orkestrering routes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   describe('batch.regulering.orkestrering action (startOrkestrering)', () => {

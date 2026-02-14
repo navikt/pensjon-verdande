@@ -26,6 +26,7 @@ describe('uttrekk routes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   describe('startUttrekk', () => {

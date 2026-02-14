@@ -29,6 +29,7 @@ describe('ekskludertesaker routes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   describe('hent', () => {

@@ -39,6 +39,7 @@ describe('batch.regulering loader', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('henter regulering detaljer og returnerer data', async () => {

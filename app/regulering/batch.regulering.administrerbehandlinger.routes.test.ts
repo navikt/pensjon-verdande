@@ -33,6 +33,7 @@ describe('administrerbehandlinger action-routes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   describe('endrePrioritetBatch', () => {
@@ -97,7 +98,7 @@ describe('administrerbehandlinger action-routes', () => {
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/nyeavviksgrenser/faktormodus')
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
-      expect(result).toBe(true)
+      expect(result).toEqual({ success: true })
     })
   })
 
@@ -121,7 +122,7 @@ describe('administrerbehandlinger action-routes', () => {
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/familiereguleringertilbehandling')
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
-      expect(result).toBe(true)
+      expect(result).toEqual({ success: true })
     })
   })
 
@@ -143,7 +144,7 @@ describe('administrerbehandlinger action-routes', () => {
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/familiereguleringer')
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
-      expect(result).toBe(true)
+      expect(result).toEqual({ success: true })
     })
   })
 
@@ -165,7 +166,7 @@ describe('administrerbehandlinger action-routes', () => {
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/iverksettvedtak')
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
-      expect(result).toBe(true)
+      expect(result).toEqual({ success: true })
     })
   })
 
@@ -187,7 +188,7 @@ describe('administrerbehandlinger action-routes', () => {
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/faktorogfeilmodus')
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
-      expect(result).toBe(true)
+      expect(result).toEqual({ success: true })
     })
   })
 
@@ -209,7 +210,7 @@ describe('administrerbehandlinger action-routes', () => {
       expect(url).toBe('http://pen-test/api/vedtak/regulering/fortsett/nyeavviksgrenser')
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
-      expect(result).toBe(true)
+      expect(result).toEqual({ success: true })
     })
   })
 

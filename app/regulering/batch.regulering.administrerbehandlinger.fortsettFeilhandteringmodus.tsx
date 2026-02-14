@@ -3,5 +3,5 @@ import type { Route } from './+types/batch.regulering.administrerbehandlinger.fo
 
 export const action = async ({ request }: Route.ActionArgs) => {
   await apiPost('/api/vedtak/regulering/fortsett/faktorogfeilmodus', {}, request)
-  return true
+  return { success: true }
 }
