@@ -38,7 +38,6 @@ describe('afp-etteroppgjor action', () => {
   })
 
   it('POST starter AFP etteroppgjør og redirecter', async () => {
-    // First call: loader apiGet (already using api.server), second: startAfpEtteroppgjor
     fetchSpy.mockResolvedValueOnce(jsonResponse({ behandlingId: 99 }))
 
     const formData = new FormData()

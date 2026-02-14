@@ -54,8 +54,8 @@ describe('avstemming action', () => {
     formData.set('PENKP', 'true')
     formData.set('PENUP', 'false')
     formData.set('UFOREUT', 'true')
-    formData.set('fom', '2025-01')
-    formData.set('tom', '2025-06')
+    formData.set('fom', '2025-01-01')
+    formData.set('tom', '2025-06-30')
 
     const request = new Request('http://localhost/avstemming', { method: 'POST', body: formData })
     await action(actionArgs(request))
@@ -76,8 +76,8 @@ describe('avstemming action', () => {
       penPenkp: true,
       penPenup: false,
       penUforeut: true,
-      avstemmingsperiodeStart: '2025-01',
-      avstemmingsperiodeEnd: '2025-06',
+      avstemmingsperiodeStart: '2025-01-01',
+      avstemmingsperiodeEnd: '2025-06-30',
     })
   })
 })
