@@ -46,7 +46,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       },
       request,
     )
-    return redirect(`/behandling/${response?.behandlingId}`)
+    if (!response?.behandlingId) {
+      throw new Error('Missing behandlingId')
+    }
+    return redirect(`/behandling/${response.behandlingId}`)
   } catch (error) {
     return {
       success: false,

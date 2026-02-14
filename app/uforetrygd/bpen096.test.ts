@@ -30,6 +30,7 @@ describe('bpen096 action', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('HentSkattehendelser sender riktig body og returnerer redirect', async () => {
@@ -112,5 +113,35 @@ describe('bpen096 action', () => {
     expect(init.signal).toBeInstanceOf(AbortSignal)
 
     expect(result).toEqual({ antall: 42 })
+  })
+
+  it('HentSkattehendelser kaster feil ved tomt svar (manglende behandlingId)', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+    const formData = new FormData()
+    formData.set('action', 'HENT_SKATTEHENDELSER')
+    formData.set('maksAntallSekvensnummer', '10000')
+    formData.set('sekvensnummerPerBehandling', '100')
+    formData.set('debug', 'false')
+
+    const request = new Request('http://localhost/bpen096', { method: 'POST', body: formData })
+
+    await expect(action(actionArgs(request))).rejects.toThrow('Missing behandlingId')
+  })
+
+  it('HentSkattehendelserManuelt returnerer feil ved tomt svar (manglende behandlingIder)', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+    const formData = new FormData()
+    formData.set('action', 'HENT_SKATTEHENDELSER_MANUELT')
+    formData.set('sekvensnr', '1,2,3')
+
+    const request = new Request('http://localhost/bpen096', { method: 'POST', body: formData })
+    const result = await action(actionArgs(request))
+
+    expect(result).toMatchObject({
+      action: 'HENT_SKATTEHENDELSER_MANUELT',
+      error: 'Mangler behandlingIder fra tjenesten',
+    })
   })
 })

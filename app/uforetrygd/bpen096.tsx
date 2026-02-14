@@ -27,7 +27,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       },
       request,
     )
-    return redirect(`/behandling/${response?.behandlingId}`)
+    if (!response?.behandlingId) {
+      throw new Error('Missing behandlingId')
+    }
+    return redirect(`/behandling/${response.behandlingId}`)
   } else if (formData.action === Action.HentSkattehendelserManuelt) {
     const sekvensnr: number[] = formData.sekvensnr
       .toString()
@@ -49,7 +52,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
       { sekvensnummer: sekvensnr },
       request,
     )
-    return { behandlingIder: response?.behandlingIder }
+    if (!response?.behandlingIder || response.behandlingIder.length === 0) {
+      return {
+        action: formData.action,
+        error: 'Mangler behandlingIder fra tjenesten',
+      }
+    }
+    return { behandlingIder: response.behandlingIder }
   } else if (formData.action === Action.HentAntallSkattehendelser) {
     const response = await apiGet<{ antall: number }>('/api/uforetrygd/etteroppgjor/skattehendelser/antall', request)
     return { antall: response.antall }

@@ -30,6 +30,7 @@ describe('bpen090 action', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('POST opprettBpen090 sender riktig body og returnerer redirect', async () => {
@@ -100,5 +101,19 @@ describe('bpen090 action', () => {
       expect(e.data.status).toBe(500)
       expect(e.init.status).toBe(500)
     }
+  })
+
+  it('kaster feil ved tomt svar fra backend (manglende behandlingId)', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+    const formData = new FormData()
+    formData.set('kjoremaaned', '202506')
+    formData.set('begrensUtplukk', 'false')
+    formData.set('dryRun', 'true')
+    formData.set('prioritet', '2')
+
+    const request = new Request('http://localhost/bpen090', { method: 'POST', body: formData })
+
+    await expect(action(actionArgs(request))).rejects.toThrow('Missing behandlingId')
   })
 })

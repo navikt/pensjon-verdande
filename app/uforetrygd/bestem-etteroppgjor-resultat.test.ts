@@ -35,6 +35,7 @@ describe('bestem-etteroppgjor-resultat action', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('POST sender riktig body og returnerer redirect', async () => {
@@ -83,5 +84,18 @@ describe('bestem-etteroppgjor-resultat action', () => {
     const result = await action(actionArgs(request))
 
     expect(result).toMatchObject({ success: false, error: expect.any(String) })
+  })
+
+  it('tomt svar fra backend (manglende behandlingId) returnerer feilmelding', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+    const formData = new FormData()
+    formData.set('etteroppgjorAr', '2024')
+    formData.set('sakIds', '100')
+
+    const request = new Request('http://localhost/bestem-etteroppgjor-resultat', { method: 'POST', body: formData })
+    const result = await action(actionArgs(request))
+
+    expect(result).toMatchObject({ success: false, error: 'Missing behandlingId' })
   })
 })
