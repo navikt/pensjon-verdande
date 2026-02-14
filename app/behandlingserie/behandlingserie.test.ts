@@ -32,6 +32,7 @@ describe('behandlingserie loader', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('GET med behandlingType returnerer BehandlingSerieDTO[]', async () => {
@@ -69,6 +70,7 @@ describe('behandlingserie action', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('POST opprettBehandlingSerie sender riktig body og returnerer redirect', async () => {
