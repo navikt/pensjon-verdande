@@ -1,4 +1,4 @@
-import { apiGet } from '~/services/api.server'
+import { apiGetRawResponse } from '~/services/api.server'
 import type { Route } from './+types/uttrekk'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -6,5 +6,5 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const queryString = incomingUrl.searchParams.toString()
   const path = `/api/behandling/manuell-behandling/behandlinger${queryString ? `?${queryString}` : ''}`
 
-  return await apiGet(path, request)
+  return await apiGetRawResponse(path, request)
 }

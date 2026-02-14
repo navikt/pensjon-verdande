@@ -35,6 +35,7 @@ describe('uttrekk loader', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('henter behandlinger med søkeparametere', async () => {
