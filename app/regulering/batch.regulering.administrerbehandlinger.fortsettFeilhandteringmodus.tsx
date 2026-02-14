@@ -1,9 +1,7 @@
-import { requireAccessToken } from '~/services/auth.server'
-import 'chart.js/auto'
-import { fortsettFeilhandteringmodus } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.fortsettFeilhandteringmodus'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
-  return await fortsettFeilhandteringmodus(accessToken)
+  await apiPost('/api/vedtak/regulering/fortsett/faktorogfeilmodus', {}, request)
+  return { success: true }
 }

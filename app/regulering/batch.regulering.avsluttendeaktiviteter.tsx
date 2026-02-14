@@ -2,8 +2,7 @@ import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { useSubmit } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
-import { avbrytBehandlinger } from '~/regulering/regulering.server'
-import { requireAccessToken } from '~/services/auth.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.avsluttendeaktiviteter'
 
 export const loader = async () => {
@@ -11,14 +10,23 @@ export const loader = async () => {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
   const data = (await request.json()) as FormType
 
-  const res = await avbrytBehandlinger(data.action, accessToken)
+  let urlPostfix: string
 
-  if (res.status !== 200) {
-    throw new Error(await res.text())
+  switch (data.action) {
+    case 'avbrytBehandlingerFeiletMotPOPP':
+      urlPostfix = '/avbryt/oppdaterpopp'
+      break
+    case 'avbrytBehandlingerFeiletIBeregnYtelse':
+      urlPostfix = '/avbryt/beregnytelser'
+      break
+    default:
+      urlPostfix = ''
+      break
   }
+
+  await apiPost(`/api/vedtak/regulering${urlPostfix}`, {}, request)
 
   return { success: true, action: data.action }
 }

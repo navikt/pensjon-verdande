@@ -1,9 +1,9 @@
 import { Heading, HStack, Stepper, VStack } from '@navikt/ds-react'
 import { Outlet, redirect, useLocation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
 import { Behandlingstatus } from '~/types'
 import 'chart.js/auto'
-import { getReguleringDetaljer } from '~/regulering/regulering.server'
+import type { ReguleringDetaljer } from '~/regulering/regulering.types'
+import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering'
 
 export function meta(): Route.MetaDescriptors {
@@ -11,8 +11,7 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const accessToken = await requireAccessToken(request)
-  const regulering = await getReguleringDetaljer(accessToken)
+  const regulering = await apiGet<ReguleringDetaljer>('/api/vedtak/regulering/detaljer', request)
 
   const url = new URL(request.url)
   const pathname = url.pathname
