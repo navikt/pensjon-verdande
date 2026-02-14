@@ -12,8 +12,8 @@ import {
 } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
 import { Await, Form, useNavigation } from 'react-router'
-import { opprettAvstemmingGrensesnittBehandling } from '~/avstemming/avstemming.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { apiPost } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/avstemming'
@@ -56,21 +56,23 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsperiodeStart = formData.get('fom') as string
   const avstemmingsperiodeEnd = formData.get('tom') as string
-  const accessToken = await requireAccessToken(request)
 
-  await opprettAvstemmingGrensesnittBehandling(
-    accessToken,
-    PENAFP,
-    PENAFPP,
-    PENAP,
-    PENBP,
-    PENGJ,
-    PENGY,
-    PENKP,
-    PENUP,
-    UFOREUT,
-    avstemmingsperiodeStart,
-    avstemmingsperiodeEnd,
+  await apiPost(
+    '/api/vedtak/avstemming/grensesnitt/start',
+    {
+      penAfp: PENAFP,
+      penAfpp: PENAFPP,
+      penPenap: PENAP,
+      penPenbp: PENBP,
+      penPengj: PENGJ,
+      penPengy: PENGY,
+      penPenkp: PENKP,
+      penPenup: PENUP,
+      penUforeut: UFOREUT,
+      avstemmingsperiodeStart,
+      avstemmingsperiodeEnd,
+    },
+    request,
   )
 
   return

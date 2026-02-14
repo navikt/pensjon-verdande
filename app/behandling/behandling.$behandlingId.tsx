@@ -1,10 +1,10 @@
 import { useOutletContext } from 'react-router'
 import invariant from 'tiny-invariant'
 import BehandlingCard from '~/behandling/BehandlingCard'
-import { sendTilOppdragPaNytt } from '~/behandling/iverksettVedtak.server'
 import type { MeResponse } from '~/brukere/brukere'
 import { replaceTemplates } from '~/common/replace-templates'
 import { subdomain } from '~/common/utils'
+import { apiPost } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import {
   bekreftStoppBehandling,
@@ -60,6 +60,7 @@ function getField(form: FormData, name: string): { value: string; error?: never 
 
 function operationHandlers(
   accessToken: string,
+  request: Request,
   behandlingId: string,
   operation: Operation,
   form: FormData,
@@ -110,7 +111,9 @@ function operationHandlers(
           handler = () => sendTilManuellMedKontrollpunkt(accessToken, behandlingId, kontrollpunkt.value)
         break
       case OPERATION.sendTilOppdragPaNytt:
-        handler = () => sendTilOppdragPaNytt(accessToken, behandlingId)
+        handler = async () => {
+          await apiPost(`/api/vedtak/iverksett/${behandlingId}/sendtiloppdragpanytt`, {}, request)
+        }
         break
       case OPERATION.stopp:
         handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)
@@ -169,7 +172,7 @@ export const action = async ({ params, request }: Route.ActionArgs) => {
     return { errors: { operation: `Operasjon mangler eller er ukjent: ${String(operation)}` } }
   }
 
-  const { errors, handler } = operationHandlers(accessToken, behandlingId, operation, form)
+  const { errors, handler } = operationHandlers(accessToken, request, behandlingId, operation, form)
   if (Object.keys(errors).length > 0 || !handler) {
     return { errors }
   }
