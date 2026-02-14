@@ -1,6 +1,5 @@
 import { redirect } from 'react-router'
-import { opprettOmregningbehandling } from '~/omregning/batch.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
+import { apiPost } from '~/services/api.server'
 import type { OmregningRequest } from '~/types'
 import type { Route } from './+types/omregning.omregning'
 
@@ -51,9 +50,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
     prioritet: updates.prioritet,
   } as OmregningRequest
 
-  const accessToken = await requireAccessToken(request)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/behandling/omregning/opprett',
+    omregningRequest,
+    request,
+  )
 
-  const response = await opprettOmregningbehandling(accessToken, omregningRequest)
-
+  if (!response) {
+    throw new Error('Opprettelse av omregningsbehandling returnerte ingen respons')
+  }
   return redirect(`/behandling/${response.behandlingId}`)
 }

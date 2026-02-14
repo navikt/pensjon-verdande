@@ -1,10 +1,7 @@
-import { oppdaterOmregningInput } from '~/omregning/batch.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/omregning.omregningsaker'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
   const formData = await request.formData()
   const omregnedeSaker = (formData.get('saksnummerListe') as string)
     .split('\n')
@@ -16,5 +13,5 @@ export const action = async ({ request }: Route.ActionArgs) => {
     saker: omregnedeSaker,
   }
 
-  return await oppdaterOmregningInput(accessToken, requestPen)
+  return await apiPost('/api/behandling/omregning/input', requestPen, request)
 }
