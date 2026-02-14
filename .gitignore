@@ -9,3 +9,4 @@ node_modules
 .react-router/
 .DS_Store
 .zed/
+storybook-static/
