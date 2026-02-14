@@ -218,7 +218,8 @@ Available functions:
 
 **What NOT to do:**
 - **Do NOT use `fetch()` directly** for backend calls.
-- **Do NOT create custom fetch wrappers** (e.g., local `req()` functions in `.server.ts` files). Use the `api.server.ts` functions instead.
+- **Do NOT create custom fetch wrappers** (e.g., local `req()` functions). Use the `api.server.ts` functions instead.
+- **Do NOT create thin `.server.ts` wrapper files** that just forward to `apiGet`/`apiPost`. Call `api.server.ts` directly in loader/action.
 - **Avoid calling `requireAccessToken()` manually when you already have a `Request`** — prefer passing the `Request` directly to `api.server.ts`. Only obtain/pass `{ accessToken }` (via `requireAccessToken`) in helpers/services that don't have access to a `Request`.
 
 **Why:** `api.server.ts` provides consistent auth, 15s timeout, error normalization via `normalizeAndThrow`, and network error handling (ECONNREFUSED → 503, timeout → 504). Direct `fetch` or custom wrappers typically lack timeout and proper error normalization.
@@ -226,7 +227,7 @@ Available functions:
 **Exception:** Only use `fetch` directly with a documented reason (e.g., streaming, binary data, or calls to services other than pensjon-pen), and ensure equivalent timeout and error handling.
 
 ```tsx
-// ✅ Correct — use api.server.ts
+// ✅ Correct — call api.server.ts directly in loader/action
 import type { Route } from './+types/my-route'
 import { apiGet, apiPost } from '~/services/api.server'
 
@@ -247,7 +248,16 @@ async function req(url: string, init: RequestInit & { accessToken: string }) {
 const res = await fetch(`${env.penUrl}/api/...`, {
   headers: { Authorization: `Bearer ${token}` },
 })
+
+// ❌ Wrong — do NOT create thin .server.ts wrappers around api.server.ts
+// (e.g., my-feature.server.ts that just forwards to apiGet/apiPost)
+// Call apiGet/apiPost directly in loader/action instead.
+export async function getData(request: Request) {
+  return apiGet<MyType>('/api/my-endpoint', request)  // Unnecessary layer
+}
 ```
+
+> **Rule of thumb:** Call `apiGet`/`apiPost`/`apiPut` etc. directly in loader/action. Only extract to a `.server.ts` file when there is significant business logic (transformation, combining multiple calls, etc.) — not for simple pass-through calls.
 
 Benefits: Consistent auth via `requireAccessToken`, 15s timeout, error normalization via `normalizeAndThrow`.
 

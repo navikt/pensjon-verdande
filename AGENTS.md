@@ -148,7 +148,8 @@ Tilgjengelige funksjoner:
 
 ### Hva du IKKE skal gjøre
 - **IKKE bruk `fetch()` direkte** for kall mot backend.
-- **IKKE lag egne fetch-wrappere** (f.eks. lokale `req()`-funksjoner i `.server.ts`-filer). Bruk `api.server.ts`-funksjonene i stedet.
+- **IKKE lag egne fetch-wrappere** (f.eks. lokale `req()`-funksjoner). Bruk `api.server.ts`-funksjonene i stedet.
+- **IKKE lag tynne `.server.ts`-filer** som bare videresender til `apiGet`/`apiPost`. Kall `api.server.ts` direkte i loader/action.
 - **IKKE kall `requireAccessToken()` manuelt kun for å gjøre backend-kall i en loader/action** – send heller `request` direkte til `api.server.ts`. Kall `requireAccessToken()` eksplisitt bare når du ikke har en `Request` tilgjengelig (f.eks. i et service-lag som kun får `{ accessToken }`).
 
 ### Hvorfor
@@ -165,7 +166,7 @@ Bruk kun `fetch` direkte hvis du har et dokumentert behov (f.eks. streaming, bin
 
 ### Eksempel
 ```tsx
-// ✅ Riktig — bruk api.server.ts
+// ✅ Riktig — kall api.server.ts direkte i loader/action
 import type { Route } from './+types/min-route'
 import { apiGet, apiPost } from '~/services/api.server'
 
@@ -191,7 +192,16 @@ async function req(url: string, init: RequestInit & { accessToken: string }) {
 const res = await fetch(`${env.penUrl}/api/...`, {
   headers: { Authorization: `Bearer ${token}` },
 })
+
+// ❌ Feil — IKKE lag tynne .server.ts-wrappere rundt api.server.ts
+// (f.eks. min-feature.server.ts som bare videresender til apiGet/apiPost)
+// Kall apiGet/apiPost direkte i loader/action i stedet.
+export async function hentData(request: Request) {
+  return apiGet<MyType>('/api/my-endpoint', request)  // Unødvendig lag
+}
 ```
+
+> **Tommelfingerregel:** Kall `apiGet`/`apiPost`/`apiPut` etc. direkte i loader/action. Ekstraher til en `.server.ts`-fil kun når det er vesentlig forretningslogikk (transformering, sammenstilling av flere kall, etc.) — ikke for enkle pass-through-kall.
 
 ## Nav Designsystem (Aksel)
 - Bruk komponenter fra `@navikt/ds-react`.
