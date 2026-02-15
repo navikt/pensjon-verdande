@@ -35,6 +35,7 @@ describe('omregning.omregning action', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('POST oppretter omregning og redirecter', async () => {
@@ -86,18 +87,5 @@ describe('omregning.omregning action', () => {
 
     const request = new Request('http://localhost/omregning/omregning', { method: 'POST', body: formData })
     await expect(action(actionArgs(request))).rejects.toBeDefined()
-  })
-
-  it('backend 204 uten body kaster feil', async () => {
-    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
-
-    const formData = new FormData()
-    formData.set('behandlingsnokkel', 'TEST')
-    formData.set('omregningstidspunkt', '2025-07-01')
-
-    const request = new Request('http://localhost/omregning/omregning', { method: 'POST', body: formData })
-    await expect(action(actionArgs(request))).rejects.toThrow(
-      'Opprettelse av omregningsbehandling returnerte ingen respons',
-    )
   })
 })

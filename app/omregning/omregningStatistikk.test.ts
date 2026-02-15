@@ -53,7 +53,7 @@ describe('omregningStatistikk._index', () => {
   it('loader henter statistikk, csv og behandlingsnøkler', async () => {
     const mockStatistikk = { content: [{ id: 1 }], totalElements: 1 }
     const mockCsv = 'id;status\n1;OK'
-    const mockNoekler = { behandlingsnoekler: ['KEY-1', 'KEY-2'] }
+    const mockNoekler = { behandlingsnoekkel: ['KEY-1', 'KEY-2'] }
 
     // Fetch 1: hentOmregningStatistikk (POST)
     fetchSpy.mockResolvedValueOnce(jsonResponse(mockStatistikk))
@@ -108,21 +108,6 @@ describe('omregningStatistikk._index', () => {
     expect(result).toEqual({ omregningStatistikkPage: mockStatistikk })
   })
 
-  it('action kaster feil ved 204/tom body fra backend', async () => {
-    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
-
-    const formData = new FormData()
-    formData.set('behandlingsnoekler', 'KEY-2')
-
-    const request = new Request('http://localhost/omregningStatistikk?page=1&size=5', {
-      method: 'POST',
-      body: formData,
-    })
-    await expect(action(actionArgs(request))).rejects.toThrow(
-      'Henting av omregningsstatistikk returnerte ingen respons',
-    )
-  })
-
   it('loader kaster feil ved 500 fra statistikk-endepunkt', async () => {
     fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
 
@@ -132,7 +117,7 @@ describe('omregningStatistikk._index', () => {
 
   it('loader håndterer 404 fra CSV-endepunktet', async () => {
     const mockStatistikk = { content: [{ id: 1 }], totalElements: 1 }
-    const mockNoekler = { behandlingsnoekler: ['KEY-1'] }
+    const mockNoekler = { behandlingsnoekkel: ['KEY-1'] }
 
     fetchSpy
       .mockResolvedValueOnce(jsonResponse(mockStatistikk))

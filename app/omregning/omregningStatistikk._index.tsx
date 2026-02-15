@@ -17,13 +17,10 @@ async function hentOmregningStatistikk(
 ): Promise<OmregningStatistikkPage> {
   const response = await apiPost<OmregningStatistikkPage>(
     `/api/behandling/omregning/statistikk?behandlingsnoekkel=${behandlingsnoekkel}&page=${page}&size=${size}`,
-    undefined,
+    {},
     request,
   )
-  if (!response) {
-    throw new Error('Henting av omregningsstatistikk returnerte ingen respons')
-  }
-  return response
+  return response as OmregningStatistikkPage
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -53,7 +50,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
-  const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string)
+  const behandlingsNoekkel =
+    searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string) ?? 'not set'
 
   const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
   return { omregningStatistikkPage }

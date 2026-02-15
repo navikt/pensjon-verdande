@@ -35,10 +35,11 @@ describe('omregning._index loader', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('henter omregning init og input', async () => {
-    const mockInit = { behandlingsnokler: ['A', 'B'] }
+    const mockInit = { toleransegrenser: ['DEFAULT'], oppgaveSett: ['DEFAULT'], batchbrevtyper: ['REGULERING'] }
     const mockInput = { content: [{ sakId: 1 }], totalElements: 1 }
 
     // Fetch 1: hentOmregningInit, Fetch 2: hentOmregningInput

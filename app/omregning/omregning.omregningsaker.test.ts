@@ -35,6 +35,7 @@ describe('omregning.omregningsaker action', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('POST oppdaterer omregning input med saksnumre', async () => {
