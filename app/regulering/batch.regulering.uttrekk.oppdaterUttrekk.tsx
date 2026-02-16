@@ -1,10 +1,7 @@
-import { requireAccessToken } from '~/services/auth.server'
-import 'chart.js/auto'
-import { oppdaterUttrekk } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.uttrekk.oppdaterUttrekk'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
-
-  return await oppdaterUttrekk(accessToken)
+  await apiPost('/api/vedtak/regulering/uttrekk/oppdater', {}, request)
+  return { success: true }
 }
