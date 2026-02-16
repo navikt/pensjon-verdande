@@ -9,6 +9,7 @@ import {
   hentEkskluderSakerFraArligOmregning,
 } from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
 import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/opptjening.arlig.omregning.server'
+import { opprettOpptjeningsendringArligOmregningBegrensetsaker } from '~/opptjening/arlig/opptjening.arlig.omregningBegrensetsaker.server'
 import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
 import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
 import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
@@ -41,6 +42,7 @@ enum Action {
   fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
+  kjoerOmregningBegrensetSaker = 'KJOER_OMREGNING_BEGRENSSET_SAKER',
   oppdaterSisteGyldigeOpptjeningsaar = 'OPPDATER_SISTE_GYLDIGE_OPPTJENINGSAAR',
   oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
@@ -74,6 +76,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
       +fromEntries.opptjeningsar,
       +fromEntries.bolkstorrelse,
     )
+    return redirect(`/behandling/${response.behandlingId}`)
+  } else if (fromEntries.action === Action.kjoerOmregningBegrensetSaker) {
+    const response = await opprettOpptjeningsendringArligOmregningBegrensetsaker(
+      accessToken,
+      +fromEntries.opptjeningsar,
+    )
+
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
     await oppdaterSisteGyldigOpptjeningsaar(accessToken, +fromEntries.oppdaterOpptjeningsaar)
@@ -208,6 +217,11 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
             <div style={{ marginTop: '1rem' }}>
               <Button type="submit" name="action" value={Action.kjoerOmregning} disabled={isSubmitting}>
                 Start årlig opptjeningsendring
+              </Button>
+            </div>
+            <div style={{ marginTop: '1rem' }}>
+              <Button type="submit" name="action" value={Action.kjoerOmregningBegrensetSaker} disabled={isSubmitting}>
+                Start årlig opptjeningsendring med begrenset saker
               </Button>
             </div>
           </VStack>
