@@ -38,7 +38,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function Foo({ loaderData }: Route.ComponentProps) {
+export default function BrukerComponent({ loaderData }: Route.ComponentProps) {
   const { bruker, tilgangskontrollmeta, readOnly } = loaderData
 
   return <Bruker bruker={bruker} tilgangskontrollmeta={tilgangskontrollmeta} readOnly={readOnly}></Bruker>
