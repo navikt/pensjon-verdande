@@ -16,16 +16,9 @@ import { redirect, useFetcher, useNavigate, useSearchParams } from 'react-router
 import 'chart.js/auto'
 import { ExternalLinkIcon } from '@navikt/aksel-icons'
 import type { DateRange } from 'react-day-picker'
-import {
-  endrePlanlagtStartet,
-  getBehandlingSerier,
-  getTillateBehandlinger,
-  hentSerieValg,
-  opprettBehandlingSerie,
-} from '~/behandlingserie/behandlingserie.server'
 import PlanlagteDatoerPreview, { type PlannedItem } from '~/behandlingserie/planlagteDatoerPreview'
 import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview'
-import { requireAccessToken } from '~/services/auth.server'
+import { apiGet, apiPost, apiPut } from '~/services/api.server'
 import type { BehandlingInfoDTO, BehandlingSerieDTO } from '~/types'
 import type { Route } from './+types/behandlingserie'
 import {
@@ -105,17 +98,16 @@ export function meta(): Route.MetaDescriptors {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const behandlingType = searchParams.get('behandlingType') ?? ''
-  const accessToken = await requireAccessToken(request)
-  const [behandlingSerier, serieValg, tillateBehandlinger] = await Promise.all([
-    getBehandlingSerier(accessToken, behandlingType),
-    hentSerieValg(accessToken, behandlingType),
-    getTillateBehandlinger(accessToken),
-  ])
-  return { behandlingSerier, serieValg, tillateBehandlinger }
+  const behandlingSerier = behandlingType
+    ? await apiGet<BehandlingSerieDTO[]>(
+        `/api/behandling/serier?behandlingCode=${encodeURIComponent(behandlingType)}`,
+        request,
+      )
+    : []
+  return { behandlingSerier }
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
   const formData = await request.formData()
   const intent = String(formData.get('_intent') ?? '')
   if (intent === 'updatePlanlagtStartet') {
@@ -124,7 +116,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const ymd = String(formData.get('ymd') ?? '')
     const time = String(formData.get('time') ?? '')
     const isoLocalDatetime = `${ymd}T${time}:00`
-    await endrePlanlagtStartet(accessToken, behandlingId, isoLocalDatetime)
+    await apiPut(
+      `/api/behandling/serier/${behandlingId}/endrePlanlagtStartet?planlagtStartet=${encodeURIComponent(isoLocalDatetime)}&fjernFraSerie=false`,
+      undefined,
+      request,
+    )
     return redirect(`/behandlingserie?behandlingType=${behandlingCode}`)
   }
   const behandlingCode = String(formData.get('behandlingCode') ?? '')
@@ -133,7 +129,17 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const opprettetAv = String(formData.get('opprettetAv') ?? 'VERDANDE')
   const valgteDatoerRaw = String(formData.get('valgteDatoer') ?? '[]')
   const valgteDatoer = JSON.parse(valgteDatoerRaw) as string[]
-  await opprettBehandlingSerie(accessToken, behandlingCode, regelmessighet, valgteDatoer, startTid, opprettetAv)
+  const planlagteKjoringer = valgteDatoer.map((d) => `${d}T${startTid}:00`)
+  await apiPost(
+    '/api/behandling/serier',
+    {
+      behandlingCode,
+      planlagteKjoringer,
+      regelmessighet: regelmessighet.toUpperCase(),
+      opprettetAv,
+    },
+    request,
+  )
   return redirect(`/behandlingserie?behandlingType=${behandlingCode}`)
 }
 
