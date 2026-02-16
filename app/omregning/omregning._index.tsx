@@ -432,7 +432,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                       </OmregningCheckbox>
                       <OmregningCheckbox
                         defaultChecked={regelendringUt2026}
-                        name={'Regelendringer UT 2026'}
+                        name={'regelendringUt2026'}
                         value={regelendringUt2026}
                         onChange={setRegelendringUt2026}
                       >
