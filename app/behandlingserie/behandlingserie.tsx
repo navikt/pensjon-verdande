@@ -37,6 +37,7 @@ import {
 } from './seriekalenderUtils'
 import {
   byggRegelAdvarsler,
+  DEFAULT_SERIE_VALG,
   erDatoIEkskludertMnd,
   filtrerDatoerMedRegler,
   type SerieValg,
@@ -98,13 +99,21 @@ export function meta(): Route.MetaDescriptors {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const behandlingType = searchParams.get('behandlingType') ?? ''
-  const behandlingSerier = behandlingType
-    ? await apiGet<BehandlingSerieDTO[]>(
-        `/api/behandling/serier?behandlingCode=${encodeURIComponent(behandlingType)}`,
-        request,
-      )
-    : []
-  return { behandlingSerier }
+
+  const [behandlingSerier, serieValg, tillateBehandlinger] = await Promise.all([
+    behandlingType
+      ? apiGet<BehandlingSerieDTO[]>(
+          `/api/behandling/serier?behandlingCode=${encodeURIComponent(behandlingType)}`,
+          request,
+        )
+      : [],
+    behandlingType
+      ? apiGet<SerieValg>(`/api/behandling/serier/valg?behandlingCode=${encodeURIComponent(behandlingType)}`, request)
+      : DEFAULT_SERIE_VALG,
+    apiGet<string[]>('/api/behandling/serier/tillateBehandlinger', request),
+  ])
+
+  return { behandlingSerier, serieValg, tillateBehandlinger }
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
