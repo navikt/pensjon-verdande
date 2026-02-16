@@ -1,9 +1,7 @@
-import { requireAccessToken } from '~/services/auth.server'
-import 'chart.js/auto'
-import { fortsettFaktoromregningModus } from '~/regulering/regulering.server'
+import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.fortsettFaktoromregningsmodus'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
-  return await fortsettFaktoromregningModus(accessToken)
+  await apiPost('/api/vedtak/regulering/fortsett/nyeavviksgrenser/faktormodus', {}, request)
+  return { success: true }
 }

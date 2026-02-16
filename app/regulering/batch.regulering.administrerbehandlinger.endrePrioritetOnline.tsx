@@ -1,9 +1,7 @@
-import { requireAccessToken } from '~/services/auth.server'
-import 'chart.js/auto'
-import { endrePrioritetTilOnline } from '~/regulering/regulering.server'
+import { apiPut } from '~/services/api.server'
 import type { Route } from './+types/batch.regulering.administrerbehandlinger.endrePrioritetOnline'
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
-  return await endrePrioritetTilOnline(accessToken)
+  await apiPut('/api/vedtak/regulering/endre/prioritet/online', {}, request)
+  return { success: true }
 }
