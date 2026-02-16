@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {DEFAULT_SERIE_VALG} from "~/behandlingserie/serieValg";
+import { DEFAULT_SERIE_VALG } from '~/behandlingserie/serieValg'
 
 vi.mock('~/services/auth.server', () => ({
   requireAccessToken: vi.fn().mockResolvedValue('test-token'),
@@ -52,6 +52,7 @@ describe('behandlingserie loader', () => {
 
     // Kall 1: serier
     const [url1, init1] = fetchSpy.mock.calls[0]
+    console.log('Actual URL:', url1)
     expect(url1).toBe('http://pen-test/api/behandling/serier?behandlingCode=AvsluttSaker')
     assertStandardGetRequest(init1)
 
