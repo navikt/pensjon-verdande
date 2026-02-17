@@ -27,6 +27,7 @@ export const Default: Story = {
     skalSamordne: true,
     skalSletteIverksettingsoppgaver: false,
     skalDistribuereUforevedtak: false,
+    regelendringUt2026: false,
     skalBestilleBrev: 'ALLE',
     selectedBrevkodeSokerAlderGammeltRegelverk: { value: 'PE_BA_01_001', label: 'Vedtak alderspensjon' },
     selectedBrevkodeSokerAlderNyttRegelverk: undefined,
