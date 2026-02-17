@@ -31,6 +31,7 @@ enum Action {
   fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
+  kjoerOmregningBegrensetSaker = 'KJOER_OMREGNING_BEGRENSET_SAKER',
   oppdaterSisteGyldigeOpptjeningsaar = 'OPPDATER_SISTE_GYLDIGE_OPPTJENINGSAAR',
   oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
@@ -62,6 +63,19 @@ export const action = async ({ request }: Route.ActionArgs) => {
       {
         opptjeningsar: +fromEntries.opptjeningsar,
         bolkstorrelse: +fromEntries.bolkstorrelse,
+      },
+      request,
+    )
+    if (!response) {
+      throw new Error('Opprettelse av årlig omregning returnerte ingen respons')
+    }
+    return redirect(`/behandling/${response.behandlingId}`)
+  } else if (fromEntries.action === Action.kjoerOmregningBegrensetSaker) {
+    const response = await apiPost<StartBatchResponse>(
+      '/api/opptjening/arligendring/opprettbegrensetsaker',
+      {
+        opptjeningsar: +fromEntries.opptjeningsar,
+        bolkstorrelse: 10000,
       },
       request,
     )
@@ -210,6 +224,9 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
             <div style={{ marginTop: '1rem' }}>
               <Button type="submit" name="action" value={Action.kjoerOmregning} disabled={isSubmitting}>
                 Start årlig opptjeningsendring
+              </Button>
+              <Button type="submit" name="action" value={Action.kjoerOmregningBegrensetSaker} disabled={isSubmitting}>
+                Start årlig opptjeningsendring begrenset saker
               </Button>
             </div>
           </VStack>
