@@ -1,4 +1,4 @@
-import { Alert, Box, CopyButton, HStack, Page, Theme } from '@navikt/ds-react'
+import { Box, CopyButton, GlobalAlert, HStack, Page, Theme, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { createCookie, isRouteErrorResponse, Outlet, useNavigation } from 'react-router'
 import { hentMe } from '~/brukere/brukere.server'
@@ -31,9 +31,15 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const isNavigating = navigation.state !== 'idle'
 
   const schedulerAlert = schedulerStatus && !schedulerStatus.schedulerEnabled && !schedulerStatus.schedulerLocal && (
-    <Alert variant="error" style={{ marginBottom: '1rem' }}>
-      Behandlingsløsningen er avslått i dette miljøet. Behandlinger vil ikke bli prosessert.
-    </Alert>
+    <GlobalAlert status="warning">
+      <GlobalAlert.Header>
+        <GlobalAlert.Title as="h2">Behandlingsløsningen er stoppet</GlobalAlert.Title>
+      </GlobalAlert.Header>
+      <GlobalAlert.Content>
+        Ingen behandlinger vil bli prosessert i dette miljøet. Behandlingsløsningen må aktiveres for å gjenoppta
+        behandling.
+      </GlobalAlert.Content>
+    </GlobalAlert>
   )
 
   return (
@@ -71,8 +77,10 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
             <Page.Block>
               <Box padding={'space-16'}>
-                {schedulerAlert}
-                <Outlet context={me} />
+                <VStack gap="space-16">
+                  {schedulerAlert}
+                  <Outlet context={me} />
+                </VStack>
               </Box>
             </Page.Block>
           </HStack>
