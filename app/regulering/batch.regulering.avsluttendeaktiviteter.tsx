@@ -1,4 +1,4 @@
-import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
+import { Button, HStack, InlineMessage, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { useSubmit } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
@@ -48,9 +48,9 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
   return (
     <VStack gap="space-20">
       {actionData?.success && (
-        <Alert variant="success" inline>
+        <InlineMessage status="success">
           Behandlinger avbrutt mot {actionData.action === 'avbrytBehandlingerFeiletMotPOPP' ? 'POPP' : 'Beregn Ytelse'}
-        </Alert>
+        </InlineMessage>
       )}
       <HStack gap="space-20">
         <Button onClick={() => setOpenConfirmationModal('avbrytBehandlingerFeiletMotPOPP')}>

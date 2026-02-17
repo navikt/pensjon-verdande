@@ -1,4 +1,4 @@
-import { Alert, Button, Heading, HStack, Modal, Select, TextField, VStack } from '@navikt/ds-react'
+import { Button, Heading, HStack, InlineMessage, Modal, Select, TextField, VStack } from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfDay, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import { useMemo, useRef, useState } from 'react'
@@ -151,9 +151,9 @@ export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.
             />
           </div>
 
-          <Alert variant="info" size="small" style={{ visibility: kanOpprette ? 'hidden' : 'visible' }}>
+          <InlineMessage status="info" size="small" style={{ visibility: kanOpprette ? 'hidden' : 'visible' }}>
             Kjøremåned må velges før behandlingen opprettes.
-          </Alert>
+          </InlineMessage>
 
           <HStack gap="space-16">
             <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
@@ -191,9 +191,9 @@ export default function OpprettKontrollSaerskiltSatsRoute({ loaderData }: Route.
               <b>Ønsket virkningmåned:</b>{' '}
               {selectedOensketVirkMaaned ? formatYearMonth(selectedOensketVirkMaaned) : 'ikke satt'}
             </div>
-            <Alert variant="warning" size="small">
+            <InlineMessage status="warning" size="small">
               Etter start kan du ikke angre denne handlingen.
-            </Alert>
+            </InlineMessage>
           </VStack>
         </Modal.Body>
         <Modal.Footer>
