@@ -1,4 +1,4 @@
-import { Alert, Button, HStack, VStack } from '@navikt/ds-react'
+import { Button, HStack, InlineMessage, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { useSubmit } from 'react-router'
 import { ConfirmationModal } from '~/components/confirmation-modal/ConfirmationModal'
@@ -48,9 +48,9 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
   return (
     <VStack gap="space-20">
       {actionData?.success && (
-        <Alert variant="success" inline>
+        <InlineMessage status="success">
           Behandlinger avbrutt mot {actionData.action === 'avbrytBehandlingerFeiletMotPOPP' ? 'POPP' : 'Beregn Ytelse'}
-        </Alert>
+        </InlineMessage>
       )}
       <HStack gap="space-20">
         <Button onClick={() => setOpenConfirmationModal('avbrytBehandlingerFeiletMotPOPP')}>
@@ -61,7 +61,7 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
         </Button>
         <ConfirmationModal
           text="Er du sikker på at du vil avbryte behandlinger som har feilet mot POPP? Dette vil sette det nye vedtaket til avbrutt og opprette oppgave til saksbehandler om at saken må reguleres manuelt."
-          showModal={openConfirmationModal === 'avbrytBehandlingerFeiletMotPOPP'}
+          open={openConfirmationModal === 'avbrytBehandlingerFeiletMotPOPP'}
           onOk={() => {
             avbrytBehandlingerFeiletMotPopp()
           }}
@@ -69,7 +69,7 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
         />
         <ConfirmationModal
           text="Er du sikker på at du vil avbryte behandlinger som har feilet i Beregn Ytelse? Dette vil sette det nye vedtaket til avbrutt og opprette oppgave til saksbehandler om at saken må reguleres manuelt."
-          showModal={openConfirmationModal === 'avbrytBehandlingerFeiletIBeregnYtelse'}
+          open={openConfirmationModal === 'avbrytBehandlingerFeiletIBeregnYtelse'}
           onOk={() => {
             avbrytBehandlerFeiletIBeregnYtelse()
           }}

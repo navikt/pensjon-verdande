@@ -12,7 +12,6 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
-    modalRef: { current: null },
     behandling: mockBehandlingDto({
       muligeKontrollpunkt: [
         { kontrollpunkt: 'KONTROLL_PUNKT_1', decode: 'Kontrollpunkt for manuell vurdering' },

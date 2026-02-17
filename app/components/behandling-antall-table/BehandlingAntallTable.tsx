@@ -1,4 +1,4 @@
-import { HelpText, HStack, Link, Table } from '@navikt/ds-react'
+import { BodyShort, HelpText, HStack, Link, Table } from '@navikt/ds-react'
 import React from 'react'
 import { NavLink } from 'react-router'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -19,6 +19,9 @@ export default function BehandlingAntallTable(props: Props) {
 
   return (
     <Table size={'small'} zebraStripes>
+      <BodyShort as="caption" visuallyHidden>
+        Antall per behandlingstype
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader align={'right'}>#</Table.ColumnHeader>

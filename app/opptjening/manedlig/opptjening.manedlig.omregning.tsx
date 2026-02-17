@@ -54,9 +54,9 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData>
     sort: searchParams.get('sort'),
   })
 
-  const sisteAvsjekk = await getSisteAvsjekk(accessToken)
+  const sisteAvsjekk = await getSisteAvsjekk(request)
 
-  const muligeManedligeKjoringer = await hentMuligeManedligeKjoringer(accessToken)
+  const muligeManedligeKjoringer = await hentMuligeManedligeKjoringer(request)
 
   const currentMonth = format(new Date(), 'yyyy-MM')
   const defaultMonth = muligeManedligeKjoringer.maneder.includes(currentMonth)
@@ -73,8 +73,7 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData>
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accessToken = await requireAccessToken(request)
-  await opprettAvsjekk(accessToken)
+  await opprettAvsjekk(request)
   return null
 }
 

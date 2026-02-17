@@ -1,19 +1,8 @@
 import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
-import { opprettOpptjeningsendringArligUttrekk } from '~/opptjening/arlig/batch.opptjeningsendringArligUttrekk.server'
-import {
-  ekskluderSakerFraArligOmregning,
-  fjernAlleEkskluderteSakerFraArligOmregning,
-  fjernEkskluderteSakerFraArligOmregning,
-  hentEkskluderSakerFraArligOmregning,
-} from '~/opptjening/arlig/opptjening.arlig.ekskludersaker.server'
-import { opprettOpptjeningsendringArligOmregning } from '~/opptjening/arlig/opptjening.arlig.omregning.server'
-import { opprettOpptjeningsendringArligOmregningBegrensetsaker } from '~/opptjening/arlig/opptjening.arlig.omregningBegrensetsaker.server'
-import type { EkskludertSak } from '~/opptjening/arlig/opptjening.types'
-import { oppdaterSisteGyldigOpptjeningsaar } from '~/opptjening/arlig/siste.gyldig.opptjeningsaar.server'
-import { oppdaterSisteOmsorgGodskrivingsaar } from '~/opptjening/arlig/siste.omsorg.godskrivingsaar.server'
-import { requireAccessToken } from '~/services/auth.server'
+import type { EkskluderteSakerResponse, EkskludertSak, StartBatchResponse } from '~/opptjening/arlig/opptjening.types'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { Route } from './+types/opptjening.arlig.omregning'
 
 export function meta(): Route.MetaDescriptors {
@@ -21,8 +10,8 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const accessToken = await requireAccessToken(request)
-  const ekskluderteSaker = await hentEkskluderSakerFraArligOmregning(accessToken)
+  const result = await apiGet<EkskluderteSakerResponse>('/api/opptjening/eksludertesaker', request)
+  const ekskluderteSaker = result.ekskluderteSaker
 
   const innevaerendeAar = new Date().getFullYear()
   const defaultOpptjeningsaar = innevaerendeAar - 1
@@ -42,7 +31,6 @@ enum Action {
   fjernEkskluderSaker = 'FJERN_EKSKLUDERTE_SAKER',
   kjoerUttrekk = 'KJOER_UTTREKK',
   kjoerOmregning = 'KJOER_OMREGNING',
-  kjoerOmregningBegrensetSaker = 'KJOER_OMREGNING_BEGRENSSET_SAKER',
   oppdaterSisteGyldigeOpptjeningsaar = 'OPPDATER_SISTE_GYLDIGE_OPPTJENINGSAAR',
   oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
@@ -50,48 +38,53 @@ enum Action {
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const fromEntries = Object.fromEntries(formData)
-  const accessToken = await requireAccessToken(request)
 
   if (fromEntries.action === Action.ekskluderSaker) {
-    const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
-    const sakIder = konverterTilListe(ekskluderteSakIderText)
-
-    await ekskluderSakerFraArligOmregning(accessToken, sakIder, fromEntries.kommentar as string | undefined)
+    const sakIder = konverterTilListe(fromEntries.ekskluderteSakIderText as string)
+    await apiPost('/api/opptjening/eksludertesaker/leggTil', { sakIder, kommentar: fromEntries.kommentar }, request)
     return redirect(request.url)
   } else if (fromEntries.action === Action.fjernEkskluderSaker) {
-    const ekskluderteSakIderText = fromEntries.ekskluderteSakIderText as string
-    const sakIder = konverterTilListe(ekskluderteSakIderText)
-
-    await fjernEkskluderteSakerFraArligOmregning(accessToken, sakIder)
+    const sakIder = konverterTilListe(fromEntries.ekskluderteSakIderText as string)
+    await apiPost('/api/opptjening/eksludertesaker/fjern', { sakIder }, request)
     return redirect(request.url)
   } else if (fromEntries.action === Action.fjernAlleEkskluderSaker) {
-    await fjernAlleEkskluderteSakerFraArligOmregning(accessToken)
+    await apiPost('/api/opptjening/eksludertesaker/fjernAlle', {}, request)
     return redirect(request.url)
   } else if (fromEntries.action === Action.kjoerUttrekk) {
-    const response = await opprettOpptjeningsendringArligUttrekk(accessToken)
+    const response = await apiPost<StartBatchResponse>('/api/opptjening/arliguttrekk/opprett', {}, request)
+    if (!response) {
+      throw new Error('Opprettelse av årlig uttrekk returnerte ingen respons')
+    }
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.kjoerOmregning) {
-    const response = await opprettOpptjeningsendringArligOmregning(
-      accessToken,
-      +fromEntries.opptjeningsar,
-      +fromEntries.bolkstorrelse,
+    const response = await apiPost<StartBatchResponse>(
+      '/api/opptjening/arligendring/opprett',
+      {
+        opptjeningsar: +fromEntries.opptjeningsar,
+        bolkstorrelse: +fromEntries.bolkstorrelse,
+      },
+      request,
     )
-    return redirect(`/behandling/${response.behandlingId}`)
-  } else if (fromEntries.action === Action.kjoerOmregningBegrensetSaker) {
-    const response = await opprettOpptjeningsendringArligOmregningBegrensetsaker(
-      accessToken,
-      +fromEntries.opptjeningsar,
-    )
-
+    if (!response) {
+      throw new Error('Opprettelse av årlig omregning returnerte ingen respons')
+    }
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (fromEntries.action === Action.oppdaterSisteGyldigeOpptjeningsaar) {
-    await oppdaterSisteGyldigOpptjeningsaar(accessToken, +fromEntries.oppdaterOpptjeningsaar)
+    await apiPost(
+      `/api/opptjening/opptjeningsaar/oppdater?opptjeningsar=${fromEntries.oppdaterOpptjeningsaar}`,
+      {},
+      request,
+    )
     return JSON.stringify({
       melding: `✅ Siste gyldige opptjeningsår er oppdatert til ${fromEntries.oppdaterOpptjeningsaar}`,
       action: Action.oppdaterSisteGyldigeOpptjeningsaar,
     })
   } else if (fromEntries.action === Action.oppdaterSisteOmsorgGodskrivingsaar) {
-    await oppdaterSisteOmsorgGodskrivingsaar(accessToken, +fromEntries.oppdaterOmsorgGodskrivingsaar)
+    await apiPost(
+      `/api/opptjening/omsorggodskrivingsaar/oppdater?godskrivingsaar=${fromEntries.oppdaterOmsorgGodskrivingsaar}`,
+      {},
+      request,
+    )
     return JSON.stringify({
       melding: `✅ Siste godskrivingsår for omsorg er oppdatert til ${fromEntries.oppdaterOmsorgGodskrivingsaar}`,
       action: Action.oppdaterSisteOmsorgGodskrivingsaar,
@@ -217,11 +210,6 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
             <div style={{ marginTop: '1rem' }}>
               <Button type="submit" name="action" value={Action.kjoerOmregning} disabled={isSubmitting}>
                 Start årlig opptjeningsendring
-              </Button>
-            </div>
-            <div style={{ marginTop: '1rem' }}>
-              <Button type="submit" name="action" value={Action.kjoerOmregningBegrensetSaker} disabled={isSubmitting}>
-                Start årlig opptjeningsendring med begrenset saker
               </Button>
             </div>
           </VStack>

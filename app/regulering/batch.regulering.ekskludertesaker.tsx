@@ -1,5 +1,5 @@
 import 'chart.js/auto'
-import { Alert, Button, Heading, HStack, Loader, Modal, Table, Tabs, Textarea, VStack } from '@navikt/ds-react'
+import { Button, Heading, HStack, InlineMessage, Loader, Modal, Table, Tabs, Textarea, VStack } from '@navikt/ds-react'
 import { useEffect, useRef, useState } from 'react'
 import { useFetcher } from 'react-router'
 import type { Ekskluderinger, EkskluderingMedKommentar } from '~/regulering/regulering.types'
@@ -38,9 +38,7 @@ export default function EkskluderteSaker() {
             </Tabs.Panel>
           </Tabs>
           <VStack>
-            <Alert variant="info" inline>
-              Antall saker i listen: {antallSaker}
-            </Alert>
+            <InlineMessage status="info">Antall saker i listen: {antallSaker}</InlineMessage>
           </VStack>
 
           <HStack gap="space-20">
@@ -133,9 +131,7 @@ export function EkskluderingLeggTilInputBox(props: { text: string; showModal: bo
           <VStack gap={'space-20'}>
             {props.text}
             {(!harLagtTilSaker || response?.erOppdatert) && (
-              <Alert variant="success" inline>
-                Ekskluderingsliste oppdatert
-              </Alert>
+              <InlineMessage status="success">Ekskluderingsliste oppdatert</InlineMessage>
             )}
             {harLagtTilSaker && !response?.erOppdatert && <Loader title="Oppdaterer liste…" />}
             <Textarea
@@ -223,9 +219,7 @@ export function EkskluderingFjernInputBox(props: { text: string; showModal: bool
           <VStack gap={'space-20'}>
             {props.text}
             {(!harFjernetSaker || response?.erOppdatert) && (
-              <Alert variant="success" inline>
-                Ekskluderingsliste oppdatert
-              </Alert>
+              <InlineMessage status="success">Ekskluderingsliste oppdatert</InlineMessage>
             )}
             {harFjernetSaker && !response?.erOppdatert && <Loader title="Oppdaterer liste…" />}
             <Textarea

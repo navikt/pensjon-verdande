@@ -1,6 +1,6 @@
 import 'chart.js/auto'
 import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
-import { Alert, Button, Dropdown, HStack, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
+import { Button, Dropdown, HStack, InlineMessage, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
 import { Link, useFetcher, useOutletContext } from 'react-router'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
@@ -290,9 +290,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
                 </Entry>
               </VStack>
             ) : (
-              <Alert variant="info" inline>
-                Uttrekk ikke kjørt enda
-              </Alert>
+              <InlineMessage status="info">Uttrekk ikke kjørt enda</InlineMessage>
             )}
           </Tabs.Panel>
           <Tabs.Panel value="arbeidstabell" style={{ paddingTop: '2em' }}>
@@ -323,7 +321,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       </HStack>
       <ConfirmationModal
         text="Er du sikker på at du vil fortsette familiebehandlinger som er utsatt? Dette vil nullstille utsattTil-tidspunkt for alle ikke-feilende familiebehandlinger."
-        showModal={openConfirmationModal === 'fortsettFamilieReguleringerTilBehandling'}
+        open={openConfirmationModal === 'fortsettFamilieReguleringerTilBehandling'}
         onOk={() => {
           fortsettFamilieReguleringerTilBehandling()
         }}
@@ -331,7 +329,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du vil fortsette feilende familiebehandlinger? Dette vil nullstille utsattTil-tidspunkt for alle feilende familiebehandlinger."
-        showModal={openConfirmationModal === 'fortsettFeilendeFamiliereguleringer'}
+        open={openConfirmationModal === 'fortsettFeilendeFamiliereguleringer'}
         onOk={() => {
           fortsettFeilendeFamilieReguleringer()
         }}
@@ -339,7 +337,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du vil fortsette feilende iverksett-vedtak-behandlinger? Dette vil nullstille utsattTil-tidspunkt for alle feilende iverksett-vedtak-behandlinger."
-        showModal={openConfirmationModal === 'fortsettFeilendeIverksettVedtak'}
+        open={openConfirmationModal === 'fortsettFeilendeIverksettVedtak'}
         onOk={() => {
           fortsettFeilendeIverksettVedtak()
         }}
@@ -347,7 +345,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du vil gjenoppta kjøring med nye avviksgrenser? Familiebehandlinger som har gått ut på avviksgrenser vil kjøre fra BeregnYtelser-aktiviteten på nytt og hente opp nåværende avviksgrenser."
-        showModal={openConfirmationModal === 'fortsettNyAvviksgrenser'}
+        open={openConfirmationModal === 'fortsettNyAvviksgrenser'}
         onOk={() => {
           fortsettNyAvviksgrenser()
         }}
@@ -355,7 +353,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du vil kjøre i faktoromregningsmodus? Dette gjør at faktoromregning tillates for familiebehandlinger som har gått ut med beregningsavvik."
-        showModal={openConfirmationModal === 'fortsettFaktoromregningsmodus'}
+        open={openConfirmationModal === 'fortsettFaktoromregningsmodus'}
         onOk={() => {
           fortsettFaktoromregningsmodus()
         }}
@@ -363,7 +361,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du vil kjøre i feilhåndteringsmodus? Dette gjør at forenklet beregning og faktoromregning gjøres for familiebehandlinger som har feilet i BeregnYtelser-aktiviteten."
-        showModal={openConfirmationModal === 'fortsettFeilhandteringmodus'}
+        open={openConfirmationModal === 'fortsettFeilhandteringmodus'}
         onOk={() => {
           fortsettFeilhandteringmodus()
         }}
@@ -371,7 +369,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du endre prioritet til ONLINE? Dette vil endre på prioriteten til alle familiebehandlinger som ikke er fullført, og medføre at resterende vedtak blir iverksatt på ONLINE-kø hos Oppdrag."
-        showModal={openConfirmationModal === 'endrePrioritetTilOnline'}
+        open={openConfirmationModal === 'endrePrioritetTilOnline'}
         onOk={() => {
           endrePrioritetTilOnline()
         }}
@@ -379,7 +377,7 @@ export default function AdministrerTilknyttetdeBehandlinger() {
       />
       <ConfirmationModal
         text="Er du sikker på at du endre prioritet til BATCH? Dette vil endre på prioriteten til alle familiebehandlinger som ikke er fullført, og medføre at resterende vedtak blir iverksatt på BATCH-kø hos Oppdrag (HPEN)."
-        showModal={openConfirmationModal === 'endrePrioritetTilBatch'}
+        open={openConfirmationModal === 'endrePrioritetTilBatch'}
         onOk={() => {
           endrePrioritetTilBatch()
         }}
@@ -500,11 +498,7 @@ function EndreAvviksgrenser({ avviksgrenser }: { avviksgrenser: AvviksGrense[] }
   const [toggleEndreAvviksgrenser, setToggleEndreAvviksgrenser] = useState(false)
   return (
     <VStack gap="space-20">
-      {response?.success === true && (
-        <Alert variant="success" inline>
-          Avviksgrenser oppdatert
-        </Alert>
-      )}
+      {response?.success === true && <InlineMessage status="success">Avviksgrenser oppdatert</InlineMessage>}
       <Table zebraStripes>
         <Table.Row>
           <Table.HeaderCell>Sakstype</Table.HeaderCell>

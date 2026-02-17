@@ -1,4 +1,4 @@
-import { Table } from '@navikt/ds-react'
+import { BodyShort, Table } from '@navikt/ds-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
 import { formatIsoTimestamp } from '~/common/date'
@@ -32,6 +32,9 @@ export default function BehandlingAktivitetTable(props: Props) {
       }}
       zebraStripes
     >
+      <BodyShort as="caption" visuallyHidden>
+        Aktiviteter
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader sortable sortKey="aktivitetId">
