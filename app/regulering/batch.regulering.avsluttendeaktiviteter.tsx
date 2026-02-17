@@ -61,7 +61,7 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
         </Button>
         <ConfirmationModal
           text="Er du sikker på at du vil avbryte behandlinger som har feilet mot POPP? Dette vil sette det nye vedtaket til avbrutt og opprette oppgave til saksbehandler om at saken må reguleres manuelt."
-          showModal={openConfirmationModal === 'avbrytBehandlingerFeiletMotPOPP'}
+          open={openConfirmationModal === 'avbrytBehandlingerFeiletMotPOPP'}
           onOk={() => {
             avbrytBehandlingerFeiletMotPopp()
           }}
@@ -69,7 +69,7 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
         />
         <ConfirmationModal
           text="Er du sikker på at du vil avbryte behandlinger som har feilet i Beregn Ytelse? Dette vil sette det nye vedtaket til avbrutt og opprette oppgave til saksbehandler om at saken må reguleres manuelt."
-          showModal={openConfirmationModal === 'avbrytBehandlingerFeiletIBeregnYtelse'}
+          open={openConfirmationModal === 'avbrytBehandlingerFeiletIBeregnYtelse'}
           onOk={() => {
             avbrytBehandlerFeiletIBeregnYtelse()
           }}
