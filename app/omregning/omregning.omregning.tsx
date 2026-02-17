@@ -1,6 +1,5 @@
 import { redirect } from 'react-router'
-import { opprettOmregningbehandling } from '~/omregning/batch.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
+import { apiPost } from '~/services/api.server'
 import type { OmregningRequest } from '~/types'
 import type { Route } from './+types/omregning.omregning'
 
@@ -52,9 +51,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
     regelendringUt2026: updates.regelendringUt2026 === 'true',
   } as OmregningRequest
 
-  const accessToken = await requireAccessToken(request)
-
-  const response = await opprettOmregningbehandling(accessToken, omregningRequest)
+  const response = (await apiPost<{ behandlingId: number }>(
+    '/api/behandling/omregning/opprett',
+    omregningRequest,
+    request,
+  )) as { behandlingId: number }
 
   return redirect(`/behandling/${response.behandlingId}`)
 }

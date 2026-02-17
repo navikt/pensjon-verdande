@@ -1,35 +1,43 @@
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
 import { Form, useSearchParams } from 'react-router'
-import {
-  hentOmregningbehandlingsnokler,
-  hentOmregningStatistikk,
-  hentOmregningStatistikkCsv,
-} from '~/omregning/batch.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
-import type { OmregningStatistikkPage } from '~/types'
+import { apiGet, apiGetRawStringOrUndefined, apiPost } from '~/services/api.server'
+import type { OmregningBehandlingsnoekler, OmregningStatistikkPage } from '~/types'
 import type { Route } from './+types/omregningStatistikk._index'
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Omregningsstatistikk | Verdande' }]
 }
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const accesstoken = await requireAccessToken(request)
+async function hentOmregningStatistikk(
+  request: Request,
+  behandlingsnoekkel: string,
+  page: number,
+  size: number,
+): Promise<OmregningStatistikkPage> {
+  const response = await apiPost<OmregningStatistikkPage>(
+    `/api/behandling/omregning/statistikk?behandlingsnoekkel=${behandlingsnoekkel}&page=${page}&size=${size}`,
+    {},
+    request,
+  )
+  return response as OmregningStatistikkPage
+}
 
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
-  const omregningStatistikkPage = (await hentOmregningStatistikk(
-    accesstoken,
-    behandlingsNoekkel,
-    Number(page),
-    Number(size),
-  )) as OmregningStatistikkPage
-  const content = await hentOmregningStatistikkCsv(accesstoken, behandlingsNoekkel)
+  const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
+  const content = await apiGetRawStringOrUndefined(
+    `/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsNoekkel}`,
+    request,
+  )
 
-  const omregningStatistikkInit = await hentOmregningbehandlingsnokler(accesstoken)
+  const omregningStatistikkInit = await apiGet<OmregningBehandlingsnoekler>(
+    '/api/behandling/omregning/statistikk/behandlingsnoekler',
+    request,
+  )
   return {
     omregningStatistikkInit: omregningStatistikkInit,
     omregningStatistikkPage: omregningStatistikkPage,
@@ -38,19 +46,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const accesstoken = await requireAccessToken(request)
   const formData = await request.formData()
   const { searchParams } = new URL(request.url)
   const page = searchParams.get('page') ?? '0'
   const size = searchParams.get('size') ?? '10'
-  const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string)
+  const behandlingsNoekkel =
+    searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string) ?? 'not set'
 
-  const omregningStatistikkPage = (await hentOmregningStatistikk(
-    accesstoken,
-    behandlingsNoekkel,
-    Number(page),
-    Number(size),
-  )) as OmregningStatistikkPage
+  const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
   return { omregningStatistikkPage }
 }
 
