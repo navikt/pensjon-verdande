@@ -12,7 +12,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     text: 'Er du sikker på at du vil stoppe behandlingen?',
-    showModal: false,
+    open: false,
     onOk: () => {},
     onCancel: () => {},
   },
@@ -21,7 +21,7 @@ export const Default: Story = {
 export const Open: Story = {
   args: {
     text: 'Er du sikker på at du vil slette alle feilende behandlinger?',
-    showModal: true,
+    open: true,
     onOk: () => {},
     onCancel: () => {},
   },
