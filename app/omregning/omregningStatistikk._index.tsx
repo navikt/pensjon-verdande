@@ -83,13 +83,14 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
   const [downloadLink, setDownloadLink] = useState('')
   useEffect(() => {
     const data = new Blob([`[${content}]`], { type: 'application/json' })
+    const newLink = window.URL.createObjectURL(data)
+    setDownloadLink(newLink)
 
-    // this part avoids memory leaks
-    if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
-
-    // update the download link state
-    setDownloadLink(window.URL.createObjectURL(data))
-  }, [content, downloadLink])
+    // cleanup: revoke the previous URL when content changes or component unmounts
+    return () => {
+      window.URL.revokeObjectURL(newLink)
+    }
+  }, [content])
 
   function setSearchParamsWithBehandlingsNoekler() {
     searchParams.set('behandlingsnoekler', behandlingsNoekler)
