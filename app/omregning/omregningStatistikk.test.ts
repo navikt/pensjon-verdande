@@ -8,7 +8,7 @@ vi.mock('~/services/env.server', () => ({
   env: { penUrl: 'http://pen-test' },
 }))
 
-const { loader, action } = await import('./omregningStatistikk._index')
+const { loader } = await import('./omregningStatistikk._index')
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -28,14 +28,6 @@ const loaderArgs = (request: Request) =>
     context: {},
     unstable_pattern: '/omregningStatistikk',
   }) as Parameters<typeof loader>[0]
-
-const actionArgs = (request: Request) =>
-  ({
-    request,
-    params: {},
-    context: {},
-    unstable_pattern: '/omregningStatistikk',
-  }) as Parameters<typeof action>[0]
 
 describe('omregningStatistikk._index', () => {
   let fetchSpy: ReturnType<typeof vi.fn>
@@ -83,29 +75,8 @@ describe('omregningStatistikk._index', () => {
     expect(noeklerInit.method).toBe('GET')
     expect(noeklerInit.signal).toBeInstanceOf(AbortSignal)
     expect(result.omregningStatistikkPage).toEqual(mockStatistikk)
-    expect(result.omregningStatistikkCsv).toBe(mockCsv)
+    expect(result.csvDownloadUrl).toBe(`data:text/csv;charset=utf-8,${encodeURIComponent(mockCsv)}`)
     expect(result.omregningStatistikkInit).toEqual(mockNoekler)
-  })
-
-  it('action henter statistikk med behandlingsnøkkel fra formdata', async () => {
-    const mockStatistikk = { content: [{ id: 2 }], totalElements: 1 }
-    fetchSpy.mockResolvedValueOnce(jsonResponse(mockStatistikk))
-
-    const formData = new FormData()
-    formData.set('behandlingsnoekler', 'KEY-2')
-
-    const request = new Request('http://localhost/omregningStatistikk?page=1&size=5', {
-      method: 'POST',
-      body: formData,
-    })
-    const result = await action(actionArgs(request))
-
-    expect(fetchSpy).toHaveBeenCalledOnce()
-    const [url, init] = fetchSpy.mock.calls[0]
-    expect(url).toBe('http://pen-test/api/behandling/omregning/statistikk?behandlingsnoekkel=KEY-2&page=1&size=5')
-    expect(init.method).toBe('POST')
-    expect(init.signal).toBeInstanceOf(AbortSignal)
-    expect(result).toEqual({ omregningStatistikkPage: mockStatistikk })
   })
 
   it('loader kaster feil ved 500 fra statistikk-endepunkt', async () => {
@@ -128,7 +99,7 @@ describe('omregningStatistikk._index', () => {
     const result = await loader(loaderArgs(request))
 
     expect(fetchSpy).toHaveBeenCalledTimes(3)
-    expect(result.omregningStatistikkCsv).toBeUndefined()
+    expect(result.csvDownloadUrl).toBeUndefined()
     expect(result.omregningStatistikkPage).toEqual(mockStatistikk)
   })
 })
