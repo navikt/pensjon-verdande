@@ -1,4 +1,12 @@
 import type { DateRange as RDDateRange } from 'react-day-picker'
+import {
+  erDatoEkskludertAvRegler,
+  erDatoIEkskludertMnd,
+  erMaanedFull,
+  getMaksBehandlingerPerMnd,
+  type SerieValg,
+} from './serieValg'
+
 export type DateRange = RDDateRange
 
 export function toYearMonthDay(date: Date): string {
@@ -6,6 +14,17 @@ export function toYearMonthDay(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+export function toYearMonth(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  return `${year}-${month}`
+}
+
+export function parseYmd(ymd: string): Date {
+  const [year, month, day] = ymd.split('-').map(Number)
+  return new Date(year, month - 1, day)
 }
 
 function startOfDay(date: Date): Date {
@@ -88,6 +107,7 @@ export function byggHelligdagsdata(includeNextYear: boolean) {
 
 export function firstPossibleDayOnOrAfter(
   anchorDate: Date,
+  serieValg: SerieValg,
   holidaySet?: Set<string>,
   excludeWeekend: boolean = true,
   excludeHolidays: boolean = true,
@@ -100,25 +120,56 @@ export function firstPossibleDayOnOrAfter(
     // 2) Kun søndag, dersom helg ikke er ekskludert
     (!excludeWeekend && excludeSunday && currentDate.getDay() === 0) ||
     // 3) Helligdager
-    (excludeHolidays && (holidaySet?.has(toYearMonthDay(currentDate)) ?? false))
+    (excludeHolidays && (holidaySet?.has(toYearMonthDay(currentDate)) ?? false)) ||
+    // 4) dagIMaanedRegler (ex. må være mellom 10-20.)
+    (serieValg && erDatoEkskludertAvRegler(currentDate, serieValg))
   ) {
     currentDate = addDays(currentDate, 1)
   }
   return currentDate
 }
 
-export function firstWeekdayOnOrAfter(anchorDate: Date, weekdayNumber: number): Date {
+export function firstWeekdayOnOrAfter(
+  anchorDate: Date,
+  weekdayNumber: number,
+  serieValg?: SerieValg,
+  holidaySet?: Set<string>,
+  excludeHolidays: boolean = true,
+): Date {
   let currentDate = startOfDay(anchorDate)
-  while (currentDate.getDay() !== weekdayNumber) currentDate = addDays(currentDate, 1)
+  while (
+    currentDate.getDay() !== weekdayNumber ||
+    // Skipper bevisst ikke til neste mnd med
+    // dagIMaanedRegler (ex. må være mellom 10-20.)
+    (serieValg && erDatoEkskludertAvRegler(currentDate, serieValg)) ||
+    // Helligdager
+    (excludeHolidays && holidaySet?.has(toYearMonthDay(currentDate)))
+  ) {
+    currentDate = addDays(currentDate, 1)
+  }
   return currentDate
 }
 
-export function allWeekdaysInRange(weekdayNumber: number, startDate: Date, endDate: Date): Date[] {
+export function allWeekdaysInRange(
+  weekdayNumber: number,
+  startDate: Date,
+  endDate: Date,
+  serieValg?: SerieValg,
+  holidaySet?: Set<string>,
+  excludeHolidays: boolean = true,
+): Date[] {
   const start = startOfDay(startDate)
   const end = startOfDay(endDate)
   const first = firstWeekdayOnOrAfter(start, weekdayNumber)
   const out: Date[] = []
-  for (let d = first; d.getTime() <= end.getTime(); d = addDays(d, 7)) out.push(startOfDay(d))
+  for (let d = first; d.getTime() <= end.getTime(); d = addDays(d, 7)) {
+    // Filter vekk datoer som bryter med SerieValg
+    if (serieValg && erDatoEkskludertAvRegler(d, serieValg)) continue
+    if (serieValg && erDatoIEkskludertMnd(d, serieValg)) continue
+    // Helligdager
+    if (excludeHolidays && holidaySet?.has(toYearMonthDay(d))) continue
+    out.push(startOfDay(d))
+  }
   return out
 }
 
@@ -136,14 +187,13 @@ export function monthlyAnchoredStartDates(startDate: Date, monthInterval: number
 }
 
 export function quarterlyStartDates(startDate: Date, horizonDate: Date): Date[] {
-  const startIndex = startDate.getFullYear() * 12
+  const startIndex = startDate.getFullYear() * 12 + startDate.getMonth()
   const endIndex = horizonDate.getFullYear() * 12 + horizonDate.getMonth()
   const out: Date[] = []
   for (let index = startIndex; index <= endIndex; index += 3) {
     const year = Math.floor(index / 12)
     const month = index % 12
-    const date = new Date(year, month, 1)
-    if (date >= new Date(startDate.getFullYear(), startDate.getMonth(), 1) && date <= horizonDate) out.push(date)
+    out.push(new Date(year, month, 1))
   }
   return out
 }
@@ -225,8 +275,7 @@ export function buildValgteDatoer(
     const date = new Date(year, month - 1, day)
     if (ekskluderHelg && isWeekend(date)) return false
     if (!ekskluderHelg && ekskluderSondag && date.getDay() === 0) return false
-    if (ekskluderHelligdager && helligdagerYearMonthDaySet.has(yearMonthDay)) return false
-    return true
+    return !(ekskluderHelligdager && helligdagerYearMonthDaySet.has(yearMonthDay))
   })
 }
 
@@ -235,6 +284,8 @@ type DeaktiverteDatoerOptions = {
   toDate: Date
   bookedDates: Date[]
   helligdagsdatoer: Date[]
+  serieValg: SerieValg
+  antallPerMaaned: Map<string, number>
   ekskluderHelg: boolean
   ekskluderHelligdager: boolean
   ekskluderSondag: boolean
@@ -245,6 +296,8 @@ export function buildDisabledDates({
   toDate,
   bookedDates,
   helligdagsdatoer,
+  serieValg,
+  antallPerMaaned,
   ekskluderHelg,
   ekskluderHelligdager,
   ekskluderSondag,
@@ -252,11 +305,17 @@ export function buildDisabledDates({
   const disabledSet = new Set<number>()
   const addDisabled = (date: Date) => disabledSet.add(startOfDay(date).getTime())
 
+  const maksValgtePerMnd = getMaksBehandlingerPerMnd(serieValg)
+
   const start = startOfDay(fromDate)
   const end = startOfDay(toDate)
   for (let d = start; d.getTime() <= end.getTime(); d = addDays(d, 1)) {
     if (ekskluderHelg && isWeekend(d)) addDisabled(d)
     else if (!ekskluderHelg && ekskluderSondag && d.getDay() === 0) addDisabled(d)
+
+    if (erDatoEkskludertAvRegler(d, serieValg)) addDisabled(d)
+    if (erDatoIEkskludertMnd(d, serieValg)) addDisabled(d)
+    if (erMaanedFull(d, antallPerMaaned, maksValgtePerMnd)) addDisabled(d)
   }
 
   if (ekskluderHelligdager) for (const date of helligdagsdatoer) addDisabled(date)

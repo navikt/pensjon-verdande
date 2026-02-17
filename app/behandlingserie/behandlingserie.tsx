@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Checkbox,
   DatePicker,
@@ -34,6 +35,14 @@ import {
   tertialStartDates,
   toYearMonthDay,
 } from './seriekalenderUtils'
+import {
+  byggRegelAdvarsler,
+  DEFAULT_SERIE_VALG,
+  erDatoIEkskludertMnd,
+  filtrerDatoerMedRegler,
+  type SerieValg,
+  tellDatoerPerMaaned,
+} from './serieValg'
 
 type RegelmessighetModus = 'range' | 'multiple'
 type Utvalg = Date[] | DateRange | undefined
@@ -61,17 +70,27 @@ const TIDER: string[] = Array.from({ length: 24 * 4 }, (_, i) => {
   const m = (i % 4) * 15
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 })
-const BEHANDLINGSTYPER = [
-  'AvsluttSaker',
-  'DagligAvstemming',
-  'ManedligAvstemming',
-  'FodselsdatoAjourhold',
-  'IdentAjourhold',
-  'KontrollerOppgaver',
-  'PersonAjourhold',
-  'E500Fillevering',
-  'LeveattestGrunnlag',
-]
+
+function getTilgjengeligeTider(forhandsvisDatoer: string[]): string[] {
+  // Hvis ingen datoer er valgt, vis alle tider
+  if (forhandsvisDatoer.length === 0) return TIDER
+
+  const now = new Date()
+  const todayYmd = toYearMonthDay(now)
+
+  const harValgtIDagEllerTidligere = forhandsvisDatoer.some((ymd) => ymd <= todayYmd)
+  if (!harValgtIDagEllerTidligere) return TIDER
+
+  // Hvis i dag eller tidligere er valgt, kun vis valg frem i tid (minst en time margin)
+  const minTime = new Date(now.getTime() + 60 * 60 * 1000)
+  const minHour = minTime.getHours()
+  const minMinute = Math.ceil(minTime.getMinutes() / 15) * 15
+
+  return TIDER.filter((tid) => {
+    const [h, m] = tid.split(':').map(Number)
+    return h > minHour || (h === minHour && m >= minMinute)
+  })
+}
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Behandlingserier | Verdande' }]
@@ -80,13 +99,21 @@ export function meta(): Route.MetaDescriptors {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
   const behandlingType = searchParams.get('behandlingType') ?? ''
-  const behandlingSerier = behandlingType
-    ? await apiGet<BehandlingSerieDTO[]>(
-        `/api/behandling/serier?behandlingCode=${encodeURIComponent(behandlingType)}`,
-        request,
-      )
-    : []
-  return { behandlingSerier }
+
+  const [behandlingSerier, serieValg, tillateBehandlinger] = await Promise.all([
+    behandlingType
+      ? apiGet<BehandlingSerieDTO[]>(
+          `/api/behandling/serier?behandlingCode=${encodeURIComponent(behandlingType)}`,
+          request,
+        )
+      : [],
+    behandlingType
+      ? apiGet<SerieValg>(`/api/behandling/serier/valg?behandlingCode=${encodeURIComponent(behandlingType)}`, request)
+      : DEFAULT_SERIE_VALG,
+    apiGet<string[]>('/api/behandling/serier/tillateBehandlinger', request),
+  ])
+
+  return { behandlingSerier, serieValg, tillateBehandlinger }
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -137,7 +164,12 @@ function byggBookedeDatoer(serier: BehandlingSerieDTO[]) {
       ymdSet.add(toYearMonthDay(dato))
     }
   }
-  return { bookedeDatoer, ymdSet }
+
+  return {
+    bookedeDatoer,
+    ymdSet,
+    antallPerMaaned: tellDatoerPerMaaned([...ymdSet]),
+  }
 }
 
 export function erDateRange(x: unknown): x is DateRange {
@@ -147,12 +179,20 @@ export function erDateRange(x: unknown): x is DateRange {
   return ('from' in obj || 'to' in obj) && erDato(obj.from) && erDato(obj.to)
 }
 
-function SerieVelger({ behandlingType, onChange }: { behandlingType: string; onChange: (value: string) => void }) {
+function SerieVelger({
+  behandlingType,
+  onChange,
+  tillateBehandlinger,
+}: {
+  behandlingType: string
+  onChange: (value: string) => void
+  tillateBehandlinger: string[]
+}) {
   return (
     <HStack>
       <Select label="Velg behandling" value={behandlingType} onChange={(e) => onChange(e.target.value)}>
         <option value="">Velg behandlingstype</option>
-        {BEHANDLINGSTYPER.map((type) => (
+        {tillateBehandlinger.map((type) => (
           <option key={type} value={type}>
             {type}
           </option>
@@ -162,7 +202,15 @@ function SerieVelger({ behandlingType, onChange }: { behandlingType: string; onC
   )
 }
 
-function RegelKontroller({ verdi, onChange }: { verdi: ReglerVerdi; onChange: (patch: ReglerPatch) => void }) {
+function RegelKontroller({
+  verdi,
+  onChange,
+  serieValg,
+}: {
+  verdi: ReglerVerdi
+  onChange: (patch: ReglerPatch) => void
+  serieValg: SerieValg
+}) {
   const maanedLabel = verdi.dagvalgModus === 'first-weekday' ? 'Hver N. måned (første virkedag)' : 'i antall måneder'
   return (
     <VStack>
@@ -171,7 +219,7 @@ function RegelKontroller({ verdi, onChange }: { verdi: ReglerVerdi; onChange: (p
         value={verdi.regelmessighet}
         onChange={(v) => onChange({ regelmessighet: v as RegelmessighetModus })}
       >
-        <Radio value="range">Velg en range fra og til</Radio>
+        {serieValg.enableRangeVelger && <Radio value="range">Velg en range fra og til</Radio>}
         <Radio value="multiple">Velg diverse datoer</Radio>
       </RadioGroup>
       {verdi.regelmessighet === 'multiple' && (
@@ -267,7 +315,7 @@ function AlternativerRad({
       >
         Ekskluder helligdager
       </Checkbox>
-      <Checkbox checked={!!verdi.ekskluderHelg} onChange={(e) => onChange({ ekskluderHelg: e.target.checked })}>
+      <Checkbox checked={verdi.ekskluderHelg} onChange={(e) => onChange({ ekskluderHelg: e.target.checked })}>
         Ekskluder helg
       </Checkbox>
       <Checkbox checked={verdi.ekskluderSondag} onChange={(e) => onChange({ ekskluderSondag: e.target.checked })}>
@@ -284,6 +332,7 @@ function KalenderSeksjon({
   horisontSlutt,
   ekskluderHelg,
   deaktiverteDatoer,
+  regelAdvarsler,
   onSelect,
   onClear,
   kanTomme,
@@ -294,12 +343,26 @@ function KalenderSeksjon({
   horisontSlutt: Date
   ekskluderHelg: boolean
   deaktiverteDatoer: Date[]
+  regelAdvarsler: string[]
   onSelect: (v: Utvalg) => void
   onClear: () => void
   kanTomme: boolean
 }) {
   return (
     <VStack>
+      {regelAdvarsler.length > 0 && (
+        <Alert variant="info" size="small">
+          {regelAdvarsler.length === 1 ? (
+            regelAdvarsler[0]
+          ) : (
+            <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+              {regelAdvarsler.map((advarsel) => (
+                <li key={advarsel}>{advarsel}</li>
+              ))}
+            </ul>
+          )}
+        </Alert>
+      )}
       {regelmessighet === 'multiple' ? (
         <DatePicker.Standalone
           key={`multiple-${horisontSlutt.getFullYear()}`}
@@ -363,6 +426,11 @@ function EndreDialog({
   const headingId = useId()
   const navigate = useNavigate()
 
+  const tilgjengeligeTiderDialog = useMemo(() => {
+    if (!dato) return TIDER
+    return getTilgjengeligeTider([toYearMonthDay(dato)])
+  }, [dato])
+
   useEffect(() => {
     if (!element) return
     const [year, month, day] = element.yearMonthDay.split('-').map(Number)
@@ -372,8 +440,20 @@ function EndreDialog({
   }, [element])
 
   useEffect(() => {
+    if (tid && !tilgjengeligeTiderDialog.includes(tid)) {
+      setTid(tilgjengeligeTiderDialog[0] ?? '')
+    }
+  }, [tilgjengeligeTiderDialog, tid])
+
+  useEffect(() => {
     setInput(
-      dato ? new Intl.DateTimeFormat('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(dato) : '',
+      dato
+        ? new Intl.DateTimeFormat('no-NO', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }).format(dato)
+        : '',
     )
   }, [dato])
 
@@ -430,7 +510,7 @@ function EndreDialog({
             </DatePicker>
 
             <Select label="Tid" value={tid} onChange={(e) => setTid(e.target.value)}>
-              {TIDER.map((t) => (
+              {tilgjengeligeTiderDialog.map((t) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -466,7 +546,7 @@ function EndreDialog({
 }
 
 export default function BehandlingOpprett_index({ loaderData }: Route.ComponentProps) {
-  const now = new Date()
+  const [now] = useState(() => new Date())
   const [inkluderNesteAar, setInkluderNesteAar] = useState(false)
   const horisontSlutt = useMemo(() => {
     const year = new Date().getFullYear() + (inkluderNesteAar ? 1 : 0)
@@ -487,7 +567,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
   const createFetcher = useFetcher()
   const [searchParams, setSearchParams] = useSearchParams()
   const [behandlingType, setBehandlingType] = useState(searchParams.get('behandlingType') || '')
-  const { behandlingSerier } = loaderData
+  const { behandlingSerier, serieValg, tillateBehandlinger } = loaderData
 
   const helligdagsdata = useMemo(() => byggHelligdagsdata(inkluderNesteAar), [inkluderNesteAar])
   const booketData = useMemo(() => byggBookedeDatoer(behandlingSerier || []), [behandlingSerier])
@@ -510,6 +590,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     const monthStart = new Date(idag.getFullYear(), idag.getMonth(), 1)
     const firstBusinessThisMonth = firstPossibleDayOnOrAfter(
       monthStart,
+      serieValg,
       helligdagsdata.yearMonthDaySet,
       ekskluderHelg,
       ekskluderHelligdager,
@@ -521,6 +602,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     const quarterStart = new Date(idag.getFullYear(), Math.floor(idag.getMonth() / 3) * 3, 1)
     const firstBusinessThisQuarter = firstPossibleDayOnOrAfter(
       quarterStart,
+      serieValg,
       helligdagsdata.yearMonthDaySet,
       ekskluderHelg,
       ekskluderHelligdager,
@@ -534,6 +616,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     const tertialStart = new Date(idag.getFullYear(), currentTertialMonth, 1)
     const firstBusinessThisTertial = firstPossibleDayOnOrAfter(
       tertialStart,
+      serieValg,
       helligdagsdata.yearMonthDaySet,
       ekskluderHelg,
       ekskluderHelligdager,
@@ -544,62 +627,63 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
 
     let datoer: Date[] = []
 
-    if (dagvalgModus === 'first-weekday') {
+    const hentStartDatoer = (): Date[] => {
       if (intervallModus === 'quarterly') {
         const base = includeCurrentQuarter ? quarterStart : nextQuarterStart
-        datoer = quarterlyStartDates(base, horisontSlutt).map((start) =>
-          firstPossibleDayOnOrAfter(
-            start,
-            helligdagsdata.yearMonthDaySet,
-            ekskluderHelg,
-            ekskluderHelligdager,
-            ekskluderSondag,
-          ),
-        )
-      } else if (intervallModus === 'tertial') {
+        return quarterlyStartDates(base, horisontSlutt)
+      }
+      if (intervallModus === 'tertial') {
         const base = includeCurrentTertial ? tertialStart : nextTertialStart
-        datoer = tertialStartDates(base, horisontSlutt).map((start) =>
-          firstPossibleDayOnOrAfter(
-            start,
-            helligdagsdata.yearMonthDaySet,
-            ekskluderHelg,
-            ekskluderHelligdager,
-            ekskluderSondag,
-          ),
-        )
-      } else if (maanedsSteg) {
+        return tertialStartDates(base, horisontSlutt)
+      }
+      if (maanedsSteg) {
         const m = parseInt(maanedsSteg, 10)
         if (m > 0) {
           const base = includeCurrentMonth ? monthStart : nextMonthStart
-          const starts = monthlyAnchoredStartDates(base, m, horisontSlutt)
-          datoer = starts.map((start) =>
-            firstPossibleDayOnOrAfter(
-              start,
-              helligdagsdata.yearMonthDaySet,
-              ekskluderHelg,
-              ekskluderHelligdager,
-              ekskluderSondag,
-            ),
-          )
+          return monthlyAnchoredStartDates(base, m, horisontSlutt)
         }
       }
+      return []
+    }
+
+    if (dagvalgModus === 'first-weekday') {
+      datoer = hentStartDatoer()
+        .filter((start) => !erDatoIEkskludertMnd(start, serieValg))
+        .map((start) =>
+          firstPossibleDayOnOrAfter(
+            start,
+            serieValg,
+            helligdagsdata.yearMonthDaySet,
+            ekskluderHelg,
+            ekskluderHelligdager,
+            ekskluderSondag,
+          ),
+        )
     } else {
       if (!valgtUkedag) return
       const ukedagNummer = getWeekdayNumber(valgtUkedag)
       if (ukedagNummer == null) return
-      if (intervallModus === 'quarterly') {
-        const base = quarterStart
-        datoer = quarterlyStartDates(base, horisontSlutt).map((start) => firstWeekdayOnOrAfter(start, ukedagNummer))
-      } else if (intervallModus === 'tertial') {
-        const base = tertialStart
-        datoer = tertialStartDates(base, horisontSlutt).map((start) => firstWeekdayOnOrAfter(start, ukedagNummer))
-      } else if (maanedsSteg) {
+
+      if (!intervallModus && maanedsSteg) {
         const m = parseInt(maanedsSteg, 10)
         if (m > 0) {
           const slutt = addMonths(idag, m)
           const klippetSlutt = slutt > horisontSlutt ? horisontSlutt : slutt
-          datoer = allWeekdaysInRange(ukedagNummer, idag, klippetSlutt)
+          datoer = allWeekdaysInRange(
+            ukedagNummer,
+            idag,
+            klippetSlutt,
+            serieValg,
+            helligdagsdata.yearMonthDaySet,
+            ekskluderHelligdager,
+          )
         }
+      } else {
+        datoer = hentStartDatoer()
+          .filter((start) => !erDatoIEkskludertMnd(start, serieValg))
+          .map((start) =>
+            firstWeekdayOnOrAfter(start, ukedagNummer, serieValg, helligdagsdata.yearMonthDaySet, ekskluderHelligdager),
+          )
       }
     }
 
@@ -621,7 +705,14 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     helligdagsdata.yearMonthDaySet,
     ekskluderHelligdager,
     ekskluderSondag,
+    serieValg,
   ])
+
+  useEffect(() => {
+    if (!serieValg.enableRangeVelger && regelmessighet === 'range') {
+      setRegelmessighet('multiple')
+    }
+  }, [serieValg.enableRangeVelger, regelmessighet])
 
   const oppdaterBehandlingType = useCallback(
     (value: string) => {
@@ -653,7 +744,13 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
         helligdagerYearMonthDaySet: helligdagsdata.yearMonthDaySet,
       } as BuildValgteDatoerParams[2],
     )
-    return base.filter((ymd) => !booketData.ymdSet.has(ymd))
+
+    return filtrerDatoerMedRegler({
+      datoer: base,
+      booketYmdSet: booketData.ymdSet,
+      antallPerMaaned: booketData.antallPerMaaned,
+      serieValg: serieValg,
+    })
   }, [
     utvalg,
     regelmessighet,
@@ -662,8 +759,18 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     helligdagsdata.yearMonthDaySet,
     ekskluderHelligdager,
     booketData.ymdSet,
+    booketData.antallPerMaaned,
     ekskluderSondag,
+    serieValg,
   ])
+
+  const tilgjengeligeTider = useMemo(() => getTilgjengeligeTider(forhandsvisDatoer), [forhandsvisDatoer])
+
+  useEffect(() => {
+    if (valgtTid && !tilgjengeligeTider.includes(valgtTid)) {
+      setValgtTid('')
+    }
+  }, [tilgjengeligeTider, valgtTid])
 
   const kanLagre = Boolean(behandlingType && valgtTid && forhandsvisDatoer.length > 0)
 
@@ -682,27 +789,38 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     else setUtvalg(undefined)
   }, [regelmessighet])
 
-  const deaktiverteDatoer = useMemo(
-    () =>
-      buildDisabledDates({
-        fromDate: now,
-        toDate: horisontSlutt,
-        bookedDates: booketData.bookedeDatoer,
-        helligdagsdatoer: helligdagsdata.holidayDates,
-        ekskluderHelg,
-        ekskluderHelligdager,
-        ekskluderSondag,
-      }),
-    [
-      now,
-      horisontSlutt,
-      booketData.bookedeDatoer,
-      helligdagsdata.holidayDates,
+  const totaltPerMaaned = useMemo(
+    () => tellDatoerPerMaaned(forhandsvisDatoer, booketData.antallPerMaaned),
+    [booketData.antallPerMaaned, forhandsvisDatoer],
+  )
+
+  const deaktiverteDatoer = useMemo(() => {
+    const disabled = buildDisabledDates({
+      fromDate: now,
+      toDate: horisontSlutt,
+      bookedDates: booketData.bookedeDatoer,
+      helligdagsdatoer: helligdagsdata.holidayDates,
+      serieValg: serieValg,
+      antallPerMaaned: totaltPerMaaned,
       ekskluderHelg,
       ekskluderHelligdager,
       ekskluderSondag,
-    ],
-  )
+    })
+
+    const selectedYmdSet = new Set(forhandsvisDatoer)
+    return disabled.filter((date) => !selectedYmdSet.has(toYearMonthDay(date)))
+  }, [
+    now,
+    horisontSlutt,
+    booketData.bookedeDatoer,
+    totaltPerMaaned,
+    helligdagsdata.holidayDates,
+    serieValg,
+    ekskluderHelg,
+    ekskluderHelligdager,
+    ekskluderSondag,
+    forhandsvisDatoer,
+  ])
 
   const planlagteElementer: PlannedItem[] = useMemo(() => {
     const items: PlannedItem[] = []
@@ -755,7 +873,11 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
       <Heading size="medium" level="1">
         Behandlingserie
       </Heading>
-      <SerieVelger behandlingType={behandlingType} onChange={oppdaterBehandlingType} />
+      <SerieVelger
+        behandlingType={behandlingType}
+        tillateBehandlinger={tillateBehandlinger}
+        onChange={oppdaterBehandlingType}
+      />
       {behandlingType !== '' && (
         <>
           <Heading size="medium" level="1">
@@ -774,7 +896,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
               onChange={(e) => setValgtTid(e.target.value)}
             >
               <option value="">Velg tid</option>
-              {TIDER.map((t) => (
+              {tilgjengeligeTider.map((t) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -784,6 +906,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
 
           <RegelKontroller
             verdi={{ regelmessighet, dagvalgModus, valgtUkedag, maanedsSteg, intervallModus }}
+            serieValg={serieValg}
             onChange={(patch) => {
               if (patch.regelmessighet !== undefined) {
                 setRegelmessighet(patch.regelmessighet)
@@ -814,6 +937,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
             horisontSlutt={horisontSlutt}
             ekskluderHelg={ekskluderHelg}
             deaktiverteDatoer={deaktiverteDatoer}
+            regelAdvarsler={byggRegelAdvarsler(serieValg)}
             onSelect={setUtvalg}
             onClear={toemAlt}
             kanTomme={

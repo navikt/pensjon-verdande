@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { DEFAULT_SERIE_VALG } from '~/behandlingserie/serieValg'
 
 vi.mock('~/services/auth.server', () => ({
   requireAccessToken: vi.fn().mockResolvedValue('test-token'),
@@ -35,28 +36,56 @@ describe('behandlingserie loader', () => {
     vi.unstubAllGlobals()
   })
 
-  it('GET med behandlingType returnerer BehandlingSerieDTO[]', async () => {
+  it('GET med behandlingType returnerer behandlingSerier, serieValg og tillateBehandlinger', async () => {
     const serier = [{ behandlingSerieId: '1', behandlingCode: 'AvsluttSaker', behandlinger: [] }]
-    fetchSpy.mockResolvedValueOnce(jsonResponse(serier))
+    const tillateBehandlinger = ['AvsluttSaker', 'DagligAvstemming']
+
+    fetchSpy
+      .mockResolvedValueOnce(jsonResponse(serier))
+      .mockResolvedValueOnce(jsonResponse(DEFAULT_SERIE_VALG))
+      .mockResolvedValueOnce(jsonResponse(tillateBehandlinger))
 
     const request = new Request('http://localhost/behandlingserie?behandlingType=AvsluttSaker')
     const result = await loader(loaderArgs(request))
 
-    expect(fetchSpy).toHaveBeenCalledOnce()
-    const [url, init] = fetchSpy.mock.calls[0]
-    expect(url).toBe('http://pen-test/api/behandling/serier?behandlingCode=AvsluttSaker')
+    expect(fetchSpy).toHaveBeenCalledTimes(3)
+
+    // Kall 1: serier
+    const [url1, init1] = fetchSpy.mock.calls[0]
+    expect(url1).toBe('http://pen-test/api/behandling/serier?behandlingCode=AvsluttSaker')
+    assertStandardGetRequest(init1)
+
+    // Kall 2: serieValg
+    const [url2, init2] = fetchSpy.mock.calls[1]
+    expect(url2).toBe('http://pen-test/api/behandling/serier/valg?behandlingCode=AvsluttSaker')
+    assertStandardGetRequest(init2)
+
+    // Kall 3: tillateBehandlinger
+    const [url3, init3] = fetchSpy.mock.calls[2]
+    expect(url3).toBe('http://pen-test/api/behandling/serier/tillateBehandlinger')
+    assertStandardGetRequest(init3)
+
+    expect(result).toEqual({ behandlingSerier: serier, serieValg: DEFAULT_SERIE_VALG, tillateBehandlinger })
+  })
+
+  function assertStandardGetRequest(init: RequestInit) {
     expect(init.method).toBe('GET')
     expect(init.headers).toMatchObject({ Authorization: 'Bearer test-token' })
     expect(init.signal).toBeInstanceOf(AbortSignal)
-    expect(result).toEqual({ behandlingSerier: serier })
-  })
+  }
 
-  it('GET med tom behandlingType returnerer tom liste uten fetch', async () => {
+  it('GET uten behandlingType returnerer tom liste for behandlingSerier og default serieValg, kun tillateBehandlinger hentes', async () => {
+    const tillateBehandlinger = ['AvsluttSaker', 'DagligAvstemming']
+
+    fetchSpy.mockResolvedValueOnce(jsonResponse(tillateBehandlinger))
+
     const request = new Request('http://localhost/behandlingserie')
     const result = await loader(loaderArgs(request))
 
-    expect(fetchSpy).not.toHaveBeenCalled()
-    expect(result).toEqual({ behandlingSerier: [] })
+    // kun tillateBehandlinger hentes
+    expect(fetchSpy).toHaveBeenCalledOnce()
+    expect(fetchSpy.mock.calls[0][0]).toBe('http://pen-test/api/behandling/serier/tillateBehandlinger')
+    expect(result).toEqual({ behandlingSerier: [], serieValg: DEFAULT_SERIE_VALG, tillateBehandlinger })
   })
 })
 
@@ -137,7 +166,9 @@ describe('behandlingserie action', () => {
         headers: { 'Content-Type': 'application/json' },
       }),
     )
-
+    // Mock resterende endepunkter
+    fetchSpy.mockResolvedValueOnce(jsonResponse(DEFAULT_SERIE_VALG))
+    fetchSpy.mockResolvedValueOnce(jsonResponse(['AvsluttSaker']))
     const request = new Request('http://localhost/behandlingserie?behandlingType=AvsluttSaker')
 
     try {
