@@ -1,5 +1,6 @@
 import { PlayIcon } from '@navikt/aksel-icons'
 import {
+  BodyShort,
   Box,
   Button,
   CheckboxGroup,
@@ -231,6 +232,9 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       return (
         <div>
           <Table size="medium" zebraStripes>
+            <BodyShort as="caption" visuallyHidden>
+              Omregninger
+            </BodyShort>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell scope="col">SakId</Table.HeaderCell>

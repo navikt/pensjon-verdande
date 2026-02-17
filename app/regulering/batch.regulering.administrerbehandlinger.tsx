@@ -1,6 +1,17 @@
 import 'chart.js/auto'
 import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
-import { Button, Dropdown, HStack, InlineMessage, Loader, Table, Tabs, TextField, VStack } from '@navikt/ds-react'
+import {
+  BodyShort,
+  Button,
+  Dropdown,
+  HStack,
+  InlineMessage,
+  Loader,
+  Table,
+  Tabs,
+  TextField,
+  VStack,
+} from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
 import { Link, useFetcher, useOutletContext } from 'react-router'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
@@ -396,6 +407,9 @@ function ArbeidstabellStatistikkTable({
 
   return (
     <Table zebraStripes>
+      <BodyShort as="caption" visuallyHidden>
+        Arbeidstabell
+      </BodyShort>
       <Table.Row>
         <Table.HeaderCell>Antall</Table.HeaderCell>
         <Table.HeaderCell align="right">Antall</Table.HeaderCell>

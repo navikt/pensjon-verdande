@@ -1,4 +1,4 @@
-import { Box, Table } from '@navikt/ds-react'
+import { BodyShort, Box, Table } from '@navikt/ds-react'
 import { Link } from 'react-router'
 import { hentBrukere } from '~/brukere/brukere.server'
 import { requireAccessToken } from '~/services/auth.server'
@@ -22,6 +22,9 @@ export default function Brukere({ loaderData }: Route.ComponentProps) {
   return (
     <Box style={{ padding: '6px' }} borderRadius="4">
       <Table>
+        <BodyShort as="caption" visuallyHidden>
+          Brukere
+        </BodyShort>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Brukernavn</Table.HeaderCell>

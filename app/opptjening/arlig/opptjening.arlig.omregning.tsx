@@ -1,4 +1,4 @@
-import { Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
+import { BodyShort, Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
 import type { EkskluderteSakerResponse, EkskludertSak, StartBatchResponse } from '~/opptjening/arlig/opptjening.types'
@@ -290,6 +290,9 @@ interface meldingResponse {
 function EkskluderingerMedKommentarTable({ ekskluderteSaker }: { ekskluderteSaker: EkskludertSak[] }) {
   return (
     <Table zebraStripes>
+      <BodyShort as="caption" visuallyHidden>
+        Ekskluderte saker
+      </BodyShort>
       <Table.Row>
         <Table.HeaderCell>SakId</Table.HeaderCell>
         <Table.HeaderCell align="right">Kommentar</Table.HeaderCell>
