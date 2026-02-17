@@ -49,6 +49,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     brevkoderSoker: brevkoderSoker,
     brevkoderBerorteSaker: brevkoderBerorteSaker,
     prioritet: updates.prioritet,
+    regelendringUt2026: updates.regelendringUt2026 === 'true',
   } as OmregningRequest
 
   const accessToken = await requireAccessToken(request)
