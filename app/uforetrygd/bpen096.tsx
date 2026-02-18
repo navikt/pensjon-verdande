@@ -1,12 +1,7 @@
 import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, Link, redirect, useNavigation } from 'react-router'
-import { requireAccessToken } from '~/services/auth.server'
-import {
-  hentAntallSkattehendelser,
-  hentSkattehendelserManuelt,
-  opprettBpen096,
-} from '~/uforetrygd/batch.bpen096.server'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { Route } from './+types/bpen096'
 
 enum Action {
@@ -21,15 +16,20 @@ export function meta(): Route.MetaDescriptors {
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = Object.fromEntries(await request.formData())
-  const accessToken = await requireAccessToken(request)
 
   if (formData.action === Action.HentSkattehendelser) {
-    const response = await opprettBpen096(
-      accessToken,
-      +formData.maksAntallSekvensnummer,
-      +formData.sekvensnummerPerBehandling,
-      formData.debug === 'true',
+    const response = await apiPost<{ behandlingId: number }>(
+      '/api/uforetrygd/etteroppgjor/skattehendelser',
+      {
+        maksAntallSekvensnummer: +formData.maksAntallSekvensnummer,
+        sekvensnummerPerBehandling: +formData.sekvensnummerPerBehandling,
+        debug: formData.debug === 'true',
+      },
+      request,
     )
+    if (!response?.behandlingId) {
+      throw new Error('Missing behandlingId')
+    }
     return redirect(`/behandling/${response.behandlingId}`)
   } else if (formData.action === Action.HentSkattehendelserManuelt) {
     const sekvensnr: number[] = formData.sekvensnr
@@ -47,10 +47,20 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
     }
 
-    const response = await hentSkattehendelserManuelt(sekvensnr, accessToken)
+    const response = await apiPost<{ behandlingIder: number[] }>(
+      '/api/uforetrygd/etteroppgjor/skattehendelser/kjor-hendelser-manuelt',
+      { sekvensnummer: sekvensnr },
+      request,
+    )
+    if (!response?.behandlingIder || response.behandlingIder.length === 0) {
+      return {
+        action: formData.action,
+        error: 'Mangler behandlingIder fra tjenesten',
+      }
+    }
     return { behandlingIder: response.behandlingIder }
   } else if (formData.action === Action.HentAntallSkattehendelser) {
-    const response = await hentAntallSkattehendelser(accessToken)
+    const response = await apiGet<{ antall: number }>('/api/uforetrygd/etteroppgjor/skattehendelser/antall', request)
     return { antall: response.antall }
   }
 }
