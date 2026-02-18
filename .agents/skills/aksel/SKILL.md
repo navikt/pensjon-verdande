@@ -101,13 +101,13 @@ For detaljert informasjon, se filene i `docs/`-mappen:
 - **Detail** → `Detail`
 
 ### Layout (Primitives)
-- **Sidelayout** → `Page`
-- **Horisontal flexbox** → `HStack`
-- **Vertikal flexbox** → `VStack`
-- **Grid** → `HGrid`
-- **Boks med styling** → `Box`
-- **Vis/skjul responsivt** → `Show` / `Hide`
-- **Negativ margin** → `Bleed`
+- **Sidelayout med maksbredde/sentrering** → `Page` + `Page.Block` (width: text/md/lg/xl/2xl)
+- **Horisontal flexbox** → `HStack` (gap, justify, align, wrap)
+- **Vertikal flexbox (skjema-elementer)** → `VStack` (gap, justify, align)
+- **CSS Grid-layout** → `HGrid` (columns: number/string/responsive)
+- **Boks med styling/semantikk** → `Box` (background, border, shadow, as="nav"/"section")
+- **Vis/skjul ved brekkpunkt** → `Show` / `Hide` (above/below, NB: display:none, ikke lazy-loading)
+- **Negativ margin/bleed** → `Bleed` (marginInline: "full"/"px", reflectivePadding)
 - **Mellomrom/skyv til høyre** → `Spacer`
 - **Header for interne apper** → `InternalHeader`
 

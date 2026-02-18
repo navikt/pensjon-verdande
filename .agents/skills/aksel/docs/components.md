@@ -1842,89 +1842,271 @@ Importeres fra `@navikt/ds-react`. Alle primitives støtter responsive props via
 
 ### Page
 
-Top-level sidelayout.
+Top-level sidelayout. Håndterer maksbredde, sentrering av sideblokker og footer-plassering.
+
+**Egnet til:** Sidelayout, sentrering av sideblokker.
+
+**Sub-komponenter:**
+- `Page.Block` — Innholdsblokk med predefinert maksbredde
+
+**Page props:**
+- `as` — `"div" | "body"` (default: `"div"`)
+- `footer` — `ReactNode` — footer-innhold, muliggjør bedre plassering
+- `footerPosition` — `"belowFold"` — plasserer footer under page-fold
+- `contentBlockPadding` — `"end" | "none"` (default: `"end"`) — 4rem padding mellom innhold og footer
+- `background` — **Deprecated i v8**, bruk `<Box asChild background="...">` rundt `<Page>` i stedet
+
+**Page.Block props:**
+- `width` — Predefinert maksbredde:
+
+| Verdi | Maksbredde | Beskrivelse |
+|-------|-----------|-------------|
+| `"2xl"` | 1440px | Standard for header og footer, opptil 3 kolonner |
+| `"xl"` | 1280px | Opptil 3 kolonner |
+| `"lg"` | 1024px | Opptil 2 kolonner |
+| `"md"` | 768px | 1 kolonne |
+| `"text"` | 576px + gutters | Anbefalt for løpende tekst |
+
+- `gutters` — `boolean` (default: `false`) — responsiv padding-inline (3rem over md, 1rem under md)
+- `as` — `React.ElementType` — styr semantikken (f.eks. `"header"`, `"main"`, `"footer"`, `"nav"`)
+
+**Tilgjengelighet:** `Page.Block` er `<div>` som standard — bruk `as`-prop for korrekt semantisk HTML.
 
 ```tsx
-<Page>
-  <Page.Block width="xl" gutters>
-    <main>Innhold</main>
+<Page
+  footer={<MyFooter />}
+  footerPosition="belowFold"
+  contentBlockPadding="end"
+>
+  <Page.Block as="header" width="2xl" gutters>
+    <Header />
   </Page.Block>
-  <Page.Block as="footer" width="xl" gutters>
-    <footer>Bunn</footer>
+  <Page.Block as="main" width="xl" gutters>
+    <Innhold />
   </Page.Block>
 </Page>
 ```
 
+**Retningslinjer:**
+- De fleste applikasjoner bør bruke `width="2xl"` (1440px) som standard maksbredde.
+- Interne verktøy kan droppe maksbredde for full skjermflate.
+- Bruk `width="text"` for sider med primært løpende tekst (576px + gutters).
+
 ### HStack
 
-Horisontal flexbox.
+Horisontal flexbox (`display: flex`, `flex-direction: row`).
+
+**Egnet til:** Gruppering av Tags, Cards, knapper, ikoner.
+**Uegnet til:** Oppbygging av større side-layout (bruk Page / HGrid).
+
+**Props (utover BasePrimitive):**
+- `gap` — `ResponsiveProp<AkselSpaceToken>` — avstand mellom elementer. Støtter to verdier: `"space-32 space-16"` (row-gap column-gap).
+- `justify` — `ResponsiveProp<"start" | "center" | "end" | "space-around" | "space-between" | "space-evenly">`
+- `align` — `ResponsiveProp<"start" | "center" | "end" | "baseline" | "stretch">` (default: `"stretch"`)
+- `wrap` — `boolean` — aktiverer `flex-wrap`
+- `asChild` — `boolean` — slår sammen med child-element
+- `as` — `React.ElementType` — overskriv HTML-tag
 
 ```tsx
-<HStack gap="space-16" align="center" justify="space-between">
+<HStack gap="space-16" align="center" justify="space-between" wrap>
+  <Tag variant="info">Status</Tag>
+  <Tag variant="success">OK</Tag>
+</HStack>
+
+{/* Responsiv gap og justify */}
+<HStack
+  gap={{ xs: 'space-8', md: 'space-16' }}
+  justify={{ xs: 'center', md: 'space-between' }}
+>
   <div>Venstre</div>
   <div>Høyre</div>
 </HStack>
+
+{/* Spacer — skyver elementer til høyre */}
+<HStack gap="space-16" align="center">
+  <Heading size="small">Tittel</Heading>
+  <Spacer />
+  <Button size="small">Handling</Button>
+</HStack>
 ```
+
+**Spacer:** `<Spacer />` (importeres fra `@navikt/ds-react`) legger inn automatisk stretch mellom elementer. Nyttig for å plassere knapper i `InternalHeader` eller skyve elementer til høyre i en `HStack`.
 
 ### VStack
 
-Vertikal flexbox.
+Vertikal flexbox (`display: flex`, `flex-direction: column`).
+
+**Egnet til:** Gruppering av skjema-elementer, stabling av innhold.
+**Uegnet til:** Oppbygging av større side-layout (bruk Page / HGrid).
+
+**Props:** Identiske med HStack (gap, justify, align, wrap, asChild, as) + BasePrimitive props.
 
 ```tsx
-<VStack gap="space-24">
+<VStack gap="space-24" align="start">
   <Heading level="1" size="large">Tittel</Heading>
   <BodyLong>Innhold</BodyLong>
+</VStack>
+
+{/* Skjema-layout */}
+<VStack gap="space-16">
+  <TextField label="Fornavn" />
+  <TextField label="Etternavn" />
+  <Button type="submit">Send</Button>
 </VStack>
 ```
 
 ### HGrid
 
-Horisontal grid.
+CSS Grid-layout (`display: grid`).
+
+**Egnet til:** Oppbygging av sidelayout, gruppering av Cards.
+
+**Props (utover BasePrimitive):**
+- `columns` — `ResponsiveProp<string | number>` — `grid-template-columns`. Støtter tall, strenger med `fr`/`minmax`, og responsive objects.
+- `gap` — `ResponsiveProp<AkselSpaceToken>` — avstand mellom celler. Støtter to verdier: `"space-32 space-16"` (row-gap column-gap).
+- `align` — `"start" | "center" | "end"` — vertikal justering (default: stretch)
 
 ```tsx
+{/* Enkel to-kolonne */}
 <HGrid columns="1fr 1fr" gap="space-16">
   <Box>Kolonne 1</Box>
   <Box>Kolonne 2</Box>
 </HGrid>
 
-{/* Responsiv */}
+{/* Responsivt antall kolonner */}
 <HGrid columns={{ xs: 1, md: 2, lg: 3 }} gap="space-16">
+  <Card>A</Card>
+  <Card>B</Card>
+  <Card>C</Card>
+</HGrid>
+
+{/* CSS grid-streng med minmax */}
+<HGrid columns="repeat(3, minmax(0, 1fr))" gap="space-16">
   ...
+</HGrid>
+
+{/* Responsiv med fr og auto */}
+<HGrid columns={{ sm: 1, md: 1, lg: "1fr auto", xl: "1fr auto" }} gap="space-16">
+  <main>Hovedinnhold</main>
+  <aside>Sidebar</aside>
 </HGrid>
 ```
 
 ### Box
 
-Byggestein med styling.
+Byggestein med visuell styling (padding, border, bakgrunn, skygge). Ofte brukt som wrapper for andre komponenter.
+
+**Egnet til:** Statiske containere med begrenset styling, wrapper for mer komplekse komponenter.
+
+**Props (utover BasePrimitive):**
+- `background` — bakgrunnsfarge-token (f.eks. `"bg-subtle"`, `"bg-default"`, `"neutral-soft"`)
+- `borderColor` — border-farge-token
+- `borderWidth` — `"0" | "1" | "2" | "3" | "4" | "5"` — shorthand som CSS (`"1 2 3 4"`)
+- `borderRadius` — `ResponsiveProp<AkselBorderRadiusToken | "0">` — shorthand som CSS (`"0 full 12 2"`)
+- `shadow` — `"dialog"` — skygge på boksen
+- `asChild` — `boolean` — slår sammen med child-element
+- `as` — `React.ElementType` — overskriv HTML-tag for semantikk
+
+**Tilgjengelighet:** Box er ikke en erstatning for semantisk HTML. Bruk `as`-prop aktivt:
 
 ```tsx
-<Box padding="space-16" background="bg-subtle" borderRadius="large" shadow="medium">
-  Innhold i boks
+<Box as="nav" padding="space-16" background="bg-subtle">
+  <SidebarMenu />
+</Box>
+
+<Box as="section" padding="space-24" background="bg-default" borderRadius="large" borderWidth="1" borderColor="border-subtle">
+  <Heading level="2" size="medium">Seksjon</Heading>
+  <BodyLong>Innhold</BodyLong>
+</Box>
+
+{/* Bruk asChild for å unngå ekstra div */}
+<Box asChild background="bg-subtle" padding="space-16">
+  <HStack gap="space-8">
+    <div>A</div>
+    <div>B</div>
+  </HStack>
 </Box>
 ```
 
 ### Show / Hide
 
-Vis/skjul responsivt.
+Vis/skjul elementer basert på brekkpunkt.
+
+**Egnet til:** Vise/skjule sidebar, menypunkter i header basert på skjermstørrelse.
+**Uegnet til:** Vise/skjule elementer basert på state (bruk vanlig conditional rendering).
+
+**Viktig:** Bruker `display: none` — children rendres fortsatt i DOM selv når de er skjult. Ikke en erstatning for lazy-loading.
+
+**Props:**
+- `above` — `"sm" | "md" | "lg" | "xl" | "2xl"` — vis/skjul over brekkpunkt (inklusiv)
+- `below` — `"sm" | "md" | "lg" | "xl" | "2xl"` — vis/skjul under brekkpunkt (inklusiv)
+- `as` — `"div" | "span"` (default: `"div"`)
+- `asChild` — `boolean` — slår sammen med child-element
 
 ```tsx
-<Show above="md">Vises bare over 768px</Show>
-<Hide below="md">Skjules under 768px</Hide>
+{/* Vis sidebar kun på desktop */}
+<Show above="md">
+  <Sidebar />
+</Show>
+
+{/* Skjul navigasjon på mobil */}
+<Hide below="md">
+  <DesktopNavigation />
+</Hide>
+
+{/* Med asChild for å unngå ekstra div */}
+<Show asChild above="lg">
+  <nav>Kun synlig over lg</nav>
+</Show>
 ```
 
 ### Bleed
 
-Negativ margin.
+Negativ margin som lar innhold «blø» ut av sin parent-padding.
+
+**Egnet til:** Ignorere padding fra parent-element, 1px optisk justering.
+**Uegnet til:** Oppbygging av større side-layout (bruk Page / HGrid), header og footer.
+
+**Props:**
+- `marginInline` — `ResponsiveProp<BleedSpacingInline>` — negativ horisontal margin. Støtter spacing tokens + spesialverdier:
+  - `"full"` — bruker `calc((100vw - 100%) / -2)` for å strekke til viewport-kant (kan kreve `overflow-x: hidden` på body)
+  - `"px"` — 1px negativ margin for optisk justering
+- `marginBlock` — `ResponsiveProp<AkselSpaceToken>` — negativ vertikal margin. Støtter spacing tokens + `"px"`, men **ikke** `"full"`.
+- `reflectivePadding` — `boolean` — erstatter negativ margin med tilsvarende padding. Nyttig når bakgrunn skal gå til kanten, men innholdet skal forbli på plass.
+- `asChild` — `boolean` — **anbefalt** — rendrer som nærmeste child-element
 
 ```tsx
-<Bleed marginInline="space-16">
-  Full-bredde element
+{/* Strekk bilde ut av parent-padding */}
+<Box padding="space-16">
+  <BodyLong>Tekst med padding</BodyLong>
+  <Bleed marginInline="space-16">
+    <img src="..." alt="Full bredde" style={{ width: '100%' }} />
+  </Bleed>
+</Box>
+
+{/* Full viewport-bredde */}
+<Bleed marginInline="full">
+  <Box background="bg-subtle" padding="space-24">
+    Går helt til kanten av viewporten
+  </Box>
+</Bleed>
+
+{/* Optisk 1px-justering */}
+<Bleed marginInline="px">
+  <ikon />
+</Bleed>
+
+{/* Reflective padding — bakgrunn til kant, innhold på plass */}
+<Bleed asChild marginInline="space-16" reflectivePadding>
+  <Box background="bg-subtle">
+    Innholdet er visuelt på samme plass
+  </Box>
 </Bleed>
 ```
 
 ### asChild
 
-Alle primitives (unntatt Page) støtter `asChild` for å slå sammen DOM-noder:
+Alle primitives (unntatt Page) støtter `asChild` for å slå sammen DOM-noder. Merger CSS-klasser, stiler og event handlers med child-elementet:
 
 ```tsx
 <Box asChild background="bg-subtle" padding="space-16">
@@ -1933,20 +2115,50 @@ Alle primitives (unntatt Page) støtter `asChild` for å slå sammen DOM-noder:
     <div>B</div>
   </HStack>
 </Box>
-{/* Rendrer: <div class="box hstack">...</div> */}
+{/* Rendrer: <div class="box hstack">...</div> (én DOM-node) */}
 ```
+
+**Anbefalt for Bleed** — unngår en ekstra wrapper-div.
 
 ### BasePrimitive props
 
-Felles props for HGrid, Box, HStack, VStack, Stack:
-- `padding / paddingInline / paddingBlock`
-- `margin / marginInline / marginBlock`
-- `width / minWidth / maxWidth`
-- `height / minHeight / maxHeight`
-- `position` — `static | relative | absolute | fixed | sticky`
-- `inset / top / right / bottom / left`
+Felles props for HGrid, Box, HStack, VStack (og Bleed for et subsett). Alle verdier støtter `ResponsiveProp` for responsive breakpoints.
 
-Alle avstandsverdier bruker spacing tokens (`space-16`, etc.) og støtter responsive objects.
+**Spacing:**
+- `padding / paddingInline / paddingBlock` — indre avstand (spacing tokens)
+- `margin / marginInline / marginBlock` — ytre avstand (spacing tokens, marginInline/marginBlock støtter også `"auto"`)
+
+**Dimensjoner:**
+- `width / minWidth / maxWidth` — `ResponsiveProp<string>`
+- `height / minHeight / maxHeight` — `ResponsiveProp<string>`
+
+**Posisjonering:**
+- `position` — `ResponsiveProp<"static" | "relative" | "absolute" | "fixed" | "sticky">`
+- `inset / top / right / bottom / left` — spacing tokens
+
+**Overflow:**
+- `overflow` — `ResponsiveProp<"hidden" | "auto" | "visible" | "clip" | "scroll">`
+- `overflowX` — `ResponsiveProp<"hidden" | "auto" | "visible" | "clip" | "scroll">`
+- `overflowY` — `ResponsiveProp<"hidden" | "auto" | "visible" | "clip" | "scroll">`
+
+**Flex/Grid:**
+- `flexBasis` — `ResponsiveProp<string>`
+- `flexShrink` — `ResponsiveProp<string>`
+- `flexGrow` — `ResponsiveProp<string>`
+- `gridColumn` — `ResponsiveProp<string>`
+
+Alle avstandsverdier bruker spacing tokens (`space-16`, etc.) og støtter responsive objects:
+
+```tsx
+<HStack
+  padding={{ xs: 'space-8', md: 'space-16' }}
+  marginBlock="space-24"
+  overflow="hidden"
+  flexGrow="1"
+>
+  ...
+</HStack>
+```
 
 ---
 
