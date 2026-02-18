@@ -47,11 +47,13 @@ For detaljert informasjon, se filene i `docs/`-mappen:
 - **Kort tekst/tall** → `TextField`
 - **Lang tekst** → `Textarea`
 - **Velg ett alternativ (få valg)** → `RadioGroup` + `Radio`
-- **Velg ett alternativ (mange valg)** → `Select` eller `Combobox`
+- **Velg ett alternativ (mange valg)** → `Select` eller `UNSAFE_Combobox` (Beta)
 - **Velg flere alternativer** → `CheckboxGroup` + `Checkbox`
 - **Dato** → `DatePicker`
+- **Måned** → `MonthPicker`
 - **Søkefelt** → `Search`
 - **Bekreftelse (on/off)** → `Switch`
+- **Filopplasting** → `FileUpload` (Dropzone, Trigger, Item)
 
 ### Feedback og meldinger
 - **Viktig systemmelding (hele siden)** → `GlobalAlert`
@@ -59,28 +61,37 @@ For detaljert informasjon, se filene i `docs/`-mappen:
 - **Liten inline-melding** → `InlineMessage`
 - **Info-kort** → `InfoCard`
 - **Feiloppsummering** → `ErrorSummary`
+- **Feilmeldingstekst** → `ErrorMessage`
 - **Hjelp** → `HelpText`
 - **Fremgang i skjema** → `FormProgress`
+- **Fremdriftsindikator** → `ProgressBar`
+- **Les mer/utfyllende info** → `ReadMore`
 
 ### Navigasjon og struktur
 - **Knapper** → `Button` (primary/secondary/tertiary)
 - **Lenker** → `Link`
+- **Lenke med rikt innhold** → `LinkCard`
 - **Faner** → `Tabs`
 - **Trekkspill** → `Accordion`
-- **Meny** → `ActionMenu`
-- **Steg** → `Stepper`
+- **Meny** → `ActionMenu` (erstatter Dropdown)
+- **Steg (brukernavigert)** → `Stepper`
+- **Prosess (systemdrevet)** → `Process`
 - **Paginering** → `Pagination`
 - **Tidslinje** → `Timeline`
+- **Filtrering** → `Chips` (Toggle/Removable)
 
 ### Visning av data
 - **Tabell** → `Table`
 - **Tags** → `Tag`
+- **Lister** → `List`
 - **Kort med mer info** → `ExpansionCard`
 - **Dialog/modal** → `Dialog`
 - **Tooltip** → `Tooltip`
+- **Popover** → `Popover`
 - **Kopiering** → `CopyButton`
 - **Lasting (spinner)** → `Loader` (med `title`-prop for tilgjengelighet)
 - **Lasting (plassholder)** → `Skeleton`
+- **Chat/dialog** → `Chat`
 
 ### Typografi
 - **Overskrifter** → `Heading` (med `level` og `size`)
@@ -97,6 +108,8 @@ For detaljert informasjon, se filene i `docs/`-mappen:
 - **Boks med styling** → `Box`
 - **Vis/skjul responsivt** → `Show` / `Hide`
 - **Negativ margin** → `Bleed`
+- **Mellomrom/skyv til høyre** → `Spacer`
+- **Header for interne apper** → `InternalHeader`
 
 ## Farger — data-color
 
