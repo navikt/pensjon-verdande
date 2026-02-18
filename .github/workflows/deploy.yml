@@ -127,7 +127,7 @@ jobs:
           team: teampensjon
 
       - name: 'Generate SBOM'
-        uses: aquasecurity/trivy-action@0.32.0
+        uses: aquasecurity/trivy-action@0.34.0
         with:
           scan-type: 'image'
           format: 'cyclonedx'
