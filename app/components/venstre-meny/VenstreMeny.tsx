@@ -59,6 +59,7 @@ const batcherMeny = [
     'Årlig omregning ved opptjeningsendring',
   ],
   ['REGULERING_LES', `/batch/regulering`, 'Regulering'],
+  ['REGELENDRING2026_VARSEL', `/varsel-regelendring2026`, 'Varsel regelendring Uføretrygd 2026'],
 ]
 
 const kontrollMeny = [
