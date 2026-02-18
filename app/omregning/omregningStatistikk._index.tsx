@@ -1,7 +1,7 @@
 import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { apiGet, apiGetRawStringOrUndefined, apiPost } from '~/services/api.server'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { OmregningBehandlingsnoekler, OmregningStatistikkPage } from '~/types'
 import type { Route } from './+types/omregningStatistikk._index'
 
@@ -29,28 +29,28 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
   const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
-  const csvContent = await apiGetRawStringOrUndefined(
-    `/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsNoekkel}`,
-    request,
-  )
 
   const omregningStatistikkInit = await apiGet<OmregningBehandlingsnoekler>(
     '/api/behandling/omregning/statistikk/behandlingsnoekler',
     request,
   )
 
-  // Create data URL for CSV download on the server
-  const csvDownloadUrl = csvContent ? `data:text/csv;charset=utf-8,${encodeURIComponent(csvContent)}` : undefined
+  // Build CSV download URL pointing to the resource route
+  const csvDownloadUrl =
+    behandlingsNoekkel !== 'not set'
+      ? `/omregningStatistikk/csv?behandlingsnoekkel=${encodeURIComponent(behandlingsNoekkel)}`
+      : undefined
 
   return {
-    omregningStatistikkInit: omregningStatistikkInit,
-    omregningStatistikkPage: omregningStatistikkPage,
+    omregningStatistikkInit,
+    omregningStatistikkPage,
+    behandlingsNoekkel,
     csvDownloadUrl,
   }
 }
 
 export default function OmregningStatistikk({ loaderData }: Route.ComponentProps) {
-  const { omregningStatistikkInit, omregningStatistikkPage, csvDownloadUrl } = loaderData
+  const { omregningStatistikkInit, omregningStatistikkPage, behandlingsNoekkel, csvDownloadUrl } = loaderData
 
   const optionBehandlingsNoekler: { value: string; label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })
@@ -58,7 +58,7 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
     optionBehandlingsNoekler.push({ value: value, label: value })
   })
 
-  const [behandlingsNoekler, setBehandlingsNoekler] = useState(optionBehandlingsNoekler[0].value)
+  const [selectedBehandlingsNoekkel, setSelectedBehandlingsNoekkel] = useState(optionBehandlingsNoekler[0].value)
   const [searchParams, setSearchParams] = useSearchParams()
 
   const omregningsaker = omregningStatistikkPage
@@ -66,12 +66,12 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
   const onPageChange = (page: number) => {
     searchParams.set('page', (page - 1).toString())
     searchParams.set('size', omregningsaker?.size ? omregningsaker.size.toString() : '10')
-    searchParams.set('behandlingsnoekler', behandlingsNoekler)
+    searchParams.set('behandlingsnoekler', selectedBehandlingsNoekkel)
     setSearchParams(searchParams)
   }
 
   function handleHentStatistikk() {
-    searchParams.set('behandlingsnoekler', behandlingsNoekler)
+    searchParams.set('behandlingsnoekler', selectedBehandlingsNoekkel)
     searchParams.set('page', '0') // Reset to first page
     setSearchParams(searchParams)
   }
@@ -84,8 +84,8 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
         <Select
           label={'Behandlingsnøkler'}
           name={'behandlingsnoekler'}
-          value={behandlingsNoekler}
-          onChange={(event) => setBehandlingsNoekler(event.target.value)}
+          value={selectedBehandlingsNoekkel}
+          onChange={(event) => setSelectedBehandlingsNoekkel(event.target.value)}
         >
           {optionBehandlingsNoekler.map((option) => (
             <option key={option.value} value={option.value}>
@@ -102,10 +102,11 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
         {csvDownloadUrl && (
           <Link
             style={{ padding: '1em', position: 'relative', right: 0, float: 'right' }}
-            download="omregningTabell.csv"
+            download={`omregningStatistikk-${behandlingsNoekkel}.csv`}
             href={csvDownloadUrl}
+            target="_blank"
           >
-            Last ned tabell
+            Last ned tabell (CSV)
           </Link>
         )}
       </Box>

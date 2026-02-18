@@ -17,10 +17,6 @@ function jsonResponse(body: unknown, status = 200) {
   })
 }
 
-function textResponse(text: string, status = 200) {
-  return new Response(text, { status })
-}
-
 const loaderArgs = (request: Request) =>
   ({
     request,
@@ -42,41 +38,33 @@ describe('omregningStatistikk._index', () => {
     vi.unstubAllGlobals()
   })
 
-  it('loader henter statistikk, csv og behandlingsnøkler', async () => {
+  it('loader henter statistikk og behandlingsnøkler', async () => {
     const mockStatistikk = { content: [{ id: 1 }], totalElements: 1 }
-    const mockCsv = 'id;status\n1;OK'
     const mockNoekler = { behandlingsnoekkel: ['KEY-1', 'KEY-2'] }
 
     // Fetch 1: hentOmregningStatistikk (POST)
     fetchSpy.mockResolvedValueOnce(jsonResponse(mockStatistikk))
-    // Fetch 2: hentOmregningStatistikkCsv (GET, text)
-    fetchSpy.mockResolvedValueOnce(textResponse(mockCsv))
-    // Fetch 3: hentOmregningbehandlingsnokler (GET)
+    // Fetch 2: hentOmregningbehandlingsnokler (GET)
     fetchSpy.mockResolvedValueOnce(jsonResponse(mockNoekler))
 
     const request = new Request('http://localhost/omregningStatistikk?behandlingsnoekler=KEY-1&page=0&size=10')
     const result = await loader(loaderArgs(request))
 
-    expect(fetchSpy).toHaveBeenCalledTimes(3)
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
 
     // hentOmregningStatistikk
     const [statUrl, statInit] = fetchSpy.mock.calls[0]
     expect(statUrl).toBe('http://pen-test/api/behandling/omregning/statistikk?behandlingsnoekkel=KEY-1&page=0&size=10')
     expect(statInit.method).toBe('POST')
     expect(statInit.signal).toBeInstanceOf(AbortSignal)
-    // hentOmregningStatistikkCsv
-    const [csvUrl, csvInit] = fetchSpy.mock.calls[1]
-    expect(csvUrl).toBe('http://pen-test/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=KEY-1')
-    expect(csvInit.method).toBe('GET')
-    expect(csvInit.signal).toBeInstanceOf(AbortSignal)
     // hentOmregningbehandlingsnokler
-    const [noeklerUrl, noeklerInit] = fetchSpy.mock.calls[2]
+    const [noeklerUrl, noeklerInit] = fetchSpy.mock.calls[1]
     expect(noeklerUrl).toBe('http://pen-test/api/behandling/omregning/statistikk/behandlingsnoekler')
     expect(noeklerInit.method).toBe('GET')
     expect(noeklerInit.signal).toBeInstanceOf(AbortSignal)
     expect(result.omregningStatistikkPage).toEqual(mockStatistikk)
-    expect(result.csvDownloadUrl).toBe(`data:text/csv;charset=utf-8,${encodeURIComponent(mockCsv)}`)
     expect(result.omregningStatistikkInit).toEqual(mockNoekler)
+    expect(result.behandlingsNoekkel).toBe('KEY-1')
   })
 
   it('loader kaster feil ved 500 fra statistikk-endepunkt', async () => {
@@ -84,22 +72,5 @@ describe('omregningStatistikk._index', () => {
 
     const request = new Request('http://localhost/omregningStatistikk?behandlingsnoekler=KEY-1&page=0&size=10')
     await expect(loader(loaderArgs(request))).rejects.toBeDefined()
-  })
-
-  it('loader håndterer 404 fra CSV-endepunktet', async () => {
-    const mockStatistikk = { content: [{ id: 1 }], totalElements: 1 }
-    const mockNoekler = { behandlingsnoekkel: ['KEY-1'] }
-
-    fetchSpy
-      .mockResolvedValueOnce(jsonResponse(mockStatistikk))
-      .mockResolvedValueOnce(new Response('Not found', { status: 404 }))
-      .mockResolvedValueOnce(jsonResponse(mockNoekler))
-
-    const request = new Request('http://localhost/omregningStatistikk?behandlingsnoekler=KEY-1&page=0&size=10')
-    const result = await loader(loaderArgs(request))
-
-    expect(fetchSpy).toHaveBeenCalledTimes(3)
-    expect(result.csvDownloadUrl).toBeUndefined()
-    expect(result.omregningStatistikkPage).toEqual(mockStatistikk)
   })
 })
