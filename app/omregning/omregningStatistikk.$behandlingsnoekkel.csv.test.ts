@@ -61,7 +61,8 @@ describe('omregningStatistikk.csv', () => {
     const request = new Request('http://localhost/omregningStatistikk/KEY-1.csv')
 
     await expect(loader(loaderArgs(request, 'KEY-1'))).rejects.toMatchObject({
-      status: 404,
+      data: { status: 404 },
+      init: { status: 404 },
     })
   })
 })
