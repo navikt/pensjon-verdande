@@ -4,21 +4,39 @@ Verdande er et grafisk brukergrensesnitt for å kunne overvåke, feilsøke og ut
 
 Mer informasjon om Verdande i [systemdokumentasjonen](https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Verdande.html) (intern).
 
+Dokumentasjon på behandlingsløsningen som Verdande er et drift- og utviklingsbrukergrensesnitt for, er tilgjengelig for Nav-ansatte på [pensjon-dokumentasjon](https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html).
+
 Verdande henter sitt navn fra norrøn mytologi og betyr "[det som er i ferd med å bli](https://no.wikipedia.org/wiki/Verdande)".
 
 ## Komme i gang
 
+Krever Node.js ≥ 24.11.0.
+
 ```sh
-$ brew install npm # eller noe annet enn brew om du ikke bruker Mac
-$ cd pensjon-verdande
-$ npm install
-$ ./fetch-secrets.sh
+npm install
+./fetch-secrets.sh   # Henter secrets fra Kubernetes (krever naisdevice)
 ```
 
-Start `PenApplication`. Deretter følgende for å kjøre lokalt:
+Start `PenApplication`. Deretter:
 
 ```sh
-$ npm run dev
+npm run dev
+```
+
+## Kvalitetssjekker
+
+```sh
+npm run check        # Biome lint + formattering
+npm run typecheck    # TypeScript-sjekk
+npm run test         # Enhetstester (Vitest)
+npm run test:stories # Storybook smoke-tester (Playwright)
+npm run build        # Produksjonsbygg
+```
+
+## Storybook
+
+```sh
+npm run storybook    # Start Storybook på http://localhost:6006
 ```
 
 ---

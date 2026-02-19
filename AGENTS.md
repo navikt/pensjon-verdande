@@ -6,7 +6,7 @@ Denne filen beskriver hvordan en automatisert kodeagent (og mennesker) bør jobb
 - App: React Router 7 (Framework Mode / data routers) + TypeScript
 - UI: Nav Designsystem (Aksel, Darkside) `@navikt/ds-react` / `@navikt/ds-css`
 - Server: Node/Express (`server.ts`), React Router server build
-- Tester: `vitest`
+- Tester: `vitest`, Storybook-tester via `@storybook/addon-vitest`
 
 ## Viktige mapper
 - `app/` – React Router routes, komponenter, services og felleskode
@@ -33,7 +33,9 @@ Kjør alltid disse før du leverer større endringer:
 
 ```zsh
 npm run typecheck
+npm run check
 npm run test
+npm run test:stories
 npm run build
 ```
 
@@ -223,8 +225,21 @@ export async function hentData(request: Request) {
 - Ikke logg tokens/hemmeligheter.
 - Ikke legg sensitive data i URL eller klient-side storage.
 
+## Storybook-testing
+Alle Storybook-historier kjøres automatisk som smoke-tester via `@storybook/addon-vitest` i headless Chromium (Playwright).
+
+```zsh
+npm run test:stories
+```
+
+- Historier som krasjer med "Unexpected Application Error" feiler testen automatisk
+- Historier som med vilje tester feil-states merkes med `tags: ['error-expected']`
+- Nye historier bør alltid ha komplett loader-data for å unngå rendering-feil
+
 ## Definition of Done (DoD)
-- Typecheck er grønn
-- Tester er grønne (der det finnes)
+- `npm run check` (Biome) er grønn
+- `npm run typecheck` er grønn
+- `npm run test` er grønn
+- `npm run test:stories` er grønn
 - `npm run build` er grønn
 - Endringen er dokumentert kort i PR-beskrivelse (hva/hvorfor) og evt. i README/kommentar ved behov

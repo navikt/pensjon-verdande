@@ -7,7 +7,7 @@ Verdande is a web application for monitoring, debugging, and developing treatmen
 - **Frontend**: React Router 7 (data routers), React 19, TypeScript
 - **UI**: Nav Designsystem (`@navikt/ds-react`, `@navikt/ds-css` Darkside)
 - **Backend**: Node.js/Express, React Router SSR
-- **Testing**: Vitest
+- **Testing**: Vitest, Storybook testing via `@storybook/addon-vitest`
 - **Linting/Formatting**: Biome
 - **Build**: Vite, React Router build system
 - **Deployment**: NAIS (NAV's Kubernetes platform), Docker
@@ -64,11 +64,11 @@ Production build creates:
 
 ### Testing
 ```bash
-npm test  # Run Vitest tests
+npm test          # Run Vitest unit tests
+npm run test:stories  # Run Storybook smoke tests in headless Chromium
 ```
-Only 2 test files exist currently:
-- `app/common/decodeBehandling.test.ts`
-- `app/alde-oppfolging/StatusfordelingOverTidBarChart/utils.test.ts`
+
+Unit tests are located throughout `app/**/*.test.{ts,tsx}`. Storybook story tests are auto-discovered from `app/**/*.stories.tsx` and run via `@storybook/addon-vitest` with Playwright. Stories that crash with an error boundary are automatically detected and fail the test. Stories that intentionally test error states should use `tags: ['error-expected']`.
 
 ### Linting and Formatting (Biome)
 Biome is configured in `biome.json` and handles both linting and formatting:
@@ -96,15 +96,23 @@ Lefthook (`lefthook.yml`) runs on pre-commit:
 If hooks fail locally, run the same commands manually.
 
 ### CI/CD Pipeline
-GitHub Actions workflow (`.github/workflows/deploy.yml`):
-1. **Build job**: `npm ci && npm run typecheck && npm run build && npm prune --omit=dev`
-2. Docker build and push to NAIS registry
-3. Deploy to dev (q0, q1, q2, q5) and prod environments
+GitHub Actions workflows:
+- **CI** (`.github/workflows/ci.yml`): Runs on PRs and pushes to main
+  - `unit` job: `npm ci && npm test`
+  - `storybook` job: `npm ci && npx playwright install --with-deps chromium && npm run test:stories`
+  - `biome` job: Lint/format check
+- **Deploy** (`.github/workflows/deploy.yml`): Build, Docker, deploy to NAIS
+  1. **Build job**: `npm ci && npm run typecheck && npm run build && npm prune --omit=dev`
+  2. Docker build and push to NAIS registry
+  3. Deploy to dev (q0, q1, q2, q5) and prod environments
 
 **To replicate CI locally**:
 ```bash
 npm ci
+npm run check
 npm run typecheck
+npm run test
+npm run test:stories
 npm run build
 ```
 
@@ -140,6 +148,7 @@ npm run build
 ├── .nais/                     # NAIS deployment configs
 ├── biome.json                 # Biome config
 ├── tsconfig.json              # TypeScript config
+├── vitest.config.ts             # Vitest config (unit + storybook projects)
 ├── vite.config.ts             # Vite config
 ├── react-router.config.ts     # React Router config
 └── lefthook.yml               # Git hooks config
@@ -295,7 +304,8 @@ Dynamic imports can trigger Vite warnings about modules being both dynamically a
 3. Node version mismatch: Verify `node --version` >= 24.11.0
 
 ### Test Failures
-- Only 2 test files exist; most features lack tests
+- Unit tests: `app/**/*.test.{ts,tsx}`
+- Story tests: `app/**/*.stories.tsx` (smoke-tested via `npm run test:stories`)
 - If adding features, tests are not strictly required but recommended
 
 ### Environment Issues
@@ -304,11 +314,12 @@ Dynamic imports can trigger Vite warnings about modules being both dynamically a
 
 ## Definition of Done
 Before submitting changes:
-1. `npm run typecheck` passes
-2. `npm run check` (Biome) passes
-3. `npm run test` passes (if tests exist)
-4. `npm run build` succeeds
-5. Changes documented in PR description
+1. `npm run check` (Biome) passes
+2. `npm run typecheck` passes
+3. `npm run test` passes
+4. `npm run test:stories` passes
+5. `npm run build` succeeds
+6. Changes documented in PR description
 
 ## Additional Notes
 - **AGENTS.md** contains team-specific Norwegian instructions (complementary to this file)
