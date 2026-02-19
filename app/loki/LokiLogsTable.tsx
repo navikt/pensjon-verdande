@@ -127,6 +127,9 @@ function MessageTable({
 
   return (
     <Table size="small">
+      <BodyShort as="caption" visuallyHidden>
+        Loggdetaljer
+      </BodyShort>
       <Table.Body>
         {entries.map(([key, value]) => {
           const selected = isSelected(key)
@@ -493,6 +496,9 @@ export default function LokiLogsTable({
       </HStack>
       <HStack as="div" className={styles.tableScroller} wrap={false} align="stretch">
         <Table className={styles.table} size="small" sort={sort ?? undefined} onSortChange={onSortChange}>
+          <BodyShort as="caption" visuallyHidden>
+            Loggoppføringer
+          </BodyShort>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell aria-label="Detaljer" />

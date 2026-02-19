@@ -66,6 +66,9 @@ export default function LaasOppSakSakIdPage({ loaderData }: Route.ComponentProps
                 <Heading size="medium">Vedtak til behandling</Heading>
                 <HStack>
                   <Table size="small" zebraStripes>
+                    <BodyShort as="caption" visuallyHidden>
+                      Vedtak til behandling
+                    </BodyShort>
                     <Table.Header>
                       <Table.Row>
                         <Table.ColumnHeader>Vedtak ID</Table.ColumnHeader>
@@ -128,6 +131,9 @@ export default function LaasOppSakSakIdPage({ loaderData }: Route.ComponentProps
                 <Heading size="medium">Automatiske krav uten vedtak</Heading>
                 <HStack>
                   <Table size="small" zebraStripes>
+                    <BodyShort as="caption" visuallyHidden>
+                      Automatiske krav uten vedtak
+                    </BodyShort>
                     <Table.Header>
                       <Table.Row>
                         <Table.ColumnHeader>Krav ID</Table.ColumnHeader>
@@ -468,6 +474,9 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Ved
 
           {vedtakIOppdrag !== undefined && (
             <Table size="small" zebraStripes>
+              <BodyShort as="caption" visuallyHidden>
+                Ytelsekomponenter
+              </BodyShort>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeader>Ytelse type</Table.ColumnHeader>

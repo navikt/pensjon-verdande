@@ -1,4 +1,5 @@
 import {
+  BodyShort,
   Box,
   Button,
   DatePicker,
@@ -159,6 +160,9 @@ export function KildeOppsummeringVisning({
         </HStack>
 
         <Table size="small">
+          <BodyShort as="caption" visuallyHidden>
+            Kildeoppsummering
+          </BodyShort>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell style={{ whiteSpace: 'nowrap' }}>Innsender</Table.HeaderCell>

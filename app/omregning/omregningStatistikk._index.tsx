@@ -1,4 +1,4 @@
-import { Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
+import { BodyShort, Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { apiGet, apiPost } from '~/services/api.server'
@@ -112,6 +112,9 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
       </Box>
       <Box>
         <Table size="small" zebraStripes>
+          <BodyShort as="caption" visuallyHidden>
+            Omregningsstatistikk
+          </BodyShort>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell scope="col">Behandlingsnøkkel</Table.HeaderCell>

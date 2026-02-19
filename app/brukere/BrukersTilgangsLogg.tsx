@@ -1,4 +1,4 @@
-import { Table } from '@navikt/ds-react'
+import { BodyShort, Table } from '@navikt/ds-react'
 import { type BrukerResponse, decodeOperasjon, type Tilgangsmeta } from '~/brukere/brukere'
 import { formatIsoTimestamp } from '~/common/date'
 
@@ -10,6 +10,9 @@ export interface Props {
 export const BrukersTilgangsLogg = (props: Props) => {
   return (
     <Table>
+      <BodyShort as="caption" visuallyHidden>
+        Tilgangslogg
+      </BodyShort>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Operasjon</Table.HeaderCell>
