@@ -2,9 +2,9 @@ import { ArrowCirclepathReverseIcon, FilterIcon } from '@navikt/aksel-icons'
 import {
   Button,
   DatePicker,
+  Dialog,
   Heading,
   HStack,
-  Modal,
   Page,
   Pagination,
   Select,
@@ -14,7 +14,7 @@ import {
   useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
-import { useMemo, useRef } from 'react'
+import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import type { BehandlingAuditDTO, BehandlingAuditGroupedDTO, PageDTO } from '~/audit/audit.types'
 import { apiGet } from '~/services/api.server'
@@ -64,7 +64,7 @@ function isGroupedPage(
 export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
   const { page, view: initialView } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
-  const filterModalRef = useRef<HTMLDialogElement>(null)
+  const [filterOpen, setFilterOpen] = useState(false)
 
   const view = (searchParams.get('view') ?? initialView ?? 'raw') as 'raw' | 'grouped'
 
@@ -88,7 +88,7 @@ export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
   const clearAll = () => {
     const base = new URLSearchParams()
     setSearchParams(base)
-    filterModalRef.current?.close()
+    setFilterOpen(false)
   }
 
   const sortState = useMemo<SortState>(() => {
@@ -151,7 +151,7 @@ export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
             icon={<FilterIcon aria-hidden />}
             size="small"
             variant="secondary"
-            onClick={() => filterModalRef.current?.showModal()}
+            onClick={() => setFilterOpen(true)}
             title="Vis søkefiltre"
           >
             Søkefilter
@@ -172,61 +172,68 @@ export default function AuditIndexPage({ loaderData }: Route.ComponentProps) {
       <div className={styles.pageTopMargin}>
         <Pagination page={page.number + 1} onPageChange={(p) => goToPage(p - 1)} count={page.totalPages} />
       </div>
-      <Modal ref={filterModalRef} onClose={() => filterModalRef.current?.close()} header={{ heading: 'Filtrer audit' }}>
-        <Modal.Body>
-          <VStack gap="space-24">
-            <HStack gap="space-16" wrap>
-              <TextField
-                label="BehandlingId"
-                inputMode="numeric"
-                value={searchParams.get('behandlingId') ?? ''}
-                onChange={(e) => updateSearchParams('behandlingId', e.target.value)}
-              />
-              <TextField
-                label="Navident"
-                value={searchParams.get('navident') ?? ''}
-                onChange={(e) => updateSearchParams('navident', e.target.value)}
-              />
-              <Select
-                label="Handlingtype"
-                value={searchParams.get('handlingType') ?? ''}
-                onChange={(e) => updateSearchParams('handlingType', e.target.value)}
-              >
-                <option value="">Alle</option>
-                <option value="LES">Les</option>
-                <option value="SKRIV">Skriv</option>
-              </Select>
-              <TextField
-                label="Fritekst (begrunnelse/issue)"
-                value={searchParams.get('q') ?? ''}
-                onChange={(e) => updateSearchParams('q', e.target.value)}
-              />
-            </HStack>
-
-            <fieldset className={styles.filterFieldset}>
-              <legend className={styles.filterLegend}>Tidsrom</legend>
-              <HStack gap="space-24" align="start" wrap>
-                <DatePicker {...datepickerProps}>
-                  <HStack wrap gap="space-16" justify="center">
-                    <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
-                    <DatePicker.Input size="small" {...toInputProps} label="Til" />
-                  </HStack>
-                </DatePicker>
+      <Dialog open={filterOpen} onOpenChange={(open) => setFilterOpen(open)}>
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>Filtrer audit</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            <VStack gap="space-24">
+              <HStack gap="space-16" wrap>
+                <TextField
+                  label="BehandlingId"
+                  inputMode="numeric"
+                  value={searchParams.get('behandlingId') ?? ''}
+                  onChange={(e) => updateSearchParams('behandlingId', e.target.value)}
+                />
+                <TextField
+                  label="Navident"
+                  value={searchParams.get('navident') ?? ''}
+                  onChange={(e) => updateSearchParams('navident', e.target.value)}
+                />
+                <Select
+                  label="Handlingtype"
+                  value={searchParams.get('handlingType') ?? ''}
+                  onChange={(e) => updateSearchParams('handlingType', e.target.value)}
+                >
+                  <option value="">Alle</option>
+                  <option value="LES">Les</option>
+                  <option value="SKRIV">Skriv</option>
+                </Select>
+                <TextField
+                  label="Fritekst (begrunnelse/issue)"
+                  value={searchParams.get('q') ?? ''}
+                  onChange={(e) => updateSearchParams('q', e.target.value)}
+                />
               </HStack>
-            </fieldset>
-          </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <HStack gap="space-8">
-            <Button type="button" variant="secondary" onClick={clearAll}>
-              Nullstill
-            </Button>
-            <Button type="button" variant="primary" onClick={() => filterModalRef.current?.close()}>
-              Lukk
-            </Button>
-          </HStack>
-        </Modal.Footer>
-      </Modal>
+
+              <fieldset className={styles.filterFieldset}>
+                <legend className={styles.filterLegend}>Tidsrom</legend>
+                <HStack gap="space-24" align="start" wrap>
+                  <DatePicker {...datepickerProps}>
+                    <HStack wrap gap="space-16" justify="center">
+                      <DatePicker.Input size="small" {...fromInputProps} label="Fra" />
+                      <DatePicker.Input size="small" {...toInputProps} label="Til" />
+                    </HStack>
+                  </DatePicker>
+                </HStack>
+              </fieldset>
+            </VStack>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <HStack gap="space-8">
+              <Button type="button" variant="secondary" onClick={clearAll}>
+                Nullstill
+              </Button>
+              <Dialog.CloseTrigger>
+                <Button type="button" variant="primary">
+                  Lukk
+                </Button>
+              </Dialog.CloseTrigger>
+            </HStack>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </Page.Block>
   )
 }

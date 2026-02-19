@@ -7,13 +7,13 @@ import {
   Chips,
   CopyButton,
   Detail,
+  Dialog,
   ErrorMessage,
   Heading,
   HStack,
   Link,
   List,
   Loader,
-  Modal,
   Page,
   Pagination,
   ReadMore,
@@ -24,7 +24,7 @@ import {
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
 import type React from 'react'
-import { useMemo, useRef } from 'react'
+import { useMemo, useState } from 'react'
 import { NavLink, useNavigation, useSearchParams } from 'react-router'
 import {
   type KildeOppsummering,
@@ -163,7 +163,7 @@ export default function Alderspensjonssoknader({ loaderData }: Route.ComponentPr
   const navigation = useNavigation()
   const { field: sortField, dir: sortDir } = parseSortParam(searchParams)
   const summary = useMemo(() => activeFilterSummary(searchParams), [searchParams])
-  const ref = useRef<HTMLDialogElement>(null)
+  const [open, setOpen] = useState(false)
 
   const totalPages = page.totalPages
 
@@ -261,12 +261,7 @@ export default function Alderspensjonssoknader({ loaderData }: Route.ComponentPr
             <div></div>
           )}
 
-          <Button
-            icon={<FilterIcon aria-hidden />}
-            size="small"
-            variant="secondary"
-            onClick={() => ref.current?.showModal()}
-          >
+          <Button icon={<FilterIcon aria-hidden />} size="small" variant="secondary" onClick={() => setOpen(true)}>
             Søkefilter
           </Button>
         </HStack>
@@ -295,36 +290,41 @@ export default function Alderspensjonssoknader({ loaderData }: Route.ComponentPr
           <Pagination page={(pageIndex ?? 0) + 1} count={totalPages} onPageChange={onChangePage} prevNextTexts />
         </HStack>
       </VStack>
-      <Modal ref={ref} header={{ heading: 'Søkefilter' }}>
-        <Modal.Body>
-          {' '}
-          <VStack gap="space-24">
-            <FilterBar
-              ferdig={clampFerdig(searchParams.get('ferdig') ?? 'alle')}
-              status={(searchParams.get('status')?.split(',').filter(Boolean) as BehandlingStatus[]) ?? []}
-              onToggleFerdig={(val) => {
-                onToggleFerdig(val) /* setFiltersOpen(false) om ønskelig */
-              }}
-              onToggleStatus={(s, checked) => {
-                onToggleStatus(s, checked) /* setFiltersOpen(false) */
-              }}
-              pageSize={pageSize}
-              onChangeSize={(sz) => {
-                onChangeSize(sz) /* setFiltersOpen(false) */
-              }}
-              totalElements={page.totalElements}
-              sortField={sortField}
-              sortDir={sortDir}
-              onChangeSortField={(f) => {
-                onChangeSortField(f) /* setFiltersOpen(false) */
-              }}
-              onChangeSortDir={(d) => {
-                onChangeSortDir(d) /* setFiltersOpen(false) */
-              }}
-            />
-          </VStack>
-        </Modal.Body>
-      </Modal>
+      <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>Søkefilter</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            {' '}
+            <VStack gap="space-24">
+              <FilterBar
+                ferdig={clampFerdig(searchParams.get('ferdig') ?? 'alle')}
+                status={(searchParams.get('status')?.split(',').filter(Boolean) as BehandlingStatus[]) ?? []}
+                onToggleFerdig={(val) => {
+                  onToggleFerdig(val) /* setFiltersOpen(false) om ønskelig */
+                }}
+                onToggleStatus={(s, checked) => {
+                  onToggleStatus(s, checked) /* setFiltersOpen(false) */
+                }}
+                pageSize={pageSize}
+                onChangeSize={(sz) => {
+                  onChangeSize(sz) /* setFiltersOpen(false) */
+                }}
+                totalElements={page.totalElements}
+                sortField={sortField}
+                sortDir={sortDir}
+                onChangeSortField={(f) => {
+                  onChangeSortField(f) /* setFiltersOpen(false) */
+                }}
+                onChangeSortDir={(d) => {
+                  onChangeSortDir(d) /* setFiltersOpen(false) */
+                }}
+              />
+            </VStack>
+          </Dialog.Body>
+        </Dialog.Popup>
+      </Dialog>
     </Page.Block>
   )
 }

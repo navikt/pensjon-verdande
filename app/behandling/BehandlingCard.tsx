@@ -20,12 +20,12 @@ import {
   CopyButton,
   DatePicker,
   Detail,
+  Dialog,
   Heading,
   HGrid,
   HStack,
   Link,
   Loader,
-  Modal,
   Page,
   ProgressBar,
   Select,
@@ -87,60 +87,60 @@ function StoppButton({ behandling }: { behandling: BehandlingDto }) {
           Stopp behandling
         </Button>
       </Tooltip>
-      <Modal
+      <Dialog
         open={open}
-        onClose={() => {
-          setOpen(false)
-          setBegrunnelse('')
-          fetcher.reset()
+        onOpenChange={(open) => {
+          setOpen(open)
+          if (!open) {
+            setBegrunnelse('')
+            fetcher.reset()
+          }
         }}
-        header={{ heading: 'Stopp behandling' }}
       >
-        <Modal.Body>
-          <VStack gap={'space-16'}>
-            <BodyLong>
-              Bekreft at du ønsker å stoppe <i>{decodeBehandling(behandling)}</i> behandlingen med status{' '}
-              <i>{decodeBehandlingStatus(behandling.status)}</i>. <b>Denne handlingen kan ikke angres.</b>
-            </BodyLong>
-            <BodyLong>
-              Saken, kravet, vedtaket eller liknende, som behandlinger er knyttet til må mest sannsynlig rapporteres til
-              linja. Stopping av en behandling skal kun gjøres om feil ikke kan løses på annen måte.
-            </BodyLong>
-            <BodyLong>
-              Du må gi en begrunnelse for hvorfor du stopper behandlingen. I tillegg må noen andre bekrefte at
-              behandlingen er blitt tilstrekkelig fulgt opp. Legg gjerne ved en lenke til Slacktråd, Jira eller
-              liknende.
-            </BodyLong>
-            <Textarea
-              label="Begrunnelse"
-              value={begrunnelse}
-              onChange={(e) => setBegrunnelse(e.target.value)}
-              error={fetcher.data?.errors?.begrunnelse}
-            />
-          </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            type="button"
-            variant="danger"
-            disabled={fetcher.state !== 'idle'}
-            onClick={() => fetcher.submit({ operation: OPERATION.stopp, begrunnelse }, { method: 'POST' })}
-          >
-            Stopp behandling
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              setOpen(false)
-              setBegrunnelse('')
-              fetcher.reset()
-            }}
-          >
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>Stopp behandling</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            <VStack gap={'space-16'}>
+              <BodyLong>
+                Bekreft at du ønsker å stoppe <i>{decodeBehandling(behandling)}</i> behandlingen med status{' '}
+                <i>{decodeBehandlingStatus(behandling.status)}</i>. <b>Denne handlingen kan ikke angres.</b>
+              </BodyLong>
+              <BodyLong>
+                Saken, kravet, vedtaket eller liknende, som behandlinger er knyttet til må mest sannsynlig rapporteres
+                til linja. Stopping av en behandling skal kun gjøres om feil ikke kan løses på annen måte.
+              </BodyLong>
+              <BodyLong>
+                Du må gi en begrunnelse for hvorfor du stopper behandlingen. I tillegg må noen andre bekrefte at
+                behandlingen er blitt tilstrekkelig fulgt opp. Legg gjerne ved en lenke til Slacktråd, Jira eller
+                liknende.
+              </BodyLong>
+              <Textarea
+                label="Begrunnelse"
+                value={begrunnelse}
+                onChange={(e) => setBegrunnelse(e.target.value)}
+                error={fetcher.data?.errors?.begrunnelse}
+              />
+            </VStack>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Button
+              type="button"
+              variant="danger"
+              disabled={fetcher.state !== 'idle'}
+              onClick={() => fetcher.submit({ operation: OPERATION.stopp, begrunnelse }, { method: 'POST' })}
+            >
+              Stopp behandling
+            </Button>
+            <Dialog.CloseTrigger>
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            </Dialog.CloseTrigger>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </>
   )
 }
@@ -166,27 +166,34 @@ function BekreftStoppBehandlingButton() {
         </Button>
       </Tooltip>
 
-      <Modal open={open} header={{ heading: 'Bekreft oppfølging' }} onClose={() => setOpen(false)}>
-        <Modal.Body>
-          <BodyLong>
-            Bekreft at nødvendig oppfølging er gjort. Denne handlingen kan ikke angres, og vil fjerne behovet for videre
-            bekreftelse av stopp.
-          </BodyLong>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => fetcher.submit({ operation: OPERATION.bekreftStoppBehandling }, { method: 'POST' })}
-            disabled={fetcher.state !== 'idle'}
-          >
-            Bekreft
-          </Button>
-          <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>Bekreft oppfølging</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            <BodyLong>
+              Bekreft at nødvendig oppfølging er gjort. Denne handlingen kan ikke angres, og vil fjerne behovet for
+              videre bekreftelse av stopp.
+            </BodyLong>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => fetcher.submit({ operation: OPERATION.bekreftStoppBehandling }, { method: 'POST' })}
+              disabled={fetcher.state !== 'idle'}
+            >
+              Bekreft
+            </Button>
+            <Dialog.CloseTrigger>
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            </Dialog.CloseTrigger>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </>
   )
 }
@@ -196,8 +203,8 @@ export default function BehandlingCard(props: Props) {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const fortsettModal = useRef<HTMLDialogElement>(null)
-  const sendTilOppdragPaNyttModal = useRef<HTMLDialogElement>(null)
+  const [fortsettModalOpen, setFortsettModalOpen] = useState(false)
+  const [sendTilOppdragPaNyttModalOpen, setSendTilOppdragPaNyttModalOpen] = useState(false)
 
   function beregnFremdriftProsent(ferdig: number, totalt: number): string {
     if (ferdig === totalt) {
@@ -246,7 +253,7 @@ export default function BehandlingCard(props: Props) {
       },
     )
 
-    sendTilOppdragPaNyttModal.current?.close()
+    setSendTilOppdragPaNyttModalOpen(false)
   }
 
   function hasLink(rel: string) {
@@ -295,29 +302,36 @@ export default function BehandlingCard(props: Props) {
             <Button
               variant="secondary"
               icon={<BankNoteIcon aria-hidden />}
-              onClick={() => sendTilOppdragPaNyttModal.current?.showModal()}
+              onClick={() => setSendTilOppdragPaNyttModalOpen(true)}
             >
               Send melding til oppdrag på nytt
             </Button>
           </Tooltip>
-          <Modal ref={sendTilOppdragPaNyttModal} header={{ heading: 'Send melding til oppdrag på nytt' }}>
-            <Modal.Body>
-              <BodyLong>
-                Ønsker du virkerlig å sende melding til oppdrag på nytt? Dette skal kun gjøres når man har bekreftet med
-                #utbetaling at meldingen fra Pen til Oppdragssystemet er borte
-              </BodyLong>
-            </Modal.Body>
-            <Modal.Footer>
-              <fetcher.Form method="post">
-                <Button data-color="danger" type="button" variant="primary" onClick={sendTilOppdragPaNytt}>
-                  Send til oppdrag på nytt
-                </Button>
-              </fetcher.Form>
-              <Button type="button" variant="secondary" onClick={() => sendTilOppdragPaNyttModal.current?.close()}>
-                Avbryt
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <Dialog open={sendTilOppdragPaNyttModalOpen} onOpenChange={(open) => setSendTilOppdragPaNyttModalOpen(open)}>
+            <Dialog.Popup>
+              <Dialog.Header>
+                <Dialog.Title>Send melding til oppdrag på nytt</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                <BodyLong>
+                  Ønsker du virkerlig å sende melding til oppdrag på nytt? Dette skal kun gjøres når man har bekreftet
+                  med #utbetaling at meldingen fra Pen til Oppdragssystemet er borte
+                </BodyLong>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <fetcher.Form method="post">
+                  <Button data-color="danger" type="button" variant="primary" onClick={sendTilOppdragPaNytt}>
+                    Send til oppdrag på nytt
+                  </Button>
+                </fetcher.Form>
+                <Dialog.CloseTrigger>
+                  <Button type="button" variant="secondary">
+                    Avbryt
+                  </Button>
+                </Dialog.CloseTrigger>
+              </Dialog.Footer>
+            </Dialog.Popup>
+          </Dialog>
         </>
       )
     }
@@ -333,32 +347,39 @@ export default function BehandlingCard(props: Props) {
                 <Button
                   variant={'secondary'}
                   icon={<PlayIcon aria-hidden />}
-                  onClick={() => fortsettModal.current?.showModal()}
+                  onClick={() => setFortsettModalOpen(true)}
                 >
                   Fortsett
                 </Button>
               </Tooltip>
-              <Modal ref={fortsettModal} header={{ heading: 'Fortsett behandling' }}>
-                <Modal.Body>
-                  <BodyLong>
-                    Dette er en behandling planlagt kjørt <strong>{formatIsoTimestamp(planlagtStartet)}</strong>. Vil du
-                    kjøre den nå med en gang? Denne handlingen kan ikke angres.
-                  </BodyLong>
-                </Modal.Body>
-                <Modal.Footer>
-                  <fetcher.Form method="post">
-                    <input hidden readOnly name="operation" value={OPERATION.fortsett} />
+              <Dialog open={fortsettModalOpen} onOpenChange={(open) => setFortsettModalOpen(open)}>
+                <Dialog.Popup>
+                  <Dialog.Header>
+                    <Dialog.Title>Fortsett behandling</Dialog.Title>
+                  </Dialog.Header>
+                  <Dialog.Body>
+                    <BodyLong>
+                      Dette er en behandling planlagt kjørt <strong>{formatIsoTimestamp(planlagtStartet)}</strong>. Vil
+                      du kjøre den nå med en gang? Denne handlingen kan ikke angres.
+                    </BodyLong>
+                  </Dialog.Body>
+                  <Dialog.Footer>
+                    <fetcher.Form method="post">
+                      <input hidden readOnly name="operation" value={OPERATION.fortsett} />
 
-                    <input type="hidden" name="nullstillPlanlagtStartet" value="true" />
-                    <Button variant={'primary'} icon={<PlayIcon aria-hidden />} name={'fortsett'}>
-                      Kjør planlagt startet behandling nå
-                    </Button>
-                  </fetcher.Form>
-                  <Button type="button" variant="secondary" onClick={() => fortsettModal.current?.close()}>
-                    Avbryt
-                  </Button>
-                </Modal.Footer>
-              </Modal>
+                      <input type="hidden" name="nullstillPlanlagtStartet" value="true" />
+                      <Button variant={'primary'} icon={<PlayIcon aria-hidden />} name={'fortsett'}>
+                        Kjør planlagt startet behandling nå
+                      </Button>
+                    </fetcher.Form>
+                    <Dialog.CloseTrigger>
+                      <Button type="button" variant="secondary">
+                        Avbryt
+                      </Button>
+                    </Dialog.CloseTrigger>
+                  </Dialog.Footer>
+                </Dialog.Popup>
+              </Dialog>
             </>
           ) : (
             <Tooltip content="Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart">
@@ -855,84 +876,82 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
           Endre planlagt startet
         </Button>
       </Tooltip>
-      <Modal
+      <Dialog
         open={open}
-        header={{ heading: 'Endre planlagt startet' }}
-        onClose={() => {
-          setOpen(false)
-          setDato(initialDate)
-          setTid(initialTime)
-          setInputValue(formatDDMMYYYY(initialDate))
-          setInputError(undefined)
+        onOpenChange={(open) => {
+          setOpen(open)
+          if (!open) {
+            setDato(initialDate)
+            setTid(initialTime)
+            setInputValue(formatDDMMYYYY(initialDate))
+            setInputError(undefined)
+          }
         }}
       >
-        <Modal.Body>
-          <div style={{ display: 'grid', gap: '1rem' }}>
-            <DatePicker
-              mode="single"
-              selected={dato}
-              defaultSelected={initialDate}
-              defaultMonth={dato ?? initialDate}
-              onSelect={handleSelect}
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>Endre planlagt startet</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              <DatePicker
+                mode="single"
+                selected={dato}
+                defaultSelected={initialDate}
+                defaultMonth={dato ?? initialDate}
+                onSelect={handleSelect}
+              >
+                <DatePicker.Input
+                  label="Ny planlagt startdato"
+                  value={inputValue}
+                  error={inputError}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                />
+              </DatePicker>
+
+              <HStack gap="space-16">
+                <Select
+                  label="Time"
+                  value={tid.split(':')[0] ?? ''}
+                  onChange={(e) => setTid(`${e.target.value}:${tid.split(':')[1] || '00'}`)}
+                >
+                  <option value="">Velg time</option>
+                  {timer.map((t) => (
+                    <option key={t}>{t}</option>
+                  ))}
+                </Select>
+
+                <Select
+                  label="Minutt"
+                  value={tid.split(':')[1] ?? ''}
+                  onChange={(e) => setTid(`${tid.split(':')[0] || '00'}:${e.target.value}`)}
+                >
+                  <option value="">Velg minutt</option>
+                  {kvarter.map((m) => (
+                    <option key={m}>{m}</option>
+                  ))}
+                </Select>
+              </HStack>
+            </div>
+          </Dialog.Body>
+
+          <Dialog.Footer>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={handleLagre}
+              disabled={!dato || !!inputError || fetcher.state !== 'idle'}
             >
-              <DatePicker.Input
-                label="Ny planlagt startdato"
-                value={inputValue}
-                error={inputError}
-                onChange={(e) => handleInputChange(e.target.value)}
-              />
-            </DatePicker>
-
-            <HStack gap="space-16">
-              <Select
-                label="Time"
-                value={tid.split(':')[0] ?? ''}
-                onChange={(e) => setTid(`${e.target.value}:${tid.split(':')[1] || '00'}`)}
-              >
-                <option value="">Velg time</option>
-                {timer.map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
-              </Select>
-
-              <Select
-                label="Minutt"
-                value={tid.split(':')[1] ?? ''}
-                onChange={(e) => setTid(`${tid.split(':')[0] || '00'}:${e.target.value}`)}
-              >
-                <option value="">Velg minutt</option>
-                {kvarter.map((m) => (
-                  <option key={m}>{m}</option>
-                ))}
-              </Select>
-            </HStack>
-          </div>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={handleLagre}
-            disabled={!dato || !!inputError || fetcher.state !== 'idle'}
-          >
-            {fetcher.state === 'idle' ? 'Lagre' : 'Lagrer...'}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              setOpen(false)
-              setDato(initialDate)
-              setTid(initialTime)
-              setInputValue(formatDDMMYYYY(initialDate))
-              setInputError(undefined)
-            }}
-          >
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
+              {fetcher.state === 'idle' ? 'Lagre' : 'Lagrer...'}
+            </Button>
+            <Dialog.CloseTrigger>
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            </Dialog.CloseTrigger>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </>
   )
 }
