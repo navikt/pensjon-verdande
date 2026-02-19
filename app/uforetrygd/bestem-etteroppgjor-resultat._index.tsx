@@ -1,33 +1,29 @@
-import { Button, Checkbox, Heading, LocalAlert, TextField, VStack } from '@navikt/ds-react'
+import { Button, Checkbox, Heading, HelpText, HStack, LocalAlert, TextField, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { apiPost } from '~/services/api.server'
+import { parseSakIds, SakIdTextArea } from '~/uforetrygd/components/input/SakIdTextArea'
 import type { Route } from './+types/bestem-etteroppgjor-resultat._index'
-
-function parseSakIds(sakIds: FormDataEntryValue | null): number[] {
-  if (!sakIds || typeof sakIds !== 'string') return []
-
-  return sakIds
-    .split(',')
-    .map((id) => id.trim())
-    .filter((id) => id !== '')
-    .map((id) => {
-      const parsed = Number(id)
-      if (Number.isNaN(parsed)) {
-        throw new Error(`Ugyldig sak ID: "${id}"`)
-      }
-      return parsed
-    })
-}
 
 function parseFormData(formData: FormData) {
   const arValue = formData.get('etteroppgjorAr')
   const ar = arValue ? Number(arValue) : null
   const sakIds = parseSakIds(formData.get('sakIds'))
   const oppdaterSisteGyldigeEtteroppgjørsÅr = formData.get('oppdaterSisteGyldigeEtteroppgjørsÅr') === 'checked'
+  const overstyrEpsVedManglendeData = formData.get('overstyrEpsVedManglendeData') === 'checked'
 
-  return { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr }
+  return { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr, overstyrEpsVedManglendeData }
 }
+
+const overstyrEpsHelperText = `Ved å huke av denne aktiveres følgende : 
+  
+Ved manglende etteroppgjør for annen forelder vil brukers etteroppgjør gå til manuell behandling med oppgave.
+
+Hvis det ikke er registrert mottatt inntekter for annen forelder vil etteroppgjøret gjennomføres som normalt, og basere seg på at annen forelder ikke har inntekter.`
+
+const oppdaterEtteroppgjorsArHelperText = `Ved å huke av denne vil man åpne for at saksbehandler kan gjennomføre manuelle etteroppgjør for samme år.
+
+Hvis det allerede er åpnet opp for manuelle etteroppgjør for dette året er det ikke nødvendig å huke av denne på nytt.`
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Bestem etteroppgjør resultat | Verdande' }]
@@ -36,13 +32,14 @@ export function meta(): Route.MetaDescriptors {
 export const action = async ({ request }: Route.ActionArgs) => {
   try {
     const formData = await request.formData()
-    const { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr } = parseFormData(formData)
+    const { ar, sakIds, oppdaterSisteGyldigeEtteroppgjørsÅr, overstyrEpsVedManglendeData } = parseFormData(formData)
     const response = await apiPost<{ behandlingId: number }>(
       '/api/uforetrygd/bestemetteroppgjor/start',
       {
         sakIds,
         ar,
         oppdaterSisteGyldigeEtteroppgjørsÅr,
+        overstyrEpsVedManglendeData,
       },
       request,
     )
@@ -70,16 +67,16 @@ export default function BestemEtteroppgjorResultatPage({ actionData }: Route.Com
   }
 
   return (
-    <VStack gap="space-16" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-16" style={{ margin: '2em' }}>
       {actionData && error && (
         <LocalAlert status="error">
           <LocalAlert.Content>Feilmelding: {error}</LocalAlert.Content>
         </LocalAlert>
       )}
-      <Heading size="small" level="1">
+      <Heading size="medium" level="1">
         Bestem etteroppgjørsresultat (tidligere BPEN092)
       </Heading>
-      <Form method="post" style={{ width: '20em' }}>
+      <Form method="post" style={{ width: '25em' }}>
         <VStack gap="space-20">
           <TextField
             label="År for etteroppgjør:"
@@ -88,18 +85,32 @@ export default function BestemEtteroppgjorResultatPage({ actionData }: Route.Com
             type="text"
             inputMode="numeric"
             onChange={handleEtteroppgjorArChange}
+            style={{ width: '10em' }}
           />
-          <Checkbox name="oppdaterSisteGyldigeEtteroppgjørsÅr" value="checked" disabled={!etteroppgjørsårErSatt}>
-            Oppdater etteroppgjørsår for saksbehandler
-          </Checkbox>
-          <TextField
-            label="Kommaseparert liste med sak-id'er som skal behandles (tomt betyr alle):"
-            aria-label="sakIds"
-            name="sakIds"
-            type="text"
-          />
+          <HStack gap="space-8" align="center">
+            <Checkbox name="oppdaterSisteGyldigeEtteroppgjørsÅr" value="checked">
+              Oppdater etteroppgjørsår for saksbehandler
+            </Checkbox>
+            <HelpText title="Oppdater siste gyldige etteroppgjorsar">
+              <span style={{ whiteSpace: 'pre-line' }}>{oppdaterEtteroppgjorsArHelperText}</span>
+            </HelpText>
+          </HStack>
+          <HStack gap="space-8" align="center">
+            <Checkbox name="overstyrEpsVedManglendeData" value="checked">
+              Overstyr EPS ved manglende grunnlagsdata
+            </Checkbox>
+            <HelpText title="Overstyring av EPS">
+              <span style={{ whiteSpace: 'pre-line' }}>{overstyrEpsHelperText}</span>
+            </HelpText>
+          </HStack>
+          <SakIdTextArea fieldName="sakIds" />
           {!etteroppgjørsårErSatt && 'År for etteroppgjør må være satt'}
-          <Button type="submit" disabled={isSubmitting || !etteroppgjørsårErSatt} size="small">
+          <Button
+            type="submit"
+            disabled={isSubmitting || !etteroppgjørsårErSatt}
+            size="small"
+            style={{ width: '10em' }}
+          >
             Opprett
           </Button>
         </VStack>
