@@ -60,6 +60,7 @@ function stubServerModules(): Plugin {
 
 const config: StorybookConfig = {
   stories: ['../app/**/*.stories.@(ts|tsx)'],
+  addons: ['@storybook/addon-vitest'],
   framework: '@storybook/react-vite',
   async viteFinal(config) {
     config.plugins = config.plugins || []

@@ -5,13 +5,14 @@ import LinkeDnrFnrPage from './linke-dnr-fnr'
 const meta: Meta = {
   title: 'Sider/Vedlikehold/Linke DNR-FNR',
   component: LinkeDnrFnrPage,
-  decorators: [withRouter],
 }
 
 export default meta
 type Story = StoryObj
 
-export const Default: Story = {}
+export const Default: Story = {
+  decorators: [withRouter],
+}
 
 export const MedFeilmelding: Story = {
   render: () =>
