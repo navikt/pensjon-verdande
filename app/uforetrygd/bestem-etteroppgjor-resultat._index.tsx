@@ -91,7 +91,7 @@ export default function BestemEtteroppgjorResultatPage({ actionData }: Route.Com
             <Checkbox name="oppdaterSisteGyldigeEtteroppgjørsÅr" value="checked">
               Oppdater etteroppgjørsår for saksbehandler
             </Checkbox>
-            <HelpText title="Oppdater siste gyldige etteroppgjorsar">
+            <HelpText title="Oppdater siste gyldige etteroppgjorsår">
               <span style={{ whiteSpace: 'pre-line' }}>{oppdaterEtteroppgjorsArHelperText}</span>
             </HelpText>
           </HStack>
