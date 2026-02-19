@@ -1,5 +1,5 @@
 import { BodyShort, Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { apiGet, apiPost } from '~/services/api.server'
 import type { OmregningBehandlingsnoekler, OmregningStatistikkPage } from '~/types'
@@ -60,9 +60,11 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
     behandlingsNoekkel || optionBehandlingsNoekler[0].value,
   )
   // Synk select-state med loaderData ved navigasjon innen samme route
-  if (behandlingsNoekkel && behandlingsNoekkel !== selectedBehandlingsNoekkel) {
-    setSelectedBehandlingsNoekkel(behandlingsNoekkel)
-  }
+  useEffect(() => {
+    if (behandlingsNoekkel) {
+      setSelectedBehandlingsNoekkel((prev) => (prev !== behandlingsNoekkel ? behandlingsNoekkel : prev))
+    }
+  }, [behandlingsNoekkel])
   const [searchParams, setSearchParams] = useSearchParams()
 
   const omregningsaker = omregningStatistikkPage
