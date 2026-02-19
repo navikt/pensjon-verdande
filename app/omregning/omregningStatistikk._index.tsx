@@ -56,7 +56,9 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
     optionBehandlingsNoekler.push({ value: value, label: value })
   })
 
-  const [selectedBehandlingsNoekkel, setSelectedBehandlingsNoekkel] = useState(optionBehandlingsNoekler[0].value)
+  const [selectedBehandlingsNoekkel, setSelectedBehandlingsNoekkel] = useState(
+    behandlingsNoekkel || optionBehandlingsNoekler[0].value,
+  )
   const [searchParams, setSearchParams] = useSearchParams()
 
   const omregningsaker = omregningStatistikkPage
