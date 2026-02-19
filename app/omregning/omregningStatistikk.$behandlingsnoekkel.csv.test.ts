@@ -8,18 +8,18 @@ vi.mock('~/services/env.server', () => ({
   env: { penUrl: 'http://pen-test' },
 }))
 
-const { loader } = await import('./omregningStatistikk.csv')
+const { loader } = await import('./omregningStatistikk.$behandlingsnoekkel.csv')
 
 function textResponse(text: string, status = 200) {
   return new Response(text, { status })
 }
 
-const loaderArgs = (request: Request) =>
+const loaderArgs = (request: Request, behandlingsnoekkel: string) =>
   ({
     request,
-    params: {},
+    params: { behandlingsnoekkel },
     context: {},
-    unstable_pattern: '/omregningStatistikk/csv',
+    unstable_pattern: '/omregningStatistikk/:behandlingsnoekkel.csv',
   }) as Parameters<typeof loader>[0]
 
 describe('omregningStatistikk.csv', () => {
@@ -39,8 +39,8 @@ describe('omregningStatistikk.csv', () => {
     const mockCsv = 'id;status\n1;OK'
     fetchSpy.mockResolvedValueOnce(textResponse(mockCsv))
 
-    const request = new Request('http://localhost/omregningStatistikk/csv?behandlingsnoekkel=KEY-1')
-    const result = await loader(loaderArgs(request))
+    const request = new Request('http://localhost/omregningStatistikk/KEY-1.csv')
+    const result = await loader(loaderArgs(request, 'KEY-1'))
 
     expect(fetchSpy).toHaveBeenCalledOnce()
     const [url, init] = fetchSpy.mock.calls[0]
@@ -58,9 +58,9 @@ describe('omregningStatistikk.csv', () => {
   it('loader kaster 404 når CSV ikke finnes', async () => {
     fetchSpy.mockResolvedValueOnce(new Response('Not found', { status: 404 }))
 
-    const request = new Request('http://localhost/omregningStatistikk/csv?behandlingsnoekkel=KEY-1')
+    const request = new Request('http://localhost/omregningStatistikk/KEY-1.csv')
 
-    await expect(loader(loaderArgs(request))).rejects.toMatchObject({
+    await expect(loader(loaderArgs(request, 'KEY-1'))).rejects.toMatchObject({
       status: 404,
     })
   })

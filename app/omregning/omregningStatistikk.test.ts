@@ -65,6 +65,7 @@ describe('omregningStatistikk._index', () => {
     expect(result.omregningStatistikkPage).toEqual(mockStatistikk)
     expect(result.omregningStatistikkInit).toEqual(mockNoekler)
     expect(result.behandlingsNoekkel).toBe('KEY-1')
+    expect(result.csvDownloadUrl).toBe('/omregningStatistikk/KEY-1.csv')
   })
 
   it('loader kaster feil ved 500 fra statistikk-endepunkt', async () => {

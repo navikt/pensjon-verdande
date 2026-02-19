@@ -1,9 +1,8 @@
 import { apiGetRawStringOrUndefined } from '~/services/api.server'
-import type { Route } from './+types/omregningStatistikk.csv'
+import type { Route } from './+types/omregningStatistikk.$behandlingsnoekkel.csv'
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const { searchParams } = new URL(request.url)
-  const behandlingsNoekkel = searchParams.get('behandlingsnoekkel') ?? 'not set'
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
+  const behandlingsNoekkel = params.behandlingsnoekkel
 
   const csvContent = await apiGetRawStringOrUndefined(
     `/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsNoekkel}`,

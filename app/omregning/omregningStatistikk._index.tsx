@@ -37,9 +37,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   // Build CSV download URL pointing to the resource route
   const csvDownloadUrl =
-    behandlingsNoekkel !== 'not set'
-      ? `/omregningStatistikk/csv?behandlingsnoekkel=${encodeURIComponent(behandlingsNoekkel)}`
-      : undefined
+    behandlingsNoekkel !== 'not set' ? `/omregningStatistikk/${encodeURIComponent(behandlingsNoekkel)}.csv` : undefined
 
   return {
     omregningStatistikkInit,
