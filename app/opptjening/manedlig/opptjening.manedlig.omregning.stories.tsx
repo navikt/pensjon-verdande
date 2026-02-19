@@ -63,3 +63,11 @@ export const MedFeiletAvsjekk: Story = {
       },
     }),
 }
+
+export const KanOverstyre: Story = {
+  render: () =>
+    renderWithLoader(OpprettEndretOpptjeningRoute, {
+      ...mockData,
+      kanOverstyre: true,
+    }),
+}

@@ -74,3 +74,18 @@ export const MedFeilVedtak: Story = {
       },
     }),
 }
+
+export const UnderBehandling: Story = {
+  render: () =>
+    renderWithLoader(LaasteVedtakPage, {
+      ...mockData,
+      uttrekkStatus: {
+        behandlingId: 'beh-001',
+        aktivitet: 'Henter vedtak fra databasen',
+        isFerdig: false,
+        isFeilet: false,
+        feilmelding: '',
+        stackTrace: '',
+      },
+    }),
+}

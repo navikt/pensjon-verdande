@@ -21,6 +21,28 @@ export const Default: Story = {
     }),
 }
 
+export const Warning: Story = {
+  render: () =>
+    renderWithLoader(InfoBannerPage, {
+      validToDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      variant: 'WARNING',
+      description: 'Det kan forekomme forsinkelser i behandling av søknader.',
+      url: null,
+      urlText: null,
+    }),
+}
+
+export const ErrorVariant: Story = {
+  render: () =>
+    renderWithLoader(InfoBannerPage, {
+      validToDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+      variant: 'ERROR',
+      description: 'Driftsforstyrrelser – noen tjenester er utilgjengelige.',
+      url: 'https://nav.no/status',
+      urlText: 'Se driftsstatus',
+    }),
+}
+
 export const Empty: Story = {
   render: () =>
     renderWithLoader(InfoBannerPage, {

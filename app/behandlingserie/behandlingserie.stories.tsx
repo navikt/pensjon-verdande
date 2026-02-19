@@ -47,3 +47,17 @@ export const Empty: Story = {
       tillateBehandlinger: ['DagligAvstemming'],
     }),
 }
+
+export const MedRegelAdvarsler: Story = {
+  render: () =>
+    renderWithLoader(BehandlingOpprett_index, {
+      behandlingSerier: [],
+      serieValg: {
+        dagIMaanedRegler: [{ type: 'AFTER', dag: 15 }],
+        maksBehandlingerPerMnd: 3,
+        ekskluderteMaaneder: [6, 7, 12],
+        enableRangeVelger: true,
+      },
+      tillateBehandlinger: ['DagligAvstemming'],
+    }),
+}
