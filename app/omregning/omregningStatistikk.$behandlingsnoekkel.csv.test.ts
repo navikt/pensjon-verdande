@@ -65,4 +65,16 @@ describe('omregningStatistikk.csv', () => {
       init: { status: 404 },
     })
   })
+
+  it('loader saniterer spesialtegn i filnavn', async () => {
+    const mockCsv = 'id;status\n1;OK'
+    fetchSpy.mockResolvedValueOnce(textResponse(mockCsv))
+
+    const request = new Request('http://localhost/omregningStatistikk/KEY"injection.csv')
+    const result = await loader(loaderArgs(request, 'KEY"injection'))
+
+    expect(result.headers.get('Content-Disposition')).toBe(
+      'attachment; filename="omregningStatistikk-KEY_injection.csv"',
+    )
+  })
 })

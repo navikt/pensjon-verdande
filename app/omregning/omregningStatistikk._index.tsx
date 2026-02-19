@@ -59,6 +59,10 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
   const [selectedBehandlingsNoekkel, setSelectedBehandlingsNoekkel] = useState(
     behandlingsNoekkel || optionBehandlingsNoekler[0].value,
   )
+  // Synk select-state med loaderData ved navigasjon innen samme route
+  if (behandlingsNoekkel && behandlingsNoekkel !== selectedBehandlingsNoekkel) {
+    setSelectedBehandlingsNoekkel(behandlingsNoekkel)
+  }
   const [searchParams, setSearchParams] = useSearchParams()
 
   const omregningsaker = omregningStatistikkPage
@@ -104,7 +108,6 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
             style={{ padding: '1em', position: 'relative', right: 0, float: 'right' }}
             download={`omregningStatistikk-${behandlingsNoekkel}.csv`}
             href={csvDownloadUrl}
-            target="_blank"
           >
             Last ned tabell (CSV)
           </Link>

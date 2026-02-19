@@ -94,9 +94,10 @@ export async function apiGetStream(path: string, requestCtx: RequestCtx | Reques
   const url = `${env.penUrl}${path}`
   const { signal, cancel } = withTimeout(15_000)
   try {
+    const headers = { ...buildHeaders(ctx), Accept: '*/*' }
     const res = await fetch(url, {
       method: 'GET',
-      headers: { Authorization: `Bearer ${ctx.accessToken}` },
+      headers,
       signal,
     })
 
