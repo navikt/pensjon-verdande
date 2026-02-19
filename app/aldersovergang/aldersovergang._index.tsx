@@ -1,4 +1,15 @@
-import { BodyShort, Button, Heading, InlineMessage, Label, Radio, RadioGroup, Select, VStack } from '@navikt/ds-react'
+import {
+  BodyShort,
+  Box,
+  Button,
+  Heading,
+  InlineMessage,
+  Label,
+  Radio,
+  RadioGroup,
+  Select,
+  VStack,
+} from '@navikt/ds-react'
 import { endOfMonth, format, parse, startOfMonth } from 'date-fns'
 import { nb } from 'date-fns/locale'
 import type React from 'react'
@@ -74,13 +85,15 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       </Heading>
       <BodyShort spacing>Velg behandlingsmåned og tidspunkt for kjøring.</BodyShort>
       {!kanOverstyreBehandlingsmaned && (
-        <InlineMessage status="info" style={{ marginBottom: '1rem' }}>
-          Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
-          aktuelle måneden.
-        </InlineMessage>
+        <Box marginBlock="space-0 space-16">
+          <InlineMessage status="info">
+            Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
+            aktuelle måneden.
+          </InlineMessage>
+        </Box>
       )}
       <Form action="opprett" method="POST" style={{ width: '100%', maxWidth: 800 }}>
-        <VStack gap="space-16" style={{ marginBottom: '2rem' }}>
+        <VStack gap="space-16" marginBlock="space-0 space-32">
           <div
             style={{
               display: 'grid',
@@ -89,16 +102,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
               rowGap: '0.25rem',
             }}
           >
-            <div>
-              <Label htmlFor="behandlingsmaned" style={{ marginBottom: '0.25rem' }}>
-                Behandlingsmåned
-              </Label>
-            </div>
-            <div>
-              <Label htmlFor="kjoeretidspunkt" style={{ marginBottom: '0.25rem' }}>
+            <Box marginBlock="space-0 space-4">
+              <Label htmlFor="behandlingsmaned">Behandlingsmåned</Label>
+            </Box>
+            <Box marginBlock="space-0 space-4">
+              <Label htmlFor="kjoeretidspunkt">
                 Kjøretidspunkt {kanOverstyreBehandlingsmaned ? '(valgfritt)' : ''}
               </Label>
-            </div>
+            </Box>
 
             <div>
               <Select
@@ -118,7 +129,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                 ))}
               </Select>
             </div>
-            <div style={{ paddingTop: '7px' }}>
+            <Box paddingBlock="space-8 space-0">
               <DateTimePicker
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}
@@ -126,7 +137,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                 maxDate={maxDate}
                 label=""
               />
-            </div>
+            </Box>
           </div>
 
           {selectedMonthDate && (
@@ -147,9 +158,9 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
           {selectedMonthDate && erBegrensUtplukkLovlig && (
             <div>
               <Label>Begrenset utplukk</Label>
-              <BodyShort size="small" style={{ marginBottom: '0.5rem' }}>
-                Behandler kun personer som ligger i utplukkstabellen.
-              </BodyShort>
+              <Box marginBlock="space-0 space-8">
+                <BodyShort size="small">Behandler kun personer som ligger i utplukkstabellen.</BodyShort>
+              </Box>
               <RadioGroup name="begrensetUtplukk" defaultValue="false" legend="" size="small">
                 <Radio value="true">Ja</Radio>
                 <Radio value="false">Nei</Radio>
@@ -158,15 +169,15 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
           )}
 
           {selectedMonthDate && (kanOverstyreBehandlingsmaned || selectedDate) && (
-            <div style={{ marginTop: '1rem' }}>
+            <Box marginBlock="space-16 space-0">
               <Button type="submit" onClick={handleSubmit} variant="primary">
                 Opprett
               </Button>
-            </div>
+            </Box>
           )}
         </VStack>
       </Form>
-      <div style={{ marginTop: '2rem' }}>
+      <Box marginBlock="space-32 space-0">
         <Heading level="2" size="medium" spacing>
           Aldersoverganger
         </Heading>
@@ -175,7 +186,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
           visBehandlingTypeSoek={false}
           behandlingerResponse={behandlinger as BehandlingerPage}
         />
-      </div>
+      </Box>
     </div>
   )
 }
