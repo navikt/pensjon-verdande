@@ -8,7 +8,6 @@ import {
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import {
-  Alert,
   BodyLong,
   BodyShort,
   Button,
@@ -18,6 +17,7 @@ import {
   Dropdown,
   Heading,
   HStack,
+  InlineMessage,
   List,
   Loader,
   Modal,
@@ -87,19 +87,19 @@ export default function LaasteVedtakPage({ loaderData }: Route.ComponentProps) {
           <div style={{ marginLeft: 'auto' }}>
             <HStack gap="space-16" align="center">
               {laasteVedtakSummary.uttrekkStatus?.isFerdig && (
-                <Alert variant="success" size="small" inline>
+                <InlineMessage status="success" size="small">
                   Sist kjørt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}
-                </Alert>
+                </InlineMessage>
               )}
               {laasteVedtakSummary.uttrekkStatus?.isFeilet && (
-                <Alert variant="error" size="small" inline>
-                  Uttrekk feilet. Sist forsøkt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}{' '}
-                </Alert>
+                <InlineMessage status="error" size="small">
+                  Uttrekk feilet. Sist forsøkt: {formatIsoTimestamp(laasteVedtakSummary.sistKjoert)}
+                </InlineMessage>
               )}
               {uttrekkStatus?.isFerdig === false && (
-                <Alert variant="info" size="small" inline>
+                <InlineMessage status="info" size="small">
                   Kjører aktivitet: {uttrekkStatus?.aktivitet ?? 'Behandling starter...'}
-                </Alert>
+                </InlineMessage>
               )}
               <RunUttrekk
                 isFerdig={

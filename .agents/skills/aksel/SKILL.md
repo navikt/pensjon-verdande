@@ -57,8 +57,8 @@ For detaljert informasjon, se filene i `docs/`-mappen:
 
 ### Feedback og meldinger
 - **Viktig systemmelding (hele siden)** → `GlobalAlert`
-- **Melding i kontekst** → `LocalAlert`
-- **Liten inline-melding** → `InlineMessage`
+- **Melding i kontekst (blokk med tittel/innhold)** → `LocalAlert` (compound API: `.Header`, `.Title`, `.Content`; status: announcement/success/warning/error)
+- **Liten inline-melding (kort tekst)** → `InlineMessage` (status: info/success/warning/error)
 - **Info-kort** → `InfoCard`
 - **Feiloppsummering** → `ErrorSummary`
 - **Feilmeldingstekst** → `ErrorMessage`

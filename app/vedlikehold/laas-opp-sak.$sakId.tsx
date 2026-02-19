@@ -5,7 +5,6 @@ import {
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import {
-  Alert,
   BodyLong,
   BodyShort,
   Box,
@@ -16,8 +15,10 @@ import {
   Heading,
   HGrid,
   HStack,
+  InlineMessage,
   List,
   Loader,
+  LocalAlert,
   Modal,
   Table,
   Tooltip,
@@ -58,7 +59,7 @@ export default function LaasOppSakSakIdPage({ loaderData }: Route.ComponentProps
             </HStack>
             {sak.vedtak.length === 0 && sak.automatiskeKravUtenVedtak.length === 0 && (
               <HStack>
-                <Alert variant="info">Ingenting å låse opp</Alert>
+                <InlineMessage status="info">Ingenting å låse opp</InlineMessage>
               </HStack>
             )}
             {sak.vedtak.length > 0 && (
@@ -395,16 +396,26 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: VedtakLaasOpp; onClos
             <List.Item title="Endring av vedtakstatus">Vedtakstatus vil bli endret til "Til Attestering"</List.Item>
           </List>
           {vedtak.behandlinger.some((b) => b.isFeilet) && (
-            <Alert variant="warning">
-              Obs!!! Denne saken har en behandling som har feilet teknisk, og det er derfor ikke sikkert det er riktig
-              løsning å låse opp saken! En utvikler bør se på saken før du låser opp.
-            </Alert>
+            <LocalAlert status="warning">
+              <LocalAlert.Header>
+                <LocalAlert.Title as="h3">Behandling som har feilet teknisk</LocalAlert.Title>
+              </LocalAlert.Header>
+              <LocalAlert.Content>
+                Obs!!! Denne saken har en behandling som har feilet teknisk, og det er derfor ikke sikkert det er riktig
+                løsning å låse opp saken! En utvikler bør se på saken før du låser opp.
+              </LocalAlert.Content>
+            </LocalAlert>
           )}
           {vedtak.behandlinger.some((b) => b.type === 'IverksettVedtakBehandling') && (
-            <Alert variant="warning">
-              Det er en Iverksett Vedtak behandling på dette vedtaket. Dersom du låser opp, så må kravet feilregistreres
-              og nytt krav må opprettes.
-            </Alert>
+            <LocalAlert status="warning">
+              <LocalAlert.Header>
+                <LocalAlert.Title as="h3">Iverksett Vedtak behandling på vedtaket</LocalAlert.Title>
+              </LocalAlert.Header>
+              <LocalAlert.Content>
+                Det er en Iverksett Vedtak behandling på dette vedtaket. Dersom du låser opp, så må kravet
+                feilregistreres og nytt krav må opprettes.
+              </LocalAlert.Content>
+            </LocalAlert>
           )}
         </VStack>
       </Modal.Body>
