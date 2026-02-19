@@ -5,7 +5,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const behandlingsNoekkel = params.behandlingsnoekkel
 
   const response = await apiGetStream(
-    `/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsNoekkel}`,
+    `/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${encodeURIComponent(behandlingsNoekkel)}`,
     request,
   )
 
