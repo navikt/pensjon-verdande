@@ -89,6 +89,37 @@ export async function apiGetRawStringOrUndefined(
   return apiFetch<string>('GET', path, requestCtx, (res) => res.text(), { allow404AsUndefined: true })
 }
 
+export async function apiGetStream(path: string, requestCtx: RequestCtx | Request): Promise<Response> {
+  const ctx = await resolveCtx(requestCtx)
+  const url = `${env.penUrl}${path}`
+  const { signal, cancel } = withTimeout(15_000)
+  try {
+    const headers = { ...buildHeaders(ctx), Accept: '*/*' }
+    const res = await fetch(url, {
+      method: 'GET',
+      headers,
+      signal,
+    })
+
+    if (!res.ok) {
+      await normalizeAndThrow(res, `Feil ved GET ${path}`)
+    }
+
+    return res
+  } catch (err) {
+    const code = getNodeErrorCode(err)
+    if (code === 'ECONNREFUSED') {
+      await normalizeAndThrowNetworkError('ECONNREFUSED', 'GET', path)
+    }
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      await normalizeAndThrowNetworkError('ETIMEDOUT', 'GET', path)
+    }
+    throw err
+  } finally {
+    cancel()
+  }
+}
+
 export async function apiPost<T>(
   path: string,
   body: unknown,

@@ -138,6 +138,7 @@ Tilgjengelige funksjoner:
 - `apiGet<T>(path, requestCtx)` — GET med JSON-respons
 - `apiGetOrUndefined<T>(path, requestCtx)` — GET der 404 returnerer `undefined`
 - `apiGetRawStringOrUndefined(path, requestCtx)` — GET med tekst-respons
+- `apiGetStream(path, requestCtx)` — GET som returnerer rå `Response` for streaming (f.eks. CSV, binærdata)
 - `apiPost<T>(path, body, requestCtx)` — POST med JSON body
 - `apiPut<T>(path, body, requestCtx)` — PUT med JSON body
 - `apiPatch<T>(path, body, requestCtx)` — PATCH med JSON body
@@ -147,7 +148,7 @@ Tilgjengelige funksjoner:
 `requestCtx` kan være enten `Request` (fra loader/action) eller `{ accessToken: string }`.
 
 ### Hva du IKKE skal gjøre
-- **IKKE bruk `fetch()` direkte** for kall mot backend.
+- **IKKE bruk `fetch()` direkte** for kall mot backend. Hvis du trenger funksjonalitet som ikke finnes i `api.server.ts`, **spør utvikleren først** om det bør lages en ny hjelpefunksjon der, i stedet for å bruke `fetch` direkte.
 - **IKKE lag egne fetch-wrappere** (f.eks. lokale `req()`-funksjoner). Bruk `api.server.ts`-funksjonene i stedet.
 - **IKKE lag tynne `.server.ts`-filer** som bare videresender til `apiGet`/`apiPost`. Kall `api.server.ts` direkte i loader/action.
 - **IKKE kall `requireAccessToken()` manuelt kun for å gjøre backend-kall i en loader/action** – send heller `request` direkte til `api.server.ts`. Kall `requireAccessToken()` eksplisitt bare når du ikke har en `Request` tilgjengelig (f.eks. i et service-lag som kun får `{ accessToken }`).
@@ -162,7 +163,10 @@ Tilgjengelige funksjoner:
 Direkte `fetch` eller egne wrappere mangler typisk timeout og riktig feilnormalisering, noe som gir inkonsistent feilhåndtering i appen.
 
 ### Unntak
-Bruk kun `fetch` direkte hvis du har et dokumentert behov (f.eks. streaming, binary data, eller kall mot andre tjenester enn pensjon-pen), og sørg da for tilsvarende timeout og feilhåndtering.
+Dersom ingen eksisterende funksjon i `api.server.ts` dekker behovet (f.eks. streaming, binary data, eller kall mot andre tjenester enn pensjon-pen):
+1. **Spør utvikleren** om det bør lages en ny hjelpefunksjon i `api.server.ts`.
+2. Lag i så fall funksjonen i `api.server.ts` med tilsvarende auth, timeout og feilnormalisering.
+3. Bruk **aldri** `fetch` direkte i loader/action uten å ha avklart med utvikleren først.
 
 ### Eksempel
 ```tsx

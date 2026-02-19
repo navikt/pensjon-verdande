@@ -1,7 +1,7 @@
 import { BodyShort, Box, Button, Link, Pagination, Select, Table } from '@navikt/ds-react'
 import { useEffect, useState } from 'react'
-import { Form, useSearchParams } from 'react-router'
-import { apiGet, apiGetRawStringOrUndefined, apiPost } from '~/services/api.server'
+import { useSearchParams } from 'react-router'
+import { apiGet, apiPost } from '~/services/api.server'
 import type { OmregningBehandlingsnoekler, OmregningStatistikkPage } from '~/types'
 import type { Route } from './+types/omregningStatistikk._index'
 
@@ -29,36 +29,26 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const size = searchParams.get('size') ?? '10'
   const behandlingsNoekkel = searchParams.get('behandlingsnoekler') ?? 'not set'
   const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
-  const content = await apiGetRawStringOrUndefined(
-    `/api/behandling/omregning/statistikk/csv?behandlingsnoekkel=${behandlingsNoekkel}`,
-    request,
-  )
 
   const omregningStatistikkInit = await apiGet<OmregningBehandlingsnoekler>(
     '/api/behandling/omregning/statistikk/behandlingsnoekler',
     request,
   )
+
+  // Build CSV download URL pointing to the resource route
+  const csvDownloadUrl =
+    behandlingsNoekkel !== 'not set' ? `/omregningStatistikk/${encodeURIComponent(behandlingsNoekkel)}.csv` : undefined
+
   return {
-    omregningStatistikkInit: omregningStatistikkInit,
-    omregningStatistikkPage: omregningStatistikkPage,
-    omregningStatistikkCsv: content,
+    omregningStatistikkInit,
+    omregningStatistikkPage,
+    behandlingsNoekkel,
+    csvDownloadUrl,
   }
 }
 
-export const action = async ({ request }: Route.ActionArgs) => {
-  const formData = await request.formData()
-  const { searchParams } = new URL(request.url)
-  const page = searchParams.get('page') ?? '0'
-  const size = searchParams.get('size') ?? '10'
-  const behandlingsNoekkel =
-    searchParams.get('behandlingsnoekler') ?? (formData.get('behandlingsnoekler') as string) ?? 'not set'
-
-  const omregningStatistikkPage = await hentOmregningStatistikk(request, behandlingsNoekkel, Number(page), Number(size))
-  return { omregningStatistikkPage }
-}
-
 export default function OmregningStatistikk({ loaderData }: Route.ComponentProps) {
-  const { omregningStatistikkInit, omregningStatistikkPage, omregningStatistikkCsv } = loaderData
+  const { omregningStatistikkInit, omregningStatistikkPage, behandlingsNoekkel, csvDownloadUrl } = loaderData
 
   const optionBehandlingsNoekler: { value: string; label: string }[] = []
   optionBehandlingsNoekler.push({ value: 'not set', label: 'Ikke angitt' })
@@ -66,7 +56,15 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
     optionBehandlingsNoekler.push({ value: value, label: value })
   })
 
-  const [behandlingsNoekler, setBehandlingsNoekler] = useState(optionBehandlingsNoekler[0].value)
+  const [selectedBehandlingsNoekkel, setSelectedBehandlingsNoekkel] = useState(
+    behandlingsNoekkel || optionBehandlingsNoekler[0].value,
+  )
+  // Synk select-state med loaderData ved navigasjon innen samme route
+  useEffect(() => {
+    if (behandlingsNoekkel) {
+      setSelectedBehandlingsNoekkel((prev) => (prev !== behandlingsNoekkel ? behandlingsNoekkel : prev))
+    }
+  }, [behandlingsNoekkel])
   const [searchParams, setSearchParams] = useSearchParams()
 
   const omregningsaker = omregningStatistikkPage
@@ -74,25 +72,12 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
   const onPageChange = (page: number) => {
     searchParams.set('page', (page - 1).toString())
     searchParams.set('size', omregningsaker?.size ? omregningsaker.size.toString() : '10')
-    searchParams.set('behandlingsnoekler', behandlingsNoekler)
+    searchParams.set('behandlingsnoekler', selectedBehandlingsNoekkel)
     setSearchParams(searchParams)
   }
 
-  const content = omregningStatistikkCsv
-
-  const [downloadLink, setDownloadLink] = useState('')
-  useEffect(() => {
-    const data = new Blob([`[${content}]`], { type: 'application/json' })
-
-    // this part avoids memory leaks
-    if (downloadLink !== '') window.URL.revokeObjectURL(downloadLink)
-
-    // update the download link state
-    setDownloadLink(window.URL.createObjectURL(data))
-  }, [content, downloadLink])
-
-  function setSearchParamsWithBehandlingsNoekler() {
-    searchParams.set('behandlingsnoekler', behandlingsNoekler)
+  function handleHentStatistikk() {
+    searchParams.set('behandlingsnoekler', selectedBehandlingsNoekkel)
     searchParams.set('page', '0') // Reset to first page
     setSearchParams(searchParams)
   }
@@ -101,12 +86,12 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
     <div>
       <h1>Omregning Statistikk</h1>
       <p>Her vil statistikk relatert til omregning bli vist.</p>
-      <Form method={'POST'} navigate={false}>
+      <div>
         <Select
           label={'Behandlingsnøkler'}
           name={'behandlingsnoekler'}
-          value={behandlingsNoekler}
-          onChange={(event) => setBehandlingsNoekler(event.target.value)}
+          value={selectedBehandlingsNoekkel}
+          onChange={(event) => setSelectedBehandlingsNoekkel(event.target.value)}
         >
           {optionBehandlingsNoekler.map((option) => (
             <option key={option.value} value={option.value}>
@@ -115,20 +100,20 @@ export default function OmregningStatistikk({ loaderData }: Route.ComponentProps
           ))}
         </Select>
         <br />
-        <Button variant="primary" onClick={setSearchParamsWithBehandlingsNoekler}>
+        <Button variant="primary" onClick={handleHentStatistikk}>
           Hent statistikk for nøkkel
         </Button>
-      </Form>
+      </div>
       <Box>
-        <Link
-          style={{ padding: '1em', position: 'relative', right: 0, float: 'right' }}
-          // this attribute sets the filename
-          download="omregningTabell.csv"
-          // link to the download URL
-          href={downloadLink}
-        >
-          Last ned tabell
-        </Link>
+        {csvDownloadUrl && (
+          <Link
+            style={{ padding: '1em', position: 'relative', right: 0, float: 'right' }}
+            download={`omregningStatistikk-${behandlingsNoekkel}.csv`}
+            href={csvDownloadUrl}
+          >
+            Last ned tabell (CSV)
+          </Link>
+        )}
       </Box>
       <Box>
         <Table size="small" zebraStripes>
