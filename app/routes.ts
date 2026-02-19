@@ -137,6 +137,8 @@ export default [
 
     route('hvilenderett', 'uforetrygd/hvilende-rett.tsx'),
 
+    route('varsel-regelendring2026', 'uforetrygd/varsel-regelendring2026.tsx'),
+
     route('brukere', 'brukere/index.tsx'),
     route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),
 
