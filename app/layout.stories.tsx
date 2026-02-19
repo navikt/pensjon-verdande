@@ -11,6 +11,7 @@ export default meta
 type Story = StoryObj
 
 export const NotFound: Story = {
+  tags: ['error-expected'],
   render: () => {
     const Stub = createRoutesStub([
       {
@@ -27,6 +28,7 @@ export const NotFound: Story = {
 }
 
 export const IkkeTilgang: Story = {
+  tags: ['error-expected'],
   render: () => {
     const Stub = createRoutesStub([
       {
@@ -64,6 +66,7 @@ export const BehandlingslosningenAvslaatt: Story = {
 }
 
 export const Serverfeil: Story = {
+  tags: ['error-expected'],
   render: () => {
     const Stub = createRoutesStub([
       {
