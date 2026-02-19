@@ -81,10 +81,13 @@ function getTilgjengeligeTider(forhandsvisDatoer: string[]): string[] {
   const harValgtIDagEllerTidligere = forhandsvisDatoer.some((ymd) => ymd <= todayYmd)
   if (!harValgtIDagEllerTidligere) return TIDER
 
-  // Hvis i dag eller tidligere er valgt, kun vis valg frem i tid (minst en time margin)
-  const minTime = new Date(now.getTime() + 60 * 60 * 1000)
-  const minHour = minTime.getHours()
-  const minMinute = Math.ceil(minTime.getMinutes() / 15) * 15
+  // Hvis i dag eller tidligere er valgt, kun vis valg frem i tid
+  let minHour = now.getHours()
+  let minMinute = Math.ceil(now.getMinutes() / 15) * 15
+  if (minMinute === 60) {
+    minHour = (minHour + 1) % 24
+    minMinute = 0
+  }
 
   return TIDER.filter((tid) => {
     const [h, m] = tid.split(':').map(Number)
