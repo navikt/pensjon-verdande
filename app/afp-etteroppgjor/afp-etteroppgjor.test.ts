@@ -6,6 +6,7 @@ vi.mock('~/services/auth.server', () => ({
 
 vi.mock('~/services/env.server', () => ({
   env: { penUrl: 'http://pen-test' },
+  isDevelopment: false,
 }))
 
 const { action } = await import('./afp-etteroppgjor')

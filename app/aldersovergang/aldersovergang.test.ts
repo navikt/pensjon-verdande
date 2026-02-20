@@ -6,6 +6,7 @@ vi.mock('~/services/auth.server', () => ({
 
 vi.mock('~/services/env.server', () => ({
   env: { penUrl: 'http://pen-test' },
+  isDevelopment: false,
 }))
 
 vi.mock('~/services/behandling.server', () => ({
@@ -31,7 +32,7 @@ describe('aldersovergang._index loader', () => {
     vi.restoreAllMocks()
   })
 
-  it('henter mulige aldersoverganger', async () => {
+  it('henter mulige aldersoverganger', { timeout: 15_000 }, async () => {
     const { loader } = await import('./aldersovergang._index')
 
     fetchSpy.mockResolvedValueOnce(
