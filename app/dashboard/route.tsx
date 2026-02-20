@@ -12,7 +12,16 @@ import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
-import { getDashboardSummary, hentKalenderHendelser } from '~/services/behandling.server'
+import { apiGet } from '~/services/api.server'
+import { hentKalenderHendelser } from '~/services/behandling.server'
+import type {
+  AntallUferdigeBehandlingerResponse,
+  BehandlingAntallResponse,
+  FeilendeBehandlingerResponse,
+  OpprettetPerDagResponse,
+  TotaltAntallBehandlingerResponse,
+  UkjenteBehandlingstyperResponse,
+} from '~/types'
 import type { Route } from './+types/route'
 
 export function meta(): Route.MetaDescriptors {
@@ -20,7 +29,35 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const dashboardResponse = getDashboardSummary(request)
+  const dashboardResponse = Promise.all([
+    apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
+      (it) => it.totaltAntallBehandlinger,
+    ),
+    apiGet<FeilendeBehandlingerResponse>('/api/behandling/oppsummering-feilende-behandlinger', request).then(
+      (it) => it.feilendeBehandlinger,
+    ),
+    apiGet<UkjenteBehandlingstyperResponse>('/api/behandling/oppsummering-ukjente-behandlingstyper', request).then(
+      (it) => it.ukjenteBehandlingstyper,
+    ),
+    apiGet<AntallUferdigeBehandlingerResponse>(
+      '/api/behandling/oppsummering-antall-uferdige-behandlinger',
+      request,
+    ).then((it) => it.antallUferdigeBehandlinger),
+    apiGet<BehandlingAntallResponse>('/api/behandling/oppsummering-behandling-antall', request).then(
+      (it) => it.behandlingAntall,
+    ),
+    apiGet<OpprettetPerDagResponse>('/api/behandling/oppsummering-opprettet-per-dag', request).then(
+      (it) => it.opprettetPerDag,
+    ),
+  ]).then((it) => ({
+    totaltAntallBehandlinger: it[0],
+    feilendeBehandlinger: it[1],
+    ukjenteBehandlingstyper: it[2],
+    antallUferdigeBehandlinger: it[3],
+    behandlingAntall: it[4],
+    opprettetPerDag: it[5],
+  }))
+
   if (!dashboardResponse) {
     throw new Response('Not Found', { status: 404 })
   }

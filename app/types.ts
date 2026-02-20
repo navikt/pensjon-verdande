@@ -244,6 +244,30 @@ export type DashboardResponse = {
   opprettetPerDag: DatoAntall[]
 }
 
+export type TotaltAntallBehandlingerResponse = {
+  totaltAntallBehandlinger: number
+}
+
+export type BehandlingAntallResponse = {
+  behandlingAntall: BehandlingAntall[]
+}
+
+export type FeilendeBehandlingerResponse = {
+  feilendeBehandlinger: number
+}
+
+export type UkjenteBehandlingstyperResponse = {
+  ukjenteBehandlingstyper: string[]
+}
+
+export type AntallUferdigeBehandlingerResponse = {
+  antallUferdigeBehandlinger: number
+}
+
+export type OpprettetPerDagResponse = {
+  opprettetPerDag: DatoAntall[]
+}
+
 export interface HalLink {
   href: string
   type: string

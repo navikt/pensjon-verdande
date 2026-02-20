@@ -16,7 +16,6 @@ import type {
   BehandlingerPage,
   BehandlingManuellOpptellingResponse,
   BehandlingManuellPage,
-  DashboardResponse,
   DetaljertFremdriftDTO,
   IkkeFullforteAktiviteterDTO,
   PatchBehandlingDto,
@@ -26,10 +25,6 @@ import type {
 
 export async function getSchedulerStatus(request: Request): Promise<SchedulerStatusResponse> {
   return await apiGet<SchedulerStatusResponse>('/api/behandling/scheduler-status', request)
-}
-
-export async function getDashboardSummary(request: Request): Promise<DashboardResponse> {
-  return apiGet<DashboardResponse>('/api/behandling/dashboard-summary', request)
 }
 
 export async function getBehandlinger(
