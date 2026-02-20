@@ -45,6 +45,7 @@ describe('bestem-etteroppgjor-resultat action', () => {
     formData.set('etteroppgjorAr', '2024')
     formData.set('sakIds', '100,200,300')
     formData.set('oppdaterSisteGyldigeEtteroppgjørsÅr', 'checked')
+    formData.set('overstyrEpsVedManglendeData', 'checked')
 
     const request = new Request('http://localhost/bestem-etteroppgjor-resultat', { method: 'POST', body: formData })
     const result = (await action(actionArgs(request))) as Response
@@ -61,6 +62,7 @@ describe('bestem-etteroppgjor-resultat action', () => {
       sakIds: [100, 200, 300],
       ar: 2024,
       oppdaterSisteGyldigeEtteroppgjørsÅr: true,
+      overstyrEpsVedManglendeData: true,
     })
 
     expect(result.status).toBe(302)
