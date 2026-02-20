@@ -5,10 +5,10 @@ import {
   Button,
   CheckboxGroup,
   CopyButton,
+  Dialog,
   HGrid,
   Link,
   Loader,
-  Modal,
   MonthPicker,
   Pagination,
   Table,
@@ -20,7 +20,7 @@ import {
 } from '@navikt/ds-react'
 import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
 import type React from 'react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import type { HTMLFormMethod } from 'react-router'
 import { Form, useFetcher, useNavigation, useSearchParams, useSubmit } from 'react-router'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
@@ -58,7 +58,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const { omregningInit, omregningSakerPage } = loaderData
   const now = new Date()
   const [isClicked, setIsClicked] = useState(false)
-  const ref = useRef<HTMLDialogElement>(null)
+  const [modalOpen, setModalOpen] = useState(false)
   const navigation = useNavigation()
   const defaultbatchbrevtypeOption: ComboboxOption = { value: 'not set', label: 'Ikke angitt' }
 
@@ -591,68 +591,70 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
 
           <Box>
             <br />
-            <Button icon={<PlayIcon aria-hidden />} onClick={() => ref.current?.showModal()}>
+            <Button icon={<PlayIcon aria-hidden />} onClick={() => setModalOpen(true)}>
               Start omregning
             </Button>
 
-            <Modal
-              ref={ref}
-              header={{ heading: 'Start Omregning' }}
-              size={'medium'}
-              style={{
-                minWidth: '1024px',
-              }}
-            >
-              <Modal.Body>
-                <OmregningOppsummering
-                  skalBestilleBrev={skalBestilleBrev}
-                  skalSendeBrevBerorteSaker={skalSendeBrevBerorteSaker}
-                  selectedBrevkodeSokerAlderGammeltRegelverk={selectedBrevkodeSokerAlderGammeltRegelverk}
-                  selectedBrevkodeSokerAlderNyttRegelverk={selectedBrevkodeSokerAlderNyttRegelverk}
-                  selectedBrevkodeSokerUforetrygd={selectedBrevkodeSokerUforetrygd}
-                  selectedBrevkodeSokerBarnepensjon={selectedBrevkodeSokerBarnepensjon}
-                  selectedBrevkodeSokerAFP={selectedBrevkodeSokerAFP}
-                  selectedBrevkodeSokerGjenlevendepensjon={selectedBrevkodeSokerGjenlevendepensjon}
-                  selectedBrevkodeSokerAFPPrivat={selectedBrevkodeSokerAFPPrivat}
-                  selectedBrevkoderBerorteSakerAlderGammeltRegelverk={
-                    selectedBrevkoderBerorteSakerAlderGammeltRegelverk
-                  }
-                  selectedBrevkoderBerorteSakerAlderNyttRegelverk={selectedBrevkoderBerorteSakerAlderNyttRegelverk}
-                  selectedBrevkoderBerorteSakerUforetrygd={selectedBrevkoderBerorteSakerUforetrygd}
-                  selectedBrevkoderBerorteSakerBarnepensjon={selectedBrevkoderBerorteSakerBarnepensjon}
-                  selectedBrevkoderBerorteSakerAFP={selectedBrevkoderBerorteSakerAFP}
-                  selectedBrevkoderBerorteSakerGjenlevendepensjon={selectedBrevkoderBerorteSakerGjenlevendepensjon}
-                  selectedBrevkodeBerorteSakerAFPPrivat={selectedBrevkodeBerorteSakerAFPPrivat}
-                  omregningstidspunkt={omregningstidspunkt}
-                  behandlingsnokkel={behandlingsnokkel}
-                  kravGjelder={kravGjelder}
-                  kravArsak={kravArsak}
-                  toleransegrenseSett={toleransegrenseSett}
-                  oppgaveSett={oppgaveSett}
-                  oppgavePrefiks={oppgavePrefiks}
-                  omregneAFP={omregneAFP}
-                  prioritet={prioritet}
-                  skalSamordne={skalSamordne}
-                  skalSletteIverksettingsoppgaver={skalSletteIverksettingsoppgaver}
-                  skalDistribuereUforevedtak={skalDistribuereUforevedtak}
-                  regelendringUt2026={regelendringUt2026}
-                  behandleApneKrav={behandleApneKrav}
-                  brukFaktoromregning={brukFaktoromregning}
-                  opprettAlleOppgaver={opprettAlleOppgaver}
-                  sjekkYtelseFraAvtaleland={sjekkYtelseFraAvtaleland}
-                />
-                Du kan ikke angre denne handlingen.
-              </Modal.Body>
-              <Modal.Footer>
-                <Button form={'skjema'} type="submit" disabled={isClicked}>
-                  Start Omregning
-                </Button>
-                <Button type="button" variant="secondary" onClick={() => ref.current?.close()}>
-                  Tilbake
-                </Button>
-                <CopyButton copyText={getHumanReadableParameterText()} text="Kopier parameterliste" />
-              </Modal.Footer>
-            </Modal>
+            <Dialog open={modalOpen} onOpenChange={(open) => setModalOpen(open)}>
+              <Dialog.Popup
+                style={{
+                  minWidth: '1024px',
+                }}
+              >
+                <Dialog.Header>
+                  <Dialog.Title>Start Omregning</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <OmregningOppsummering
+                    skalBestilleBrev={skalBestilleBrev}
+                    skalSendeBrevBerorteSaker={skalSendeBrevBerorteSaker}
+                    selectedBrevkodeSokerAlderGammeltRegelverk={selectedBrevkodeSokerAlderGammeltRegelverk}
+                    selectedBrevkodeSokerAlderNyttRegelverk={selectedBrevkodeSokerAlderNyttRegelverk}
+                    selectedBrevkodeSokerUforetrygd={selectedBrevkodeSokerUforetrygd}
+                    selectedBrevkodeSokerBarnepensjon={selectedBrevkodeSokerBarnepensjon}
+                    selectedBrevkodeSokerAFP={selectedBrevkodeSokerAFP}
+                    selectedBrevkodeSokerGjenlevendepensjon={selectedBrevkodeSokerGjenlevendepensjon}
+                    selectedBrevkodeSokerAFPPrivat={selectedBrevkodeSokerAFPPrivat}
+                    selectedBrevkoderBerorteSakerAlderGammeltRegelverk={
+                      selectedBrevkoderBerorteSakerAlderGammeltRegelverk
+                    }
+                    selectedBrevkoderBerorteSakerAlderNyttRegelverk={selectedBrevkoderBerorteSakerAlderNyttRegelverk}
+                    selectedBrevkoderBerorteSakerUforetrygd={selectedBrevkoderBerorteSakerUforetrygd}
+                    selectedBrevkoderBerorteSakerBarnepensjon={selectedBrevkoderBerorteSakerBarnepensjon}
+                    selectedBrevkoderBerorteSakerAFP={selectedBrevkoderBerorteSakerAFP}
+                    selectedBrevkoderBerorteSakerGjenlevendepensjon={selectedBrevkoderBerorteSakerGjenlevendepensjon}
+                    selectedBrevkodeBerorteSakerAFPPrivat={selectedBrevkodeBerorteSakerAFPPrivat}
+                    omregningstidspunkt={omregningstidspunkt}
+                    behandlingsnokkel={behandlingsnokkel}
+                    kravGjelder={kravGjelder}
+                    kravArsak={kravArsak}
+                    toleransegrenseSett={toleransegrenseSett}
+                    oppgaveSett={oppgaveSett}
+                    oppgavePrefiks={oppgavePrefiks}
+                    omregneAFP={omregneAFP}
+                    prioritet={prioritet}
+                    skalSamordne={skalSamordne}
+                    skalSletteIverksettingsoppgaver={skalSletteIverksettingsoppgaver}
+                    skalDistribuereUforevedtak={skalDistribuereUforevedtak}
+                    regelendringUt2026={regelendringUt2026}
+                    behandleApneKrav={behandleApneKrav}
+                    brukFaktoromregning={brukFaktoromregning}
+                    opprettAlleOppgaver={opprettAlleOppgaver}
+                    sjekkYtelseFraAvtaleland={sjekkYtelseFraAvtaleland}
+                  />
+                  Du kan ikke angre denne handlingen.
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Button form={'skjema'} type="submit" disabled={isClicked}>
+                    Start Omregning
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={() => setModalOpen(false)}>
+                    Tilbake
+                  </Button>
+                  <CopyButton copyText={getHumanReadableParameterText()} text="Kopier parameterliste" />
+                </Dialog.Footer>
+              </Dialog.Popup>
+            </Dialog>
           </Box>
         </Tabs.Panel>
 

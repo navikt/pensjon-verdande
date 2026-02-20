@@ -13,10 +13,10 @@ import {
   Checkbox,
   CheckboxGroup,
   DatePicker,
+  Dialog,
   Heading,
   HStack,
   Label,
-  Modal,
   Table,
   Tag,
   useRangeDatepicker,
@@ -209,8 +209,8 @@ function countActiveFilters(filters: Partial<Record<FacetKey, string[]>>): numbe
 export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route.ComponentProps) {
   const { nowIso, rows, fomDato, tomDato } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
-  const sokeModalRef = useRef<HTMLDialogElement>(null)
-  const grupperModalRef = useRef<HTMLDialogElement>(null)
+  const [sokeOpen, setSokeOpen] = useState(false)
+  const [grupperOpen, setGrupperOpen] = useState(false)
 
   const now = new Date(nowIso)
 
@@ -432,7 +432,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
               <HStack gap="space-8">
                 <Button
                   icon={<FilterIcon aria-hidden />}
-                  onClick={() => sokeModalRef.current?.showModal()}
+                  onClick={() => setSokeOpen(true)}
                   variant="secondary"
                   size="small"
                 >
@@ -443,7 +443,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                 </Button>
                 <Button
                   icon={<Density2Icon aria-hidden />}
-                  onClick={() => grupperModalRef.current?.showModal()}
+                  onClick={() => setGrupperOpen(true)}
                   variant="secondary"
                   size="small"
                 >
@@ -571,125 +571,129 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
           </Button>
         </HStack>
 
-        <Modal ref={sokeModalRef} header={{ heading: 'Søkefilter' }} width={1440}>
-          <Modal.Body>
-            <div ref={columnsWrapperRef} style={{ overflow: 'auto', paddingRight: 8 }}>
-              <div
-                style={{
-                  columnCount: columnCount,
-                  columnGap: 24,
-                  columnFill: 'balance',
-                }}
-              >
-                {FACETS.map((facet) => (
-                  <div key={facet} style={{ breakInside: 'avoid' }}>
-                    <FacetSection
-                      title={facetLabel(facet)}
-                      facet={facet}
-                      options={facetOptions[facet]}
-                      selected={new Set(searchParams.getAll(facet))}
-                      onToggle={onToggle}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <HStack gap="space-12">
-              <Button variant="secondary" onClick={clearFacetFilters}>
-                Nullstill
-              </Button>
-              <Button variant="primary" onClick={() => sokeModalRef.current?.close()}>
-                Lukk
-              </Button>
-            </HStack>
-          </Modal.Footer>
-        </Modal>
-        <Modal ref={grupperModalRef} header={{ heading: 'Gruppering' }} width={720}>
-          <Modal.Body>
-            <VStack gap="space-16">
-              <Box>
-                <Label size="small">Grupper etter</Label>
-                <CheckboxGroup legend="" hideLegend size="small" value={searchParams.getAll(GROUP_PARAM)}>
-                  {FACETS.map((f) => (
-                    <Checkbox key={`gb-${f}`} value={f} onChange={() => onToggleGroupBy(f)}>
-                      {facetLabel(f)}
-                    </Checkbox>
+        <Dialog open={sokeOpen} onOpenChange={(open) => setSokeOpen(open)}>
+          <Dialog.Popup style={{ width: 1440 }}>
+            <Dialog.Body>
+              <div ref={columnsWrapperRef} style={{ overflow: 'auto', paddingRight: 8 }}>
+                <div
+                  style={{
+                    columnCount: columnCount,
+                    columnGap: 24,
+                    columnFill: 'balance',
+                  }}
+                >
+                  {FACETS.map((facet) => (
+                    <div key={facet} style={{ breakInside: 'avoid' }}>
+                      <FacetSection
+                        title={facetLabel(facet)}
+                        facet={facet}
+                        options={facetOptions[facet]}
+                        selected={new Set(searchParams.getAll(facet))}
+                        onToggle={onToggle}
+                      />
+                    </div>
                   ))}
-                </CheckboxGroup>
-              </Box>
-
-              <Box padding="space-12" borderRadius="8" borderColor="warning">
-                <Label size="small">Rekkefølge</Label>
-                {groupBy.length === 0 ? (
-                  <BodyShort size="small" textColor="subtle">
-                    Ingen dimensjoner valgt ennå.
-                  </BodyShort>
-                ) : (
-                  <ol style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
-                    {groupBy.map((g, idx) => (
-                      <li
-                        key={`order-${g}`}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: 8,
-                          padding: '6px 10px',
-                          marginBottom: 6,
-                          border: '1px solid var(--ax-border-neutral-subtle)',
-                          borderRadius: 6,
-                          background: 'var(--ax-bg-accent-soft)',
-                          userSelect: 'none',
-                        }}
-                      >
-                        <span aria-hidden style={{ fontFamily: 'monospace' }}>
-                          ≡
-                        </span>
-                        <span style={{ flex: 1 }}>{facetLabel(g)}</span>
-                        <HStack gap="space-4" align="center">
-                          <Button
-                            size="xsmall"
-                            variant="tertiary"
-                            icon={<ChevronUpIcon aria-hidden />}
-                            aria-label={`Flytt ${facetLabel(g)} opp`}
-                            onClick={(e) => {
-                              e.preventDefault()
-                              moveGroupBy(idx, -1)
-                            }}
-                            disabled={idx === 0}
-                          />
-                          <Button
-                            size="xsmall"
-                            variant="tertiary"
-                            icon={<ChevronDownIcon aria-hidden />}
-                            aria-label={`Flytt ${facetLabel(g)} ned`}
-                            onClick={(e) => {
-                              e.preventDefault()
-                              moveGroupBy(idx, 1)
-                            }}
-                            disabled={idx === groupBy.length - 1}
-                          />
-                        </HStack>
-                      </li>
+                </div>
+              </div>
+            </Dialog.Body>
+            <Dialog.Footer>
+              <HStack gap="space-12">
+                <Button variant="secondary" onClick={clearFacetFilters}>
+                  Nullstill
+                </Button>
+                <Dialog.CloseTrigger>
+                  <Button variant="primary">Lukk</Button>
+                </Dialog.CloseTrigger>
+              </HStack>
+            </Dialog.Footer>
+          </Dialog.Popup>
+        </Dialog>
+        <Dialog open={grupperOpen} onOpenChange={(open) => setGrupperOpen(open)}>
+          <Dialog.Popup style={{ width: 720 }}>
+            <Dialog.Body>
+              <VStack gap="space-16">
+                <Box>
+                  <Label size="small">Grupper etter</Label>
+                  <CheckboxGroup legend="" hideLegend size="small" value={searchParams.getAll(GROUP_PARAM)}>
+                    {FACETS.map((f) => (
+                      <Checkbox key={`gb-${f}`} value={f} onChange={() => onToggleGroupBy(f)}>
+                        {facetLabel(f)}
+                      </Checkbox>
                     ))}
-                  </ol>
-                )}
-              </Box>
-            </VStack>
-          </Modal.Body>
-          <Modal.Footer>
-            <HStack gap="space-12">
-              <Button variant="secondary" onClick={clearGrouping}>
-                Nullstill gruppering
-              </Button>
-              <Button variant="primary" onClick={() => grupperModalRef.current?.close()}>
-                Lukk
-              </Button>
-            </HStack>
-          </Modal.Footer>
-        </Modal>
+                  </CheckboxGroup>
+                </Box>
+
+                <Box padding="space-12" borderRadius="8" borderColor="warning">
+                  <Label size="small">Rekkefølge</Label>
+                  {groupBy.length === 0 ? (
+                    <BodyShort size="small" textColor="subtle">
+                      Ingen dimensjoner valgt ennå.
+                    </BodyShort>
+                  ) : (
+                    <ol style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
+                      {groupBy.map((g, idx) => (
+                        <li
+                          key={`order-${g}`}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 8,
+                            padding: '6px 10px',
+                            marginBottom: 6,
+                            border: '1px solid var(--ax-border-neutral-subtle)',
+                            borderRadius: 6,
+                            background: 'var(--ax-bg-accent-soft)',
+                            userSelect: 'none',
+                          }}
+                        >
+                          <span aria-hidden style={{ fontFamily: 'monospace' }}>
+                            ≡
+                          </span>
+                          <span style={{ flex: 1 }}>{facetLabel(g)}</span>
+                          <HStack gap="space-4" align="center">
+                            <Button
+                              size="xsmall"
+                              variant="tertiary"
+                              icon={<ChevronUpIcon aria-hidden />}
+                              aria-label={`Flytt ${facetLabel(g)} opp`}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                moveGroupBy(idx, -1)
+                              }}
+                              disabled={idx === 0}
+                            />
+                            <Button
+                              size="xsmall"
+                              variant="tertiary"
+                              icon={<ChevronDownIcon aria-hidden />}
+                              aria-label={`Flytt ${facetLabel(g)} ned`}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                moveGroupBy(idx, 1)
+                              }}
+                              disabled={idx === groupBy.length - 1}
+                            />
+                          </HStack>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </Box>
+              </VStack>
+            </Dialog.Body>
+            <Dialog.Footer>
+              <HStack gap="space-12">
+                <Button variant="secondary" onClick={clearGrouping}>
+                  Nullstill gruppering
+                </Button>
+                <Dialog.CloseTrigger>
+                  <Button variant="primary">Lukk</Button>
+                </Dialog.CloseTrigger>
+              </HStack>
+            </Dialog.Footer>
+          </Dialog.Popup>
+        </Dialog>
       </VStack>
     </Box>
   )

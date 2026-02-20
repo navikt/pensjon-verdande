@@ -3,9 +3,9 @@ import {
   Button,
   Checkbox,
   DatePicker,
+  Dialog,
   Heading,
   HStack,
-  Modal,
   Radio,
   RadioGroup,
   Select,
@@ -472,79 +472,81 @@ function EndreDialog({
   }
 
   return (
-    <Modal open={apen} onClose={lukk} aria-labelledby={headingId}>
-      <Modal.Header>
-        <Heading size="small" level="2" id={headingId}>
-          {(() => {
-            if (!element) return 'Endre planlagt kjøring'
-            const [year, month, day] = element.yearMonthDay.split('-').map(Number)
-            const d = new Date(year, (month ?? 1) - 1, day ?? 1)
-            const dateStr = new Intl.DateTimeFormat('no-NO', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-            }).format(d)
-            const timeStr = element.time ? ` kl ${element.time}` : ''
-            return `Planlagt kjøring ${dateStr}${timeStr}`
-          })()}
-        </Heading>
-      </Modal.Header>
-      <Modal.Body>
-        <VStack gap="space-16">
-          <HStack gap="space-16" wrap>
-            <DatePicker
-              mode="single"
-              selected={dato}
-              fromDate={new Date()}
-              toDate={horisontSlutt}
-              disableWeekends={ekskluderHelg}
-              disabled={deaktiverteDatoer}
-              onSelect={(d) => setDato(d ?? undefined)}
+    <Dialog open={apen} onOpenChange={(open) => !open && lukk()}>
+      <Dialog.Popup>
+        <Dialog.Header>
+          <Heading size="small" level="2" id={headingId}>
+            {(() => {
+              if (!element) return 'Endre planlagt kjøring'
+              const [year, month, day] = element.yearMonthDay.split('-').map(Number)
+              const d = new Date(year, (month ?? 1) - 1, day ?? 1)
+              const dateStr = new Intl.DateTimeFormat('no-NO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              }).format(d)
+              const timeStr = element.time ? ` kl ${element.time}` : ''
+              return `Planlagt kjøring ${dateStr}${timeStr}`
+            })()}
+          </Heading>
+        </Dialog.Header>
+        <Dialog.Body>
+          <VStack gap="space-16">
+            <HStack gap="space-16" wrap>
+              <DatePicker
+                mode="single"
+                selected={dato}
+                fromDate={new Date()}
+                toDate={horisontSlutt}
+                disableWeekends={ekskluderHelg}
+                disabled={deaktiverteDatoer}
+                onSelect={(d) => setDato(d ?? undefined)}
+              >
+                <DatePicker.Input
+                  label="Ny dato"
+                  value={input}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    setInput(v)
+                    setDato(parseNoDate(v))
+                  }}
+                />
+              </DatePicker>
+
+              <Select label="Tid" value={tid} onChange={(e) => setTid(e.target.value)}>
+                {tilgjengeligeTiderDialog.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </Select>
+            </HStack>
+
+            <div style={{ fontSize: 12, opacity: 0.7 }}>
+              {element?.behandlingId} {element?.behandlingCode ? `• ${element?.behandlingCode}` : ''}{' '}
+              {element?.serieId ? ` • Serie ${element.serieId}` : ''}
+            </div>
+          </VStack>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <HStack gap="space-8">
+            <Button onClick={() => dato && tid && onSave(toYearMonthDay(dato), tid)} disabled={!dato || !tid}>
+              Lagre dato
+            </Button>
+            <Dialog.CloseTrigger>
+              <Button variant="secondary">Lukk</Button>
+            </Dialog.CloseTrigger>
+            <Button
+              variant="tertiary"
+              icon={<ExternalLinkIcon aria-hidden />}
+              onClick={() => navigate(`/behandling/${element?.behandlingId}`)}
             >
-              <DatePicker.Input
-                label="Ny dato"
-                value={input}
-                onChange={(e) => {
-                  const v = e.target.value
-                  setInput(v)
-                  setDato(parseNoDate(v))
-                }}
-              />
-            </DatePicker>
-
-            <Select label="Tid" value={tid} onChange={(e) => setTid(e.target.value)}>
-              {tilgjengeligeTiderDialog.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </Select>
+              Gå til behandling
+            </Button>
           </HStack>
-
-          <div style={{ fontSize: 12, opacity: 0.7 }}>
-            {element?.behandlingId} {element?.behandlingCode ? `• ${element?.behandlingCode}` : ''}{' '}
-            {element?.serieId ? ` • Serie ${element.serieId}` : ''}
-          </div>
-        </VStack>
-      </Modal.Body>
-      <Modal.Footer>
-        <HStack gap="space-8">
-          <Button onClick={() => dato && tid && onSave(toYearMonthDay(dato), tid)} disabled={!dato || !tid}>
-            Lagre dato
-          </Button>
-          <Button variant="secondary" onClick={lukk}>
-            Lukk
-          </Button>
-          <Button
-            variant="tertiary"
-            icon={<ExternalLinkIcon aria-hidden />}
-            onClick={() => navigate(`/behandling/${element?.behandlingId}`)}
-          >
-            Gå til behandling
-          </Button>
-        </HStack>
-      </Modal.Footer>
-    </Modal>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }
 

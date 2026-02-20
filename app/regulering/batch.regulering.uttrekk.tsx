@@ -4,9 +4,9 @@ import {
   BodyLong,
   Button,
   DatePicker,
+  Dialog,
   HStack,
   Loader,
-  Modal,
   ProgressBar,
   ReadMore,
   VStack,
@@ -136,29 +136,36 @@ function StartUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   }
 
   return (
-    <Modal header={{ heading: 'Start uttrekk' }} open={isOpen} onClose={() => onClose()}>
-      <Modal.Body>
-        <VStack gap="space-20">
-          <BodyLong>Velg satsdato</BodyLong>
-          <DatePicker.Standalone
-            selected={satsDato}
-            today={defaultSatsdato}
-            onSelect={setSatsDato}
-            fromDate={new Date(`1 May ${year - 2}`)}
-            toDate={new Date(`1 May ${year + 2}`)}
-            dropdownCaption
-          />
-        </VStack>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={startUttrekk} loading={fetcher.state === 'submitting'}>
-          Start uttrekk
-        </Button>
-        <Button type="button" variant="secondary" onClick={() => onClose()}>
-          Avbryt
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Popup>
+        <Dialog.Header>
+          <Dialog.Title>Start uttrekk</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Body>
+          <VStack gap="space-20">
+            <BodyLong>Velg satsdato</BodyLong>
+            <DatePicker.Standalone
+              selected={satsDato}
+              today={defaultSatsdato}
+              onSelect={setSatsDato}
+              fromDate={new Date(`1 May ${year - 2}`)}
+              toDate={new Date(`1 May ${year + 2}`)}
+              dropdownCaption
+            />
+          </VStack>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Button onClick={startUttrekk} loading={fetcher.state === 'submitting'}>
+            Start uttrekk
+          </Button>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary">
+              Avbryt
+            </Button>
+          </Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }
 
@@ -180,20 +187,29 @@ function OppdaterUttrekkModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   }
 
   return (
-    <Modal header={{ heading: 'Oppdater uttrekk' }} open={isOpen} onClose={() => onClose()}>
-      <Modal.Body>
-        <VStack gap="space-20">
-          <BodyLong>Dette vil oppdatere arbeidstabellene med familiesammenstøt som nå er klare for regulering</BodyLong>
-        </VStack>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={oppdaterUttrekk} loading={fetcher.state === 'submitting'}>
-          Oppdater uttrekk
-        </Button>
-        <Button type="button" variant="secondary" onClick={() => onClose()}>
-          Avbryt
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Popup>
+        <Dialog.Header>
+          <Dialog.Title>Oppdater uttrekk</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Body>
+          <VStack gap="space-20">
+            <BodyLong>
+              Dette vil oppdatere arbeidstabellene med familiesammenstøt som nå er klare for regulering
+            </BodyLong>
+          </VStack>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Button onClick={oppdaterUttrekk} loading={fetcher.state === 'submitting'}>
+            Oppdater uttrekk
+          </Button>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary">
+              Avbryt
+            </Button>
+          </Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }

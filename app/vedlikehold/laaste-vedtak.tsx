@@ -15,12 +15,12 @@ import {
   Checkbox,
   CopyButton,
   Detail,
+  Dialog,
   Dropdown,
   Heading,
   HStack,
   List,
   Loader,
-  Modal,
   Select,
   Switch,
   Table,
@@ -449,51 +449,58 @@ function LaasOppVedtakModal({ vedtak, onClose }: { vedtak: LaasteVedtakRow; onCl
   }, [fetcher.data, onClose])
 
   return (
-    <Modal header={{ heading: 'Lås opp vedtak' }} open={true} onClose={onClose}>
-      <Modal.Body>
-        <VStack gap="space-20">
-          <BodyLong>
-            Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag er
-            innvolvert og at saksbehandler får nødvendig informasjon.
-          </BodyLong>
-          <BodyLong weight="semibold">
-            Team {decodeTeam(vedtak.team)} må gjøre vurdering på hva som skal til for å unngå dette i fremtiden.
-          </BodyLong>
-          <Heading size="small">Dette vil skje:</Heading>
-          <List as="ul">
-            {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak !== null && (
-              <List.Item title="Sammenstøtende vedtak">
-                Vedtaket har sammenstøtende vedtak i sak {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak.sakId}.
-                Dette vedtaket må også låses opp.
-              </List.Item>
-            )}
-            {vedtak.opplaasVedtakInformasjon?.harBehandling && (
-              <List.Item title="Behandling">Vedtaket har en pågående behandling. Denne vil bli stoppet.</List.Item>
-            )}
-            {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
-              <List.Item title="Automatisk vedtak">
-                Kravet har behandlings type automatisk. Det vil endret til manuell, oppgave blir opprettet.
-              </List.Item>
-            )}
-            <List.Item title="Endring av vedtakstatus">Vedtakstatus vil bli endret til "Til Attestering"</List.Item>
-          </List>
-        </VStack>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          data-color="danger"
-          type="button"
-          loading={fetcher.state === 'submitting'}
-          variant="primary"
-          onClick={laasOppVedtak}
-        >
-          Lås opp
-        </Button>
-        <Button type="button" variant="secondary" onClick={onClose}>
-          Avbryt
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Popup>
+        <Dialog.Header>
+          <Dialog.Title>Lås opp vedtak</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Body>
+          <VStack gap="space-20">
+            <BodyLong>
+              Er du sikker på at du vil låse opp vedtaket? Dette fører til merarbeid for saksbehandler, sørg for at fag
+              er innvolvert og at saksbehandler får nødvendig informasjon.
+            </BodyLong>
+            <BodyLong weight="semibold">
+              Team {decodeTeam(vedtak.team)} må gjøre vurdering på hva som skal til for å unngå dette i fremtiden.
+            </BodyLong>
+            <Heading size="small">Dette vil skje:</Heading>
+            <List as="ul">
+              {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak !== null && (
+                <List.Item title="Sammenstøtende vedtak">
+                  Vedtaket har sammenstøtende vedtak i sak {vedtak.opplaasVedtakInformasjon?.sammenstotendeVedtak.sakId}
+                  . Dette vedtaket må også låses opp.
+                </List.Item>
+              )}
+              {vedtak.opplaasVedtakInformasjon?.harBehandling && (
+                <List.Item title="Behandling">Vedtaket har en pågående behandling. Denne vil bli stoppet.</List.Item>
+              )}
+              {vedtak.opplaasVedtakInformasjon?.erAutomatisk && (
+                <List.Item title="Automatisk vedtak">
+                  Kravet har behandlings type automatisk. Det vil endret til manuell, oppgave blir opprettet.
+                </List.Item>
+              )}
+              <List.Item title="Endring av vedtakstatus">Vedtakstatus vil bli endret til "Til Attestering"</List.Item>
+            </List>
+          </VStack>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Button
+            data-color="danger"
+            type="button"
+            loading={fetcher.state === 'submitting'}
+            variant="primary"
+            onClick={laasOppVedtak}
+          >
+            Lås opp
+          </Button>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary">
+              Avbryt
+            </Button>
+          </Dialog.CloseTrigger>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }
 
@@ -529,65 +536,72 @@ function VerifiserOppdragsmeldingManueltModal({ vedtak, onClose }: { vedtak: Laa
   const vedtakIOppdrag = fetcher.data as VedtakYtelsekomponenter | undefined
 
   return (
-    <Modal header={{ heading: 'Verifiser oppdragsmelding manuelt' }} open={true} onClose={onClose} width={1000}>
-      <Modal.Body>
-        <VStack gap="space-20">
-          <BodyLong>
-            Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
-          </BodyLong>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Popup>
+        <Dialog.Header>
+          <Dialog.Title>Verifiser oppdragsmelding manuelt</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Body>
+          <VStack gap="space-20">
+            <BodyLong>
+              Brukes dersom kvittering fra oppdrag ikke er mottatt og oppdrag er oppdatert. Må verifiseres manuelt.
+            </BodyLong>
 
-          {fetcher.state === 'loading' && (
-            <HStack gap="space-8">
-              <Loader size="small" title="Henter data…" /> <Detail>Henter ytelsekomponenter...</Detail>
-            </HStack>
-          )}
+            {fetcher.state === 'loading' && (
+              <HStack gap="space-8">
+                <Loader size="small" title="Henter data…" /> <Detail>Henter ytelsekomponenter...</Detail>
+              </HStack>
+            )}
 
-          {vedtakIOppdrag !== undefined && (
-            <Table size="small" zebraStripes>
-              <BodyShort as="caption" visuallyHidden>
-                Ytelsekomponenter oversendt oppdrag
-              </BodyShort>
-              <Table.Header>
-                <Table.Row>
-                  <Table.ColumnHeader>Ytelse type</Table.ColumnHeader>
-                  <Table.ColumnHeader>Beløp i Pesys</Table.ColumnHeader>
-                  <Table.ColumnHeader>YtelsekomponentId</Table.ColumnHeader>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {vedtakIOppdrag?.ytelsekomponenterOversendtOppdrag.map((ytelse) => (
-                  <Table.Row key={ytelse.ytelsekomponentId}>
-                    <Table.DataCell>{ytelse.ytelseKomponentType}</Table.DataCell>
-                    <Table.DataCell>{ytelse.belop}</Table.DataCell>
-                    <Table.DataCell>{ytelse.ytelsekomponentId}</Table.DataCell>
+            {vedtakIOppdrag !== undefined && (
+              <Table size="small" zebraStripes>
+                <BodyShort as="caption" visuallyHidden>
+                  Ytelsekomponenter oversendt oppdrag
+                </BodyShort>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.ColumnHeader>Ytelse type</Table.ColumnHeader>
+                    <Table.ColumnHeader>Beløp i Pesys</Table.ColumnHeader>
+                    <Table.ColumnHeader>YtelsekomponentId</Table.ColumnHeader>
                   </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          )}
-        </VStack>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          type="button"
-          loading={submitFetcher.state === 'submitting'}
-          disabled={fetcher.state === 'loading' || !oppdragsmeldingOk}
-          onClick={verifiserOppdragsmeldingManuelt}
-        >
-          Iverksett vedtak
-        </Button>
-        <Button type="button" variant="secondary" onClick={onClose}>
-          Avbryt
-        </Button>
-        <Checkbox
-          value={oppdragsmeldingOk}
-          onChange={() => setOppdragsmeldingOk(!oppdragsmeldingOk)}
-          disabled={fetcher.state === 'loading'}
-        >
-          Oppdragsmelding er verifisert manuelt
-        </Checkbox>
-      </Modal.Footer>
-    </Modal>
+                </Table.Header>
+                <Table.Body>
+                  {vedtakIOppdrag?.ytelsekomponenterOversendtOppdrag.map((ytelse) => (
+                    <Table.Row key={ytelse.ytelsekomponentId}>
+                      <Table.DataCell>{ytelse.ytelseKomponentType}</Table.DataCell>
+                      <Table.DataCell>{ytelse.belop}</Table.DataCell>
+                      <Table.DataCell>{ytelse.ytelsekomponentId}</Table.DataCell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            )}
+          </VStack>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Button
+            type="button"
+            loading={submitFetcher.state === 'submitting'}
+            disabled={fetcher.state === 'loading' || !oppdragsmeldingOk}
+            onClick={verifiserOppdragsmeldingManuelt}
+          >
+            Iverksett vedtak
+          </Button>
+          <Dialog.CloseTrigger>
+            <Button type="button" variant="secondary">
+              Avbryt
+            </Button>
+          </Dialog.CloseTrigger>
+          <Checkbox
+            value={oppdragsmeldingOk}
+            onChange={() => setOppdragsmeldingOk(!oppdragsmeldingOk)}
+            disabled={fetcher.state === 'loading'}
+          >
+            Oppdragsmelding er verifisert manuelt
+          </Checkbox>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }
 
