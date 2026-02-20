@@ -1,6 +1,7 @@
 import { data } from 'react-router'
 import { requireAccessToken } from '~/services/auth.server'
 import { env } from './env.server'
+import { logger } from './logger.server'
 
 export type RequestCtx = {
   accessToken: string
@@ -39,6 +40,7 @@ async function apiFetch<T>(
   const ctx = await resolveCtx(requestCtx)
   const url = `${env.penUrl}${path}`
   const { signal, cancel } = withTimeout(15_000)
+  const start = performance.now()
   try {
     const headers: HeadersInit = { ...buildHeaders(ctx) }
     const init: RequestInit = { headers, signal, method }
@@ -48,22 +50,29 @@ async function apiFetch<T>(
       init.body = JSON.stringify(opts.body)
     }
     const res = await fetch(url, init)
+    const durationMs = Math.round(performance.now() - start)
 
     if (opts?.allow404AsUndefined && res.status === 404) {
+      logger.info(`${method} ${path} -> ${res.status} (${durationMs}ms)`)
       return undefined
     }
 
     if (!res.ok) {
+      logger.warn(`${method} ${path} -> ${res.status} (${durationMs}ms)`)
       await normalizeAndThrow(res, `Feil ved ${method} ${path}`)
     }
 
+    logger.info(`${method} ${path} -> ${res.status} (${durationMs}ms)`)
     return await parse(res)
   } catch (err) {
+    const durationMs = Math.round(performance.now() - start)
     const code = getNodeErrorCode(err)
     if (code === 'ECONNREFUSED') {
+      logger.error(`${method} ${path} -> ECONNREFUSED (${durationMs}ms)`)
       await normalizeAndThrowNetworkError('ECONNREFUSED', method, path)
     }
     if (err instanceof DOMException && err.name === 'AbortError') {
+      logger.error(`${method} ${path} -> ETIMEDOUT (${durationMs}ms)`)
       await normalizeAndThrowNetworkError('ETIMEDOUT', method, path)
     }
     throw err
@@ -93,6 +102,7 @@ export async function apiGetStream(path: string, requestCtx: RequestCtx | Reques
   const ctx = await resolveCtx(requestCtx)
   const url = `${env.penUrl}${path}`
   const { signal, cancel } = withTimeout(15_000)
+  const start = performance.now()
   try {
     const headers = { ...buildHeaders(ctx), Accept: '*/*' }
     const res = await fetch(url, {
@@ -100,18 +110,24 @@ export async function apiGetStream(path: string, requestCtx: RequestCtx | Reques
       headers,
       signal,
     })
+    const durationMs = Math.round(performance.now() - start)
 
     if (!res.ok) {
+      logger.warn(`GET ${path} -> ${res.status} (${durationMs}ms)`)
       await normalizeAndThrow(res, `Feil ved GET ${path}`)
     }
 
+    logger.info(`GET ${path} -> ${res.status} (${durationMs}ms)`)
     return res
   } catch (err) {
+    const durationMs = Math.round(performance.now() - start)
     const code = getNodeErrorCode(err)
     if (code === 'ECONNREFUSED') {
+      logger.error(`GET ${path} -> ECONNREFUSED (${durationMs}ms)`)
       await normalizeAndThrowNetworkError('ECONNREFUSED', 'GET', path)
     }
     if (err instanceof DOMException && err.name === 'AbortError') {
+      logger.error(`GET ${path} -> ETIMEDOUT (${durationMs}ms)`)
       await normalizeAndThrowNetworkError('ETIMEDOUT', 'GET', path)
     }
     throw err
