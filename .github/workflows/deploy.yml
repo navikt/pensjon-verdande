@@ -13,11 +13,11 @@ jobs:
       image: "${{ steps.set-outputs.outputs.IMAGE }}"
       image-digest: "${{ steps.login.outputs.registry }}/${{ github.repository }}/${{ github.repository_owner}}@${{ steps.build_push.outputs.digest }}"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
-          node-version: '24'
+          node-version-file: 'package.json'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
       - run: |
@@ -34,7 +34,7 @@ jobs:
 
       - name: NAIS login
         if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: nais/login@v0
+        uses: nais/login@e7cf2c159677dc7c7d599feff5f808f2bf59c7cf # v0
         id: login
         with:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
@@ -44,7 +44,7 @@ jobs:
       - name: Docker meta
         if: ${{ github.actor != 'dependabot[bot]' }}
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
           images: |
             ${{ steps.login.outputs.registry }}/${{ github.repository }}/${{ github.repository_owner}}
@@ -54,7 +54,7 @@ jobs:
       - name: Build and push
         if: ${{ github.actor != 'dependabot[bot]' }}
         id: build_push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
           push: true
@@ -99,8 +99,8 @@ jobs:
             vars: .nais/vars-dev-q5.yaml
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: nais/deploy/actions/deploy@v2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: nais/deploy/actions/deploy@fa754451577294aae42872a69b888b3470478ec1 # v2
         name: 'Deploy to NAIS'
         env:
           IMAGE: "${{ needs.build.outputs.image }}"
@@ -116,10 +116,10 @@ jobs:
     needs: [build]
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: NAIS login
-        uses: nais/login@v0
+        uses: nais/login@e7cf2c159677dc7c7d599feff5f808f2bf59c7cf # v0
         id: login
         with:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
@@ -127,7 +127,7 @@ jobs:
           team: teampensjon
 
       - name: 'Generate SBOM'
-        uses: aquasecurity/trivy-action@0.34.0
+        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
         with:
           scan-type: 'image'
           format: 'cyclonedx'
@@ -136,7 +136,7 @@ jobs:
 
       - name: Attest and sign image
         id: attest-sign
-        uses: nais/attest-sign@v1
+        uses: nais/attest-sign@4026aea21c05a2c711a00bced0d9bb5fc944fcf6 # v1
         with:
           image_ref: "${{ needs.build.outputs.image-digest }}"
           sbom: "trivy-results.cyclonedx"
