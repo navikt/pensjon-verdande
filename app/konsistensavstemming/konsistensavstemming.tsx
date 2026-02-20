@@ -13,7 +13,7 @@ import {
 import { Suspense, useState } from 'react'
 import { Await, Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { opprettKonsistensavstemmingBehandling } from '~/konsistensavstemming/konsistensavstemming.server'
+import { apiPost } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/konsistensavstemming'
@@ -55,20 +55,22 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const PENKP = (formData.get('PENKP') as string) === 'true'
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
-  const accessToken = await requireAccessToken(request)
 
-  await opprettKonsistensavstemmingBehandling(
-    accessToken,
-    PENAFP,
-    PENAFPP,
-    PENAP,
-    PENBP,
-    PENFP,
-    PENGJ,
-    PENGY,
-    PENKP,
-    UFOREUT,
-    avstemmingsdato,
+  await apiPost(
+    '/api/vedtak/avstemming/konsistens/start',
+    {
+      penAfp: PENAFP,
+      penAfpp: PENAFPP,
+      penPenap: PENAP,
+      penPenbp: PENBP,
+      penPenfp: PENFP,
+      penPengj: PENGJ,
+      penPengy: PENGY,
+      penPenkp: PENKP,
+      penUforeut: UFOREUT,
+      avstemmingsdato,
+    },
+    request,
   )
 
   return

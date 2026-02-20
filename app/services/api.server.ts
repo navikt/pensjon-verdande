@@ -78,6 +78,11 @@ export async function apiGet<T>(path: string, requestCtx: RequestCtx | Request):
   return result as T
 }
 
+export async function apiGetRawResponse(path: string, requestCtx: RequestCtx | Request): Promise<Response> {
+  const result = await apiFetch<Response>('GET', path, requestCtx, async (res) => res)
+  return result as Response
+}
+
 export async function apiGetOrUndefined<T>(path: string, requestCtx: RequestCtx | Request): Promise<T | undefined> {
   return apiFetch<T>('GET', path, requestCtx, async (res) => (await res.json()) as T, { allow404AsUndefined: true })
 }

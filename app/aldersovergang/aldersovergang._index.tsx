@@ -4,13 +4,19 @@ import { nb } from 'date-fns/locale'
 import type React from 'react'
 import { useMemo, useState } from 'react'
 import { Form, useSubmit } from 'react-router'
-import { hentMuligeAldersoverganger } from '~/aldersovergang/behandling.aldersovergang.server'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
+import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/aldersovergang._index'
+
+type MuligeAldersovergangerResponse = {
+  maneder: string[]
+  erBegrensUtplukkLovlig: boolean
+  kanOverstyreBehandlingsmaned: boolean
+}
 
 type LoaderData = {
   behandlinger: BehandlingerPage
@@ -38,7 +44,10 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData>
     sort: searchParams.get('sort'),
   })
 
-  const aldersoverganger = await hentMuligeAldersoverganger(accessToken)
+  const aldersoverganger = await apiGet<MuligeAldersovergangerResponse>(
+    '/api/aldersovergang/muligeAldersoverganger',
+    request,
+  )
 
   const currentMonth = format(new Date(), 'yyyy-MM')
   const defaultMonth = aldersoverganger.maneder.includes(currentMonth) ? currentMonth : aldersoverganger.maneder[0]

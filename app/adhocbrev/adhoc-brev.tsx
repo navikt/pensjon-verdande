@@ -1,9 +1,9 @@
 import { BodyLong, Box, Button, Heading, Select, Skeleton, TextField, VStack } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
 import { Await, Form, redirect, useNavigation } from 'react-router'
-import { opprettAdhocBrevBehandling } from '~/adhocbrev/adhoc-brev.server'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import { apiPost } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/adhoc-brev'
@@ -36,14 +36,19 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const updates = Object.fromEntries(formData)
-  const accessToken = await requireAccessToken(request)
 
-  const response = await opprettAdhocBrevBehandling(
-    accessToken,
-    updates.brevmal as string,
-    updates.ekskluderAvdoed === 'true',
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/brev/adhoc/start',
+    {
+      brevmal: updates.brevmal as string,
+      ekskluderAvdoed: updates.ekskluderAvdoed === 'true',
+    },
+    request,
   )
 
+  if (!response) {
+    throw new Error('Opprettelse av adhoc-brevbehandling returnerte ingen respons')
+  }
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
