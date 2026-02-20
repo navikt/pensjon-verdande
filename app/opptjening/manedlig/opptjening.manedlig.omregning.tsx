@@ -1,5 +1,4 @@
 import {
-  Alert,
   BodyShort,
   Button,
   Checkbox,
@@ -7,6 +6,7 @@ import {
   Heading,
   HelpText,
   HStack,
+  InlineMessage,
   Select,
   VStack,
 } from '@navikt/ds-react'
@@ -99,10 +99,10 @@ export default function OpprettEndretOpptjeningRoute({ loaderData }: Route.Compo
         Velg behandlingsmåned og tidspunkt for kjøring.
       </BodyShort>
       {!kanOverstyre && (
-        <Alert variant="info" inline style={{ marginBottom: '1rem' }}>
+        <InlineMessage status="info" style={{ marginBottom: '1rem' }}>
           Hvis en behandlingsmåned ikke er tilgjengelig, betyr det at det allerede er opprettet en behandling for den
           aktuelle måneden.
-        </Alert>
+        </InlineMessage>
       )}
       <Form action="opprett" method="post" style={{ width: '100%', maxWidth: 800 }}>
         <VStack gap={'space-16'}>
@@ -184,21 +184,21 @@ export default function OpprettEndretOpptjeningRoute({ loaderData }: Route.Compo
         </VStack>
       </Form>
       {sisteAvsjekk === null && (
-        <Alert variant="info" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+        <InlineMessage status="info" style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Ingen avsjekk gjort
-        </Alert>
+        </InlineMessage>
       )}
       {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === false && (
-        <Alert variant="error" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+        <InlineMessage status="error" style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {sisteAvsjekk.sisteAvsjekkTidspunkt} var ikke OK. PEN har mottatt{' '}
           {sisteAvsjekk.antallHendelserPen}, POPP har sendt {sisteAvsjekk.antallHendelserPopp}
-        </Alert>
+        </InlineMessage>
       )}
       {sisteAvsjekk !== null && sisteAvsjekk?.avsjekkOk === true && (
-        <Alert variant="success" inline style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+        <InlineMessage status="success" style={{ marginBottom: '1rem', marginTop: '1rem' }}>
           Siste avsjekk {format(sisteAvsjekk.sisteAvsjekkTidspunkt, "dd.MM.yyyy 'kl.' HH:mm:ss")} var OK. Vi har mottatt{' '}
           {sisteAvsjekk.antallHendelserPen} hendelser.
-        </Alert>
+        </InlineMessage>
       )}
       <div style={{ marginTop: '2rem' }}>
         <Heading level="2" size="medium" spacing>

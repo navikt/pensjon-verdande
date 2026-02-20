@@ -1,10 +1,10 @@
 import {
-  Alert,
   Button,
   Checkbox,
   DatePicker,
   Heading,
   HStack,
+  InfoCard,
   Modal,
   Radio,
   RadioGroup,
@@ -14,7 +14,7 @@ import {
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { redirect, useFetcher, useNavigate, useSearchParams } from 'react-router'
 import 'chart.js/auto'
-import { ExternalLinkIcon } from '@navikt/aksel-icons'
+import { ExternalLinkIcon, InformationSquareIcon } from '@navikt/aksel-icons'
 import type { DateRange } from 'react-day-picker'
 import PlanlagteDatoerPreview, { type PlannedItem } from '~/behandlingserie/planlagteDatoerPreview'
 import ValgteDatoerPreview from '~/behandlingserie/valgteDatoerPreview'
@@ -354,17 +354,22 @@ function KalenderSeksjon({
   return (
     <VStack>
       {regelAdvarsler.length > 0 && (
-        <Alert variant="info" size="small">
-          {regelAdvarsler.length === 1 ? (
-            regelAdvarsler[0]
-          ) : (
-            <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-              {regelAdvarsler.map((advarsel) => (
-                <li key={advarsel}>{advarsel}</li>
-              ))}
-            </ul>
-          )}
-        </Alert>
+        <InfoCard data-color="info" size="small">
+          <InfoCard.Header icon={<InformationSquareIcon aria-hidden />}>
+            <InfoCard.Title as="h3">Regler</InfoCard.Title>
+          </InfoCard.Header>
+          <InfoCard.Content>
+            {regelAdvarsler.length === 1 ? (
+              regelAdvarsler[0]
+            ) : (
+              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                {regelAdvarsler.map((advarsel) => (
+                  <li key={advarsel}>{advarsel}</li>
+                ))}
+              </ul>
+            )}
+          </InfoCard.Content>
+        </InfoCard>
       )}
       {regelmessighet === 'multiple' ? (
         <DatePicker.Standalone

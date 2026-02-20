@@ -1158,47 +1158,84 @@ Informasjonskort som fremhever innhold med farge og ikon.
 
 ### InlineMessage
 
-Liten inline-statusmelding.
+Liten inline-statusmelding. Brukes til korte meldinger direkte i kontekst av innholdet.
 
 ```tsx
 <InlineMessage status="info">Dette er en informasjonsmelding.</InlineMessage>
+<InlineMessage status="warning" size="small">Advarsel!</InlineMessage>
 ```
 
 **Props:**
-- `status: "info" | "warning" | "success" | "error"` — Påkrevd
+- `status: "info" | "warning" | "success" | "error"` — Påkrevd. **Merk: Har `"info"`, ikke `"announcement"` (det er LocalAlert som bruker `"announcement"`)**
 - `size?: "medium" | "small"` (default: `"medium"`)
 
 > **VIKTIG:** Bruker `status`-prop, IKKE `variant`.
+>
+> **Migrering fra `<Alert inline>`:** Erstatt med `<InlineMessage>`. Fjern `inline`-prop. Bytt `variant` til `status` (1:1 mapping: info→info, warning→warning, success→success, error→error).
+> Hvis meldingen dukker opp dynamisk, vurder å sette `role="alert"` eller `role="status"`.
 
 ---
 
 ### LocalAlert
 
-Kontekstuell varsel. Compound API.
+Kontekstuell varsel i nærheten av hendelsen. Compound API med sub-komponenter.
+
+**Bruk compound components:**
+- `<LocalAlert.Header>` — Wrapper for tittel (valgfri, men anbefalt ved strukturert innhold)
+- `<LocalAlert.Title>` — Tittel/overskrift (default `h2`, sett riktig nivå med `as`-prop)
+- `<LocalAlert.Content>` — Brødtekst/innhold (anbefalt for alt annet enn helt enkel tekst)
+- `<LocalAlert.CloseButton>` — Lukkeknapp (valgfri)
 
 ```tsx
+{/* Med tittel og innhold (anbefalt for strukturert innhold) */}
 <LocalAlert status="warning">
   <LocalAlert.Header>
-    <LocalAlert.Title>Frist</LocalAlert.Title>
+    <LocalAlert.Title as="h3">Frist</LocalAlert.Title>
   </LocalAlert.Header>
   <LocalAlert.Content>
     Søknadsfristen er snart ute.
   </LocalAlert.Content>
 </LocalAlert>
+
+{/* Enkel kort tekst uten tittel */}
+<LocalAlert status="announcement">
+  <LocalAlert.Content>Ingenting å vise.</LocalAlert.Content>
+</LocalAlert>
 ```
 
 **Props:**
-- `status: "info" | "warning" | "success" | "error" | "announcement"` — Påkrevd
+- `status: "announcement" | "success" | "warning" | "error"` — Påkrevd. **Merk: IKKE `"info"` — bruk `"announcement"` i stedet**
+- `size?: "medium" | "small"` (default: `"medium"`)
+- `as?: "div" | "section"` (default: `"section"`)
 
-> **VIKTIG:** Bruker `status`-prop, IKKE `variant`.
+> **VIKTIG:**
+> - Bruker `status`-prop, IKKE `variant`.
+> - `LocalAlert` har **IKKE** `status="info"`. Bruk `status="announcement"` for informasjonsmeldinger. Hvis du trenger `"info"`, bruk `InlineMessage` i stedet.
+> - `LocalAlert.Title` rendrer `h2` som default. **Husk å sette riktig heading-nivå** med `as`-prop (f.eks. `as="h3"`, `as="h4"`).
+> - Komponenten har `role="alert"` som default — innholdet leses opp umiddelbart av skjermlesere. Sett `role={undefined}` hvis dette ikke er ønsket.
+> - Bruk compound components (`LocalAlert.Header`, `LocalAlert.Title`, `LocalAlert.Content`) for strukturert innhold. **Ikke** legg innhold direkte som children uten sub-komponenter.
 >
 > **Migrering fra Alert:**
-> | Alert (gammel) | LocalAlert/InlineMessage (ny) |
+>
+> **Valg av komponent:**
+> | Alert (gammel) | Ny komponent |
 > |---|---|
-> | `variant="info"` | `status="info"` |
-> | `variant="warning"` | `status="warning"` |
-> | `variant="success"` | `status="success"` |
-> | `variant="error"` | `status="error"` (IKKE `"danger"`) |
+> | `<Alert inline>` (kort inline-tekst) | `<InlineMessage>` |
+> | `<Alert>` (blokk-varsel med innhold) | `<LocalAlert>` med compound components |
+>
+> **Status-mapping:**
+> | Alert (gammel) | InlineMessage (ny) | LocalAlert (ny) |
+> |---|---|---|
+> | `variant="info"` | `status="info"` | `status="announcement"` |
+> | `variant="warning"` | `status="warning"` | `status="warning"` |
+> | `variant="success"` | `status="success"` | `status="success"` |
+> | `variant="error"` | `status="error"` | `status="error"` |
+>
+> **Ved migrering:**
+> 1. Vurder semantikken — ikke bare mekanisk mapp `variant` til `status`. F.eks. kan `variant="info"` egentlig bety `status="warning"` avhengig av kontekst.
+> 2. Legg til `LocalAlert.Header` + `LocalAlert.Title` med beskrivende tittel når innholdet har en tydelig overskrift.
+> 3. Pakk innhold i `LocalAlert.Content`.
+> 4. Sett riktig heading-nivå på `LocalAlert.Title` med `as`-prop.
 
 ---
 
