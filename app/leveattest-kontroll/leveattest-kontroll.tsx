@@ -1,7 +1,8 @@
 import { Button, Checkbox, CheckboxGroup, Heading, HStack, Select, TextField, VStack } from '@navikt/ds-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useFetcher, useLoaderData } from 'react-router'
+import { useFetcher } from 'react-router'
 import { apiGetOrUndefined, apiPost } from '~/services/api.server'
+import type { Route } from './+types/leveattest-kontroll'
 import KjoringerPreview, { type BubbleItem } from './kjoringer-preview'
 
 type StartGrunnlagResponse = { behandlingId: number }
@@ -22,7 +23,7 @@ type LeveattestSokResultat = {
   grunnlagBehandlingId: number
   status: string
   sokBehandlingId: number
-  sokPaaLand: string[] // Bostedland enum-names
+  sokPaaLand: string[]
   alder: number
   filtrerPaSakstypeUfore: boolean
   antallPersonerTilKontroll: number
@@ -53,6 +54,10 @@ type LoaderData = {
   latestGrunnlag: LeveattestGrunnlagResultat | null
   sok: LeveattestSokResultat[]
   startkontroller: LeveattestStartKontrollResponse[]
+}
+
+export function meta(): Route.MetaDescriptors {
+  return [{ title: 'Leveattestkontroll | Verdande' }]
 }
 
 const FERDIG_STATUSER: ReadonlySet<string> = new Set(['FULLFORT', 'STOPPET', 'STOPPET_VENTER_BEKREFTELSE'])
@@ -173,7 +178,7 @@ function startKontrollStatusToBubbleStatus(status: string): BubbleItem['status']
   return 'OPPRETTET'
 }
 
-export async function loader({ request }: { request: Request }) {
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
 
   if (url.searchParams.get('poll') === 'grunnlag') {
@@ -203,7 +208,6 @@ export async function loader({ request }: { request: Request }) {
         `/api/behandling/leveattest/startkontroll`,
         request,
       )) ?? []
-
     return Response.json({ startkontroller } satisfies StartKontrollPollResponse)
   }
 
@@ -230,29 +234,33 @@ export async function loader({ request }: { request: Request }) {
   } satisfies LoaderData)
 }
 
-export async function action({ request }: { request: Request }) {
+export async function action({ request }: Route.ActionArgs) {
   const fd = await request.formData()
   const intent = String(fd.get('_intent') ?? '')
 
   if (intent === 'hentGrunnlag') {
     const behandlingId = await apiPost<number>('/api/behandling/leveattest/grunnlag', {}, request)
-
     if (typeof behandlingId !== 'number') {
       return Response.json({ error: 'Mangler behandlingId fra backend' }, { status: 500 })
     }
-
     return Response.json({ behandlingId } satisfies StartGrunnlagResponse)
   }
 
   if (intent === 'kjorSok') {
     const grunnlagBehandlingId = Number(fd.get('grunnlagBehandlingId'))
-    const alder = Number(fd.get('alder'))
-    const filtrerPaSakstypeUfore = String(fd.get('filtrerPaSakstypeUfore') ?? 'false') === 'true'
 
+    const alderRaw = String(fd.get('alder') ?? '')
+    const alder = Number(alderRaw)
+    if (!Number.isFinite(alder) || alder < 0 || alder > 120) {
+      return Response.json({ error: 'Ugyldig minstealder' }, { status: 400 })
+    }
+
+    const filtrerPaSakstypeUfore = String(fd.get('filtrerPaSakstypeUfore') ?? 'false') === 'true'
     const sokPaaLand = fd
       .getAll('sokPaaLand')
       .map((v) => String(v))
       .filter(Boolean)
+
     if (sokPaaLand.length === 0) {
       return Response.json({ error: 'Mangler sokPaaLand' }, { status: 400 })
     }
@@ -288,15 +296,13 @@ export async function action({ request }: { request: Request }) {
   return null
 }
 
-export default function LeveattestKontrollStartside() {
-  const { latestGrunnlag, sok: initialSok, startkontroller: initialStartkontroller } = useLoaderData() as LoaderData
+export default function LeveattestKontrollStartside({ loaderData }: Route.ComponentProps) {
+  const { latestGrunnlag, sok: initialSok, startkontroller: initialStartkontroller } = loaderData as LoaderData
 
   const startFetcher = useFetcher<StartGrunnlagResponse>()
   const pollFetcher = useFetcher<PollResponse>()
-
   const sokStartFetcher = useFetcher<StartSokResponse>()
   const sokListFetcher = useFetcher<SokPollResponse>()
-
   const startKontrollFetcher = useFetcher<StartKontrollActionResponse>()
   const startKontrollListFetcher = useFetcher<StartKontrollPollResponse>()
 
@@ -310,61 +316,34 @@ export default function LeveattestKontrollStartside() {
   )
 
   const pollTimerRef = useRef<number | null>(null)
-  const initializedFromLoaderRef = useRef(false)
-
   const sokPollTimerRef = useRef<number | null>(null)
   const sokBackgroundPollRef = useRef<number | null>(null)
-  const lastStartedSokIdRef = useRef<number | null>(null)
-
   const startKontrollPollRef = useRef<number | null>(null)
+  const initializedRef = useRef(false)
 
   const [valgteSokIds, setValgteSokIds] = useState<number[]>([])
 
-  const stoppGrunnlagPolling = useCallback(() => {
-    if (pollTimerRef.current != null) {
-      window.clearInterval(pollTimerRef.current)
-      pollTimerRef.current = null
+  const stoppInterval = useCallback((ref: React.MutableRefObject<number | null>) => {
+    if (ref.current != null) {
+      window.clearInterval(ref.current)
+      ref.current = null
     }
   }, [])
 
-  const stoppSokPolling = useCallback(() => {
-    if (sokPollTimerRef.current != null) {
-      window.clearInterval(sokPollTimerRef.current)
-      sokPollTimerRef.current = null
-    }
-  }, [])
-
-  const stoppSokBackgroundPolling = useCallback(() => {
-    if (sokBackgroundPollRef.current != null) {
-      window.clearInterval(sokBackgroundPollRef.current)
-      sokBackgroundPollRef.current = null
-    }
-  }, [])
-
-  const stoppStartKontrollPolling = useCallback(() => {
-    if (startKontrollPollRef.current != null) {
-      window.clearInterval(startKontrollPollRef.current)
-      startKontrollPollRef.current = null
-    }
-  }, [])
-
-  const pollLoad = pollFetcher.load
   const pollGrunnlag = useCallback(() => {
-    pollLoad(`?poll=grunnlag`)
-  }, [pollLoad])
+    pollFetcher.load(`?poll=grunnlag`)
+  }, [pollFetcher])
 
-  const sokLoad = sokListFetcher.load
   const pollSokListe = useCallback(
     (grunnlagId: number) => {
-      sokLoad(`?poll=sok&grunnlagId=${grunnlagId}`)
+      sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
     },
-    [sokLoad],
+    [sokListFetcher],
   )
 
-  const startKontrollLoad = startKontrollListFetcher.load
   const pollStartKontroller = useCallback(() => {
-    startKontrollLoad(`?poll=startkontroll`)
-  }, [startKontrollLoad])
+    startKontrollListFetcher.load(`?poll=startkontroll`)
+  }, [startKontrollListFetcher])
 
   const sendtTilKontrollSet = useMemo(() => {
     return new Set(startkontroller.map((k) => k.sokBehandlingId))
@@ -374,15 +353,15 @@ export default function LeveattestKontrollStartside() {
     setValgteSokIds((prev) => prev.filter((id) => !sendtTilKontrollSet.has(id)))
   }, [sendtTilKontrollSet])
 
+  // init from loaderData
   useEffect(() => {
-    if (initializedFromLoaderRef.current) return
-    initializedFromLoaderRef.current = true
+    if (initializedRef.current) return
+    initializedRef.current = true
 
     setStartkontroller(initialStartkontroller ?? [])
 
     if (!latestGrunnlag) {
       setGrunnlagStatus('IDLE')
-      setSokListe([])
       return
     }
 
@@ -392,19 +371,21 @@ export default function LeveattestKontrollStartside() {
 
     if (isFerdig(latestGrunnlag.status)) {
       setGrunnlagStatus('FERDIG')
-      stoppGrunnlagPolling()
+      stoppInterval(pollTimerRef)
       return
     }
 
     setGrunnlagStatus('KJØRER')
     pollGrunnlag()
-    stoppGrunnlagPolling()
+    stoppInterval(pollTimerRef)
     pollTimerRef.current = window.setInterval(pollGrunnlag, 10_000)
-  }, [latestGrunnlag, initialSok, initialStartkontroller, pollGrunnlag, stoppGrunnlagPolling])
 
-  const behandlingId = startFetcher.data?.behandlingId ?? null
+    return () => stoppInterval(pollTimerRef)
+  }, [latestGrunnlag, initialSok, initialStartkontroller, pollGrunnlag, stoppInterval])
 
+  // start grunnlag
   useEffect(() => {
+    const behandlingId = startFetcher.data?.behandlingId
     if (!behandlingId) return
 
     setGrunnlagBehandlingId(behandlingId)
@@ -418,12 +399,13 @@ export default function LeveattestKontrollStartside() {
     })
 
     pollGrunnlag()
-    stoppGrunnlagPolling()
+    stoppInterval(pollTimerRef)
     pollTimerRef.current = window.setInterval(pollGrunnlag, 10_000)
 
-    return () => stoppGrunnlagPolling()
-  }, [behandlingId, pollGrunnlag, stoppGrunnlagPolling])
+    return () => stoppInterval(pollTimerRef)
+  }, [startFetcher.data?.behandlingId, pollGrunnlag, stoppInterval])
 
+  // handle grunnlag polling result
   useEffect(() => {
     const data = pollFetcher.data
     if (!data) return
@@ -442,103 +424,93 @@ export default function LeveattestKontrollStartside() {
       setGrunnlagStatus('FERDIG')
       setGrunnlagResultat(data.resultat)
       setGrunnlagBehandlingId(data.resultat.grunnlagBehandlingId)
-      stoppGrunnlagPolling()
+      stoppInterval(pollTimerRef)
       pollSokListe(data.resultat.grunnlagBehandlingId)
     }
-  }, [pollFetcher.data, pollSokListe, stoppGrunnlagPolling])
+  }, [pollFetcher.data, pollSokListe, stoppInterval])
 
+  // handle søk list response
   useEffect(() => {
     if (!sokListFetcher.data) return
     setSokListe(sokListFetcher.data.sok ?? [])
   }, [sokListFetcher.data])
 
+  // background poll søk while any non-terminal
+  useEffect(() => {
+    const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
+    if (!grunnlagId) return
+    if (grunnlagStatus !== 'FERDIG') return
+
+    const hasNonTerminal = sokListe.some((s) => !isTerminal(s.status))
+    if (!hasNonTerminal) {
+      stoppInterval(sokBackgroundPollRef)
+      return
+    }
+
+    if (sokBackgroundPollRef.current != null) return
+    sokBackgroundPollRef.current = window.setInterval(() => pollSokListe(grunnlagId), 10_000)
+
+    return () => stoppInterval(sokBackgroundPollRef)
+  }, [grunnlagBehandlingId, grunnlagResultat, grunnlagStatus, sokListe, pollSokListe, stoppInterval])
+
+  // tight poll after starting a new søk
+  useEffect(() => {
+    const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
+    const sokId = sokStartFetcher.data?.sokBehandlingId
+    if (!grunnlagId || !sokId) return
+
+    pollSokListe(grunnlagId)
+    stoppInterval(sokPollTimerRef)
+
+    const startedAt = Date.now()
+    sokPollTimerRef.current = window.setInterval(() => {
+      pollSokListe(grunnlagId)
+      if (Date.now() - startedAt > 60_000) stoppInterval(sokPollTimerRef)
+    }, 5_000)
+
+    return () => stoppInterval(sokPollTimerRef)
+  }, [sokStartFetcher.data?.sokBehandlingId, grunnlagBehandlingId, grunnlagResultat, pollSokListe, stoppInterval])
+
+  // handle startkontroll list response
   useEffect(() => {
     if (!startKontrollListFetcher.data) return
     setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
   }, [startKontrollListFetcher.data])
 
-  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
-
-  useEffect(() => {
-    if (!valgtGrunnlagId) return
-    if (grunnlagStatus !== 'FERDIG') return
-    pollSokListe(valgtGrunnlagId)
-  }, [valgtGrunnlagId, grunnlagStatus, pollSokListe])
-
-  useEffect(() => {
-    if (!valgtGrunnlagId) return
-    if (grunnlagStatus !== 'FERDIG') return
-
-    const hasNonTerminal = sokListe.some((s) => !isTerminal(s.status))
-    if (!hasNonTerminal) {
-      stoppSokBackgroundPolling()
-      return
-    }
-
-    if (sokBackgroundPollRef.current != null) return
-    sokBackgroundPollRef.current = window.setInterval(() => pollSokListe(valgtGrunnlagId), 10_000)
-    return () => stoppSokBackgroundPolling()
-  }, [valgtGrunnlagId, grunnlagStatus, sokListe, pollSokListe, stoppSokBackgroundPolling])
-
-  useEffect(() => {
-    const sokBehandlingId = sokStartFetcher.data?.sokBehandlingId
-    if (!sokBehandlingId) return
-    if (!valgtGrunnlagId) return
-
-    lastStartedSokIdRef.current = sokBehandlingId
-
-    stoppSokPolling()
-    pollSokListe(valgtGrunnlagId)
-
-    const startedAt = Date.now()
-    sokPollTimerRef.current = window.setInterval(() => {
-      pollSokListe(valgtGrunnlagId)
-      if (Date.now() - startedAt > 60_000) stoppSokPolling()
-    }, 5_000)
-
-    return () => stoppSokPolling()
-  }, [sokStartFetcher.data?.sokBehandlingId, valgtGrunnlagId, pollSokListe, stoppSokPolling])
-
-  useEffect(() => {
-    const lastId = lastStartedSokIdRef.current
-    if (!lastId) return
-    const found = sokListe.find((s) => s.sokBehandlingId === lastId)
-    if (found && isTerminal(found.status)) stoppSokPolling()
-  }, [sokListe, stoppSokPolling])
-
+  // poll startkontroll after POST
   useEffect(() => {
     if (startKontrollFetcher.state !== 'idle') return
     if (!startKontrollFetcher.data?.ok) return
 
     pollStartKontroller()
-    stoppStartKontrollPolling()
+    stoppInterval(startKontrollPollRef)
 
     const startedAt = Date.now()
     startKontrollPollRef.current = window.setInterval(() => {
       pollStartKontroller()
-      if (Date.now() - startedAt > 60_000) stoppStartKontrollPolling()
+      if (Date.now() - startedAt > 60_000) stoppInterval(startKontrollPollRef)
     }, 5_000)
 
-    return () => stoppStartKontrollPolling()
-  }, [startKontrollFetcher.state, startKontrollFetcher.data, pollStartKontroller, stoppStartKontrollPolling])
+    return () => stoppInterval(startKontrollPollRef)
+  }, [startKontrollFetcher.state, startKontrollFetcher.data, pollStartKontroller, stoppInterval])
 
+  // background poll startkontroll while any non-terminal
   useEffect(() => {
     const hasNonTerminal = startkontroller.some((k) => !isTerminal(k.status))
     if (!hasNonTerminal) {
-      stoppStartKontrollPolling()
+      stoppInterval(startKontrollPollRef)
       return
     }
 
     if (startKontrollPollRef.current != null) return
-    startKontrollPollRef.current = window.setInterval(() => {
-      pollStartKontroller()
-    }, 10_000)
+    startKontrollPollRef.current = window.setInterval(() => pollStartKontroller(), 10_000)
 
-    return () => stoppStartKontrollPolling()
-  }, [startkontroller, pollStartKontroller, stoppStartKontrollPolling])
+    return () => stoppInterval(startKontrollPollRef)
+  }, [startkontroller, pollStartKontroller, stoppInterval])
 
+  // Step 2 state
   const disableStart = grunnlagStatus === 'KJØRER'
-  const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
+  const disableSok = !(grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId) || grunnlagStatus !== 'FERDIG'
 
   const [minstAlder, setMinstAlder] = useState<string>('67')
   const [kunUfore, setKunUfore] = useState<boolean>(false)
@@ -598,6 +570,8 @@ export default function LeveattestKontrollStartside() {
     setValgteSokIds((prev) => (prev.includes(sokId) ? prev.filter((x) => x !== sokId) : [...prev, sokId]))
   }
 
+  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
+
   const grunnlagItems: BubbleItem[] = useMemo(() => {
     const id = valgtGrunnlagId
     if (!id) return []
@@ -641,7 +615,6 @@ export default function LeveattestKontrollStartside() {
             : `${s.sokPaaLand.length} land (${s.sokPaaLand.slice(0, 3).join(', ')}, …)`
 
         const sendt = sendtTilKontrollSet.has(s.sokBehandlingId)
-
         const baseTag = `SøkId: ${s.sokBehandlingId} · ${landLabel} · ${s.alder}+${s.filtrerPaSakstypeUfore ? ' · Kun uføre' : ''}`
         const tagText = sendt ? `${baseTag} · SENDT` : baseTag
 
@@ -681,8 +654,8 @@ export default function LeveattestKontrollStartside() {
           yearMonthDay: ymd,
           time,
           status: startKontrollStatusToBubbleStatus(k.status),
-          description: `StartKontroll · ${k.status}`,
-          tagText: `SøkeId: ${k.sokBehandlingId}`,
+          description: `Startkontroll · ${k.status}`,
+          tagText: `SøkId: ${k.sokBehandlingId}`,
           tagColorKey: `KONTROLL:${String(k.sokBehandlingId)}`,
           selected: false,
         }
@@ -732,6 +705,9 @@ export default function LeveattestKontrollStartside() {
             label="Minstealder"
             value={minstAlder}
             onChange={(e) => setMinstAlder(e.target.value)}
+            type="number"
+            min={0}
+            max={120}
             inputMode="numeric"
             disabled={disableSok}
           />
@@ -783,10 +759,10 @@ export default function LeveattestKontrollStartside() {
           style={{
             maxHeight: '240px',
             overflow: 'auto',
-            border: '1px solid #d0d0d0',
+            border: '1px solid var(--a-border-subtle)',
             borderRadius: '12px',
             padding: '0.75rem',
-            background: '#fff',
+            background: 'var(--a-surface-default)',
           }}
         >
           <div style={{ fontSize: '0.85rem' }}>
@@ -809,7 +785,7 @@ export default function LeveattestKontrollStartside() {
 
         <div style={{ opacity: 0.85 }}>
           Valgt: <strong>{selectedLandLabel}</strong> {' · '}
-          Minstealder: <strong>{minstAlder}+</strong> {' · '}
+          Minstealder: <strong>{minstAlder || '—'}+</strong> {' · '}
           Filter: <strong>{kunUfore ? 'Kun uføre' : 'Alle'}</strong>
         </div>
 
@@ -877,7 +853,7 @@ export default function LeveattestKontrollStartside() {
         <KjoringerPreview
           title="StartKontrollkjøringer"
           items={startKontrollItems}
-          emptyText="Ingen start kontroller funnet ennå."
+          emptyText="Ingen startkontroller funnet ennå."
         />
       </VStack>
     </VStack>
