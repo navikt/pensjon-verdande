@@ -681,8 +681,8 @@ export default function LeveattestKontrollStartside() {
           yearMonthDay: ymd,
           time,
           status: startKontrollStatusToBubbleStatus(k.status),
-          description: `Kontroll · ${k.status}`,
-          tagText: `SøkId: ${k.sokBehandlingId}`,
+          description: `StartKontroll · ${k.status}`,
+          tagText: `SøkeId: ${k.sokBehandlingId}`,
           tagColorKey: `KONTROLL:${String(k.sokBehandlingId)}`,
           selected: false,
         }
@@ -875,9 +875,9 @@ export default function LeveattestKontrollStartside() {
         </startKontrollFetcher.Form>
 
         <KjoringerPreview
-          title="Kontrollkjøringer"
+          title="StartKontrollkjøringer"
           items={startKontrollItems}
-          emptyText="Ingen kontroller funnet ennå."
+          emptyText="Ingen start kontroller funnet ennå."
         />
       </VStack>
     </VStack>
