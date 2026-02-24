@@ -50,6 +50,7 @@ const batcherMeny = [
   ['GRADERT_AP_FRA_GRADERT_UP', '/gradert-ap-brev', 'Utplukk gradert AP brev'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
   ['HVILENDE_RETT_UFORETRYGD', `/hvilenderett`, 'Hvilende rett av Uføretrygd'],
+  ['LEVEATTEST_KONTROLL', `/leveattest-kontroll`, 'Leveattest kontroll'],
   ['LEVER_SAMBOEROPPLYSNING', '/lever-samboeropplysning', 'Lever Samboeropplysning'],
   ['LOEPENDE_INNTEKTSAVKORTING', `/bpen090`, 'Løpende inntektsavkorting'],
   ['OMREGNING_VED_OPPTJENINGSENDRING', `/opptjening/manedlig/omregning`, 'Månedlig omregning ved opptjeningsendring'],
