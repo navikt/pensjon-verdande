@@ -735,6 +735,9 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
             }}
             disabled={disableSok}
           >
+            <option value="tom" disabled>
+              Velg…
+            </option>
             <option value="valgt">Egendefinert</option>
             <option value="eu">Typisk Europa</option>
             <option value="na">Nord-Amerika</option>
