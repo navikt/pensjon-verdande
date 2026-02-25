@@ -248,6 +248,9 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (intent === 'kjorSok') {
     const grunnlagBehandlingId = Number(fd.get('grunnlagBehandlingId'))
+    if (!Number.isFinite(grunnlagBehandlingId) || grunnlagBehandlingId <= 0) {
+      return Response.json({ error: 'Ugyldig grunnlagBehandlingId' }, { status: 400 })
+    }
 
     const alderRaw = String(fd.get('alder') ?? '')
     const alder = Number(alderRaw)
