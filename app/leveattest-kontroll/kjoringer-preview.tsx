@@ -136,7 +136,11 @@ export default function KjoringerPreview({ title, items, emptyText, onClickItem 
       {keys.map((key) => {
         const list = (groups[key] ?? [])
           .slice()
-          .sort((a, b) => (a.yearMonthDay + (a.time ?? '') < b.yearMonthDay + (b.time ?? '') ? -1 : 1))
+          .sort((a, b) => {
+            const aKey = a.yearMonthDay + (a.time ?? '')
+            const bKey = b.yearMonthDay + (b.time ?? '')
+            return aKey.localeCompare(bKey)
+          })
 
         return (
           <VStack key={key} gap="space-4">
