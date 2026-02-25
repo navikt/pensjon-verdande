@@ -763,10 +763,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
           style={{
             maxHeight: '240px',
             overflow: 'auto',
-            border: '1px solid var(--a-border-subtle)',
+            border: '1px solid var(--ax-border-subtle)',
             borderRadius: '12px',
             padding: '0.75rem',
-            background: 'var(--a-surface-default)',
+            background: 'var(--ax-surface-default)',
           }}
         >
           <div style={{ fontSize: '0.85rem' }}>
