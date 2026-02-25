@@ -48,9 +48,40 @@ const PALETT = [
   '#6A5ACD',
 ]
 
+function hexToRgb(hex: string) {
+  const h = hex.replace('#', '')
+  const v =
+    h.length === 3
+      ? h
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : h
+  const n = Number.parseInt(v, 16)
+  if (Number.isNaN(n)) return null
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }
+}
+
+function relLuminance({ r, g, b }: { r: number; g: number; b: number }) {
+  const srgb = [r, g, b].map((x) => {
+    const c = x / 255
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * (srgb[0] ?? 0) + 0.7152 * (srgb[1] ?? 0) + 0.0722 * (srgb[2] ?? 0)
+}
+
+function bestTextColor(bgHex: string) {
+  const rgb = hexToRgb(bgHex)
+  if (!rgb) return '#fff'
+  const L = relLuminance(rgb)
+  // terskel funker bra for palette-farger: høy luminans -> mørk tekst
+  return L > 0.6 ? '#111' : '#fff'
+}
+
 function tagColors(key?: string) {
-  const bg = PALETT[hash(key) % PALETT.length]
-  return { bg, fg: '#fff' }
+  const bg = PALETT[hash(key) % PALETT.length] ?? '#0044CC'
+  const fg = bestTextColor(bg)
+  return { bg, fg }
 }
 
 function weekdayFromYmd(ymd: string): number {
@@ -67,7 +98,7 @@ function monthLabel(ym: string) {
   return new Intl.DateTimeFormat('no-NO', { month: 'long', year: 'numeric' }).format(new Date(y, (m ?? 1) - 1, 1))
 }
 
-export default function LeveattestKontroll({ title, items, emptyText, onClickItem }: Props) {
+export default function KjoringerPreview({ title, items, emptyText, onClickItem }: Props) {
   if (!items?.length) {
     return (
       <VStack gap="space-8">
@@ -79,29 +110,31 @@ export default function LeveattestKontroll({ title, items, emptyText, onClickIte
 
   const groups = items.reduce<Record<string, BubbleItem[]>>((acc, it) => {
     const key = it.yearMonthDay.slice(0, 7)
-    if (!acc[key]) {
-      acc[key] = []
-    }
+    if (!acc[key]) acc[key] = []
     acc[key].push(it)
     return acc
   }, {})
 
   const keys = Object.keys(groups).sort()
 
-  const bubbleClass = (it: BubbleItem) => {
+  const bubbleClass = (it: BubbleItem, clickable: boolean) => {
     const cls = [styles.bubble]
+    if (clickable) cls.push(styles.clickable)
+    else cls.push(styles.disabled)
     if (it.status === 'KJØRER') cls.push(styles.statusRunning)
     if (it.status === 'FEILET') cls.push(styles.statusFailed)
     if (it.selected) cls.push(styles.selected)
     return cls.join(' ')
   }
 
+  const clickable = typeof onClickItem === 'function'
+
   return (
     <VStack gap="space-8" className={styles.wrapper}>
       {title && <Heading size="medium">{title}</Heading>}
 
       {keys.map((key) => {
-        const list = groups[key]
+        const list = (groups[key] ?? [])
           .slice()
           .sort((a, b) => (a.yearMonthDay + (a.time ?? '') < b.yearMonthDay + (b.time ?? '') ? -1 : 1))
 
@@ -125,8 +158,9 @@ export default function LeveattestKontroll({ title, items, emptyText, onClickIte
                   <button
                     key={it.id}
                     type="button"
-                    className={bubbleClass(it)}
-                    onClick={() => onClickItem?.(it)}
+                    className={bubbleClass(it, clickable)}
+                    disabled={!clickable}
+                    onClick={clickable ? () => onClickItem?.(it) : undefined}
                     title={tooltipParts.join(' • ')}
                   >
                     <div className={styles.topRow}>

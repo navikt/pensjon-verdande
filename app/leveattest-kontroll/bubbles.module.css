@@ -36,16 +36,37 @@
   border: 1px solid var(--ax-border-neutral-subtleA);
   background: var(--ax-bg-raised);
 
-  cursor: pointer;
+  cursor: default;
 
   transition:
     transform 120ms ease,
-    border-color 120ms ease;
+    border-color 120ms ease,
+    opacity 120ms ease;
 }
 
-.bubble:hover {
+/* Kun interaktive bobler får pointer + hover-løft */
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
   transform: translateY(-1px);
   border-color: var(--ax-border-neutral);
+}
+
+/* Disabled-state når boblen ikke er klikkbar */
+.disabled,
+.bubble:disabled {
+  cursor: default;
+  transform: none;
+  opacity: 0.7;
+  border-color: var(--ax-border-neutral-subtleA);
+}
+
+.disabled:hover,
+.bubble:disabled:hover {
+  transform: none;
+  border-color: var(--ax-border-neutral-subtleA);
 }
 
 .bubble:focus-visible {
@@ -120,30 +141,6 @@
   background: var(--ax-bg-moderateA);
   color: var(--ax-text-default);
   border: 1px solid var(--ax-border-neutral-subtleA);
-}
-
-.tagGreen {
-  background: var(--ax-bg-success-softA);
-  border-color: var(--ax-border-success-subtleA);
-  color: var(--ax-text-default);
-}
-
-.tagBlue {
-  background: var(--ax-bg-info-softA);
-  border-color: var(--ax-border-info-subtleA);
-  color: var(--ax-text-default);
-}
-
-.tagPurple {
-  background: var(--ax-bg-accent-softA);
-  border-color: var(--ax-border-accent-subtleA);
-  color: var(--ax-text-default);
-}
-
-.tagGray {
-  background: var(--ax-bg-neutral-softA);
-  border-color: var(--ax-border-neutral-subtleA);
-  color: var(--ax-text-default);
 }
 
 .statusRunning {
