@@ -1,7 +1,7 @@
-import { Button, Heading, HStack, InlineMessage, Modal, Select, VStack } from '@navikt/ds-react'
+import { Button, Dialog, Heading, HStack, InlineMessage, Select, VStack } from '@navikt/ds-react'
 import { format, parse } from 'date-fns'
 import { nb } from 'date-fns/locale'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { opprettKontrollereAfpStatEtter65Behandling } from '~/kontroll-afp-stat-etter-65/kontroll-afp-stat-etter-65.server'
@@ -70,7 +70,7 @@ const genererManedsalternativer = () => {
 
 export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionData }: Route.ComponentProps) {
   const { behandlinger } = loaderData
-  const modalRef = useRef<HTMLDialogElement>(null)
+  const [modalOpen, setModalOpen] = useState(false)
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
 
@@ -90,7 +90,7 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
   // Lukk modal ved oppretting av flere behandlinger samtidig
   useEffect(() => {
     if (suksessmelding) {
-      modalRef.current?.close()
+      setModalOpen(false)
     }
   }, [suksessmelding])
 
@@ -153,7 +153,7 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
           )}
 
           <HStack gap="space-16">
-            <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
+            <Button type="button" onClick={() => setModalOpen(true)} disabled={!kanOpprette}>
               Opprett kontroll
             </Button>
           </HStack>
@@ -176,39 +176,46 @@ export default function OpprettKontrollAfpStatEtter65Route({ loaderData, actionD
           behandlingerResponse={behandlinger}
         />
       </div>
-      <Modal ref={modalRef} header={{ heading: 'Start AFP Stat 65 års Kontroll' }} size="small">
-        <Modal.Body>
-          <VStack gap="space-16">
-            <div>
-              <b>Fra og med måned:</b> {selectedFomMaaned ? formatYearMonth(selectedFomMaaned) : '-'}
-            </div>
-            <div>
-              <b>Antall måneder å opprette:</b> {antallMaaneder}
-            </div>
-            {selectedFomMaaned && (
+      <Dialog open={modalOpen} onOpenChange={(open) => setModalOpen(open)} size="small">
+        <Dialog.Popup>
+          <Dialog.Header>
+            <Dialog.Title>Start AFP Stat 65 års Kontroll</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>
+            <VStack gap="space-16">
               <div>
-                <b>Måneder som opprettes:</b>
-                <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
-                  {Array.from({ length: parseInt(antallMaaneder, 10) }, (_, i) => {
-                    const startDate = parse(selectedFomMaaned, 'yyyy-MM', new Date())
-                    const d = new Date(startDate)
-                    d.setMonth(d.getMonth() + i)
-                    return <li key={format(d, 'yyyy-MM')}>{format(d, 'MMMM yyyy', { locale: nb })}</li>
-                  })}
-                </ul>
+                <b>Fra og med måned:</b> {selectedFomMaaned ? formatYearMonth(selectedFomMaaned) : '-'}
               </div>
-            )}
-          </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button form="skjema" type="submit" disabled={!kanOpprette || isSubmitting} loading={isSubmitting}>
-            Start behandling{parseInt(antallMaaneder, 10) > 1 ? 'er' : ''}
-          </Button>
-          <Button type="button" variant="secondary" onClick={() => modalRef.current?.close()}>
-            Tilbake
-          </Button>
-        </Modal.Footer>
-      </Modal>
+              <div>
+                <b>Antall måneder å opprette:</b> {antallMaaneder}
+              </div>
+              {selectedFomMaaned && (
+                <div>
+                  <b>Måneder som opprettes:</b>
+                  <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
+                    {Array.from({ length: parseInt(antallMaaneder, 10) }, (_, i) => {
+                      const startDate = parse(selectedFomMaaned, 'yyyy-MM', new Date())
+                      const d = new Date(startDate)
+                      d.setMonth(d.getMonth() + i)
+                      return <li key={format(d, 'yyyy-MM')}>{format(d, 'MMMM yyyy', { locale: nb })}</li>
+                    })}
+                  </ul>
+                </div>
+              )}
+            </VStack>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Button form="skjema" type="submit" disabled={!kanOpprette || isSubmitting} loading={isSubmitting}>
+              Start behandling{parseInt(antallMaaneder, 10) > 1 ? 'er' : ''}
+            </Button>
+            <Dialog.CloseTrigger>
+              <Button type="button" variant="secondary">
+                Tilbake
+              </Button>
+            </Dialog.CloseTrigger>
+          </Dialog.Footer>
+        </Dialog.Popup>
+      </Dialog>
     </div>
   )
 }
