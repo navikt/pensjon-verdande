@@ -195,6 +195,9 @@ export async function loader({ request }: Route.LoaderArgs) {
       return Response.json({ grunnlagBehandlingId: 0, sok: [] } satisfies SokPollResponse, { status: 400 })
     }
     const grunnlagId = Number(grunnlagIdStr)
+    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) {
+      return Response.json({ grunnlagBehandlingId: 0, sok: [] } satisfies SokPollResponse, { status: 400 })
+    }
 
     const sok =
       (await apiGetOrUndefined<LeveattestSokResultat[]>(`/api/behandling/leveattest/${grunnlagId}`, request)) ?? []
