@@ -168,6 +168,8 @@ export default [
       route('laasOpp', 'vedlikehold/laaste-vedtak.laasOpp.tsx'),
     ]),
 
+    route('leveattest-kontroll', 'leveattest-kontroll/leveattest-kontroll.tsx'),
+
     route('leveattester-sokos-spkmottak', 'vedlikehold/leveattester-sokos-spkmottak.tsx'),
 
     route('lever-samboeropplysning', 'samboeropplysninger/lever-samboeropplysning._index.tsx'),
