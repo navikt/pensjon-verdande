@@ -1,6 +1,6 @@
 import { Button, Heading, HStack, Textarea, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { Outlet, redirect, useFetcher } from 'react-router'
+import { redirect, useFetcher } from 'react-router'
 import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/feil-registrer-krav'
 
@@ -54,7 +54,6 @@ export default function FeilRegistrerKravPage() {
           </Button>
         </HStack>
       </fetcher.Form>
-      <Outlet />
     </VStack>
   )
 }
