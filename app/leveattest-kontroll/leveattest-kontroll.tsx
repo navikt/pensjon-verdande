@@ -412,6 +412,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
     if (data.status === 'IKKE_FUNNET') {
       setGrunnlagStatus('IDLE')
+      stoppInterval(pollTimerRef)
       return
     }
 
