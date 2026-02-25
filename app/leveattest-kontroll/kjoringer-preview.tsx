@@ -134,13 +134,11 @@ export default function KjoringerPreview({ title, items, emptyText, onClickItem 
       {title && <Heading size="medium">{title}</Heading>}
 
       {keys.map((key) => {
-        const list = (groups[key] ?? [])
-          .slice()
-          .sort((a, b) => {
-            const aKey = a.yearMonthDay + (a.time ?? '')
-            const bKey = b.yearMonthDay + (b.time ?? '')
-            return aKey.localeCompare(bKey)
-          })
+        const list = (groups[key] ?? []).slice().sort((a, b) => {
+          const aKey = a.yearMonthDay + (a.time ?? '')
+          const bKey = b.yearMonthDay + (b.time ?? '')
+          return aKey.localeCompare(bKey)
+        })
 
         return (
           <VStack key={key} gap="space-4">
