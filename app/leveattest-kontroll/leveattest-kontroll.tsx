@@ -184,22 +184,22 @@ export async function loader({ request }: Route.LoaderArgs) {
   if (url.searchParams.get('poll') === 'grunnlag') {
     const resultat = await apiGetOrUndefined<LeveattestGrunnlagResultat>(`/api/behandling/leveattest/grunnlag`, request)
 
-    if (!resultat) return Response.json({ status: 'IKKE_FUNNET' } satisfies PollResponse)
-    if (isFerdig(resultat.status)) return Response.json({ status: 'FERDIG', resultat } satisfies PollResponse)
-    return Response.json({ status: 'KJØRER' } satisfies PollResponse)
+    if (!resultat) return { status: 'IKKE_FUNNET' } satisfies PollResponse
+    if (isFerdig(resultat.status)) return { status: 'FERDIG', resultat } satisfies PollResponse
+    return { status: 'KJØRER' } satisfies PollResponse
   }
 
   if (url.searchParams.get('poll') === 'sok') {
     const grunnlagIdStr = url.searchParams.get('grunnlagId')
     if (!grunnlagIdStr) {
-      return Response.json({ grunnlagBehandlingId: 0, sok: [] } satisfies SokPollResponse, { status: 400 })
+      return { grunnlagBehandlingId: 0, sok: [] } satisfies SokPollResponse
     }
     const grunnlagId = Number(grunnlagIdStr)
 
     const sok =
       (await apiGetOrUndefined<LeveattestSokResultat[]>(`/api/behandling/leveattest/${grunnlagId}`, request)) ?? []
 
-    return Response.json({ grunnlagBehandlingId: grunnlagId, sok } satisfies SokPollResponse)
+    return { grunnlagBehandlingId: grunnlagId, sok } satisfies SokPollResponse
   }
 
   if (url.searchParams.get('poll') === 'startkontroll') {
@@ -208,7 +208,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         `/api/behandling/leveattest/startkontroll`,
         request,
       )) ?? []
-    return Response.json({ startkontroller } satisfies StartKontrollPollResponse)
+    return { startkontroller } satisfies StartKontrollPollResponse
   }
 
   const latestGrunnlag = await apiGetOrUndefined<LeveattestGrunnlagResultat>(
@@ -227,11 +227,11 @@ export async function loader({ request }: Route.LoaderArgs) {
     (await apiGetOrUndefined<LeveattestStartKontrollResponse[]>(`/api/behandling/leveattest/startkontroll`, request)) ??
     []
 
-  return Response.json({
+  return {
     latestGrunnlag: latestGrunnlag ?? null,
     sok,
     startkontroller,
-  } satisfies LoaderData)
+  } satisfies LoaderData
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -241,21 +241,21 @@ export async function action({ request }: Route.ActionArgs) {
   if (intent === 'hentGrunnlag') {
     const behandlingId = await apiPost<number>('/api/behandling/leveattest/grunnlag', {}, request)
     if (typeof behandlingId !== 'number') {
-      return Response.json({ error: 'Mangler behandlingId fra backend' }, { status: 500 })
+      return { error: 'Mangler behandlingId fra backend' }
     }
-    return Response.json({ behandlingId } satisfies StartGrunnlagResponse)
+    return { behandlingId } satisfies StartGrunnlagResponse
   }
 
   if (intent === 'kjorSok') {
     const grunnlagBehandlingId = Number(fd.get('grunnlagBehandlingId'))
     if (!Number.isFinite(grunnlagBehandlingId) || grunnlagBehandlingId <= 0) {
-      return Response.json({ error: 'Ugyldig grunnlagBehandlingId' }, { status: 400 })
+      return { error: 'Ugyldig grunnlagBehandlingId' }
     }
 
     const alderRaw = String(fd.get('alder') ?? '')
     const alder = Number(alderRaw)
     if (!Number.isFinite(alder) || alder < 0 || alder > 120) {
-      return Response.json({ error: 'Ugyldig minstealder' }, { status: 400 })
+      return { error: 'Ugyldig minstealder' }
     }
 
     const filtrerPaSakstypeUfore = String(fd.get('filtrerPaSakstypeUfore') ?? 'false') === 'true'
@@ -265,7 +265,7 @@ export async function action({ request }: Route.ActionArgs) {
       .filter(Boolean)
 
     if (sokPaaLand.length === 0) {
-      return Response.json({ error: 'Mangler sokPaaLand' }, { status: 400 })
+      return { error: 'Mangler sokPaaLand' }
     }
 
     const sokBehandlingId = await apiPost<number>(
@@ -275,10 +275,10 @@ export async function action({ request }: Route.ActionArgs) {
     )
 
     if (typeof sokBehandlingId !== 'number') {
-      return Response.json({ error: 'Mangler sokBehandlingId fra backend' }, { status: 500 })
+      return { error: 'Mangler sokBehandlingId fra backend' }
     }
 
-    return Response.json({ sokBehandlingId } satisfies StartSokResponse)
+    return { sokBehandlingId } satisfies StartSokResponse
   }
 
   if (intent === 'startKontroll') {
@@ -288,19 +288,19 @@ export async function action({ request }: Route.ActionArgs) {
       .filter((n) => Number.isFinite(n))
 
     if (sokBehandlingId.length === 0) {
-      return Response.json({ error: 'Ingen søk valgt' }, { status: 400 })
+      return { error: 'Ingen søk valgt' }
     }
 
     await apiPost<void>('/api/behandling/leveattest/startkontroll', { sokBehandlingId }, request)
 
-    return Response.json({ ok: true } satisfies StartKontrollActionResponse)
+    return { ok: true } satisfies StartKontrollActionResponse
   }
 
   return null
 }
 
 export default function LeveattestKontrollStartside({ loaderData }: Route.ComponentProps) {
-  const { latestGrunnlag, sok: initialSok, startkontroller: initialStartkontroller } = loaderData as LoaderData
+  const { latestGrunnlag, sok: initialSok, startkontroller: initialStartkontroller } = loaderData
 
   const startFetcher = useFetcher<StartGrunnlagResponse>()
   const pollFetcher = useFetcher<PollResponse>()
