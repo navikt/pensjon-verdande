@@ -61,9 +61,7 @@ export function meta(): Route.MetaDescriptors {
 }
 
 const FERDIG_STATUSER: ReadonlySet<string> = new Set(['FULLFORT', 'STOPPET', 'STOPPET_VENTER_BEKREFTELSE'])
-
 const TERMINAL_STATUSER: ReadonlySet<string> = new Set([...Array.from(FERDIG_STATUSER), 'FEILENDE'])
-
 const KJORENDE_STATUSER: ReadonlySet<string> = new Set(['OPPRETTET', 'UNDER_BEHANDLING'])
 
 function isFerdig(status: string) {
@@ -106,10 +104,7 @@ function formatIsoTimeNo(value: unknown): string | null {
   if (typeof value !== 'string' || value.length < 10) return null
   const dt = new Date(value)
   if (Number.isNaN(dt.getTime())) return null
-  return new Intl.DateTimeFormat('no-NO', {
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(dt)
+  return new Intl.DateTimeFormat('no-NO', { hour: '2-digit', minute: '2-digit' }).format(dt)
 }
 
 const BOSTEDLAND_OPTIONS: Array<{ value: string; label: string }> = [
@@ -182,40 +177,38 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
 
   if (url.searchParams.get('poll') === 'grunnlag') {
-    const resultat = await apiGetOrUndefined<LeveattestGrunnlagResultat>(`/api/behandling/leveattest/grunnlag`, request)
+    const resultat = await apiGetOrUndefined<LeveattestGrunnlagResultat>('/api/behandling/leveattest/grunnlag', request)
 
-    if (!resultat) return Response.json({ status: 'IKKE_FUNNET' } satisfies PollResponse)
-    if (isFerdig(resultat.status)) return Response.json({ status: 'FERDIG', resultat } satisfies PollResponse)
-    return Response.json({ status: 'KJØRER' } satisfies PollResponse)
+    if (!resultat) return { status: 'IKKE_FUNNET' } satisfies PollResponse
+    if (isFerdig(resultat.status)) return { status: 'FERDIG', resultat } satisfies PollResponse
+    return { status: 'KJØRER' } satisfies PollResponse
   }
 
   if (url.searchParams.get('poll') === 'sok') {
     const grunnlagIdStr = url.searchParams.get('grunnlagId')
-    if (!grunnlagIdStr) {
-      return Response.json({ grunnlagBehandlingId: 0, sok: [] } satisfies SokPollResponse, { status: 400 })
-    }
+    if (!grunnlagIdStr) throw new Response('Missing grunnlagId', { status: 400 })
+
     const grunnlagId = Number(grunnlagIdStr)
-    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) {
-      return Response.json({ grunnlagBehandlingId: 0, sok: [] } satisfies SokPollResponse, { status: 400 })
-    }
+    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) throw new Response('Invalid grunnlagId', { status: 400 })
 
     const sok =
       (await apiGetOrUndefined<LeveattestSokResultat[]>(`/api/behandling/leveattest/${grunnlagId}`, request)) ?? []
 
-    return Response.json({ grunnlagBehandlingId: grunnlagId, sok } satisfies SokPollResponse)
+    return { grunnlagBehandlingId: grunnlagId, sok } satisfies SokPollResponse
   }
 
   if (url.searchParams.get('poll') === 'startkontroll') {
     const startkontroller =
       (await apiGetOrUndefined<LeveattestStartKontrollResponse[]>(
-        `/api/behandling/leveattest/startkontroll`,
+        '/api/behandling/leveattest/startkontroll',
         request,
       )) ?? []
-    return Response.json({ startkontroller } satisfies StartKontrollPollResponse)
+
+    return { startkontroller } satisfies StartKontrollPollResponse
   }
 
   const latestGrunnlag = await apiGetOrUndefined<LeveattestGrunnlagResultat>(
-    `/api/behandling/leveattest/grunnlag`,
+    '/api/behandling/leveattest/grunnlag',
     request,
   )
 
@@ -227,14 +220,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     : []
 
   const startkontroller =
-    (await apiGetOrUndefined<LeveattestStartKontrollResponse[]>(`/api/behandling/leveattest/startkontroll`, request)) ??
+    (await apiGetOrUndefined<LeveattestStartKontrollResponse[]>('/api/behandling/leveattest/startkontroll', request)) ??
     []
 
-  return Response.json({
+  return {
     latestGrunnlag: latestGrunnlag ?? null,
     sok,
     startkontroller,
-  } satisfies LoaderData)
+  } satisfies LoaderData
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -243,22 +236,20 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (intent === 'hentGrunnlag') {
     const behandlingId = await apiPost<number>('/api/behandling/leveattest/grunnlag', {}, request)
-    if (typeof behandlingId !== 'number') {
-      return Response.json({ error: 'Mangler behandlingId fra backend' }, { status: 500 })
-    }
-    return Response.json({ behandlingId } satisfies StartGrunnlagResponse)
+    if (typeof behandlingId !== 'number') throw new Response('Missing behandlingId', { status: 500 })
+    return { behandlingId } satisfies StartGrunnlagResponse
   }
 
   if (intent === 'kjorSok') {
     const grunnlagBehandlingId = Number(fd.get('grunnlagBehandlingId'))
     if (!Number.isFinite(grunnlagBehandlingId) || grunnlagBehandlingId <= 0) {
-      return Response.json({ error: 'Ugyldig grunnlagBehandlingId' }, { status: 400 })
+      throw new Response('Invalid grunnlagBehandlingId', { status: 400 })
     }
 
     const alderRaw = String(fd.get('alder') ?? '')
     const alder = Number(alderRaw)
     if (!Number.isFinite(alder) || alder < 0 || alder > 120) {
-      return Response.json({ error: 'Ugyldig minstealder' }, { status: 400 })
+      throw new Response('Ugyldig minstealder', { status: 400 })
     }
 
     const filtrerPaSakstypeUfore = String(fd.get('filtrerPaSakstypeUfore') ?? 'false') === 'true'
@@ -266,10 +257,7 @@ export async function action({ request }: Route.ActionArgs) {
       .getAll('sokPaaLand')
       .map((v) => String(v))
       .filter(Boolean)
-
-    if (sokPaaLand.length === 0) {
-      return Response.json({ error: 'Mangler sokPaaLand' }, { status: 400 })
-    }
+    if (sokPaaLand.length === 0) throw new Response('Mangler sokPaaLand', { status: 400 })
 
     const sokBehandlingId = await apiPost<number>(
       '/api/behandling/leveattest/sok',
@@ -277,11 +265,8 @@ export async function action({ request }: Route.ActionArgs) {
       request,
     )
 
-    if (typeof sokBehandlingId !== 'number') {
-      return Response.json({ error: 'Mangler sokBehandlingId fra backend' }, { status: 500 })
-    }
-
-    return Response.json({ sokBehandlingId } satisfies StartSokResponse)
+    if (typeof sokBehandlingId !== 'number') throw new Response('Missing sokBehandlingId', { status: 500 })
+    return { sokBehandlingId } satisfies StartSokResponse
   }
 
   if (intent === 'startKontroll') {
@@ -289,21 +274,17 @@ export async function action({ request }: Route.ActionArgs) {
       .getAll('valgteSok')
       .map((v) => Number(v))
       .filter((n) => Number.isFinite(n))
-
-    if (sokBehandlingId.length === 0) {
-      return Response.json({ error: 'Ingen søk valgt' }, { status: 400 })
-    }
+    if (sokBehandlingId.length === 0) throw new Response('Ingen søk valgt', { status: 400 })
 
     await apiPost<void>('/api/behandling/leveattest/startkontroll', { sokBehandlingId }, request)
-
-    return Response.json({ ok: true } satisfies StartKontrollActionResponse)
+    return { ok: true } satisfies StartKontrollActionResponse
   }
 
   return null
 }
 
 export default function LeveattestKontrollStartside({ loaderData }: Route.ComponentProps) {
-  const { latestGrunnlag, sok: initialSok, startkontroller: initialStartkontroller } = loaderData as LoaderData
+  const { latestGrunnlag, sok: initialSok, startkontroller: initialStartkontroller } = loaderData
 
   const startFetcher = useFetcher<StartGrunnlagResponse>()
   const pollFetcher = useFetcher<PollResponse>()
@@ -337,7 +318,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   }, [])
 
   const pollGrunnlag = useCallback(() => {
-    pollFetcher.load(`?poll=grunnlag`)
+    pollFetcher.load('?poll=grunnlag')
   }, [pollFetcher])
 
   const pollSokListe = useCallback(
@@ -348,18 +329,16 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   )
 
   const pollStartKontroller = useCallback(() => {
-    startKontrollListFetcher.load(`?poll=startkontroll`)
+    startKontrollListFetcher.load('?poll=startkontroll')
   }, [startKontrollListFetcher])
 
-  const sendtTilKontrollSet = useMemo(() => {
-    return new Set(startkontroller.map((k) => k.sokBehandlingId))
-  }, [startkontroller])
+  const sendtTilKontrollSet = useMemo(() => new Set(startkontroller.map((k) => k.sokBehandlingId)), [startkontroller])
 
   useEffect(() => {
     setValgteSokIds((prev) => prev.filter((id) => !sendtTilKontrollSet.has(id)))
   }, [sendtTilKontrollSet])
 
-  // init from loaderData
+  // Init from loaderData
   useEffect(() => {
     if (initializedRef.current) return
     initializedRef.current = true
@@ -368,6 +347,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
     if (!latestGrunnlag) {
       setGrunnlagStatus('IDLE')
+      setSokListe([])
       return
     }
 
@@ -385,11 +365,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     pollGrunnlag()
     stoppInterval(pollTimerRef)
     pollTimerRef.current = window.setInterval(pollGrunnlag, 10_000)
-
     return () => stoppInterval(pollTimerRef)
   }, [latestGrunnlag, initialSok, initialStartkontroller, pollGrunnlag, stoppInterval])
 
-  // start grunnlag
+  // Start grunnlag => start polling
   useEffect(() => {
     const behandlingId = startFetcher.data?.behandlingId
     if (!behandlingId) return
@@ -407,18 +386,16 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     pollGrunnlag()
     stoppInterval(pollTimerRef)
     pollTimerRef.current = window.setInterval(pollGrunnlag, 10_000)
-
     return () => stoppInterval(pollTimerRef)
   }, [startFetcher.data?.behandlingId, pollGrunnlag, stoppInterval])
 
-  // handle grunnlag polling result
+  // Handle grunnlag poll response
   useEffect(() => {
     const data = pollFetcher.data
     if (!data) return
 
     if (data.status === 'IKKE_FUNNET') {
       setGrunnlagStatus('IDLE')
-      stoppInterval(pollTimerRef)
       return
     }
 
@@ -436,17 +413,16 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     }
   }, [pollFetcher.data, pollSokListe, stoppInterval])
 
-  // handle søk list response
+  // Handle søk list response
   useEffect(() => {
     if (!sokListFetcher.data) return
     setSokListe(sokListFetcher.data.sok ?? [])
   }, [sokListFetcher.data])
 
-  // background poll søk while any non-terminal
+  // Background poll søk while any non-terminal
   useEffect(() => {
     const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
-    if (!grunnlagId) return
-    if (grunnlagStatus !== 'FERDIG') return
+    if (!grunnlagId || grunnlagStatus !== 'FERDIG') return
 
     const hasNonTerminal = sokListe.some((s) => !isTerminal(s.status))
     if (!hasNonTerminal) {
@@ -456,11 +432,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
     if (sokBackgroundPollRef.current != null) return
     sokBackgroundPollRef.current = window.setInterval(() => pollSokListe(grunnlagId), 10_000)
-
     return () => stoppInterval(sokBackgroundPollRef)
   }, [grunnlagBehandlingId, grunnlagResultat, grunnlagStatus, sokListe, pollSokListe, stoppInterval])
 
-  // tight poll after starting a new søk
+  // Tight poll after starting søk
   useEffect(() => {
     const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
     const sokId = sokStartFetcher.data?.sokBehandlingId
@@ -478,13 +453,13 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return () => stoppInterval(sokPollTimerRef)
   }, [sokStartFetcher.data?.sokBehandlingId, grunnlagBehandlingId, grunnlagResultat, pollSokListe, stoppInterval])
 
-  // handle startkontroll list response
+  // Handle startkontroll list response
   useEffect(() => {
     if (!startKontrollListFetcher.data) return
     setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
   }, [startKontrollListFetcher.data])
 
-  // poll startkontroll after POST
+  // Poll startkontroll after POST
   useEffect(() => {
     if (startKontrollFetcher.state !== 'idle') return
     if (!startKontrollFetcher.data?.ok) return
@@ -501,7 +476,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return () => stoppInterval(startKontrollPollRef)
   }, [startKontrollFetcher.state, startKontrollFetcher.data, pollStartKontroller, stoppInterval])
 
-  // background poll startkontroll while any non-terminal
+  // Background poll startkontroll while any non-terminal
   useEffect(() => {
     const hasNonTerminal = startkontroller.some((k) => !isTerminal(k.status))
     if (!hasNonTerminal) {
@@ -511,13 +486,13 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
     if (startKontrollPollRef.current != null) return
     startKontrollPollRef.current = window.setInterval(() => pollStartKontroller(), 10_000)
-
     return () => stoppInterval(startKontrollPollRef)
   }, [startkontroller, pollStartKontroller, stoppInterval])
 
-  // Step 2 state
+  // UI state (step 2)
+  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
   const disableStart = grunnlagStatus === 'KJØRER'
-  const disableSok = !(grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId) || grunnlagStatus !== 'FERDIG'
+  const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
 
   const [minstAlder, setMinstAlder] = useState<string>('67')
   const [kunUfore, setKunUfore] = useState<boolean>(false)
@@ -577,8 +552,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     setValgteSokIds((prev) => (prev.includes(sokId) ? prev.filter((x) => x !== sokId) : [...prev, sokId]))
   }
 
-  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
-
+  // Bubble items
   const grunnlagItems: BubbleItem[] = useMemo(() => {
     const id = valgtGrunnlagId
     if (!id) return []
@@ -622,6 +596,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
             : `${s.sokPaaLand.length} land (${s.sokPaaLand.slice(0, 3).join(', ')}, …)`
 
         const sendt = sendtTilKontrollSet.has(s.sokBehandlingId)
+
         const baseTag = `SøkId: ${s.sokBehandlingId} · ${landLabel} · ${s.alder}+${s.filtrerPaSakstypeUfore ? ' · Kun uføre' : ''}`
         const tagText = sendt ? `${baseTag} · SENDT` : baseTag
 
@@ -663,7 +638,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
           status: startKontrollStatusToBubbleStatus(k.status),
           description: `Startkontroll · ${k.status}`,
           tagText: `SøkId: ${k.sokBehandlingId}`,
-          tagColorKey: `KONTROLL:${String(k.sokBehandlingId)}`,
+          tagColorKey: `STARTKONTROLL:${String(k.sokBehandlingId)}`,
           selected: false,
         }
       })
@@ -769,10 +744,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
           style={{
             maxHeight: '240px',
             overflow: 'auto',
-            border: '1px solid var(--ax-border-subtle)',
+            border: '1px solid var(--ax-border-neutral-subtleA)',
             borderRadius: '12px',
             padding: '0.75rem',
-            background: 'var(--ax-surface-default)',
+            background: 'var(--ax-bg-raised)',
           }}
         >
           <div style={{ fontSize: '0.85rem' }}>
