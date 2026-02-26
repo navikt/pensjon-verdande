@@ -61,7 +61,7 @@ export default function FeilRegistrerKravPage() {
         <VStack gap="space-16">
           <HStack gap="space-8" align="end">
             <Textarea
-              label={'Feil registrerte saker (en per linje)'}
+              label={'Feilregistrerte saker (en per linje)'}
               onChange={(e) => setSakIderText(e.target.value)}
               value={sakIderText}
               name="sakIder"
@@ -83,7 +83,7 @@ export default function FeilRegistrerKravPage() {
           </HStack>
           <HStack>
             <Button type="submit" name="action">
-              Feil registrer saker
+              Feilregistrer saker
             </Button>
           </HStack>
         </VStack>
