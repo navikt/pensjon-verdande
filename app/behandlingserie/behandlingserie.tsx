@@ -830,6 +830,31 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
     forhandsvisDatoer,
   ])
 
+  const deaktiverteDatoerForEndring = useMemo(() => {
+    return buildDisabledDates({
+      fromDate: now,
+      toDate: horisontSlutt,
+      bookedDates: booketData.bookedeDatoer,
+      helligdagsdatoer: helligdagsdata.holidayDates,
+      serieValg: serieValg,
+      antallPerMaaned: totaltPerMaaned,
+      ekskluderHelg,
+      ekskluderHelligdager,
+      ekskluderSondag,
+      ignorerMaksPerMaaned: true,
+    })
+  }, [
+    now,
+    horisontSlutt,
+    booketData.bookedeDatoer,
+    totaltPerMaaned,
+    helligdagsdata.holidayDates,
+    serieValg,
+    ekskluderHelg,
+    ekskluderHelligdager,
+    ekskluderSondag,
+  ])
+
   const planlagteElementer: PlannedItem[] = useMemo(() => {
     const items: PlannedItem[] = []
     for (const serie of behandlingSerier ?? []) {
@@ -973,7 +998,7 @@ export default function BehandlingOpprett_index({ loaderData }: Route.ComponentP
             element={redigeres}
             horisontSlutt={horisontSlutt}
             ekskluderHelg={ekskluderHelg}
-            deaktiverteDatoer={deaktiverteDatoer}
+            deaktiverteDatoer={deaktiverteDatoerForEndring}
             onSave={lagreEndring}
           />
         </>
