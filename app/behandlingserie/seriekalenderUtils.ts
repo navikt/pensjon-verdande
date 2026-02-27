@@ -289,6 +289,7 @@ type DeaktiverteDatoerOptions = {
   ekskluderHelg: boolean
   ekskluderHelligdager: boolean
   ekskluderSondag: boolean
+  ignorerMaksPerMaaned?: boolean
 }
 
 export function buildDisabledDates({
@@ -301,6 +302,7 @@ export function buildDisabledDates({
   ekskluderHelg,
   ekskluderHelligdager,
   ekskluderSondag,
+  ignorerMaksPerMaaned,
 }: DeaktiverteDatoerOptions): Date[] {
   const disabledSet = new Set<number>()
   const addDisabled = (date: Date) => disabledSet.add(startOfDay(date).getTime())
@@ -315,7 +317,7 @@ export function buildDisabledDates({
 
     if (erDatoEkskludertAvRegler(d, serieValg)) addDisabled(d)
     if (erDatoIEkskludertMnd(d, serieValg)) addDisabled(d)
-    if (erMaanedFull(d, antallPerMaaned, maksValgtePerMnd)) addDisabled(d)
+    if (!ignorerMaksPerMaaned && erMaanedFull(d, antallPerMaaned, maksValgtePerMnd)) addDisabled(d)
   }
 
   if (ekskluderHelligdager) for (const date of helligdagsdatoer) addDisabled(date)
