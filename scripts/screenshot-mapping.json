@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Mapping fra Storybook story-IDer til dokumentasjonsbilder i pensjon-dokumentasjon. Brukes av capture-screenshots.ts --docs for å generere og kopiere skjermbilder.",
+  "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Behandlingsloesningen/images",
+  "screenshots": [
+    {
+      "storyId": "sider-dashboard--default",
+      "filename": "verdande-dashboard.png",
+      "description": "Verdande Dashboard med statusoversikt og statistikk"
+    },
+    {
+      "storyId": "sider-kalender--default",
+      "filename": "verdande-kalender.png",
+      "description": "Kalender med kjørte og planlagte batch-behandlinger"
+    },
+    {
+      "storyId": "sider-søk--with-results",
+      "filename": "verdande-sok.png",
+      "description": "Søkeresultater for behandlinger"
+    },
+    {
+      "storyId": "sider-behandling--default",
+      "filename": "verdande-behandling.png",
+      "description": "Behandlingsdetaljer med aktiviteter og historikk"
+    },
+    {
+      "storyId": "sider-behandling--fullfort",
+      "filename": "verdande-behandling-fullfort.png",
+      "description": "Fullført behandling med alle aktiviteter ferdig"
+    },
+    {
+      "storyId": "sider-behandlinger--default",
+      "filename": "verdande-behandlinger.png",
+      "description": "Behandlingsliste med filtrering"
+    },
+    {
+      "storyId": "sider-batcher--default",
+      "filename": "verdande-batcher.png",
+      "description": "Batchoversikt med fremdrift"
+    },
+    {
+      "storyId": "sider-manuell-behandling--default",
+      "filename": "verdande-manuell-behandling.png",
+      "description": "Oversikt over manuelle behandlinger"
+    },
+    {
+      "storyId": "sider-brukere--default",
+      "filename": "verdande-brukere.png",
+      "description": "Brukeradministrasjon"
+    },
+    {
+      "storyId": "sider-behandlingserie--default",
+      "filename": "verdande-behandlingserie.png",
+      "description": "Behandlingserie med kalenderplanlegging"
+    },
+    {
+      "storyId": "sider-alde-oppfølging--default",
+      "filename": "alde-oppfolging.png",
+      "description": "ALDE-oppfølging med statusoversikt"
+    }
+  ]
+}

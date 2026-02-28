@@ -19,6 +19,7 @@
     "storybook": "STORYBOOK=true storybook dev -p 6006",
     "build-storybook": "STORYBOOK=true storybook build",
     "capture-screenshots": "npx tsx scripts/capture-screenshots.ts",
+    "capture-docs-screenshots": "npx tsx scripts/capture-screenshots.ts --docs",
     "test": "vitest --project unit",
     "test:stories": "vitest --project storybook",
     "typecheck": "node scripts/copy-server-dts.ts && react-router typegen && tsc"
