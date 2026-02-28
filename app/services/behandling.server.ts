@@ -137,24 +137,13 @@ export async function search(
   size: number,
   sort: string | null,
 ): Promise<BehandlingerPage> {
-  let request = ''
-  if (status) {
-    request += `&status=${status}`
-  }
+  const params = new URLSearchParams({ query, page: String(page), size: String(size) })
+  if (status) params.set('status', status)
+  if (behandlingType) params.set('behandlingType', behandlingType)
+  if (sort) params.set('sort', sort)
+  if (ansvarligTeam) params.set('ansvarligTeam', ansvarligTeam)
 
-  if (behandlingType) {
-    request += `&behandlingType=${behandlingType}`
-  }
-
-  if (sort) {
-    request += `&sort=${sort}`
-  }
-
-  if (ansvarligTeam) {
-    request += `&ansvarligTeam=${ansvarligTeam}`
-  }
-
-  return await apiGet<BehandlingerPage>(`/api/behandling?query=${query}&page=${page}&size=${size}${request}`, {
+  return await apiGet<BehandlingerPage>(`/api/behandling?${params}`, {
     accessToken,
   })
 }
