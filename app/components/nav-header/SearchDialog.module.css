@@ -1,0 +1,69 @@
+.kbd {
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.triggerButton {
+  margin: var(--ax-space-6) var(--ax-space-16);
+  padding: var(--ax-space-6) var(--ax-space-12);
+}
+
+.popup {
+  align-self: start;
+  justify-self: center;
+  margin-block-start: 15vh;
+}
+
+.body {
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.resultList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.resultItem {
+  cursor: pointer;
+}
+
+.resultItemSelected {
+  cursor: pointer;
+  background: var(--ax-bg-accent-moderate-pressed);
+}
+
+.resultIcon {
+  font-size: 1rem;
+  color: var(--ax-text-neutral-subtle);
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchInputWrapper {
+  flex: 1;
+}
+
+.resultContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.subtleText {
+  color: var(--ax-text-neutral-subtle);
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.footer {
+  padding: var(--ax-space-12);
+}

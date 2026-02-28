@@ -12,6 +12,8 @@ import IkkeTilgang from './components/feilmelding/IkkeTilgang'
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const darkmodeCookie = await createCookie('darkmode').parse(request.headers.get('cookie'))
   const darkmode = darkmodeCookie === 'true' || darkmodeCookie === true
+  const ua = request.headers.get('User-Agent') ?? ''
+  const isMac = /Mac|iPhone|iPad/.test(ua)
 
   const [me, schedulerStatus] = await Promise.all([hentMe(request), getSchedulerStatus(request)])
 
@@ -20,11 +22,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     me: me,
     schedulerStatus: schedulerStatus,
     darkmode: darkmode,
+    isMac: isMac,
   }
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { env, me, schedulerStatus, darkmode } = loaderData
+  const { env, me, schedulerStatus, darkmode, isMac } = loaderData
   const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
   const [showIconMenu, setShowIconMenu] = useState<boolean>(false)
   const navigation = useNavigation()
@@ -70,6 +73,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
             setDarkmode={setIsDarkmode}
             showIconMenu={showIconMenu}
             setShowIconMenu={setShowIconMenu}
+            isMac={isMac}
           />
 
           <HStack gap="space-0" wrap={false}>
