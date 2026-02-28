@@ -4,52 +4,47 @@
   "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Behandlingsloesningen/images",
   "screenshots": [
     {
-      "storyId": "sider-dashboard--default",
+      "storyId": "fullpage--dashboard-fullpage",
       "filename": "verdande-dashboard.png",
       "description": "Verdande Dashboard med statusoversikt og statistikk"
     },
     {
-      "storyId": "sider-kalender--default",
+      "storyId": "fullpage--kalender-fullpage",
       "filename": "verdande-kalender.png",
       "description": "Kalender med kjørte og planlagte batch-behandlinger"
     },
     {
-      "storyId": "sider-søk--with-results",
+      "storyId": "fullpage--sok-fullpage",
       "filename": "verdande-sok.png",
       "description": "Søkeresultater for behandlinger"
     },
     {
-      "storyId": "sider-behandling--default",
+      "storyId": "fullpage--behandling-fullpage",
       "filename": "verdande-behandling.png",
       "description": "Behandlingsdetaljer med aktiviteter og historikk"
     },
     {
-      "storyId": "sider-behandling--fullfort",
-      "filename": "verdande-behandling-fullfort.png",
-      "description": "Fullført behandling med alle aktiviteter ferdig"
-    },
-    {
-      "storyId": "sider-behandlinger--default",
+      "storyId": "fullpage--behandlinger-fullpage",
       "filename": "verdande-behandlinger.png",
       "description": "Behandlingsliste med filtrering"
     },
     {
-      "storyId": "sider-batcher--default",
+      "storyId": "fullpage--batcher-fullpage",
       "filename": "verdande-batcher.png",
       "description": "Batchoversikt med fremdrift"
     },
     {
-      "storyId": "sider-manuell-behandling--default",
+      "storyId": "fullpage--manuell-behandling-fullpage",
       "filename": "verdande-manuell-behandling.png",
       "description": "Oversikt over manuelle behandlinger"
     },
     {
-      "storyId": "sider-brukere--default",
+      "storyId": "fullpage--brukere-fullpage",
       "filename": "verdande-brukere.png",
       "description": "Brukeradministrasjon"
     },
     {
-      "storyId": "sider-behandlingserie--default",
+      "storyId": "fullpage--behandlingserie-fullpage",
       "filename": "verdande-behandlingserie.png",
       "description": "Behandlingserie med kalenderplanlegging"
     },
