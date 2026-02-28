@@ -71,7 +71,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 export default function HvilendeRettPage() {
   return (
-    <VStack gap="space-80" style={{ maxWidth: '50em', margin: '2em' }}>
+    <VStack gap="space-80" margin="space-32" style={{ maxWidth: '50em' }}>
       {hvilendeRettVarselForm()}
       {hvilendeRettOpphorForm()}
     </VStack>
