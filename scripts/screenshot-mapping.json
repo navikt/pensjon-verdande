@@ -76,6 +76,12 @@
       "storyId": "sider-alde-oppfølging--default",
       "filename": "alde-oppfolging.png",
       "description": "ALDE-oppfølging med statusoversikt"
+    },
+    {
+      "storyId": "fullpage--alde-oppfolging-fullpage",
+      "filename": "verdande-alde-oppfolging.png",
+      "description": "Alde oppfølging dashboard med statusfordeling og grafer",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
     }
   ]
 }

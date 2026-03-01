@@ -11,6 +11,7 @@ import {
   mockDashboardResponse,
 } from '../.storybook/mocks/data'
 import { renderWithLayout } from '../.storybook/mocks/router'
+import AldeOppfolging from './alde-oppfolging'
 import Alderspensjonssoknader from './alderspensjon/forstegangsbehandling/soknader'
 import Batcher from './batcher/batcher'
 import Behandling from './behandling/behandling.$behandlingId'
@@ -705,5 +706,115 @@ export const AlderspensjonssoknaderFullpage: Story = {
         tomDato: '2026-03-01',
       },
       { path: '/alderspensjon/forstegangsbehandling/soknader' },
+    ),
+}
+
+export const AldeOppfolgingFullpage: Story = {
+  name: 'Alde oppfølging',
+  render: () =>
+    renderWithLayout(
+      AldeOppfolging,
+      {
+        aldeStatusFordeling: [
+          { status: 'FULLFORT', antall: 1250 },
+          { status: 'UNDER_BEHANDLING', antall: 42 },
+          { status: 'AVBRUTT', antall: 8 },
+          { status: 'DEBUG', antall: 3 },
+          { status: 'FEILENDE', antall: 5 },
+          { status: 'STOPPET', antall: 2 },
+        ],
+        behandlingFordeling: [
+          { behandlingType: 'FleksibelApSak', antall: 980 },
+          { behandlingType: 'FleksibelApSoknad', antall: 270 },
+          { behandlingType: 'FleksibelApEndring', antall: 60 },
+        ],
+        avbrutteBehandlinger: [
+          { opprettet: '15.06.2024 10:30', begrunnelse: 'Manglende grunnlagsdata' },
+          { opprettet: '14.06.2024 14:15', begrunnelse: 'Feil i inntektsopplysninger' },
+          { opprettet: '13.06.2024 09:00', begrunnelse: 'Ugyldig samboerforhold' },
+        ],
+        aldeBehandlinger: [
+          {
+            friendlyName: 'Fleksibel AP (sak)',
+            handlerName: 'FleksibelApSakHandler',
+            behandlingType: 'FleksibelApSak',
+          },
+          {
+            friendlyName: 'Fleksibel AP (søknad)',
+            handlerName: 'FleksibelApSoknadHandler',
+            behandlingType: 'FleksibelApSoknad',
+          },
+          {
+            friendlyName: 'Fleksibel AP (endring)',
+            handlerName: 'FleksibelApEndringHandler',
+            behandlingType: 'FleksibelApEndring',
+          },
+        ],
+        statusfordelingOverTid: [
+          {
+            dato: '2024-06-10',
+            fordeling: [
+              { status: 'FULLFORT', antall: 180 },
+              { status: 'UNDER_BEHANDLING', antall: 10 },
+            ],
+          },
+          {
+            dato: '2024-06-11',
+            fordeling: [
+              { status: 'FULLFORT', antall: 200 },
+              { status: 'UNDER_BEHANDLING', antall: 8 },
+            ],
+          },
+          {
+            dato: '2024-06-12',
+            fordeling: [
+              { status: 'FULLFORT', antall: 190 },
+              { status: 'UNDER_BEHANDLING', antall: 12 },
+              { status: 'AVBRUTT', antall: 3 },
+            ],
+          },
+          {
+            dato: '2024-06-13',
+            fordeling: [
+              { status: 'FULLFORT', antall: 210 },
+              { status: 'UNDER_BEHANDLING', antall: 6 },
+            ],
+          },
+          {
+            dato: '2024-06-14',
+            fordeling: [
+              { status: 'FULLFORT', antall: 195 },
+              { status: 'UNDER_BEHANDLING', antall: 4 },
+              { status: 'FEILENDE', antall: 2 },
+            ],
+          },
+          {
+            dato: '2024-06-15',
+            fordeling: [
+              { status: 'FULLFORT', antall: 175 },
+              { status: 'UNDER_BEHANDLING', antall: 2 },
+            ],
+          },
+        ],
+        kontrollpunktFordelingOverTid: {
+          fordeling: [
+            { dato: '2024-06-10', data: [{ type: 'SAMBOER', antall: 5, enhet: 'stk' }] },
+            { dato: '2024-06-11', data: [{ type: 'SAMBOER', antall: 8, enhet: 'stk' }] },
+            { dato: '2024-06-12', data: [{ type: 'SAMBOER', antall: 3, enhet: 'stk' }] },
+          ],
+        },
+        statusfordelingAldeAktiviteter: [
+          { status: 'FULLFORT', aktivitet: 'HentGrunnlag', antall: 1200 },
+          { status: 'FULLFORT', aktivitet: 'BeregnYtelse', antall: 1150 },
+          { status: 'UNDER_BEHANDLING', aktivitet: 'HentGrunnlag', antall: 20 },
+          { status: 'UNDER_BEHANDLING', aktivitet: 'BeregnYtelse', antall: 15 },
+          { status: 'FEILENDE', aktivitet: 'IverksettVedtak', antall: 3 },
+        ],
+        fomDato: '2024-06-10',
+        tomDato: '2024-06-15',
+        behandlingstype: 'FleksibelApSak',
+        nowIso: '2024-06-15T12:00:00.000Z',
+      },
+      { path: '/alde' },
     ),
 }
