@@ -24,6 +24,30 @@
       "description": "Behandlingsdetaljer med aktiviteter og historikk"
     },
     {
+      "storyId": "fullpage--behandling-fullfort-fullpage",
+      "filename": "verdande-behandling-fullfort.png",
+      "description": "Fullført alderspensjonssøknad med kjøringshistorikk",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--behandling-under-behandling-fullpage",
+      "filename": "verdande-behandling-under-behandling.png",
+      "description": "Alderspensjonssøknad under behandling med handlingsknapper",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--behandling-med-alle-knapper-fullpage",
+      "filename": "verdande-behandling-alle-handlinger.png",
+      "description": "Behandling i testmiljø med alle handlingsknapper inkl. stopp og debug",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--alderspensjonssoknader-fullpage",
+      "filename": "verdande-alderspensjonssoknader.png",
+      "description": "Oversikt over førstegangsbehandling alderspensjonssøknader",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
       "storyId": "fullpage--behandlinger-fullpage",
       "filename": "verdande-behandlinger.png",
       "description": "Behandlingsliste med filtrering"

@@ -34,6 +34,7 @@ interface ScreenshotMapping {
     storyId: string
     filename: string
     description: string
+    targetDir?: string
   }>
 }
 
@@ -134,15 +135,17 @@ async function runDocsMode(url: string, theme: string) {
   let copied = 0
   for (const s of mapping.screenshots) {
     const src = join(OUTPUT_DIR, s.filename)
-    const dest = join(targetDir, s.filename)
+    const dest = join(resolve(__dirname, '..', s.targetDir ?? mapping.targetDir), s.filename)
     if (existsSync(src)) {
+      const destDir = resolve(dest, '..')
+      mkdirSync(destDir, { recursive: true })
       copyFileSync(src, dest)
       copied++
     }
   }
 
   console.log(`\nFerdig! ${captured}/${mapping.screenshots.length} screenshots generert`)
-  console.log(`${copied} bilder kopiert til ${targetDir}`)
+  console.log(`${copied} bilder kopiert`)
 }
 
 async function runStandardMode(url: string, theme: string, filter?: string, clean?: boolean) {
