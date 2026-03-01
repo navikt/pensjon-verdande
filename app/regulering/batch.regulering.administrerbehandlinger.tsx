@@ -1,9 +1,9 @@
 import 'chart.js/auto'
 import { ChevronDownIcon, PlayFillIcon } from '@navikt/aksel-icons'
 import {
+  ActionMenu,
   BodyShort,
   Button,
-  Dropdown,
   HStack,
   InlineMessage,
   Loader,
@@ -182,35 +182,28 @@ export default function AdministrerTilknyttetdeBehandlinger() {
   return (
     <VStack gap="space-20">
       <HStack gap="space-12">
-        <Dropdown>
-          <Button
-            icon={<PlayFillIcon />}
-            as={Dropdown.Toggle}
-            size="small"
-            loading={
-              fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting' ||
-              fetcherFortsettFamilieReguleringerTilBehandling.state === 'submitting'
-            }
-          >
-            Fortsett familie reguleringer ({antallFeilendeFamiliebehandlinger})
-          </Button>
-          <Dropdown.Menu>
-            <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item
-                as={Button}
-                onClick={() => setOpenConfirmationModal('fortsettFeilendeFamiliereguleringer')}
-              >
-                Fortsett feilende behandlinger ({antallFeilendeFamiliebehandlinger})
-              </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item
-                as={Button}
-                onClick={() => setOpenConfirmationModal('fortsettFamilieReguleringerTilBehandling')}
-              >
-                Fortsett utsatte behandlinger
-              </Dropdown.Menu.List.Item>
-            </Dropdown.Menu.List>
-          </Dropdown.Menu>
-        </Dropdown>
+        <ActionMenu>
+          <ActionMenu.Trigger>
+            <Button
+              icon={<PlayFillIcon />}
+              size="small"
+              loading={
+                fetcherFortsettFeilendeFamilieReguleringer.state === 'submitting' ||
+                fetcherFortsettFamilieReguleringerTilBehandling.state === 'submitting'
+              }
+            >
+              Fortsett familie reguleringer ({antallFeilendeFamiliebehandlinger})
+            </Button>
+          </ActionMenu.Trigger>
+          <ActionMenu.Content>
+            <ActionMenu.Item onClick={() => setOpenConfirmationModal('fortsettFeilendeFamiliereguleringer')}>
+              Fortsett feilende behandlinger ({antallFeilendeFamiliebehandlinger})
+            </ActionMenu.Item>
+            <ActionMenu.Item onClick={() => setOpenConfirmationModal('fortsettFamilieReguleringerTilBehandling')}>
+              Fortsett utsatte behandlinger
+            </ActionMenu.Item>
+          </ActionMenu.Content>
+        </ActionMenu>
         <Button
           icon={<PlayFillIcon />}
           size="small"
@@ -219,66 +212,58 @@ export default function AdministrerTilknyttetdeBehandlinger() {
         >
           Fortsett feilende iverksett vedtak ({antallFeilendeverksettVedtak})
         </Button>
-        <Dropdown>
-          <Button
-            icon={<ChevronDownIcon />}
-            iconPosition="right"
-            as={Dropdown.Toggle}
-            variant="secondary"
-            size="small"
-            loading={
-              fetcherFeilhandteringmodus.state === 'submitting' ||
-              fetcherFaktoromregningsmodus.state === 'submitting' ||
-              fetcherNyAvviksgrenser.state === 'submitting'
-            }
-          >
-            Rune sin knapp
-          </Button>
-          <Dropdown.Menu>
-            <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('fortsettNyAvviksgrenser')}>
-                Prøv på nytt med nye avviksgrenser ({antallVenterPaaRune})
-              </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item
-                as={Button}
-                onClick={() => setOpenConfirmationModal('fortsettFaktoromregningsmodus')}
-              >
-                Kjør i faktoromregningsmodus ({antallVenterPaaRune})
-              </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item
-                as={Button}
-                onClick={() => setOpenConfirmationModal('fortsettFeilhandteringmodus')}
-              >
-                Kjør i feilhåndteringsmodus ({antallFeilendeBeregnytelser})
-              </Dropdown.Menu.List.Item>
-            </Dropdown.Menu.List>
-          </Dropdown.Menu>
-        </Dropdown>
-        <Dropdown>
-          <Button
-            icon={<ChevronDownIcon />}
-            iconPosition="right"
-            as={Dropdown.Toggle}
-            variant="secondary"
-            size="small"
-            loading={
-              fetcherEndrePrioritetTilOnline.state === 'submitting' ||
-              fetcherEndrePrioritetTilBatch.state === 'submitting'
-            }
-          >
-            Endre prioritet
-          </Button>
-          <Dropdown.Menu>
-            <Dropdown.Menu.List>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('endrePrioritetTilOnline')}>
-                Endre til ONLINE
-              </Dropdown.Menu.List.Item>
-              <Dropdown.Menu.List.Item as={Button} onClick={() => setOpenConfirmationModal('endrePrioritetTilBatch')}>
-                Endre til BATCH
-              </Dropdown.Menu.List.Item>
-            </Dropdown.Menu.List>
-          </Dropdown.Menu>
-        </Dropdown>
+        <ActionMenu>
+          <ActionMenu.Trigger>
+            <Button
+              icon={<ChevronDownIcon />}
+              iconPosition="right"
+              variant="secondary"
+              size="small"
+              loading={
+                fetcherFeilhandteringmodus.state === 'submitting' ||
+                fetcherFaktoromregningsmodus.state === 'submitting' ||
+                fetcherNyAvviksgrenser.state === 'submitting'
+              }
+            >
+              Rune sin knapp
+            </Button>
+          </ActionMenu.Trigger>
+          <ActionMenu.Content>
+            <ActionMenu.Item onClick={() => setOpenConfirmationModal('fortsettNyAvviksgrenser')}>
+              Prøv på nytt med nye avviksgrenser ({antallVenterPaaRune})
+            </ActionMenu.Item>
+            <ActionMenu.Item onClick={() => setOpenConfirmationModal('fortsettFaktoromregningsmodus')}>
+              Kjør i faktoromregningsmodus ({antallVenterPaaRune})
+            </ActionMenu.Item>
+            <ActionMenu.Item onClick={() => setOpenConfirmationModal('fortsettFeilhandteringmodus')}>
+              Kjør i feilhåndteringsmodus ({antallFeilendeBeregnytelser})
+            </ActionMenu.Item>
+          </ActionMenu.Content>
+        </ActionMenu>
+        <ActionMenu>
+          <ActionMenu.Trigger>
+            <Button
+              icon={<ChevronDownIcon />}
+              iconPosition="right"
+              variant="secondary"
+              size="small"
+              loading={
+                fetcherEndrePrioritetTilOnline.state === 'submitting' ||
+                fetcherEndrePrioritetTilBatch.state === 'submitting'
+              }
+            >
+              Endre prioritet
+            </Button>
+          </ActionMenu.Trigger>
+          <ActionMenu.Content>
+            <ActionMenu.Item onClick={() => setOpenConfirmationModal('endrePrioritetTilOnline')}>
+              Endre til ONLINE
+            </ActionMenu.Item>
+            <ActionMenu.Item onClick={() => setOpenConfirmationModal('endrePrioritetTilBatch')}>
+              Endre til BATCH
+            </ActionMenu.Item>
+          </ActionMenu.Content>
+        </ActionMenu>
       </HStack>
       <HStack>
         <Tabs defaultValue="totaloversiktbehandlinger">
