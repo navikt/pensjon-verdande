@@ -243,3 +243,36 @@ npm run test:stories
 - `npm run test:stories` er grønn
 - `npm run build` er grønn
 - Endringen er dokumentert kort i PR-beskrivelse (hva/hvorfor) og evt. i README/kommentar ved behov
+
+## Skjermbilder for dokumentasjon
+
+Verdande har et script for å ta skjermbilder av Storybook-stories, som brukes til å generere bilder for dokumentasjonen i `pensjon-dokumentasjon`.
+
+### Kommandoer
+
+```zsh
+# Ta skjermbilder av alle stories
+npm run capture-screenshots
+
+# Ta skjermbilder kun for dokumentasjon og kopier til pensjon-dokumentasjon
+npm run capture-docs-screenshots
+```
+
+### Mapping
+
+Filen `scripts/screenshot-mapping.json` definerer hvilke stories som brukes i dokumentasjonen, med filnavn og beskrivelser. Denne filen er kilden til sannhet for AI som oppdaterer skjermbilder.
+
+### Oppdatere skjermbilder
+
+Etter visuelle endringer i Verdande:
+
+1. Start Storybook: `npm run storybook`
+2. Generer docs-screenshots: `npm run capture-docs-screenshots`
+3. Verifiser bildene i `pensjon-dokumentasjon/pen/docs/modules/Behandlingsloesningen/images/`
+4. Commit endrede bilder i `pensjon-dokumentasjon`
+
+### Viktige filer
+
+- `scripts/capture-screenshots.ts` — Playwright-basert screenshot-script
+- `scripts/screenshot-mapping.json` — Mapping fra story-id til dokumentasjonsbilde
+- `app/utils/decodeBehandling.ts` — Dekoding av behandlingstyper til lesbare navn

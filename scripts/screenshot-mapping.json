@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Mapping fra Storybook story-IDer til dokumentasjonsbilder i pensjon-dokumentasjon. Brukes av capture-screenshots.ts --docs for å generere og kopiere skjermbilder.",
+  "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Behandlingsloesningen/images",
+  "screenshots": [
+    {
+      "storyId": "fullpage--dashboard-fullpage",
+      "filename": "verdande-dashboard.png",
+      "description": "Verdande Dashboard med statusoversikt og statistikk"
+    },
+    {
+      "storyId": "fullpage--kalender-fullpage",
+      "filename": "verdande-kalender.png",
+      "description": "Kalender med kjørte og planlagte batch-behandlinger"
+    },
+    {
+      "storyId": "fullpage--sok-fullpage",
+      "filename": "verdande-sok.png",
+      "description": "Søkeresultater for behandlinger"
+    },
+    {
+      "storyId": "fullpage--behandling-fullpage",
+      "filename": "verdande-behandling.png",
+      "description": "Behandlingsdetaljer med aktiviteter og historikk"
+    },
+    {
+      "storyId": "fullpage--behandling-fullfort-fullpage",
+      "filename": "verdande-behandling-fullfort.png",
+      "description": "Fullført alderspensjonssøknad med kjøringshistorikk",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--behandling-under-behandling-fullpage",
+      "filename": "verdande-behandling-under-behandling.png",
+      "description": "Alderspensjonssøknad under behandling med handlingsknapper",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--behandling-med-alle-knapper-fullpage",
+      "filename": "verdande-behandling-alle-handlinger.png",
+      "description": "Behandling i testmiljø med alle handlingsknapper inkl. stopp og debug",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--alderspensjonssoknader-fullpage",
+      "filename": "verdande-alderspensjonssoknader.png",
+      "description": "Oversikt over førstegangsbehandling alderspensjonssøknader",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--behandlinger-fullpage",
+      "filename": "verdande-behandlinger.png",
+      "description": "Behandlingsliste med filtrering"
+    },
+    {
+      "storyId": "fullpage--batcher-fullpage",
+      "filename": "verdande-batcher.png",
+      "description": "Batchoversikt med fremdrift"
+    },
+    {
+      "storyId": "fullpage--manuell-behandling-fullpage",
+      "filename": "verdande-manuell-behandling.png",
+      "description": "Oversikt over manuelle behandlinger"
+    },
+    {
+      "storyId": "fullpage--brukere-fullpage",
+      "filename": "verdande-brukere.png",
+      "description": "Brukeradministrasjon"
+    },
+    {
+      "storyId": "fullpage--behandlingserie-fullpage",
+      "filename": "verdande-behandlingserie.png",
+      "description": "Behandlingserie med kalenderplanlegging"
+    },
+    {
+      "storyId": "sider-alde-oppfølging--default",
+      "filename": "alde-oppfolging.png",
+      "description": "ALDE-oppfølging med statusoversikt"
+    },
+    {
+      "storyId": "fullpage--alde-oppfolging-fullpage",
+      "filename": "verdande-alde-oppfolging.png",
+      "description": "Alde oppfølging dashboard med statusfordeling og grafer",
+      "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    }
+  ]
+}
