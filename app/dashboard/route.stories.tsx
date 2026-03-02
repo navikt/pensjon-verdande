@@ -25,7 +25,7 @@ export const Default: Story = {
   render: () =>
     renderWithLoader(Dashboard, {
       loadingDashboardResponse: mockDashboardResponse(),
-      kalenderHendelser: mockKalenderHendelser,
+      loadingKalenderHendelser: mockKalenderHendelser,
       startDato: new Date('2024-06-15'),
     }),
 }
@@ -41,7 +41,7 @@ export const Empty: Story = {
         opprettetPerDag: [],
         ukjenteBehandlingstyper: [],
       }),
-      kalenderHendelser: { offentligeFridager: [], kalenderBehandlinger: [] },
+      loadingKalenderHendelser: { offentligeFridager: [], kalenderBehandlinger: [] },
       startDato: new Date('2024-06-15'),
     }),
 }

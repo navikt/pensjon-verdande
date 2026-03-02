@@ -12,16 +12,8 @@ import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
-import { apiGet } from '~/services/api.server'
 import { hentKalenderHendelser } from '~/services/behandling.server'
-import type {
-  AntallUferdigeBehandlingerResponse,
-  BehandlingAntallResponse,
-  FeilendeBehandlingerResponse,
-  OpprettetPerDagResponse,
-  TotaltAntallBehandlingerResponse,
-  UkjenteBehandlingstyperResponse,
-} from '~/types'
+import { getDashboardSummary } from '~/services/dashboard.server'
 import type { Route } from './+types/route'
 
 export function meta(): Route.MetaDescriptors {
@@ -29,50 +21,14 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const dashboardResponse = Promise.all([
-    apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
-      (it) => it.totaltAntallBehandlinger,
-    ),
-    apiGet<FeilendeBehandlingerResponse>('/api/behandling/oppsummering-feilende-behandlinger', request).then(
-      (it) => it.feilendeBehandlinger,
-    ),
-    apiGet<UkjenteBehandlingstyperResponse>('/api/behandling/oppsummering-ukjente-behandlingstyper', request).then(
-      (it) => it.ukjenteBehandlingstyper,
-    ),
-    apiGet<AntallUferdigeBehandlingerResponse>(
-      '/api/behandling/oppsummering-antall-uferdige-behandlinger',
-      request,
-    ).then((it) => it.antallUferdigeBehandlinger),
-    apiGet<BehandlingAntallResponse>('/api/behandling/oppsummering-behandling-antall', request).then(
-      (it) => it.behandlingAntall,
-    ),
-    apiGet<OpprettetPerDagResponse>('/api/behandling/oppsummering-opprettet-per-dag', request).then(
-      (it) => it.opprettetPerDag,
-    ),
-  ]).then((it) => ({
-    totaltAntallBehandlinger: it[0],
-    feilendeBehandlinger: it[1],
-    ukjenteBehandlingstyper: it[2],
-    antallUferdigeBehandlinger: it[3],
-    behandlingAntall: it[4],
-    opprettetPerDag: it[5],
-  }))
-
-  if (!dashboardResponse) {
-    throw new Response('Not Found', { status: 404 })
-  }
-
   const { searchParams } = new URL(request.url)
-
   const dato = searchParams.get('dato')
-
   const startDato = dato ? new Date(dato) : new Date()
-
   const { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
 
   return {
-    loadingDashboardResponse: dashboardResponse,
-    kalenderHendelser: await hentKalenderHendelser(request, {
+    loadingDashboardResponse: getDashboardSummary(request),
+    loadingKalenderHendelser: hentKalenderHendelser(request, {
       fom: forsteDato,
       tom: sisteDato,
     }),
@@ -81,7 +37,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  const { kalenderHendelser, loadingDashboardResponse, startDato } = loaderData
+  const { loadingKalenderHendelser, loadingDashboardResponse, startDato } = loaderData
 
   return (
     <React.Suspense
@@ -139,12 +95,18 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                 <HGrid gap="space-24" columns={2}>
                   <VStack gap="space-24">
                     <BehandlingerPerDagLineChartCard opprettetPerDag={dashboardResponse.opprettetPerDag} />
-                    <Kalender
-                      kalenderHendelser={kalenderHendelser}
-                      maksAntallPerDag={6}
-                      startDato={startDato}
-                      visKlokkeSlett={false}
-                    ></Kalender>
+                    <React.Suspense fallback={<Skeleton variant="rounded" width="100%" height={550} />}>
+                      <Await resolve={loadingKalenderHendelser}>
+                        {(kalenderHendelser) => (
+                          <Kalender
+                            kalenderHendelser={kalenderHendelser}
+                            maksAntallPerDag={6}
+                            startDato={startDato}
+                            visKlokkeSlett={false}
+                          />
+                        )}
+                      </Await>
+                    </React.Suspense>
                   </VStack>
                   <VStack gap="space-24">
                     <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
