@@ -388,7 +388,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     setValgteSokIds((prev) => prev.filter((id) => !sendtTilKontrollSet.has(id)))
   }, [sendtTilKontrollSet])
 
-  // Init from loaderData
   useEffect(() => {
     if (initializedRef.current) return
     initializedRef.current = true
@@ -418,7 +417,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return () => stoppInterval(pollTimerRef)
   }, [latestGrunnlag, initialSok, initialStartkontroller, pollGrunnlag, stoppInterval])
 
-  // Start grunnlag => start polling
   useEffect(() => {
     const behandlingId = startFetcher.data?.behandlingId
     if (!behandlingId) return
@@ -439,7 +437,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return () => stoppInterval(pollTimerRef)
   }, [startFetcher.data?.behandlingId, pollGrunnlag, stoppInterval])
 
-  // Handle grunnlag poll response
   useEffect(() => {
     const data = pollFetcher.data
     if (!data) return
@@ -463,13 +460,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     }
   }, [pollFetcher.data, pollSokListe, stoppInterval])
 
-  // Handle søk list response
   useEffect(() => {
     if (!sokListFetcher.data) return
     setSokListe(sokListFetcher.data.sok ?? [])
   }, [sokListFetcher.data])
 
-  // Background poll søk while any non-terminal
   useEffect(() => {
     const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
     if (!grunnlagId || grunnlagStatus !== 'FERDIG') return
@@ -485,7 +480,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return () => stoppInterval(sokBackgroundPollRef)
   }, [grunnlagBehandlingId, grunnlagResultat, grunnlagStatus, sokListe, pollSokListe, stoppInterval])
 
-  // Tight poll after starting søk
   useEffect(() => {
     const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
     const sokId = sokStartFetcher.data?.sokBehandlingId
@@ -503,20 +497,19 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return () => stoppInterval(sokPollTimerRef)
   }, [sokStartFetcher.data?.sokBehandlingId, grunnlagBehandlingId, grunnlagResultat, pollSokListe, stoppInterval])
 
-  // Handle startkontroll list response
   useEffect(() => {
     if (!startKontrollListFetcher.data) return
     setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
   }, [startKontrollListFetcher.data])
+  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
 
-  // Handle statistikk response
   useEffect(() => {
-    if (!statistikkFetcher.data) return
-    if (statistikkFetcher.data.grunnlagId !== valgtGrunnlagId) return
-    setStatistikk(statistikkFetcher.data.statistikk ?? null)
+    const data = statistikkFetcher.data
+    if (!data) return
+    if (data.grunnlagId !== valgtGrunnlagId) return
+    setStatistikk(data.statistikk ?? null)
   }, [statistikkFetcher.data, valgtGrunnlagId])
 
-  // Poll startkontroll after POST
   useEffect(() => {
     if (startKontrollFetcher.state !== 'idle') return
     if (!startKontrollFetcher.data?.ok) return
@@ -533,7 +526,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return () => stoppInterval(startKontrollPollRef)
   }, [startKontrollFetcher.state, startKontrollFetcher.data, pollStartKontroller, stoppInterval])
 
-  // Background poll startkontroll while any non-terminal
   useEffect(() => {
     const hasNonTerminal = startkontroller.some((k) => !isTerminal(k.status))
     if (!hasNonTerminal) {
@@ -545,14 +537,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     startKontrollPollRef.current = window.setInterval(() => pollStartKontroller(), 10_000)
     return () => stoppInterval(startKontrollPollRef)
   }, [startkontroller, pollStartKontroller, stoppInterval])
-
-  // UI state (step 2)
-  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
   const disableStart = grunnlagStatus === 'KJØRER'
   const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
-
-  // Statistikk: last automatisk én gang når grunnlaget er ferdig (reset når grunnlagId endres)
   useEffect(() => {
+    void valgtGrunnlagId
     autoStatistikkLastetRef.current = false
     setStatistikk(null)
   }, [valgtGrunnlagId])
@@ -623,7 +611,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     setValgteSokIds((prev) => (prev.includes(sokId) ? prev.filter((x) => x !== sokId) : [...prev, sokId]))
   }
 
-  // Bubble items
   const grunnlagItems: BubbleItem[] = useMemo(() => {
     const id = valgtGrunnlagId
     if (!id) return []
