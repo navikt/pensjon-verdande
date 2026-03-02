@@ -10,6 +10,8 @@ type Props = {
 
 export function BehandlingAntallTableCard(props: Props) {
   const [expanded, setExpanded] = useState(false)
+  const visibleData = expanded ? props.behandlingAntall : props.behandlingAntall.slice(0, 10)
+  const hasMore = props.behandlingAntall.length > 10
 
   return (
     <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
@@ -23,16 +25,18 @@ export function BehandlingAntallTableCard(props: Props) {
           Antall etter type
         </div>
         <Spacer />
-        <Button
-          size="xsmall"
-          variant="tertiary"
-          icon={expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? 'Skjul' : `Vis alle (${props.behandlingAntall.length})`}
-        </Button>
+        {hasMore && (
+          <Button
+            size="xsmall"
+            variant="tertiary"
+            icon={expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? 'Vis topp 10' : `Vis alle (${props.behandlingAntall.length})`}
+          </Button>
+        )}
       </HStack>
-      {expanded && <BehandlingAntallTable oppsummering={props.behandlingAntall} />}
+      <BehandlingAntallTable oppsummering={visibleData} />
     </Box>
   )
 }
