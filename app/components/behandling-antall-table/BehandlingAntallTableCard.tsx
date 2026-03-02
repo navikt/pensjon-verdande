@@ -1,5 +1,6 @@
-import { NumberListIcon } from '@navikt/aksel-icons'
-import { Box } from '@navikt/ds-react'
+import { ChevronDownIcon, ChevronUpIcon, NumberListIcon } from '@navikt/aksel-icons'
+import { Box, Button, HStack, Spacer } from '@navikt/ds-react'
+import { useState } from 'react'
 import BehandlingAntallTable from '~/components/behandling-antall-table/BehandlingAntallTable'
 import type { BehandlingAntall } from '~/types'
 
@@ -8,10 +9,12 @@ type Props = {
 }
 
 export function BehandlingAntallTableCard(props: Props) {
+  const [expanded, setExpanded] = useState(false)
+
   return (
     <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
-      <Box>
-        <div style={{ float: 'left', textAlign: 'center' }}>
+      <HStack align="center">
+        <div style={{ textAlign: 'center' }}>
           <NumberListIcon
             title="a11y-title"
             fontSize="1.5rem"
@@ -19,8 +22,17 @@ export function BehandlingAntallTableCard(props: Props) {
           />
           Antall etter type
         </div>
-      </Box>
-      <BehandlingAntallTable oppsummering={props.behandlingAntall} />
+        <Spacer />
+        <Button
+          size="xsmall"
+          variant="tertiary"
+          icon={expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? 'Skjul' : `Vis alle (${props.behandlingAntall.length})`}
+        </Button>
+      </HStack>
+      {expanded && <BehandlingAntallTable oppsummering={props.behandlingAntall} />}
     </Box>
   )
 }
