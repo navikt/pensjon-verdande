@@ -554,7 +554,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   useEffect(() => {
     autoStatistikkLastetRef.current = false
     setStatistikk(null)
-  }, [])
+  }, [valgtGrunnlagId])
 
   useEffect(() => {
     if (!valgtGrunnlagId) return
