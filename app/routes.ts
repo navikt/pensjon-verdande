@@ -6,6 +6,8 @@ export default [
   route('auth/callback', 'auth/auth.callback.tsx'),
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
+  route('api/sok', 'api/sok.ts'),
+
   layout('layout.tsx', [
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
     route('afp-etteroppgjor', 'afp-etteroppgjor/afp-etteroppgjor.tsx'),
@@ -195,7 +197,5 @@ export default [
     route('/opptjening/manedlig/omregning/opprett', 'opptjening/manedlig/opptjening.manedlig.omregning.opprett.tsx'),
 
     route('kontroll-saerskilt-sats', 'kontroll-saerskilt-sats/kontroll-saerskilt-sats._index.tsx'),
-
-    route('sok', 'sok/sok.tsx'),
   ]),
 ] satisfies RouteConfig

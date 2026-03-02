@@ -1,7 +1,8 @@
 import { BarChartIcon, BookIcon, ExternalLinkIcon, MenuGridIcon, MenuHamburgerIcon } from '@navikt/aksel-icons'
-import { ActionMenu, HStack, InternalHeader, Search, Spacer } from '@navikt/ds-react'
+import { ActionMenu, InternalHeader, Spacer } from '@navikt/ds-react'
 import type { MeResponse } from '~/brukere/brukere'
 import MeMenu from '~/components/nav-header/MeMenu'
+import SearchDialog from '~/components/nav-header/SearchDialog'
 export type Props = {
   erProduksjon: boolean
   env: string
@@ -10,6 +11,7 @@ export type Props = {
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>
   showIconMenu: boolean
   setShowIconMenu: React.Dispatch<React.SetStateAction<boolean>>
+  isMac: boolean
 }
 
 import styles from './navheader.module.css'
@@ -48,11 +50,7 @@ export default function NavHeader(props: Props) {
       )}
 
       <Spacer />
-      {harTilgang('SE_BEHANDLINGER') && (
-        <HStack as="form" paddingInline="space-20" align="center" method="get" action={'/sok'}>
-          <Search label="InternalHeader søk" size="small" variant="simple" name="query" placeholder="Søk" />
-        </HStack>
-      )}
+      {harTilgang('SE_BEHANDLINGER') && <SearchDialog isMac={props.isMac} />}
 
       <ActionMenu>
         <ActionMenu.Trigger>

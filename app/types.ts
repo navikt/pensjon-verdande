@@ -57,6 +57,9 @@ export type BehandlingDto = {
   feilmelding: string | null
   gruppeId: string | null
 
+  matchedVerdiTypes?: string[]
+  matchedVerdiTypeDecodes?: string[]
+
   parametere: Record<string, string | null>
 
   debugJson: string | null

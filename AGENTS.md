@@ -214,6 +214,15 @@ export async function hentData(request: Request) {
 - Bruk Darkside versjonen
 - Legg til rette for at utseende fungerer både med darkmode og lightmode
 
+## Decode av verdier (status, type, m.m.)
+All decode/visning av enumer og koder skal bruke fellesfunksjonene i `app/common/decode.ts` eller andre eksisterende felles decode-moduler (f.eks. `app/common/decodeTeam.ts`, `app/common/decodeBehandling.ts`).
+
+- **IKKE lag lokale decode-maps** (f.eks. egne switch/case eller Record-objekter for å oversette statuskoder).
+- **Bruk eksisterende decodere**: `decodeBehandlingStatus`, `decodeBehandlingStatusToVariant`, `decodeAktivitetStatus`, `decodeBehandlingstype`, `decodeFagomrade`, `decodeAldeBehandlingStatus`, `decodeAldeBehandlingState`.
+- **For behandlingstypenavn**: Bruk `decodeBehandling()` fra `app/common/decodeBehandling.ts` for menneskelesbare behandlingstypenavn (f.eks. "Iverksett vedtak" i stedet for "IverksettVedtakBehandling").
+- **Nye koder?** Legg til i riktig map i `decode.ts` (eller relevant felles decode-fil, f.eks. `decodeTeam.ts`, `decodeBehandling.ts`) og bruk `makeDecoder()` for å lage ny decoder-funksjon.
+- Alle decodere faller tilbake til rå nøkkelverdi dersom koden ikke finnes i mapen.
+
 ## Når du legger til nye avhengigheter
 - Bekreft med lead på driftsplattform at det er greit å innføre den nye avhengigheten.
 - Foretrekk egne metoder enn å innføre en avhengighet for å løse et lite behov.
@@ -243,3 +252,36 @@ npm run test:stories
 - `npm run test:stories` er grønn
 - `npm run build` er grønn
 - Endringen er dokumentert kort i PR-beskrivelse (hva/hvorfor) og evt. i README/kommentar ved behov
+
+## Skjermbilder for dokumentasjon
+
+Verdande har et script for å ta skjermbilder av Storybook-stories, som brukes til å generere bilder for dokumentasjonen i `pensjon-dokumentasjon`.
+
+### Kommandoer
+
+```zsh
+# Ta skjermbilder av alle stories
+npm run capture-screenshots
+
+# Ta skjermbilder kun for dokumentasjon og kopier til pensjon-dokumentasjon
+npm run capture-docs-screenshots
+```
+
+### Mapping
+
+Filen `scripts/screenshot-mapping.json` definerer hvilke stories som brukes i dokumentasjonen, med filnavn og beskrivelser. Denne filen er kilden til sannhet for AI som oppdaterer skjermbilder.
+
+### Oppdatere skjermbilder
+
+Etter visuelle endringer i Verdande:
+
+1. Start Storybook: `npm run storybook`
+2. Generer docs-screenshots: `npm run capture-docs-screenshots`
+3. Verifiser bildene i `pensjon-dokumentasjon/pen/docs/modules/Behandlingsloesningen/images/`
+4. Commit endrede bilder i `pensjon-dokumentasjon`
+
+### Viktige filer
+
+- `scripts/capture-screenshots.ts` — Playwright-basert screenshot-script
+- `scripts/screenshot-mapping.json` — Mapping fra story-id til dokumentasjonsbilde
+- `app/utils/decodeBehandling.ts` — Dekoding av behandlingstyper til lesbare navn

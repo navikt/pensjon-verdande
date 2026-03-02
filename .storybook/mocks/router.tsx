@@ -1,6 +1,9 @@
 import type { Decorator } from '@storybook/react'
 import type React from 'react'
 import { createRoutesStub } from 'react-router'
+import type { MeResponse } from '~/brukere/brukere'
+import Layout from '~/layout'
+import { mockMeResponse } from './data'
 
 /**
  * Wraps stories in a React Router context with an empty route at "/".
@@ -48,6 +51,64 @@ export function renderWithAction<T>(Component: React.ComponentType<any>, actionD
     {
       path,
       Component: Wrapper,
+    },
+  ])
+  return <Stub initialEntries={[path]} />
+}
+
+/**
+ * Renders a page component nested inside the Layout wrapper (NavHeader + VenstreMeny).
+ * Produces a full-page view with header and sidebar for documentation screenshots.
+ *
+ * @example
+ * ```tsx
+ * export const FullPage: StoryObj = {
+ *   render: () => renderWithLayout(Dashboard, { items: [], count: 0 }),
+ * }
+ * ```
+ */
+export function renderWithLayout<T>(
+  Component: React.ComponentType<any>,
+  loaderData: T,
+  options?: { path?: string; me?: Partial<MeResponse>; env?: string },
+) {
+  const path = options?.path ?? '/'
+  const me = mockMeResponse({
+    tilganger: [
+      'LESE',
+      'SKRIVE',
+      'SE_BEHANDLINGER',
+      'BATCH_KJORINGER',
+      'BEHANDLINGSERIE',
+      'REGULERING_LES',
+      'AVSTEMMING_LES',
+      'INNTEKTSKONTROLL',
+      'KONTROLLERE_SAERSKILT_SATS',
+      'OMREGN_YTELSER',
+      'ADHOC_BREVBESTILLING',
+    ],
+    verdandeRoller: ['VERDANDE_ADMIN'],
+    ...options?.me,
+  })
+
+  const Stub = createRoutesStub([
+    {
+      path: '/',
+      Component: Layout as any,
+      loader: () => ({
+        env: options?.env ?? 'q2',
+        me,
+        schedulerStatus: { schedulerEnabled: true, schedulerLocal: false },
+        darkmode: false,
+      }),
+      children: [
+        {
+          path: path === '/' ? undefined : path.replace(/^\//, ''),
+          index: path === '/',
+          Component,
+          loader: () => loaderData,
+        },
+      ],
     },
   ])
   return <Stub initialEntries={[path]} />
