@@ -85,6 +85,53 @@ export const BehandlingerFullpage: Story = {
     }),
 }
 
+export const BehandlingerMedDiagramFullpage: Story = {
+  name: 'Behandlinger med diagram',
+  render: () =>
+    renderWithLayout(
+      Behandlinger,
+      {
+        behandlinger: mockBehandlingerPage(
+          [
+            mockBehandlingDto({
+              behandlingId: 100001,
+              type: 'FleksibelApSakBehandling',
+              status: 'UNDER_BEHANDLING',
+            }),
+            mockBehandlingDto({
+              behandlingId: 100002,
+              type: 'FleksibelApSakBehandling',
+              status: 'FULLFORT',
+              ferdig: '2024-06-15T12:00:00',
+            }),
+            mockBehandlingDto({
+              behandlingId: 100003,
+              type: 'FleksibelApSakBehandling',
+              status: 'FEILENDE',
+              feilmelding: 'Feil ved henting av grunnlag',
+            }),
+          ],
+          { behandlingTyper: ['FleksibelApSakBehandling'] },
+        ),
+        opprettetPerDag: Array.from({ length: 30 }, (_, i) => {
+          const d = new Date()
+          d.setDate(d.getDate() - (29 - i))
+          const yyyy = d.getFullYear()
+          const mm = String(d.getMonth() + 1).padStart(2, '0')
+          const dd = String(d.getDate()).padStart(2, '0')
+          return {
+            dato: `${yyyy}-${mm}-${dd}`,
+            antall: ((i * 7 + 3) % 13) + 1,
+          }
+        }),
+      },
+      {
+        path: '/behandlinger',
+        initialEntry: '/behandlinger?behandlingType=FleksibelApSakBehandling',
+      },
+    ),
+}
+
 export const BehandlingFullpage: Story = {
   name: 'Behandling',
   render: () =>

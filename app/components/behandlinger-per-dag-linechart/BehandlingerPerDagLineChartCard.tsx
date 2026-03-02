@@ -6,6 +6,7 @@ import type { DatoAntall } from '~/types'
 
 type Props = {
   opprettetPerDag: DatoAntall[]
+  chartHeight?: number
 }
 
 export function BehandlingerPerDagLineChartCard(props: Props) {
@@ -43,10 +44,17 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
           7 dager
         </Button>
       </HStack>
-      <BehandlingerPerDagLineChart
-        opprettetPerDag={props.opprettetPerDag}
-        antallDager={antallDager}
-      ></BehandlingerPerDagLineChart>
+      {props.chartHeight !== undefined ? (
+        <div style={{ position: 'relative', height: `${props.chartHeight}px` }}>
+          <BehandlingerPerDagLineChart
+            opprettetPerDag={props.opprettetPerDag}
+            antallDager={antallDager}
+            maintainAspectRatio={false}
+          />
+        </div>
+      ) : (
+        <BehandlingerPerDagLineChart opprettetPerDag={props.opprettetPerDag} antallDager={antallDager} />
+      )}
     </Box>
   )
 }

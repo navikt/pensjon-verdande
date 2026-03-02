@@ -74,7 +74,7 @@ export function renderWithLayout<T>(
   // biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes from React Router
   Component: React.ComponentType<any>,
   loaderData: T,
-  options?: { path?: string; me?: Partial<MeResponse>; env?: string },
+  options?: { path?: string; initialEntry?: string; me?: Partial<MeResponse>; env?: string },
 ) {
   const path = options?.path ?? '/'
   const me = mockMeResponse({
@@ -116,5 +116,5 @@ export function renderWithLayout<T>(
       ],
     },
   ])
-  return <Stub initialEntries={[path]} />
+  return <Stub initialEntries={[options?.initialEntry ?? path]} />
 }

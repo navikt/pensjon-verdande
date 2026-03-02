@@ -15,6 +15,7 @@ import type { DatoAntall } from '~/types'
 type Props = {
   opprettetPerDag: DatoAntall[]
   antallDager: number
+  maintainAspectRatio?: boolean
 }
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
@@ -50,6 +51,7 @@ export function BehandlingerPerDagLineChart(props: Props) {
     <Line
       options={{
         responsive: true,
+        maintainAspectRatio: props.maintainAspectRatio ?? true,
         plugins: {
           legend: {
             display: false,

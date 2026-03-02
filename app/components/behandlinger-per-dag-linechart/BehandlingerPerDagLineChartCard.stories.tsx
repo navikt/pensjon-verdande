@@ -15,3 +15,10 @@ export const Default: Story = {
     opprettetPerDag: mockDashboardResponse().opprettetPerDag,
   },
 }
+
+export const FixedHeight: Story = {
+  args: {
+    opprettetPerDag: mockDashboardResponse().opprettetPerDag,
+    chartHeight: 180,
+  },
+}

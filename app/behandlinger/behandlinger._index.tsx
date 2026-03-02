@@ -1,7 +1,10 @@
+import { VStack } from '@navikt/ds-react'
+import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-
+import { apiGet } from '~/services/api.server'
 import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
+import type { OpprettetPerDagResponse } from '~/types'
 import type { Route } from './+types/behandlinger._index'
 
 export function meta(): Route.MetaDescriptors {
@@ -16,8 +19,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const page = searchParams.get('page')
   const size = searchParams.get('size')
 
+  const behandlingType = searchParams.get('behandlingType')
+
   const behandlinger = await getBehandlinger(accessToken, {
-    behandlingType: searchParams.get('behandlingType'),
+    behandlingType,
     status: searchParams.get('status'),
     ansvarligTeam: searchParams.get('ansvarligTeam'),
     behandlingManuellKategori: searchParams.get('behandlingManuellKategori'),
@@ -29,11 +34,23 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     throw new Response('Not Found', { status: 404 })
   }
 
-  return { behandlinger }
+  const opprettetPerDag = behandlingType
+    ? await apiGet<OpprettetPerDagResponse>(
+        `/api/behandling/oppsummering-opprettet-per-dag?${new URLSearchParams({ behandlingType }).toString()}`,
+        request,
+      ).then((it) => it.opprettetPerDag)
+    : null
+
+  return { behandlinger, opprettetPerDag }
 }
 
 export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentProps) {
-  const { behandlinger } = loaderData
+  const { behandlinger, opprettetPerDag } = loaderData
 
-  return <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
+  return (
+    <VStack gap="space-24">
+      {opprettetPerDag && <BehandlingerPerDagLineChartCard opprettetPerDag={opprettetPerDag} chartHeight={180} />}
+      <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
+    </VStack>
+  )
 }
