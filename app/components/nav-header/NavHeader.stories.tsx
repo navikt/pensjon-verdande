@@ -21,6 +21,7 @@ export const Default: Story = {
     setDarkmode: () => {},
     showIconMenu: false,
     setShowIconMenu: () => {},
+    isMac: true,
   },
 }
 
@@ -33,5 +34,6 @@ export const Produksjon: Story = {
     setDarkmode: () => {},
     showIconMenu: false,
     setShowIconMenu: () => {},
+    isMac: true,
   },
 }

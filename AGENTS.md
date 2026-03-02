@@ -214,6 +214,15 @@ export async function hentData(request: Request) {
 - Bruk Darkside versjonen
 - Legg til rette for at utseende fungerer både med darkmode og lightmode
 
+## Decode av verdier (status, type, m.m.)
+All decode/visning av enumer og koder skal bruke fellesfunksjonene i `app/common/decode.ts` eller andre eksisterende felles decode-moduler (f.eks. `app/common/decodeTeam.ts`, `app/common/decodeBehandling.ts`).
+
+- **IKKE lag lokale decode-maps** (f.eks. egne switch/case eller Record-objekter for å oversette statuskoder).
+- **Bruk eksisterende decodere**: `decodeBehandlingStatus`, `decodeBehandlingStatusToVariant`, `decodeAktivitetStatus`, `decodeBehandlingstype`, `decodeFagomrade`, `decodeAldeBehandlingStatus`, `decodeAldeBehandlingState`.
+- **For behandlingstypenavn**: Bruk `decodeBehandling()` fra `app/common/decodeBehandling.ts` for menneskelesbare behandlingstypenavn (f.eks. "Iverksett vedtak" i stedet for "IverksettVedtakBehandling").
+- **Nye koder?** Legg til i riktig map i `decode.ts` (eller relevant felles decode-fil, f.eks. `decodeTeam.ts`, `decodeBehandling.ts`) og bruk `makeDecoder()` for å lage ny decoder-funksjon.
+- Alle decodere faller tilbake til rå nøkkelverdi dersom koden ikke finnes i mapen.
+
 ## Når du legger til nye avhengigheter
 - Bekreft med lead på driftsplattform at det er greit å innføre den nye avhengigheten.
 - Foretrekk egne metoder enn å innføre en avhengighet for å løse et lite behov.
