@@ -1,9 +1,24 @@
-import { Button, Checkbox, CheckboxGroup, Heading, HStack, Select, TextField, VStack } from '@navikt/ds-react'
+import {
+  Alert,
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Heading,
+  HStack,
+  Loader,
+  Select,
+  Table,
+  Tabs,
+  TextField,
+  VStack,
+} from '@navikt/ds-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Bar } from 'react-chartjs-2'
 import { useFetcher } from 'react-router'
 import { apiGetOrUndefined, apiPost } from '~/services/api.server'
 import type { Route } from './+types/leveattest-kontroll'
 import KjoringerPreview, { type BubbleItem } from './kjoringer-preview'
+import 'chart.js/auto'
 
 type StartGrunnlagResponse = { behandlingId: number }
 type StartSokResponse = { sokBehandlingId: number }
@@ -48,6 +63,13 @@ type SokPollResponse = {
 
 type StartKontrollPollResponse = {
   startkontroller: LeveattestStartKontrollResponse[]
+}
+
+type LeveattestKontrollStatistikk = {
+  antallOpprettet: number
+  antallUnderBehandling: number
+  antallFullfort: number
+  antallFeil: number
 }
 
 type LoaderData = {
@@ -207,6 +229,21 @@ export async function loader({ request }: Route.LoaderArgs) {
     return { startkontroller } satisfies StartKontrollPollResponse
   }
 
+  if (url.searchParams.get('poll') === 'statistikk') {
+    const grunnlagIdStr = url.searchParams.get('grunnlagId')
+    if (!grunnlagIdStr) throw new Response('Missing grunnlagId', { status: 400 })
+
+    const grunnlagId = Number(grunnlagIdStr)
+    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) throw new Response('Invalid grunnlagId', { status: 400 })
+
+    const statistikk = await apiGetOrUndefined<LeveattestKontrollStatistikk>(
+      `/api/behandling/leveattest/startkontroll/${grunnlagId}/statistikk`,
+      request,
+    )
+
+    return { grunnlagId, statistikk: statistikk ?? null }
+  }
+
   const latestGrunnlag = await apiGetOrUndefined<LeveattestGrunnlagResultat>(
     '/api/behandling/leveattest/grunnlag',
     request,
@@ -292,6 +329,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const sokListFetcher = useFetcher<SokPollResponse>()
   const startKontrollFetcher = useFetcher<StartKontrollActionResponse>()
   const startKontrollListFetcher = useFetcher<StartKontrollPollResponse>()
+  const statistikkFetcher = useFetcher<{ grunnlagId: number; statistikk: LeveattestKontrollStatistikk | null }>()
 
   const [grunnlagBehandlingId, setGrunnlagBehandlingId] = useState<number | null>(null)
   const [grunnlagStatus, setGrunnlagStatus] = useState<'IDLE' | 'KJØRER' | 'FERDIG'>('IDLE')
@@ -301,6 +339,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const [startkontroller, setStartkontroller] = useState<LeveattestStartKontrollResponse[]>(
     initialStartkontroller ?? [],
   )
+
+  const [statistikk, setStatistikk] = useState<LeveattestKontrollStatistikk | null>(null)
+  const autoStatistikkLastetRef = useRef(false)
+
+  const [aktivFane, setAktivFane] = useState<'kontroll' | 'statistikk'>('kontroll')
 
   const pollTimerRef = useRef<number | null>(null)
   const sokPollTimerRef = useRef<number | null>(null)
@@ -331,6 +374,13 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const pollStartKontroller = useCallback(() => {
     startKontrollListFetcher.load('?poll=startkontroll')
   }, [startKontrollListFetcher])
+
+  const pollStatistikk = useCallback(
+    (grunnlagId: number) => {
+      statistikkFetcher.load(`?poll=statistikk&grunnlagId=${grunnlagId}`)
+    },
+    [statistikkFetcher],
+  )
 
   const sendtTilKontrollSet = useMemo(() => new Set(startkontroller.map((k) => k.sokBehandlingId)), [startkontroller])
 
@@ -459,6 +509,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
   }, [startKontrollListFetcher.data])
 
+  // Handle statistikk response
+  useEffect(() => {
+    if (!statistikkFetcher.data) return
+    setStatistikk(statistikkFetcher.data.statistikk ?? null)
+  }, [statistikkFetcher.data])
+
   // Poll startkontroll after POST
   useEffect(() => {
     if (startKontrollFetcher.state !== 'idle') return
@@ -493,6 +549,20 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
   const disableStart = grunnlagStatus === 'KJØRER'
   const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
+
+  // Statistikk: last automatisk én gang når grunnlaget er ferdig (reset når grunnlagId endres)
+  useEffect(() => {
+    autoStatistikkLastetRef.current = false
+    setStatistikk(null)
+  }, [])
+
+  useEffect(() => {
+    if (!valgtGrunnlagId) return
+    if (grunnlagStatus !== 'FERDIG') return
+    if (autoStatistikkLastetRef.current) return
+    autoStatistikkLastetRef.current = true
+    pollStatistikk(valgtGrunnlagId)
+  }, [valgtGrunnlagId, grunnlagStatus, pollStatistikk])
 
   const [minstAlder, setMinstAlder] = useState<string>('67')
   const [kunUfore, setKunUfore] = useState<boolean>(false)
@@ -646,201 +716,311 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
   const disableStartKontroll = valgteSokIds.length === 0
 
+  const statistikkChartData = useMemo(() => {
+    if (!statistikk) return null
+    return {
+      labels: ['Opprettet', 'Under behandling', 'Fullført', 'Feil'],
+      datasets: [
+        {
+          label: 'Antall',
+          data: [
+            statistikk.antallOpprettet,
+            statistikk.antallUnderBehandling,
+            statistikk.antallFullfort,
+            statistikk.antallFeil,
+          ],
+        },
+      ],
+    }
+  }, [statistikk])
+
   return (
     <VStack gap="space-24" style={{ padding: '1rem' }}>
       <Heading size="large" level="1">
         Opprett leveattestkontroll
       </Heading>
 
-      <VStack gap="space-12">
-        <Heading size="medium" level="2">
-          Steg 1: Hent grunnlag
-        </Heading>
+      <Tabs value={aktivFane} onChange={(v) => setAktivFane(v as 'kontroll' | 'statistikk')}>
+        <Tabs.List>
+          <Tabs.Tab value="kontroll" label="Kontroll" />
+          <Tabs.Tab value="statistikk" label="Statistikk" />
+        </Tabs.List>
 
-        <HStack gap="space-12" align="end">
-          <startFetcher.Form method="post">
-            <input type="hidden" name="_intent" value="hentGrunnlag" />
-            <Button type="submit" loading={startFetcher.state !== 'idle'} disabled={disableStart}>
-              Hent grunnlag
-            </Button>
-          </startFetcher.Form>
+        <Tabs.Panel value="kontroll" style={{ marginTop: '1rem' }}>
+          <VStack gap="space-24">
+            <VStack gap="space-12">
+              <Heading size="medium" level="2">
+                Steg 1: Hent grunnlag
+              </Heading>
 
-          {grunnlagStatus === 'KJØRER' && <div style={{ opacity: 0.85 }}>Kjører…</div>}
+              <HStack gap="space-12" align="end">
+                <startFetcher.Form method="post">
+                  <input type="hidden" name="_intent" value="hentGrunnlag" />
+                  <Button type="submit" loading={startFetcher.state !== 'idle'} disabled={disableStart}>
+                    Hent grunnlag
+                  </Button>
+                </startFetcher.Form>
 
-          {grunnlagStatus === 'FERDIG' && grunnlagResultat && (
-            <div style={{ opacity: 0.9 }}>
-              Ferdig: <strong>{grunnlagResultat.antallSPKPersoner ?? 0}</strong> personer
-            </div>
-          )}
-        </HStack>
+                {grunnlagStatus === 'KJØRER' && <div style={{ opacity: 0.85 }}>Kjører…</div>}
 
-        <KjoringerPreview title="Grunnlagkjøring" items={grunnlagItems} emptyText="Ingen grunnlag funnet ennå." />
-      </VStack>
-
-      <VStack gap="space-12">
-        <Heading size="medium" level="2">
-          Steg 2: Kjør søk
-        </Heading>
-
-        <HStack gap="space-12" wrap align="end">
-          <TextField
-            label="Minstealder"
-            value={minstAlder}
-            onChange={(e) => setMinstAlder(e.target.value)}
-            type="number"
-            min={0}
-            max={120}
-            inputMode="numeric"
-            disabled={disableSok}
-          />
-
-          <Checkbox checked={kunUfore} onChange={(e) => setKunUfore(e.target.checked)} disabled={disableSok}>
-            Kun uføre
-          </Checkbox>
-
-          <Select
-            label="Velg land-sett"
-            value={sokPaaLand.length > 0 ? 'valgt' : 'tom'}
-            onChange={(e) => {
-              const v = e.target.value
-              if (v === 'eu') setSokPaaLand(['DEU', 'FRA', 'ESP', 'PRT', 'ITA', 'NLD', 'BEL', 'AUT', 'CHE', 'IRL'])
-              else if (v === 'na') setSokPaaLand(['USA', 'CAN'])
-              else if (v === 'asia') setSokPaaLand(['THA', 'IND', 'KOR'])
-              else if (v === 'reset') setSokPaaLand(['USA'])
-            }}
-            disabled={disableSok}
-          >
-            <option value="tom" disabled>
-              Velg…
-            </option>
-            <option value="valgt">Egendefinert</option>
-            <option value="eu">Typisk Europa</option>
-            <option value="na">Nord-Amerika</option>
-            <option value="asia">Asia (utvalg)</option>
-            <option value="reset">Reset (USA)</option>
-          </Select>
-        </HStack>
-
-        <HStack gap="space-8" align="end">
-          <TextField
-            label="Søk land (navn eller kode)"
-            value={landQuery}
-            onChange={(e) => setLandQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && canAddFromQuery) {
-                e.preventDefault()
-                addFromQuery()
-              }
-            }}
-            disabled={disableSok}
-            placeholder="F.eks. Thailand eller THA"
-          />
-          <Button type="button" variant="secondary" onClick={addFromQuery} disabled={disableSok || !canAddFromQuery}>
-            Legg til kode
-          </Button>
-        </HStack>
-
-        <div
-          style={{
-            maxHeight: '240px',
-            overflow: 'auto',
-            border: '1px solid var(--ax-border-neutral-subtleA)',
-            borderRadius: '12px',
-            padding: '0.75rem',
-            background: 'var(--ax-bg-raised)',
-          }}
-        >
-          <div style={{ fontSize: '0.85rem' }}>
-            <CheckboxGroup
-              legend="Søk på land"
-              value={sokPaaLand}
-              onChange={(v) => setSokPaaLand(v as string[])}
-              disabled={disableSok}
-            >
-              <div style={{ columnCount: 3, columnGap: '1rem' }}>
-                {visibleLandOptions.map((o) => (
-                  <div key={o.value} style={{ breakInside: 'avoid', padding: '2px 0' }}>
-                    <Checkbox value={o.value}>{o.label}</Checkbox>
+                {grunnlagStatus === 'FERDIG' && grunnlagResultat && (
+                  <div style={{ opacity: 0.9 }}>
+                    Ferdig: <strong>{grunnlagResultat.antallSPKPersoner ?? 0}</strong> personer
                   </div>
-                ))}
+                )}
+              </HStack>
+
+              <KjoringerPreview title="Grunnlagkjøring" items={grunnlagItems} emptyText="Ingen grunnlag funnet ennå." />
+            </VStack>
+
+            <VStack gap="space-12">
+              <Heading size="medium" level="2">
+                Steg 2: Kjør søk
+              </Heading>
+
+              <HStack gap="space-12" wrap align="end">
+                <TextField
+                  label="Minstealder"
+                  value={minstAlder}
+                  onChange={(e) => setMinstAlder(e.target.value)}
+                  type="number"
+                  min={0}
+                  max={120}
+                  inputMode="numeric"
+                  disabled={disableSok}
+                />
+
+                <Checkbox checked={kunUfore} onChange={(e) => setKunUfore(e.target.checked)} disabled={disableSok}>
+                  Kun uføre
+                </Checkbox>
+
+                <Select
+                  label="Velg land-sett"
+                  value={sokPaaLand.length > 0 ? 'valgt' : 'tom'}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (v === 'eu')
+                      setSokPaaLand(['DEU', 'FRA', 'ESP', 'PRT', 'ITA', 'NLD', 'BEL', 'AUT', 'CHE', 'IRL'])
+                    else if (v === 'na') setSokPaaLand(['USA', 'CAN'])
+                    else if (v === 'asia') setSokPaaLand(['THA', 'IND', 'KOR'])
+                    else if (v === 'reset') setSokPaaLand(['USA'])
+                  }}
+                  disabled={disableSok}
+                >
+                  <option value="tom" disabled>
+                    Velg…
+                  </option>
+                  <option value="valgt">Egendefinert</option>
+                  <option value="eu">Typisk Europa</option>
+                  <option value="na">Nord-Amerika</option>
+                  <option value="asia">Asia (utvalg)</option>
+                  <option value="reset">Reset (USA)</option>
+                </Select>
+              </HStack>
+
+              <HStack gap="space-8" align="end">
+                <TextField
+                  label="Søk land (navn eller kode)"
+                  value={landQuery}
+                  onChange={(e) => setLandQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && canAddFromQuery) {
+                      e.preventDefault()
+                      addFromQuery()
+                    }
+                  }}
+                  disabled={disableSok}
+                  placeholder="F.eks. Thailand eller THA"
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={addFromQuery}
+                  disabled={disableSok || !canAddFromQuery}
+                >
+                  Legg til kode
+                </Button>
+              </HStack>
+
+              <div
+                style={{
+                  maxHeight: '240px',
+                  overflow: 'auto',
+                  border: '1px solid var(--ax-border-neutral-subtleA)',
+                  borderRadius: '12px',
+                  padding: '0.75rem',
+                  background: 'var(--ax-bg-raised)',
+                }}
+              >
+                <div style={{ fontSize: '0.85rem' }}>
+                  <CheckboxGroup
+                    legend="Søk på land"
+                    value={sokPaaLand}
+                    onChange={(v) => setSokPaaLand(v as string[])}
+                    disabled={disableSok}
+                  >
+                    <div style={{ columnCount: 3, columnGap: '1rem' }}>
+                      {visibleLandOptions.map((o) => (
+                        <div key={o.value} style={{ breakInside: 'avoid', padding: '2px 0' }}>
+                          <Checkbox value={o.value}>{o.label}</Checkbox>
+                        </div>
+                      ))}
+                    </div>
+                  </CheckboxGroup>
+                </div>
               </div>
-            </CheckboxGroup>
-          </div>
-        </div>
 
-        <div style={{ opacity: 0.85 }}>
-          Valgt: <strong>{selectedLandLabel}</strong> {' · '}
-          Minstealder: <strong>{minstAlder || '—'}+</strong> {' · '}
-          Filter: <strong>{kunUfore ? 'Kun uføre' : 'Alle'}</strong>
-        </div>
+              <div style={{ opacity: 0.85 }}>
+                Valgt: <strong>{selectedLandLabel}</strong> {' · '}
+                Minstealder: <strong>{minstAlder || '—'}+</strong> {' · '}
+                Filter: <strong>{kunUfore ? 'Kun uføre' : 'Alle'}</strong>
+              </div>
 
-        <sokStartFetcher.Form method="post">
-          <input type="hidden" name="_intent" value="kjorSok" />
-          <input type="hidden" name="grunnlagBehandlingId" value={valgtGrunnlagId ?? ''} />
-          <input type="hidden" name="alder" value={minstAlder} />
-          <input type="hidden" name="filtrerPaSakstypeUfore" value={String(kunUfore)} />
-          {sokPaaLand.map((l) => (
-            <input key={l} type="hidden" name="sokPaaLand" value={l} />
-          ))}
+              <sokStartFetcher.Form method="post">
+                <input type="hidden" name="_intent" value="kjorSok" />
+                <input type="hidden" name="grunnlagBehandlingId" value={valgtGrunnlagId ?? ''} />
+                <input type="hidden" name="alder" value={minstAlder} />
+                <input type="hidden" name="filtrerPaSakstypeUfore" value={String(kunUfore)} />
+                {sokPaaLand.map((l) => (
+                  <input key={l} type="hidden" name="sokPaaLand" value={l} />
+                ))}
 
-          <Button
-            type="submit"
-            variant="secondary"
-            loading={sokStartFetcher.state !== 'idle'}
-            disabled={disableSok || sokPaaLand.length === 0}
-          >
-            Kjør søk
-          </Button>
-        </sokStartFetcher.Form>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  loading={sokStartFetcher.state !== 'idle'}
+                  disabled={disableSok || sokPaaLand.length === 0}
+                >
+                  Kjør søk
+                </Button>
+              </sokStartFetcher.Form>
 
-        <KjoringerPreview
-          title="Søkeresultater"
-          items={sokItems}
-          emptyText="Ingen søk kjørt ennå."
-          onClickItem={(item) => {
-            const id = Number(item.id)
-            if (!Number.isFinite(id)) return
-            const s = sokListe.find((x) => x.sokBehandlingId === id)
-            if (!s) return
-            if (!isFerdig(s.status)) return
-            if (sendtTilKontrollSet.has(id)) return
-            toggleSokSelection(id)
-          }}
-        />
-      </VStack>
+              <KjoringerPreview
+                title="Søkeresultater"
+                items={sokItems}
+                emptyText="Ingen søk kjørt ennå."
+                onClickItem={(item) => {
+                  const id = Number(item.id)
+                  if (!Number.isFinite(id)) return
+                  const s = sokListe.find((x) => x.sokBehandlingId === id)
+                  if (!s) return
+                  if (!isFerdig(s.status)) return
+                  if (sendtTilKontrollSet.has(id)) return
+                  toggleSokSelection(id)
+                }}
+              />
+            </VStack>
 
-      <VStack gap="space-12">
-        <Heading size="medium" level="2">
-          Steg 3: Start kontroll
-        </Heading>
+            <VStack gap="space-12">
+              <Heading size="medium" level="2">
+                Steg 3: Start kontroll
+              </Heading>
 
-        <div style={{ opacity: 0.85 }}>
-          Valgte søk: <strong>{valgteSokIds.length}</strong>
-          {valgteSokIds.length > 0 ? ` (${valgteSokIds.join(', ')})` : ''}
-        </div>
+              <div style={{ opacity: 0.85 }}>
+                Valgte søk: <strong>{valgteSokIds.length}</strong>
+                {valgteSokIds.length > 0 ? ` (${valgteSokIds.join(', ')})` : ''}
+              </div>
 
-        <startKontrollFetcher.Form method="post">
-          <input type="hidden" name="_intent" value="startKontroll" />
-          {valgteSokIds.map((id) => (
-            <input key={id} type="hidden" name="valgteSok" value={String(id)} />
-          ))}
+              <startKontrollFetcher.Form method="post">
+                <input type="hidden" name="_intent" value="startKontroll" />
+                {valgteSokIds.map((id) => (
+                  <input key={id} type="hidden" name="valgteSok" value={String(id)} />
+                ))}
 
-          <Button
-            type="submit"
-            variant="primary"
-            loading={startKontrollFetcher.state !== 'idle'}
-            disabled={disableStartKontroll}
-          >
-            Start kontroll på valgte
-          </Button>
-        </startKontrollFetcher.Form>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  loading={startKontrollFetcher.state !== 'idle'}
+                  disabled={disableStartKontroll}
+                >
+                  Start kontroll på valgte
+                </Button>
+              </startKontrollFetcher.Form>
 
-        <KjoringerPreview
-          title="StartKontrollkjøringer"
-          items={startKontrollItems}
-          emptyText="Ingen startkontroller funnet ennå."
-        />
-      </VStack>
+              <KjoringerPreview
+                title="StartKontrollkjøringer"
+                items={startKontrollItems}
+                emptyText="Ingen startkontroller funnet ennå."
+              />
+            </VStack>
+          </VStack>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="statistikk" style={{ marginTop: '1rem' }}>
+          <VStack gap="space-12">
+            <Heading size="medium" level="2">
+              Kontrollstatistikk (grunnlag)
+            </Heading>
+
+            {!valgtGrunnlagId || grunnlagStatus !== 'FERDIG' ? (
+              <Alert variant="info">
+                Statistikk er tilgjengelig når grunnlaget er ferdig. Kjør steg 1 (grunnlag) og vent til status er
+                ferdig.
+              </Alert>
+            ) : (
+              <>
+                <HStack align="center">
+                  <Button
+                    size="small"
+                    variant="secondary"
+                    onClick={() => pollStatistikk(valgtGrunnlagId)}
+                    loading={statistikkFetcher.state !== 'idle'}
+                  >
+                    Refresh
+                  </Button>
+                  {statistikkFetcher.state !== 'idle' ? <Loader size="xsmall" title="Henter statistikk" /> : null}
+                  <div style={{ opacity: 0.85 }}>
+                    GrunnlagId: <strong>{valgtGrunnlagId}</strong>
+                  </div>
+                </HStack>
+                <div style={{ maxWidth: 560 }}>
+                  <div style={{ height: 260 }}>
+                    <Table size="small">
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.ColumnHeader scope="col">Opprettet</Table.ColumnHeader>
+                          <Table.ColumnHeader scope="col">Under behandling</Table.ColumnHeader>
+                          <Table.ColumnHeader scope="col">Fullført</Table.ColumnHeader>
+                          <Table.ColumnHeader scope="col">Feil</Table.ColumnHeader>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
+                        <Table.Row>
+                          <Table.DataCell>{statistikk?.antallOpprettet ?? '—'}</Table.DataCell>
+                          <Table.DataCell>{statistikk?.antallUnderBehandling ?? '—'}</Table.DataCell>
+                          <Table.DataCell>{statistikk?.antallFullfort ?? '—'}</Table.DataCell>
+                          <Table.DataCell>{statistikk?.antallFeil ?? '—'}</Table.DataCell>
+                        </Table.Row>
+                      </Table.Body>
+                    </Table>
+
+                    {statistikkChartData ? (
+                      <Bar
+                        data={statistikkChartData}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: { legend: { display: false } },
+                          scales: {
+                            y: { beginAtZero: true, ticks: { precision: 0 } },
+                          },
+                          datasets: {
+                            bar: {
+                              maxBarThickness: 42,
+                              categoryPercentage: 0.7,
+                              barPercentage: 0.8,
+                            },
+                          },
+                        }}
+                      />
+                    ) : null}
+                  </div>
+                </div>
+              </>
+            )}
+          </VStack>
+        </Tabs.Panel>
+      </Tabs>
     </VStack>
   )
 }
