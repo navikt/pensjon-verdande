@@ -28,6 +28,7 @@ export const Empty: Story = {
         behandlingAntall: [],
         opprettetPerDag: [],
         ukjenteBehandlingstyper: [],
+        kjoringerPerTime: [],
       }),
     }),
 }

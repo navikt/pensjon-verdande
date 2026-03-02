@@ -233,6 +233,11 @@ export type DatoAntall = {
   antall: number
 }
 
+export type TidspunktAntall = {
+  tidspunkt: string
+  antall: number
+}
+
 export type SchedulerStatusResponse = {
   schedulerEnabled: boolean
   schedulerLocal: boolean
@@ -245,6 +250,7 @@ export type DashboardResponse = {
   ukjenteBehandlingstyper: string[]
   behandlingAntall: BehandlingAntall[]
   opprettetPerDag: DatoAntall[]
+  kjoringerPerTime: TidspunktAntall[]
 }
 
 export interface HalLink {

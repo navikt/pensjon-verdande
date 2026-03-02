@@ -11,6 +11,7 @@ import { formatNumber } from '~/common/number'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
+import { KjoringerPerTimeLineChartCard } from '~/components/kjoringer-per-time-linechart/KjoringerPerTimeLineChartCard'
 import { getDashboardSummary } from '~/services/dashboard.server'
 import type { Route } from './+types/route'
 
@@ -38,8 +39,8 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <Skeleton variant="rounded" width="100%" height={70} />
           </HGrid>
           <HGrid gap="space-24" style={{ paddingTop: '12px' }} columns={2}>
-            <Skeleton variant="rounded" width="100%" height={550} />
-            <Skeleton variant="rounded" width="100%" height={1024} />
+            <Skeleton variant="rounded" width="100%" height={300} />
+            <Skeleton variant="rounded" width="100%" height={300} />
           </HGrid>
         </VStack>
       }
@@ -77,8 +78,9 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                 </HGrid>
                 <HGrid gap="space-24" columns={2}>
                   <BehandlingerPerDagLineChartCard opprettetPerDag={dashboardResponse.opprettetPerDag} />
-                  <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
+                  <KjoringerPerTimeLineChartCard kjoringerPerTime={dashboardResponse.kjoringerPerTime} />
                 </HGrid>
+                <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
               </VStack>
             )
           )

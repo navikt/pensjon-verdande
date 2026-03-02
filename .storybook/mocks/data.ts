@@ -138,6 +138,19 @@ export function mockDashboardResponse(overrides?: Partial<DashboardResponse>): D
     { dato: '2024-06-15', antall: 7 },
   ]
 
+  const kjoringerPerTime = [
+    { tidspunkt: '2024-06-15T06:00:00', antall: 5 },
+    { tidspunkt: '2024-06-15T07:00:00', antall: 12 },
+    { tidspunkt: '2024-06-15T08:00:00', antall: 45 },
+    { tidspunkt: '2024-06-15T09:00:00', antall: 78 },
+    { tidspunkt: '2024-06-15T10:00:00', antall: 62 },
+    { tidspunkt: '2024-06-15T11:00:00', antall: 34 },
+    { tidspunkt: '2024-06-15T12:00:00', antall: 15 },
+    { tidspunkt: '2024-06-15T13:00:00', antall: 28 },
+    { tidspunkt: '2024-06-15T14:00:00', antall: 41 },
+    { tidspunkt: '2024-06-15T15:00:00', antall: 22 },
+  ]
+
   return {
     totaltAntallBehandlinger: 185,
     feilendeBehandlinger: 3,
@@ -145,6 +158,7 @@ export function mockDashboardResponse(overrides?: Partial<DashboardResponse>): D
     ukjenteBehandlingstyper: [],
     behandlingAntall,
     opprettetPerDag,
+    kjoringerPerTime,
     ...overrides,
   }
 }
