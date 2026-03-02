@@ -512,8 +512,9 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   // Handle statistikk response
   useEffect(() => {
     if (!statistikkFetcher.data) return
+    if (statistikkFetcher.data.grunnlagId !== valgtGrunnlagId) return
     setStatistikk(statistikkFetcher.data.statistikk ?? null)
-  }, [statistikkFetcher.data])
+  }, [statistikkFetcher.data, valgtGrunnlagId])
 
   // Poll startkontroll after POST
   useEffect(() => {
