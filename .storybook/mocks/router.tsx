@@ -30,6 +30,7 @@ export const withRouter: Decorator = (Story) => {
  * }
  * ```
  */
+// biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes from React Router
 export function renderWithLoader<T>(Component: React.ComponentType<any>, loaderData: T, path = '/') {
   const Stub = createRoutesStub([
     {
@@ -45,7 +46,9 @@ export function renderWithLoader<T>(Component: React.ComponentType<any>, loaderD
  * Renders a route component with mock action data (for pages that display actionData).
  * Wraps the component inside a router context and injects actionData as a prop.
  */
+// biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes from React Router
 export function renderWithAction<T>(Component: React.ComponentType<any>, actionData: T, path = '/') {
+  // biome-ignore lint/suspicious/noExplicitAny: Props are forwarded dynamically to route components
   const Wrapper = (props: any) => <Component {...props} actionData={actionData} />
   const Stub = createRoutesStub([
     {
@@ -68,6 +71,7 @@ export function renderWithAction<T>(Component: React.ComponentType<any>, actionD
  * ```
  */
 export function renderWithLayout<T>(
+  // biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes from React Router
   Component: React.ComponentType<any>,
   loaderData: T,
   options?: { path?: string; me?: Partial<MeResponse>; env?: string },
@@ -94,6 +98,7 @@ export function renderWithLayout<T>(
   const Stub = createRoutesStub([
     {
       path: '/',
+      // biome-ignore lint/suspicious/noExplicitAny: Layout type is incompatible with createRoutesStub's expected component type
       Component: Layout as any,
       loader: () => ({
         env: options?.env ?? 'q2',

@@ -23,7 +23,6 @@ import Dashboard from './dashboard/route'
 import KalenderVisning from './kalender/route'
 import ManuellBehandling from './manuell-behandling/index'
 
-
 const mockKalenderHendelser: KalenderHendelser = {
   offentligeFridager: [
     { dato: '2024-06-17', navn: '2. pinsedag' },
