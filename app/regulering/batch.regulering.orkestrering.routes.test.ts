@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('~/services/auth.server', () => ({
   requireAccessToken: vi.fn().mockResolvedValue('test-token'),
@@ -27,6 +27,23 @@ function okResponse(status = 200) {
 describe('orkestrering routes', () => {
   let fetchSpy: ReturnType<typeof vi.fn>
 
+  // Eagerly import all route modules so Vite transform cost does not count against individual test timeouts
+  let orkestrerMod: typeof import('./batch.regulering.orkestrering')
+  let fortsettMod: typeof import('./batch.regulering.orkestrering.fortsett.$behandlingId')
+  let pauseMod: typeof import('./batch.regulering.orkestrering.pause.$behandlingId')
+  let feilmeldingerMod: typeof import('./batch.regulering.orkestrering.hentAggregerteFeilmeldinger')
+  let statistikkMod: typeof import('./batch.regulering.orkestrering.hentOrkestreringStatistikk.$behandlingId')
+
+  beforeAll(async () => {
+    ;[orkestrerMod, fortsettMod, pauseMod, feilmeldingerMod, statistikkMod] = await Promise.all([
+      import('./batch.regulering.orkestrering'),
+      import('./batch.regulering.orkestrering.fortsett.$behandlingId'),
+      import('./batch.regulering.orkestrering.pause.$behandlingId'),
+      import('./batch.regulering.orkestrering.hentAggregerteFeilmeldinger'),
+      import('./batch.regulering.orkestrering.hentOrkestreringStatistikk.$behandlingId'),
+    ])
+  })
+
   beforeEach(() => {
     fetchSpy = vi.fn()
     vi.stubGlobal('fetch', fetchSpy)
@@ -39,7 +56,7 @@ describe('orkestrering routes', () => {
 
   describe('batch.regulering.orkestrering action (startOrkestrering)', () => {
     it('POST starter orkestrering med formdata-parametre', async () => {
-      const { action } = await import('./batch.regulering.orkestrering')
+      const { action } = orkestrerMod
       fetchSpy.mockResolvedValueOnce(okResponse())
 
       const formData = new FormData()
@@ -72,7 +89,7 @@ describe('orkestrering routes', () => {
 
   describe('fortsett.$behandlingId', () => {
     it('POST fortsetter orkestrering for behandlingId', async () => {
-      const { action } = await import('./batch.regulering.orkestrering.fortsett.$behandlingId')
+      const { action } = fortsettMod
       fetchSpy.mockResolvedValueOnce(okResponse())
 
       const request = new Request('http://localhost/x', { method: 'POST' })
@@ -92,7 +109,7 @@ describe('orkestrering routes', () => {
     })
 
     it('backend 500 kaster feil', async () => {
-      const { action } = await import('./batch.regulering.orkestrering.fortsett.$behandlingId')
+      const { action } = fortsettMod
       fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
 
       const request = new Request('http://localhost/x', { method: 'POST' })
@@ -109,7 +126,7 @@ describe('orkestrering routes', () => {
 
   describe('pause.$behandlingId', () => {
     it('POST pauser orkestrering for behandlingId', async () => {
-      const { action } = await import('./batch.regulering.orkestrering.pause.$behandlingId')
+      const { action } = pauseMod
       fetchSpy.mockResolvedValueOnce(okResponse())
 
       const request = new Request('http://localhost/x', { method: 'POST' })
@@ -129,7 +146,7 @@ describe('orkestrering routes', () => {
     })
 
     it('backend 500 kaster feil', async () => {
-      const { action } = await import('./batch.regulering.orkestrering.pause.$behandlingId')
+      const { action } = pauseMod
       fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
 
       const request = new Request('http://localhost/x', { method: 'POST' })
@@ -146,7 +163,7 @@ describe('orkestrering routes', () => {
 
   describe('hentAggregerteFeilmeldinger', () => {
     it('loader henter aggregerte feilmeldinger', async () => {
-      const { loader } = await import('./batch.regulering.orkestrering.hentAggregerteFeilmeldinger')
+      const { loader } = feilmeldingerMod
       const mockData = { feilmeldinger: [{ melding: 'Feil', antall: 5 }] }
       fetchSpy.mockResolvedValueOnce(jsonResponse(mockData))
 
@@ -167,7 +184,7 @@ describe('orkestrering routes', () => {
 
   describe('hentOrkestreringStatistikk.$behandlingId', () => {
     it('loader henter orkestreringsstatistikk', async () => {
-      const { loader } = await import('./batch.regulering.orkestrering.hentOrkestreringStatistikk.$behandlingId')
+      const { loader } = statistikkMod
       const mockData = { fremdrift: 50, status: 'AKTIV' }
       fetchSpy.mockResolvedValueOnce(jsonResponse(mockData))
 

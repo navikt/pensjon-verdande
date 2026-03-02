@@ -22,7 +22,6 @@ import Brukere from './brukere/index'
 import Dashboard from './dashboard/route'
 import KalenderVisning from './kalender/route'
 import ManuellBehandling from './manuell-behandling/index'
-import Sok from './sok/sok'
 
 const mockKalenderHendelser: KalenderHendelser = {
   offentligeFridager: [
@@ -62,21 +61,6 @@ export const KalenderFullpage: Story = {
       kalenderHendelser: mockKalenderHendelser,
       startDato: new Date('2024-06-15'),
     }),
-}
-
-export const SokFullpage: Story = {
-  name: 'Søk',
-  render: () =>
-    renderWithLayout(
-      Sok,
-      {
-        behandlinger: mockBehandlingerPage([
-          mockBehandlingDto({ behandlingId: 100001, fnr: '12345678901', type: 'ForstegangsbehandlingAlder' }),
-          mockBehandlingDto({ behandlingId: 100002, fnr: '12345678901', type: 'Omregning', status: 'FULLFORT' }),
-        ]),
-      },
-      { path: '/sok' },
-    ),
 }
 
 export const BehandlingerFullpage: Story = {

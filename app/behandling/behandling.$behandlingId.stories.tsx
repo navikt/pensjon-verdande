@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import type { HalLinks } from '~/types'
+import type { BehandlingKjoringDTO, HalLinks } from '~/types'
 import { mockBehandlingDto } from '../../.storybook/mocks/data'
 import { renderWithLoader } from '../../.storybook/mocks/router'
 import Behandling from './behandling.$behandlingId'
@@ -92,7 +92,7 @@ export const Interaktiv: StoryObj<KnappControls> = {
       behandling: mockBehandlingDto({
         status: 'UNDER_BEHANDLING',
         planlagtStartet: args.planlagtStartet ? '2024-12-01T08:00:00' : null,
-        behandlingKjoringer: args.endrePlanlagtStartet ? [] : [{ kjoringId: 1 } as any],
+        behandlingKjoringer: args.endrePlanlagtStartet ? [] : [{ kjoringId: 1 } as unknown as BehandlingKjoringDTO],
         behandlingSerieId: args.behandlingserie ? 'serie-123' : null,
         muligeKontrollpunkt: args.sendTilManuellMedKontrollpunkt
           ? [

@@ -52,6 +52,7 @@ export const BehandlingslosningenAvslaatt: Story = {
     const Stub = createRoutesStub([
       {
         path: '/',
+        // biome-ignore lint/suspicious/noExplicitAny: Layout type is incompatible with createRoutesStub's expected component type
         Component: Layout as any,
         loader: () => ({
           env: 'q2',
