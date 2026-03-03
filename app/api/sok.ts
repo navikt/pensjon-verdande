@@ -1,4 +1,3 @@
-import { requireAccessToken } from '~/services/auth.server'
 import { search } from '~/services/behandling.server'
 import { logger } from '~/services/logger.server'
 import type { BehandlingerPage } from '~/types'
@@ -28,13 +27,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   if (query) {
     try {
-      const accessToken = await requireAccessToken(request)
-
       const page = getIntValue(formData, 'page', 0)
       const size = getIntValue(formData, 'size', 10, 100)
 
       behandlinger = await search(
-        accessToken,
+        request,
         query,
         getStringValue(formData, 'behandlingType'),
         getStringValue(formData, 'status'),

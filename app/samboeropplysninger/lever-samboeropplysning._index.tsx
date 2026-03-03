@@ -2,7 +2,6 @@ import { BodyShort, Button, Heading, TextField, VStack } from '@navikt/ds-react'
 import { Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { apiPost } from '~/services/api.server'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/lever-samboeropplysning._index'
 
@@ -16,8 +15,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
-  const accessToken = await requireAccessToken(request)
-  const behandlinger = await getBehandlinger(accessToken, {
+  const behandlinger = await getBehandlinger(request, {
     behandlingType: 'VurderSamboereBatch',
     page: page ? +page : 0,
     size: size ? +size : 5,

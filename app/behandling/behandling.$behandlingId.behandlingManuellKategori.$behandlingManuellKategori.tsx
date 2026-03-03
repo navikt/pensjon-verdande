@@ -2,7 +2,6 @@ import { Heading, VStack } from '@navikt/ds-react'
 
 import invariant from 'tiny-invariant'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/behandling.$behandlingId.behandlingManuellKategori.$behandlingManuellKategori'
 
@@ -12,11 +11,9 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const { searchParams } = new URL(request.url)
 
-  const accessToken = await requireAccessToken(request)
-
   const page = searchParams.get('page')
   const size = searchParams.get('size')
-  const manuellKategoriBehandlinger = await getBehandlinger(accessToken, {
+  const manuellKategoriBehandlinger = await getBehandlinger(request, {
     behandlingType: searchParams.get('behandlingType'),
     status: searchParams.get('status'),
     ansvarligTeam: searchParams.get('ansvarligTeam'),

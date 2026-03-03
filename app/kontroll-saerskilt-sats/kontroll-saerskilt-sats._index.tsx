@@ -6,7 +6,6 @@ import { Form, redirect, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { opprettKontrollereSaerskiltSatsBehandling } from '~/kontroll-saerskilt-sats/kontroll-saerskilt-sats.server'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/kontroll-saerskilt-sats._index'
@@ -33,10 +32,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const accessToken = await requireAccessToken(request)
   const { searchParams } = new URL(request.url)
 
-  const behandlinger = await getBehandlinger(accessToken, {
+  const behandlinger = await getBehandlinger(request, {
     behandlingType: 'KontrollerSaerskiltSats_Utplukk',
     status: searchParams.get('status'),
     page: +(searchParams.get('page') ?? 0),
