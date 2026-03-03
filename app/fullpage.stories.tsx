@@ -22,7 +22,6 @@ import Brukere from './brukere/index'
 import Dashboard from './dashboard/route'
 import KalenderVisning from './kalender/route'
 import ManuellBehandling from './manuell-behandling/index'
-import Sok from './sok/sok'
 
 const mockKalenderHendelser: KalenderHendelser = {
   offentligeFridager: [
@@ -64,21 +63,6 @@ export const KalenderFullpage: Story = {
     }),
 }
 
-export const SokFullpage: Story = {
-  name: 'Søk',
-  render: () =>
-    renderWithLayout(
-      Sok,
-      {
-        behandlinger: mockBehandlingerPage([
-          mockBehandlingDto({ behandlingId: 100001, fnr: '12345678901', type: 'ForstegangsbehandlingAlder' }),
-          mockBehandlingDto({ behandlingId: 100002, fnr: '12345678901', type: 'Omregning', status: 'FULLFORT' }),
-        ]),
-      },
-      { path: '/sok' },
-    ),
-}
-
 export const BehandlingerFullpage: Story = {
   name: 'Behandlinger',
   render: () =>
@@ -99,6 +83,53 @@ export const BehandlingerFullpage: Story = {
         }),
       ]),
     }),
+}
+
+export const BehandlingerMedDiagramFullpage: Story = {
+  name: 'Behandlinger med diagram',
+  render: () =>
+    renderWithLayout(
+      Behandlinger,
+      {
+        behandlinger: mockBehandlingerPage(
+          [
+            mockBehandlingDto({
+              behandlingId: 100001,
+              type: 'FleksibelApSakBehandling',
+              status: 'UNDER_BEHANDLING',
+            }),
+            mockBehandlingDto({
+              behandlingId: 100002,
+              type: 'FleksibelApSakBehandling',
+              status: 'FULLFORT',
+              ferdig: '2024-06-15T12:00:00',
+            }),
+            mockBehandlingDto({
+              behandlingId: 100003,
+              type: 'FleksibelApSakBehandling',
+              status: 'FEILENDE',
+              feilmelding: 'Feil ved henting av grunnlag',
+            }),
+          ],
+          { behandlingTyper: ['FleksibelApSakBehandling'] },
+        ),
+        opprettetPerDag: Array.from({ length: 30 }, (_, i) => {
+          const d = new Date()
+          d.setDate(d.getDate() - (29 - i))
+          const yyyy = d.getFullYear()
+          const mm = String(d.getMonth() + 1).padStart(2, '0')
+          const dd = String(d.getDate()).padStart(2, '0')
+          return {
+            dato: `${yyyy}-${mm}-${dd}`,
+            antall: ((i * 7 + 3) % 13) + 1,
+          }
+        }),
+      },
+      {
+        path: '/behandlinger',
+        initialEntry: '/behandlinger?behandlingType=FleksibelApSakBehandling',
+      },
+    ),
 }
 
 export const BehandlingFullpage: Story = {
