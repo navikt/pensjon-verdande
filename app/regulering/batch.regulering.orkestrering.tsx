@@ -1,5 +1,5 @@
 import 'chart.js/auto'
-import { PauseIcon, PlayIcon } from '@navikt/aksel-icons'
+import { PauseIcon, PencilIcon, PlayIcon } from '@navikt/aksel-icons'
 import {
   Alert,
   BodyShort,
@@ -41,6 +41,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function Orkestrering() {
   const { uttrekk, orkestreringer } = useOutletContext<ReguleringDetaljer>()
   const [antallFamilier, setAntallFamilier] = useState('100000')
+  const [useDefaultParametre, setUseDefaultParametre] = useState(true)
   const navigation = useNavigation()
 
   useRevalidateOnInterval({
@@ -65,25 +66,35 @@ export default function Orkestrering() {
           </Heading>
           <Entry labelText="Antall ubehandlede familier">{uttrekk.antallUbehandlede}</Entry>
           <Entry labelText="Antall ekskluderte saker">{uttrekk.antallEkskluderteSaker}</Entry>
+          <div>
+            <Button
+              icon={<PencilIcon aria-hidden />}
+              size="small"
+              variant={'secondary'}
+              onClick={() => setUseDefaultParametre(false)}
+            >
+              Endre standard kjøreparametre
+            </Button>
+          </div>
           <Form method="post">
             <VStack gap="space-12">
+              <CheckboxGroup legend="Kjøreparametre" hideLegend={true}>
+                <Checkbox name={'kjorOnline'} value={'true'} defaultChecked={false} readOnly={useDefaultParametre}>
+                  Kjør online-kø mot oppdrag
+                </Checkbox>
+                <Checkbox name={'brukKjoreplan'} value={'true'} defaultChecked={true} readOnly={useDefaultParametre}>
+                  Bruk kjøreplan
+                </Checkbox>
+                <Checkbox name={'skalSamordne'} value={'true'} defaultChecked={true} readOnly={useDefaultParametre}>
+                  Send til samordning
+                </Checkbox>
+              </CheckboxGroup>
               <TextField
                 label="Antall familier"
                 name="antallFamilier"
                 onChange={(e) => setAntallFamilier(e.target.value)}
                 value={antallFamilier}
               />
-              <CheckboxGroup legend="Kjøreparametre" hideLegend={true}>
-                <Checkbox name={'kjorOnline'} value={'true'}>
-                  Kjør online kø mot oppdrag
-                </Checkbox>
-                <Checkbox name={'brukKjoreplan'} value={'true'}>
-                  Bruk kjøreplan
-                </Checkbox>
-                <Checkbox name={'skalSamordne'} value={'true'}>
-                  Send til samordning
-                </Checkbox>
-              </CheckboxGroup>
               <HStack gap="space-12" align="center">
                 <div>
                   <Button loading={navigation.state === 'submitting'} type="submit">
