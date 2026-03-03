@@ -1082,8 +1082,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   >
                     <Modal.Body>
                       <BodyShort>
-                        Er du sikker på at du vil purre? Dette sender purremail til behandlinger som har ligget lenge i
-                        Under behandling.
+                        Er du sikker på at du vil purre? Denne sender brev med påminnelse om leveattest til alle
+                        behandlinger som ligger til "under behandling".
                       </BodyShort>
                     </Modal.Body>
                     <Modal.Footer>
@@ -1120,7 +1120,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     header={{ heading: 'Opprett oppgaver', size: 'small' }}
                   >
                     <Modal.Body>
-                      <BodyShort>Er du sikker på at du vil opprette oppgaver?</BodyShort>
+                      <BodyShort>
+                        Er du sikker på at du vil opprette oppgaver på alle behandlinger som ligger til "under
+                        behandling" ?
+                      </BodyShort>
                     </Modal.Body>
                     <Modal.Footer>
                       <Button
