@@ -1,11 +1,13 @@
 import {
   Alert,
+  BodyShort,
   Button,
   Checkbox,
   CheckboxGroup,
   Heading,
   HStack,
   Loader,
+  Modal,
   Select,
   Table,
   Tabs,
@@ -363,6 +365,9 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const autoStatistikkLastetRef = useRef(false)
 
   const [aktivFane, setAktivFane] = useState<'kontroll' | 'statistikk'>('kontroll')
+
+  const [openPurrDialog, setOpenPurrDialog] = useState(false)
+  const [openOppgaveDialog, setOpenOppgaveDialog] = useState(false)
 
   const pollTimerRef = useRef<number | null>(null)
   const sokPollTimerRef = useRef<number | null>(null)
@@ -983,75 +988,50 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </Alert>
             ) : (
               <>
-                <HStack align="center">
-                  <Button
-                    size="small"
-                    variant="secondary"
-                    onClick={() => pollStatistikk(valgtGrunnlagId)}
-                    loading={statistikkFetcher.state !== 'idle'}
-                  >
-                    Refresh
-                  </Button>
-
-                  <purreFetcher.Form method="post">
-                    <input type="hidden" name="_intent" value="settPurreModus" />
-                    <input type="hidden" name="grunnlagId" value={String(valgtGrunnlagId)} />
+                <VStack gap="space-2">
+                  <HStack align="center" gap="space-2">
                     <Button
                       size="small"
                       variant="secondary"
-                      type="submit"
-                      loading={purreFetcher.state !== 'idle'}
-                      disabled={disableModus}
+                      onClick={() => pollStatistikk(valgtGrunnlagId)}
+                      loading={statistikkFetcher.state !== 'idle'}
                     >
-                      Purr
+                      Refresh
                     </Button>
-                  </purreFetcher.Form>
 
-                  <oppgaveFetcher.Form method="post">
-                    <input type="hidden" name="_intent" value="settOppgaveModus" />
-                    <input type="hidden" name="grunnlagId" value={String(valgtGrunnlagId)} />
-                    <Button
-                      size="small"
-                      variant="secondary"
-                      type="submit"
-                      loading={oppgaveFetcher.state !== 'idle'}
-                      disabled={disableModus}
-                    >
-                      Opprett oppgaver
-                    </Button>
-                  </oppgaveFetcher.Form>
+                    {statistikkFetcher.state !== 'idle' ? <Loader size="xsmall" title="Henter statistikk" /> : null}
 
-                  {statistikkFetcher.state !== 'idle' ? <Loader size="xsmall" title="Henter statistikk" /> : null}
-                  <div style={{ opacity: 0.85 }}>
-                    GrunnlagId: <strong>{valgtGrunnlagId}</strong>
-                  </div>
-                </HStack>
+                    <div style={{ opacity: 0.85 }}>
+                      GrunnlagId: <strong>{valgtGrunnlagId}</strong>
+                    </div>
+                  </HStack>
+                </VStack>
 
                 {modusStatus === 'PURR' ? <Alert variant="success">Purrebrev er startet.</Alert> : null}
                 {modusStatus === 'OPPGAVE' ? <Alert variant="success">Oppgaver er startet.</Alert> : null}
 
                 <div style={{ maxWidth: 560 }}>
-                  <div style={{ height: 260 }}>
-                    <Table size="small">
-                      <Table.Header>
-                        <Table.Row>
-                          <Table.ColumnHeader scope="col">Opprettet</Table.ColumnHeader>
-                          <Table.ColumnHeader scope="col">Under behandling</Table.ColumnHeader>
-                          <Table.ColumnHeader scope="col">Fullført</Table.ColumnHeader>
-                          <Table.ColumnHeader scope="col">Feil</Table.ColumnHeader>
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        <Table.Row>
-                          <Table.DataCell>{statistikk?.antallOpprettet ?? '—'}</Table.DataCell>
-                          <Table.DataCell>{statistikk?.antallUnderBehandling ?? '—'}</Table.DataCell>
-                          <Table.DataCell>{statistikk?.antallFullfort ?? '—'}</Table.DataCell>
-                          <Table.DataCell>{statistikk?.antallFeil ?? '—'}</Table.DataCell>
-                        </Table.Row>
-                      </Table.Body>
-                    </Table>
+                  <Table size="small">
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.ColumnHeader scope="col">Opprettet</Table.ColumnHeader>
+                        <Table.ColumnHeader scope="col">Under behandling</Table.ColumnHeader>
+                        <Table.ColumnHeader scope="col">Fullført</Table.ColumnHeader>
+                        <Table.ColumnHeader scope="col">Feil</Table.ColumnHeader>
+                      </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                      <Table.Row>
+                        <Table.DataCell>{statistikk?.antallOpprettet ?? '—'}</Table.DataCell>
+                        <Table.DataCell>{statistikk?.antallUnderBehandling ?? '—'}</Table.DataCell>
+                        <Table.DataCell>{statistikk?.antallFullfort ?? '—'}</Table.DataCell>
+                        <Table.DataCell>{statistikk?.antallFeil ?? '—'}</Table.DataCell>
+                      </Table.Row>
+                    </Table.Body>
+                  </Table>
 
-                    {statistikkChartData ? (
+                  {statistikkChartData ? (
+                    <div style={{ height: 260, marginTop: '1rem' }}>
                       <Bar
                         data={statistikkChartData}
                         options={{
@@ -1070,8 +1050,105 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                           },
                         }}
                       />
-                    ) : null}
-                  </div>
+                    </div>
+                  ) : null}
+
+                  <HStack align="center" gap="space-2" style={{ marginTop: '1rem' }}>
+                    <Button
+                      size="small"
+                      variant="danger"
+                      type="button"
+                      onClick={() => setOpenPurrDialog(true)}
+                      disabled={disableModus}
+                    >
+                      Purr
+                    </Button>
+
+                    <Button
+                      size="small"
+                      variant="danger"
+                      type="button"
+                      onClick={() => setOpenOppgaveDialog(true)}
+                      disabled={disableModus}
+                    >
+                      Opprett oppgaver
+                    </Button>
+                  </HStack>
+
+                  <Modal
+                    open={openPurrDialog}
+                    onClose={() => setOpenPurrDialog(false)}
+                    header={{ heading: 'Purr', size: 'small' }}
+                  >
+                    <Modal.Body>
+                      <BodyShort>
+                        Er du sikker på at du vil purre? Dette sender purremail til behandlinger som har ligget lenge i
+                        Under behandling.
+                      </BodyShort>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        type="button"
+                        variant="danger"
+                        loading={purreFetcher.state !== 'idle'}
+                        disabled={disableModus}
+                        onClick={() => {
+                          if (!valgtGrunnlagId) return
+                          setOpenPurrDialog(false)
+                          const fd = new FormData()
+                          fd.append('_intent', 'settPurreModus')
+                          fd.append('grunnlagId', String(valgtGrunnlagId))
+                          purreFetcher.submit(fd, { method: 'post' })
+                        }}
+                      >
+                        Ja, purr
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={purreFetcher.state !== 'idle'}
+                        onClick={() => setOpenPurrDialog(false)}
+                      >
+                        Avbryt
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+
+                  <Modal
+                    open={openOppgaveDialog}
+                    onClose={() => setOpenOppgaveDialog(false)}
+                    header={{ heading: 'Opprett oppgaver', size: 'small' }}
+                  >
+                    <Modal.Body>
+                      <BodyShort>Er du sikker på at du vil opprette oppgaver?</BodyShort>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        type="button"
+                        variant="danger"
+                        loading={oppgaveFetcher.state !== 'idle'}
+                        disabled={disableModus}
+                        onClick={() => {
+                          if (!valgtGrunnlagId) return
+                          setOpenOppgaveDialog(false)
+                          const fd = new FormData()
+                          fd.append('_intent', 'settOppgaveModus')
+                          fd.append('grunnlagId', String(valgtGrunnlagId))
+                          oppgaveFetcher.submit(fd, { method: 'post' })
+                        }}
+                      >
+                        Ja, opprett oppgaver
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={oppgaveFetcher.state !== 'idle'}
+                        onClick={() => setOpenOppgaveDialog(false)}
+                      >
+                        Avbryt
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
                 </div>
               </>
             )}
