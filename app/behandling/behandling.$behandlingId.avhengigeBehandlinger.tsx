@@ -3,7 +3,6 @@ import { Suspense } from 'react'
 import { Await } from 'react-router'
 import invariant from 'tiny-invariant'
 import AvhengigeBehandlingerElement from '~/components/behandling/avhengige-behandlinger/AvhengigeBehandlingerElement'
-import { requireAccessToken } from '~/services/auth.server'
 import { getAvhengigeBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/behandling.$behandlingId.avhengigeBehandlinger'
 
@@ -12,12 +11,10 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const { searchParams } = new URL(request.url)
 
-  const accessToken = await requireAccessToken(request)
-
   const page = searchParams.get('page')
   const size = searchParams.get('size')
   const avhengigeBehandlinger = getAvhengigeBehandlinger(
-    accessToken,
+    request,
     +params.behandlingId,
     searchParams.get('behandlingType'),
     searchParams.get('status'),

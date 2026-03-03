@@ -7,7 +7,6 @@ import { Form, useSubmit } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { apiGet } from '~/services/api.server'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/aldersovergang._index'
@@ -34,9 +33,7 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData>
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
-  const accessToken = await requireAccessToken(request)
-
-  const behandlinger = await getBehandlinger(accessToken, {
+  const behandlinger = await getBehandlinger(request, {
     behandlingType: 'AldersovergangIdentifiserBruker',
     ansvarligTeam: searchParams.get('ansvarligTeam'),
     page: page ? +page : 0,

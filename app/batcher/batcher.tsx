@@ -1,6 +1,5 @@
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/batcher'
@@ -14,8 +13,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
-  const accessToken = await requireAccessToken(request)
-  const behandlinger = await getBehandlinger(accessToken, {
+  const behandlinger = await getBehandlinger(request, {
     behandlingType: searchParams.get('behandlingType'),
     status: searchParams.get('status'),
     ansvarligTeam: searchParams.get('ansvarligTeam'),

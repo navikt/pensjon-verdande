@@ -22,7 +22,6 @@ import {
   opprettAvsjekk,
   type SisteAvsjekkResponse,
 } from '~/opptjening/manedlig/opptjening.manedlig.omregning.server'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/opptjening.manedlig.omregning'
@@ -44,9 +43,7 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<LoaderData>
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
-  const accessToken = await requireAccessToken(request)
-
-  const behandlinger = await getBehandlinger(accessToken, {
+  const behandlinger = await getBehandlinger(request, {
     behandlingType: 'OpptjeningIdentifiserKategoriManedlig',
     status: searchParams.get('status'),
     page: page ? +page : 0,

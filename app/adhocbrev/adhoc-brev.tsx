@@ -4,7 +4,6 @@ import { Await, Form, redirect, useNavigation } from 'react-router'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { apiPost } from '~/services/api.server'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/adhoc-brev'
 
@@ -19,9 +18,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
-  const accessToken = await requireAccessToken(request)
-
-  const behandlinger = getBehandlinger(accessToken, {
+  const behandlinger = getBehandlinger(request, {
     behandlingType: behandlingType,
     page: page ? +page : 0,
     size: size ? +size : 5,

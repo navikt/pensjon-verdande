@@ -1,6 +1,5 @@
 import invariant from 'tiny-invariant'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { BehandlingerPage } from '~/types'
 import type { Route } from './+types/behandlinger.$status'
@@ -19,8 +18,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const fomStr = searchParams.get('fom')
   const tomStr = searchParams.get('tom')
 
-  const accessToken = await requireAccessToken(request)
-  const behandlinger = await getBehandlinger(accessToken, {
+  const behandlinger = await getBehandlinger(request, {
     behandlingType: searchParams.get('behandlingType'),
     status: params.status,
     ansvarligTeam: searchParams.get('ansvarligTeam'),

@@ -1,7 +1,6 @@
 import { BodyShort, Link, Table } from '@navikt/ds-react'
 import { NavLink } from 'react-router'
 import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
 import { HentRelaterteFamiliebehandlinger } from '~/services/behandling.server'
 import type { RelatertFamilieBehandling } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId.relaterteFamiliebehandlinger'
@@ -11,9 +10,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   invariant(behandlingId, 'Missing behandlingId param')
 
-  const accessToken = await requireAccessToken(request)
-
-  return HentRelaterteFamiliebehandlinger(accessToken, +behandlingId)
+  return HentRelaterteFamiliebehandlinger(request, +behandlingId)
 }
 
 export default function RelaterteFamiliebehandlinger({ loaderData }: Route.ComponentProps) {
