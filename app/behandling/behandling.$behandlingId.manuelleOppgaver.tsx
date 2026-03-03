@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import { formatIsoTimestamp } from '~/common/date'
-import { getBehandling, henBehandlingManuell } from '~/services/behandling.server'
+import { getBehandling, hentBehandlingManuell } from '~/services/behandling.server'
 import type { BehandlingManuellDto } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId.manuelleOppgaver'
 
@@ -13,7 +13,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const [behandling, behandlingManuellPage] = await Promise.all([
     getBehandling(request, behandlingId),
-    henBehandlingManuell(request, +behandlingId, 0, 100, null),
+    hentBehandlingManuell(request, +behandlingId, 0, 100, null),
   ])
 
   if (!behandling || !behandlingManuellPage) {

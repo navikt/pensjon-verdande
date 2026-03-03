@@ -56,44 +56,24 @@ export async function getBehandlinger(
     sort?: string | null
   },
 ) {
-  let query = ''
-  if (behandlingType) {
-    query += `&behandlingType=${behandlingType}`
-  }
-  if (behandlingSerieId) {
-    query += `&behandlingSerieId=${behandlingSerieId}`
-  }
-  if (status) {
-    query += `&status=${status}`
-  }
-  if (ansvarligTeam) {
-    query += `&ansvarligTeam=${ansvarligTeam}`
-  }
-  if (behandlingManuellKategori) {
-    query += `&behandlingManuellKategori=${behandlingManuellKategori}`
-  }
-  if (fom) {
-    query += `&fom=${asLocalDateString(fom)}`
-  }
-  if (tom) {
-    query += `&tom=${asLocalDateString(tom)}`
-  }
-  if (forrigeBehandlingId) {
-    query += `&forrigeBehandlingId=${forrigeBehandlingId}`
-  }
-  if (isBatch) {
-    query += '&isBatch=true'
-  }
-  if (sort) {
-    query += `&sort=${sort}`
-  }
+  const params = new URLSearchParams({ page: String(page), size: String(size) })
+  if (behandlingType) params.set('behandlingType', behandlingType)
+  if (behandlingSerieId) params.set('behandlingSerieId', behandlingSerieId)
+  if (status) params.set('status', status)
+  if (ansvarligTeam) params.set('ansvarligTeam', ansvarligTeam)
+  if (behandlingManuellKategori) params.set('behandlingManuellKategori', behandlingManuellKategori)
+  if (fom) params.set('fom', asLocalDateString(fom))
+  if (tom) params.set('tom', asLocalDateString(tom))
+  if (forrigeBehandlingId) params.set('forrigeBehandlingId', String(forrigeBehandlingId))
+  if (isBatch) params.set('isBatch', 'true')
+  if (sort) params.set('sort', sort)
 
-  return await apiGet<BehandlingerPage>(`/api/behandling?page=${page}&size=${size}${query}`, request)
+  return await apiGet<BehandlingerPage>(`/api/behandling?${params}`, request)
 }
 
 export async function getAvhengigeBehandlinger(
   request: Request,
-  behandlingId: number | null,
+  behandlingId: number,
   behandlingType: string | null,
   status: string | null,
   ansvarligTeam: string | null,
@@ -101,27 +81,13 @@ export async function getAvhengigeBehandlinger(
   size: number,
   sort: string | null,
 ): Promise<BehandlingerPage> {
-  let query = ''
-  if (status) {
-    query += `&status=${status}`
-  }
+  const params = new URLSearchParams({ page: String(page), size: String(size) })
+  if (status) params.set('status', status)
+  if (behandlingType) params.set('behandlingType', behandlingType)
+  if (sort) params.set('sort', sort)
+  if (ansvarligTeam) params.set('ansvarligTeam', ansvarligTeam)
 
-  if (behandlingType) {
-    query += `&behandlingType=${behandlingType}`
-  }
-
-  if (sort) {
-    query += `&sort=${sort}`
-  }
-
-  if (ansvarligTeam) {
-    query += `&ansvarligTeam=${ansvarligTeam}`
-  }
-
-  return await apiGet<BehandlingerPage>(
-    `/api/behandling/${behandlingId}/avhengigeBehandlinger?page=${page}&size=${size}${query}`,
-    request,
-  )
+  return await apiGet<BehandlingerPage>(`/api/behandling/${behandlingId}/avhengigeBehandlinger?${params}`, request)
 }
 
 export async function search(
@@ -231,23 +197,17 @@ export async function getOppdragskvittering(request: Request, behandlingId: stri
   return await apiGetRawStringOrUndefined(`/api/vedtak/iverksett/${behandlingId}/oppdragskvittering`, request)
 }
 
-export async function henBehandlingManuell(
+export async function hentBehandlingManuell(
   request: Request,
   behandlingId: number,
   page: number,
   size: number,
   sort: string | null,
 ): Promise<BehandlingManuellPage> {
-  let query = ''
+  const params = new URLSearchParams({ page: String(page), size: String(size) })
+  if (sort) params.set('sort', sort)
 
-  if (sort) {
-    query += `&sort=${sort}`
-  }
-
-  return await apiGet<BehandlingManuellPage>(
-    `/api/behandling/${behandlingId}/behandlingManuell?page=${page}&size=${size}${query}`,
-    request,
-  )
+  return await apiGet<BehandlingManuellPage>(`/api/behandling/${behandlingId}/behandlingManuell?${params}`, request)
 }
 
 export async function hentKalenderHendelser(
@@ -281,7 +241,7 @@ export async function getBehandlingManuellOpptelling(
   return apiGet(`/api/behandling/${behandlingId}/behandlingManuellOpptelling`, request)
 }
 
-export async function HentRelaterteFamiliebehandlinger(
+export async function hentRelaterteFamiliebehandlinger(
   request: Request,
   behandlingId: number,
 ): Promise<RelatertFamilieBehandling[]> {
