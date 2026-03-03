@@ -539,16 +539,17 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   }, [statistikkFetcher.data, valgtGrunnlagId])
 
   useEffect(() => {
-    const d = purreFetcher.data
-    if (!d) return
-    setModusStatus(d.type)
-  }, [purreFetcher.data])
+    const oppgave = oppgaveFetcher.data
+    if (oppgave) {
+      setModusStatus(oppgave.type)
+      return
+    }
 
-  useEffect(() => {
-    const d = oppgaveFetcher.data
-    if (!d) return
-    setModusStatus(d.type)
-  }, [oppgaveFetcher.data])
+    const purr = purreFetcher.data
+    if (purr) {
+      setModusStatus(purr.type)
+    }
+  }, [oppgaveFetcher.data, purreFetcher.data])
 
   useEffect(() => {
     if (startKontrollFetcher.state !== 'idle') return
@@ -584,6 +585,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     void valgtGrunnlagId
     autoStatistikkLastetRef.current = false
     setStatistikk(null)
+    setModusStatus(null)
   }, [valgtGrunnlagId])
 
   useEffect(() => {
@@ -1058,7 +1060,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                       size="small"
                       variant="danger"
                       type="button"
-                      onClick={() => setOpenPurrDialog(true)}
+                      onClick={() => {
+                        setModusStatus(null)
+                        setOpenPurrDialog(true)
+                      }}
                       disabled={disableModus}
                     >
                       Purr
@@ -1068,7 +1073,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                       size="small"
                       variant="danger"
                       type="button"
-                      onClick={() => setOpenOppgaveDialog(true)}
+                      onClick={() => {
+                        setModusStatus(null)
+                        setOpenOppgaveDialog(true)
+                      }}
                       disabled={disableModus}
                     >
                       Opprett oppgaver
@@ -1082,8 +1090,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   >
                     <Modal.Body>
                       <BodyShort>
-                        Er du sikker på at du vil purre? Denne sender brev med påminnelse om leveattest til alle
-                        behandlinger som ligger til "under behandling".
+                        Er du sikker på at du vil gjøre purring av leveattester? Brev med påminnelse om leveattest vil
+                        bli sendt til alle brukere som ikke har levert leveattest.
                       </BodyShort>
                     </Modal.Body>
                     <Modal.Footer>
@@ -1094,6 +1102,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                         disabled={disableModus}
                         onClick={() => {
                           if (!valgtGrunnlagId) return
+                          setModusStatus(null)
                           setOpenPurrDialog(false)
                           const fd = new FormData()
                           fd.append('_intent', 'settPurreModus')
@@ -1121,8 +1130,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   >
                     <Modal.Body>
                       <BodyShort>
-                        Er du sikker på at du vil opprette oppgaver på alle behandlinger som ligger til "under
-                        behandling" ?
+                        Er du sikker på at du vil gjøre oppfølging av leveattester? Dette oppretter oppgave til
+                        saksbehandler for alle brukere som ikke har levert leveattest.
                       </BodyShort>
                     </Modal.Body>
                     <Modal.Footer>
@@ -1133,6 +1142,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                         disabled={disableModus}
                         onClick={() => {
                           if (!valgtGrunnlagId) return
+                          setModusStatus(null)
                           setOpenOppgaveDialog(false)
                           const fd = new FormData()
                           fd.append('_intent', 'settOppgaveModus')
