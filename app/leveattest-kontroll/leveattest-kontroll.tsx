@@ -1,11 +1,13 @@
 import {
   Alert,
+  BodyShort,
   Button,
   Checkbox,
   CheckboxGroup,
   Heading,
   HStack,
   Loader,
+  Modal,
   Select,
   Table,
   Tabs,
@@ -24,14 +26,16 @@ type StartGrunnlagResponse = { behandlingId: number }
 type StartSokResponse = { sokBehandlingId: number }
 type StartKontrollActionResponse = { ok: true }
 
+type ModusActionResponse = { ok: true; type: 'PURR' | 'OPPGAVE' }
+
 type BehandlingStatus = string
 
 type LeveattestGrunnlagResultat = {
   grunnlagBehandlingId: number
   status: BehandlingStatus
   antallSPKPersoner?: number | null
-  kjoredatoGrunnlag?: string | null // LocalDate -> YYYY-MM-DD
-  behandlingSistKjort?: string | null // LocalDateTime -> ISO
+  kjoredatoGrunnlag?: string | null
+  behandlingSistKjort?: string | null
 }
 
 type LeveattestSokResultat = {
@@ -42,13 +46,13 @@ type LeveattestSokResultat = {
   alder: number
   filtrerPaSakstypeUfore: boolean
   antallPersonerTilKontroll: number
-  behandlingSistKjort: string // ISO
+  behandlingSistKjort: string
 }
 
 type LeveattestStartKontrollResponse = {
   sokBehandlingId: number
   status: string
-  behandlingSistKjort: string // ISO
+  behandlingSistKjort: string
 }
 
 type PollResponse =
@@ -317,6 +321,19 @@ export async function action({ request }: Route.ActionArgs) {
     return { ok: true } satisfies StartKontrollActionResponse
   }
 
+  if (intent === 'settPurreModus') {
+    const grunnlagId = Number(fd.get('grunnlagId'))
+    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) throw new Response('Invalid grunnlagId', { status: 400 })
+    await apiPost<void>(`/api/behandling/leveattest/kontroll/${grunnlagId}/settpurremodus`, {}, request)
+    return { ok: true, type: 'PURR' } satisfies ModusActionResponse
+  }
+
+  if (intent === 'settOppgaveModus') {
+    const grunnlagId = Number(fd.get('grunnlagId'))
+    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) throw new Response('Invalid grunnlagId', { status: 400 })
+    await apiPost<void>(`/api/behandling/leveattest/kontroll/${grunnlagId}/settoppgavemodus`, {}, request)
+    return { ok: true, type: 'OPPGAVE' } satisfies ModusActionResponse
+  }
   return null
 }
 
@@ -330,6 +347,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const startKontrollFetcher = useFetcher<StartKontrollActionResponse>()
   const startKontrollListFetcher = useFetcher<StartKontrollPollResponse>()
   const statistikkFetcher = useFetcher<{ grunnlagId: number; statistikk: LeveattestKontrollStatistikk | null }>()
+  const purreFetcher = useFetcher<ModusActionResponse>()
+  const oppgaveFetcher = useFetcher<ModusActionResponse>()
 
   const [grunnlagBehandlingId, setGrunnlagBehandlingId] = useState<number | null>(null)
   const [grunnlagStatus, setGrunnlagStatus] = useState<'IDLE' | 'KJØRER' | 'FERDIG'>('IDLE')
@@ -341,9 +360,14 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   )
 
   const [statistikk, setStatistikk] = useState<LeveattestKontrollStatistikk | null>(null)
+
+  const [modusStatus, setModusStatus] = useState<ModusActionResponse['type'] | null>(null)
   const autoStatistikkLastetRef = useRef(false)
 
   const [aktivFane, setAktivFane] = useState<'kontroll' | 'statistikk'>('kontroll')
+
+  const [openPurrDialog, setOpenPurrDialog] = useState(false)
+  const [openOppgaveDialog, setOpenOppgaveDialog] = useState(false)
 
   const pollTimerRef = useRef<number | null>(null)
   const sokPollTimerRef = useRef<number | null>(null)
@@ -352,6 +376,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const initializedRef = useRef(false)
 
   const [valgteSokIds, setValgteSokIds] = useState<number[]>([])
+
+  const valgtGrunnlagId = useMemo(
+    () => grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null,
+    [grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId],
+  )
 
   const stoppInterval = useCallback((ref: React.MutableRefObject<number | null>) => {
     if (ref.current != null) {
@@ -501,7 +530,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (!startKontrollListFetcher.data) return
     setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
   }, [startKontrollListFetcher.data])
-  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
 
   useEffect(() => {
     const data = statistikkFetcher.data
@@ -509,6 +537,19 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (data.grunnlagId !== valgtGrunnlagId) return
     setStatistikk(data.statistikk ?? null)
   }, [statistikkFetcher.data, valgtGrunnlagId])
+
+  useEffect(() => {
+    const oppgave = oppgaveFetcher.data
+    if (oppgave) {
+      setModusStatus(oppgave.type)
+      return
+    }
+
+    const purr = purreFetcher.data
+    if (purr) {
+      setModusStatus(purr.type)
+    }
+  }, [oppgaveFetcher.data, purreFetcher.data])
 
   useEffect(() => {
     if (startKontrollFetcher.state !== 'idle') return
@@ -539,10 +580,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   }, [startkontroller, pollStartKontroller, stoppInterval])
   const disableStart = grunnlagStatus === 'KJØRER'
   const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
+  const disableModus = disableSok || purreFetcher.state !== 'idle' || oppgaveFetcher.state !== 'idle'
   useEffect(() => {
     void valgtGrunnlagId
     autoStatistikkLastetRef.current = false
     setStatistikk(null)
+    setModusStatus(null)
   }, [valgtGrunnlagId])
 
   useEffect(() => {
@@ -947,42 +990,50 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </Alert>
             ) : (
               <>
-                <HStack align="center">
-                  <Button
-                    size="small"
-                    variant="secondary"
-                    onClick={() => pollStatistikk(valgtGrunnlagId)}
-                    loading={statistikkFetcher.state !== 'idle'}
-                  >
-                    Refresh
-                  </Button>
-                  {statistikkFetcher.state !== 'idle' ? <Loader size="xsmall" title="Henter statistikk" /> : null}
-                  <div style={{ opacity: 0.85 }}>
-                    GrunnlagId: <strong>{valgtGrunnlagId}</strong>
-                  </div>
-                </HStack>
-                <div style={{ maxWidth: 560 }}>
-                  <div style={{ height: 260 }}>
-                    <Table size="small">
-                      <Table.Header>
-                        <Table.Row>
-                          <Table.ColumnHeader scope="col">Opprettet</Table.ColumnHeader>
-                          <Table.ColumnHeader scope="col">Under behandling</Table.ColumnHeader>
-                          <Table.ColumnHeader scope="col">Fullført</Table.ColumnHeader>
-                          <Table.ColumnHeader scope="col">Feil</Table.ColumnHeader>
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        <Table.Row>
-                          <Table.DataCell>{statistikk?.antallOpprettet ?? '—'}</Table.DataCell>
-                          <Table.DataCell>{statistikk?.antallUnderBehandling ?? '—'}</Table.DataCell>
-                          <Table.DataCell>{statistikk?.antallFullfort ?? '—'}</Table.DataCell>
-                          <Table.DataCell>{statistikk?.antallFeil ?? '—'}</Table.DataCell>
-                        </Table.Row>
-                      </Table.Body>
-                    </Table>
+                <VStack gap="space-2">
+                  <HStack align="center" gap="space-2">
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      onClick={() => pollStatistikk(valgtGrunnlagId)}
+                      loading={statistikkFetcher.state !== 'idle'}
+                    >
+                      Refresh
+                    </Button>
 
-                    {statistikkChartData ? (
+                    {statistikkFetcher.state !== 'idle' ? <Loader size="xsmall" title="Henter statistikk" /> : null}
+
+                    <div style={{ opacity: 0.85 }}>
+                      GrunnlagId: <strong>{valgtGrunnlagId}</strong>
+                    </div>
+                  </HStack>
+                </VStack>
+
+                {modusStatus === 'PURR' ? <Alert variant="success">Purrebrev er startet.</Alert> : null}
+                {modusStatus === 'OPPGAVE' ? <Alert variant="success">Oppgaver er startet.</Alert> : null}
+
+                <div style={{ maxWidth: 560 }}>
+                  <Table size="small">
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.ColumnHeader scope="col">Opprettet</Table.ColumnHeader>
+                        <Table.ColumnHeader scope="col">Under behandling</Table.ColumnHeader>
+                        <Table.ColumnHeader scope="col">Fullført</Table.ColumnHeader>
+                        <Table.ColumnHeader scope="col">Feil</Table.ColumnHeader>
+                      </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                      <Table.Row>
+                        <Table.DataCell>{statistikk?.antallOpprettet ?? '—'}</Table.DataCell>
+                        <Table.DataCell>{statistikk?.antallUnderBehandling ?? '—'}</Table.DataCell>
+                        <Table.DataCell>{statistikk?.antallFullfort ?? '—'}</Table.DataCell>
+                        <Table.DataCell>{statistikk?.antallFeil ?? '—'}</Table.DataCell>
+                      </Table.Row>
+                    </Table.Body>
+                  </Table>
+
+                  {statistikkChartData ? (
+                    <div style={{ height: 260, marginTop: '1rem' }}>
                       <Bar
                         data={statistikkChartData}
                         options={{
@@ -1001,8 +1052,116 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                           },
                         }}
                       />
-                    ) : null}
-                  </div>
+                    </div>
+                  ) : null}
+
+                  <HStack align="center" gap="space-2" style={{ marginTop: '1rem' }}>
+                    <Button
+                      size="small"
+                      variant="danger"
+                      type="button"
+                      onClick={() => {
+                        setModusStatus(null)
+                        setOpenPurrDialog(true)
+                      }}
+                      disabled={disableModus}
+                    >
+                      Purr
+                    </Button>
+
+                    <Button
+                      size="small"
+                      variant="danger"
+                      type="button"
+                      onClick={() => {
+                        setModusStatus(null)
+                        setOpenOppgaveDialog(true)
+                      }}
+                      disabled={disableModus}
+                    >
+                      Opprett oppgaver
+                    </Button>
+                  </HStack>
+
+                  <Modal
+                    open={openPurrDialog}
+                    onClose={() => setOpenPurrDialog(false)}
+                    header={{ heading: 'Purr', size: 'small' }}
+                  >
+                    <Modal.Body>
+                      <BodyShort>
+                        Er du sikker på at du vil gjøre purring av leveattester? Brev med påminnelse om leveattest vil
+                        bli sendt til alle brukere som ikke har levert leveattest.
+                      </BodyShort>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        type="button"
+                        variant="danger"
+                        loading={purreFetcher.state !== 'idle'}
+                        disabled={disableModus}
+                        onClick={() => {
+                          if (!valgtGrunnlagId) return
+                          setModusStatus(null)
+                          setOpenPurrDialog(false)
+                          const fd = new FormData()
+                          fd.append('_intent', 'settPurreModus')
+                          fd.append('grunnlagId', String(valgtGrunnlagId))
+                          purreFetcher.submit(fd, { method: 'post' })
+                        }}
+                      >
+                        Ja, purr
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={purreFetcher.state !== 'idle'}
+                        onClick={() => setOpenPurrDialog(false)}
+                      >
+                        Avbryt
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+
+                  <Modal
+                    open={openOppgaveDialog}
+                    onClose={() => setOpenOppgaveDialog(false)}
+                    header={{ heading: 'Opprett oppgaver', size: 'small' }}
+                  >
+                    <Modal.Body>
+                      <BodyShort>
+                        Er du sikker på at du vil gjøre oppfølging av leveattester? Dette oppretter oppgave til
+                        saksbehandler for alle brukere som ikke har levert leveattest.
+                      </BodyShort>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        type="button"
+                        variant="danger"
+                        loading={oppgaveFetcher.state !== 'idle'}
+                        disabled={disableModus}
+                        onClick={() => {
+                          if (!valgtGrunnlagId) return
+                          setModusStatus(null)
+                          setOpenOppgaveDialog(false)
+                          const fd = new FormData()
+                          fd.append('_intent', 'settOppgaveModus')
+                          fd.append('grunnlagId', String(valgtGrunnlagId))
+                          oppgaveFetcher.submit(fd, { method: 'post' })
+                        }}
+                      >
+                        Ja, opprett oppgaver
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={oppgaveFetcher.state !== 'idle'}
+                        onClick={() => setOpenOppgaveDialog(false)}
+                      >
+                        Avbryt
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
                 </div>
               </>
             )}
