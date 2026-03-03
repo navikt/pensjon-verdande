@@ -78,14 +78,14 @@ export default function Orkestrering() {
           </div>
           <Form method="post">
             <VStack gap="space-12">
-              <CheckboxGroup legend="Kjøreparametre" hideLegend={true}>
-                <Checkbox name={'kjorOnline'} value={'true'} defaultChecked={false} readOnly={useDefaultParametre}>
+              <CheckboxGroup legend="Kjøreparametre" hideLegend={true} readOnly={useDefaultParametre}>
+                <Checkbox name={'kjorOnline'} value={'true'} defaultChecked={false}>
                   Kjør online-kø mot oppdrag
                 </Checkbox>
-                <Checkbox name={'brukKjoreplan'} value={'true'} defaultChecked={true} readOnly={useDefaultParametre}>
+                <Checkbox name={'brukKjoreplan'} value={'true'} defaultChecked={true}>
                   Bruk kjøreplan
                 </Checkbox>
-                <Checkbox name={'skalSamordne'} value={'true'} defaultChecked={true} readOnly={useDefaultParametre}>
+                <Checkbox name={'skalSamordne'} value={'true'} defaultChecked={true}>
                   Send til samordning
                 </Checkbox>
               </CheckboxGroup>
