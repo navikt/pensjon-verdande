@@ -24,14 +24,16 @@ type StartGrunnlagResponse = { behandlingId: number }
 type StartSokResponse = { sokBehandlingId: number }
 type StartKontrollActionResponse = { ok: true }
 
+type ModusActionResponse = { ok: true; type: 'PURR' | 'OPPGAVE' }
+
 type BehandlingStatus = string
 
 type LeveattestGrunnlagResultat = {
   grunnlagBehandlingId: number
   status: BehandlingStatus
   antallSPKPersoner?: number | null
-  kjoredatoGrunnlag?: string | null // LocalDate -> YYYY-MM-DD
-  behandlingSistKjort?: string | null // LocalDateTime -> ISO
+  kjoredatoGrunnlag?: string | null
+  behandlingSistKjort?: string | null
 }
 
 type LeveattestSokResultat = {
@@ -42,13 +44,13 @@ type LeveattestSokResultat = {
   alder: number
   filtrerPaSakstypeUfore: boolean
   antallPersonerTilKontroll: number
-  behandlingSistKjort: string // ISO
+  behandlingSistKjort: string
 }
 
 type LeveattestStartKontrollResponse = {
   sokBehandlingId: number
   status: string
-  behandlingSistKjort: string // ISO
+  behandlingSistKjort: string
 }
 
 type PollResponse =
@@ -317,6 +319,19 @@ export async function action({ request }: Route.ActionArgs) {
     return { ok: true } satisfies StartKontrollActionResponse
   }
 
+  if (intent === 'settPurreModus') {
+    const grunnlagId = Number(fd.get('grunnlagId'))
+    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) throw new Response('Invalid grunnlagId', { status: 400 })
+    await apiPost<void>(`/api/behandling/leveattest/kontroll/${grunnlagId}/settpurremodus`, {}, request)
+    return { ok: true, type: 'PURR' } satisfies ModusActionResponse
+  }
+
+  if (intent === 'settOppgaveModus') {
+    const grunnlagId = Number(fd.get('grunnlagId'))
+    if (!Number.isFinite(grunnlagId) || grunnlagId <= 0) throw new Response('Invalid grunnlagId', { status: 400 })
+    await apiPost<void>(`/api/behandling/leveattest/kontroll/${grunnlagId}/settoppgavemodus`, {}, request)
+    return { ok: true, type: 'OPPGAVE' } satisfies ModusActionResponse
+  }
   return null
 }
 
@@ -330,6 +345,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const startKontrollFetcher = useFetcher<StartKontrollActionResponse>()
   const startKontrollListFetcher = useFetcher<StartKontrollPollResponse>()
   const statistikkFetcher = useFetcher<{ grunnlagId: number; statistikk: LeveattestKontrollStatistikk | null }>()
+  const purreFetcher = useFetcher<ModusActionResponse>()
+  const oppgaveFetcher = useFetcher<ModusActionResponse>()
 
   const [grunnlagBehandlingId, setGrunnlagBehandlingId] = useState<number | null>(null)
   const [grunnlagStatus, setGrunnlagStatus] = useState<'IDLE' | 'KJØRER' | 'FERDIG'>('IDLE')
@@ -341,6 +358,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   )
 
   const [statistikk, setStatistikk] = useState<LeveattestKontrollStatistikk | null>(null)
+
+  const [modusStatus, setModusStatus] = useState<ModusActionResponse['type'] | null>(null)
   const autoStatistikkLastetRef = useRef(false)
 
   const [aktivFane, setAktivFane] = useState<'kontroll' | 'statistikk'>('kontroll')
@@ -352,6 +371,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const initializedRef = useRef(false)
 
   const [valgteSokIds, setValgteSokIds] = useState<number[]>([])
+
+  const valgtGrunnlagId = useMemo(
+    () => grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null,
+    [grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId],
+  )
 
   const stoppInterval = useCallback((ref: React.MutableRefObject<number | null>) => {
     if (ref.current != null) {
@@ -501,7 +525,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (!startKontrollListFetcher.data) return
     setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
   }, [startKontrollListFetcher.data])
-  const valgtGrunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
 
   useEffect(() => {
     const data = statistikkFetcher.data
@@ -509,6 +532,18 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (data.grunnlagId !== valgtGrunnlagId) return
     setStatistikk(data.statistikk ?? null)
   }, [statistikkFetcher.data, valgtGrunnlagId])
+
+  useEffect(() => {
+    const d = purreFetcher.data
+    if (!d) return
+    setModusStatus(d.type)
+  }, [purreFetcher.data])
+
+  useEffect(() => {
+    const d = oppgaveFetcher.data
+    if (!d) return
+    setModusStatus(d.type)
+  }, [oppgaveFetcher.data])
 
   useEffect(() => {
     if (startKontrollFetcher.state !== 'idle') return
@@ -539,6 +574,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   }, [startkontroller, pollStartKontroller, stoppInterval])
   const disableStart = grunnlagStatus === 'KJØRER'
   const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
+  const disableModus = disableSok || purreFetcher.state !== 'idle' || oppgaveFetcher.state !== 'idle'
   useEffect(() => {
     void valgtGrunnlagId
     autoStatistikkLastetRef.current = false
@@ -956,11 +992,44 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   >
                     Refresh
                   </Button>
+
+                  <purreFetcher.Form method="post">
+                    <input type="hidden" name="_intent" value="settPurreModus" />
+                    <input type="hidden" name="grunnlagId" value={String(valgtGrunnlagId)} />
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      type="submit"
+                      loading={purreFetcher.state !== 'idle'}
+                      disabled={disableModus}
+                    >
+                      Purr
+                    </Button>
+                  </purreFetcher.Form>
+
+                  <oppgaveFetcher.Form method="post">
+                    <input type="hidden" name="_intent" value="settOppgaveModus" />
+                    <input type="hidden" name="grunnlagId" value={String(valgtGrunnlagId)} />
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      type="submit"
+                      loading={oppgaveFetcher.state !== 'idle'}
+                      disabled={disableModus}
+                    >
+                      Opprett oppgaver
+                    </Button>
+                  </oppgaveFetcher.Form>
+
                   {statistikkFetcher.state !== 'idle' ? <Loader size="xsmall" title="Henter statistikk" /> : null}
                   <div style={{ opacity: 0.85 }}>
                     GrunnlagId: <strong>{valgtGrunnlagId}</strong>
                   </div>
                 </HStack>
+
+                {modusStatus === 'PURR' ? <Alert variant="success">Purrebrev er startet.</Alert> : null}
+                {modusStatus === 'OPPGAVE' ? <Alert variant="success">Oppgaver er startet.</Alert> : null}
+
                 <div style={{ maxWidth: 560 }}>
                   <div style={{ height: 260 }}>
                     <Table size="small">
