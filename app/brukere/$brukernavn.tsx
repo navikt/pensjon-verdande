@@ -7,20 +7,17 @@ import {
   hentMe,
   hentTilgangskontrollMeta,
 } from '~/brukere/brukere.server'
-import { requireAccessToken } from '~/services/auth.server'
 import type { Route } from './+types/$brukernavn'
 
 export async function action({ params, request }: Route.ActionArgs) {
-  const accesstoken = await requireAccessToken(request)
-
   invariant(params.brukernavn, 'Missing brukernavn param')
 
   const formData = await request.formData()
 
   if (request.method === 'PUT') {
-    await giBrukerTilgang(accesstoken, params.brukernavn, formData.get('operasjon') as string)
+    await giBrukerTilgang(request, params.brukernavn, formData.get('operasjon') as string)
   } else if (request.method === 'DELETE') {
-    await fjernBrukertilgang(accesstoken, params.brukernavn, formData.get('operasjon') as string)
+    await fjernBrukertilgang(request, params.brukernavn, formData.get('operasjon') as string)
   } else {
     throw new Error(`Ugyldig HTTP-metode: ${request.method}`)
   }

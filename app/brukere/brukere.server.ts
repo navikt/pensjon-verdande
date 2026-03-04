@@ -9,11 +9,11 @@ export async function hentTilgangskontrollMeta(request: Request) {
   ).tilgangsmeta
 }
 
-export async function hentBrukere(accessToken: string) {
+export async function hentBrukere(request: Request) {
   return (
     await apiGet<{
       brukere: BrukerResponse[]
-    }>('/api/behandling/brukere/alle', { accessToken })
+    }>('/api/behandling/brukere/alle', request)
   ).brukere
 }
 
@@ -25,10 +25,10 @@ export async function hentBruker(request: Request, brukerIdent: string) {
   return apiGet<BrukerResponse>(`/api/behandling/brukere?brukernavn=${encodeURI(brukerIdent)}`, request)
 }
 
-export async function giBrukerTilgang(accessToken: string, brukernavn: string, operasjon: string) {
-  await apiPut('/api/behandling/brukere/tilganger', { brukernavn, operasjon }, { accessToken })
+export async function giBrukerTilgang(request: Request, brukernavn: string, operasjon: string) {
+  await apiPut('/api/behandling/brukere/tilganger', { brukernavn, operasjon }, request)
 }
 
-export async function fjernBrukertilgang(accessToken: string, brukernavn: string, operasjon: string) {
-  await apiDelete('/api/behandling/brukere/tilganger', { brukernavn, operasjon }, { accessToken })
+export async function fjernBrukertilgang(request: Request, brukernavn: string, operasjon: string) {
+  await apiDelete('/api/behandling/brukere/tilganger', { brukernavn, operasjon }, request)
 }
