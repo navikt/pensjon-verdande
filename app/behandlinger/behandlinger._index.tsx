@@ -21,11 +21,16 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   const behandlingType = searchParams.get('behandlingType')
 
+  const fomStr = searchParams.get('fom')
+  const tomStr = searchParams.get('tom')
+
   const behandlinger = await getBehandlinger(accessToken, {
     behandlingType,
     status: searchParams.get('status'),
     ansvarligTeam: searchParams.get('ansvarligTeam'),
     behandlingManuellKategori: searchParams.get('behandlingManuellKategori'),
+    fom: fomStr ? new Date(fomStr) : null,
+    tom: tomStr ? new Date(tomStr) : null,
     page: page ? +page : 0,
     size: size ? +size : 100,
     sort: searchParams.get('sort'),
@@ -50,7 +55,7 @@ export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentPro
   return (
     <VStack gap="space-24">
       {opprettetPerDag && <BehandlingerPerDagLineChartCard opprettetPerDag={opprettetPerDag} chartHeight={180} />}
-      <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger} />
+      <BehandlingerTable visStatusSoek={true} visTidsperiodeSoek={true} behandlingerResponse={behandlinger} />
     </VStack>
   )
 }

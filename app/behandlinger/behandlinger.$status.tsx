@@ -16,11 +16,16 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const size = searchParams.get('size')
   const page = searchParams.get('page')
 
+  const fomStr = searchParams.get('fom')
+  const tomStr = searchParams.get('tom')
+
   const accessToken = await requireAccessToken(request)
   const behandlinger = await getBehandlinger(accessToken, {
     behandlingType: searchParams.get('behandlingType'),
     status: params.status,
     ansvarligTeam: searchParams.get('ansvarligTeam'),
+    fom: fomStr ? new Date(fomStr) : null,
+    tom: tomStr ? new Date(tomStr) : null,
     page: page ? +page : 0,
     size: size ? +size : 100,
     sort: searchParams.get('sort'),
@@ -35,5 +40,11 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 export default function BehandlingerStatus({ loaderData }: Route.ComponentProps) {
   const { behandlinger } = loaderData
 
-  return <BehandlingerTable visStatusSoek={false} behandlingerResponse={behandlinger as BehandlingerPage} />
+  return (
+    <BehandlingerTable
+      visStatusSoek={false}
+      visTidsperiodeSoek={true}
+      behandlingerResponse={behandlinger as BehandlingerPage}
+    />
+  )
 }
