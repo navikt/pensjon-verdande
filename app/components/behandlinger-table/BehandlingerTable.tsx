@@ -1,8 +1,20 @@
-import { BodyShort, Box, Button, Checkbox, HStack, Pagination, Select, Spacer, Table } from '@navikt/ds-react'
+import {
+  BodyShort,
+  Box,
+  Button,
+  Checkbox,
+  DatePicker,
+  HStack,
+  Pagination,
+  Select,
+  Spacer,
+  Table,
+  useRangeDatepicker,
+} from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { Link, useFetcher, useSearchParams } from 'react-router'
-import { formatIsoTimestamp } from '~/common/date'
+import { formatIsoTimestamp, toIsoDate } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import type { BehandlingDto, BehandlingerPage } from '~/types'
@@ -13,6 +25,7 @@ interface Props {
   visStatusSoek?: boolean | true
   visBehandlingTypeSoek?: boolean | true
   visAnsvarligTeamSoek?: boolean | true
+  visTidsperiodeSoek?: boolean
   behandlingerResponse: BehandlingerPage
 }
 
@@ -21,6 +34,7 @@ export default function BehandlingerTable({
   visStatusSoek,
   visBehandlingTypeSoek = true,
   visAnsvarligTeamSoek = true,
+  visTidsperiodeSoek = false,
   behandlingerResponse,
 }: Props) {
   const fetcher = useFetcher()
@@ -33,6 +47,30 @@ export default function BehandlingerTable({
 
   const [valgteBehandlingIder, setValgteBehandlingIder] = useState<number[]>([])
 
+  const fomParam = searchParams.get('fom')
+  const tomParam = searchParams.get('tom')
+
+  const { datepickerProps, fromInputProps, toInputProps } = useRangeDatepicker({
+    defaultSelected:
+      fomParam || tomParam
+        ? { from: fomParam ? new Date(fomParam) : undefined, to: tomParam ? new Date(tomParam) : undefined }
+        : undefined,
+    onRangeChange: (range) => {
+      const next = new URLSearchParams(searchParams)
+      if (range?.from) {
+        next.set('fom', toIsoDate(range.from))
+      } else {
+        next.delete('fom')
+      }
+      if (range?.to) {
+        next.set('tom', toIsoDate(range.to))
+      } else {
+        next.delete('tom')
+      }
+      next.set('page', '0')
+      setSearchParams(next, { preventScrollReset: true })
+    },
+  })
   const onSortChange = (value: string | undefined) => {
     if (value) {
       if (sortKey === value) {
@@ -156,6 +194,16 @@ export default function BehandlingerTable({
 
   return (
     <Box background={'default'} style={{ padding: '6px' }} borderRadius="4" shadow="dialog">
+      {visTidsperiodeSoek && (
+        <HStack gap="space-16" align="end" style={{ padding: '8px 6px' }}>
+          <DatePicker {...datepickerProps}>
+            <HStack wrap gap="space-16" align="end">
+              <DatePicker.Input size="small" {...fromInputProps} label="Fra dato" />
+              <DatePicker.Input size="small" {...toInputProps} label="Til dato" />
+            </HStack>
+          </DatePicker>
+        </HStack>
+      )}
       <Table
         size={'medium'}
         onSortChange={onSortChange}
