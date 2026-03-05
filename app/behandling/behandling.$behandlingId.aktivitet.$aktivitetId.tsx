@@ -1,7 +1,6 @@
 import { useLocation } from 'react-router'
 import invariant from 'tiny-invariant'
 import AktivitetCard from '~/behandling/AktivitetCard'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandling } from '~/services/behandling.server'
 import type { BehandlingDto } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId.aktivitet.$aktivitetId'
@@ -19,8 +18,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const aktivitetId = params.aktivitetId
   invariant(aktivitetId, 'Missing aktivitetId param')
 
-  const accessToken = await requireAccessToken(request)
-  const behandling = await getBehandling(accessToken, params.behandlingId)
+  const behandling = await getBehandling(request, params.behandlingId)
   if (!behandling) {
     throw new Response('Not Found', { status: 404 })
   }

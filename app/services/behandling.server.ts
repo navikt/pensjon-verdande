@@ -8,7 +8,6 @@ import {
   apiPatch,
   apiPost,
   apiPut,
-  type RequestCtx,
 } from '~/services/api.server'
 import { kibanaLink } from '~/services/kibana.server'
 import type {
@@ -28,7 +27,7 @@ export async function getSchedulerStatus(request: Request): Promise<SchedulerSta
 }
 
 export async function getBehandlinger(
-  accessToken: string,
+  request: Request,
   {
     behandlingType,
     behandlingSerieId,
@@ -57,45 +56,43 @@ export async function getBehandlinger(
     sort?: string | null
   },
 ) {
-  let request = ''
+  let query = ''
   if (behandlingType) {
-    request += `&behandlingType=${behandlingType}`
+    query += `&behandlingType=${behandlingType}`
   }
   if (behandlingSerieId) {
-    request += `&behandlingSerieId=${behandlingSerieId}`
+    query += `&behandlingSerieId=${behandlingSerieId}`
   }
   if (status) {
-    request += `&status=${status}`
+    query += `&status=${status}`
   }
   if (ansvarligTeam) {
-    request += `&ansvarligTeam=${ansvarligTeam}`
+    query += `&ansvarligTeam=${ansvarligTeam}`
   }
   if (behandlingManuellKategori) {
-    request += `&behandlingManuellKategori=${behandlingManuellKategori}`
+    query += `&behandlingManuellKategori=${behandlingManuellKategori}`
   }
   if (fom) {
-    request += `&fom=${asLocalDateString(fom)}`
+    query += `&fom=${asLocalDateString(fom)}`
   }
   if (tom) {
-    request += `&tom=${asLocalDateString(tom)}`
+    query += `&tom=${asLocalDateString(tom)}`
   }
   if (forrigeBehandlingId) {
-    request += `&forrigeBehandlingId=${forrigeBehandlingId}`
+    query += `&forrigeBehandlingId=${forrigeBehandlingId}`
   }
   if (isBatch) {
-    request += '&isBatch=true'
+    query += '&isBatch=true'
   }
   if (sort) {
-    request += `&sort=${sort}`
+    query += `&sort=${sort}`
   }
 
-  return await apiGet<BehandlingerPage>(`/api/behandling?page=${page}&size=${size}${request}`, {
-    accessToken: accessToken,
-  })
+  return await apiGet<BehandlingerPage>(`/api/behandling?page=${page}&size=${size}${query}`, request)
 }
 
 export async function getAvhengigeBehandlinger(
-  accessToken: string,
+  request: Request,
   behandlingId: number | null,
   behandlingType: string | null,
   status: string | null,
@@ -104,31 +101,31 @@ export async function getAvhengigeBehandlinger(
   size: number,
   sort: string | null,
 ): Promise<BehandlingerPage> {
-  let request = ''
+  let query = ''
   if (status) {
-    request += `&status=${status}`
+    query += `&status=${status}`
   }
 
   if (behandlingType) {
-    request += `&behandlingType=${behandlingType}`
+    query += `&behandlingType=${behandlingType}`
   }
 
   if (sort) {
-    request += `&sort=${sort}`
+    query += `&sort=${sort}`
   }
 
   if (ansvarligTeam) {
-    request += `&ansvarligTeam=${ansvarligTeam}`
+    query += `&ansvarligTeam=${ansvarligTeam}`
   }
 
   return await apiGet<BehandlingerPage>(
-    `/api/behandling/${behandlingId}/avhengigeBehandlinger?page=${page}&size=${size}${request}`,
-    { accessToken },
+    `/api/behandling/${behandlingId}/avhengigeBehandlinger?page=${page}&size=${size}${query}`,
+    request,
   )
 }
 
 export async function search(
-  accessToken: string,
+  request: Request,
   query: string,
   behandlingType: string | null,
   status: string | null,
@@ -143,13 +140,11 @@ export async function search(
   if (sort) params.set('sort', sort)
   if (ansvarligTeam) params.set('ansvarligTeam', ansvarligTeam)
 
-  return await apiGet<BehandlingerPage>(`/api/behandling?${params}`, {
-    accessToken,
-  })
+  return await apiGet<BehandlingerPage>(`/api/behandling?${params}`, request)
 }
 
-export async function getBehandling(accessToken: string, behandlingId: string): Promise<BehandlingDto> {
-  const behandling = await apiGet<BehandlingDto>(`/api/behandling/${behandlingId}`, { accessToken: accessToken })
+export async function getBehandling(request: Request, behandlingId: string): Promise<BehandlingDto> {
+  const behandling = await apiGet<BehandlingDto>(`/api/behandling/${behandlingId}`, request)
   behandling.kibanaUrl = kibanaLink(behandling)
   return behandling
 }
@@ -169,95 +164,89 @@ export async function getIkkeFullforteAktiviteter(request: Request, behandlingId
 }
 
 export async function fortsettBehandling(
-  accessToken: string,
+  request: Request,
   behandlingId: string,
   nullstillPlanlagtStartet: boolean,
 ): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/fortsett`, { nullstillPlanlagtStartet }, { accessToken })
+  await apiPut(`/api/behandling/${behandlingId}/fortsett`, { nullstillPlanlagtStartet }, request)
 }
 
-export async function fortsettAvhengigeBehandlinger(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/fortsettAvhengigeBehandlinger`, {}, { accessToken })
+export async function fortsettAvhengigeBehandlinger(request: Request, behandlingId: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/fortsettAvhengigeBehandlinger`, {}, request)
 }
 
-export async function taTilDebug(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/debug`, {}, { accessToken })
+export async function taTilDebug(request: Request, behandlingId: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/debug`, {}, request)
 }
 
-export async function fjernFraDebug(accessToken: string, behandlingId: string): Promise<void> {
-  await apiDelete(`/api/behandling/${behandlingId}/debug`, { accessToken })
+export async function fjernFraDebug(request: Request, behandlingId: string): Promise<void> {
+  await apiDelete(`/api/behandling/${behandlingId}/debug`, request)
 }
 
 export async function patchBehandling(
-  accessToken: string,
+  request: Request,
   behandlingId: string,
   patch: Partial<PatchBehandlingDto>,
 ): Promise<void> {
-  await apiPatch(`/api/behandling/${behandlingId}`, patch, { accessToken })
+  await apiPatch(`/api/behandling/${behandlingId}`, patch, request)
 }
 
-export async function runBehandling(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPost(`/api/behandling/${behandlingId}/run`, {}, { accessToken })
+export async function runBehandling(request: Request, behandlingId: string): Promise<void> {
+  await apiPost(`/api/behandling/${behandlingId}/run`, {}, request)
 }
 
-export async function godkjennOpprettelse(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/godkjennOpprettelse`, {}, { accessToken })
+export async function godkjennOpprettelse(request: Request, behandlingId: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/godkjennOpprettelse`, {}, request)
 }
 
-export async function bekreftStoppBehandling(accessToken: string, behandlingId: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/bekreftStopp`, {}, { accessToken })
+export async function bekreftStoppBehandling(request: Request, behandlingId: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/bekreftStopp`, {}, request)
 }
 
-export async function stopp(accessToken: string, behandlingId: string, begrunnelse: string): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/stopp`, { begrunnelse }, { accessToken })
+export async function stopp(request: Request, behandlingId: string, begrunnelse: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/stopp`, { begrunnelse }, request)
 }
 
 export async function endrePlanlagtStartet(
-  accessToken: string,
+  request: Request,
   behandlingId: string,
   nyPlanlagtStartet: string,
 ): Promise<void> {
-  await apiPut(
-    `/api/behandling/${behandlingId}/endrePlanlagtStartet`,
-    { planlagtStartet: nyPlanlagtStartet },
-    {
-      accessToken,
-    },
-  )
+  await apiPut(`/api/behandling/${behandlingId}/endrePlanlagtStartet`, { planlagtStartet: nyPlanlagtStartet }, request)
 }
 
 export async function sendTilManuellMedKontrollpunkt(
-  accessToken: string,
+  request: Request,
   behandlingId: string,
   kontrollpunkt: string,
 ): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/sendTilManuellMedKontrollpunkt`, { kontrollpunkt }, { accessToken })
+  await apiPut(`/api/behandling/${behandlingId}/sendTilManuellMedKontrollpunkt`, { kontrollpunkt }, request)
 }
 
-export async function getOppdragsmelding(accessToken: string, behandlingId: string) {
-  return await apiGetRawStringOrUndefined(`/api/vedtak/iverksett/${behandlingId}/oppdragsmelding`, { accessToken })
+export async function getOppdragsmelding(request: Request, behandlingId: string) {
+  return await apiGetRawStringOrUndefined(`/api/vedtak/iverksett/${behandlingId}/oppdragsmelding`, request)
 }
 
-export async function getOppdragskvittering(accessToken: string, behandlingId: string) {
-  return await apiGetRawStringOrUndefined(`/api/vedtak/iverksett/${behandlingId}/oppdragskvittering`, { accessToken })
+export async function getOppdragskvittering(request: Request, behandlingId: string) {
+  return await apiGetRawStringOrUndefined(`/api/vedtak/iverksett/${behandlingId}/oppdragskvittering`, request)
 }
 
 export async function henBehandlingManuell(
-  accessToken: string,
+  request: Request,
   behandlingId: number,
   page: number,
   size: number,
   sort: string | null,
 ): Promise<BehandlingManuellPage> {
-  let request = ''
+  let query = ''
 
   if (sort) {
-    request += `&sort=${sort}`
+    query += `&sort=${sort}`
   }
 
   return await apiGet<BehandlingManuellPage>(
-    `/api/behandling/${behandlingId}/behandlingManuell?page=${page}&size=${size}${request}`,
-    { accessToken },
+    `/api/behandling/${behandlingId}/behandlingManuell?page=${page}&size=${size}${query}`,
+    request,
   )
 }
 
@@ -286,17 +275,18 @@ function mapKalenderHendelser(dto: KalenderHendelserDTO): KalenderHendelser {
 }
 
 export async function getBehandlingManuellOpptelling(
-  ctx: RequestCtx,
+  request: Request,
   behandlingId: number,
 ): Promise<BehandlingManuellOpptellingResponse> {
-  return apiGet(`/api/behandling/${behandlingId}/behandlingManuellOpptelling`, ctx)
+  return apiGet(`/api/behandling/${behandlingId}/behandlingManuellOpptelling`, request)
 }
 
 export async function HentRelaterteFamiliebehandlinger(
-  accessToken: string,
+  request: Request,
   behandlingId: number,
 ): Promise<RelatertFamilieBehandling[]> {
-  return await apiGet<RelatertFamilieBehandling[]>(`/api/behandling/${behandlingId}/hentRelaterteFamiliebehandlinger`, {
-    accessToken,
-  })
+  return await apiGet<RelatertFamilieBehandling[]>(
+    `/api/behandling/${behandlingId}/hentRelaterteFamiliebehandlinger`,
+    request,
+  )
 }

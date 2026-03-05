@@ -5,7 +5,6 @@ import type { MeResponse } from '~/brukere/brukere'
 import { replaceTemplates } from '~/common/replace-templates'
 import { subdomain } from '~/common/utils'
 import { apiPost } from '~/services/api.server'
-import { requireAccessToken } from '~/services/auth.server'
 import {
   bekreftStoppBehandling,
   endrePlanlagtStartet,
@@ -59,7 +58,6 @@ function getField(form: FormData, name: string): { value: string; error?: never 
 }
 
 function operationHandlers(
-  accessToken: string,
   request: Request,
   behandlingId: string,
   operation: Operation,
@@ -91,24 +89,24 @@ function operationHandlers(
   if (Object.keys(errors).length === 0) {
     switch (operation) {
       case OPERATION.fjernFraDebug:
-        handler = () => fjernFraDebug(accessToken, behandlingId)
+        handler = () => fjernFraDebug(request, behandlingId)
         break
       case OPERATION.fortsett:
-        handler = () => fortsettBehandling(accessToken, behandlingId, getBool(form.get('nullstillPlanlagtStartet')))
+        handler = () => fortsettBehandling(request, behandlingId, getBool(form.get('nullstillPlanlagtStartet')))
         break
       case OPERATION.fortsettAvhengigeBehandlinger:
-        handler = () => fortsettAvhengigeBehandlinger(accessToken, behandlingId)
+        handler = () => fortsettAvhengigeBehandlinger(request, behandlingId)
         break
       case OPERATION.oppdaterAnsvarligTeam:
         if (ansvarligTeam.value)
-          handler = () => patchBehandling(accessToken, behandlingId, { ansvarligTeam: ansvarligTeam.value })
+          handler = () => patchBehandling(request, behandlingId, { ansvarligTeam: ansvarligTeam.value })
         break
       case OPERATION.runBehandling:
-        handler = () => runBehandling(accessToken, behandlingId)
+        handler = () => runBehandling(request, behandlingId)
         break
       case OPERATION.sendTilManuellMedKontrollpunkt:
         if (kontrollpunkt.value)
-          handler = () => sendTilManuellMedKontrollpunkt(accessToken, behandlingId, kontrollpunkt.value)
+          handler = () => sendTilManuellMedKontrollpunkt(request, behandlingId, kontrollpunkt.value)
         break
       case OPERATION.sendTilOppdragPaNytt:
         handler = async () => {
@@ -116,19 +114,19 @@ function operationHandlers(
         }
         break
       case OPERATION.stopp:
-        handler = () => stopp(accessToken, behandlingId, trimmedBegrunnelse)
+        handler = () => stopp(request, behandlingId, trimmedBegrunnelse)
         break
       case OPERATION.godkjennOpprettelse:
-        handler = () => godkjennOpprettelse(accessToken, behandlingId)
+        handler = () => godkjennOpprettelse(request, behandlingId)
         break
       case OPERATION.bekreftStoppBehandling:
-        handler = () => bekreftStoppBehandling(accessToken, behandlingId)
+        handler = () => bekreftStoppBehandling(request, behandlingId)
         break
       case OPERATION.endrePlanlagtStartet:
-        handler = () => endrePlanlagtStartet(accessToken, behandlingId, String(form.get('nyPlanlagtStartet')))
+        handler = () => endrePlanlagtStartet(request, behandlingId, String(form.get('nyPlanlagtStartet')))
         break
       case OPERATION.taTilDebug:
-        handler = () => taTilDebug(accessToken, behandlingId)
+        handler = () => taTilDebug(request, behandlingId)
         break
     }
   }
@@ -140,8 +138,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const url = new URL(request.url)
 
-  const accessToken = await requireAccessToken(request)
-  const behandling = await getBehandling(accessToken, params.behandlingId)
+  const behandling = await getBehandling(request, params.behandlingId)
   if (!behandling) {
     throw new Response('Not Found', { status: 404 })
   }
@@ -164,7 +161,6 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 export const action = async ({ params, request }: Route.ActionArgs) => {
   invariant(params.behandlingId, 'Mangler parameter: behandlingId')
   const behandlingId = params.behandlingId
-  const accessToken = await requireAccessToken(request)
 
   const form = await request.formData()
   const operation = form.get('operation')
@@ -172,7 +168,7 @@ export const action = async ({ params, request }: Route.ActionArgs) => {
     return { errors: { operation: `Operasjon mangler eller er ukjent: ${String(operation)}` } }
   }
 
-  const { errors, handler } = operationHandlers(accessToken, request, behandlingId, operation, form)
+  const { errors, handler } = operationHandlers(request, behandlingId, operation, form)
   if (Object.keys(errors).length > 0 || !handler) {
     return { errors }
   }

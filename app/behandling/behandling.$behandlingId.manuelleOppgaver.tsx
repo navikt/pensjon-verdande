@@ -3,7 +3,6 @@ import { Link } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import { formatIsoTimestamp } from '~/common/date'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandling, henBehandlingManuell } from '~/services/behandling.server'
 import type { BehandlingManuellDto } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId.manuelleOppgaver'
@@ -12,11 +11,9 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId } = params
   invariant(behandlingId, 'Missing behandlingId param')
 
-  const accessToken = await requireAccessToken(request)
-
   const [behandling, behandlingManuellPage] = await Promise.all([
-    getBehandling(accessToken, behandlingId),
-    henBehandlingManuell(accessToken, +behandlingId, 0, 100, null),
+    getBehandling(request, behandlingId),
+    henBehandlingManuell(request, +behandlingId, 0, 100, null),
   ])
 
   if (!behandling || !behandlingManuellPage) {

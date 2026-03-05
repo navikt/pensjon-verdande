@@ -2,7 +2,6 @@ import { BodyShort, Link, Table } from '@navikt/ds-react'
 import { NavLink } from 'react-router'
 
 import invariant from 'tiny-invariant'
-import { requireAccessToken } from '~/services/auth.server'
 import { getBehandlingManuellOpptelling } from '~/services/behandling.server'
 import type { Route } from './+types/behandling.$behandlingId.behandlingManuellOpptelling'
 
@@ -10,11 +9,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { behandlingId } = params
   invariant(behandlingId, 'Missing behandlingId param')
 
-  const accessToken = await requireAccessToken(request)
-
-  const [behandlingManuellOpptelling] = await Promise.all([
-    getBehandlingManuellOpptelling({ accessToken: accessToken }, +behandlingId),
-  ])
+  const [behandlingManuellOpptelling] = await Promise.all([getBehandlingManuellOpptelling(request, +behandlingId)])
 
   if (!behandlingManuellOpptelling) {
     throw new Response('Not Found', { status: 404 })
