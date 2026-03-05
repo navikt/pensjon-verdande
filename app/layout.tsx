@@ -47,8 +47,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
   return (
     <Theme theme={isDarkmode ? 'dark' : 'light'}>
-      <Box asChild background={'default'}>
-        <Page>
+      <Box asChild background="default">
+        <Page contentBlockPadding="none">
           {isNavigating && (
             <div
               role="progressbar"
