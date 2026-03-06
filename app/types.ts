@@ -236,6 +236,30 @@ export type DatoAntall = {
 export type SchedulerStatusResponse = {
   schedulerEnabled: boolean
   schedulerLocal: boolean
+  deaktiverteBehandlingstyper: string[]
+}
+
+export type SchedulerStyringDto = {
+  erAktiv: boolean
+  endretAv: string | null
+  endretDato: string | null
+}
+
+export type BehandlingSchedulerStyringDto = {
+  behandlingCode: string
+  erAktiv: boolean
+  maksSamtidige: number | null
+  endretAv: string | null
+  endretDato: string | null
+}
+
+export type BehandlingSchedulerStyringAuditDto = {
+  behandlingCode: string
+  handling: string
+  gammelVerdi: string | null
+  nyVerdi: string | null
+  utfortAv: string
+  utfortDato: string
 }
 
 export type DashboardResponse = {

@@ -68,3 +68,12 @@ export const decodeFagomrade = makeDecoder(FAGOMRADE_MAP)
 export const decodeAldeBehandlingStatus = makeDecoder(ALDE_BEHANDLING_STATUS_MAP)
 
 export const decodeAldeBehandlingState = makeDecoder(ALDE_BEHANDLING_STATE_MAP)
+
+const STYRING_HANDLING_MAP = {
+  AKTIVER: 'Aktivert',
+  DEAKTIVER: 'Deaktivert',
+  ENDRE_MAKS_SAMTIDIGE: 'Endret maks samtidige',
+  NULLSTILL: 'Nullstilt',
+}
+
+export const decodeStyringHandling = makeDecoder(STYRING_HANDLING_MAP)
