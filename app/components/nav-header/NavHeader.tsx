@@ -23,8 +23,11 @@ export default function NavHeader(props: Props) {
 
   return (
     <InternalHeader className={props.erProduksjon ? styles.production : ''}>
-      <InternalHeader.Button onClick={() => props.setShowIconMenu(!props.showIconMenu)}>
-        <MenuHamburgerIcon color={'white'} title="Vis/skjul sidemeny" fontSize="2rem" display={'flex'} />
+      <InternalHeader.Button
+        className={styles.hamburgerButton}
+        onClick={() => props.setShowIconMenu(!props.showIconMenu)}
+      >
+        <MenuHamburgerIcon color={'white'} title="Vis/skjul sidemeny" fontSize="1.5rem" display={'flex'} />
       </InternalHeader.Button>
 
       <InternalHeader.Title
