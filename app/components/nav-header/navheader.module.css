@@ -1,3 +1,8 @@
+.hamburgerButton {
+  width: var(--venstre-meny-collapsed-width);
+  border-left: none;
+}
+
 .production {
   background-color: var(--ax-bg-danger-strong);
 }
