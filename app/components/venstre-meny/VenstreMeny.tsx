@@ -1,4 +1,5 @@
 import {
+  BarChartIcon,
   CalendarIcon,
   ChevronDownIcon,
   CircleIcon,
@@ -246,6 +247,17 @@ export default function VenstreMeny(props: Props) {
                   <HandShakeHeartIcon title="a11y-title" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Alde oppfølging</span>
+              </NavLink>
+            </li>
+          )}
+
+          {harTilgang(me, 'SE_BEHANDLINGER') && (
+            <li>
+              <NavLink to="/analyse" className={({ isActive }) => (isActive ? styles.active : '')}>
+                <span className={styles.menyIkon}>
+                  <BarChartIcon title="Analyse" fontSize="1.5rem" />
+                </span>
+                <span className={styles.menyTekst}>Analyse</span>
               </NavLink>
             </li>
           )}
