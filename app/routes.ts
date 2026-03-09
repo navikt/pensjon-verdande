@@ -14,6 +14,33 @@ export default [
 
     route('alde', 'alde-oppfolging/index.tsx'),
 
+    route('analyse', 'analyse/route.tsx', [
+      index('analyse/_index.tsx'),
+      route('nokkeltall', 'analyse/nokkeltall.tsx'),
+      route('statustrend', 'analyse/statustrend.tsx'),
+      route('varighet', 'analyse/varighet.tsx'),
+      route('automatisering', 'analyse/automatisering.tsx'),
+      route('feilanalyse', 'analyse/feilanalyse.tsx'),
+      route('ko', 'analyse/ko.tsx'),
+      route('gjenforsok', 'analyse/gjenforsok.tsx'),
+      route('aktivitetsvarighet', 'analyse/aktivitetsvarighet.tsx'),
+      route('tidspunkt', 'analyse/tidspunkt.tsx'),
+      route('teamytelse', 'analyse/teamytelse.tsx'),
+      route('prioritet', 'analyse/prioritet.tsx'),
+      route('stoppet', 'analyse/stoppet.tsx'),
+      route('planlagt', 'analyse/planlagt.tsx'),
+      route('gruppe', 'analyse/gruppe.tsx'),
+      route('sakstype', 'analyse/sakstype.tsx'),
+      route('kravtype', 'analyse/kravtype.tsx'),
+      route('feilklassifisering', 'analyse/feilklassifisering.tsx'),
+      route('vedtakstype', 'analyse/vedtakstype.tsx'),
+      route('aktiviteter', 'analyse/aktiviteter.tsx'),
+      route('manuelle', 'analyse/manuelle.tsx'),
+      route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
+      route('ende-til-ende', 'analyse/ende-til-ende.tsx'),
+    ]),
+    route('analyse/eksport', 'analyse/eksport.tsx'),
+
     route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx'),
 
     route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),

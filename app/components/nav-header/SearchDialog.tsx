@@ -1,7 +1,22 @@
 import { FolderIcon, MagnifyingGlassIcon, XMarkIcon } from '@navikt/aksel-icons'
-import { BodyShort, Box, Button, Detail, Dialog, HStack, Loader, Search, Tag, VStack } from '@navikt/ds-react'
+import {
+  BodyShort,
+  Box,
+  Button,
+  Detail,
+  Dialog,
+  Hide,
+  HStack,
+  Loader,
+  Search,
+  Show,
+  Tag,
+  Tooltip,
+  VStack,
+} from '@navikt/ds-react'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useFetcher, useNavigate } from 'react-router'
+import { fmtDateTime } from '~/common/date'
 import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam } from '~/common/decodeTeam'
@@ -25,7 +40,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
   )
 }
 
-type SearchResult = Pick<BehandlingDto, 'behandlingId' | 'type' | 'status' | 'ansvarligTeam'> & {
+type SearchResult = Pick<BehandlingDto, 'behandlingId' | 'type' | 'status' | 'ansvarligTeam' | 'opprettet'> & {
   matchedVerdiTypeDecodes: string[]
   matchedQuery: string
 }
@@ -54,6 +69,7 @@ export default function SearchDialog({
         type: b.type,
         status: b.status,
         ansvarligTeam: b.ansvarligTeam,
+        opprettet: b.opprettet,
         matchedVerdiTypeDecodes: b.matchedVerdiTypeDecodes ?? [],
         matchedQuery: submittedQueryRef.current,
       })) ?? [],
@@ -182,31 +198,25 @@ export default function SearchDialog({
         }
       }}
     >
-      <Dialog.Trigger>
-        <Button
-          className={styles.triggerButton}
-          size="small"
-          data-color="neutral"
-          variant="secondary"
-          iconPosition="left"
-          icon={<MagnifyingGlassIcon aria-hidden />}
-        >
-          Søk
-          {isMac ? (
-            <>
-              <span>&nbsp;</span>
-              <Kbd>⌘</Kbd>
-              <Kbd>K</Kbd>
-            </>
-          ) : (
-            <>
-              <span>&nbsp;</span>
-              <Kbd>ctrl</Kbd>
-              <Kbd>k</Kbd>
-            </>
-          )}
-        </Button>
-      </Dialog.Trigger>
+      <Tooltip content="Søk etter behandlinger" keys={isMac ? ['⌘', 'K'] : ['Ctrl', 'K']}>
+        <Dialog.Trigger>
+          <Button
+            className={styles.triggerButton}
+            size="small"
+            data-color="neutral"
+            variant="secondary"
+            iconPosition="left"
+            icon={<MagnifyingGlassIcon aria-hidden />}
+          >
+            <Hide above="md" asChild>
+              <span>Søk</span>
+            </Hide>
+            <Show above="md" asChild>
+              <span>Søk etter behandlinger</span>
+            </Show>
+          </Button>
+        </Dialog.Trigger>
+      </Tooltip>
 
       <Dialog.Popup
         width="large"
@@ -300,11 +310,16 @@ export default function SearchDialog({
                               </Tag>
                             )}
                           </HStack>
-                          <BodyShort size="small" className={`${styles.subtleText} ${styles.ellipsis}`}>
-                            {result.matchedVerdiTypeDecodes.length > 0
-                              ? `${result.matchedVerdiTypeDecodes.join(', ')}: ${result.matchedQuery}`
-                              : 'Åpne behandling'}
-                          </BodyShort>
+                          <HStack gap="space-8">
+                            <BodyShort size="small" className={styles.subtleText}>
+                              Opprettet: {fmtDateTime(result.opprettet)}
+                            </BodyShort>
+                            <BodyShort size="small" className={`${styles.subtleText} ${styles.ellipsis}`}>
+                              {result.matchedVerdiTypeDecodes.length > 0
+                                ? `${result.matchedVerdiTypeDecodes.join(', ')}: ${result.matchedQuery}`
+                                : 'Åpne behandling'}
+                            </BodyShort>
+                          </HStack>
                         </VStack>
                       </HStack>
                     </Box>
