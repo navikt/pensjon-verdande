@@ -1,27 +1,49 @@
 :root {
   --venstre-meny-expanded-width: 15em;
-  --venstre-meny-collapsed-width: 3em;
+  --venstre-meny-collapsed-width: 3rem;
+  --venstre-meny-icon-gap: var(--ax-space-8);
+  --venstre-meny-toggle-duration: 0.3s;
+  --venstre-meny-toggle-easing: ease-in-out;
+  --venstre-meny-hover-duration: 0.15s;
+  --venstre-meny-hover-easing: ease-out;
+}
+
+.sidebarColumn {
+  background-color: var(--ax-bg-raised);
+  border-right: 1px solid var(--ax-border-neutral-subtle);
+  width: var(--venstre-meny-expanded-width);
+  min-width: var(--venstre-meny-expanded-width);
+  transition:
+    width var(--venstre-meny-toggle-duration) var(--venstre-meny-toggle-easing),
+    min-width var(--venstre-meny-toggle-duration) var(--venstre-meny-toggle-easing);
+}
+
+.sidebarColumn.kunIkonerColumn {
+  width: var(--venstre-meny-collapsed-width);
+  min-width: var(--venstre-meny-collapsed-width);
 }
 
 #venstreMeny {
-  background-color: var(--ax-bg-raised);
-  height: 100vh;
   position: sticky;
   top: 0;
-  overflow: auto;
-  transition: width 0.5s ease-in-out;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition:
+    width var(--venstre-meny-toggle-duration) var(--venstre-meny-toggle-easing),
+    min-width var(--venstre-meny-toggle-duration) var(--venstre-meny-toggle-easing);
   width: var(--venstre-meny-expanded-width);
   min-width: var(--venstre-meny-expanded-width);
-  border-right: 1px solid var(--ax-border-neutral-subtle);
+  background-color: var(--ax-bg-raised);
 }
 
 #venstreMeny .menyTekst {
   display: block;
 }
+
 #venstreMeny.kunIkoner {
   width: var(--venstre-meny-collapsed-width);
   min-width: var(--venstre-meny-collapsed-width);
-  transition: width 0.5s ease-in-out;
 }
 
 #venstreMeny.kunIkoner .menyTekst {
@@ -32,52 +54,75 @@
   margin: 0;
 }
 
-#venstreMeny.kunIkoner:hover {
-  width: 20em;
-  transition: width 0.5s ease-in-out;
+#venstreMeny.kunIkoner .chevron {
+  display: none;
 }
 
-#venstreMeny.kunIkoner:hover .menyTekst {
+#venstreMeny.kunIkoner:hover .chevron,
+#venstreMeny.kunIkoner:focus-within .chevron {
+  display: block;
+}
+
+#venstreMeny.kunIkoner:hover,
+#venstreMeny.kunIkoner:focus-within {
+  width: var(--venstre-meny-expanded-width);
+  z-index: 10;
+  transition: width var(--venstre-meny-hover-duration) var(--venstre-meny-hover-easing);
+  box-shadow: var(--ax-shadow-large);
+}
+
+#venstreMeny.kunIkoner:hover .menyIkon,
+#venstreMeny.kunIkoner:focus-within .menyIkon {
+  margin-right: var(--venstre-meny-icon-gap);
+}
+
+#venstreMeny.kunIkoner:hover .menyTekst,
+#venstreMeny.kunIkoner:focus-within .menyTekst {
   display: inline;
-  transition: ease-out;
 }
 
 #venstreMeny .mainmenu,
-.submenu {
+#venstreMeny .submenu {
   list-style: none;
   padding: 0;
   margin: 0;
-  width: var(--venstre-meny-expanded-width);
+  width: 100%;
 }
 
-#venstreMeny .mainmenu a {
-  display: block;
+#venstreMeny .mainmenu a,
+#venstreMeny .mainmenu button,
+#venstreMeny .submenu a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  white-space: nowrap;
+  width: 100%;
   text-decoration: none;
   padding: var(--ax-space-12);
-
   color: var(--ax-text-neutral);
-  background-color: var(--ax-bg-raised);
+  background-color: transparent;
+  border: none;
+  font: inherit;
+  cursor: pointer;
 }
 
-#venstreMeny .mainmenu a:hover {
+#venstreMeny .mainmenu a:hover,
+#venstreMeny .mainmenu button:hover {
   background-color: var(--ax-bg-accent-moderate-hover);
 }
 
 #venstreMeny .mainmenu li.open .submenu {
   display: block;
   max-height: 1000px;
+  visibility: visible;
   border-top: solid 1px var(--ax-border-neutral-strong);
   border-bottom: solid 1px var(--ax-border-neutral-strong);
 }
 
-#venstreMeny .submenu a.active {
-  background: var(--ax-bg-accent-moderate-pressed);
-  color: white;
-}
-
+#venstreMeny .submenu a.active,
 #venstreMeny .mainmenu li a.active {
   background: var(--ax-bg-accent-moderate-pressed);
-  color: white;
+  color: var(--ax-text-on-action);
 }
 
 #venstreMeny .submenu a:hover {
@@ -87,5 +132,23 @@
 #venstreMeny .submenu {
   overflow: hidden;
   max-height: 0;
-  -webkit-transition: all 0.5s ease-out;
+  visibility: hidden;
+  transition: all 0.5s ease-out;
+}
+
+.menyIkon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: var(--venstre-meny-icon-gap);
+}
+
+.chevron {
+  margin-left: auto;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
 }

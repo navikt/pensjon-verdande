@@ -14,7 +14,6 @@ import {
   SackPensionIcon,
   WrenchIcon,
 } from '@navikt/aksel-icons'
-import { Link } from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { NavLink } from 'react-router'
@@ -98,10 +97,9 @@ export function harRolle(me: MeResponse | undefined, rolle: string) {
 
 export default function VenstreMeny(props: Props) {
   const me = props.me
-
   let currentIndex = 0
 
-  function indexSupplier() {
+  function nextIndex() {
     currentIndex += 1
     return currentIndex
   }
@@ -109,12 +107,7 @@ export default function VenstreMeny(props: Props) {
   function createMenuItem(operasjon: string, link: string, label: string) {
     return (
       <li key={operasjon + link + label}>
-        <NavLink
-          to={link}
-          end
-          style={{ display: 'flex', justifyContent: 'flex-start' }}
-          className={({ isActive }) => (isActive ? styles.active : '')}
-        >
+        <NavLink to={link} end className={({ isActive }) => (isActive ? styles.active : '')}>
           <span className={styles.menyIkon}>
             <CircleIcon title={label} fontSize="1.5rem" />
           </span>
@@ -130,48 +123,41 @@ export default function VenstreMeny(props: Props) {
     setOpenIndex(openIndex === index ? null : index)
   }
 
-  function byggMeny(navn: string, menyElementer: string[][], indexSupplier: () => number, p0?: JSX.Element) {
+  function byggMeny(navn: string, menyElementer: string[][], nextIdx: () => number, icon?: JSX.Element) {
     const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(me, operasjon))
-    if (harTilgangTilMeny) {
-      const idx: number = indexSupplier()
+    if (!harTilgangTilMeny) return undefined
 
-      return (
-        <li key={`meny-${navn}`} className={openIndex === idx ? styles.open : ''}>
-          <Link as="a" onClick={() => handleMenuClick(idx)} style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <span className={styles.menyIkon}>{p0}</span>
-            <span className={styles.menyTekst}>{navn}</span>
-            <ChevronDownIcon
-              title="a11y-title"
-              fontSize="1.5rem"
-              style={{
-                marginLeft: 'auto',
-                transition: 'transform 0.2s',
-                transform: openIndex === idx ? 'rotate(180deg)' : 'rotate(0deg)',
-              }}
-            />
-          </Link>
-          <ul className={styles.submenu}>
-            {menyElementer
-              .filter(([operasjon]) => harTilgang(me, operasjon))
-              .map(([operasjon, link, label]) => createMenuItem(operasjon, link, label))}
-          </ul>
-        </li>
-      )
-    } else {
-      return undefined
-    }
+    const idx = nextIdx()
+    const isOpen = openIndex === idx
+
+    return (
+      <li key={`meny-${navn}`} className={isOpen ? styles.open : ''}>
+        <button type="button" onClick={() => handleMenuClick(idx)} aria-expanded={isOpen}>
+          <span className={styles.menyIkon}>{icon}</span>
+          <span className={styles.menyTekst}>{navn}</span>
+          <ChevronDownIcon
+            aria-hidden
+            fontSize="1.5rem"
+            className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
+          />
+        </button>
+        <ul className={styles.submenu}>
+          {menyElementer
+            .filter(([operasjon]) => harTilgang(me, operasjon))
+            .map(([operasjon, link, label]) => createMenuItem(operasjon, link, label))}
+        </ul>
+      </li>
+    )
   }
 
+  const columnClass = `${styles.sidebarColumn} ${props.showIconMenu ? styles.kunIkonerColumn : ''}`
+
   return (
-    <nav id={styles.venstreMeny} className={`aksel-theme dark ${props.showIconMenu ? styles.kunIkoner : ''}`}>
-      <nav className={''}>
+    <div className={`aksel-theme dark ${columnClass}`}>
+      <nav id={styles.venstreMeny} className={props.showIconMenu ? styles.kunIkoner : ''}>
         <ul className={styles.mainmenu}>
           <li>
-            <NavLink
-              to={`/dashboard`}
-              style={{ display: 'flex', justifyContent: 'flex-start' }}
-              className={({ isActive }) => (isActive ? styles.active : '')}
-            >
+            <NavLink to="/dashboard" className={({ isActive }) => (isActive ? styles.active : '')}>
               <span className={styles.menyIkon}>
                 <HouseIcon title="Hjem" fontSize="1.5rem" />
               </span>
@@ -180,11 +166,7 @@ export default function VenstreMeny(props: Props) {
           </li>
 
           <li>
-            <NavLink
-              to={`/kalender`}
-              style={{ display: 'flex', justifyContent: 'flex-start' }}
-              className={({ isActive }) => (isActive ? styles.active : '')}
-            >
+            <NavLink to="/kalender" className={({ isActive }) => (isActive ? styles.active : '')}>
               <span className={styles.menyIkon}>
                 <CalendarIcon title="Kalender" fontSize="1.5rem" />
               </span>
@@ -194,13 +176,9 @@ export default function VenstreMeny(props: Props) {
 
           {harRolle(me, 'VERDANDE_ADMIN') && (
             <li>
-              <NavLink
-                to={`/brukere`}
-                style={{ display: 'flex', justifyContent: 'flex-start' }}
-                className={({ isActive }) => (isActive ? styles.active : '')}
-              >
+              <NavLink to="/brukere" className={({ isActive }) => (isActive ? styles.active : '')}>
                 <span className={styles.menyIkon}>
-                  <PersonGroupIcon title="Brukere" fontSize="1.5rem" className={styles.menyIkon} />
+                  <PersonGroupIcon title="Brukere" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Brukere</span>
               </NavLink>
@@ -208,13 +186,9 @@ export default function VenstreMeny(props: Props) {
           )}
           {harRolle(me, 'VERDANDE_ADMIN') && (
             <li>
-              <NavLink
-                to={`/audit`}
-                style={{ display: 'flex', justifyContent: 'flex-start' }}
-                className={({ isActive }) => (isActive ? styles.active : '')}
-              >
+              <NavLink to="/audit" className={({ isActive }) => (isActive ? styles.active : '')}>
                 <span className={styles.menyIkon}>
-                  <ReceiptIcon title="Revisjonslogg" fontSize="1.5rem" className={styles.menyIkon} />
+                  <ReceiptIcon title="Revisjonslogg" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Revisjonslogg</span>
               </NavLink>
@@ -223,13 +197,9 @@ export default function VenstreMeny(props: Props) {
 
           {harTilgang(me, 'SE_BEHANDLINGER') && (
             <li>
-              <NavLink
-                to={`/manuell-behandling`}
-                style={{ display: 'flex', justifyContent: 'flex-start' }}
-                className={({ isActive }) => (isActive ? styles.active : '')}
-              >
+              <NavLink to="/manuell-behandling" className={({ isActive }) => (isActive ? styles.active : '')}>
                 <span className={styles.menyIkon}>
-                  <PersonRectangleIcon title="Manuell behandling" fontSize="1.5rem" className={styles.menyIkon} />
+                  <PersonRectangleIcon title="Manuell behandling" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Manuell behandling</span>
               </NavLink>
@@ -238,13 +208,9 @@ export default function VenstreMeny(props: Props) {
 
           {harTilgang(me, 'SE_BEHANDLINGER') && (
             <li>
-              <NavLink
-                to={`/alde`}
-                style={{ display: 'flex', justifyContent: 'flex-start' }}
-                className={({ isActive }) => (isActive ? styles.active : '')}
-              >
+              <NavLink to="/alde" className={({ isActive }) => (isActive ? styles.active : '')}>
                 <span className={styles.menyIkon}>
-                  <HandShakeHeartIcon title="a11y-title" fontSize="1.5rem" />
+                  <HandShakeHeartIcon title="Alde oppfølging" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Alde oppfølging</span>
               </NavLink>
@@ -265,35 +231,25 @@ export default function VenstreMeny(props: Props) {
           {byggMeny(
             'Større kjøringer',
             batcherMeny,
-            indexSupplier,
-            <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" className={styles.menyIkon} />,
+            nextIndex,
+            <SackPensionIcon title="Større kjøringer" fontSize="1.5rem" />,
           )}
-          {byggMeny(
-            'Kontroll',
-            kontrollMeny,
-            indexSupplier,
-            <GavelIcon title="Kontroll" fontSize="1.5rem" className={styles.menyIkon} />,
-          )}
+          {byggMeny('Kontroll', kontrollMeny, nextIndex, <GavelIcon title="Kontroll" fontSize="1.5rem" />)}
           {byggMeny(
             'Behandlinger',
             behandlingerMeny,
-            indexSupplier,
-            <NumberListIcon title="Behandlinger" fontSize="1.5rem" className={styles.menyIkon} />,
+            nextIndex,
+            <NumberListIcon title="Behandlinger" fontSize="1.5rem" />,
           )}
           {byggMeny(
             'Omregning',
             omregningMeny,
-            indexSupplier,
-            <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" className={styles.menyIkon} />,
+            nextIndex,
+            <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" />,
           )}
-          {byggMeny(
-            'Vedlikehold',
-            administrasjonMeny,
-            indexSupplier,
-            <WrenchIcon title="Vedlikehold" fontSize="1.5rem" className={styles.menyIkon} />,
-          )}
+          {byggMeny('Vedlikehold', administrasjonMeny, nextIndex, <WrenchIcon title="Vedlikehold" fontSize="1.5rem" />)}
         </ul>
       </nav>
-    </nav>
+    </div>
   )
 }
