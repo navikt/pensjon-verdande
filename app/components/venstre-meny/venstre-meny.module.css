@@ -4,6 +4,8 @@
   --venstre-meny-icon-gap: var(--ax-space-8);
   --venstre-meny-toggle-duration: 0.3s;
   --venstre-meny-toggle-easing: ease-in-out;
+  --venstre-meny-hover-duration: 0.15s;
+  --venstre-meny-hover-easing: ease-out;
 }
 
 .sidebarColumn {
@@ -42,9 +44,6 @@
 #venstreMeny.kunIkoner {
   width: var(--venstre-meny-collapsed-width);
   min-width: var(--venstre-meny-collapsed-width);
-  transition:
-    width var(--venstre-meny-toggle-duration) var(--venstre-meny-toggle-easing),
-    min-width var(--venstre-meny-toggle-duration) var(--venstre-meny-toggle-easing);
 }
 
 #venstreMeny.kunIkoner .menyTekst {
@@ -66,7 +65,7 @@
 #venstreMeny.kunIkoner:hover {
   width: var(--venstre-meny-expanded-width);
   z-index: 10;
-  transition: width 0.15s ease-out;
+  transition: width var(--venstre-meny-hover-duration) var(--venstre-meny-hover-easing);
   box-shadow: var(--ax-shadow-large);
 }
 
@@ -76,7 +75,6 @@
 
 #venstreMeny.kunIkoner:hover .menyTekst {
   display: inline;
-  transition: ease-out;
 }
 
 #venstreMeny .mainmenu,

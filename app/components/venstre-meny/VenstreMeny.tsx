@@ -135,7 +135,7 @@ export default function VenstreMeny(props: Props) {
           <span className={styles.menyIkon}>{icon}</span>
           <span className={styles.menyTekst}>{navn}</span>
           <ChevronDownIcon
-            title="Vis/skjul undermeny"
+            aria-hidden
             fontSize="1.5rem"
             className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
           />
