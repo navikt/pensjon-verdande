@@ -3,16 +3,23 @@
  * Brukes for dokumentasjonsskjermbilder som viser hele applikasjonen med header og meny.
  */
 import type { Meta, StoryObj } from '@storybook/react'
+import type React from 'react'
+import { createRoutesStub } from 'react-router'
 import type { KalenderHendelser } from '~/components/kalender/types'
+import Layout from '~/layout'
 import {
   mockBehandlingDto,
   mockBehandlingerPage,
   mockBehandlingKjoringDto,
   mockDashboardResponse,
+  mockMeResponse,
 } from '../.storybook/mocks/data'
 import { renderWithLayout } from '../.storybook/mocks/router'
 import AldeOppfolging from './alde-oppfolging'
 import Alderspensjonssoknader from './alderspensjon/forstegangsbehandling/soknader'
+import { mockOppsummering, mockRouteLoaderData } from './analyse/mocks'
+import Nokkeltall from './analyse/nokkeltall'
+import AnalyseLayout from './analyse/route'
 import Batcher from './batcher/batcher'
 import Behandling from './behandling/behandling.$behandlingId'
 import Behandlinger from './behandlinger/behandlinger._index'
@@ -848,4 +855,67 @@ export const AldeOppfolgingFullpage: Story = {
       },
       { path: '/alde' },
     ),
+}
+
+// --- Analyse fullpage ---
+
+const fullpageMe = mockMeResponse({
+  tilganger: [
+    'LESE',
+    'SKRIVE',
+    'SE_BEHANDLINGER',
+    'BATCH_KJORINGER',
+    'BEHANDLINGSERIE',
+    'REGULERING_LES',
+    'AVSTEMMING_LES',
+    'INNTEKTSKONTROLL',
+    'KONTROLLERE_SAERSKILT_SATS',
+    'OMREGN_YTELSER',
+    'ADHOC_BREVBESTILLING',
+  ],
+  verdandeRoller: ['VERDANDE_ADMIN'],
+})
+
+function renderAnalyseFullpage() {
+  const Stub = createRoutesStub([
+    {
+      path: '/',
+      // biome-ignore lint/suspicious/noExplicitAny: Layout type is incompatible with createRoutesStub's expected component type
+      Component: Layout as any,
+      loader: () => ({
+        env: 'q2',
+        me: fullpageMe,
+        schedulerStatus: { schedulerEnabled: true, schedulerLocal: false },
+        darkmode: false,
+      }),
+      children: [
+        {
+          path: 'analyse',
+          // biome-ignore lint/suspicious/noExplicitAny: React Router route type mismatch
+          Component: AnalyseLayout as React.ComponentType<any>,
+          loader: () => mockRouteLoaderData(),
+          children: [
+            {
+              path: 'nokkeltall',
+              // biome-ignore lint/suspicious/noExplicitAny: React Router route type mismatch
+              Component: Nokkeltall as React.ComponentType<any>,
+              loader: () => ({ oppsummering: mockOppsummering(), oppsummeringFeil: null }),
+            },
+          ],
+        },
+      ],
+    },
+  ])
+  return (
+    <Stub
+      initialEntries={[
+        '/analyse/nokkeltall?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE',
+      ]}
+    />
+  )
+}
+
+export const AnalyseFullpage: Story = {
+  name: 'Analyse',
+  render: () => renderAnalyseFullpage(),
 }
