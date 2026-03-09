@@ -38,6 +38,7 @@ export default [
       route('manuelle', 'analyse/manuelle.tsx'),
       route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
       route('ende-til-ende', 'analyse/ende-til-ende.tsx'),
+      route('auto-brev', 'analyse/auto-brev.tsx'),
     ]),
     route('analyse/eksport', 'analyse/eksport.tsx'),
 

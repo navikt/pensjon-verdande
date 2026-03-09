@@ -73,6 +73,7 @@ const faner = [
   { value: 'manuelle', label: 'Manuelle oppgaver' },
   { value: 'kontrollpunkter', label: 'Kontrollpunkter' },
   { value: 'ende-til-ende', label: 'Ende-til-ende' },
+  { value: 'auto-brev', label: 'Autobrev' },
 ] as const
 
 /** Velg passende aggregeringsnivå basert på tidsperioden */
