@@ -434,7 +434,7 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                           {r.antall.toLocaleString('nb-NO')}
                         </Table.DataCell>
                         <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
-                          {((r.antall * 100) / total).toFixed(1)} %
+                          {total > 0 ? `${((r.antall * 100) / total).toFixed(1)} %` : manglendeVerdi}
                         </Table.DataCell>
                       </Table.Row>
                     ))}
@@ -464,7 +464,7 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                         {gr.antall.toLocaleString('nb-NO')}
                       </Table.DataCell>
                       <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
-                        {((gr.antall * 100) / total).toFixed(1)} %
+                        {total > 0 ? `${((gr.antall * 100) / total).toFixed(1)} %` : manglendeVerdi}
                       </Table.DataCell>
                     </Table.Row>
                   ))}
