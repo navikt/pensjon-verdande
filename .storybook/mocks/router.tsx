@@ -74,7 +74,13 @@ export function renderWithLayout<T>(
   // biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes from React Router
   Component: React.ComponentType<any>,
   loaderData: T,
-  options?: { path?: string; initialEntry?: string; me?: Partial<MeResponse>; env?: string },
+  options?: {
+    path?: string
+    initialEntry?: string
+    me?: Partial<MeResponse>
+    env?: string
+    schedulerStatus?: { schedulerEnabled: boolean; schedulerLocal: boolean; deaktiverteBehandlingstyper?: string[] }
+  },
 ) {
   const path = options?.path ?? '/'
   const me = mockMeResponse({
@@ -103,7 +109,11 @@ export function renderWithLayout<T>(
       loader: () => ({
         env: options?.env ?? 'q2',
         me,
-        schedulerStatus: { schedulerEnabled: true, schedulerLocal: false },
+        schedulerStatus: options?.schedulerStatus ?? {
+          schedulerEnabled: true,
+          schedulerLocal: false,
+          deaktiverteBehandlingstyper: [],
+        },
         darkmode: false,
       }),
       children: [

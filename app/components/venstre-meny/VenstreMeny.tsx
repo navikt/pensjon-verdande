@@ -27,6 +27,7 @@ export type Props = {
 }
 
 const administrasjonMeny = [
+  ['SCHEDULER_STYRING', `/scheduler-styring`, 'Scheduler-styring'],
   ['BEHANDLINGSERIE', `/behandlingserie`, 'Behandlingserie'],
   ['UGYLDIGGJOR_ETTEROPPGJOR_HISTORIKK_UFORE', `/etteroppgjor-historikk-ufore`, 'Etteroppgjørhistorikk Uføre'],
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
