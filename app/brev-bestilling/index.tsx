@@ -50,19 +50,28 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const now = new Date()
 
-  const fomDato = url.searchParams.get('fomDato') as string
-  const tomDato = url.searchParams.get('tomDato') as string
-
   const iso = /^\d{4}-\d{2}-\d{2}$/
-  const manglendeEllerUgyldigDato = !fomDato || !tomDato || !iso.test(fomDato) || !iso.test(tomDato)
+  const fomDatoParam = url.searchParams.get('fomDato')
+  const tomDatoParam = url.searchParams.get('tomDato')
 
-  if (manglendeEllerUgyldigDato) {
-    url.searchParams.set('fomDato', fomDato ?? toIsoDate(sub(now, { days: 30 })))
-    url.searchParams.set('tomDato', tomDato ?? toIsoDate(now))
+  const fomDatoGyldig = !!fomDatoParam && iso.test(fomDatoParam)
+  const tomDatoGyldig = !!tomDatoParam && iso.test(tomDatoParam)
+
+  if (!fomDatoGyldig || !tomDatoGyldig) {
+    const defaultFomDato = toIsoDate(sub(now, { days: 30 }))
+    const defaultTomDato = toIsoDate(now)
+
+    const normalisertFomDato = fomDatoGyldig ? (fomDatoParam as string) : defaultFomDato
+    const normalisertTomDato = tomDatoGyldig ? (tomDatoParam as string) : defaultTomDato
+
+    url.searchParams.set('fomDato', normalisertFomDato)
+    url.searchParams.set('tomDato', normalisertTomDato)
 
     return redirect(`${url.pathname}?${url.searchParams.toString()}`)
   }
 
+  const fomDato = url.searchParams.get('fomDato') as string
+  const tomDato = url.searchParams.get('tomDato') as string
   const qs = new URLSearchParams()
   qs.set('fomDato', fomDato)
   qs.set('tomDato', tomDato)
