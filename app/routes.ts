@@ -182,6 +182,8 @@ export default [
 
     route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
 
+    route('brev-bestilling', 'brev-bestilling/index.tsx'),
+
     route('manuell-behandling', 'manuell-behandling/index.tsx'),
     route('manuell-behandling-uttrekk', 'manuell-behandling/uttrekk.tsx'),
 
