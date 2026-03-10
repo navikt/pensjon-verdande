@@ -1,11 +1,13 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/feilklassifisering'
 import LastNedTabData from './components/LastNedTabData'
-import type { FeilklassifiseringResponse } from './types'
+import type { ExceptionTypeStatistikk, FeilklassifiseringResponse } from './types'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { params } = parseAnalyseParams(request)
@@ -18,6 +20,23 @@ export default function FeilklassifiseringTab({ loaderData }: Route.ComponentPro
   const behandlingType = searchParams.get('behandlingType') || 'FleksibelApSak'
   const fom = searchParams.get('fom') || ''
   const tom = searchParams.get('tom') || ''
+
+  const getValue = useCallback((item: ExceptionTypeStatistikk, key: string) => {
+    switch (key) {
+      case 'exceptionType':
+        return item.exceptionType
+      case 'antall':
+        return item.antall
+      case 'sisteOpptreden':
+        return item.sisteOpptreden
+      case 'eksempelMelding':
+        return item.eksempelMelding
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.exceptionTyper, 'antall', 'descending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -42,17 +61,25 @@ export default function FeilklassifiseringTab({ loaderData }: Route.ComponentPro
       </HStack>
 
       {data.exceptionTyper.length > 0 && (
-        <Table size="small" zebraStripes>
+        <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Exception-type</Table.HeaderCell>
-              <Table.HeaderCell align="right">Antall</Table.HeaderCell>
-              <Table.HeaderCell>Siste opptreden</Table.HeaderCell>
-              <Table.HeaderCell>Eksempel</Table.HeaderCell>
+              <Table.ColumnHeader sortable sortKey="exceptionType">
+                Exception-type
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antall" align="right">
+                Antall
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="sisteOpptreden">
+                Siste opptreden
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="eksempelMelding">
+                Eksempel
+              </Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {data.exceptionTyper.map((e) => (
+            {sorted.map((e) => (
               <Table.Row key={e.exceptionType}>
                 <Table.DataCell>
                   <span style={{ fontFamily: 'monospace', fontSize: '0.85em' }}>{e.exceptionType}</span>

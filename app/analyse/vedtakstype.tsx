@@ -1,4 +1,5 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
@@ -6,6 +7,7 @@ import type { Route } from './+types/vedtakstype'
 import LastNedTabData from './components/LastNedTabData'
 import type { VedtakstypeAnalyseResponse } from './types'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { params } = parseAnalyseParams(request)
@@ -20,6 +22,23 @@ export default function VedtakstypeTab({ loaderData }: Route.ComponentProps) {
   const tom = searchParams.get('tom') || ''
 
   const totalAntall = data.vedtakstyper.reduce((s, v) => s + v.antall, 0)
+
+  const getValue = useCallback((item: (typeof data.vedtakstyper)[number], key: string) => {
+    switch (key) {
+      case 'vedtakType':
+        return item.vedtakType
+      case 'vedtakStatus':
+        return item.vedtakStatus
+      case 'antall':
+        return item.antall
+      case 'gjennomsnittDagerTilIverksatt':
+        return item.gjennomsnittDagerTilIverksatt
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.vedtakstyper, 'antall', 'descending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -44,17 +63,25 @@ export default function VedtakstypeTab({ loaderData }: Route.ComponentProps) {
       </HStack>
 
       {data.vedtakstyper.length > 0 && (
-        <Table size="small" zebraStripes>
+        <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Vedtakstype</Table.HeaderCell>
-              <Table.HeaderCell>Vedtakstatus</Table.HeaderCell>
-              <Table.HeaderCell align="right">Antall</Table.HeaderCell>
-              <Table.HeaderCell align="right">Snitt dager til iverksatt</Table.HeaderCell>
+              <Table.ColumnHeader sortable sortKey="vedtakType">
+                Vedtakstype
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="vedtakStatus">
+                Vedtakstatus
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antall" align="right">
+                Antall
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="gjennomsnittDagerTilIverksatt" align="right">
+                Snitt dager til iverksatt
+              </Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {data.vedtakstyper.map((v) => (
+            {sorted.map((v) => (
               <Table.Row key={`${v.vedtakType}-${v.vedtakStatus}`}>
                 <Table.DataCell>{v.vedtakType}</Table.DataCell>
                 <Table.DataCell>{v.vedtakStatus}</Table.DataCell>

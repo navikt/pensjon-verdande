@@ -1,13 +1,30 @@
 import { BodyShort, Box, Heading, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { decodeAktivitet } from '~/common/decodeBehandling'
 import type { ManuellOppgaveStatistikk } from '../types'
 import { formaterTall } from '../utils/formattering'
+import { useSortableTable } from '../utils/useSortableTable'
 
 interface Props {
   data: ManuellOppgaveStatistikk[]
 }
 
 export default function ManuelleOppgaverTabell({ data }: Props) {
+  const getValue = useCallback((item: ManuellOppgaveStatistikk, key: string) => {
+    switch (key) {
+      case 'aktivitet':
+        return decodeAktivitet(item.aktivitetType)
+      case 'oppgaveKategori':
+        return item.oppgaveKategori
+      case 'antall':
+        return item.antall
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data, 'antall', 'descending', getValue)
+
   if (data.length === 0) {
     return (
       <Box padding="space-32" style={{ textAlign: 'center' }}>
@@ -21,17 +38,23 @@ export default function ManuelleOppgaverTabell({ data }: Props) {
       <Heading level="3" size="small">
         Manuelle oppgaver per aktivitet
       </Heading>
-      <Table size="small" zebraStripes>
+      <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader />
-            <Table.ColumnHeader>Aktivitet</Table.ColumnHeader>
-            <Table.ColumnHeader>Oppgavekategori</Table.ColumnHeader>
-            <Table.ColumnHeader align="right">Antall</Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="aktivitet">
+              Aktivitet
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="oppgaveKategori">
+              Oppgavekategori
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="antall" align="right">
+              Antall
+            </Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data.map((oppgave) => (
+          {sorted.map((oppgave) => (
             <Table.ExpandableRow
               key={`${oppgave.aktivitetType}-${oppgave.oppgaveKategori}`}
               content={

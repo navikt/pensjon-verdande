@@ -1,4 +1,5 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
@@ -7,6 +8,7 @@ import GjenforsokFordelingChart from './components/GjenforsokFordelingChart'
 import LastNedTabData from './components/LastNedTabData'
 import type { GjenforsokAnalyseResponse } from './types'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { params } = parseAnalyseParams(request)
@@ -23,6 +25,29 @@ export default function GjenforsokTab({ loaderData }: Route.ComponentProps) {
   const totalMedRetry = data.aktiviteter.reduce((sum, a) => sum + a.antallMedRetry, 0)
   const totalAktiviteter = data.aktiviteter.reduce((sum, a) => sum + a.antallAktiviteter, 0)
   const retryProsent = totalAktiviteter > 0 ? `${((totalMedRetry / totalAktiviteter) * 100).toFixed(1)}%` : '–'
+
+  const getValue = useCallback((item: GjenforsokAnalyseResponse['aktiviteter'][number], key: string) => {
+    switch (key) {
+      case 'aktivitetType':
+        return item.aktivitetType
+      case 'antallAktiviteter':
+        return item.antallAktiviteter
+      case 'gjennomsnittKjoringer':
+        return item.gjennomsnittKjoringer
+      case 'maxKjoringer':
+        return item.maxKjoringer
+      case 'antallMedRetry':
+        return item.antallMedRetry
+      case 'retryRate':
+        return item.retryRate ?? null
+      case 'suksessEtterRetryRate':
+        return item.suksessEtterRetryRate ?? null
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.aktiviteter, 'antallMedRetry', 'descending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -57,20 +82,34 @@ export default function GjenforsokTab({ loaderData }: Route.ComponentProps) {
           <Heading level="3" size="small">
             Retry-statistikk per aktivitetstype
           </Heading>
-          <Table size="small" zebraStripes>
+          <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell>Aktivitet</Table.HeaderCell>
-                <Table.HeaderCell align="right">Antall</Table.HeaderCell>
-                <Table.HeaderCell align="right">Snitt kjøringer</Table.HeaderCell>
-                <Table.HeaderCell align="right">Maks</Table.HeaderCell>
-                <Table.HeaderCell align="right">Med retry</Table.HeaderCell>
-                <Table.HeaderCell align="right">Retry-rate</Table.HeaderCell>
-                <Table.HeaderCell align="right">Fullført etter retry</Table.HeaderCell>
+                <Table.ColumnHeader sortable sortKey="aktivitetType">
+                  Aktivitet
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antallAktiviteter" align="right">
+                  Antall
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="gjennomsnittKjoringer" align="right">
+                  Snitt kjøringer
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="maxKjoringer" align="right">
+                  Maks
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antallMedRetry" align="right">
+                  Med retry
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="retryRate" align="right">
+                  Retry-rate
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="suksessEtterRetryRate" align="right">
+                  Fullført etter retry
+                </Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.aktiviteter.map((a) => (
+              {sorted.map((a) => (
                 <Table.Row key={a.aktivitetType}>
                   <Table.DataCell>
                     <span style={{ fontFamily: 'monospace', fontSize: '0.85em' }}>{a.aktivitetType}</span>

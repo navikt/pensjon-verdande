@@ -1,4 +1,5 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
@@ -7,6 +8,7 @@ import LastNedTabData from './components/LastNedTabData'
 import type { KravtypeAnalyseResponse } from './types'
 import { formaterVarighet } from './utils/formattering'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { params } = parseAnalyseParams(request)
@@ -21,6 +23,29 @@ export default function KravtypeTab({ loaderData }: Route.ComponentProps) {
   const tom = searchParams.get('tom') || ''
 
   const totalAntall = data.kravtyper.reduce((s, k) => s + k.antall, 0)
+
+  const getValue = useCallback((item: (typeof data.kravtyper)[number], key: string) => {
+    switch (key) {
+      case 'kravGjelder':
+        return item.kravGjelder
+      case 'kravStatus':
+        return item.kravStatus
+      case 'antall':
+        return item.antall
+      case 'antallFullfort':
+        return item.antallFullfort
+      case 'antallFeilet':
+        return item.antallFeilet
+      case 'feilrate':
+        return item.feilrate
+      case 'gjennomsnittVarighetSekunder':
+        return item.gjennomsnittVarighetSekunder
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.kravtyper, 'antall', 'descending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -45,20 +70,34 @@ export default function KravtypeTab({ loaderData }: Route.ComponentProps) {
       </HStack>
 
       {data.kravtyper.length > 0 && (
-        <Table size="small" zebraStripes>
+        <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Krav gjelder</Table.HeaderCell>
-              <Table.HeaderCell>Kravstatus</Table.HeaderCell>
-              <Table.HeaderCell align="right">Antall</Table.HeaderCell>
-              <Table.HeaderCell align="right">Fullført</Table.HeaderCell>
-              <Table.HeaderCell align="right">Feilet</Table.HeaderCell>
-              <Table.HeaderCell align="right">Feilrate</Table.HeaderCell>
-              <Table.HeaderCell align="right">Snitt varighet</Table.HeaderCell>
+              <Table.ColumnHeader sortable sortKey="kravGjelder">
+                Krav gjelder
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="kravStatus">
+                Kravstatus
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antall" align="right">
+                Antall
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antallFullfort" align="right">
+                Fullført
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antallFeilet" align="right">
+                Feilet
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="feilrate" align="right">
+                Feilrate
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="gjennomsnittVarighetSekunder" align="right">
+                Snitt varighet
+              </Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {data.kravtyper.map((k) => (
+            {sorted.map((k) => (
               <Table.Row key={`${k.kravGjelder}-${k.kravStatus}`}>
                 <Table.DataCell>{k.kravGjelder}</Table.DataCell>
                 <Table.DataCell>{k.kravStatus}</Table.DataCell>
