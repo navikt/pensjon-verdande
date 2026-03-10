@@ -29,6 +29,7 @@ import Brukere from './brukere/index'
 import Dashboard from './dashboard/route'
 import KalenderVisning from './kalender/route'
 import ManuellBehandling from './manuell-behandling/index'
+import SchedulerStyringPage from './vedlikehold/scheduler-styring'
 
 const mockKalenderHendelser: KalenderHendelser = {
   offentligeFridager: [
@@ -918,4 +919,158 @@ function renderAnalyseFullpage() {
 export const AnalyseFullpage: Story = {
   name: 'Analyse',
   render: () => renderAnalyseFullpage(),
+}
+
+const mockSchedulerStyring = {
+  schedulerStyring: {
+    erAktiv: true,
+    endretAv: 'Z999999',
+    endretDato: '2026-03-04T10:00:00',
+  },
+  typeStyringer: [
+    {
+      behandlingCode: 'DagligAvstemmingBehandling',
+      erAktiv: true,
+      maksSamtidige: null,
+      endretAv: null,
+      endretDato: null,
+    },
+    {
+      behandlingCode: 'PersonAjourholdBehandling',
+      erAktiv: false,
+      maksSamtidige: 3,
+      endretAv: 'Z999999',
+      endretDato: '2026-03-04T09:00:00',
+    },
+    {
+      behandlingCode: 'AldersovergangKontrollBehandling',
+      erAktiv: true,
+      maksSamtidige: null,
+      endretAv: null,
+      endretDato: null,
+    },
+    {
+      behandlingCode: 'AfpStat65KontrollBehandling',
+      erAktiv: true,
+      maksSamtidige: 2,
+      endretAv: 'Z888888',
+      endretDato: '2026-03-03T15:30:00',
+    },
+    {
+      behandlingCode: 'DistribuerBrevBehandling',
+      erAktiv: true,
+      maksSamtidige: null,
+      endretAv: null,
+      endretDato: null,
+    },
+    {
+      behandlingCode: 'EtteroppgjorUTBehandling',
+      erAktiv: false,
+      maksSamtidige: null,
+      endretAv: 'Z999999',
+      endretDato: '2026-03-02T12:00:00',
+    },
+    {
+      behandlingCode: 'ForventetInntektUTBehandling',
+      erAktiv: true,
+      maksSamtidige: 5,
+      endretAv: 'Z888888',
+      endretDato: '2026-03-01T08:00:00',
+    },
+    {
+      behandlingCode: 'IverksettVedtakBehandling',
+      erAktiv: true,
+      maksSamtidige: null,
+      endretAv: null,
+      endretDato: null,
+    },
+  ],
+  audit: [
+    {
+      behandlingCode: 'PersonAjourholdBehandling',
+      handling: 'DEAKTIVER',
+      gammelVerdi: 'true',
+      nyVerdi: 'false',
+      utfortAv: 'Z999999',
+      utfortDato: '2026-03-04T09:00:00',
+    },
+    {
+      behandlingCode: 'AfpStat65KontrollBehandling',
+      handling: 'ENDRE_MAKS_SAMTIDIGE',
+      gammelVerdi: null,
+      nyVerdi: '2',
+      utfortAv: 'Z888888',
+      utfortDato: '2026-03-03T15:30:00',
+    },
+    {
+      behandlingCode: 'GLOBAL',
+      handling: 'AKTIVER',
+      gammelVerdi: 'false',
+      nyVerdi: 'true',
+      utfortAv: 'Z999999',
+      utfortDato: '2026-03-03T08:00:00',
+    },
+  ],
+}
+
+export const SchedulerStyringFullpage: Story = {
+  name: 'Scheduler-styring',
+  render: () =>
+    renderWithLayout(SchedulerStyringPage, mockSchedulerStyring, {
+      path: '/scheduler-styring',
+    }),
+}
+
+export const SchedulerStyringGlobalStoppetFullpage: Story = {
+  name: 'Scheduler-styring (global stoppet)',
+  render: () =>
+    renderWithLayout(
+      SchedulerStyringPage,
+      {
+        ...mockSchedulerStyring,
+        schedulerStyring: {
+          erAktiv: false,
+          endretAv: 'Z999999',
+          endretDato: '2026-03-04T10:00:00',
+        },
+      },
+      {
+        path: '/scheduler-styring',
+        schedulerStatus: { schedulerEnabled: false, schedulerLocal: false },
+      },
+    ),
+}
+
+export const DashboardGlobalStoppetFullpage: Story = {
+  name: 'Dashboard (global stoppet)',
+  render: () =>
+    renderWithLayout(
+      Dashboard,
+      {
+        loadingDashboardResponse: mockDashboardResponse(),
+        kalenderHendelser: mockKalenderHendelser,
+        startDato: new Date('2024-06-15'),
+      },
+      { schedulerStatus: { schedulerEnabled: false, schedulerLocal: false } },
+    ),
+}
+
+export const DashboardDeaktiverteBehandlingerFullpage: Story = {
+  name: 'Dashboard (deaktiverte behandlingstyper)',
+  render: () =>
+    renderWithLayout(
+      Dashboard,
+      {
+        loadingDashboardResponse: mockDashboardResponse(),
+        kalenderHendelser: mockKalenderHendelser,
+        startDato: new Date('2024-06-15'),
+      },
+      {
+        schedulerStatus: {
+          schedulerEnabled: true,
+          schedulerLocal: false,
+          deaktiverteBehandlingstyper: ['PersonAjourholdBehandling', 'EtteroppgjorUTBehandling'],
+        },
+      },
+    ),
 }

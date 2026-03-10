@@ -82,6 +82,26 @@
       "filename": "verdande-alde-oppfolging.png",
       "description": "Alde oppfølging dashboard med statusfordeling og grafer",
       "targetDir": "../pensjon-dokumentasjon/pen/docs/modules/Alderspensjon/images"
+    },
+    {
+      "storyId": "fullpage--scheduler-styring-fullpage",
+      "filename": "verdande-scheduler-styring.png",
+      "description": "Scheduler-styring med oversikt over behandlingstyper og innstillinger"
+    },
+    {
+      "storyId": "fullpage--scheduler-styring-global-stoppet-fullpage",
+      "filename": "verdande-scheduler-styring-stoppet.png",
+      "description": "Scheduler-styring med global stoppet og GlobalAlert"
+    },
+    {
+      "storyId": "fullpage--dashboard-global-stoppet-fullpage",
+      "filename": "verdande-dashboard-global-stoppet.png",
+      "description": "Dashboard med GlobalAlert for stoppet behandlingsløsning"
+    },
+    {
+      "storyId": "fullpage--dashboard-deaktiverte-behandlinger-fullpage",
+      "filename": "verdande-dashboard-deaktiverte-behandlinger.png",
+      "description": "Dashboard med GlobalAlert for deaktiverte behandlingstyper"
     }
   ]
 }

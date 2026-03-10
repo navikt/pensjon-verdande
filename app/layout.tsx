@@ -2,6 +2,7 @@ import { Box, CopyButton, GlobalAlert, HStack, Page, Theme, VStack } from '@navi
 import { useState } from 'react'
 import { createCookie, isRouteErrorResponse, Outlet, useNavigation } from 'react-router'
 import { hentMe } from '~/brukere/brukere.server'
+import { decodeBehandling } from '~/common/decodeBehandling'
 import NavHeader from '~/components/nav-header/NavHeader'
 import VenstreMeny from '~/components/venstre-meny/VenstreMeny'
 import { getSchedulerStatus } from '~/services/behandling.server'
@@ -33,16 +34,33 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const navigation = useNavigation()
   const isNavigating = navigation.state !== 'idle'
 
-  const schedulerAlert = schedulerStatus && !schedulerStatus.schedulerEnabled && !schedulerStatus.schedulerLocal && (
-    <GlobalAlert status="warning">
-      <GlobalAlert.Header>
-        <GlobalAlert.Title as="h2">Behandlingsløsningen er stoppet</GlobalAlert.Title>
-      </GlobalAlert.Header>
-      <GlobalAlert.Content>
-        Ingen behandlinger vil bli prosessert i dette miljøet. Behandlingsløsningen må aktiveres for å gjenoppta
-        behandling.
-      </GlobalAlert.Content>
-    </GlobalAlert>
+  const schedulerAlert = schedulerStatus && (
+    <>
+      {!schedulerStatus.schedulerEnabled && (
+        <GlobalAlert status="warning">
+          <GlobalAlert.Header>
+            <GlobalAlert.Title as="h2">Behandlingsløsningen er stoppet</GlobalAlert.Title>
+          </GlobalAlert.Header>
+          <GlobalAlert.Content>
+            Ingen behandlinger vil bli prosessert i dette miljøet. Behandlingsløsningen må aktiveres for å gjenoppta
+            behandling.
+          </GlobalAlert.Content>
+        </GlobalAlert>
+      )}
+      {schedulerStatus.schedulerEnabled &&
+        schedulerStatus.deaktiverteBehandlingstyper &&
+        schedulerStatus.deaktiverteBehandlingstyper.length > 0 && (
+          <GlobalAlert status="warning">
+            <GlobalAlert.Header>
+              <GlobalAlert.Title as="h2">Noen behandlingstyper er deaktivert</GlobalAlert.Title>
+            </GlobalAlert.Header>
+            <GlobalAlert.Content>
+              Følgende behandlingstyper er deaktivert:{' '}
+              {schedulerStatus.deaktiverteBehandlingstyper.map(decodeBehandling).join(', ')}
+            </GlobalAlert.Content>
+          </GlobalAlert>
+        )}
+    </>
   )
 
   return (
