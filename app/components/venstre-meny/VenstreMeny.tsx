@@ -25,6 +25,7 @@ import styles from './venstre-meny.module.css'
 export type Props = {
   me: MeResponse
   showIconMenu: boolean
+  env: string
 }
 
 const administrasjonMeny = [
@@ -207,15 +208,11 @@ export default function VenstreMeny(props: Props) {
             </li>
           )}
 
-          {harTilgang(me, 'SE_BEHANDLINGER') && (
+          {props.env !== 'p' && harTilgang(me, 'SE_BEHANDLINGER') && (
             <li>
-              <NavLink
-                to={`/brev-bestilling`}
-                style={{ display: 'flex', justifyContent: 'flex-start' }}
-                className={({ isActive }) => (isActive ? styles.active : '')}
-              >
+              <NavLink to="/brev-bestilling" className={({ isActive }) => (isActive ? styles.active : '')}>
                 <span className={styles.menyIkon}>
-                  <EnvelopeClosedIcon title="Brev-bestilling" fontSize="1.5rem" className={styles.menyIkon} />
+                  <EnvelopeClosedIcon title="Brev-bestilling" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Brev-bestilling</span>
               </NavLink>

@@ -25,6 +25,7 @@ import type { Route } from './+types/route'
 const OpprettetChart = React.lazy(() => import('./components/OpprettetChart'))
 
 import { apiGet } from '~/services/api.server'
+import { env as serverEnv } from '~/services/env.server'
 import { logger } from '~/services/logger.server'
 import type { TidsserieResponse } from './types'
 import { formaterTimestamp, normalizePeriodToDate } from './utils/formattering'
@@ -107,7 +108,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     logger.warn(`Analyse tidsserie feilet: ${String(e)}`)
   }
 
-  return { behandlingType, fom, tom, aggregering, tidsserie }
+  return { behandlingType, fom, tom, aggregering, tidsserie, erProd: serverEnv.env === 'p' }
 }
 
 export function shouldRevalidate({ currentUrl, nextUrl }: { currentUrl: URL; nextUrl: URL }) {
@@ -115,7 +116,7 @@ export function shouldRevalidate({ currentUrl, nextUrl }: { currentUrl: URL; nex
 }
 
 export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
-  const { behandlingType, fom, tom, aggregering, tidsserie } = loaderData
+  const { behandlingType, fom, tom, aggregering, tidsserie, erProd } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
   const navigate = useNavigate()
@@ -325,9 +326,11 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
             <Tabs value={currentTab} onChange={onTabChange}>
               <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                 <Tabs.List>
-                  {faner.map((f) => (
-                    <Tabs.Tab key={f.value} value={f.value} label={f.label} />
-                  ))}
+                  {faner
+                    .filter((f) => f.value !== 'auto-brev' || !erProd)
+                    .map((f) => (
+                      <Tabs.Tab key={f.value} value={f.value} label={f.label} />
+                    ))}
                 </Tabs.List>
               </div>
             </Tabs>
