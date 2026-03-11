@@ -47,6 +47,7 @@ const oversettinger = [
   ['TilbakekrevingshendelseBehandling', 'Tilbakekrevingshendelse'],
   ['UtvandringAnnulleringMeldingBehandling', 'Annulert utvandringsmelding'],
   ['UtvandringMeldingBehandling', 'Utvandringsmelding'],
+  ['AFPStat65Kontroll', 'AFP Stat kontroll'],
 ]
 export function decodeBehandling(behandling: string | BehandlingDto) {
   const string: string = typeof behandling === 'string' ? behandling : behandling.type
