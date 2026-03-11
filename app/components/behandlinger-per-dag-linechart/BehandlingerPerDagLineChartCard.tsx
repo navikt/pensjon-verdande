@@ -24,7 +24,7 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
   }, [antallDager, fetcherLoad])
 
   const opprettetPerDag =
-    antallDager === DEFAULT_ANTALL_DAGER && !fetcher.data
+    antallDager === DEFAULT_ANTALL_DAGER
       ? props.opprettetPerDag
       : (fetcher.data?.opprettetPerDag ?? props.opprettetPerDag)
 

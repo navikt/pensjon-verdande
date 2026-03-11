@@ -4,7 +4,8 @@ import type { Route } from './+types/opprettet-per-dag'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
-  const dager = Number.parseInt(searchParams.get('dager') ?? '30', 10)
+  const parsed = Number.parseInt(searchParams.get('dager') ?? '30', 10)
+  const dager = Number.isFinite(parsed) && parsed > 0 ? parsed : 30
   const fom = new Date()
   fom.setDate(fom.getDate() - dager)
   const fomStr = fom.toISOString().split('T')[0]
