@@ -11,8 +11,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   fom.setTime(fom.getTime() - timer * 60 * 60 * 1000)
 
   const params = new URLSearchParams({
-    fom: fom.toISOString(),
-    tom: new Date().toISOString(),
+    fom: fom.toISOString().replace('Z', ''),
+    tom: new Date().toISOString().replace('Z', ''),
     aggregering: 'TIME',
   })
 
