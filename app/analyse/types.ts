@@ -266,6 +266,25 @@ export type AktivitetsvarighetStatistikk = {
   andelAvTotal: number | null
 }
 
+// --- Aktivitet kalendertid ---
+
+export type AktivitetKalendertidResponse = {
+  behandlingType: string
+  aktiviteter: AktivitetKalendertidStatistikk[]
+}
+
+export type AktivitetKalendertidStatistikk = {
+  aktivitetType: string
+  antall: number
+  gjennomsnittSekunder: number
+  medianSekunder: number
+  p90Sekunder: number
+  p95Sekunder: number
+  minSekunder: number
+  maxSekunder: number
+  andelAvTotal: number | null
+}
+
 // --- Tidspunktanalyse ---
 
 export type TidspunktAnalyseResponse = {

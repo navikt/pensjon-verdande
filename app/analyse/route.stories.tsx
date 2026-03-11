@@ -9,7 +9,6 @@ import AktivitetsvarighetTab from './aktivitetsvarighet'
 import AutomatiseringTab from './automatisering'
 import EndeTilEndeTab from './ende-til-ende'
 import FeilanalyseTab from './feilanalyse'
-import FeilklassifiseringTab from './feilklassifisering'
 import GjenforsokTab from './gjenforsok'
 import GruppeTab from './gruppe'
 import KoTab from './ko'
@@ -122,12 +121,12 @@ export const KoStory: Story = {
 
 export const FeilanalyseStory: Story = {
   name: 'Feilanalyse',
-  render: () => renderAnalyseTab(FeilanalyseTab, mockFeilanalyseData(), 'feilanalyse'),
-}
-
-export const FeilklassifiseringStory: Story = {
-  name: 'Feilklasser',
-  render: () => renderAnalyseTab(FeilklassifiseringTab, mockFeilklassifiseringData(), 'feilklassifisering'),
+  render: () =>
+    renderAnalyseTab(
+      FeilanalyseTab,
+      { feil: mockFeilanalyseData(), klassifisering: mockFeilklassifiseringData() },
+      'feilanalyse',
+    ),
 }
 
 export const GjenforsokStory: Story = {

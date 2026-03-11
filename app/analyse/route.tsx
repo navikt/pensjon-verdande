@@ -58,9 +58,9 @@ const faner = [
   { value: 'automatisering', label: 'Automatisering' },
   { value: 'ko', label: 'Gjennomstrømning' },
   { value: 'feilanalyse', label: 'Feilanalyse' },
-  { value: 'feilklassifisering', label: 'Feilklasser' },
   { value: 'gjenforsok', label: 'Gjenforsøk' },
   { value: 'aktivitetsvarighet', label: 'Flaskehals' },
+  { value: 'kalendertid', label: 'Kalendertid' },
   { value: 'tidspunkt', label: 'Tidspunkt' },
   { value: 'teamytelse', label: 'Team' },
   { value: 'prioritet', label: 'Prioritet' },
@@ -242,6 +242,28 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
                       {decodeBehandling(`${bt}Behandling`)}
                     </option>
                   ))}
+                </Select>
+              </Box>
+
+              <Box style={{ minWidth: '180px' }}>
+                <Select
+                  label="Kravbehandlingstype"
+                  size="small"
+                  value={searchParams.get('kravBehandlingType') || ''}
+                  onChange={(e) => {
+                    const next = new URLSearchParams(searchParams)
+                    if (e.target.value) {
+                      next.set('kravBehandlingType', e.target.value)
+                    } else {
+                      next.delete('kravBehandlingType')
+                    }
+                    setSearchParams(next)
+                  }}
+                >
+                  <option value="">Alle</option>
+                  <option value="AUTO">Automatisk</option>
+                  <option value="DEL_AUTO">Del-automatisk</option>
+                  <option value="MAN">Manuell</option>
                 </Select>
               </Box>
 

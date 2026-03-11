@@ -7,6 +7,7 @@ export type AnalyseParams = {
   fom: string
   tom: string
   aggregering: Aggregeringsniva
+  kravBehandlingType: string | null
   /** Query string: `behandlingType=...&fom=...&tom=...` */
   params: URLSearchParams
   /** Query string med aggregering: `behandlingType=...&fom=...&tom=...&aggregering=...` */
@@ -21,6 +22,7 @@ export function parseAnalyseParams(request: Request): AnalyseParams {
   const fom = url.searchParams.get('fom') || toIsoDate(sub(now, { days: 30 }))
   const tom = url.searchParams.get('tom') || toIsoDate(now)
   const aggregering = (url.searchParams.get('aggregering') || 'UKE') as Aggregeringsniva
+  const kravBehandlingType = url.searchParams.get('kravBehandlingType') || null
 
   // Send timestamps to backend: append time component only if not already present
   const fomTimestamp = fom.includes('T') ? fom : `${fom}T00:00:00.000`
@@ -29,5 +31,10 @@ export function parseAnalyseParams(request: Request): AnalyseParams {
   const params = new URLSearchParams({ behandlingType, fom: fomTimestamp, tom: tomTimestamp })
   const paramsAgg = new URLSearchParams({ behandlingType, fom: fomTimestamp, tom: tomTimestamp, aggregering })
 
-  return { behandlingType, fom, tom, aggregering, params, paramsAgg }
+  if (kravBehandlingType) {
+    params.set('kravBehandlingType', kravBehandlingType)
+    paramsAgg.set('kravBehandlingType', kravBehandlingType)
+  }
+
+  return { behandlingType, fom, tom, aggregering, kravBehandlingType, params, paramsAgg }
 }

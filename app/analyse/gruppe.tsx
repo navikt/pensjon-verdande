@@ -1,4 +1,5 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
@@ -7,6 +8,7 @@ import LastNedTabData from './components/LastNedTabData'
 import type { GruppeAnalyseResponse } from './types'
 import { formaterVarighet } from './utils/formattering'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { params } = parseAnalyseParams(request)
@@ -19,6 +21,25 @@ export default function GruppeTab({ loaderData }: Route.ComponentProps) {
   const behandlingType = searchParams.get('behandlingType') || 'FleksibelApSak'
   const fom = searchParams.get('fom') || ''
   const tom = searchParams.get('tom') || ''
+
+  const getValue = useCallback((item: (typeof data.grupper)[number], key: string) => {
+    switch (key) {
+      case 'gruppeId':
+        return item.gruppeId
+      case 'antallBehandlinger':
+        return item.antallBehandlinger
+      case 'antallFullfort':
+        return item.antallFullfort
+      case 'antallFeilet':
+        return item.antallFeilet
+      case 'gjennomsnittVarighetSekunder':
+        return item.gjennomsnittVarighetSekunder
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.grupper, 'antallBehandlinger', 'descending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -47,18 +68,28 @@ export default function GruppeTab({ loaderData }: Route.ComponentProps) {
           <Heading level="3" size="small">
             Topp 100 grupper
           </Heading>
-          <Table size="small" zebraStripes>
+          <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell>Gruppe-ID</Table.HeaderCell>
-                <Table.HeaderCell align="right">Behandlinger</Table.HeaderCell>
-                <Table.HeaderCell align="right">Fullført</Table.HeaderCell>
-                <Table.HeaderCell align="right">Feilet</Table.HeaderCell>
-                <Table.HeaderCell align="right">Snitt varighet</Table.HeaderCell>
+                <Table.ColumnHeader sortable sortKey="gruppeId">
+                  Gruppe-ID
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antallBehandlinger" align="right">
+                  Behandlinger
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antallFullfort" align="right">
+                  Fullført
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antallFeilet" align="right">
+                  Feilet
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="gjennomsnittVarighetSekunder" align="right">
+                  Snitt varighet
+                </Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.grupper.map((g) => (
+              {sorted.map((g) => (
                 <Table.Row key={g.gruppeId}>
                   <Table.DataCell>
                     <span style={{ fontFamily: 'monospace', fontSize: '0.85em' }}>{g.gruppeId}</span>

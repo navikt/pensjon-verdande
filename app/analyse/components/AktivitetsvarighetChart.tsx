@@ -7,17 +7,28 @@ import type { AktivitetsvarighetStatistikk } from '../types'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-function formatDuration(seconds: number): string {
+function defaultFormatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds.toFixed(1)}s`
   if (seconds < 3600) return `${(seconds / 60).toFixed(1)}m`
-  return `${(seconds / 3600).toFixed(1)}t`
+  if (seconds < 86400) return `${(seconds / 3600).toFixed(1)}t`
+  return `${(seconds / 86400).toFixed(1)}d`
 }
 
 interface Props {
   data: AktivitetsvarighetStatistikk[]
+  title?: string
+  ariaLabel?: string
+  xAxisLabel?: string
+  formatDuration?: (seconds: number) => string
 }
 
-export default function AktivitetsvarighetChart({ data }: Props) {
+export default function AktivitetsvarighetChart({
+  data,
+  title = 'Varighet per aktivitetssteg (sekunder)',
+  ariaLabel = 'Horisontalt søylediagram: Varighet per aktivitetssteg',
+  xAxisLabel = 'Sekunder',
+  formatDuration = defaultFormatDuration,
+}: Props) {
   const chartData = useMemo(() => {
     if (data.length === 0) return null
 
@@ -56,7 +67,7 @@ export default function AktivitetsvarighetChart({ data }: Props) {
     () => ({
       indexAxis: 'y' as const,
       plugins: {
-        title: { display: true, text: 'Varighet per aktivitetssteg (sekunder)' },
+        title: { display: true, text: title },
         legend: { display: true, position: 'top' as const },
         tooltip: {
           callbacks: {
@@ -69,14 +80,14 @@ export default function AktivitetsvarighetChart({ data }: Props) {
       scales: {
         x: {
           beginAtZero: true,
-          title: { display: true, text: 'Sekunder' },
+          title: { display: true, text: xAxisLabel },
           ticks: {
             callback: (value) => formatDuration(Number(value)),
           },
         },
       },
     }),
-    [],
+    [title, xAxisLabel, formatDuration],
   )
 
   if (!chartData) {
@@ -88,11 +99,7 @@ export default function AktivitetsvarighetChart({ data }: Props) {
   }
 
   return (
-    <div
-      style={{ height: `${Math.max(300, data.length * 60)}px` }}
-      role="img"
-      aria-label="Horisontalt søylediagram: Varighet per aktivitetssteg"
-    >
+    <div style={{ height: `${Math.max(300, data.length * 60)}px` }} role="img" aria-label={ariaLabel}>
       <Bar options={options} data={chartData} />
     </div>
   )

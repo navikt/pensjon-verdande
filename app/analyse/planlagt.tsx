@@ -1,12 +1,14 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/planlagt'
 import LastNedTabData from './components/LastNedTabData'
-import type { PlanlagtAnalyseResponse } from './types'
+import type { PlanlagtAnalyseResponse, PlanlagtDatapunkt } from './types'
 import { formaterVarighet } from './utils/formattering'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { paramsAgg } = parseAnalyseParams(request)
@@ -22,6 +24,23 @@ export default function PlanlagtTab({ loaderData }: Route.ComponentProps) {
 
   const totalt = data.antallMedPlanlagt + data.antallUtenPlanlagt
   const planlagtAndel = totalt > 0 ? `${((data.antallMedPlanlagt / totalt) * 100).toFixed(1)}%` : '–'
+
+  const getValue = useCallback((item: PlanlagtDatapunkt, key: string) => {
+    switch (key) {
+      case 'periodeFra':
+        return item.periodeFra
+      case 'antallPlanlagt':
+        return item.antallPlanlagt
+      case 'antallIkkePlanlagt':
+        return item.antallIkkePlanlagt
+      case 'gjennomsnittForsinkelseSekunder':
+        return item.gjennomsnittForsinkelseSekunder
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.datapunkter, 'periodeFra', 'ascending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -62,17 +81,25 @@ export default function PlanlagtTab({ loaderData }: Route.ComponentProps) {
           <Heading level="3" size="small">
             Planlegging over tid
           </Heading>
-          <Table size="small" zebraStripes>
+          <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell>Periode</Table.HeaderCell>
-                <Table.HeaderCell align="right">Planlagt</Table.HeaderCell>
-                <Table.HeaderCell align="right">Ikke planlagt</Table.HeaderCell>
-                <Table.HeaderCell align="right">Snitt forsinkelse</Table.HeaderCell>
+                <Table.ColumnHeader sortable sortKey="periodeFra">
+                  Periode
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antallPlanlagt" align="right">
+                  Planlagt
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antallIkkePlanlagt" align="right">
+                  Ikke planlagt
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="gjennomsnittForsinkelseSekunder" align="right">
+                  Snitt forsinkelse
+                </Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.datapunkter.map((d) => (
+              {sorted.map((d) => (
                 <Table.Row key={d.periodeFra}>
                   <Table.DataCell>{d.periodeFra}</Table.DataCell>
                   <Table.DataCell align="right">{d.antallPlanlagt.toLocaleString('nb-NO')}</Table.DataCell>
