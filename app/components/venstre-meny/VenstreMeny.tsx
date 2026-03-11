@@ -213,9 +213,9 @@ export default function VenstreMeny(props: Props) {
             <li>
               <NavLink to="/brev-bestilling" className={({ isActive }) => (isActive ? styles.active : '')}>
                 <span className={styles.menyIkon}>
-                  <EnvelopeClosedIcon title="Brev-bestilling" fontSize="1.5rem" />
+                  <EnvelopeClosedIcon title="Brevbestilling" fontSize="1.5rem" />
                 </span>
-                <span className={styles.menyTekst}>Brev-bestilling</span>
+                <span className={styles.menyTekst}>Brevbestilling</span>
               </NavLink>
             </li>
           )}
