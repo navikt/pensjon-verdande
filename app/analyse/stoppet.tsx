@@ -5,6 +5,7 @@ import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/stoppet'
 import LastNedTabData from './components/LastNedTabData'
+import StopprateTidsserieChart from './components/StopprateTidsserieChart'
 import type { StoppetAnalyseResponse } from './types'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
 import { useSortableTable } from './utils/useSortableTable'
@@ -124,6 +125,7 @@ export default function StoppetTab({ loaderData }: Route.ComponentProps) {
           <Heading level="3" size="small">
             Stopprate over tid
           </Heading>
+          <StopprateTidsserieChart data={data.datapunkter} />
           <Table size="small" zebraStripes sort={sortTidsserie} onSortChange={handleSortTidsserie}>
             <Table.Header>
               <Table.Row>
