@@ -1,12 +1,14 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/teamytelse'
 import LastNedTabData from './components/LastNedTabData'
-import type { TeamytelseResponse } from './types'
+import type { TeamStatistikk, TeamytelseResponse } from './types'
 import { formaterVarighet } from './utils/formattering'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { params } = parseAnalyseParams(request)
@@ -22,6 +24,33 @@ export default function TeamytelseTab({ loaderData }: Route.ComponentProps) {
 
   const totalAntall = data.team.reduce((s, t) => s + t.antall, 0)
   const antallTeam = data.team.length
+
+  const getValue = useCallback((item: TeamStatistikk, key: string): number | string | null => {
+    switch (key) {
+      case 'ansvarligTeam':
+        return item.ansvarligTeam
+      case 'antall':
+        return item.antall
+      case 'antallFullfort':
+        return item.antallFullfort
+      case 'antallFeilet':
+        return item.antallFeilet
+      case 'antallStoppet':
+        return item.antallStoppet
+      case 'fullforingsrate':
+        return item.fullforingsrate
+      case 'feilrate':
+        return item.feilrate
+      case 'gjennomsnittVarighetSekunder':
+        return item.gjennomsnittVarighetSekunder
+      case 'medianVarighetSekunder':
+        return item.medianVarighetSekunder
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.team, 'antall', 'descending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -46,22 +75,40 @@ export default function TeamytelseTab({ loaderData }: Route.ComponentProps) {
       </HStack>
 
       {data.team.length > 0 && (
-        <Table size="small" zebraStripes>
+        <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Team</Table.HeaderCell>
-              <Table.HeaderCell align="right">Antall</Table.HeaderCell>
-              <Table.HeaderCell align="right">Fullført</Table.HeaderCell>
-              <Table.HeaderCell align="right">Feilet</Table.HeaderCell>
-              <Table.HeaderCell align="right">Stoppet</Table.HeaderCell>
-              <Table.HeaderCell align="right">Fullføringsrate</Table.HeaderCell>
-              <Table.HeaderCell align="right">Feilrate</Table.HeaderCell>
-              <Table.HeaderCell align="right">Snitt varighet</Table.HeaderCell>
-              <Table.HeaderCell align="right">Median varighet</Table.HeaderCell>
+              <Table.ColumnHeader sortable sortKey="ansvarligTeam">
+                Team
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antall" align="right">
+                Antall
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antallFullfort" align="right">
+                Fullført
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antallFeilet" align="right">
+                Feilet
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="antallStoppet" align="right">
+                Stoppet
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="fullforingsrate" align="right">
+                Fullføringsrate
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="feilrate" align="right">
+                Feilrate
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="gjennomsnittVarighetSekunder" align="right">
+                Snitt varighet
+              </Table.ColumnHeader>
+              <Table.ColumnHeader sortable sortKey="medianVarighetSekunder" align="right">
+                Median varighet
+              </Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {data.team.map((t) => (
+            {sorted.map((t) => (
               <Table.Row key={t.ansvarligTeam}>
                 <Table.DataCell>{t.ansvarligTeam}</Table.DataCell>
                 <Table.DataCell align="right">{t.antall.toLocaleString('nb-NO')}</Table.DataCell>

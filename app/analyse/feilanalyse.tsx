@@ -1,4 +1,5 @@
 import { BodyShort, Heading, HStack, Table, VStack } from '@navikt/ds-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
@@ -7,6 +8,7 @@ import FeilTidsserieChart from './components/FeilTidsserieChart'
 import LastNedTabData from './components/LastNedTabData'
 import type { FeilAnalyseResponse } from './types'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
+import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { paramsAgg } = parseAnalyseParams(request)
@@ -19,6 +21,21 @@ export default function FeilanalyseTab({ loaderData }: Route.ComponentProps) {
   const behandlingType = searchParams.get('behandlingType') || 'FleksibelApSak'
   const fom = searchParams.get('fom') || ''
   const tom = searchParams.get('tom') || ''
+
+  const getValue = useCallback((item: FeilAnalyseResponse['toppFeilmeldinger'][number], key: string) => {
+    switch (key) {
+      case 'feilmelding':
+        return item.feilmelding
+      case 'antall':
+        return item.antall
+      case 'sisteOpptreden':
+        return item.sisteOpptreden
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(data.toppFeilmeldinger, 'antall', 'descending', getValue)
 
   return (
     <VStack gap="space-16">
@@ -49,17 +66,23 @@ export default function FeilanalyseTab({ loaderData }: Route.ComponentProps) {
           <Heading level="3" size="small">
             Topp feilmeldinger
           </Heading>
-          <Table size="small" zebraStripes>
+          <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>#</Table.HeaderCell>
-                <Table.HeaderCell>Feilmelding</Table.HeaderCell>
-                <Table.HeaderCell align="right">Antall</Table.HeaderCell>
-                <Table.HeaderCell>Sist sett</Table.HeaderCell>
+                <Table.ColumnHeader sortable sortKey="feilmelding">
+                  Feilmelding
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="antall" align="right">
+                  Antall
+                </Table.ColumnHeader>
+                <Table.ColumnHeader sortable sortKey="sisteOpptreden">
+                  Sist sett
+                </Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.toppFeilmeldinger.map((feil, idx) => (
+              {sorted.map((feil, idx) => (
                 <Table.Row key={feil.feilmelding}>
                   <Table.DataCell>{idx + 1}</Table.DataCell>
                   <Table.DataCell>

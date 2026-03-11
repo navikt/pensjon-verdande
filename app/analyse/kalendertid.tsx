@@ -3,16 +3,16 @@ import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
 import { AnalyseErrorAlert } from '~/analyse/utils/AnalyseErrorAlert'
 import { apiGet } from '~/services/api.server'
-import type { Route } from './+types/aktivitetsvarighet'
+import type { Route } from './+types/kalendertid'
 import AktivitetsvarighetChart from './components/AktivitetsvarighetChart'
 import LastNedTabData from './components/LastNedTabData'
-import type { AktivitetsvarighetResponse, AktivitetsvarighetStatistikk } from './types'
+import type { AktivitetKalendertidResponse, AktivitetKalendertidStatistikk } from './types'
 import { parseAnalyseParams } from './utils/parseAnalyseParams'
 import { useSortableTable } from './utils/useSortableTable'
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { params } = parseAnalyseParams(request)
-  return await apiGet<AktivitetsvarighetResponse>(`/api/behandling/analyse/aktivitetsvarighet?${params}`, request)
+  return await apiGet<AktivitetKalendertidResponse>(`/api/behandling/analyse/aktivitet-kalendertid?${params}`, request)
 }
 
 function formatDuration(seconds: number): string {
@@ -22,7 +22,7 @@ function formatDuration(seconds: number): string {
   return `${(seconds / 86400).toFixed(1)}d`
 }
 
-export default function AktivitetsvarighetTab({ loaderData }: Route.ComponentProps) {
+export default function KalendertidTab({ loaderData }: Route.ComponentProps) {
   const data = loaderData
   const [searchParams] = useSearchParams()
   const behandlingType = searchParams.get('behandlingType') || 'FleksibelApSak'
@@ -35,7 +35,7 @@ export default function AktivitetsvarighetTab({ loaderData }: Route.ComponentPro
       ? [...data.aktiviteter].sort((a, b) => b.gjennomsnittSekunder - a.gjennomsnittSekunder)[0]
       : null
 
-  const getValue = useCallback((item: AktivitetsvarighetStatistikk, key: string): number | string | null => {
+  const getValue = useCallback((item: AktivitetKalendertidStatistikk, key: string): number | string | null => {
     switch (key) {
       case 'aktivitetType':
         return item.aktivitetType
@@ -70,9 +70,9 @@ export default function AktivitetsvarighetTab({ loaderData }: Route.ComponentPro
   return (
     <VStack gap="space-16">
       <BodyShort size="small" textColor="subtle">
-        Flaskehalsanalyse viser gjennomsnittlig tidsbruk per aktivitetssteg i behandlingen. Identifiser de tregeste
-        stegene for å finne optimaliseringsmuligheter. Andel av total viser hvor stor del av behandlingstiden hvert steg
-        utgjør.
+        Kalendertid viser total ventetid fra en aktivitet opprettes til siste kjøring er fullført, inkludert pauser,
+        ventetid og gjenforsøk. Til forskjell fra flaskehalsanalysen (som viser ren prosesseringstid) gir dette et bilde
+        av den reelle kalendertiden en aktivitet tar.
       </BodyShort>
 
       <HStack gap="space-24" wrap>
@@ -80,13 +80,13 @@ export default function AktivitetsvarighetTab({ loaderData }: Route.ComponentPro
           <Heading level="3" size="large">
             {formatDuration(totalSnitt)}
           </Heading>
-          <BodyShort size="small">Sum snitt</BodyShort>
+          <BodyShort size="small">Sum snitt kalendertid</BodyShort>
         </VStack>
         {tregestAktivitet && (
           <Box borderWidth="2" padding="space-16" borderRadius="4" borderColor="warning">
             <VStack gap="space-4">
               <BodyShort size="small" weight="semibold">
-                Tregeste steg
+                Lengst kalendertid
               </BodyShort>
               <BodyShort size="small" style={{ fontFamily: 'monospace' }}>
                 {tregestAktivitet.aktivitetType}
@@ -104,12 +104,19 @@ export default function AktivitetsvarighetTab({ loaderData }: Route.ComponentPro
         )}
       </HStack>
 
-      {data.aktiviteter.length > 0 && <AktivitetsvarighetChart data={data.aktiviteter} />}
+      {data.aktiviteter.length > 0 && (
+        <AktivitetsvarighetChart
+          data={data.aktiviteter}
+          title="Kalendertid per aktivitetssteg"
+          ariaLabel="Horisontalt søylediagram: Kalendertid per aktivitetssteg"
+          xAxisLabel="Tid"
+        />
+      )}
 
       {data.aktiviteter.length > 0 && (
         <VStack gap="space-8">
           <Heading level="3" size="small">
-            Varighetsdetaljer per aktivitetssteg
+            Kalendertid per aktivitetssteg
           </Heading>
           <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
             <Table.Header>
@@ -167,12 +174,12 @@ export default function AktivitetsvarighetTab({ loaderData }: Route.ComponentPro
       )}
 
       <HStack justify="end">
-        <LastNedTabData data={data.aktiviteter} filnavn={`aktivitetsvarighet-${behandlingType}-${fom}-${tom}`} />
+        <LastNedTabData data={data.aktiviteter} filnavn={`kalendertid-${behandlingType}-${fom}-${tom}`} />
       </HStack>
     </VStack>
   )
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  return <AnalyseErrorAlert error={error} label="aktivitetsvarighetsdata" />
+  return <AnalyseErrorAlert error={error} label="kalendertidsdata" />
 }

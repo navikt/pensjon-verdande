@@ -24,6 +24,7 @@ export default [
       route('ko', 'analyse/ko.tsx'),
       route('gjenforsok', 'analyse/gjenforsok.tsx'),
       route('aktivitetsvarighet', 'analyse/aktivitetsvarighet.tsx'),
+      route('kalendertid', 'analyse/kalendertid.tsx'),
       route('tidspunkt', 'analyse/tidspunkt.tsx'),
       route('teamytelse', 'analyse/teamytelse.tsx'),
       route('prioritet', 'analyse/prioritet.tsx'),

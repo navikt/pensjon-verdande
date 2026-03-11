@@ -1,11 +1,12 @@
 import { BodyShort, Box, Heading, HStack, Select, Table, VStack } from '@navikt/ds-react'
 import type { ChartData, ChartOptions } from 'chart.js'
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js'
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Bar, Pie } from 'react-chartjs-2'
 import type { KontrollpunktTidsserieDatapunkt, KontrollpunktTypeStatistikk } from '../types'
 import { getPaletteColor } from '../utils/chartColors'
 import { formaterPeriodeLabel, formaterTall } from '../utils/formattering'
+import { useSortableTable } from '../utils/useSortableTable'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
@@ -34,6 +35,23 @@ export default function KontrollpunktAnalyse({ data, tidsserie }: Props) {
   )
 
   const top10 = useMemo(() => [...filteredData].sort((a, b) => b.antall - a.antall).slice(0, 10), [filteredData])
+
+  const getValue = useCallback((item: KontrollpunktTypeStatistikk, key: string) => {
+    switch (key) {
+      case 'type':
+        return item.kontrollpunktType
+      case 'kravStatus':
+        return item.kravStatus
+      case 'antall':
+        return item.antall
+      case 'kritiske':
+        return item.antallKritiske
+      default:
+        return null
+    }
+  }, [])
+
+  const { sort, handleSort, sorted } = useSortableTable(top10, 'antall', 'descending', getValue)
   const andre = useMemo(() => {
     const top10Keys = new Set(top10.map((k) => `${k.kontrollpunktType}|${k.kravStatus}`))
     return filteredData
@@ -186,17 +204,25 @@ export default function KontrollpunktAnalyse({ data, tidsserie }: Props) {
       <Heading level="3" size="small">
         Topp 10 kontrollpunkttyper
       </Heading>
-      <Table size="small" zebraStripes>
+      <Table size="small" zebraStripes sort={sort} onSortChange={handleSort}>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>Type</Table.ColumnHeader>
-            <Table.ColumnHeader>Kravstatus</Table.ColumnHeader>
-            <Table.ColumnHeader align="right">Antall</Table.ColumnHeader>
-            <Table.ColumnHeader align="right">Kritiske</Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="type">
+              Type
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="kravStatus">
+              Kravstatus
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="antall" align="right">
+              Antall
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="kritiske" align="right">
+              Kritiske
+            </Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {top10.map((kp) => (
+          {sorted.map((kp) => (
             <Table.Row key={`${kp.kontrollpunktType}|${kp.kravStatus}`}>
               <Table.DataCell>{kp.kontrollpunktType}</Table.DataCell>
               <Table.DataCell>{kp.kravStatus}</Table.DataCell>
