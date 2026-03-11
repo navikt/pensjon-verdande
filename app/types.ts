@@ -269,6 +269,7 @@ export type DashboardResponse = {
   ukjenteBehandlingstyper: string[]
   behandlingAntall: BehandlingAntall[]
   opprettetPerDag: DatoAntall[]
+  aktivitetDatapunkter: { periodeFra: string; status: string; antall: number }[]
 }
 
 export type TotaltAntallBehandlingerResponse = {

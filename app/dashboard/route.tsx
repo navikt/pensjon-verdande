@@ -7,8 +7,10 @@ import {
 import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
 import { Await } from 'react-router'
+import type { TidsserieResponse } from '~/analyse/types'
 import { asLocalDateString } from '~/common/date'
 import { formatNumber } from '~/common/number'
+import { AktivitetChartCard } from '~/components/aktivitet-chart/AktivitetChartCard'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
@@ -32,6 +34,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const fom = new Date()
   fom.setDate(fom.getDate() - defaultDager)
   const fomStr = asLocalDateString(fom)
+  const tomStr = asLocalDateString(new Date())
+
+  const tidsserieParams = new URLSearchParams({
+    fom: `${fomStr}T00:00:00.000`,
+    tom: `${tomStr}T23:59:59.999`,
+    aggregering: 'DAG',
+  })
 
   const dashboardResponse = Promise.all([
     apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
@@ -53,6 +62,9 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     apiGet<OpprettetPerDagResponse>(`/api/behandling/oppsummering-opprettet-per-dag?fom=${fomStr}`, request).then(
       (it) => it.opprettetPerDag,
     ),
+    apiGet<TidsserieResponse>(`/api/behandling/analyse/tidsserie?${tidsserieParams}`, request).then(
+      (it) => it.datapunkter,
+    ),
   ]).then((it) => ({
     totaltAntallBehandlinger: it[0],
     feilendeBehandlinger: it[1],
@@ -60,6 +72,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     antallUferdigeBehandlinger: it[3],
     behandlingAntall: it[4],
     opprettetPerDag: it[5],
+    aktivitetDatapunkter: it[6],
   }))
 
   return {
@@ -84,6 +97,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <Skeleton variant="rounded" width="100%" height={550} />
             <Skeleton variant="rounded" width="100%" height={550} />
           </HGrid>
+          <Skeleton variant="rounded" width="100%" height={350} />
         </VStack>
       }
     >
@@ -122,6 +136,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   <BehandlingerPerDagLineChartCard opprettetPerDag={dashboardResponse.opprettetPerDag} />
                   <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
                 </HGrid>
+                <AktivitetChartCard datapunkter={dashboardResponse.aktivitetDatapunkter} />
               </VStack>
             )
           )

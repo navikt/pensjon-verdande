@@ -145,6 +145,23 @@ export function mockDashboardResponse(overrides?: Partial<DashboardResponse>): D
     ukjenteBehandlingstyper: [],
     behandlingAntall,
     opprettetPerDag,
+    aktivitetDatapunkter: [
+      { periodeFra: '2024-06-10T00:00:00', status: 'FULLFORT', antall: 10 },
+      { periodeFra: '2024-06-10T00:00:00', status: 'UNDER_BEHANDLING', antall: 3 },
+      { periodeFra: '2024-06-10T00:00:00', status: 'STOPPET', antall: 1 },
+      { periodeFra: '2024-06-11T00:00:00', status: 'FULLFORT', antall: 15 },
+      { periodeFra: '2024-06-11T00:00:00', status: 'UNDER_BEHANDLING', antall: 5 },
+      { periodeFra: '2024-06-11T00:00:00', status: 'STOPPET', antall: 2 },
+      { periodeFra: '2024-06-12T00:00:00', status: 'FULLFORT', antall: 8 },
+      { periodeFra: '2024-06-12T00:00:00', status: 'UNDER_BEHANDLING', antall: 2 },
+      { periodeFra: '2024-06-13T00:00:00', status: 'FULLFORT', antall: 22 },
+      { periodeFra: '2024-06-13T00:00:00', status: 'UNDER_BEHANDLING', antall: 4 },
+      { periodeFra: '2024-06-13T00:00:00', status: 'STOPPET', antall: 1 },
+      { periodeFra: '2024-06-14T00:00:00', status: 'FULLFORT', antall: 12 },
+      { periodeFra: '2024-06-14T00:00:00', status: 'UNDER_BEHANDLING', antall: 3 },
+      { periodeFra: '2024-06-15T00:00:00', status: 'FULLFORT', antall: 6 },
+      { periodeFra: '2024-06-15T00:00:00', status: 'STOPPET', antall: 1 },
+    ],
     ...overrides,
   }
 }
