@@ -1,35 +1,19 @@
-import { asLocalDateString } from '~/common/date'
+import type { TidsserieResponse } from '~/analyse/types'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/aktivitet-per-dag'
 
-type TidsserieDatapunkt = {
-  periodeFra: string
-  status: string
-  antall: number
-}
-
-type TidsserieResponse = {
-  behandlingType: string | null
-  fom: string
-  tom: string
-  aggregering: string
-  datapunkter: TidsserieDatapunkt[]
-}
-
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { searchParams } = new URL(request.url)
-  const parsed = Number.parseInt(searchParams.get('dager') ?? '30', 10)
-  const dager = Number.isFinite(parsed) && parsed > 0 && parsed <= 3650 ? parsed : 30
+  const parsed = Number.parseInt(searchParams.get('timer') ?? '24', 10)
+  const timer = Number.isFinite(parsed) && parsed > 0 && parsed <= 8760 ? parsed : 24
 
   const fom = new Date()
-  fom.setDate(fom.getDate() - dager)
-  const fomStr = asLocalDateString(fom)
-  const tomStr = asLocalDateString(new Date())
+  fom.setTime(fom.getTime() - timer * 60 * 60 * 1000)
 
   const params = new URLSearchParams({
-    fom: `${fomStr}T00:00:00.000`,
-    tom: `${tomStr}T23:59:59.999`,
-    aggregering: 'DAG',
+    fom: fom.toISOString(),
+    tom: new Date().toISOString(),
+    aggregering: 'TIME',
   })
 
   return await apiGet<TidsserieResponse>(`/api/behandling/analyse/tidsserie?${params}`, request)

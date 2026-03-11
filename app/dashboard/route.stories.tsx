@@ -27,7 +27,7 @@ export const Empty: Story = {
         feilendeBehandlinger: 0,
         antallUferdigeBehandlinger: 0,
         behandlingAntall: [],
-        opprettetPerDag: [],
+        aktivitetDatapunkter: [],
         ukjenteBehandlingstyper: [],
       }),
     }),

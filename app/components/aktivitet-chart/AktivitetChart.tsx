@@ -11,18 +11,13 @@ import {
 } from 'chart.js'
 import { useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
+import type { TidsserieDatapunkt } from '~/analyse/types'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
-type TidsserieDatapunkt = {
-  periodeFra: string
-  status: string
-  antall: number
-}
-
 type Props = {
   datapunkter: TidsserieDatapunkt[]
-  antallDager: number
+  antallTimer: number
   maintainAspectRatio?: boolean
 }
 
@@ -46,12 +41,17 @@ const statusConfig: Record<string, { label: string; borderColor: string; backgro
 
 const statusOrder = ['FULLFORT', 'UNDER_BEHANDLING', 'STOPPET']
 
-function formatDate(iso: string): string {
-  const [, month, day] = iso.split('T')[0].split('-')
-  return `${day}.${month}`
+function formatLabel(iso: string, antallTimer: number): string {
+  const [datePart, timePart] = iso.split('T')
+  const [, month, day] = datePart.split('-')
+  const hour = timePart?.substring(0, 2) ?? '00'
+  if (antallTimer <= 48) {
+    return `${hour}:00`
+  }
+  return `${day}.${month} ${hour}:00`
 }
 
-export function AktivitetChart({ datapunkter, antallDager, maintainAspectRatio }: Props) {
+export function AktivitetChart({ datapunkter, antallTimer, maintainAspectRatio }: Props) {
   const chartData = useMemo(() => {
     if (datapunkter.length === 0) return null
 
@@ -63,10 +63,13 @@ export function AktivitetChart({ datapunkter, antallDager, maintainAspectRatio }
       dataMap.get(dp.periodeFra)?.set(dp.status, dp.antall)
     }
 
-    const statuser = statusOrder.filter((s) => datapunkter.some((d) => d.status === s))
+    const statuser = [
+      ...statusOrder.filter((s) => datapunkter.some((d) => d.status === s)),
+      ...[...new Set(datapunkter.map((d) => d.status))].filter((s) => !statusOrder.includes(s)),
+    ]
 
     return {
-      labels: perioder.map(formatDate),
+      labels: perioder.map((p) => formatLabel(p, antallTimer)),
       datasets: statuser.map((status) => {
         const config = statusConfig[status] ?? {
           label: status,
@@ -81,11 +84,11 @@ export function AktivitetChart({ datapunkter, antallDager, maintainAspectRatio }
           borderWidth: 2,
           fill: true,
           tension: 0.3,
-          pointRadius: antallDager > 30 ? 1 : 3,
+          pointRadius: antallTimer > 48 ? 1 : 3,
         }
       }),
     }
-  }, [datapunkter, antallDager])
+  }, [datapunkter, antallTimer])
 
   if (!chartData) return null
 
