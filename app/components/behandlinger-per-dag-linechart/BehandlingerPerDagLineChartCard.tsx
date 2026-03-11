@@ -29,13 +29,19 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
   }, [antallDager, fetcherLoad, cache])
 
   useEffect(() => {
-    if (fetcher.data?.opprettetPerDag && fetcher.state === 'idle' && pendingKeyRef.current !== null) {
+    if (
+      fetcher.data &&
+      'opprettetPerDag' in fetcher.data &&
+      fetcher.state === 'idle' &&
+      pendingKeyRef.current !== null
+    ) {
       const key = pendingKeyRef.current
       pendingKeyRef.current = null
       setCache((prev) => new Map(prev).set(key, fetcher.data?.opprettetPerDag ?? []))
     }
   }, [fetcher.data, fetcher.state])
 
+  const displayedDager = cache.has(antallDager) ? antallDager : DEFAULT_ANTALL_DAGER
   const opprettetPerDag = cache.get(antallDager) ?? props.opprettetPerDag
   const isLoading = fetcher.state === 'loading' && !cache.has(antallDager)
 
@@ -81,13 +87,13 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
         >
           <BehandlingerPerDagLineChart
             opprettetPerDag={opprettetPerDag}
-            antallDager={antallDager}
+            antallDager={displayedDager}
             maintainAspectRatio={false}
           />
         </div>
       ) : (
         <div style={{ opacity: isLoading ? 0.5 : 1 }}>
-          <BehandlingerPerDagLineChart opprettetPerDag={opprettetPerDag} antallDager={antallDager} />
+          <BehandlingerPerDagLineChart opprettetPerDag={opprettetPerDag} antallDager={displayedDager} />
         </div>
       )}
     </Box>
