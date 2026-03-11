@@ -7,6 +7,7 @@ import {
 import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
 import { Await } from 'react-router'
+import { asLocalDateString } from '~/common/date'
 import { formatNumber } from '~/common/number'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
@@ -32,7 +33,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const defaultDager = 30
   const fom = new Date()
   fom.setDate(fom.getDate() - defaultDager)
-  const fomStr = fom.toISOString().split('T')[0]
+  const fomStr = asLocalDateString(fom)
 
   const dashboardResponse = Promise.all([
     apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
