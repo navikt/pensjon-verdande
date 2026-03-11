@@ -57,8 +57,6 @@ export const DashboardFullpage: Story = {
   render: () =>
     renderWithLayout(Dashboard, {
       loadingDashboardResponse: mockDashboardResponse(),
-      kalenderHendelser: mockKalenderHendelser,
-      startDato: new Date('2024-06-15'),
     }),
 }
 
@@ -1048,8 +1046,6 @@ export const DashboardGlobalStoppetFullpage: Story = {
       Dashboard,
       {
         loadingDashboardResponse: mockDashboardResponse(),
-        kalenderHendelser: mockKalenderHendelser,
-        startDato: new Date('2024-06-15'),
       },
       { schedulerStatus: { schedulerEnabled: false, schedulerLocal: false } },
     ),
@@ -1062,8 +1058,6 @@ export const DashboardDeaktiverteBehandlingerFullpage: Story = {
       Dashboard,
       {
         loadingDashboardResponse: mockDashboardResponse(),
-        kalenderHendelser: mockKalenderHendelser,
-        startDato: new Date('2024-06-15'),
       },
       {
         schedulerStatus: {

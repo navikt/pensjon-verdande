@@ -12,9 +12,7 @@ import { formatNumber } from '~/common/number'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
-import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { apiGet } from '~/services/api.server'
-import { hentKalenderHendelser } from '~/services/behandling.server'
 import type {
   AntallUferdigeBehandlingerResponse,
   BehandlingAntallResponse,
@@ -64,30 +62,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     opprettetPerDag: it[5],
   }))
 
-  if (!dashboardResponse) {
-    throw new Response('Not Found', { status: 404 })
-  }
-
-  const { searchParams } = new URL(request.url)
-
-  const dato = searchParams.get('dato')
-
-  const startDato = dato ? new Date(dato) : new Date()
-
-  const { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(startDato)
-
   return {
     loadingDashboardResponse: dashboardResponse,
-    kalenderHendelser: await hentKalenderHendelser(request, {
-      fom: forsteDato,
-      tom: sisteDato,
-    }),
-    startDato: startDato,
   }
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  const { kalenderHendelser, loadingDashboardResponse, startDato } = loaderData
+  const { loadingDashboardResponse } = loaderData
 
   return (
     <React.Suspense
@@ -100,13 +81,8 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <Skeleton variant="rounded" width="100%" height={70} />
           </HGrid>
           <HGrid gap="space-24" style={{ paddingTop: '12px' }} columns={2}>
-            <VStack gap="space-24">
-              <Skeleton variant="rounded" width="100%" height={550} />
-              <Skeleton variant="rounded" width="100%" height={550} />
-            </VStack>
-            <VStack gap="space-24">
-              <Skeleton variant="rounded" width="100%" height={1024} />
-            </VStack>
+            <Skeleton variant="rounded" width="100%" height={550} />
+            <Skeleton variant="rounded" width="100%" height={550} />
           </HGrid>
         </VStack>
       }
@@ -143,18 +119,8 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   />
                 </HGrid>
                 <HGrid gap="space-24" columns={2}>
-                  <VStack gap="space-24">
-                    <BehandlingerPerDagLineChartCard opprettetPerDag={dashboardResponse.opprettetPerDag} />
-                    <Kalender
-                      kalenderHendelser={kalenderHendelser}
-                      maksAntallPerDag={6}
-                      startDato={startDato}
-                      visKlokkeSlett={false}
-                    ></Kalender>
-                  </VStack>
-                  <VStack gap="space-24">
-                    <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
-                  </VStack>
+                  <BehandlingerPerDagLineChartCard opprettetPerDag={dashboardResponse.opprettetPerDag} />
+                  <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
                 </HGrid>
               </VStack>
             )
