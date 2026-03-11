@@ -46,7 +46,10 @@ export default function BehandlingAntallTable(props: Props) {
                 <Table.DataCell align={'right'}>{index + 1}</Table.DataCell>
                 <Table.DataCell>
                   <HStack>
-                    <Link as={NavLink} to={`/behandlinger?behandlingType=${it.behandlingType ?? it.navn}`}>
+                    <Link
+                      as={NavLink}
+                      to={`/behandlinger?behandlingType=${encodeURIComponent(it.behandlingType ?? it.navn)}`}
+                    >
                       {decodeBehandling(it.behandlingType ?? it.navn)}
                     </Link>
                     {it.behandlingType === null && (
@@ -70,7 +73,7 @@ export default function BehandlingAntallTable(props: Props) {
           onClick={() => setVisAlle(!visAlle)}
           style={{ marginTop: '8px', width: '100%' }}
         >
-          {visAlle ? 'Vis topp 10' : `Vis alle (${sortedOppsummering.length})`}
+          {visAlle ? `Vis topp ${DEFAULT_VISIBLE_ROWS}` : `Vis alle (${sortedOppsummering.length})`}
         </Button>
       )}
     </>

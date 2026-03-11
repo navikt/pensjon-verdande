@@ -11,4 +11,4 @@ node_modules
 .zed/
 storybook-static/
 screenshots/
-app/components/venstre-meny/.VenstreMeny.tsx.swp
+*.swp
