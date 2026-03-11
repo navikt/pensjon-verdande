@@ -517,8 +517,7 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
           <Modal.Body>
             <VStack gap="space-16">
               <Box>
-                <Label size="small">Grupper etter</Label>
-                <CheckboxGroup legend="" hideLegend size="small" value={searchParams.getAll(GROUP_PARAM)}>
+                <CheckboxGroup legend="Grupper etter" size="small" value={searchParams.getAll(GROUP_PARAM)}>
                   {FACETS.map((f) => (
                     <Checkbox key={`gb-${f}`} value={f} onChange={() => onToggleGroupBy(f)}>
                       {facetLabel(f)}
@@ -559,8 +558,7 @@ function FacetSection({
 }) {
   return (
     <VStack gap="space-8">
-      <Label size="small">{title}</Label>
-      <CheckboxGroup legend="" hideLegend size="small" value={[...selected]}>
+      <CheckboxGroup legend={title} size="small" value={[...selected]}>
         {options.map((opt) => {
           const enc = encodeValue(opt.value)
           const isDisabled = opt.count === 0
