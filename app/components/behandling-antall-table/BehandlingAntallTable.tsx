@@ -17,7 +17,7 @@ export default function BehandlingAntallTable(props: Props) {
   const [visAlle, setVisAlle] = useState(false)
 
   const sortedOppsummering: BehandlingAntall[] = React.useMemo(() => {
-    return props.oppsummering.sort(sortFunc)
+    return props.oppsummering.slice().sort(sortFunc)
   }, [props.oppsummering, sortFunc])
 
   const harFlereEnnDefault = sortedOppsummering.length > DEFAULT_VISIBLE_ROWS

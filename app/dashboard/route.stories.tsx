@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import type { BehandlingAntall } from '~/types'
 import { mockDashboardResponse } from '../../.storybook/mocks/data'
 import { renderWithLoader } from '../../.storybook/mocks/router'
 import Dashboard from './route'
@@ -28,6 +29,21 @@ export const Empty: Story = {
         behandlingAntall: [],
         opprettetPerDag: [],
         ukjenteBehandlingstyper: [],
+      }),
+    }),
+}
+
+const mangeBehandlingstyper: BehandlingAntall[] = Array.from({ length: 15 }, (_, i) => ({
+  navn: `Behandlingstype ${i + 1}`,
+  behandlingType: `Type${i + 1}`,
+  antall: 100 - i * 5,
+}))
+
+export const MedVisAlleKnapp: Story = {
+  render: () =>
+    renderWithLoader(Dashboard, {
+      loadingDashboardResponse: mockDashboardResponse({
+        behandlingAntall: mangeBehandlingstyper,
       }),
     }),
 }

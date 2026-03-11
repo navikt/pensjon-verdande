@@ -62,10 +62,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     opprettetPerDag: it[5],
   }))
 
-  if (!dashboardResponse) {
-    throw new Response('Not Found', { status: 404 })
-  }
-
   return {
     loadingDashboardResponse: dashboardResponse,
   }
