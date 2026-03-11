@@ -29,6 +29,11 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
+  const defaultDager = 30
+  const fom = new Date()
+  fom.setDate(fom.getDate() - defaultDager)
+  const fomStr = fom.toISOString().split('T')[0]
+
   const dashboardResponse = Promise.all([
     apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
       (it) => it.totaltAntallBehandlinger,
@@ -46,7 +51,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     apiGet<BehandlingAntallResponse>('/api/behandling/oppsummering-behandling-antall', request).then(
       (it) => it.behandlingAntall,
     ),
-    apiGet<OpprettetPerDagResponse>('/api/behandling/oppsummering-opprettet-per-dag', request).then(
+    apiGet<OpprettetPerDagResponse>(`/api/behandling/oppsummering-opprettet-per-dag?fom=${fomStr}`, request).then(
       (it) => it.opprettetPerDag,
     ),
   ]).then((it) => ({
