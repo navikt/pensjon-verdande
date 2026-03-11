@@ -1,6 +1,7 @@
 import { AreaChartFillIcon } from '@navikt/aksel-icons'
 import { Box, Button, HStack, Spacer } from '@navikt/ds-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useFetcher } from 'react-router'
 import { BehandlingerPerDagLineChart } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChart'
 import type { DatoAntall } from '~/types'
 
@@ -9,8 +10,40 @@ type Props = {
   chartHeight?: number
 }
 
+const DEFAULT_ANTALL_DAGER = 30
+
 export function BehandlingerPerDagLineChartCard(props: Props) {
-  const [antallDager, setAntallDager] = useState(30)
+  const [antallDager, setAntallDager] = useState(DEFAULT_ANTALL_DAGER)
+  const fetcher = useFetcher<{ opprettetPerDag: DatoAntall[] }>()
+  const [cache, setCache] = useState<Map<number, DatoAntall[]>>(
+    () => new Map([[DEFAULT_ANTALL_DAGER, props.opprettetPerDag]]),
+  )
+  const pendingKeyRef = useRef<number | null>(null)
+  const fetcherLoad = fetcher.load
+
+  useEffect(() => {
+    if (!cache.has(antallDager)) {
+      pendingKeyRef.current = antallDager
+      fetcherLoad(`/api/opprettet-per-dag?dager=${antallDager}`)
+    }
+  }, [antallDager, fetcherLoad, cache])
+
+  useEffect(() => {
+    if (
+      fetcher.data &&
+      'opprettetPerDag' in fetcher.data &&
+      fetcher.state === 'idle' &&
+      pendingKeyRef.current !== null
+    ) {
+      const key = pendingKeyRef.current
+      pendingKeyRef.current = null
+      setCache((prev) => new Map(prev).set(key, fetcher.data?.opprettetPerDag ?? []))
+    }
+  }, [fetcher.data, fetcher.state])
+
+  const displayedDager = cache.has(antallDager) ? antallDager : DEFAULT_ANTALL_DAGER
+  const opprettetPerDag = cache.get(antallDager) ?? props.opprettetPerDag
+  const isLoading = fetcher.state === 'loading' && !cache.has(antallDager)
 
   return (
     <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
@@ -45,15 +78,23 @@ export function BehandlingerPerDagLineChartCard(props: Props) {
         </Button>
       </HStack>
       {props.chartHeight !== undefined ? (
-        <div style={{ position: 'relative', height: `${props.chartHeight}px` }}>
+        <div
+          style={{
+            position: 'relative',
+            height: `${props.chartHeight}px`,
+            opacity: isLoading ? 0.5 : 1,
+          }}
+        >
           <BehandlingerPerDagLineChart
-            opprettetPerDag={props.opprettetPerDag}
-            antallDager={antallDager}
+            opprettetPerDag={opprettetPerDag}
+            antallDager={displayedDager}
             maintainAspectRatio={false}
           />
         </div>
       ) : (
-        <BehandlingerPerDagLineChart opprettetPerDag={props.opprettetPerDag} antallDager={antallDager} />
+        <div style={{ opacity: isLoading ? 0.5 : 1 }}>
+          <BehandlingerPerDagLineChart opprettetPerDag={opprettetPerDag} antallDager={displayedDager} />
+        </div>
       )}
     </Box>
   )

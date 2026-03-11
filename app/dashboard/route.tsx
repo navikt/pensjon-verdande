@@ -7,6 +7,7 @@ import {
 import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
 import { Await } from 'react-router'
+import { asLocalDateString } from '~/common/date'
 import { formatNumber } from '~/common/number'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
@@ -29,6 +30,11 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
+  const defaultDager = 30
+  const fom = new Date()
+  fom.setDate(fom.getDate() - defaultDager)
+  const fomStr = asLocalDateString(fom)
+
   const dashboardResponse = Promise.all([
     apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
       (it) => it.totaltAntallBehandlinger,
@@ -46,7 +52,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     apiGet<BehandlingAntallResponse>('/api/behandling/oppsummering-behandling-antall', request).then(
       (it) => it.behandlingAntall,
     ),
-    apiGet<OpprettetPerDagResponse>('/api/behandling/oppsummering-opprettet-per-dag', request).then(
+    apiGet<OpprettetPerDagResponse>(`/api/behandling/oppsummering-opprettet-per-dag?fom=${fomStr}`, request).then(
       (it) => it.opprettetPerDag,
     ),
   ]).then((it) => ({

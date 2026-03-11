@@ -7,6 +7,7 @@ export default [
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
   route('api/sok', 'api/sok.ts'),
+  route('api/opprettet-per-dag', 'api/opprettet-per-dag.ts'),
 
   layout('layout.tsx', [
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),
