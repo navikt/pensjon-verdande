@@ -86,12 +86,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
+/** Sentinel-verdi for null i URL-parametere */
+const NULL_TOKEN = '__NULL__'
+
 function encodeValue(v: string | null): string {
-  return v ?? '__NULL__'
+  return v ?? NULL_TOKEN
 }
 
 function decodeValue(v: string): string | null {
-  return v === '__NULL__' ? null : v
+  return v === NULL_TOKEN ? null : v
 }
 
 function sumAntall(rows: AutoBrevOppsummering[]): number {
