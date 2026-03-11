@@ -57,7 +57,6 @@ const faner = [
   { value: 'automatisering', label: 'Automatisering' },
   { value: 'ko', label: 'Gjennomstrømning' },
   { value: 'feilanalyse', label: 'Feilanalyse' },
-  { value: 'feilklassifisering', label: 'Feilklasser' },
   { value: 'gjenforsok', label: 'Gjenforsøk' },
   { value: 'aktivitetsvarighet', label: 'Flaskehals' },
   { value: 'kalendertid', label: 'Kalendertid' },

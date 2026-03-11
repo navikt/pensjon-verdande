@@ -31,7 +31,7 @@ export default function AutomatiseringTab({ loaderData }: Route.ComponentProps) 
 
       <HStack gap="space-24" wrap>
         <VStack gap="space-4" align="center" style={{ minWidth: '120px' }}>
-          <Heading level="3" size="xlarge">
+          <Heading level="3" size="large">
             {prosent}
           </Heading>
           <BodyShort size="small" weight="semibold">
@@ -42,7 +42,7 @@ export default function AutomatiseringTab({ loaderData }: Route.ComponentProps) 
           <Heading level="3" size="large">
             {data.totaltAntall.toLocaleString('nb-NO')}
           </Heading>
-          <BodyShort size="small">Fullført totalt</BodyShort>
+          <BodyShort size="small">Fullført</BodyShort>
         </VStack>
         <VStack gap="space-4" align="center" style={{ minWidth: '100px' }}>
           <Heading level="3" size="large">

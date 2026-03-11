@@ -33,7 +33,6 @@ export default [
       route('gruppe', 'analyse/gruppe.tsx'),
       route('sakstype', 'analyse/sakstype.tsx'),
       route('kravtype', 'analyse/kravtype.tsx'),
-      route('feilklassifisering', 'analyse/feilklassifisering.tsx'),
       route('vedtakstype', 'analyse/vedtakstype.tsx'),
       route('aktiviteter', 'analyse/aktiviteter.tsx'),
       route('manuelle', 'analyse/manuelle.tsx'),
