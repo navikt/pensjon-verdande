@@ -8,6 +8,7 @@ import AktiviteterTab from './aktiviteter'
 import AktiviteterLayout from './aktiviteter-layout'
 import AktivitetsvarighetTab from './aktivitetsvarighet'
 import AutomatiseringTab from './automatisering'
+import AutomatiseringLayout from './automatisering-layout'
 import DimensjonerLayout from './dimensjoner-layout'
 import EndeTilEndeTab from './ende-til-ende'
 import FeilanalyseTab from './feilanalyse'
@@ -16,7 +17,6 @@ import GruppeTab from './gruppe'
 import KoTab from './ko'
 import KontrollpunkterTab from './kontrollpunkter'
 import KravtypeTab from './kravtype'
-import KvalitetLayout from './kvalitet-layout'
 import ManuelleTab from './manuelle'
 import {
   mockAktivitetData,
@@ -65,41 +65,41 @@ type Story = StoryObj
 
 const sectionLayouts: Record<string, { path: string; Component: React.ComponentType }> = {
   ytelse: { path: 'ytelse', Component: YtelseLayout },
-  kvalitet: { path: 'kvalitet', Component: KvalitetLayout },
+  automatisering: { path: 'automatisering', Component: AutomatiseringLayout },
   'aktiviteter-og-tid': { path: 'aktiviteter-og-tid', Component: AktiviteterLayout },
   dimensjoner: { path: 'dimensjoner', Component: DimensjonerLayout },
 }
 
-const tabToSection: Record<string, string> = {
-  nokkeltall: 'ytelse',
-  statustrend: 'ytelse',
-  varighet: 'ytelse',
-  ko: 'ytelse',
-  automatisering: 'ytelse',
-  'ende-til-ende': 'ytelse',
-  feilanalyse: 'kvalitet',
-  gjenforsok: 'kvalitet',
-  stoppet: 'kvalitet',
-  kontrollpunkter: 'kvalitet',
-  manuelle: 'kvalitet',
-  aktivitetsvarighet: 'aktiviteter-og-tid',
-  kalendertid: 'aktiviteter-og-tid',
-  aktiviteter: 'aktiviteter-og-tid',
-  tidspunkt: 'aktiviteter-og-tid',
-  planlagt: 'aktiviteter-og-tid',
-  teamytelse: 'dimensjoner',
-  prioritet: 'dimensjoner',
-  gruppe: 'dimensjoner',
-  sakstype: 'dimensjoner',
-  kravtype: 'dimensjoner',
-  vedtakstype: 'dimensjoner',
-  'auto-brev': 'dimensjoner',
+const tabToSection: Record<string, { section: string; path: string }> = {
+  nokkeltall: { section: 'ytelse', path: 'nokkeltall' },
+  statustrend: { section: 'ytelse', path: 'statustrend' },
+  varighet: { section: 'ytelse', path: 'varighet' },
+  ko: { section: 'ytelse', path: 'ko' },
+  'ende-til-ende': { section: 'ytelse', path: 'ende-til-ende' },
+  oversikt: { section: 'automatisering', path: 'oversikt' },
+  stoppet: { section: 'automatisering', path: 'stoppet' },
+  feilanalyse: { section: 'automatisering', path: 'feilanalyse' },
+  gjenforsok: { section: 'automatisering', path: 'gjenforsok' },
+  kontrollpunkter: { section: 'automatisering', path: 'kontrollpunkter' },
+  manuelle: { section: 'automatisering', path: 'manuelle' },
+  aktivitetsvarighet: { section: 'aktiviteter-og-tid', path: 'aktivitetsvarighet' },
+  kalendertid: { section: 'aktiviteter-og-tid', path: 'kalendertid' },
+  aktiviteter: { section: 'aktiviteter-og-tid', path: 'aktiviteter' },
+  tidspunkt: { section: 'aktiviteter-og-tid', path: 'tidspunkt' },
+  planlagt: { section: 'aktiviteter-og-tid', path: 'planlagt' },
+  teamytelse: { section: 'dimensjoner', path: 'teamytelse' },
+  prioritet: { section: 'dimensjoner', path: 'prioritet' },
+  gruppe: { section: 'dimensjoner', path: 'gruppe' },
+  sakstype: { section: 'dimensjoner', path: 'sakstype' },
+  kravtype: { section: 'dimensjoner', path: 'kravtype' },
+  vedtakstype: { section: 'dimensjoner', path: 'vedtakstype' },
+  'auto-brev': { section: 'dimensjoner', path: 'auto-brev' },
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes
 function renderAnalyseTab(TabComponent: React.ComponentType<any>, tabLoaderData: unknown, tabPath = 'nokkeltall') {
-  const sectionKey = tabToSection[tabPath] || 'ytelse'
-  const section = sectionLayouts[sectionKey]
+  const mapping = tabToSection[tabPath] || { section: 'ytelse', path: tabPath }
+  const section = sectionLayouts[mapping.section]
   const Stub = createRoutesStub([
     {
       path: '/analyse',
@@ -113,7 +113,7 @@ function renderAnalyseTab(TabComponent: React.ComponentType<any>, tabLoaderData:
           Component: section.Component as any,
           children: [
             {
-              path: tabPath,
+              path: mapping.path,
               Component: TabComponent,
               loader: () => tabLoaderData,
             },
@@ -125,7 +125,7 @@ function renderAnalyseTab(TabComponent: React.ComponentType<any>, tabLoaderData:
   return (
     <Stub
       initialEntries={[
-        `/analyse/${section.path}/${tabPath}?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE`,
+        `/analyse/${section.path}/${mapping.path}?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE`,
       ]}
     />
   )
@@ -157,7 +157,7 @@ export const VarighetStory: Story = {
 
 export const AutomatiseringStory: Story = {
   name: 'Automatisering',
-  render: () => renderAnalyseTab(AutomatiseringTab, mockAutomatiseringData(), 'automatisering'),
+  render: () => renderAnalyseTab(AutomatiseringTab, mockAutomatiseringData(), 'oversikt'),
 }
 
 export const KoStory: Story = {

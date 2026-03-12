@@ -53,7 +53,7 @@ const behandlingstyper = [
 
 const seksjoner = [
   { value: 'ytelse', label: 'Ytelse' },
-  { value: 'kvalitet', label: 'Kvalitet' },
+  { value: 'automatisering', label: 'Automatisering' },
   { value: 'aktiviteter-og-tid', label: 'Aktiviteter & Tid' },
   { value: 'dimensjoner', label: 'Dimensjoner' },
 ] as const

@@ -25,16 +25,16 @@ export default [
         route('statustrend', 'analyse/statustrend.tsx'),
         route('varighet', 'analyse/varighet.tsx'),
         route('ko', 'analyse/ko.tsx'),
-        route('automatisering', 'analyse/automatisering.tsx'),
         route('ende-til-ende', 'analyse/ende-til-ende.tsx'),
       ]),
 
-      // Kvalitet — feilhåndtering og kvalitetsovervåking
-      route('kvalitet', 'analyse/kvalitet-layout.tsx', [
-        index('analyse/kvalitet-index.tsx'),
+      // Automatisering — automatiseringsgrad, feilhåndtering og blokkere
+      route('automatisering', 'analyse/automatisering-layout.tsx', [
+        index('analyse/automatisering-index.tsx'),
+        route('oversikt', 'analyse/automatisering.tsx'),
+        route('stoppet', 'analyse/stoppet.tsx'),
         route('feilanalyse', 'analyse/feilanalyse.tsx'),
         route('gjenforsok', 'analyse/gjenforsok.tsx'),
-        route('stoppet', 'analyse/stoppet.tsx'),
         route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
         route('manuelle', 'analyse/manuelle.tsx'),
       ]),

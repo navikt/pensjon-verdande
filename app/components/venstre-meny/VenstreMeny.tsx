@@ -86,7 +86,7 @@ const behandlingerMeny = [
 
 const analyseMeny = [
   ['SE_BEHANDLINGER', '/analyse/ytelse', 'Ytelse'],
-  ['SE_BEHANDLINGER', '/analyse/kvalitet', 'Kvalitet'],
+  ['SE_BEHANDLINGER', '/analyse/automatisering', 'Automatisering'],
   ['SE_BEHANDLINGER', '/analyse/aktiviteter-og-tid', 'Aktiviteter & Tid'],
   ['SE_BEHANDLINGER', '/analyse/dimensjoner', 'Dimensjoner'],
 ]
