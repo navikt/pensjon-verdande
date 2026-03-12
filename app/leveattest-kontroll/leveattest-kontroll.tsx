@@ -645,6 +645,13 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const [sokPaaLand, setSokPaaLand] = useState<string[]>(['USA'])
   const [landQuery, setLandQuery] = useState<string>('')
 
+  const nullstillSok = useCallback(() => {
+    setMinstAlder('')
+    setKunUfore(false)
+    setSokPaaLand([])
+    setLandQuery('')
+  }, [])
+
   const normalizeCode = (raw: string) => raw.trim().toUpperCase()
 
   const canAddFromQuery = (() => {
@@ -960,14 +967,19 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   <input key={l} type="hidden" name="sokPaaLand" value={l} />
                 ))}
 
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  loading={sokStartFetcher.state !== 'idle'}
-                  disabled={disableSok || sokPaaLand.length === 0}
-                >
-                  Kjør søk
-                </Button>
+                <HStack gap="space-8" align="center">
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    loading={sokStartFetcher.state !== 'idle'}
+                    disabled={disableSok || sokPaaLand.length === 0}
+                  >
+                    Kjør søk
+                  </Button>
+                  <Button type="button" variant="tertiary" onClick={nullstillSok} disabled={disableSok}>
+                    Nullstill
+                  </Button>
+                </HStack>
               </sokStartFetcher.Form>
 
               <KjoringerPreview
