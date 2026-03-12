@@ -5,8 +5,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createRoutesStub } from 'react-router'
 import AktiviteterTab from './aktiviteter'
+import AktiviteterLayout from './aktiviteter-layout'
 import AktivitetsvarighetTab from './aktivitetsvarighet'
 import AutomatiseringTab from './automatisering'
+import DimensjonerLayout from './dimensjoner-layout'
 import EndeTilEndeTab from './ende-til-ende'
 import FeilanalyseTab from './feilanalyse'
 import GjenforsokTab from './gjenforsok'
@@ -14,6 +16,7 @@ import GruppeTab from './gruppe'
 import KoTab from './ko'
 import KontrollpunkterTab from './kontrollpunkter'
 import KravtypeTab from './kravtype'
+import KvalitetLayout from './kvalitet-layout'
 import ManuelleTab from './manuelle'
 import {
   mockAktivitetData,
@@ -51,6 +54,7 @@ import TeamytelseTab from './teamytelse'
 import TidspunktTab from './tidspunkt'
 import VarighetTab from './varighet'
 import VedtakstypeTab from './vedtakstype'
+import YtelseLayout from './ytelse-layout'
 
 const meta: Meta = {
   title: 'Sider/Analyse',
@@ -59,8 +63,43 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
+const sectionLayouts: Record<string, { path: string; Component: React.ComponentType }> = {
+  ytelse: { path: 'ytelse', Component: YtelseLayout },
+  kvalitet: { path: 'kvalitet', Component: KvalitetLayout },
+  'aktiviteter-og-tid': { path: 'aktiviteter-og-tid', Component: AktiviteterLayout },
+  dimensjoner: { path: 'dimensjoner', Component: DimensjonerLayout },
+}
+
+const tabToSection: Record<string, string> = {
+  nokkeltall: 'ytelse',
+  statustrend: 'ytelse',
+  varighet: 'ytelse',
+  ko: 'ytelse',
+  automatisering: 'ytelse',
+  'ende-til-ende': 'ytelse',
+  feilanalyse: 'kvalitet',
+  gjenforsok: 'kvalitet',
+  stoppet: 'kvalitet',
+  kontrollpunkter: 'kvalitet',
+  manuelle: 'kvalitet',
+  aktivitetsvarighet: 'aktiviteter-og-tid',
+  kalendertid: 'aktiviteter-og-tid',
+  aktiviteter: 'aktiviteter-og-tid',
+  tidspunkt: 'aktiviteter-og-tid',
+  planlagt: 'aktiviteter-og-tid',
+  teamytelse: 'dimensjoner',
+  prioritet: 'dimensjoner',
+  gruppe: 'dimensjoner',
+  sakstype: 'dimensjoner',
+  kravtype: 'dimensjoner',
+  vedtakstype: 'dimensjoner',
+  'auto-brev': 'dimensjoner',
+}
+
 // biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes
 function renderAnalyseTab(TabComponent: React.ComponentType<any>, tabLoaderData: unknown, tabPath = 'nokkeltall') {
+  const sectionKey = tabToSection[tabPath] || 'ytelse'
+  const section = sectionLayouts[sectionKey]
   const Stub = createRoutesStub([
     {
       path: '/analyse',
@@ -69,9 +108,16 @@ function renderAnalyseTab(TabComponent: React.ComponentType<any>, tabLoaderData:
       loader: () => mockRouteLoaderData(),
       children: [
         {
-          path: tabPath,
-          Component: TabComponent,
-          loader: () => tabLoaderData,
+          path: section.path,
+          // biome-ignore lint/suspicious/noExplicitAny: createRoutesStub type mismatch with react-router typed routes
+          Component: section.Component as any,
+          children: [
+            {
+              path: tabPath,
+              Component: TabComponent,
+              loader: () => tabLoaderData,
+            },
+          ],
         },
       ],
     },
@@ -79,7 +125,7 @@ function renderAnalyseTab(TabComponent: React.ComponentType<any>, tabLoaderData:
   return (
     <Stub
       initialEntries={[
-        `/analyse/${tabPath}?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE`,
+        `/analyse/${section.path}/${tabPath}?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE`,
       ]}
     />
   )

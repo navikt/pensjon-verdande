@@ -20,6 +20,7 @@ import Alderspensjonssoknader from './alderspensjon/forstegangsbehandling/soknad
 import { mockOppsummering, mockRouteLoaderData } from './analyse/mocks'
 import Nokkeltall from './analyse/nokkeltall'
 import AnalyseLayout from './analyse/route'
+import YtelseLayout from './analyse/ytelse-layout'
 import Batcher from './batcher/batcher'
 import Behandling from './behandling/behandling.$behandlingId'
 import Behandlinger from './behandlinger/behandlinger._index'
@@ -936,10 +937,17 @@ function renderAnalyseFullpage() {
           loader: () => mockRouteLoaderData(),
           children: [
             {
-              path: 'nokkeltall',
+              path: 'ytelse',
               // biome-ignore lint/suspicious/noExplicitAny: React Router route type mismatch
-              Component: Nokkeltall as React.ComponentType<any>,
-              loader: () => ({ oppsummering: mockOppsummering(), oppsummeringFeil: null }),
+              Component: YtelseLayout as any,
+              children: [
+                {
+                  path: 'nokkeltall',
+                  // biome-ignore lint/suspicious/noExplicitAny: React Router route type mismatch
+                  Component: Nokkeltall as React.ComponentType<any>,
+                  loader: () => ({ oppsummering: mockOppsummering(), oppsummeringFeil: null }),
+                },
+              ],
             },
           ],
         },
@@ -949,7 +957,7 @@ function renderAnalyseFullpage() {
   return (
     <Stub
       initialEntries={[
-        '/analyse/nokkeltall?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE',
+        '/analyse/ytelse/nokkeltall?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE',
       ]}
     />
   )
