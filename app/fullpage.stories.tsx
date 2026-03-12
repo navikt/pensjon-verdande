@@ -544,24 +544,28 @@ export const BrevBestillingFullpage: Story = {
         {
           behandlingstype: 'FleksibelApSakBehandling',
           brevkode: 'PE_AP_04_001',
+          brevbakerBrevkode: 'AP_INNVILGELSE_AUTO',
           sprakKode: 'NB',
           antall: 123,
         },
         {
           behandlingstype: 'FleksibelApSakBehandling',
           brevkode: 'PE_AP_04_002',
+          brevbakerBrevkode: 'AP_ENDRING_AUTO',
           sprakKode: 'NN',
           antall: 45,
         },
         {
           behandlingstype: 'DodsmeldingBehandling',
           brevkode: 'PE_AP_07_001',
+          brevbakerBrevkode: null,
           sprakKode: null,
           antall: 8,
         },
         {
           behandlingstype: 'ReguleringFamilieBehandling',
           brevkode: 'PE_UT_04_100',
+          brevbakerBrevkode: 'UT_REG_AUTO',
           sprakKode: 'NB',
           antall: 310,
         },
