@@ -4,6 +4,7 @@ import {
   ChevronDownIcon,
   CircleIcon,
   CurrencyExchangeIcon,
+  EnvelopeClosedIcon,
   GavelIcon,
   HandShakeHeartIcon,
   HouseIcon,
@@ -24,6 +25,7 @@ import styles from './venstre-meny.module.css'
 export type Props = {
   me: MeResponse
   showIconMenu: boolean
+  env: string
 }
 
 const administrasjonMeny = [
@@ -203,6 +205,17 @@ export default function VenstreMeny(props: Props) {
                   <PersonRectangleIcon title="Manuell behandling" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Manuell behandling</span>
+              </NavLink>
+            </li>
+          )}
+
+          {props.env !== 'p' && harTilgang(me, 'SE_BEHANDLINGER') && (
+            <li>
+              <NavLink to="/brev-bestilling" className={({ isActive }) => (isActive ? styles.active : '')}>
+                <span className={styles.menyIkon}>
+                  <EnvelopeClosedIcon title="Brevbestilling" fontSize="1.5rem" />
+                </span>
+                <span className={styles.menyTekst}>Brevbestilling</span>
               </NavLink>
             </li>
           )}

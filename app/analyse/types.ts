@@ -456,3 +456,15 @@ export type VedtakstypeStatistikk = {
   antall: number
   gjennomsnittDagerTilIverksatt: number | null
 }
+
+// --- Auto-brev ---
+
+export type AutoBrevAnalyseResponse = {
+  behandlingType: string
+  brevStatistikk: AutoBrevStatistikk[]
+}
+
+export type AutoBrevStatistikk = {
+  brevkode: string
+  antall: number
+}

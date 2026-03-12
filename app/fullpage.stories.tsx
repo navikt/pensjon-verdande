@@ -25,6 +25,7 @@ import Behandling from './behandling/behandling.$behandlingId'
 import Behandlinger from './behandlinger/behandlinger._index'
 import Behandlingserie from './behandlingserie/behandlingserie'
 import { DEFAULT_SERIE_VALG } from './behandlingserie/serieValg'
+import BrevBestilling from './brev-bestilling/index'
 import Brukere from './brukere/index'
 import Dashboard from './dashboard/route'
 import KalenderVisning from './kalender/route'
@@ -527,6 +528,42 @@ export const ManuellBehandlingFullpage: Story = {
           underkategoriKode: 'UNDER_01',
           prioritetKode: 'LAV',
           antall: 15,
+        },
+      ],
+      nowIso: new Date().toISOString(),
+      fomDato: '2024-05-01',
+      tomDato: '2024-06-01',
+    }),
+}
+
+export const BrevBestillingFullpage: Story = {
+  name: 'Brevbestilling',
+  render: () =>
+    renderWithLayout(BrevBestilling, {
+      rows: [
+        {
+          behandlingstype: 'FleksibelApSakBehandling',
+          brevkode: 'PE_AP_04_001',
+          sprakKode: 'NB',
+          antall: 123,
+        },
+        {
+          behandlingstype: 'FleksibelApSakBehandling',
+          brevkode: 'PE_AP_04_002',
+          sprakKode: 'NN',
+          antall: 45,
+        },
+        {
+          behandlingstype: 'DodsmeldingBehandling',
+          brevkode: 'PE_AP_07_001',
+          sprakKode: null,
+          antall: 8,
+        },
+        {
+          behandlingstype: 'ReguleringFamilieBehandling',
+          brevkode: 'PE_UT_04_100',
+          sprakKode: 'NB',
+          antall: 310,
         },
       ],
       nowIso: new Date().toISOString(),

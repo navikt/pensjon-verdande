@@ -39,6 +39,7 @@ export default [
       route('manuelle', 'analyse/manuelle.tsx'),
       route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
       route('ende-til-ende', 'analyse/ende-til-ende.tsx'),
+      route('auto-brev', 'analyse/auto-brev.tsx'),
     ]),
     route('analyse/eksport', 'analyse/eksport.tsx'),
 
@@ -209,6 +210,8 @@ export default [
     route('feil-registrer-krav', 'vedlikehold/feil-registrer-krav.tsx'),
 
     route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
+
+    route('brev-bestilling', 'brev-bestilling/index.tsx'),
 
     route('scheduler-styring', 'vedlikehold/scheduler-styring.tsx'),
 
