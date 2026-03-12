@@ -169,7 +169,7 @@ const BOSTEDLAND_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'LAO', label: 'Laos (LA)' },
   { value: 'LBN', label: 'Libanon (LB)' },
   { value: 'MYS', label: 'Malaysia (MY)' },
-  { value: 'MAK', label: 'Marokko (MA)' },
+  { value: 'MAR', label: 'Marokko (MA)' },
   { value: 'MUS', label: 'Mauritius (MU)' },
   { value: 'MEX', label: 'Mexico (MX)' },
   { value: 'MNE', label: 'Montenegro (ME)' },
