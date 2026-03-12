@@ -421,9 +421,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
   const [valgteSokIds, setValgteSokIds] = useState<number[]>([])
 
-  const userTouchedSokDefaultsRef = useRef(false)
-  const lastAppliedSokDefaultsRef = useRef<number | null>(null)
-
   const valgtGrunnlagId = useMemo(
     () => grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null,
     [grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId],
@@ -633,8 +630,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     autoStatistikkLastetRef.current = false
     setStatistikk(null)
     setModusStatus(null)
-    userTouchedSokDefaultsRef.current = false
-    lastAppliedSokDefaultsRef.current = null
   }, [valgtGrunnlagId])
 
   useEffect(() => {
@@ -645,31 +640,17 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     pollStatistikk(valgtGrunnlagId)
   }, [valgtGrunnlagId, grunnlagStatus, pollStatistikk])
 
-  useEffect(() => {
-    if (userTouchedSokDefaultsRef.current) return
-    if (sokListe.length === 0) return
-
-    const sorted = sokListe.slice().sort((a, b) => {
-      const ta = Date.parse(a.behandlingSistKjort)
-      const tb = Date.parse(b.behandlingSistKjort)
-      if (Number.isFinite(ta) && Number.isFinite(tb) && ta !== tb) return tb - ta
-      return b.sokBehandlingId - a.sokBehandlingId
-    })
-
-    const latest = sorted[0]
-    if (!latest) return
-    if (lastAppliedSokDefaultsRef.current === latest.sokBehandlingId) return
-
-    setSokPaaLand(latest.sokPaaLand ?? [])
-    setMinstAlder(String(latest.alder))
-    setKunUfore(Boolean(latest.filtrerPaSakstypeUfore))
-    lastAppliedSokDefaultsRef.current = latest.sokBehandlingId
-  }, [sokListe])
-
   const [minstAlder, setMinstAlder] = useState<string>('67')
   const [kunUfore, setKunUfore] = useState<boolean>(false)
   const [sokPaaLand, setSokPaaLand] = useState<string[]>(['USA'])
   const [landQuery, setLandQuery] = useState<string>('')
+
+  const nullstillSok = useCallback(() => {
+    setMinstAlder('')
+    setKunUfore(false)
+    setSokPaaLand([])
+    setLandQuery('')
+  }, [])
 
   const normalizeCode = (raw: string) => raw.trim().toUpperCase()
 
@@ -681,7 +662,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   function addFromQuery() {
     const c = normalizeCode(landQuery)
     if (!/^[A-Z]{3}$/.test(c)) return
-    userTouchedSokDefaultsRef.current = true
     setSokPaaLand((prev) => (prev.includes(c) ? prev : [c, ...prev]))
     setLandQuery('')
   }
@@ -884,10 +864,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                 <TextField
                   label="Minstealder"
                   value={minstAlder}
-                  onChange={(e) => {
-                    userTouchedSokDefaultsRef.current = true
-                    setMinstAlder(e.target.value)
-                  }}
+                  onChange={(e) => setMinstAlder(e.target.value)}
                   type="number"
                   min={0}
                   max={120}
@@ -895,14 +872,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   disabled={disableSok}
                 />
 
-                <Checkbox
-                  checked={kunUfore}
-                  onChange={(e) => {
-                    userTouchedSokDefaultsRef.current = true
-                    setKunUfore(e.target.checked)
-                  }}
-                  disabled={disableSok}
-                >
+                <Checkbox checked={kunUfore} onChange={(e) => setKunUfore(e.target.checked)} disabled={disableSok}>
                   Kun uføre
                 </Checkbox>
 
@@ -910,7 +880,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   label="Velg land-sett"
                   value={sokPaaLand.length > 0 ? 'valgt' : 'tom'}
                   onChange={(e) => {
-                    userTouchedSokDefaultsRef.current = true
                     const v = e.target.value
                     if (v === 'eu')
                       setSokPaaLand(['DEU', 'FRA', 'ESP', 'PRT', 'ITA', 'NLD', 'BEL', 'AUT', 'CHE', 'IRL'])
@@ -969,10 +938,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   <CheckboxGroup
                     legend="Søk på land"
                     value={sokPaaLand}
-                    onChange={(v) => {
-                      userTouchedSokDefaultsRef.current = true
-                      setSokPaaLand(v as string[])
-                    }}
+                    onChange={(v) => setSokPaaLand(v as string[])}
                     disabled={disableSok}
                   >
                     <div style={{ columnCount: 3, columnGap: '1rem' }}>
@@ -1001,14 +967,19 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   <input key={l} type="hidden" name="sokPaaLand" value={l} />
                 ))}
 
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  loading={sokStartFetcher.state !== 'idle'}
-                  disabled={disableSok || sokPaaLand.length === 0}
-                >
-                  Kjør søk
-                </Button>
+                <HStack gap="space-8" align="center">
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    loading={sokStartFetcher.state !== 'idle'}
+                    disabled={disableSok || sokPaaLand.length === 0}
+                  >
+                    Kjør søk
+                  </Button>
+                  <Button type="button" variant="tertiary" onClick={nullstillSok} disabled={disableSok}>
+                    Nullstill
+                  </Button>
+                </HStack>
               </sokStartFetcher.Form>
 
               <KjoringerPreview
