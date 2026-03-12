@@ -27,11 +27,12 @@ import type { Route } from './+types/index'
 export type AutoBrevOppsummering = {
   behandlingstype: string
   brevkode: string
+  brevbakerBrevkode: string | null
   sprakKode: string | null
   antall: number
 }
 
-const FACETS = ['behandlingstype', 'brevkode', 'sprakKode'] as const
+const FACETS = ['behandlingstype', 'brevkode', 'brevbakerBrevkode', 'sprakKode'] as const
 const GROUP_PARAM = 'groupBy' as const
 const manglendeVerdi = '–'
 
@@ -179,7 +180,7 @@ function toggleParam(current: string[] | null, value: string): string[] | null {
   return arr.length ? arr : null
 }
 
-const rowKey = (r: AutoBrevOppsummering) => [r.behandlingstype, r.brevkode, r.sprakKode].join('|')
+const rowKey = (r: AutoBrevOppsummering) => [r.behandlingstype, r.brevkode, r.brevbakerBrevkode, r.sprakKode].join('|')
 
 function countActiveFilters(filters: Partial<Record<FacetKey, string[]>>): number {
   return Object.values(filters).reduce((acc, v) => acc + ((v?.length ?? 0) > 0 ? 1 : 0), 0)
@@ -417,6 +418,7 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                   <Table.Row>
                     <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
                     <Table.HeaderCell>Brevkode</Table.HeaderCell>
+                    <Table.HeaderCell>Brevbaker-brevkode</Table.HeaderCell>
                     <Table.HeaderCell>Språkkode</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
@@ -432,6 +434,7 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                           {r.behandlingstype ? decodeBehandling(r.behandlingstype) : manglendeVerdi}
                         </Table.DataCell>
                         <Table.DataCell>{r.brevkode}</Table.DataCell>
+                        <Table.DataCell>{r.brevbakerBrevkode ?? manglendeVerdi}</Table.DataCell>
                         <Table.DataCell>{r.sprakKode ?? manglendeVerdi}</Table.DataCell>
                         <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                           {r.antall.toLocaleString('nb-NO')}
@@ -584,6 +587,8 @@ function facetLabel(f: FacetKey): string {
       return 'Behandlingstype'
     case 'brevkode':
       return 'Brevkode'
+    case 'brevbakerBrevkode':
+      return 'Brevbaker-brevkode'
     case 'sprakKode':
       return 'Språkkode'
   }
