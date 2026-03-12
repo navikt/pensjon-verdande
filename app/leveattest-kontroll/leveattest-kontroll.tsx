@@ -137,7 +137,7 @@ const BOSTEDLAND_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'DZA', label: 'Algerie (DZ)' },
   { value: 'ARG', label: 'Argentina (AR)' },
   { value: 'AUS', label: 'Australia (AU)' },
-  { value: 'BAH', label: 'Bosnia-Hercegovina (BA)' },
+  { value: 'BIH', label: 'Bosnia-Hercegovina (BA)' },
   { value: 'BRA', label: 'Brasil (BR)' },
   { value: 'CAN', label: 'Canada (CA)' },
   { value: 'CHL', label: 'Chile (CL)' },
