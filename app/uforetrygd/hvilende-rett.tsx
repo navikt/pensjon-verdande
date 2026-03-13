@@ -72,13 +72,13 @@ export async function action({ request }: Route.ActionArgs) {
 export default function HvilendeRettPage() {
   return (
     <VStack gap="space-80" style={{ maxWidth: '50em', margin: '2em' }}>
-      {hvilendeRettVarselForm()}
-      {hvilendeRettOpphorForm()}
+      <HvilendeRettVarselForm />
+      <HvilendeRettOpphorForm />
     </VStack>
   )
 }
 
-function hvilendeRettVarselForm() {
+function HvilendeRettVarselForm() {
   const fetcher = useFetcher()
   const varselFormRef = useRef<HTMLFormElement | null>(null)
   const [visModal, setVisModal] = useState<boolean>(false)
@@ -138,7 +138,7 @@ function hvilendeRettVarselForm() {
   )
 }
 
-function hvilendeRettOpphorForm() {
+function HvilendeRettOpphorForm() {
   const fetcher = useFetcher()
   const opphorFormRef = useRef<HTMLFormElement | null>(null)
   const [visModal, setVisModal] = useState<boolean>(false)
