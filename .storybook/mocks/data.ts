@@ -159,6 +159,17 @@ export function mockDashboardResponse(overrides?: Partial<DashboardResponse>): D
       { periodeFra: '2024-06-15T20:00:00', status: 'UNDER_BEHANDLING', antall: 2 },
       { periodeFra: '2024-06-15T22:00:00', status: 'FULLFORT', antall: 3 },
     ],
+    brevDatapunkter: [
+      { periodeFra: '2024-06-15T00:00:00', antall: 2 },
+      { periodeFra: '2024-06-15T02:00:00', antall: 1 },
+      { periodeFra: '2024-06-15T06:00:00', antall: 5 },
+      { periodeFra: '2024-06-15T08:00:00', antall: 12 },
+      { periodeFra: '2024-06-15T10:00:00', antall: 18 },
+      { periodeFra: '2024-06-15T12:00:00', antall: 10 },
+      { periodeFra: '2024-06-15T14:00:00', antall: 8 },
+      { periodeFra: '2024-06-15T16:00:00', antall: 5 },
+      { periodeFra: '2024-06-15T20:00:00', antall: 3 },
+    ],
     ...overrides,
   }
 }

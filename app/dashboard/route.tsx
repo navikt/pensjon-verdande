@@ -7,10 +7,11 @@ import {
 import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
 import { Await } from 'react-router'
-import type { TidsserieResponse } from '~/analyse/types'
+import type { BrevTidsserieResponse, TidsserieResponse } from '~/analyse/types'
 import { formatNumber } from '~/common/number'
 import { AktivitetChartCard } from '~/components/aktivitet-chart/AktivitetChartCard'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
+import { BrevChartCard } from '~/components/brev-chart/BrevChartCard'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import { apiGet } from '~/services/api.server'
 import type {
@@ -37,6 +38,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     aggregering: 'TIME',
   })
 
+  const brevParams = new URLSearchParams({
+    fom: fom.toISOString().replace('Z', ''),
+    tom: new Date().toISOString().replace('Z', ''),
+    aggregering: 'TIME',
+  })
+
   const dashboardResponse = Promise.all([
     apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
       (it) => it.totaltAntallBehandlinger,
@@ -57,6 +64,9 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     apiGet<TidsserieResponse>(`/api/behandling/analyse/tidsserie?${tidsserieParams}`, request).then(
       (it) => it.datapunkter,
     ),
+    apiGet<BrevTidsserieResponse>(`/api/behandling/analyse/brev-tidsserie?${brevParams}`, request).then(
+      (it) => it.datapunkter,
+    ),
   ]).then((it) => ({
     totaltAntallBehandlinger: it[0],
     feilendeBehandlinger: it[1],
@@ -64,6 +74,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     antallUferdigeBehandlinger: it[3],
     behandlingAntall: it[4],
     aktivitetDatapunkter: it[5],
+    brevDatapunkter: it[6],
   }))
 
   return {
@@ -124,8 +135,9 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                 </HGrid>
                 <HGrid gap="space-24" columns={2}>
                   <AktivitetChartCard datapunkter={dashboardResponse.aktivitetDatapunkter} />
-                  <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
+                  <BrevChartCard datapunkter={dashboardResponse.brevDatapunkter} />
                 </HGrid>
+                <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
               </VStack>
             )
           )

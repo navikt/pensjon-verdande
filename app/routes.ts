@@ -9,6 +9,7 @@ export default [
   route('api/sok', 'api/sok.ts'),
   route('api/opprettet-per-dag', 'api/opprettet-per-dag.ts'),
   route('api/aktivitet-per-dag', 'api/aktivitet-per-dag.ts'),
+  route('api/brev-per-periode', 'api/brev-per-periode.ts'),
 
   layout('layout.tsx', [
     route('adhocbrev', 'adhocbrev/adhoc-brev.tsx'),

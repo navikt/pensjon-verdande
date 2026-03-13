@@ -29,6 +29,7 @@ export const Empty: Story = {
         behandlingAntall: [],
         aktivitetDatapunkter: [],
         ukjenteBehandlingstyper: [],
+        brevDatapunkter: [],
       }),
     }),
 }
