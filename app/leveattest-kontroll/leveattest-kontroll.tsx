@@ -632,7 +632,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
   const [minstAlder, setMinstAlder] = useState<string>('67')
   const [kunUfore, setKunUfore] = useState<boolean>(false)
-  const [sokPaaLand, setSokPaaLand] = useState<string[]>(['USA'])
+  const [sokPaaLand, setSokPaaLand] = useState<string[]>([])
   const [landQuery, setLandQuery] = useState<string>('')
 
   const normalizeCode = (raw: string) => raw.trim().toUpperCase()
@@ -647,6 +647,17 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (!/^[A-Z]{3}$/.test(c)) return
     setSokPaaLand((prev) => (prev.includes(c) ? prev : [c, ...prev]))
     setLandQuery('')
+  }
+
+  function resetSokValg() {
+    setMinstAlder('67')
+    setKunUfore(false)
+    setSokPaaLand([])
+    setLandQuery('')
+  }
+
+  function resetValgteSok() {
+    setValgteSokIds([])
   }
 
   const allLandOptions = useMemo(() => {
@@ -876,7 +887,9 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                       setSokPaaLand(['DEU', 'FRA', 'ESP', 'PRT', 'ITA', 'NLD', 'BEL', 'AUT', 'CHE', 'IRL'])
                     else if (v === 'na') setSokPaaLand(['USA', 'CAN'])
                     else if (v === 'asia') setSokPaaLand(['THA', 'IND', 'KOR'])
-                    else if (v === 'reset') setSokPaaLand(['USA'])
+                    else if (v === 'sorostasia')
+                      setSokPaaLand(['THA', 'PHL', 'VNM', 'SGP', 'IDN', 'MYS', 'KHM', 'LAO', 'MMR'])
+                    else if (v === 'reset') setSokPaaLand([])
                   }}
                   disabled={disableSok}
                 >
@@ -887,8 +900,13 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   <option value="eu">Typisk Europa</option>
                   <option value="na">Nord-Amerika</option>
                   <option value="asia">Asia (utvalg)</option>
-                  <option value="reset">Reset (USA)</option>
+                  <option value="sorostasia">Sørøst-Asia</option>
+                  <option value="reset">Nullstill land</option>
                 </Select>
+
+                <Button type="button" variant="secondary" onClick={resetSokValg} disabled={disableSok}>
+                  Nullstill valg
+                </Button>
               </HStack>
 
               <HStack gap="space-8" align="end">
@@ -1038,10 +1056,21 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                 Steg 3: Start kontroll
               </Heading>
 
-              <div style={{ opacity: 0.85 }}>
-                Valgte søk: <strong>{valgteSokIds.length}</strong>
-                {valgteSokIds.length > 0 ? ` (${valgteSokIds.join(', ')})` : ''}
-              </div>
+              <HStack align="center" gap="space-8">
+                <div style={{ opacity: 0.85 }}>
+                  Valgte søk: <strong>{valgteSokIds.length}</strong>
+                  {valgteSokIds.length > 0 ? ` (${valgteSokIds.join(', ')})` : ''}
+                </div>
+                <Button
+                  type="button"
+                  size="small"
+                  variant="secondary"
+                  onClick={resetValgteSok}
+                  disabled={valgteSokIds.length === 0}
+                >
+                  Nullstill valg
+                </Button>
+              </HStack>
 
               <startKontrollFetcher.Form method="post">
                 <input type="hidden" name="_intent" value="startKontroll" />
