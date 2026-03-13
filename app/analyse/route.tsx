@@ -10,13 +10,12 @@ import {
   Page,
   Select,
   Skeleton,
-  Tabs,
   useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
 import React, { Suspense } from 'react'
-import { isRouteErrorResponse, Outlet, useLocation, useNavigate, useNavigation, useSearchParams } from 'react-router'
+import { isRouteErrorResponse, Outlet, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -50,32 +49,6 @@ const behandlingstyper = [
   'ReguleringFamilie',
   'OpptjeningsendringAarligAlder',
 ]
-
-const faner = [
-  { value: 'nokkeltall', label: 'Nøkkeltall' },
-  { value: 'statustrend', label: 'Statustrend' },
-  { value: 'varighet', label: 'Varighet' },
-  { value: 'automatisering', label: 'Automatisering' },
-  { value: 'ko', label: 'Gjennomstrømning' },
-  { value: 'feilanalyse', label: 'Feilanalyse' },
-  { value: 'gjenforsok', label: 'Gjenforsøk' },
-  { value: 'aktivitetsvarighet', label: 'Flaskehals' },
-  { value: 'kalendertid', label: 'Kalendertid' },
-  { value: 'tidspunkt', label: 'Tidspunkt' },
-  { value: 'teamytelse', label: 'Team' },
-  { value: 'prioritet', label: 'Prioritet' },
-  { value: 'stoppet', label: 'Stoppede' },
-  { value: 'planlagt', label: 'Planlegging' },
-  { value: 'gruppe', label: 'Grupper' },
-  { value: 'sakstype', label: 'Sakstype' },
-  { value: 'kravtype', label: 'Kravtype' },
-  { value: 'vedtakstype', label: 'Vedtak' },
-  { value: 'aktiviteter', label: 'Aktiviteter' },
-  { value: 'manuelle', label: 'Manuelle oppgaver' },
-  { value: 'kontrollpunkter', label: 'Kontrollpunkter' },
-  { value: 'ende-til-ende', label: 'Ende-til-ende' },
-  { value: 'auto-brev', label: 'Autobrev' },
-] as const
 
 /** Velg passende aggregeringsnivå basert på tidsperioden */
 function velgAggregering(fom: string, tom: string): string {
@@ -118,13 +91,6 @@ export function shouldRevalidate({ currentUrl, nextUrl }: { currentUrl: URL; nex
 export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
   const { behandlingType, fom, tom, aggregering, tidsserie, erProd } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
-  const navigation = useNavigation()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [debouncedLoading, setDebouncedLoading] = React.useState(false)
-
-  const currentTab = location.pathname.split('/').pop() || 'nokkeltall'
-  const isLoading = navigation.state === 'loading'
 
   // Sørg for at behandlingType alltid er i URL-parametere
   React.useEffect(() => {
@@ -134,14 +100,6 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
       setSearchParams(next, { replace: true })
     }
   }, [searchParams, behandlingType, setSearchParams])
-
-  React.useEffect(() => {
-    if (isLoading) {
-      const timer = setTimeout(() => setDebouncedLoading(true), 200)
-      return () => clearTimeout(timer)
-    }
-    setDebouncedLoading(false)
-  }, [isLoading])
 
   function updateSearchParams(updates: Record<string, string>) {
     const next = new URLSearchParams(searchParams)
@@ -205,10 +163,6 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
 
   function presetAllTime() {
     applyPeriod('2000-01-01', toIsoDate(new Date()))
-  }
-
-  function onTabChange(tab: string) {
-    navigate(`/analyse/${tab}${location.search}`)
   }
 
   return (
@@ -343,33 +297,7 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
           </VStack>
         )}
 
-        <Box>
-          <VStack gap="space-16">
-            <Tabs value={currentTab} onChange={onTabChange}>
-              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                <Tabs.List>
-                  {faner
-                    .filter((f) => f.value !== 'auto-brev' || !erProd)
-                    .map((f) => (
-                      <Tabs.Tab key={f.value} value={f.value} label={f.label} />
-                    ))}
-                </Tabs.List>
-              </div>
-            </Tabs>
-
-            <Box padding="space-24" style={{ overflowX: 'auto' }}>
-              {debouncedLoading ? (
-                <VStack gap="space-16">
-                  <Skeleton variant="rounded" height={28} width="60%" />
-                  <Skeleton variant="rounded" height={300} width="100%" />
-                  <Skeleton variant="rounded" height={20} width="40%" />
-                </VStack>
-              ) : (
-                <Outlet />
-              )}
-            </Box>
-          </VStack>
-        </Box>
+        <Outlet context={{ erProd }} />
       </VStack>
     </Page.Block>
   )
