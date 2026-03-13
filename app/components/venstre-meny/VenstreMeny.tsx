@@ -4,6 +4,7 @@ import {
   ChevronDownIcon,
   CircleIcon,
   CurrencyExchangeIcon,
+  EnvelopeClosedIcon,
   GavelIcon,
   HandShakeHeartIcon,
   HouseIcon,
@@ -16,7 +17,7 @@ import {
 } from '@navikt/aksel-icons'
 import type { JSX } from 'react'
 import { useState } from 'react'
-import { NavLink } from 'react-router'
+import { NavLink, useLocation } from 'react-router'
 import type { MeResponse } from '~/brukere/brukere'
 import { BEHANDLING_STATUS_MAP } from '~/common/decode'
 import styles from './venstre-meny.module.css'
@@ -24,6 +25,7 @@ import styles from './venstre-meny.module.css'
 export type Props = {
   me: MeResponse
   showIconMenu: boolean
+  env: string
 }
 
 const administrasjonMeny = [
@@ -82,6 +84,14 @@ const behandlingerMeny = [
   ...Object.entries(BEHANDLING_STATUS_MAP).map(([key, label]) => ['SE_BEHANDLINGER', `/behandlinger/${key}`, label]),
 ]
 
+const analyseMeny = [
+  ['SE_BEHANDLINGER', '/analyse/ytelse', 'Ytelse'],
+  ['SE_BEHANDLINGER', '/analyse/automatisering', 'Automatisering'],
+  ['SE_BEHANDLINGER', '/analyse/kvalitet', 'Kvalitet'],
+  ['SE_BEHANDLINGER', '/analyse/aktiviteter-og-tid', 'Aktiviteter & Tid'],
+  ['SE_BEHANDLINGER', '/analyse/dimensjoner', 'Dimensjoner'],
+]
+
 export function harTilgang(me: MeResponse | undefined, operasjon: string) {
   if (!me) {
     return false
@@ -98,6 +108,8 @@ export function harRolle(me: MeResponse | undefined, rolle: string) {
 
 export default function VenstreMeny(props: Props) {
   const me = props.me
+  const location = useLocation()
+  const analyseSearch = location.pathname.startsWith('/analyse') ? location.search : ''
   let currentIndex = 0
 
   function nextIndex() {
@@ -105,10 +117,10 @@ export default function VenstreMeny(props: Props) {
     return currentIndex
   }
 
-  function createMenuItem(operasjon: string, link: string, label: string) {
+  function createMenuItem(operasjon: string, link: string, label: string, end = true) {
     return (
       <li key={operasjon + link + label}>
-        <NavLink to={link} end className={({ isActive }) => (isActive ? styles.active : '')}>
+        <NavLink to={link} end={end} className={({ isActive }) => (isActive ? styles.active : '')}>
           <span className={styles.menyIkon}>
             <CircleIcon title={label} fontSize="1.5rem" />
           </span>
@@ -124,7 +136,14 @@ export default function VenstreMeny(props: Props) {
     setOpenIndex(openIndex === index ? null : index)
   }
 
-  function byggMeny(navn: string, menyElementer: string[][], nextIdx: () => number, icon?: JSX.Element) {
+  function byggMeny(
+    navn: string,
+    menyElementer: string[][],
+    nextIdx: () => number,
+    icon?: JSX.Element,
+    useEnd = true,
+    preserveSearch = '',
+  ) {
     const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(me, operasjon))
     if (!harTilgangTilMeny) return undefined
 
@@ -145,7 +164,7 @@ export default function VenstreMeny(props: Props) {
         <ul className={styles.submenu}>
           {menyElementer
             .filter(([operasjon]) => harTilgang(me, operasjon))
-            .map(([operasjon, link, label]) => createMenuItem(operasjon, link, label))}
+            .map(([operasjon, link, label]) => createMenuItem(operasjon, `${link}${preserveSearch}`, label, useEnd))}
         </ul>
       </li>
     )
@@ -207,6 +226,17 @@ export default function VenstreMeny(props: Props) {
             </li>
           )}
 
+          {props.env !== 'p' && harTilgang(me, 'SE_BEHANDLINGER') && (
+            <li>
+              <NavLink to="/brev-bestilling" className={({ isActive }) => (isActive ? styles.active : '')}>
+                <span className={styles.menyIkon}>
+                  <EnvelopeClosedIcon title="Brevbestilling" fontSize="1.5rem" />
+                </span>
+                <span className={styles.menyTekst}>Brevbestilling</span>
+              </NavLink>
+            </li>
+          )}
+
           {harTilgang(me, 'SE_BEHANDLINGER') && (
             <li>
               <NavLink to="/alde" className={({ isActive }) => (isActive ? styles.active : '')}>
@@ -218,15 +248,13 @@ export default function VenstreMeny(props: Props) {
             </li>
           )}
 
-          {harTilgang(me, 'SE_BEHANDLINGER') && (
-            <li>
-              <NavLink to="/analyse" className={({ isActive }) => (isActive ? styles.active : '')}>
-                <span className={styles.menyIkon}>
-                  <BarChartIcon title="Analyse" fontSize="1.5rem" />
-                </span>
-                <span className={styles.menyTekst}>Analyse</span>
-              </NavLink>
-            </li>
+          {byggMeny(
+            'Analyse',
+            analyseMeny,
+            nextIndex,
+            <BarChartIcon title="Analyse" fontSize="1.5rem" />,
+            false,
+            analyseSearch,
           )}
 
           {byggMeny(

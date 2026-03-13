@@ -20,11 +20,13 @@ import Alderspensjonssoknader from './alderspensjon/forstegangsbehandling/soknad
 import { mockOppsummering, mockRouteLoaderData } from './analyse/mocks'
 import Nokkeltall from './analyse/nokkeltall'
 import AnalyseLayout from './analyse/route'
+import YtelseLayout from './analyse/ytelse-layout'
 import Batcher from './batcher/batcher'
 import Behandling from './behandling/behandling.$behandlingId'
 import Behandlinger from './behandlinger/behandlinger._index'
 import Behandlingserie from './behandlingserie/behandlingserie'
 import { DEFAULT_SERIE_VALG } from './behandlingserie/serieValg'
+import BrevBestilling from './brev-bestilling/index'
 import Brukere from './brukere/index'
 import Dashboard from './dashboard/route'
 import KalenderVisning from './kalender/route'
@@ -535,6 +537,46 @@ export const ManuellBehandlingFullpage: Story = {
     }),
 }
 
+export const BrevBestillingFullpage: Story = {
+  name: 'Brevbestilling',
+  render: () =>
+    renderWithLayout(BrevBestilling, {
+      rows: [
+        {
+          behandlingstype: 'FleksibelApSakBehandling',
+          brevkode: 'PE_AP_04_001',
+          brevbakerBrevkode: 'AP_INNVILGELSE_AUTO',
+          sprakKode: 'NB',
+          antall: 123,
+        },
+        {
+          behandlingstype: 'FleksibelApSakBehandling',
+          brevkode: 'PE_AP_04_002',
+          brevbakerBrevkode: 'AP_ENDRING_AUTO',
+          sprakKode: 'NN',
+          antall: 45,
+        },
+        {
+          behandlingstype: 'DodsmeldingBehandling',
+          brevkode: 'PE_AP_07_001',
+          brevbakerBrevkode: null,
+          sprakKode: null,
+          antall: 8,
+        },
+        {
+          behandlingstype: 'ReguleringFamilieBehandling',
+          brevkode: 'PE_UT_04_100',
+          brevbakerBrevkode: 'UT_REG_AUTO',
+          sprakKode: 'NB',
+          antall: 310,
+        },
+      ],
+      nowIso: new Date().toISOString(),
+      fomDato: '2024-05-01',
+      tomDato: '2024-06-01',
+    }),
+}
+
 export const BrukereFullpage: Story = {
   name: 'Brukere',
   render: () =>
@@ -895,10 +937,17 @@ function renderAnalyseFullpage() {
           loader: () => mockRouteLoaderData(),
           children: [
             {
-              path: 'nokkeltall',
+              path: 'ytelse',
               // biome-ignore lint/suspicious/noExplicitAny: React Router route type mismatch
-              Component: Nokkeltall as React.ComponentType<any>,
-              loader: () => ({ oppsummering: mockOppsummering(), oppsummeringFeil: null }),
+              Component: YtelseLayout as any,
+              children: [
+                {
+                  path: 'nokkeltall',
+                  // biome-ignore lint/suspicious/noExplicitAny: React Router route type mismatch
+                  Component: Nokkeltall as React.ComponentType<any>,
+                  loader: () => ({ oppsummering: mockOppsummering(), oppsummeringFeil: null }),
+                },
+              ],
             },
           ],
         },
@@ -908,7 +957,7 @@ function renderAnalyseFullpage() {
   return (
     <Stub
       initialEntries={[
-        '/analyse/nokkeltall?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE',
+        '/analyse/ytelse/nokkeltall?behandlingType=FleksibelApSak&fom=2026-01-01&tom=2026-03-01&aggregering=UKE',
       ]}
     />
   )

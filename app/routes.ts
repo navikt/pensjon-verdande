@@ -18,28 +18,57 @@ export default [
 
     route('analyse', 'analyse/route.tsx', [
       index('analyse/_index.tsx'),
-      route('nokkeltall', 'analyse/nokkeltall.tsx'),
-      route('statustrend', 'analyse/statustrend.tsx'),
-      route('varighet', 'analyse/varighet.tsx'),
-      route('automatisering', 'analyse/automatisering.tsx'),
-      route('feilanalyse', 'analyse/feilanalyse.tsx'),
-      route('ko', 'analyse/ko.tsx'),
-      route('gjenforsok', 'analyse/gjenforsok.tsx'),
-      route('aktivitetsvarighet', 'analyse/aktivitetsvarighet.tsx'),
-      route('kalendertid', 'analyse/kalendertid.tsx'),
-      route('tidspunkt', 'analyse/tidspunkt.tsx'),
-      route('teamytelse', 'analyse/teamytelse.tsx'),
-      route('prioritet', 'analyse/prioritet.tsx'),
-      route('stoppet', 'analyse/stoppet.tsx'),
-      route('planlagt', 'analyse/planlagt.tsx'),
-      route('gruppe', 'analyse/gruppe.tsx'),
-      route('sakstype', 'analyse/sakstype.tsx'),
-      route('kravtype', 'analyse/kravtype.tsx'),
-      route('vedtakstype', 'analyse/vedtakstype.tsx'),
-      route('aktiviteter', 'analyse/aktiviteter.tsx'),
-      route('manuelle', 'analyse/manuelle.tsx'),
-      route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
-      route('ende-til-ende', 'analyse/ende-til-ende.tsx'),
+
+      // Ytelse — overordnet ytelsesovervåking
+      route('ytelse', 'analyse/ytelse-layout.tsx', [
+        index('analyse/ytelse-index.tsx'),
+        route('nokkeltall', 'analyse/nokkeltall.tsx'),
+        route('statustrend', 'analyse/statustrend.tsx'),
+        route('varighet', 'analyse/varighet.tsx'),
+        route('ko', 'analyse/ko.tsx'),
+        route('ende-til-ende', 'analyse/ende-til-ende.tsx'),
+      ]),
+
+      // Automatisering — automatiseringsgrad og blokkere
+      route('automatisering', 'analyse/automatisering-layout.tsx', [
+        index('analyse/automatisering-index.tsx'),
+        route('oversikt', 'analyse/automatisering.tsx'),
+        route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
+        route('manuelle', 'analyse/manuelle.tsx'),
+      ]),
+
+      // Kvalitet — feilhåndtering og kvalitetsovervåking
+      route('kvalitet', 'analyse/kvalitet-layout.tsx', [
+        index('analyse/kvalitet-index.tsx'),
+        route('stoppet', 'analyse/stoppet.tsx'),
+        route('feilanalyse', 'analyse/feilanalyse.tsx'),
+        route('gjenforsok', 'analyse/gjenforsok.tsx'),
+      ]),
+
+      // Aktiviteter og tid — aktivitetsnivå og tidsmønstre
+      route('aktiviteter-og-tid', 'analyse/aktiviteter-layout.tsx', [
+        index('analyse/aktiviteter-index.tsx'),
+        route('aktivitetsvarighet', 'analyse/aktivitetsvarighet.tsx'),
+        route('kalendertid', 'analyse/kalendertid.tsx'),
+        route('aktiviteter', 'analyse/aktiviteter.tsx'),
+        route('tidspunkt', 'analyse/tidspunkt.tsx'),
+        route('planlagt', 'analyse/planlagt.tsx'),
+      ]),
+
+      // Dimensjoner — tverrgående analyse etter forretningsdimensjoner
+      route('dimensjoner', 'analyse/dimensjoner-layout.tsx', [
+        index('analyse/dimensjoner-index.tsx'),
+        route('teamytelse', 'analyse/teamytelse.tsx'),
+        route('prioritet', 'analyse/prioritet.tsx'),
+        route('gruppe', 'analyse/gruppe.tsx'),
+        route('sakstype', 'analyse/sakstype.tsx'),
+        route('kravtype', 'analyse/kravtype.tsx'),
+        route('vedtakstype', 'analyse/vedtakstype.tsx'),
+        route('auto-brev', 'analyse/auto-brev.tsx'),
+      ]),
+
+      // Bakoverkompatibel catch-all for gamle fane-URL-er (f.eks. /analyse/nokkeltall → /analyse/ytelse/nokkeltall)
+      route('*', 'analyse/redirect-tab.tsx'),
     ]),
     route('analyse/eksport', 'analyse/eksport.tsx'),
 
@@ -210,6 +239,8 @@ export default [
     route('feil-registrer-krav', 'vedlikehold/feil-registrer-krav.tsx'),
 
     route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
+
+    route('brev-bestilling', 'brev-bestilling/index.tsx'),
 
     route('scheduler-styring', 'vedlikehold/scheduler-styring.tsx'),
 
