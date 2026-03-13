@@ -13,7 +13,7 @@ import {
   TextField,
   VStack,
 } from '@navikt/ds-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bar } from 'react-chartjs-2'
 import { useFetcher } from 'react-router'
 import { apiGetOrUndefined, apiPost } from '~/services/api.server'
@@ -425,30 +425,24 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     [grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId],
   )
 
-  const refreshGrunnlag = useCallback(() => {
+  const refreshGrunnlag = () => {
     if (pollFetcher.state !== 'idle') return
     pollFetcher.load('?poll=grunnlag')
-  }, [pollFetcher.state, pollFetcher.load])
+  }
 
-  const refreshSokListe = useCallback(
-    (grunnlagId: number) => {
-      if (sokListFetcher.state !== 'idle') return
-      sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
-    },
-    [sokListFetcher.state, sokListFetcher.load],
-  )
+  const refreshSokListe = (grunnlagId: number) => {
+    if (sokListFetcher.state !== 'idle') return
+    sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
+  }
 
-  const refreshStartKontroller = useCallback(() => {
+  const refreshStartKontroller = () => {
     if (startKontrollListFetcher.state !== 'idle') return
     startKontrollListFetcher.load('?poll=startkontroll')
-  }, [startKontrollListFetcher.state, startKontrollListFetcher.load])
+  }
 
-  const pollStatistikk = useCallback(
-    (grunnlagId: number) => {
-      statistikkFetcher.load(`?poll=statistikk&grunnlagId=${grunnlagId}`)
-    },
-    [statistikkFetcher],
-  )
+  const pollStatistikk = (grunnlagId: number) => {
+    statistikkFetcher.load(`?poll=statistikk&grunnlagId=${grunnlagId}`)
+  }
 
   const sendtTilKontrollSet = useMemo(() => new Set(startkontroller.map((k) => k.sokBehandlingId)), [startkontroller])
 
@@ -491,8 +485,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     })
     lastLoadedSokForGrunnlagRef.current = null
 
-    refreshGrunnlag()
-  }, [startFetcher.data?.behandlingId, refreshGrunnlag])
+    if (pollFetcher.state === 'idle') {
+      pollFetcher.load('?poll=grunnlag')
+    }
+  }, [startFetcher.data?.behandlingId, pollFetcher.state, pollFetcher.load])
 
   useEffect(() => {
     const data = pollFetcher.data
@@ -516,10 +512,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
       if (lastLoadedSokForGrunnlagRef.current !== ferdigGrunnlagId) {
         lastLoadedSokForGrunnlagRef.current = ferdigGrunnlagId
-        refreshSokListe(ferdigGrunnlagId)
+        if (sokListFetcher.state === 'idle') {
+          sokListFetcher.load(`?poll=sok&grunnlagId=${ferdigGrunnlagId}`)
+        }
       }
     }
-  }, [pollFetcher.data, refreshSokListe])
+  }, [pollFetcher.data, sokListFetcher.state, sokListFetcher.load])
 
   useEffect(() => {
     if (!sokListFetcher.data) return
@@ -533,12 +531,15 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (handledSokStartIdRef.current === sokId) return
 
     handledSokStartIdRef.current = sokId
-    refreshSokListe(grunnlagId)
+    if (sokListFetcher.state === 'idle') {
+      sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
+    }
   }, [
     sokStartFetcher.data?.sokBehandlingId,
     grunnlagBehandlingId,
     grunnlagResultat?.grunnlagBehandlingId,
-    refreshSokListe,
+    sokListFetcher.state,
+    sokListFetcher.load,
   ])
 
   useEffect(() => {
@@ -575,22 +576,26 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (handledStartKontrollResponseRef.current === data) return
 
     handledStartKontrollResponseRef.current = data
-    refreshStartKontroller()
-  }, [startKontrollFetcher.data, refreshStartKontroller])
+    if (startKontrollListFetcher.state === 'idle') {
+      startKontrollListFetcher.load('?poll=startkontroll')
+    }
+  }, [startKontrollFetcher.data, startKontrollListFetcher.state, startKontrollListFetcher.load])
 
   useEffect(() => {
     const id = window.setInterval(() => {
       const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
 
-      if (grunnlagStatus === 'KJØRER') {
-        refreshGrunnlag()
+      if (grunnlagStatus === 'KJØRER' && pollFetcher.state === 'idle') {
+        pollFetcher.load('?poll=grunnlag')
       }
 
-      if (grunnlagId) {
-        refreshSokListe(grunnlagId)
+      if (grunnlagId && sokListFetcher.state === 'idle') {
+        sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
       }
 
-      refreshStartKontroller()
+      if (startKontrollListFetcher.state === 'idle') {
+        startKontrollListFetcher.load('?poll=startkontroll')
+      }
     }, 20_000)
 
     return () => window.clearInterval(id)
@@ -598,9 +603,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     grunnlagStatus,
     grunnlagBehandlingId,
     grunnlagResultat?.grunnlagBehandlingId,
-    refreshGrunnlag,
-    refreshSokListe,
-    refreshStartKontroller,
+    pollFetcher.state,
+    pollFetcher.load,
+    sokListFetcher.state,
+    sokListFetcher.load,
+    startKontrollListFetcher.state,
+    startKontrollListFetcher.load,
   ])
   const disableStart = grunnlagStatus === 'KJØRER'
   const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
@@ -618,7 +626,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (autoStatistikkLastetRef.current) return
     autoStatistikkLastetRef.current = true
     pollStatistikk(valgtGrunnlagId)
-  }, [valgtGrunnlagId, grunnlagStatus, pollStatistikk])
+  }, [valgtGrunnlagId, grunnlagStatus, statistikkFetcher.load])
 
   const [minstAlder, setMinstAlder] = useState<string>('67')
   const [kunUfore, setKunUfore] = useState<boolean>(false)
@@ -1073,7 +1081,15 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               <>
                 <VStack gap="space-2">
                   <HStack align="center" gap="space-2">
-                    <Button size="small" variant="secondary" onClick={() => pollStatistikk(valgtGrunnlagId)}>
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      onClick={() => {
+                        if (statistikkFetcher.state !== 'idle') return
+                        pollStatistikk(valgtGrunnlagId)
+                      }}
+                      disabled={statistikkFetcher.state !== 'idle'}
+                    >
                       Refresh
                     </Button>
 
