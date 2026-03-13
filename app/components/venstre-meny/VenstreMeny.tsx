@@ -17,7 +17,7 @@ import {
 } from '@navikt/aksel-icons'
 import type { JSX } from 'react'
 import { useState } from 'react'
-import { NavLink } from 'react-router'
+import { NavLink, useLocation } from 'react-router'
 import type { MeResponse } from '~/brukere/brukere'
 import { BEHANDLING_STATUS_MAP } from '~/common/decode'
 import styles from './venstre-meny.module.css'
@@ -108,6 +108,8 @@ export function harRolle(me: MeResponse | undefined, rolle: string) {
 
 export default function VenstreMeny(props: Props) {
   const me = props.me
+  const location = useLocation()
+  const analyseSearch = location.pathname.startsWith('/analyse') ? location.search : ''
   let currentIndex = 0
 
   function nextIndex() {
@@ -134,7 +136,14 @@ export default function VenstreMeny(props: Props) {
     setOpenIndex(openIndex === index ? null : index)
   }
 
-  function byggMeny(navn: string, menyElementer: string[][], nextIdx: () => number, icon?: JSX.Element, useEnd = true) {
+  function byggMeny(
+    navn: string,
+    menyElementer: string[][],
+    nextIdx: () => number,
+    icon?: JSX.Element,
+    useEnd = true,
+    preserveSearch = '',
+  ) {
     const harTilgangTilMeny = menyElementer.some(([operasjon]) => harTilgang(me, operasjon))
     if (!harTilgangTilMeny) return undefined
 
@@ -155,7 +164,7 @@ export default function VenstreMeny(props: Props) {
         <ul className={styles.submenu}>
           {menyElementer
             .filter(([operasjon]) => harTilgang(me, operasjon))
-            .map(([operasjon, link, label]) => createMenuItem(operasjon, link, label, useEnd))}
+            .map(([operasjon, link, label]) => createMenuItem(operasjon, `${link}${preserveSearch}`, label, useEnd))}
         </ul>
       </li>
     )
@@ -239,7 +248,14 @@ export default function VenstreMeny(props: Props) {
             </li>
           )}
 
-          {byggMeny('Analyse', analyseMeny, nextIndex, <BarChartIcon title="Analyse" fontSize="1.5rem" />, false)}
+          {byggMeny(
+            'Analyse',
+            analyseMeny,
+            nextIndex,
+            <BarChartIcon title="Analyse" fontSize="1.5rem" />,
+            false,
+            analyseSearch,
+          )}
 
           {byggMeny(
             'Større kjøringer',
