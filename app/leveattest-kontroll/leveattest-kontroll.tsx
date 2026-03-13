@@ -624,9 +624,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (!valgtGrunnlagId) return
     if (grunnlagStatus !== 'FERDIG') return
     if (autoStatistikkLastetRef.current) return
+    if (statistikkFetcher.state !== 'idle') return
+
     autoStatistikkLastetRef.current = true
-    pollStatistikk(valgtGrunnlagId)
-  }, [valgtGrunnlagId, grunnlagStatus, statistikkFetcher.load])
+    statistikkFetcher.load(`?poll=statistikk&grunnlagId=${valgtGrunnlagId}`)
+  }, [valgtGrunnlagId, grunnlagStatus, statistikkFetcher.state, statistikkFetcher.load])
 
   const [minstAlder, setMinstAlder] = useState<string>('67')
   const [kunUfore, setKunUfore] = useState<boolean>(false)
@@ -833,7 +835,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               <KjoringerPreview title="Grunnlagkjøring" items={grunnlagItems} emptyText="Ingen grunnlag funnet ennå." />
 
               <HStack align="center" gap="space-2">
-                <Button size="small" variant="secondary" onClick={refreshGrunnlag}>
+                <Button
+                  size="small"
+                  variant="secondary"
+                  onClick={refreshGrunnlag}
+                  disabled={pollFetcher.state !== 'idle'}
+                >
                   Refresh grunnlag
                 </Button>
               </HStack>
@@ -1016,9 +1023,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   size="small"
                   variant="secondary"
                   onClick={() => {
-                    if (valgtGrunnlagId) refreshSokListe(valgtGrunnlagId)
+                    if (!valgtGrunnlagId) return
+                    refreshSokListe(valgtGrunnlagId)
                   }}
-                  disabled={!valgtGrunnlagId}
+                  disabled={!valgtGrunnlagId || sokListFetcher.state !== 'idle'}
                 >
                   Refresh søkeresultater
                 </Button>
@@ -1058,7 +1066,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               />
 
               <HStack align="center" gap="space-2">
-                <Button size="small" variant="secondary" onClick={refreshStartKontroller}>
+                <Button
+                  size="small"
+                  variant="secondary"
+                  onClick={refreshStartKontroller}
+                  disabled={startKontrollListFetcher.state !== 'idle'}
+                >
                   Refresh startkontroller
                 </Button>
               </HStack>
