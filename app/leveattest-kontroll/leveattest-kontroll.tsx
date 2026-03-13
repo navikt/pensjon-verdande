@@ -6,7 +6,6 @@ import {
   CheckboxGroup,
   Heading,
   HStack,
-  Loader,
   Modal,
   Select,
   Table,
@@ -417,7 +416,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const lastLoadedSokForGrunnlagRef = useRef<number | null>(null)
   const handledGrunnlagStartIdRef = useRef<number | null>(null)
   const handledSokStartIdRef = useRef<number | null>(null)
-  const handledStartKontrollRefreshRef = useRef(false)
+  const handledStartKontrollResponseRef = useRef<StartKontrollActionResponse | null>(null)
 
   const [valgteSokIds, setValgteSokIds] = useState<number[]>([])
 
@@ -425,6 +424,24 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     () => grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null,
     [grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId],
   )
+
+  const refreshGrunnlag = useCallback(() => {
+    if (pollFetcher.state !== 'idle') return
+    pollFetcher.load('?poll=grunnlag')
+  }, [pollFetcher.state, pollFetcher.load])
+
+  const refreshSokListe = useCallback(
+    (grunnlagId: number) => {
+      if (sokListFetcher.state !== 'idle') return
+      sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
+    },
+    [sokListFetcher.state, sokListFetcher.load],
+  )
+
+  const refreshStartKontroller = useCallback(() => {
+    if (startKontrollListFetcher.state !== 'idle') return
+    startKontrollListFetcher.load('?poll=startkontroll')
+  }, [startKontrollListFetcher.state, startKontrollListFetcher.load])
 
   const pollStatistikk = useCallback(
     (grunnlagId: number) => {
@@ -463,8 +480,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     if (handledGrunnlagStartIdRef.current === behandlingId) return
 
     handledGrunnlagStartIdRef.current = behandlingId
-    lastLoadedSokForGrunnlagRef.current = null
-
     setGrunnlagBehandlingId(behandlingId)
     setGrunnlagStatus('KJØRER')
     setGrunnlagResultat({
@@ -474,9 +489,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       kjoredatoGrunnlag: null,
       behandlingSistKjort: null,
     })
+    lastLoadedSokForGrunnlagRef.current = null
 
-    pollFetcher.load('?poll=grunnlag')
-  }, [startFetcher.data?.behandlingId])
+    refreshGrunnlag()
+  }, [startFetcher.data?.behandlingId, refreshGrunnlag])
 
   useEffect(() => {
     const data = pollFetcher.data
@@ -498,72 +514,37 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       setGrunnlagResultat(data.resultat)
       setGrunnlagBehandlingId(ferdigGrunnlagId)
 
-      if (lastLoadedSokForGrunnlagRef.current !== ferdigGrunnlagId && sokListFetcher.state === 'idle') {
+      if (lastLoadedSokForGrunnlagRef.current !== ferdigGrunnlagId) {
         lastLoadedSokForGrunnlagRef.current = ferdigGrunnlagId
-        sokListFetcher.load(`?poll=sok&grunnlagId=${ferdigGrunnlagId}`)
+        refreshSokListe(ferdigGrunnlagId)
       }
     }
-  }, [pollFetcher.data, sokListFetcher])
+  }, [pollFetcher.data, refreshSokListe])
 
   useEffect(() => {
-    const data = sokListFetcher.data
-    if (!data) return
-    setSokListe(data.sok ?? [])
+    if (!sokListFetcher.data) return
+    setSokListe(sokListFetcher.data.sok ?? [])
   }, [sokListFetcher.data])
 
   useEffect(() => {
-    const data = startKontrollListFetcher.data
-    if (!data) return
-    setStartkontroller(data.startkontroller ?? [])
-  }, [startKontrollListFetcher.data])
-
-  useEffect(() => {
     const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
-    const sokBehandlingId = sokStartFetcher.data?.sokBehandlingId
-    if (!grunnlagId || !sokBehandlingId) return
-    if (handledSokStartIdRef.current === sokBehandlingId) return
+    const sokId = sokStartFetcher.data?.sokBehandlingId
+    if (!grunnlagId || !sokId) return
+    if (handledSokStartIdRef.current === sokId) return
 
-    handledSokStartIdRef.current = sokBehandlingId
-    sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
-  }, [sokStartFetcher.data?.sokBehandlingId, grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId])
-
-  useEffect(() => {
-    if (!startKontrollFetcher.data?.ok) {
-      handledStartKontrollRefreshRef.current = false
-      return
-    }
-    if (handledStartKontrollRefreshRef.current) return
-
-    handledStartKontrollRefreshRef.current = true
-    startKontrollListFetcher.load('?poll=startkontroll')
-  }, [startKontrollFetcher.data])
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
-
-      if (grunnlagStatus === 'KJØRER' && pollFetcher.state === 'idle') {
-        pollFetcher.load('?poll=grunnlag')
-      }
-
-      if (grunnlagId && sokListFetcher.state === 'idle') {
-        sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
-      }
-
-      if (startKontrollListFetcher.state === 'idle') {
-        startKontrollListFetcher.load('?poll=startkontroll')
-      }
-    }, 60_000)
-
-    return () => window.clearInterval(id)
+    handledSokStartIdRef.current = sokId
+    refreshSokListe(grunnlagId)
   }, [
-    grunnlagStatus,
+    sokStartFetcher.data?.sokBehandlingId,
     grunnlagBehandlingId,
     grunnlagResultat?.grunnlagBehandlingId,
-    pollFetcher,
-    sokListFetcher,
-    startKontrollListFetcher,
+    refreshSokListe,
   ])
+
+  useEffect(() => {
+    if (!startKontrollListFetcher.data) return
+    setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
+  }, [startKontrollListFetcher.data])
 
   useEffect(() => {
     const data = statistikkFetcher.data
@@ -584,6 +565,43 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       setModusStatus(purr.type)
     }
   }, [oppgaveFetcher.data, purreFetcher.data])
+
+  useEffect(() => {
+    const data = startKontrollFetcher.data
+    if (!data?.ok) {
+      handledStartKontrollResponseRef.current = null
+      return
+    }
+    if (handledStartKontrollResponseRef.current === data) return
+
+    handledStartKontrollResponseRef.current = data
+    refreshStartKontroller()
+  }, [startKontrollFetcher.data, refreshStartKontroller])
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
+
+      if (grunnlagStatus === 'KJØRER') {
+        refreshGrunnlag()
+      }
+
+      if (grunnlagId) {
+        refreshSokListe(grunnlagId)
+      }
+
+      refreshStartKontroller()
+    }, 20_000)
+
+    return () => window.clearInterval(id)
+  }, [
+    grunnlagStatus,
+    grunnlagBehandlingId,
+    grunnlagResultat?.grunnlagBehandlingId,
+    refreshGrunnlag,
+    refreshSokListe,
+    refreshStartKontroller,
+  ])
   const disableStart = grunnlagStatus === 'KJØRER'
   const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
   const disableModus = disableSok || purreFetcher.state !== 'idle' || oppgaveFetcher.state !== 'idle'
@@ -627,12 +645,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return [...custom, ...BOSTEDLAND_OPTIONS]
   }, [sokPaaLand])
 
-  const selectedLandOptions = useMemo(() => {
-    const byCode = new Map(allLandOptions.map((o) => [o.value, o]))
-    return sokPaaLand.map((code) => byCode.get(code) ?? { value: code, label: `${code} (ukjent)` })
-  }, [allLandOptions, sokPaaLand])
-
-  const unselectedLandOptions = useMemo(() => {
+  const visibleLandOptions = useMemo(() => {
     const q = landQuery.trim().toLowerCase()
     const selected = new Set(sokPaaLand)
 
@@ -648,6 +661,15 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       .slice()
       .sort((a, b) => a.label.localeCompare(b.label, 'no-NO'))
   }, [allLandOptions, landQuery, sokPaaLand])
+
+  const selectedLandOptions = useMemo(() => {
+    const selected = new Set(sokPaaLand)
+
+    return allLandOptions
+      .filter((o) => selected.has(o.value))
+      .slice()
+      .sort((a, b) => a.label.localeCompare(b.label, 'no-NO'))
+  }, [allLandOptions, sokPaaLand])
 
   function toggleSokSelection(sokId: number) {
     setValgteSokIds((prev) => (prev.includes(sokId) ? prev.filter((x) => x !== sokId) : [...prev, sokId]))
@@ -803,12 +825,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               <KjoringerPreview title="Grunnlagkjøring" items={grunnlagItems} emptyText="Ingen grunnlag funnet ennå." />
 
               <HStack align="center" gap="space-2">
-                <Button
-                  size="small"
-                  variant="secondary"
-                  onClick={() => pollFetcher.load('?poll=grunnlag')}
-                  loading={pollFetcher.state !== 'idle'}
-                >
+                <Button size="small" variant="secondary" onClick={refreshGrunnlag}>
                   Refresh grunnlag
                 </Button>
               </HStack>
@@ -885,71 +902,59 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
               <div
                 style={{
-                  maxHeight: '360px',
+                  maxHeight: '320px',
                   overflow: 'auto',
                   border: '1px solid var(--ax-border-neutral-subtleA)',
                   borderRadius: '12px',
-                  padding: '0.75rem',
                   background: 'var(--ax-bg-raised)',
                 }}
               >
-                <div style={{ fontSize: '0.85rem' }}>
+                <div
+                  style={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1,
+                    padding: '0.75rem',
+                    borderBottom: '1px solid var(--ax-border-neutral-subtleA)',
+                    background: 'var(--ax-bg-raised)',
+                  }}
+                >
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>Valgte land</div>
+                  {selectedLandOptions.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {selectedLandOptions.map((o) => (
+                        <button
+                          key={o.value}
+                          type="button"
+                          onClick={() => setSokPaaLand((prev) => prev.filter((code) => code !== o.value))}
+                          disabled={disableSok}
+                          style={{
+                            border: '1px solid var(--ax-border-neutral-subtleA)',
+                            borderRadius: '999px',
+                            padding: '0.35rem 0.7rem',
+                            background: 'var(--ax-bg-subtle)',
+                            cursor: disableSok ? 'default' : 'pointer',
+                          }}
+                        >
+                          {o.label} ×
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ opacity: 0.75, fontSize: '0.9rem' }}>Ingen land valgt</div>
+                  )}
+                </div>
+
+                <div style={{ padding: '0.75rem', fontSize: '0.85rem' }}>
                   <CheckboxGroup
                     legend="Søk på land"
                     value={sokPaaLand}
                     onChange={(v) => setSokPaaLand(v as string[])}
                     disabled={disableSok}
+                    hideLegend
                   >
-                    {selectedLandOptions.length > 0 && (
-                      <div
-                        style={{
-                          position: 'sticky',
-                          top: '-0.75rem',
-                          zIndex: 2,
-                          margin: '-0.75rem -0.75rem 0.75rem',
-                          padding: '0.75rem',
-                          background: 'var(--ax-bg-raised)',
-                          borderBottom: '1px solid var(--ax-border-neutral-subtleA)',
-                        }}
-                      >
-                        <BodyShort size="small" spacing>
-                          Valgte land
-                        </BodyShort>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '0.5rem',
-                          }}
-                        >
-                          {selectedLandOptions.map((o) => (
-                            <button
-                              key={o.value}
-                              type="button"
-                              onClick={() => setSokPaaLand((prev) => prev.filter((code) => code !== o.value))}
-                              disabled={disableSok}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.35rem',
-                                border: '1px solid var(--ax-border-neutral-subtleA)',
-                                borderRadius: '999px',
-                                padding: '0.35rem 0.7rem',
-                                background: 'var(--ax-bg-default)',
-                                cursor: disableSok ? 'not-allowed' : 'pointer',
-                              }}
-                              title="Fjern land"
-                            >
-                              <span>{o.label}</span>
-                              <span aria-hidden="true">×</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     <div style={{ columnCount: 3, columnGap: '1rem' }}>
-                      {unselectedLandOptions.map((o) => (
+                      {visibleLandOptions.map((o) => (
                         <div key={o.value} style={{ breakInside: 'avoid', padding: '2px 0' }}>
                           <Checkbox value={o.value}>{o.label}</Checkbox>
                         </div>
@@ -1003,11 +1008,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   size="small"
                   variant="secondary"
                   onClick={() => {
-                    if (valgtGrunnlagId && sokListFetcher.state === 'idle') {
-                      sokListFetcher.load(`?poll=sok&grunnlagId=${valgtGrunnlagId}`)
-                    }
+                    if (valgtGrunnlagId) refreshSokListe(valgtGrunnlagId)
                   }}
-                  loading={sokListFetcher.state !== 'idle'}
                   disabled={!valgtGrunnlagId}
                 >
                   Refresh søkeresultater
@@ -1048,16 +1050,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               />
 
               <HStack align="center" gap="space-2">
-                <Button
-                  size="small"
-                  variant="secondary"
-                  onClick={() => {
-                    if (startKontrollListFetcher.state === 'idle') {
-                      startKontrollListFetcher.load('?poll=startkontroll')
-                    }
-                  }}
-                  loading={startKontrollListFetcher.state !== 'idle'}
-                >
+                <Button size="small" variant="secondary" onClick={refreshStartKontroller}>
                   Refresh startkontroller
                 </Button>
               </HStack>
@@ -1080,16 +1073,9 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               <>
                 <VStack gap="space-2">
                   <HStack align="center" gap="space-2">
-                    <Button
-                      size="small"
-                      variant="secondary"
-                      onClick={() => pollStatistikk(valgtGrunnlagId)}
-                      loading={statistikkFetcher.state !== 'idle'}
-                    >
+                    <Button size="small" variant="secondary" onClick={() => pollStatistikk(valgtGrunnlagId)}>
                       Refresh
                     </Button>
-
-                    {statistikkFetcher.state !== 'idle' ? <Loader size="xsmall" title="Henter statistikk" /> : null}
 
                     <div style={{ opacity: 0.85 }}>
                       GrunnlagId: <strong>{valgtGrunnlagId}</strong>
