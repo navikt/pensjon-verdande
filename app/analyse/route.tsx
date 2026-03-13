@@ -10,13 +10,12 @@ import {
   Page,
   Select,
   Skeleton,
-  ToggleGroup,
   useRangeDatepicker,
   VStack,
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
 import React, { Suspense } from 'react'
-import { isRouteErrorResponse, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router'
+import { isRouteErrorResponse, Outlet, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -50,13 +49,6 @@ const behandlingstyper = [
   'ReguleringFamilie',
   'OpptjeningsendringAarligAlder',
 ]
-
-const seksjoner = [
-  { value: 'ytelse', label: 'Ytelse' },
-  { value: 'automatisering', label: 'Automatisering' },
-  { value: 'aktiviteter-og-tid', label: 'Aktiviteter & Tid' },
-  { value: 'dimensjoner', label: 'Dimensjoner' },
-] as const
 
 /** Velg passende aggregeringsnivå basert på tidsperioden */
 function velgAggregering(fom: string, tom: string): string {
@@ -99,12 +91,6 @@ export function shouldRevalidate({ currentUrl, nextUrl }: { currentUrl: URL; nex
 export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
   const { behandlingType, fom, tom, aggregering, tidsserie, erProd } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  const pathParts = location.pathname.split('/')
-  const analyseIdx = pathParts.indexOf('analyse')
-  const currentSection = analyseIdx >= 0 && pathParts.length > analyseIdx + 1 ? pathParts[analyseIdx + 1] : 'ytelse'
 
   // Sørg for at behandlingType alltid er i URL-parametere
   React.useEffect(() => {
@@ -177,10 +163,6 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
 
   function presetAllTime() {
     applyPeriod('2000-01-01', toIsoDate(new Date()))
-  }
-
-  function onSectionChange(section: string) {
-    navigate(`/analyse/${section}${location.search}`)
   }
 
   return (
@@ -315,16 +297,7 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
           </VStack>
         )}
 
-        <VStack gap="space-16">
-          <ToggleGroup value={currentSection} onChange={onSectionChange} size="small">
-            {seksjoner.map((s) => (
-              <ToggleGroup.Item key={s.value} value={s.value}>
-                {s.label}
-              </ToggleGroup.Item>
-            ))}
-          </ToggleGroup>
-          <Outlet context={{ erProd }} />
-        </VStack>
+        <Outlet context={{ erProd }} />
       </VStack>
     </Page.Block>
   )
