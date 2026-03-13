@@ -17,6 +17,7 @@ import GruppeTab from './gruppe'
 import KoTab from './ko'
 import KontrollpunkterTab from './kontrollpunkter'
 import KravtypeTab from './kravtype'
+import KvalitetLayout from './kvalitet-layout'
 import ManuelleTab from './manuelle'
 import {
   mockAktivitetData,
@@ -66,6 +67,7 @@ type Story = StoryObj
 const sectionLayouts: Record<string, { path: string; Component: React.ComponentType }> = {
   ytelse: { path: 'ytelse', Component: YtelseLayout },
   automatisering: { path: 'automatisering', Component: AutomatiseringLayout },
+  kvalitet: { path: 'kvalitet', Component: KvalitetLayout },
   'aktiviteter-og-tid': { path: 'aktiviteter-og-tid', Component: AktiviteterLayout },
   dimensjoner: { path: 'dimensjoner', Component: DimensjonerLayout },
 }
@@ -77,11 +79,11 @@ const tabToSection: Record<string, { section: string; path: string }> = {
   ko: { section: 'ytelse', path: 'ko' },
   'ende-til-ende': { section: 'ytelse', path: 'ende-til-ende' },
   oversikt: { section: 'automatisering', path: 'oversikt' },
-  stoppet: { section: 'automatisering', path: 'stoppet' },
-  feilanalyse: { section: 'automatisering', path: 'feilanalyse' },
-  gjenforsok: { section: 'automatisering', path: 'gjenforsok' },
   kontrollpunkter: { section: 'automatisering', path: 'kontrollpunkter' },
   manuelle: { section: 'automatisering', path: 'manuelle' },
+  stoppet: { section: 'kvalitet', path: 'stoppet' },
+  feilanalyse: { section: 'kvalitet', path: 'feilanalyse' },
+  gjenforsok: { section: 'kvalitet', path: 'gjenforsok' },
   aktivitetsvarighet: { section: 'aktiviteter-og-tid', path: 'aktivitetsvarighet' },
   kalendertid: { section: 'aktiviteter-og-tid', path: 'kalendertid' },
   aktiviteter: { section: 'aktiviteter-og-tid', path: 'aktiviteter' },

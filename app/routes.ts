@@ -28,15 +28,20 @@ export default [
         route('ende-til-ende', 'analyse/ende-til-ende.tsx'),
       ]),
 
-      // Automatisering — automatiseringsgrad, feilhåndtering og blokkere
+      // Automatisering — automatiseringsgrad og blokkere
       route('automatisering', 'analyse/automatisering-layout.tsx', [
         index('analyse/automatisering-index.tsx'),
         route('oversikt', 'analyse/automatisering.tsx'),
+        route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
+        route('manuelle', 'analyse/manuelle.tsx'),
+      ]),
+
+      // Kvalitet — feilhåndtering og kvalitetsovervåking
+      route('kvalitet', 'analyse/kvalitet-layout.tsx', [
+        index('analyse/kvalitet-index.tsx'),
         route('stoppet', 'analyse/stoppet.tsx'),
         route('feilanalyse', 'analyse/feilanalyse.tsx'),
         route('gjenforsok', 'analyse/gjenforsok.tsx'),
-        route('kontrollpunkter', 'analyse/kontrollpunkter.tsx'),
-        route('manuelle', 'analyse/manuelle.tsx'),
       ]),
 
       // Aktiviteter og tid — aktivitetsnivå og tidsmønstre
