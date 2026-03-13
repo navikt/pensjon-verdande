@@ -38,12 +38,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     aggregering: 'TIME',
   })
 
-  const brevParams = new URLSearchParams({
-    fom: fom.toISOString().replace('Z', ''),
-    tom: new Date().toISOString().replace('Z', ''),
-    aggregering: 'TIME',
-  })
-
   const dashboardResponse = Promise.all([
     apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
       (it) => it.totaltAntallBehandlinger,
@@ -64,7 +58,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     apiGet<TidsserieResponse>(`/api/behandling/analyse/tidsserie?${tidsserieParams}`, request).then(
       (it) => it.datapunkter,
     ),
-    apiGet<BrevTidsserieResponse>(`/api/behandling/analyse/brev-tidsserie?${brevParams}`, request).then(
+    apiGet<BrevTidsserieResponse>(`/api/behandling/analyse/brev-tidsserie?${tidsserieParams}`, request).then(
       (it) => it.datapunkter,
     ),
   ]).then((it) => ({
