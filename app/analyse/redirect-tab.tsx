@@ -35,5 +35,5 @@ export function loader({ request, params }: Route.LoaderArgs) {
   if (path) {
     throw redirect(`/analyse/${path}${url.search}`)
   }
-  throw redirect(`/analyse/ytelse${url.search}`)
+  throw redirect(`/analyse/ytelse/nokkeltall${url.search}`)
 }
