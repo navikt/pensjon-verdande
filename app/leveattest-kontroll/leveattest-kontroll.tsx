@@ -413,11 +413,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const [openPurrDialog, setOpenPurrDialog] = useState(false)
   const [openOppgaveDialog, setOpenOppgaveDialog] = useState(false)
 
-  const pollTimerRef = useRef<number | null>(null)
-  const sokPollTimerRef = useRef<number | null>(null)
-  const sokBackgroundPollRef = useRef<number | null>(null)
-  const startKontrollPollRef = useRef<number | null>(null)
   const initializedRef = useRef(false)
+  const lastLoadedSokForGrunnlagRef = useRef<number | null>(null)
+  const handledGrunnlagStartIdRef = useRef<number | null>(null)
+  const handledSokStartIdRef = useRef<number | null>(null)
+  const handledStartKontrollRefreshRef = useRef(false)
 
   const [valgteSokIds, setValgteSokIds] = useState<number[]>([])
 
@@ -425,28 +425,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     () => grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null,
     [grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId],
   )
-
-  const stoppInterval = useCallback((ref: React.MutableRefObject<number | null>) => {
-    if (ref.current != null) {
-      window.clearInterval(ref.current)
-      ref.current = null
-    }
-  }, [])
-
-  const pollGrunnlag = useCallback(() => {
-    pollFetcher.load('?poll=grunnlag')
-  }, [pollFetcher])
-
-  const pollSokListe = useCallback(
-    (grunnlagId: number) => {
-      sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
-    },
-    [sokListFetcher],
-  )
-
-  const pollStartKontroller = useCallback(() => {
-    startKontrollListFetcher.load('?poll=startkontroll')
-  }, [startKontrollListFetcher])
 
   const pollStatistikk = useCallback(
     (grunnlagId: number) => {
@@ -476,23 +454,16 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     setGrunnlagBehandlingId(latestGrunnlag.grunnlagBehandlingId)
     setGrunnlagResultat(latestGrunnlag)
     setSokListe(initialSok ?? [])
-
-    if (isFerdig(latestGrunnlag.status)) {
-      setGrunnlagStatus('FERDIG')
-      stoppInterval(pollTimerRef)
-      return
-    }
-
-    setGrunnlagStatus('KJØRER')
-    pollGrunnlag()
-    stoppInterval(pollTimerRef)
-    pollTimerRef.current = window.setInterval(pollGrunnlag, 10_000)
-    return () => stoppInterval(pollTimerRef)
-  }, [latestGrunnlag, initialSok, initialStartkontroller, pollGrunnlag, stoppInterval])
+    setGrunnlagStatus(isFerdig(latestGrunnlag.status) ? 'FERDIG' : 'KJØRER')
+  }, [latestGrunnlag, initialSok, initialStartkontroller])
 
   useEffect(() => {
     const behandlingId = startFetcher.data?.behandlingId
     if (!behandlingId) return
+    if (handledGrunnlagStartIdRef.current === behandlingId) return
+
+    handledGrunnlagStartIdRef.current = behandlingId
+    lastLoadedSokForGrunnlagRef.current = null
 
     setGrunnlagBehandlingId(behandlingId)
     setGrunnlagStatus('KJØRER')
@@ -504,11 +475,8 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       behandlingSistKjort: null,
     })
 
-    pollGrunnlag()
-    stoppInterval(pollTimerRef)
-    pollTimerRef.current = window.setInterval(pollGrunnlag, 10_000)
-    return () => stoppInterval(pollTimerRef)
-  }, [startFetcher.data?.behandlingId, pollGrunnlag, stoppInterval])
+    pollFetcher.load('?poll=grunnlag')
+  }, [startFetcher.data?.behandlingId])
 
   useEffect(() => {
     const data = pollFetcher.data
@@ -525,55 +493,77 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     }
 
     if (data.status === 'FERDIG') {
+      const ferdigGrunnlagId = data.resultat.grunnlagBehandlingId
       setGrunnlagStatus('FERDIG')
       setGrunnlagResultat(data.resultat)
-      setGrunnlagBehandlingId(data.resultat.grunnlagBehandlingId)
-      stoppInterval(pollTimerRef)
-      pollSokListe(data.resultat.grunnlagBehandlingId)
+      setGrunnlagBehandlingId(ferdigGrunnlagId)
+
+      if (lastLoadedSokForGrunnlagRef.current !== ferdigGrunnlagId && sokListFetcher.state === 'idle') {
+        lastLoadedSokForGrunnlagRef.current = ferdigGrunnlagId
+        sokListFetcher.load(`?poll=sok&grunnlagId=${ferdigGrunnlagId}`)
+      }
     }
-  }, [pollFetcher.data, pollSokListe, stoppInterval])
+  }, [pollFetcher.data, sokListFetcher])
 
   useEffect(() => {
-    if (!sokListFetcher.data) return
-    setSokListe(sokListFetcher.data.sok ?? [])
+    const data = sokListFetcher.data
+    if (!data) return
+    setSokListe(data.sok ?? [])
   }, [sokListFetcher.data])
 
   useEffect(() => {
-    const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
-    if (!grunnlagId || grunnlagStatus !== 'FERDIG') return
+    const data = startKontrollListFetcher.data
+    if (!data) return
+    setStartkontroller(data.startkontroller ?? [])
+  }, [startKontrollListFetcher.data])
 
-    const hasNonTerminal = sokListe.some((s) => !isTerminal(s.status))
-    if (!hasNonTerminal) {
-      stoppInterval(sokBackgroundPollRef)
+  useEffect(() => {
+    const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
+    const sokBehandlingId = sokStartFetcher.data?.sokBehandlingId
+    if (!grunnlagId || !sokBehandlingId) return
+    if (handledSokStartIdRef.current === sokBehandlingId) return
+
+    handledSokStartIdRef.current = sokBehandlingId
+    sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
+  }, [sokStartFetcher.data?.sokBehandlingId, grunnlagBehandlingId, grunnlagResultat?.grunnlagBehandlingId])
+
+  useEffect(() => {
+    if (!startKontrollFetcher.data?.ok) {
+      handledStartKontrollRefreshRef.current = false
       return
     }
+    if (handledStartKontrollRefreshRef.current) return
 
-    if (sokBackgroundPollRef.current != null) return
-    sokBackgroundPollRef.current = window.setInterval(() => pollSokListe(grunnlagId), 10_000)
-    return () => stoppInterval(sokBackgroundPollRef)
-  }, [grunnlagBehandlingId, grunnlagResultat, grunnlagStatus, sokListe, pollSokListe, stoppInterval])
-
-  useEffect(() => {
-    const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
-    const sokId = sokStartFetcher.data?.sokBehandlingId
-    if (!grunnlagId || !sokId) return
-
-    pollSokListe(grunnlagId)
-    stoppInterval(sokPollTimerRef)
-
-    const startedAt = Date.now()
-    sokPollTimerRef.current = window.setInterval(() => {
-      pollSokListe(grunnlagId)
-      if (Date.now() - startedAt > 60_000) stoppInterval(sokPollTimerRef)
-    }, 5_000)
-
-    return () => stoppInterval(sokPollTimerRef)
-  }, [sokStartFetcher.data?.sokBehandlingId, grunnlagBehandlingId, grunnlagResultat, pollSokListe, stoppInterval])
+    handledStartKontrollRefreshRef.current = true
+    startKontrollListFetcher.load('?poll=startkontroll')
+  }, [startKontrollFetcher.data])
 
   useEffect(() => {
-    if (!startKontrollListFetcher.data) return
-    setStartkontroller(startKontrollListFetcher.data.startkontroller ?? [])
-  }, [startKontrollListFetcher.data])
+    const id = window.setInterval(() => {
+      const grunnlagId = grunnlagBehandlingId ?? grunnlagResultat?.grunnlagBehandlingId ?? null
+
+      if (grunnlagStatus === 'KJØRER' && pollFetcher.state === 'idle') {
+        pollFetcher.load('?poll=grunnlag')
+      }
+
+      if (grunnlagId && sokListFetcher.state === 'idle') {
+        sokListFetcher.load(`?poll=sok&grunnlagId=${grunnlagId}`)
+      }
+
+      if (startKontrollListFetcher.state === 'idle') {
+        startKontrollListFetcher.load('?poll=startkontroll')
+      }
+    }, 60_000)
+
+    return () => window.clearInterval(id)
+  }, [
+    grunnlagStatus,
+    grunnlagBehandlingId,
+    grunnlagResultat?.grunnlagBehandlingId,
+    pollFetcher,
+    sokListFetcher,
+    startKontrollListFetcher,
+  ])
 
   useEffect(() => {
     const data = statistikkFetcher.data
@@ -594,34 +584,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       setModusStatus(purr.type)
     }
   }, [oppgaveFetcher.data, purreFetcher.data])
-
-  useEffect(() => {
-    if (startKontrollFetcher.state !== 'idle') return
-    if (!startKontrollFetcher.data?.ok) return
-
-    pollStartKontroller()
-    stoppInterval(startKontrollPollRef)
-
-    const startedAt = Date.now()
-    startKontrollPollRef.current = window.setInterval(() => {
-      pollStartKontroller()
-      if (Date.now() - startedAt > 60_000) stoppInterval(startKontrollPollRef)
-    }, 5_000)
-
-    return () => stoppInterval(startKontrollPollRef)
-  }, [startKontrollFetcher.state, startKontrollFetcher.data, pollStartKontroller, stoppInterval])
-
-  useEffect(() => {
-    const hasNonTerminal = startkontroller.some((k) => !isTerminal(k.status))
-    if (!hasNonTerminal) {
-      stoppInterval(startKontrollPollRef)
-      return
-    }
-
-    if (startKontrollPollRef.current != null) return
-    startKontrollPollRef.current = window.setInterval(() => pollStartKontroller(), 10_000)
-    return () => stoppInterval(startKontrollPollRef)
-  }, [startkontroller, pollStartKontroller, stoppInterval])
   const disableStart = grunnlagStatus === 'KJØRER'
   const disableSok = !valgtGrunnlagId || grunnlagStatus !== 'FERDIG'
   const disableModus = disableSok || purreFetcher.state !== 'idle' || oppgaveFetcher.state !== 'idle'
@@ -645,13 +607,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
   const [sokPaaLand, setSokPaaLand] = useState<string[]>(['USA'])
   const [landQuery, setLandQuery] = useState<string>('')
 
-  const nullstillSok = useCallback(() => {
-    setMinstAlder('')
-    setKunUfore(false)
-    setSokPaaLand([])
-    setLandQuery('')
-  }, [])
-
   const normalizeCode = (raw: string) => raw.trim().toUpperCase()
 
   const canAddFromQuery = (() => {
@@ -672,7 +627,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
     return [...custom, ...BOSTEDLAND_OPTIONS]
   }, [sokPaaLand])
 
-  const visibleLandOptions = useMemo(() => {
+  const selectedLandOptions = useMemo(() => {
+    const byCode = new Map(allLandOptions.map((o) => [o.value, o]))
+    return sokPaaLand.map((code) => byCode.get(code) ?? { value: code, label: `${code} (ukjent)` })
+  }, [allLandOptions, sokPaaLand])
+
+  const unselectedLandOptions = useMemo(() => {
     const q = landQuery.trim().toLowerCase()
     const selected = new Set(sokPaaLand)
 
@@ -682,24 +642,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       return hay.includes(q)
     }
 
-    const selectedOptions = allLandOptions
-      .filter((o) => selected.has(o.value))
-      .slice()
-      .sort((a, b) => a.label.localeCompare(b.label, 'no-NO'))
-
-    const unselectedOptions = allLandOptions
+    return allLandOptions
       .filter((o) => !selected.has(o.value))
       .filter(matchesQuery)
       .slice()
       .sort((a, b) => a.label.localeCompare(b.label, 'no-NO'))
-
-    return [...selectedOptions, ...unselectedOptions]
   }, [allLandOptions, landQuery, sokPaaLand])
-
-  const selectedLandLabel = useMemo(() => {
-    if (sokPaaLand.length === 0) return 'Ingen land valgt'
-    return sokPaaLand.map(labelForLand).join(', ')
-  }, [sokPaaLand])
 
   function toggleSokSelection(sokId: number) {
     setValgteSokIds((prev) => (prev.includes(sokId) ? prev.filter((x) => x !== sokId) : [...prev, sokId]))
@@ -853,6 +801,17 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </HStack>
 
               <KjoringerPreview title="Grunnlagkjøring" items={grunnlagItems} emptyText="Ingen grunnlag funnet ennå." />
+
+              <HStack align="center" gap="space-2">
+                <Button
+                  size="small"
+                  variant="secondary"
+                  onClick={() => pollFetcher.load('?poll=grunnlag')}
+                  loading={pollFetcher.state !== 'idle'}
+                >
+                  Refresh grunnlag
+                </Button>
+              </HStack>
             </VStack>
 
             <VStack gap="space-12">
@@ -926,7 +885,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
               <div
                 style={{
-                  maxHeight: '240px',
+                  maxHeight: '360px',
                   overflow: 'auto',
                   border: '1px solid var(--ax-border-neutral-subtleA)',
                   borderRadius: '12px',
@@ -941,8 +900,56 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     onChange={(v) => setSokPaaLand(v as string[])}
                     disabled={disableSok}
                   >
+                    {selectedLandOptions.length > 0 && (
+                      <div
+                        style={{
+                          position: 'sticky',
+                          top: '-0.75rem',
+                          zIndex: 2,
+                          margin: '-0.75rem -0.75rem 0.75rem',
+                          padding: '0.75rem',
+                          background: 'var(--ax-bg-raised)',
+                          borderBottom: '1px solid var(--ax-border-neutral-subtleA)',
+                        }}
+                      >
+                        <BodyShort size="small" spacing>
+                          Valgte land
+                        </BodyShort>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          {selectedLandOptions.map((o) => (
+                            <button
+                              key={o.value}
+                              type="button"
+                              onClick={() => setSokPaaLand((prev) => prev.filter((code) => code !== o.value))}
+                              disabled={disableSok}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                border: '1px solid var(--ax-border-neutral-subtleA)',
+                                borderRadius: '999px',
+                                padding: '0.35rem 0.7rem',
+                                background: 'var(--ax-bg-default)',
+                                cursor: disableSok ? 'not-allowed' : 'pointer',
+                              }}
+                              title="Fjern land"
+                            >
+                              <span>{o.label}</span>
+                              <span aria-hidden="true">×</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div style={{ columnCount: 3, columnGap: '1rem' }}>
-                      {visibleLandOptions.map((o) => (
+                      {unselectedLandOptions.map((o) => (
                         <div key={o.value} style={{ breakInside: 'avoid', padding: '2px 0' }}>
                           <Checkbox value={o.value}>{o.label}</Checkbox>
                         </div>
@@ -953,7 +960,6 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </div>
 
               <div style={{ opacity: 0.85 }}>
-                Valgt: <strong>{selectedLandLabel}</strong> {' · '}
                 Minstealder: <strong>{minstAlder || '—'}+</strong> {' · '}
                 Filter: <strong>{kunUfore ? 'Kun uføre' : 'Alle'}</strong>
               </div>
@@ -967,19 +973,14 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   <input key={l} type="hidden" name="sokPaaLand" value={l} />
                 ))}
 
-                <HStack gap="space-8" align="center">
-                  <Button
-                    type="submit"
-                    variant="secondary"
-                    loading={sokStartFetcher.state !== 'idle'}
-                    disabled={disableSok || sokPaaLand.length === 0}
-                  >
-                    Kjør søk
-                  </Button>
-                  <Button type="button" variant="tertiary" onClick={nullstillSok} disabled={disableSok}>
-                    Nullstill
-                  </Button>
-                </HStack>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  loading={sokStartFetcher.state !== 'idle'}
+                  disabled={disableSok || sokPaaLand.length === 0}
+                >
+                  Kjør søk
+                </Button>
               </sokStartFetcher.Form>
 
               <KjoringerPreview
@@ -996,6 +997,22 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   toggleSokSelection(id)
                 }}
               />
+
+              <HStack align="center" gap="space-2">
+                <Button
+                  size="small"
+                  variant="secondary"
+                  onClick={() => {
+                    if (valgtGrunnlagId && sokListFetcher.state === 'idle') {
+                      sokListFetcher.load(`?poll=sok&grunnlagId=${valgtGrunnlagId}`)
+                    }
+                  }}
+                  loading={sokListFetcher.state !== 'idle'}
+                  disabled={!valgtGrunnlagId}
+                >
+                  Refresh søkeresultater
+                </Button>
+              </HStack>
             </VStack>
 
             <VStack gap="space-12">
@@ -1029,6 +1046,21 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                 items={startKontrollItems}
                 emptyText="Ingen startkontroller funnet ennå."
               />
+
+              <HStack align="center" gap="space-2">
+                <Button
+                  size="small"
+                  variant="secondary"
+                  onClick={() => {
+                    if (startKontrollListFetcher.state === 'idle') {
+                      startKontrollListFetcher.load('?poll=startkontroll')
+                    }
+                  }}
+                  loading={startKontrollListFetcher.state !== 'idle'}
+                >
+                  Refresh startkontroller
+                </Button>
+              </HStack>
             </VStack>
           </VStack>
         </Tabs.Panel>
