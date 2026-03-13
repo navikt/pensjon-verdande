@@ -272,11 +272,9 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
           </VStack>
         </Box>
 
-        {(fom.includes('T') || tom.includes('T')) && (
-          <Detail textColor="subtle">
-            Valgt periode: {formaterTimestamp(fom)} – {formaterTimestamp(tom)}
-          </Detail>
-        )}
+        <Detail textColor="subtle">
+          Valgt periode: {formaterTimestamp(fom)} – {formaterTimestamp(tom)}
+        </Detail>
 
         {tidsserie?.datapunkter && tidsserie.datapunkter.length > 0 && (
           <VStack gap="space-8">
