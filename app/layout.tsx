@@ -95,7 +95,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
           />
 
           <HStack gap="space-0" wrap={false}>
-            <VenstreMeny me={me} showIconMenu={showIconMenu} env={env} />
+            <VenstreMeny me={me} showIconMenu={showIconMenu} />
 
             <Page.Block style={{ minWidth: 0 }}>
               <Box padding={'space-16'}>

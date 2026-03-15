@@ -19,7 +19,6 @@ export const Default: Story = {
       verdandeRoller: ['SAKSBEHANDLER', 'VERDANDE_ADMIN'],
     }),
     showIconMenu: false,
-    env: 'q2',
   },
 }
 
@@ -30,6 +29,5 @@ export const KunIkoner: Story = {
       verdandeRoller: ['SAKSBEHANDLER'],
     }),
     showIconMenu: true,
-    env: 'q2',
   },
 }

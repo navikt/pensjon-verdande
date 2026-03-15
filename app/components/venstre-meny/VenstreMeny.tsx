@@ -25,7 +25,6 @@ import styles from './venstre-meny.module.css'
 export type Props = {
   me: MeResponse
   showIconMenu: boolean
-  env: string
 }
 
 const administrasjonMeny = [
@@ -226,7 +225,7 @@ export default function VenstreMeny(props: Props) {
             </li>
           )}
 
-          {props.env !== 'p' && harTilgang(me, 'SE_BEHANDLINGER') && (
+          {harTilgang(me, 'SE_BEHANDLINGER') && (
             <li>
               <NavLink to="/brev-bestilling" className={({ isActive }) => (isActive ? styles.active : '')}>
                 <span className={styles.menyIkon}>

@@ -24,7 +24,6 @@ import type { Route } from './+types/route'
 const OpprettetChart = React.lazy(() => import('./components/OpprettetChart'))
 
 import { apiGet } from '~/services/api.server'
-import { env as serverEnv } from '~/services/env.server'
 import { logger } from '~/services/logger.server'
 import type { TidsserieResponse } from './types'
 import { formaterTimestamp, normalizePeriodToDate } from './utils/formattering'
@@ -81,7 +80,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     logger.warn(`Analyse tidsserie feilet: ${String(e)}`)
   }
 
-  return { behandlingType, fom, tom, aggregering, tidsserie, erProd: serverEnv.env === 'p' }
+  return { behandlingType, fom, tom, aggregering, tidsserie }
 }
 
 export function shouldRevalidate({ currentUrl, nextUrl }: { currentUrl: URL; nextUrl: URL }) {
@@ -89,7 +88,7 @@ export function shouldRevalidate({ currentUrl, nextUrl }: { currentUrl: URL; nex
 }
 
 export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
-  const { behandlingType, fom, tom, aggregering, tidsserie, erProd } = loaderData
+  const { behandlingType, fom, tom, aggregering, tidsserie } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
 
   // Sørg for at behandlingType alltid er i URL-parametere
@@ -295,7 +294,7 @@ export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
           </VStack>
         )}
 
-        <Outlet context={{ erProd }} />
+        <Outlet />
       </VStack>
     </Page.Block>
   )

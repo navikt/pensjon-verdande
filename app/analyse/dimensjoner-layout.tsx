@@ -1,4 +1,3 @@
-import { useOutletContext } from 'react-router'
 import SectionTabLayout from './SectionTabLayout'
 
 const faner = [
@@ -12,6 +11,5 @@ const faner = [
 ] as const
 
 export default function DimensjonerLayout() {
-  const { erProd } = useOutletContext<{ erProd: boolean }>()
-  return <SectionTabLayout sectionPath="dimensjoner" faner={faner} erProd={erProd} />
+  return <SectionTabLayout sectionPath="dimensjoner" faner={faner} />
 }
