@@ -1,4 +1,5 @@
 import type { BrevTidsserieResponse } from '~/analyse/types'
+import { velgAggregering } from '~/components/chart-utils/velgAggregering'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/brev-per-periode'
 
@@ -13,7 +14,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const params = new URLSearchParams({
     fom: fom.toISOString().replace('Z', ''),
     tom: new Date().toISOString().replace('Z', ''),
-    aggregering: 'TIME',
+    aggregering: velgAggregering(timer),
   })
 
   return await apiGet<BrevTidsserieResponse>(`/api/behandling/analyse/brev-tidsserie?${params}`, request)
