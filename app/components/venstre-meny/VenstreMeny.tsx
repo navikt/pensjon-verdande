@@ -5,6 +5,7 @@ import {
   CircleIcon,
   CurrencyExchangeIcon,
   EnvelopeClosedIcon,
+  FileSearchIcon,
   GavelIcon,
   HandShakeHeartIcon,
   HouseIcon,
@@ -83,12 +84,17 @@ const behandlingerMeny = [
   ...Object.entries(BEHANDLING_STATUS_MAP).map(([key, label]) => ['SE_BEHANDLINGER', `/behandlinger/${key}`, label]),
 ]
 
-const analyseMeny = [
+const behandlingsanalyseMeny = [
   ['SE_BEHANDLINGER', '/analyse/ytelse', 'Ytelse'],
   ['SE_BEHANDLINGER', '/analyse/automatisering', 'Automatisering'],
   ['SE_BEHANDLINGER', '/analyse/kvalitet', 'Kvalitet'],
   ['SE_BEHANDLINGER', '/analyse/aktiviteter-og-tid', 'Aktiviteter & Tid'],
   ['SE_BEHANDLINGER', '/analyse/dimensjoner', 'Dimensjoner'],
+]
+
+const sakKravAnalyseMeny = [
+  ['SE_BEHANDLINGER', '/analyse/sak-krav/krav', 'Kravstatistikk'],
+  ['SE_BEHANDLINGER', '/analyse/sak-krav/behandlingstid', 'Behandlingstid'],
 ]
 
 export function harTilgang(me: MeResponse | undefined, operasjon: string) {
@@ -108,7 +114,11 @@ export function harRolle(me: MeResponse | undefined, rolle: string) {
 export default function VenstreMeny(props: Props) {
   const me = props.me
   const location = useLocation()
-  const analyseSearch = location.pathname.startsWith('/analyse') ? location.search : ''
+  const analyseSearch =
+    location.pathname.startsWith('/analyse') && !location.pathname.startsWith('/analyse/sak-krav')
+      ? location.search
+      : ''
+  const sakKravSearch = location.pathname.startsWith('/analyse/sak-krav') ? location.search : ''
   let currentIndex = 0
 
   function nextIndex() {
@@ -248,12 +258,21 @@ export default function VenstreMeny(props: Props) {
           )}
 
           {byggMeny(
-            'Analyse',
-            analyseMeny,
+            'Behandlingsanalyse',
+            behandlingsanalyseMeny,
             nextIndex,
-            <BarChartIcon title="Analyse" fontSize="1.5rem" />,
+            <BarChartIcon title="Behandlingsanalyse" fontSize="1.5rem" />,
             false,
             analyseSearch,
+          )}
+
+          {byggMeny(
+            'Sak- og kravanalyse',
+            sakKravAnalyseMeny,
+            nextIndex,
+            <FileSearchIcon title="Sak- og kravanalyse" fontSize="1.5rem" />,
+            false,
+            sakKravSearch,
           )}
 
           {byggMeny(

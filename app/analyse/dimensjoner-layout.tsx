@@ -8,6 +8,7 @@ const faner = [
   { value: 'kravtype', label: 'Kravtype' },
   { value: 'vedtakstype', label: 'Vedtak' },
   { value: 'auto-brev', label: 'Autobrev' },
+  { value: 'behandling-krav-alder', label: 'Behandling per alder' },
 ] as const
 
 export default function DimensjonerLayout() {
