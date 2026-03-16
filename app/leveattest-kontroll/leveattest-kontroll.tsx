@@ -920,13 +920,17 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   value={sokPaaLand.length > 0 ? 'valgt' : 'tom'}
                   onChange={(e) => {
                     const v = e.target.value
-                    if (v === 'eu')
-                      setSokPaaLand(['DEU', 'FRA', 'ESP', 'PRT', 'ITA', 'NLD', 'BEL', 'AUT', 'CHE', 'IRL'])
-                    else if (v === 'na') setSokPaaLand(['USA', 'CAN'])
-                    else if (v === 'asia') setSokPaaLand(['THA', 'IND', 'KOR'])
-                    else if (v === 'sorostasia')
-                      setSokPaaLand(['THA', 'PHL', 'VNM', 'SGP', 'IDN', 'MYS', 'KHM', 'LAO', 'MMR'])
-                    else if (v === 'reset') setSokPaaLand([])
+                    if (v === 'sorostasia') {
+                      setSokPaaLand(['IDN', 'KHM', 'LAO', 'MMR', 'MYS', 'PHL', 'SGP', 'THA', 'VNM'])
+                    } else if (v === 'utenfor-sorostasia') {
+                      setSokPaaLand(['MAR', 'PAK'])
+                    } else if (v === 'usa') {
+                      setSokPaaLand(['USA'])
+                    } else if (v === 'utenfor-usa') {
+                      setSokPaaLand(['CAN', 'TUR', 'AUS', 'CHL', 'BIH'])
+                    } else if (v === 'reset') {
+                      setSokPaaLand([])
+                    }
                   }}
                   disabled={disableSok}
                 >
@@ -934,10 +938,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     Velg…
                   </option>
                   <option value="valgt">Egendefinert</option>
-                  <option value="eu">Typisk Europa</option>
-                  <option value="na">Nord-Amerika</option>
-                  <option value="asia">Asia (utvalg)</option>
-                  <option value="sorostasia">Sørøst-Asia</option>
+                  <option value="sorostasia">Sør-øst Asia</option>
+                  <option value="utenfor-sorostasia">Utenfor sør-øst Asia</option>
+                  <option value="usa">USA</option>
+                  <option value="utenfor-usa">Utenfor USA</option>
                   <option value="reset">Nullstill land</option>
                 </Select>
 
