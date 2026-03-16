@@ -409,6 +409,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
   const [aktivFane, setAktivFane] = useState<'kontroll' | 'statistikk'>('kontroll')
 
+  const [openHentGrunnlagDialog, setOpenHentGrunnlagDialog] = useState(false)
   const [openPurrDialog, setOpenPurrDialog] = useState(false)
   const [openOppgaveDialog, setOpenOppgaveDialog] = useState(false)
 
@@ -827,12 +828,14 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </Heading>
 
               <HStack gap="space-12" align="end">
-                <startFetcher.Form method="post">
-                  <input type="hidden" name="_intent" value="hentGrunnlag" />
-                  <Button type="submit" loading={startFetcher.state !== 'idle'} disabled={disableStart}>
-                    Hent grunnlag
-                  </Button>
-                </startFetcher.Form>
+                <Button
+                  type="button"
+                  loading={startFetcher.state !== 'idle'}
+                  disabled={disableStart || startFetcher.state !== 'idle'}
+                  onClick={() => setOpenHentGrunnlagDialog(true)}
+                >
+                  Hent grunnlag
+                </Button>
 
                 {grunnlagStatus === 'KJØRER' && <div style={{ opacity: 0.85 }}>Kjører…</div>}
 
@@ -844,6 +847,40 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </HStack>
 
               <KjoringerPreview title="Grunnlagkjøring" items={grunnlagItems} emptyText="Ingen grunnlag funnet ennå." />
+
+              <Modal
+                open={openHentGrunnlagDialog}
+                onClose={() => setOpenHentGrunnlagDialog(false)}
+                header={{ heading: 'Hent nytt grunnlag', size: 'small' }}
+              >
+                <Modal.Body>
+                  <BodyShort>
+                    Er du sikker på at du vil hente nytt grunnlag? Søkeresultatene i visningen hører til siste grunnlag,
+                    og kan bli erstattet når nytt grunnlag er klart.
+                  </BodyShort>
+                </Modal.Body>
+                <Modal.Footer>
+                  <startFetcher.Form method="post">
+                    <input type="hidden" name="_intent" value="hentGrunnlag" />
+                    <Button
+                      type="submit"
+                      loading={startFetcher.state !== 'idle'}
+                      disabled={disableStart || startFetcher.state !== 'idle'}
+                      onClick={() => setOpenHentGrunnlagDialog(false)}
+                    >
+                      Ja, hent nytt grunnlag
+                    </Button>
+                  </startFetcher.Form>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={startFetcher.state !== 'idle'}
+                    onClick={() => setOpenHentGrunnlagDialog(false)}
+                  >
+                    Avbryt
+                  </Button>
+                </Modal.Footer>
+              </Modal>
 
               <HStack align="center" gap="space-2">
                 <Button
@@ -883,13 +920,17 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   value={sokPaaLand.length > 0 ? 'valgt' : 'tom'}
                   onChange={(e) => {
                     const v = e.target.value
-                    if (v === 'eu')
-                      setSokPaaLand(['DEU', 'FRA', 'ESP', 'PRT', 'ITA', 'NLD', 'BEL', 'AUT', 'CHE', 'IRL'])
-                    else if (v === 'na') setSokPaaLand(['USA', 'CAN'])
-                    else if (v === 'asia') setSokPaaLand(['THA', 'IND', 'KOR'])
-                    else if (v === 'sorostasia')
-                      setSokPaaLand(['THA', 'PHL', 'VNM', 'SGP', 'IDN', 'MYS', 'KHM', 'LAO', 'MMR'])
-                    else if (v === 'reset') setSokPaaLand([])
+                    if (v === 'sorostasia') {
+                      setSokPaaLand(['IDN', 'KHM', 'LAO', 'MMR', 'MYS', 'PHL', 'SGP', 'THA', 'VNM'])
+                    } else if (v === 'utenfor-sorostasia') {
+                      setSokPaaLand(['MAR', 'PAK'])
+                    } else if (v === 'usa') {
+                      setSokPaaLand(['USA'])
+                    } else if (v === 'utenfor-usa') {
+                      setSokPaaLand(['CAN', 'TUR', 'AUS', 'CHL', 'BIH'])
+                    } else if (v === 'reset') {
+                      setSokPaaLand([])
+                    }
                   }}
                   disabled={disableSok}
                 >
@@ -897,10 +938,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     Velg…
                   </option>
                   <option value="valgt">Egendefinert</option>
-                  <option value="eu">Typisk Europa</option>
-                  <option value="na">Nord-Amerika</option>
-                  <option value="asia">Asia (utvalg)</option>
-                  <option value="sorostasia">Sørøst-Asia</option>
+                  <option value="sorostasia">Sør-øst Asia</option>
+                  <option value="utenfor-sorostasia">Utenfor sør-øst Asia</option>
+                  <option value="usa">USA</option>
+                  <option value="utenfor-usa">Utenfor USA</option>
                   <option value="reset">Nullstill land</option>
                 </Select>
 
@@ -962,10 +1003,12 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                           onClick={() => setSokPaaLand((prev) => prev.filter((code) => code !== o.value))}
                           disabled={disableSok}
                           style={{
-                            border: '1px solid var(--ax-border-neutral-subtleA)',
+                            border: '1px solid var(--ax-border-focus)',
                             borderRadius: '999px',
                             padding: '0.35rem 0.7rem',
-                            background: 'var(--ax-bg-subtle)',
+                            background: 'var(--ax-border-focus)',
+                            color: 'white',
+                            fontWeight: 600,
                             cursor: disableSok ? 'default' : 'pointer',
                           }}
                         >
