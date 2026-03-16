@@ -46,15 +46,15 @@ export default function BehandlingstidChart({ data, metric, title, colorMap, lab
     const grupper = new Set<string>()
     for (const dp of data) {
       periodeSet.add(dp.periodeFra)
-      grupper.add(dp.behandlingsType)
+      grupper.add(dp.behandlingType)
     }
     const perioder = [...periodeSet].sort()
     const labels = perioder.map(formaterPeriodeLabel)
 
     const lookup = new Map<string, Map<string, number | null>>()
     for (const dp of data) {
-      if (!lookup.has(dp.behandlingsType)) lookup.set(dp.behandlingsType, new Map())
-      lookup.get(dp.behandlingsType)?.set(dp.periodeFra, dp[metric])
+      if (!lookup.has(dp.behandlingType)) lookup.set(dp.behandlingType, new Map())
+      lookup.get(dp.behandlingType)?.set(dp.periodeFra, dp[metric])
     }
 
     const sortedGrupper = sortOrder

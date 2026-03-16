@@ -509,7 +509,7 @@ export type BehandlingstidPerTypeResponse = {
 
 export type BehandlingstidPerTypeDatapunkt = {
   periodeFra: string
-  behandlingsType: string
+  behandlingType: string
   antall: number
   gjennomsnittDager: number | null
   medianDager: number | null

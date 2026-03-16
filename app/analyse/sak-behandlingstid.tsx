@@ -118,7 +118,7 @@ function filtrerPerAar(
   if (!data) return null
   return {
     datapunkter: data.datapunkter.filter((d) => {
-      const alder = Number.parseInt(d.behandlingsType, 10)
+      const alder = Number.parseInt(d.behandlingType, 10)
       if (Number.isNaN(alder)) return false
       return alder >= fraAlder && alder <= tilAlder
     }),
@@ -160,8 +160,8 @@ export default function SakBehandlingstidTab({ loaderData }: Route.ComponentProp
 
   const alderAarKeys = [
     ...new Set([
-      ...(filteredMottattAar?.datapunkter.map((d) => d.behandlingsType) ?? []),
-      ...(filteredVedtakAar?.datapunkter.map((d) => d.behandlingsType) ?? []),
+      ...(filteredMottattAar?.datapunkter.map((d) => d.behandlingType) ?? []),
+      ...(filteredVedtakAar?.datapunkter.map((d) => d.behandlingType) ?? []),
     ]),
   ]
 

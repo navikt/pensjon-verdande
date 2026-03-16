@@ -924,7 +924,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
     datapunkter: [
       {
         periodeFra: '2026-01-01T00:00:00',
-        behandlingsType: 'AUTO',
+        behandlingType: 'AUTO',
         antall: 80,
         gjennomsnittDager: 5.2,
         medianDager: 3.0,
@@ -933,7 +933,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-01-01T00:00:00',
-        behandlingsType: 'DEL_AUTO',
+        behandlingType: 'DEL_AUTO',
         antall: 25,
         gjennomsnittDager: 18.5,
         medianDager: 14.0,
@@ -942,7 +942,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-01-01T00:00:00',
-        behandlingsType: 'MAN',
+        behandlingType: 'MAN',
         antall: 15,
         gjennomsnittDager: 45.0,
         medianDager: 35.0,
@@ -951,7 +951,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-02-01T00:00:00',
-        behandlingsType: 'AUTO',
+        behandlingType: 'AUTO',
         antall: 100,
         gjennomsnittDager: 4.8,
         medianDager: 2.5,
@@ -960,7 +960,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-02-01T00:00:00',
-        behandlingsType: 'DEL_AUTO',
+        behandlingType: 'DEL_AUTO',
         antall: 30,
         gjennomsnittDager: 16.2,
         medianDager: 12.0,
@@ -969,7 +969,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-02-01T00:00:00',
-        behandlingsType: 'MAN',
+        behandlingType: 'MAN',
         antall: 20,
         gjennomsnittDager: 42.1,
         medianDager: 32.0,
@@ -978,7 +978,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-03-01T00:00:00',
-        behandlingsType: 'AUTO',
+        behandlingType: 'AUTO',
         antall: 90,
         gjennomsnittDager: 5.0,
         medianDager: 2.8,
@@ -987,7 +987,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-03-01T00:00:00',
-        behandlingsType: 'DEL_AUTO',
+        behandlingType: 'DEL_AUTO',
         antall: 28,
         gjennomsnittDager: 17.3,
         medianDager: 13.0,
@@ -996,7 +996,7 @@ export function mockBehandlingstidPerTypeData(): import('./types').Behandlingsti
       },
       {
         periodeFra: '2026-03-01T00:00:00',
-        behandlingsType: 'MAN',
+        behandlingType: 'MAN',
         antall: 12,
         gjennomsnittDager: 48.5,
         medianDager: 38.0,

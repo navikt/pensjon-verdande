@@ -86,10 +86,10 @@ function aggregerBehandlingstid(
   }
 
   return [...map.entries()].map(([key, v]) => {
-    const [periodeFra, behandlingsType] = key.split('|')
+    const [periodeFra, behandlingType] = key.split('|')
     return {
       periodeFra,
-      behandlingsType,
+      behandlingType,
       antall: v.antall,
       gjennomsnittDager: v.antallMedVedtak > 0 ? v.sumDager / v.antallMedVedtak : null,
       medianDager: null,
@@ -256,7 +256,7 @@ export default function KravStatistikkTab({ loaderData }: Route.ComponentProps) 
   )
 
   const alderChartProps = useMemo(() => {
-    const alderKeys = [...new Set(btPerAlder.map((d) => d.behandlingsType))]
+    const alderKeys = [...new Set(btPerAlder.map((d) => d.behandlingType))]
     return {
       colorMap: undefined,
       labelMap: Object.fromEntries(alderKeys.map((k) => [k, k === '-1' ? 'Ukjent' : `${k} år`])),
