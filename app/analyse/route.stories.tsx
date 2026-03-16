@@ -23,6 +23,8 @@ import {
   mockAktivitetData,
   mockAktivitetsvarighetData,
   mockAutomatiseringData,
+  mockBehandlingKravAlderData,
+  mockBehandlingstidPerTypeData,
   mockEndeTilEndeData,
   mockFeilanalyseData,
   mockFeilklassifiseringData,
@@ -30,12 +32,15 @@ import {
   mockGruppeData,
   mockKoData,
   mockKontrollpunktData,
+  mockKravStatistikkData,
+  mockKravTidsserieData,
   mockKravtypeData,
   mockManuelleData,
   mockOppsummering,
   mockPlanlagtData,
   mockPrioritetData,
   mockRouteLoaderData,
+  mockSaksbehandlingstidData,
   mockSakstypeData,
   mockStatustrendData,
   mockStoppetData,
@@ -48,6 +53,10 @@ import Nokkeltall from './nokkeltall'
 import PlanlagtTab from './planlagt'
 import PrioritetTab from './prioritet'
 import AnalyseLayout from './route'
+import SakBehandlingKravAlderTab from './sak-behandling-krav-alder'
+import SakBehandlingstidTab from './sak-behandlingstid'
+import SakKravLayout from './sak-krav-layout'
+import SakKravStatistikkTab from './sak-krav-statistikk'
 import SakstypeTab from './sakstype'
 import StatustrendTab from './statustrend'
 import StoppetTab from './stoppet'
@@ -64,11 +73,25 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-const sectionLayouts: Record<string, { path: string; Component: React.ComponentType }> = {
+const sectionLayouts: Record<string, { path: string; Component: React.ComponentType; loader?: () => unknown }> = {
   ytelse: { path: 'ytelse', Component: YtelseLayout },
   automatisering: { path: 'automatisering', Component: AutomatiseringLayout },
   kvalitet: { path: 'kvalitet', Component: KvalitetLayout },
   'aktiviteter-og-tid': { path: 'aktiviteter-og-tid', Component: AktiviteterLayout },
+  'sak-krav': {
+    path: 'sak-krav',
+    // biome-ignore lint/suspicious/noExplicitAny: createRoutesStub type mismatch with react-router typed routes
+    Component: SakKravLayout as any,
+    loader: () => ({
+      fom: '2026-01-01',
+      tom: '2026-03-01',
+      aggregering: 'MAANED',
+      sakTyper: [],
+      kravGjelderListe: [],
+      behandlingstyper: [],
+      kravTidsserie: mockKravTidsserieData(),
+    }),
+  },
   dimensjoner: { path: 'dimensjoner', Component: DimensjonerLayout },
 }
 
@@ -96,6 +119,9 @@ const tabToSection: Record<string, { section: string; path: string }> = {
   kravtype: { section: 'dimensjoner', path: 'kravtype' },
   vedtakstype: { section: 'dimensjoner', path: 'vedtakstype' },
   'auto-brev': { section: 'dimensjoner', path: 'auto-brev' },
+  'sak-krav-statistikk': { section: 'sak-krav', path: 'krav' },
+  'sak-behandlingstid': { section: 'sak-krav', path: 'behandlingstid' },
+  'sak-behandling-krav-alder': { section: 'dimensjoner', path: 'behandling-krav-alder' },
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: Route components have varying prop shapes
@@ -113,6 +139,7 @@ function renderAnalyseTab(TabComponent: React.ComponentType<any>, tabLoaderData:
           path: section.path,
           // biome-ignore lint/suspicious/noExplicitAny: createRoutesStub type mismatch with react-router typed routes
           Component: section.Component as any,
+          ...(section.loader ? { loader: section.loader } : {}),
           children: [
             {
               path: mapping.path,
@@ -250,4 +277,34 @@ export const KontrollpunkterStory: Story = {
 export const EndeTilEndeStory: Story = {
   name: 'Ende-til-ende',
   render: () => renderAnalyseTab(EndeTilEndeTab, mockEndeTilEndeData(), 'ende-til-ende'),
+}
+
+// --- Sak & Krav ---
+
+export const KravStatistikkStory: Story = {
+  name: 'Kravstatistikk',
+  render: () => renderAnalyseTab(SakKravStatistikkTab, mockKravStatistikkData(), 'sak-krav-statistikk'),
+}
+
+export const SakBehandlingstidStory: Story = {
+  name: 'Saksbehandlingstid',
+  render: () =>
+    renderAnalyseTab(
+      SakBehandlingstidTab,
+      {
+        tabell: mockSaksbehandlingstidData(),
+        perTypeMottatt: mockBehandlingstidPerTypeData(),
+        perTypeVedtak: mockBehandlingstidPerTypeData(),
+        perAlderGruppeMottatt: mockBehandlingstidPerTypeData(),
+        perAlderGruppeVedtak: mockBehandlingstidPerTypeData(),
+        perAlderAarMottatt: mockBehandlingstidPerTypeData(),
+        perAlderAarVedtak: mockBehandlingstidPerTypeData(),
+      },
+      'sak-behandlingstid',
+    ),
+}
+
+export const BehandlingKravAlderStory: Story = {
+  name: 'Behandling per alder',
+  render: () => renderAnalyseTab(SakBehandlingKravAlderTab, mockBehandlingKravAlderData(), 'sak-behandling-krav-alder'),
 }

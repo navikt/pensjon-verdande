@@ -15,7 +15,7 @@ import {
 } from '@navikt/ds-react'
 import { sub } from 'date-fns'
 import React, { Suspense } from 'react'
-import { isRouteErrorResponse, Outlet, useSearchParams } from 'react-router'
+import { isRouteErrorResponse, Outlet, useLocation, useSearchParams } from 'react-router'
 import type { DateRange } from '~/behandlingserie/seriekalenderUtils'
 import { toIsoDate } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -71,6 +71,14 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url)
+  const isSakKrav = url.pathname.includes('/sak-krav')
+
+  // Sak-krav-seksjonen har egne søkekriterier — hopp over behandlings-tidsserie
+  if (isSakKrav) {
+    return { behandlingType: '', fom: '', tom: '', aggregering: '', tidsserie: null }
+  }
+
   const { behandlingType, fom, tom, aggregering, paramsAgg } = parseAnalyseParams(request)
 
   let tidsserie: TidsserieResponse | null = null
@@ -88,6 +96,24 @@ export function shouldRevalidate({ currentUrl, nextUrl }: { currentUrl: URL; nex
 }
 
 export default function AnalyseLayout({ loaderData }: Route.ComponentProps) {
+  const location = useLocation()
+  const isSakKrav = location.pathname.includes('/sak-krav')
+
+  // Sak-krav har egen layout med egne søkekriterier — render bare Outlet
+  if (isSakKrav) {
+    return (
+      <Page.Block>
+        <VStack gap="space-24" paddingBlock="space-32">
+          <Outlet />
+        </VStack>
+      </Page.Block>
+    )
+  }
+
+  return <BehandlingsanalyseLayout loaderData={loaderData} />
+}
+
+function BehandlingsanalyseLayout({ loaderData }: { loaderData: Route.ComponentProps['loaderData'] }) {
   const { behandlingType, fom, tom, aggregering, tidsserie } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
 
