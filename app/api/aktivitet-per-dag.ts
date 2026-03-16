@@ -1,4 +1,5 @@
 import type { TidsserieResponse } from '~/analyse/types'
+import { formatLocalIso } from '~/components/chart-utils/formatLocalIso'
 import { velgAggregering } from '~/components/chart-utils/velgAggregering'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/aktivitet-per-dag'
@@ -12,8 +13,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   fom.setTime(fom.getTime() - timer * 60 * 60 * 1000)
 
   const params = new URLSearchParams({
-    fom: fom.toISOString().replace('Z', ''),
-    tom: new Date().toISOString().replace('Z', ''),
+    fom: formatLocalIso(fom),
+    tom: formatLocalIso(new Date()),
     aggregering: velgAggregering(timer),
   })
 

@@ -1,5 +1,7 @@
+import type { Aggregeringsniva } from '~/analyse/types'
+
 /** Velg passende aggregeringsnivå basert på antall timer i tidsperioden */
-export function velgAggregering(timer: number): string {
+export function velgAggregering(timer: number): Aggregeringsniva {
   const dager = timer / 24
   if (timer <= 3) return 'MINUTT'
   if (dager <= 3) return 'TIME'

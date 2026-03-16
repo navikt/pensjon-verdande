@@ -12,6 +12,8 @@ import { formatNumber } from '~/common/number'
 import { AktivitetChartCard } from '~/components/aktivitet-chart/AktivitetChartCard'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BrevChartCard } from '~/components/brev-chart/BrevChartCard'
+import { formatLocalIso } from '~/components/chart-utils/formatLocalIso'
+import { velgAggregering } from '~/components/chart-utils/velgAggregering'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import { apiGet } from '~/services/api.server'
 import type {
@@ -33,9 +35,9 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   fom.setTime(fom.getTime() - defaultTimer * 60 * 60 * 1000)
 
   const tidsserieParams = new URLSearchParams({
-    fom: fom.toISOString().replace('Z', ''),
-    tom: new Date().toISOString().replace('Z', ''),
-    aggregering: 'TIME',
+    fom: formatLocalIso(fom),
+    tom: formatLocalIso(new Date()),
+    aggregering: velgAggregering(defaultTimer),
   })
 
   const dashboardResponse = Promise.all([
