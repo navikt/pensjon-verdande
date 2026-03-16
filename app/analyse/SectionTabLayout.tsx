@@ -10,10 +10,9 @@ interface TabDefinition {
 interface SectionTabLayoutProps {
   readonly sectionPath: string
   readonly faner: readonly TabDefinition[]
-  readonly erProd?: boolean
 }
 
-export default function SectionTabLayout({ sectionPath, faner, erProd = true }: SectionTabLayoutProps) {
+export default function SectionTabLayout({ sectionPath, faner }: SectionTabLayoutProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const navigation = useNavigation()
@@ -35,13 +34,11 @@ export default function SectionTabLayout({ sectionPath, faner, erProd = true }: 
     navigate(`/analyse/${sectionPath}/${tab}${location.search}`)
   }
 
-  const visibleFaner = faner.filter((f) => f.value !== 'auto-brev' || !erProd)
-
   return (
     <VStack gap="space-16">
       <Tabs value={currentTab} onChange={onTabChange}>
         <Tabs.List>
-          {visibleFaner.map((f) => (
+          {faner.map((f) => (
             <Tabs.Tab key={f.value} value={f.value} label={f.label} />
           ))}
         </Tabs.List>

@@ -56,6 +56,13 @@ export default [
         route('planlagt', 'analyse/planlagt.tsx'),
       ]),
 
+      // Sak & Krav — sak/krav-perspektiv (Styringscockpit)
+      route('sak-krav', 'analyse/sak-krav-layout.tsx', [
+        index('analyse/sak-krav-index.tsx'),
+        route('krav', 'analyse/sak-krav-statistikk.tsx'),
+        route('behandlingstid', 'analyse/sak-behandlingstid.tsx'),
+      ]),
+
       // Dimensjoner — tverrgående analyse etter forretningsdimensjoner
       route('dimensjoner', 'analyse/dimensjoner-layout.tsx', [
         index('analyse/dimensjoner-index.tsx'),
@@ -66,6 +73,7 @@ export default [
         route('kravtype', 'analyse/kravtype.tsx'),
         route('vedtakstype', 'analyse/vedtakstype.tsx'),
         route('auto-brev', 'analyse/auto-brev.tsx'),
+        route('behandling-krav-alder', 'analyse/sak-behandling-krav-alder.tsx'),
       ]),
 
       // Bakoverkompatibel catch-all for gamle fane-URL-er (f.eks. /analyse/nokkeltall → /analyse/ytelse/nokkeltall)

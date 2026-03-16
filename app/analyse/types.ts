@@ -469,6 +469,77 @@ export type AutoBrevStatistikk = {
   antall: number
 }
 
+// --- Sak/Krav-analyse ---
+
+export type KravStatistikkResponse = {
+  krav: KravStatistikkRad[]
+}
+
+export type KravStatistikkRad = {
+  periodeFra: string | null
+  sakType: string
+  kravGjelder: string
+  kravStatus: string
+  behandlingType: string
+  vedtakStatus: string
+  alder: number
+  antall: number
+  gjennomsnittDager: number | null
+  medianDager: number | null
+  p90Dager: number | null
+  p95Dager: number | null
+}
+
+export type SaksbehandlingstidResponse = {
+  datapunkter: SaksbehandlingstidDatapunkt[]
+}
+
+export type SaksbehandlingstidDatapunkt = {
+  periodeFra: string
+  antall: number
+  gjennomsnittDager: number | null
+  medianDager: number | null
+  p90Dager: number | null
+  p95Dager: number | null
+}
+
+export type BehandlingstidPerTypeResponse = {
+  datapunkter: BehandlingstidPerTypeDatapunkt[]
+}
+
+export type BehandlingstidPerTypeDatapunkt = {
+  periodeFra: string
+  behandlingsType: string
+  antall: number
+  gjennomsnittDager: number | null
+  medianDager: number | null
+  p90Dager: number | null
+  p95Dager: number | null
+}
+
+export type KravTidsserieResponse = {
+  datapunkter: KravTidsserieDatapunkt[]
+}
+
+export type KravTidsserieDatapunkt = {
+  periodeFra: string
+  sakType: string
+  behandlingType: string
+  antall: number
+}
+
+export type BehandlingKravAlderResponse = {
+  rader: BehandlingKravAlderRad[]
+}
+
+export type BehandlingKravAlderRad = {
+  sakType: string
+  behandlingType: string
+  kravGjelder: string
+  alder: number
+  antall: number
+}
+
 // --- Brev-tidsserie ---
 
 export type BrevTidsserieResponse = {

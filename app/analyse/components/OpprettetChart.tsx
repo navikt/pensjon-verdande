@@ -18,23 +18,30 @@ import { formaterPeriodeLabel, formaterTall } from '../utils/formattering'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
+const palette = [
+  { border: 'rgba(54, 162, 235, 1)', bg: 'rgba(54, 162, 235, 0.4)' },
+  { border: 'rgba(255, 159, 64, 1)', bg: 'rgba(255, 159, 64, 0.4)' },
+  { border: 'rgba(255, 99, 132, 1)', bg: 'rgba(255, 99, 132, 0.4)' },
+  { border: 'rgba(75, 192, 192, 1)', bg: 'rgba(75, 192, 192, 0.4)' },
+  { border: 'rgba(153, 102, 255, 1)', bg: 'rgba(153, 102, 255, 0.4)' },
+]
+
 interface Props {
   data: TidsserieDatapunkt[]
   onRangeSelect?: (fom: string, tom: string) => void
+  labelMap?: Record<string, string>
 }
 
-export default function OpprettetChart({ data, onRangeSelect }: Props) {
+export default function OpprettetChart({ data, onRangeSelect, labelMap }: Props) {
   const perioderRef = useRef<string[]>([])
   const onRangeSelectRef = useRef(onRangeSelect)
   onRangeSelectRef.current = onRangeSelect
 
   const perioder = useMemo(() => {
     if (data.length === 0) return []
-    const periodeMap = new Map<string, number>()
-    for (const dp of data) {
-      periodeMap.set(dp.periodeFra, (periodeMap.get(dp.periodeFra) ?? 0) + dp.antall)
-    }
-    const sorted = [...periodeMap.keys()].sort()
+    const periodeSet = new Set<string>()
+    for (const dp of data) periodeSet.add(dp.periodeFra)
+    const sorted = [...periodeSet].sort()
     perioderRef.current = sorted
     return sorted
   }, [data])
@@ -42,31 +49,35 @@ export default function OpprettetChart({ data, onRangeSelect }: Props) {
   const chartData = useMemo(() => {
     if (perioder.length === 0) return null
 
-    const periodeMap = new Map<string, number>()
+    // Grupper per status (behandlingstype)
+    const grupper = new Map<string, Map<string, number>>()
     for (const dp of data) {
-      periodeMap.set(dp.periodeFra, (periodeMap.get(dp.periodeFra) ?? 0) + dp.antall)
+      if (!grupper.has(dp.status)) grupper.set(dp.status, new Map())
+      const m = grupper.get(dp.status)
+      m?.set(dp.periodeFra, (m.get(dp.periodeFra) ?? 0) + dp.antall)
     }
-    const antall = perioder.map((p) => periodeMap.get(p) ?? 0)
-    const pointRadius = perioder.length > 30 ? 1 : 3
 
-    const result: ChartData<'line'> = {
-      labels: perioder,
-      datasets: [
-        {
-          label: 'Antall opprettet',
-          data: antall,
-          cubicInterpolationMode: 'monotone',
-          tension: 0.4,
-          fill: { target: 'origin', above: 'rgba(53, 162, 235, 0.3)' },
-          borderWidth: 1.5,
-          backgroundColor: 'rgba(53, 162, 235, 0.3)',
-          borderColor: 'rgb(53, 162, 235)',
-          pointRadius,
-        },
-      ],
-    }
-    return result
-  }, [data, perioder])
+    const pointRadius = perioder.length > 30 ? 0 : 2
+    const sortedGrupper = [...grupper.keys()].sort()
+
+    const datasets = sortedGrupper.map((gruppe, i) => {
+      const gruppeData = grupper.get(gruppe) ?? new Map<string, number>()
+      const colors = palette[i % palette.length]
+      return {
+        label: labelMap?.[gruppe] ?? gruppe,
+        data: perioder.map((p) => gruppeData.get(p) ?? 0),
+        cubicInterpolationMode: 'monotone' as const,
+        tension: 0.4,
+        fill: 'origin' as const,
+        borderWidth: 1.5,
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        pointRadius,
+      }
+    })
+
+    return { labels: perioder, datasets } as ChartData<'line'>
+  }, [data, perioder, labelMap])
 
   const options: ChartOptions<'line'> = useMemo(
     () => ({
@@ -74,13 +85,13 @@ export default function OpprettetChart({ data, onRangeSelect }: Props) {
       maintainAspectRatio: false,
       plugins: {
         title: { display: false },
-        legend: { display: false },
+        legend: { display: true, position: 'top' as const },
         tooltip: {
           mode: 'index' as const,
           intersect: false,
           callbacks: {
             title: (items) => formaterPeriodeLabel(items[0]?.label ?? ''),
-            label: (item) => `Opprettet: ${formaterTall(item.parsed.y)}`,
+            label: (item) => `${item.dataset.label}: ${formaterTall(item.parsed.y)}`,
           },
         },
       },
@@ -94,6 +105,7 @@ export default function OpprettetChart({ data, onRangeSelect }: Props) {
           },
         },
         y: {
+          stacked: true,
           beginAtZero: true,
         },
       },
@@ -116,7 +128,7 @@ export default function OpprettetChart({ data, onRangeSelect }: Props) {
     <div
       style={{ height: '200px', position: 'relative' }}
       role="img"
-      aria-label="Linjediagram: Opprettede behandlinger over tid"
+      aria-label="Stacked area chart: Opprettede krav over tid per behandlingstype"
     >
       <Line options={options} data={chartData} />
       {onRangeSelect && <DragOverlay perioder={perioder} onRangeSelect={onRangeSelect} />}

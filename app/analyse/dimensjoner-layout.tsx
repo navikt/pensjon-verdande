@@ -1,4 +1,3 @@
-import { useOutletContext } from 'react-router'
 import SectionTabLayout from './SectionTabLayout'
 
 const faner = [
@@ -9,9 +8,9 @@ const faner = [
   { value: 'kravtype', label: 'Kravtype' },
   { value: 'vedtakstype', label: 'Vedtak' },
   { value: 'auto-brev', label: 'Autobrev' },
+  { value: 'behandling-krav-alder', label: 'Behandling per alder' },
 ] as const
 
 export default function DimensjonerLayout() {
-  const { erProd } = useOutletContext<{ erProd: boolean }>()
-  return <SectionTabLayout sectionPath="dimensjoner" faner={faner} erProd={erProd} />
+  return <SectionTabLayout sectionPath="dimensjoner" faner={faner} />
 }
