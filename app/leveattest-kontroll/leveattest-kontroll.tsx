@@ -831,7 +831,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                 <Button
                   type="button"
                   loading={startFetcher.state !== 'idle'}
-                  disabled={disableStart}
+                  disabled={disableStart || startFetcher.state !== 'idle'}
                   onClick={() => setOpenHentGrunnlagDialog(true)}
                 >
                   Hent grunnlag
@@ -865,7 +865,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     <Button
                       type="submit"
                       loading={startFetcher.state !== 'idle'}
-                      disabled={disableStart}
+                      disabled={disableStart || startFetcher.state !== 'idle'}
                       onClick={() => setOpenHentGrunnlagDialog(false)}
                     >
                       Ja, hent nytt grunnlag
