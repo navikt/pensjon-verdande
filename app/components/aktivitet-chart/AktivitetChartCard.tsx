@@ -1,55 +1,20 @@
 import { BarChartFillIcon } from '@navikt/aksel-icons'
 import { BodyShort, Box, Button, HStack, Spacer } from '@navikt/ds-react'
-import { useEffect, useRef, useState } from 'react'
-import { useFetcher } from 'react-router'
 import type { TidsserieDatapunkt, TidsserieResponse } from '~/analyse/types'
 import { AktivitetChart } from '~/components/aktivitet-chart/AktivitetChart'
+import { DEFAULT_ANTALL_TIMER, tidsvalgAlternativer } from '~/components/chart-utils/tidsvalgAlternativer'
+import { useTidsserieCache } from '~/components/chart-utils/useTidsserieCache'
 
 type Props = {
   datapunkter: TidsserieDatapunkt[]
   chartHeight?: number
 }
 
-const DEFAULT_ANTALL_TIMER = 24
-
-const tidsvalgAlternativer = [
-  { timer: 6, label: '6 timer' },
-  { timer: 12, label: '12 timer' },
-  { timer: 24, label: '24 timer' },
-  { timer: 48, label: '48 timer' },
-  { timer: 168, label: '7 dager' },
-]
-
 export function AktivitetChartCard(props: Props) {
-  const [antallTimer, setAntallTimer] = useState(DEFAULT_ANTALL_TIMER)
-  const fetcher = useFetcher<TidsserieResponse>()
-  const [cache, setCache] = useState<Map<number, TidsserieDatapunkt[]>>(
-    () => new Map([[DEFAULT_ANTALL_TIMER, props.datapunkter]]),
-  )
-  const pendingKeyRef = useRef<number | null>(null)
-  const fetcherLoad = fetcher.load
-
-  useEffect(() => {
-    setCache((prev) => new Map(prev).set(DEFAULT_ANTALL_TIMER, props.datapunkter))
-  }, [props.datapunkter])
-
-  useEffect(() => {
-    if (!cache.has(antallTimer)) {
-      pendingKeyRef.current = antallTimer
-      fetcherLoad(`/api/aktivitet-per-dag?timer=${antallTimer}`)
-    }
-  }, [antallTimer, fetcherLoad, cache])
-
-  useEffect(() => {
-    if (fetcher.data && 'datapunkter' in fetcher.data && fetcher.state === 'idle' && pendingKeyRef.current !== null) {
-      const key = pendingKeyRef.current
-      pendingKeyRef.current = null
-      setCache((prev) => new Map(prev).set(key, fetcher.data?.datapunkter ?? []))
-    }
-  }, [fetcher.data, fetcher.state])
-
-  const datapunkter = cache.get(antallTimer) ?? props.datapunkter
-  const isLoading = fetcher.state === 'loading' && !cache.has(antallTimer)
+  const { antallTimer, setAntallTimer, datapunkter, isLoading } = useTidsserieCache<
+    TidsserieDatapunkt,
+    TidsserieResponse
+  >(props.datapunkter, '/api/aktivitet-per-dag', DEFAULT_ANTALL_TIMER)
 
   return (
     <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>

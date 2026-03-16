@@ -12,6 +12,7 @@ import {
 import { useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
 import type { BrevTidsserieDatapunkt } from '~/analyse/types'
+import { formatLabel } from '~/components/chart-utils/formatLabel'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -19,16 +20,6 @@ type Props = {
   datapunkter: BrevTidsserieDatapunkt[]
   antallTimer: number
   maintainAspectRatio?: boolean
-}
-
-function formatLabel(iso: string, antallTimer: number): string {
-  const [datePart, timePart] = iso.split('T')
-  const [, month, day] = datePart.split('-')
-  const hour = timePart?.substring(0, 2) ?? '00'
-  if (antallTimer <= 48) {
-    return `${hour}:00`
-  }
-  return `${day}.${month} ${hour}:00`
 }
 
 export function BrevChart({ datapunkter, antallTimer, maintainAspectRatio }: Props) {
