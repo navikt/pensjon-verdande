@@ -24,14 +24,24 @@ import { decodeBehandling } from '~/common/decodeBehandling'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/index'
 
-export type AutoBrevOppsummering = {
+/** DTO som speiler API-responsen fra /api/behandling/brev/oppsummering */
+type AutoBrevOppsummeringDto = {
   behandlingstype: string
   brevkode: string
   brevbakerBrevkode: string | null
   brevnavn: string | null
   sprakKode: string | null
   antall: number
-  _originalBrevkode?: string
+}
+
+/** Visningsmodell brukt i UI — brevkode er normalisert og original bevart */
+export type AutoBrevOppsummering = {
+  behandlingstype: string
+  brevkode: string
+  originalBrevkode: string
+  brevnavn: string | null
+  sprakKode: string | null
+  antall: number
 }
 
 const FACETS = ['behandlingstype', 'brevkode'] as const
@@ -79,11 +89,14 @@ export async function loader({ request }: Route.LoaderArgs) {
   qs.set('fomDato', fomDato)
   qs.set('tomDato', tomDato)
 
-  const rawRows = await apiGet<AutoBrevOppsummering[]>(`/api/behandling/brev/oppsummering?${qs.toString()}`, request)
-  const rows = rawRows.map((r) => ({
-    ...r,
-    _originalBrevkode: r.brevkode,
+  const dtoRows = await apiGet<AutoBrevOppsummeringDto[]>(`/api/behandling/brev/oppsummering?${qs.toString()}`, request)
+  const rows: AutoBrevOppsummering[] = dtoRows.map((r) => ({
+    behandlingstype: r.behandlingstype,
     brevkode: r.brevbakerBrevkode ?? r.brevkode,
+    originalBrevkode: r.brevkode,
+    brevnavn: r.brevnavn,
+    sprakKode: r.sprakKode,
+    antall: r.antall,
   }))
 
   return {
@@ -188,8 +201,7 @@ function toggleParam(current: string[] | null, value: string): string[] | null {
   return arr.length ? arr : null
 }
 
-const rowKey = (r: AutoBrevOppsummering) =>
-  [r.behandlingstype, r._originalBrevkode ?? r.brevkode, r.brevnavn, r.sprakKode].join('|')
+const rowKey = (r: AutoBrevOppsummering) => [r.behandlingstype, r.originalBrevkode, r.brevnavn, r.sprakKode].join('|')
 
 function countActiveFilters(filters: Partial<Record<FacetKey, string[]>>): number {
   return Object.values(filters).reduce((acc, v) => acc + ((v?.length ?? 0) > 0 ? 1 : 0), 0)
