@@ -1032,7 +1032,9 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     <div style={{ columnCount: 3, columnGap: '1rem' }}>
                       {visibleLandOptions.map((o) => (
                         <div key={o.value} style={{ breakInside: 'avoid', padding: '2px 0' }}>
-                          <Checkbox value={o.value}>{o.label} ({o.value})</Checkbox>
+                          <Checkbox value={o.value}>
+                            {o.label} ({o.value})
+                          </Checkbox>
                         </div>
                       ))}
                     </div>
