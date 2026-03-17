@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { mockDashboardResponse } from '../../../.storybook/mocks/data'
+import type { DatoAntall } from '~/types'
 import { withRouter } from '../../../.storybook/mocks/router'
 import { BehandlingerPerDagLineChartCard } from './BehandlingerPerDagLineChartCard'
 
@@ -12,15 +12,24 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const mockOpprettetPerDag: DatoAntall[] = [
+  { dato: '2024-06-10', antall: 12 },
+  { dato: '2024-06-11', antall: 18 },
+  { dato: '2024-06-12', antall: 9 },
+  { dato: '2024-06-13', antall: 25 },
+  { dato: '2024-06-14', antall: 14 },
+  { dato: '2024-06-15', antall: 7 },
+]
+
 export const Default: Story = {
   args: {
-    opprettetPerDag: mockDashboardResponse().opprettetPerDag,
+    opprettetPerDag: mockOpprettetPerDag,
   },
 }
 
 export const FixedHeight: Story = {
   args: {
-    opprettetPerDag: mockDashboardResponse().opprettetPerDag,
+    opprettetPerDag: mockOpprettetPerDag,
     chartHeight: 180,
   },
 }

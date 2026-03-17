@@ -539,3 +539,17 @@ export type BehandlingKravAlderRad = {
   alder: number
   antall: number
 }
+
+// --- Brev-tidsserie ---
+
+export type BrevTidsserieResponse = {
+  fom: string
+  tom: string
+  aggregering: Aggregeringsniva
+  datapunkter: BrevTidsserieDatapunkt[]
+}
+
+export type BrevTidsserieDatapunkt = {
+  periodeFra: string
+  antall: number
+}
