@@ -43,6 +43,7 @@ export default function AutoBrevTab({ loaderData }: Route.ComponentProps) {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader>Brevkode</Table.ColumnHeader>
+            <Table.ColumnHeader>Brevnavn</Table.ColumnHeader>
             <Table.ColumnHeader align="right">Antall</Table.ColumnHeader>
             <Table.ColumnHeader align="right">Andel</Table.ColumnHeader>
           </Table.Row>
@@ -51,6 +52,7 @@ export default function AutoBrevTab({ loaderData }: Route.ComponentProps) {
           {brevStatistikk.map((r) => (
             <Table.Row key={r.brevkode}>
               <Table.DataCell>{r.brevkode}</Table.DataCell>
+              <Table.DataCell>{r.brevnavn ?? '–'}</Table.DataCell>
               <Table.DataCell align="right">{formaterTall(r.antall)}</Table.DataCell>
               <Table.DataCell align="right">{total === 0 ? '–' : formaterProsent(r.antall, total)}</Table.DataCell>
             </Table.Row>

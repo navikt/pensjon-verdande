@@ -467,6 +467,7 @@ export type AutoBrevAnalyseResponse = {
 export type AutoBrevStatistikk = {
   brevkode: string
   antall: number
+  brevnavn?: string
 }
 
 // --- Sak/Krav-analyse ---

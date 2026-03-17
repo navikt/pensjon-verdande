@@ -28,11 +28,13 @@ export type AutoBrevOppsummering = {
   behandlingstype: string
   brevkode: string
   brevbakerBrevkode: string | null
+  brevnavn: string | null
   sprakKode: string | null
   antall: number
+  _originalBrevkode?: string
 }
 
-const FACETS = ['behandlingstype', 'brevkode', 'brevbakerBrevkode', 'sprakKode'] as const
+const FACETS = ['behandlingstype', 'brevkode'] as const
 const GROUP_PARAM = 'groupBy' as const
 const manglendeVerdi = '–'
 
@@ -43,7 +45,7 @@ const facetValueTranslator: Partial<Record<FacetKey, (key: string) => string>> =
 }
 
 export function meta(): Route.MetaDescriptors {
-  return [{ title: 'Brev-bestilling | Verdande' }]
+  return [{ title: 'Brevbestilling | Verdande' }]
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -77,7 +79,12 @@ export async function loader({ request }: Route.LoaderArgs) {
   qs.set('fomDato', fomDato)
   qs.set('tomDato', tomDato)
 
-  const rows = await apiGet<AutoBrevOppsummering[]>(`/api/behandling/brev/oppsummering?${qs.toString()}`, request)
+  const rawRows = await apiGet<AutoBrevOppsummering[]>(`/api/behandling/brev/oppsummering?${qs.toString()}`, request)
+  const rows = rawRows.map((r) => ({
+    ...r,
+    _originalBrevkode: r.brevkode,
+    brevkode: r.brevbakerBrevkode ?? r.brevkode,
+  }))
 
   return {
     rows,
@@ -144,6 +151,7 @@ type GroupRow = {
   groupKey: string
   labels: Partial<Record<FacetKey, string>>
   values: Partial<Record<FacetKey, string | null>>
+  brevnavn: string | null
   antall: number
 }
 
@@ -163,7 +171,7 @@ function groupRows(rows: AutoBrevOppsummering[], keys: FacetKey[]): GroupRow[] {
     if (prev) {
       prev.antall += r.antall
     } else {
-      m.set(key, { groupKey: key, labels, values: rawValues, antall: r.antall })
+      m.set(key, { groupKey: key, labels, values: rawValues, brevnavn: r.brevnavn, antall: r.antall })
     }
   }
   return [...m.values()].sort((a, b) => b.antall - a.antall)
@@ -180,7 +188,8 @@ function toggleParam(current: string[] | null, value: string): string[] | null {
   return arr.length ? arr : null
 }
 
-const rowKey = (r: AutoBrevOppsummering) => [r.behandlingstype, r.brevkode, r.brevbakerBrevkode, r.sprakKode].join('|')
+const rowKey = (r: AutoBrevOppsummering) =>
+  [r.behandlingstype, r._originalBrevkode ?? r.brevkode, r.brevnavn, r.sprakKode].join('|')
 
 function countActiveFilters(filters: Partial<Record<FacetKey, string[]>>): number {
   return Object.values(filters).reduce((acc, v) => acc + ((v?.length ?? 0) > 0 ? 1 : 0), 0)
@@ -341,7 +350,7 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
     <Box paddingBlock="space-24" paddingInline="space-24">
       <VStack gap="space-24">
         <Heading level="1" size="small">
-          Brev-bestilling
+          Brevbestilling
         </Heading>
 
         <BodyShort>Tabellen viser opptelling av antall bestilte brev fra behandlingene</BodyShort>
@@ -410,16 +419,14 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
             </HStack>
 
             {groupBy.length === 0 ? (
-              <Table size="small" zebraStripes>
+              <Table key="ungrouped" size="small" zebraStripes>
                 <BodyShort as="caption" visuallyHidden>
                   Bestilte brev
                 </BodyShort>
                 <Table.Header>
                   <Table.Row>
                     <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
-                    <Table.HeaderCell>Brevkode</Table.HeaderCell>
-                    <Table.HeaderCell>Brevbaker-brevkode</Table.HeaderCell>
-                    <Table.HeaderCell>Språkkode</Table.HeaderCell>
+                    <Table.HeaderCell>Brev</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
                   </Table.Row>
@@ -433,9 +440,14 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                         <Table.DataCell>
                           {r.behandlingstype ? decodeBehandling(r.behandlingstype) : manglendeVerdi}
                         </Table.DataCell>
-                        <Table.DataCell>{r.brevkode}</Table.DataCell>
-                        <Table.DataCell>{r.brevbakerBrevkode ?? manglendeVerdi}</Table.DataCell>
-                        <Table.DataCell>{r.sprakKode ?? manglendeVerdi}</Table.DataCell>
+                        <Table.DataCell>
+                          <VStack gap="space-0">
+                            {r.brevnavn ? <BodyShort weight="semibold">{r.brevnavn}</BodyShort> : null}
+                            <BodyShort size="small" textColor="subtle">
+                              {r.brevkode}
+                            </BodyShort>
+                          </VStack>
+                        </Table.DataCell>
                         <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                           {r.antall.toLocaleString('nb-NO')}
                         </Table.DataCell>
@@ -447,14 +459,14 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                 </Table.Body>
               </Table>
             ) : (
-              <Table size="small" zebraStripes>
+              <Table key={`grouped-${groupBy.join(',')}`} size="small" zebraStripes>
                 <BodyShort as="caption" visuallyHidden>
                   Grupperte bestilte brev
                 </BodyShort>
                 <Table.Header>
                   <Table.Row>
                     {groupBy.map((g) => (
-                      <Table.HeaderCell key={`h-${g}`}>{facetLabel(g)}</Table.HeaderCell>
+                      <Table.HeaderCell key={`h-${g}`}>{g === 'brevkode' ? 'Brev' : facetLabel(g)}</Table.HeaderCell>
                     ))}
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
                     <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
@@ -463,9 +475,22 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                 <Table.Body>
                   {grouped.map((gr) => (
                     <Table.Row key={`gr-${gr.groupKey}`}>
-                      {groupBy.map((g) => (
-                        <Table.DataCell key={`c-${gr.groupKey}-${g}`}>{gr.labels[g] ?? manglendeVerdi}</Table.DataCell>
-                      ))}
+                      {groupBy.map((g) =>
+                        g === 'brevkode' ? (
+                          <Table.DataCell key={`c-${gr.groupKey}-${g}`}>
+                            <VStack gap="space-0">
+                              {gr.brevnavn ? <BodyShort weight="semibold">{gr.brevnavn}</BodyShort> : null}
+                              <BodyShort size="small" textColor="subtle">
+                                {gr.labels[g] ?? manglendeVerdi}
+                              </BodyShort>
+                            </VStack>
+                          </Table.DataCell>
+                        ) : (
+                          <Table.DataCell key={`c-${gr.groupKey}-${g}`}>
+                            {gr.labels[g] ?? manglendeVerdi}
+                          </Table.DataCell>
+                        ),
+                      )}
                       <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
                         {gr.antall.toLocaleString('nb-NO')}
                       </Table.DataCell>
@@ -587,9 +612,5 @@ function facetLabel(f: FacetKey): string {
       return 'Behandlingstype'
     case 'brevkode':
       return 'Brevkode'
-    case 'brevbakerBrevkode':
-      return 'Brevbaker-brevkode'
-    case 'sprakKode':
-      return 'Språkkode'
   }
 }
