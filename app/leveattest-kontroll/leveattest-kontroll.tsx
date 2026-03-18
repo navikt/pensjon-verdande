@@ -225,7 +225,7 @@ const BOSTEDLAND_OPTIONS: Array<{ value: string; label: string }> = [
 ]
 
 function labelForLand(code: string) {
-  return BOSTEDLAND_OPTIONS.find((o) => o.value === code)?.label ?? `${code} (ukjent)`
+  return BOSTEDLAND_OPTIONS.find((o) => o.value === code)?.value ?? `${code} (ukjent)`
 }
 
 function sokStatusToBubbleStatus(status: string): BubbleItem['status'] {
@@ -734,10 +734,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
         const ymd = toYmd(s.behandlingSistKjort) ?? todayYmd()
         const time = formatIsoTimeNo(s.behandlingSistKjort) ?? undefined
 
-        const landLabel =
-          s.sokPaaLand.length <= 3
-            ? s.sokPaaLand.map(labelForLand).join(', ')
-            : `${s.sokPaaLand.length} land (${s.sokPaaLand.slice(0, 3).join(', ')}, …)`
+        const landLabel = s.sokPaaLand.map(labelForLand).join(', ')
 
         const sendt = sendtTilKontrollSet.has(s.sokBehandlingId)
 
