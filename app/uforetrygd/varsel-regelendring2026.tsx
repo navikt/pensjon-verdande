@@ -1,7 +1,7 @@
 import { BodyLong, Box, Button, Heading, Select, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { apiPost } from '~/services/api.server'
-import type { Route } from './+types/bpen091'
+import type { Route } from './+types/varsel-regelendring2026'
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Varsel regelendring 2026 Uføre | Verdande' }]
