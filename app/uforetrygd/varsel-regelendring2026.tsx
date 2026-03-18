@@ -1,4 +1,4 @@
-import { BodyLong, Box, Button, Heading, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, Heading, Select, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/bpen091'
@@ -14,9 +14,15 @@ export const loader = () => {
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  //  const formData = await request.formData()
+  const formData = await request.formData()
+  const dryRunStr = String(formData.get('dryRun') ?? 'true')
+  const dryRun = dryRunStr === 'true'
 
-  const response = await apiPost<{ behandlingId: number }>('/api/uforetrygd/regelendring2026/varsel', {}, request)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/uforetrygd/regelendring2026/varsel',
+    { dryRun },
+    request,
+  )
 
   if (!response?.behandlingId) {
     throw new Error('Missing behandlingId')
@@ -39,6 +45,10 @@ export default function VarselRegelendring2026() {
       </Box>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'space-16'}>
+          <Select label="Prøvekjøring (dry run)" size="small" name="dryRun" defaultValue="true">
+            <option value="true">Ja</option>
+            <option value="false">Nei</option>
+          </Select>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Oppretter…' : 'Opprett'}
           </Button>
