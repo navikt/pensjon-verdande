@@ -1,4 +1,5 @@
 import type { AldeBehandlingState } from './alderspensjon/forstegangsbehandling/types'
+import type { BrevTidsserieDatapunkt, TidsserieDatapunkt } from './analyse/types'
 
 export interface PageResponse<T> {
   content: T[]
@@ -268,7 +269,8 @@ export type DashboardResponse = {
   antallUferdigeBehandlinger: number
   ukjenteBehandlingstyper: string[]
   behandlingAntall: BehandlingAntall[]
-  opprettetPerDag: DatoAntall[]
+  aktivitetDatapunkter: TidsserieDatapunkt[]
+  brevDatapunkter: BrevTidsserieDatapunkt[]
 }
 
 export type TotaltAntallBehandlingerResponse = {

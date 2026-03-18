@@ -133,99 +133,99 @@ function formatIsoTimeNo(value: unknown): string | null {
 }
 
 const BOSTEDLAND_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: 'DZA', label: 'Algerie (DZ)' },
-  { value: 'ARG', label: 'Argentina (AR)' },
-  { value: 'AUS', label: 'Australia (AU)' },
-  { value: 'BIH', label: 'Bosnia-Hercegovina (BA)' },
-  { value: 'BRA', label: 'Brasil (BR)' },
-  { value: 'CAN', label: 'Canada (CA)' },
-  { value: 'CHL', label: 'Chile (CL)' },
-  { value: 'COL', label: 'Colombia (CO)' },
-  { value: 'CRI', label: 'Costa Rica (CR)' },
-  { value: 'CUB', label: 'Cuba (CU)' },
-  { value: 'ARE', label: 'De Forente Arabiske Emirater (AE)' },
-  { value: 'DOM', label: 'Den Dominikanske Republikk (DO)' },
-  { value: 'ECU', label: 'Ecuador (EC)' },
-  { value: 'EGY', label: 'Egypt (EG)' },
-  { value: 'ETH', label: 'Etiopia (ET)' },
-  { value: 'PHL', label: 'Filippinene (PH)' },
-  { value: 'FRO', label: 'Færøyene (FO)' },
-  { value: 'GMB', label: 'Gambia (GM)' },
-  { value: 'GHA', label: 'Ghana (GH)' },
-  { value: 'GRL', label: 'Grønland (GL)' },
-  { value: 'HKG', label: 'Hongkong (HK)' },
-  { value: 'IND', label: 'India (IN)' },
-  { value: 'IDN', label: 'Indonesia (ID)' },
-  { value: 'IRN', label: 'Iran (IR)' },
-  { value: 'IRQ', label: 'Irak (IQ)' },
-  { value: 'ISR', label: 'Israel (IL)' },
-  { value: 'JPN', label: 'Japan (JP)' },
-  { value: 'JOR', label: 'Jordan (JO)' },
-  { value: 'CPV', label: 'Kapp Verde (CV)' },
-  { value: 'KHM', label: 'Kambodsja (KH)' },
-  { value: 'KEN', label: 'Kenya (KE)' },
-  { value: 'CHN', label: 'Kina (CN)' },
-  { value: 'XKX', label: 'Kosovo (XK)' },
-  { value: 'LAO', label: 'Laos (LA)' },
-  { value: 'LBN', label: 'Libanon (LB)' },
-  { value: 'MYS', label: 'Malaysia (MY)' },
-  { value: 'MAR', label: 'Marokko (MA)' },
-  { value: 'MUS', label: 'Mauritius (MU)' },
-  { value: 'MEX', label: 'Mexico (MX)' },
-  { value: 'MNE', label: 'Montenegro (ME)' },
-  { value: 'MMR', label: 'Myanmar (MM)' },
-  { value: 'NZL', label: 'New Zealand (NZ)' },
-  { value: 'PAK', label: 'Pakistan (PK)' },
-  { value: 'PER', label: 'Peru (PE)' },
-  { value: 'RUS', label: 'Russland (RU)' },
-  { value: 'SRB', label: 'Serbia (RS)' },
-  { value: 'SGP', label: 'Singapore (SG)' },
-  { value: 'SOM', label: 'Somalia (SO)' },
-  { value: 'GBR', label: 'Storbritannia (GB)' },
-  { value: 'ZAF', label: 'Sør-Afrika (ZA)' },
-  { value: 'KOR', label: 'Sør-Korea (KR)' },
-  { value: 'LKA', label: 'Sri Lanka (LK)' },
-  { value: 'CHE', label: 'Sveits (CH)' },
-  { value: 'TZA', label: 'Tanzania (TZ)' },
-  { value: 'THA', label: 'Thailand (TH)' },
-  { value: 'TTO', label: 'Trinidad og Tobago (TT)' },
-  { value: 'TUN', label: 'Tunisia (TN)' },
-  { value: 'TUR', label: 'Tyrkia (TR)' },
-  { value: 'UGA', label: 'Uganda (UG)' },
-  { value: 'UKR', label: 'Ukraina (UA)' },
-  { value: 'URY', label: 'Uruguay (UY)' },
-  { value: 'USA', label: 'USA (US)' },
-  { value: 'VNM', label: 'Vietnam (VN)' },
-  { value: 'BEL', label: 'Belgia (BE)' },
-  { value: 'BGR', label: 'Bulgaria (BG)' },
-  { value: 'CZE', label: 'Den Tsjekkiske Rep. (CZ)' },
-  { value: 'EST', label: 'Estland (EE)' },
-  { value: 'FRA', label: 'Frankrike (FR)' },
-  { value: 'GRC', label: 'Hellas (GR)' },
-  { value: 'IRL', label: 'Irland (IE)' },
-  { value: 'ISL', label: 'Island (IS)' },
-  { value: 'ITA', label: 'Italia (IT)' },
-  { value: 'HRV', label: 'Kroatia (HR)' },
-  { value: 'CYP', label: 'Kypros (CY)' },
-  { value: 'LVA', label: 'Latvia (LV)' },
-  { value: 'LIE', label: 'Liechtenstein (LI)' },
-  { value: 'LTU', label: 'Litauen (LT)' },
-  { value: 'LUX', label: 'Luxembourg (LU)' },
-  { value: 'MLT', label: 'Malta (MT)' },
-  { value: 'NLD', label: 'Nederland (NL)' },
-  { value: 'POL', label: 'Polen (PL)' },
-  { value: 'PRT', label: 'Portugal (PT)' },
-  { value: 'ROU', label: 'Romania (RO)' },
-  { value: 'SVK', label: 'Slovakia (SK)' },
-  { value: 'SVN', label: 'Slovenia (SI)' },
-  { value: 'ESP', label: 'Spania (ES)' },
-  { value: 'DEU', label: 'Tyskland (DE)' },
-  { value: 'HUN', label: 'Ungarn (HU)' },
-  { value: 'AUT', label: 'Østerrike (AT)' },
+  { value: 'DZA', label: 'Algerie' },
+  { value: 'ARG', label: 'Argentina' },
+  { value: 'AUS', label: 'Australia' },
+  { value: 'BIH', label: 'Bosnia-Hercegovina' },
+  { value: 'BRA', label: 'Brasil' },
+  { value: 'CAN', label: 'Canada' },
+  { value: 'CHL', label: 'Chile' },
+  { value: 'COL', label: 'Colombia' },
+  { value: 'CRI', label: 'Costa Rica' },
+  { value: 'CUB', label: 'Cuba' },
+  { value: 'ARE', label: 'De Forente Arabiske Emirater' },
+  { value: 'DOM', label: 'Den Dominikanske Republikk' },
+  { value: 'ECU', label: 'Ecuador' },
+  { value: 'EGY', label: 'Egypt' },
+  { value: 'ETH', label: 'Etiopia' },
+  { value: 'PHL', label: 'Filippinene' },
+  { value: 'FRO', label: 'Færøyene' },
+  { value: 'GMB', label: 'Gambia' },
+  { value: 'GHA', label: 'Ghana' },
+  { value: 'GRL', label: 'Grønland' },
+  { value: 'HKG', label: 'Hongkong' },
+  { value: 'IND', label: 'India' },
+  { value: 'IDN', label: 'Indonesia' },
+  { value: 'IRN', label: 'Iran' },
+  { value: 'IRQ', label: 'Irak' },
+  { value: 'ISR', label: 'Israel' },
+  { value: 'JPN', label: 'Japan' },
+  { value: 'JOR', label: 'Jordan' },
+  { value: 'CPV', label: 'Kapp Verde' },
+  { value: 'KHM', label: 'Kambodsja' },
+  { value: 'KEN', label: 'Kenya' },
+  { value: 'CHN', label: 'Kina' },
+  { value: 'XKX', label: 'Kosovo' },
+  { value: 'LAO', label: 'Laos' },
+  { value: 'LBN', label: 'Libanon' },
+  { value: 'MYS', label: 'Malaysia' },
+  { value: 'MAR', label: 'Marokko' },
+  { value: 'MUS', label: 'Mauritius' },
+  { value: 'MEX', label: 'Mexico' },
+  { value: 'MNE', label: 'Montenegro' },
+  { value: 'MMR', label: 'Myanmar' },
+  { value: 'NZL', label: 'New Zealand' },
+  { value: 'PAK', label: 'Pakistan' },
+  { value: 'PER', label: 'Peru' },
+  { value: 'RUS', label: 'Russland' },
+  { value: 'SRB', label: 'Serbia' },
+  { value: 'SGP', label: 'Singapore' },
+  { value: 'SOM', label: 'Somalia' },
+  { value: 'GBR', label: 'Storbritannia' },
+  { value: 'ZAF', label: 'Sør-Afrika' },
+  { value: 'KOR', label: 'Sør-Korea' },
+  { value: 'LKA', label: 'Sri Lanka' },
+  { value: 'CHE', label: 'Sveits' },
+  { value: 'TZA', label: 'Tanzania' },
+  { value: 'THA', label: 'Thailand' },
+  { value: 'TTO', label: 'Trinidad og Tobago' },
+  { value: 'TUN', label: 'Tunisia' },
+  { value: 'TUR', label: 'Tyrkia' },
+  { value: 'UGA', label: 'Uganda' },
+  { value: 'UKR', label: 'Ukraina' },
+  { value: 'URY', label: 'Uruguay' },
+  { value: 'USA', label: 'USA' },
+  { value: 'VNM', label: 'Vietnam' },
+  { value: 'BEL', label: 'Belgia' },
+  { value: 'BGR', label: 'Bulgaria' },
+  { value: 'CZE', label: 'Den Tsjekkiske Rep.' },
+  { value: 'EST', label: 'Estland' },
+  { value: 'FRA', label: 'Frankrike' },
+  { value: 'GRC', label: 'Hellas' },
+  { value: 'IRL', label: 'Irland' },
+  { value: 'ISL', label: 'Island' },
+  { value: 'ITA', label: 'Italia' },
+  { value: 'HRV', label: 'Kroatia' },
+  { value: 'CYP', label: 'Kypros' },
+  { value: 'LVA', label: 'Latvia' },
+  { value: 'LIE', label: 'Liechtenstein' },
+  { value: 'LTU', label: 'Litauen' },
+  { value: 'LUX', label: 'Luxembourg' },
+  { value: 'MLT', label: 'Malta' },
+  { value: 'NLD', label: 'Nederland' },
+  { value: 'POL', label: 'Polen' },
+  { value: 'PRT', label: 'Portugal' },
+  { value: 'ROU', label: 'Romania' },
+  { value: 'SVK', label: 'Slovakia' },
+  { value: 'SVN', label: 'Slovenia' },
+  { value: 'ESP', label: 'Spania' },
+  { value: 'DEU', label: 'Tyskland' },
+  { value: 'HUN', label: 'Ungarn' },
+  { value: 'AUT', label: 'Østerrike' },
 ]
 
-function labelForLand(code: string) {
-  return BOSTEDLAND_OPTIONS.find((o) => o.value === code)?.label ?? `${code} (ukjent)`
+function validerLandkode(code: string) {
+  return BOSTEDLAND_OPTIONS.find((o) => o.value === code)?.value ?? `${code} (ukjent)`
 }
 
 function sokStatusToBubbleStatus(status: string): BubbleItem['status'] {
@@ -409,6 +409,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
 
   const [aktivFane, setAktivFane] = useState<'kontroll' | 'statistikk'>('kontroll')
 
+  const [openHentGrunnlagDialog, setOpenHentGrunnlagDialog] = useState(false)
   const [openPurrDialog, setOpenPurrDialog] = useState(false)
   const [openOppgaveDialog, setOpenOppgaveDialog] = useState(false)
 
@@ -733,14 +734,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
         const ymd = toYmd(s.behandlingSistKjort) ?? todayYmd()
         const time = formatIsoTimeNo(s.behandlingSistKjort) ?? undefined
 
-        const landLabel =
-          s.sokPaaLand.length <= 3
-            ? s.sokPaaLand.map(labelForLand).join(', ')
-            : `${s.sokPaaLand.length} land (${s.sokPaaLand.slice(0, 3).join(', ')}, …)`
+        const landCodes = s.sokPaaLand.map(validerLandkode).join(', ')
 
         const sendt = sendtTilKontrollSet.has(s.sokBehandlingId)
 
-        const baseTag = `SøkId: ${s.sokBehandlingId} · ${landLabel} · ${s.alder}+${s.filtrerPaSakstypeUfore ? ' · Kun uføre' : ''}`
+        const baseTag = `SøkId: ${s.sokBehandlingId} · ${landCodes} · ${s.alder}+${s.filtrerPaSakstypeUfore ? ' · Kun uføre' : ''}`
         const tagText = sendt ? `${baseTag} · SENDT` : baseTag
 
         const selectable = isFerdig(s.status) && !sendt
@@ -827,12 +825,14 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </Heading>
 
               <HStack gap="space-12" align="end">
-                <startFetcher.Form method="post">
-                  <input type="hidden" name="_intent" value="hentGrunnlag" />
-                  <Button type="submit" loading={startFetcher.state !== 'idle'} disabled={disableStart}>
-                    Hent grunnlag
-                  </Button>
-                </startFetcher.Form>
+                <Button
+                  type="button"
+                  loading={startFetcher.state !== 'idle'}
+                  disabled={disableStart || startFetcher.state !== 'idle'}
+                  onClick={() => setOpenHentGrunnlagDialog(true)}
+                >
+                  Hent grunnlag
+                </Button>
 
                 {grunnlagStatus === 'KJØRER' && <div style={{ opacity: 0.85 }}>Kjører…</div>}
 
@@ -844,6 +844,40 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
               </HStack>
 
               <KjoringerPreview title="Grunnlagkjøring" items={grunnlagItems} emptyText="Ingen grunnlag funnet ennå." />
+
+              <Modal
+                open={openHentGrunnlagDialog}
+                onClose={() => setOpenHentGrunnlagDialog(false)}
+                header={{ heading: 'Hent nytt grunnlag', size: 'small' }}
+              >
+                <Modal.Body>
+                  <BodyShort>
+                    Er du sikker på at du vil hente nytt grunnlag? Søkeresultatene i visningen hører til siste grunnlag,
+                    og kan bli erstattet når nytt grunnlag er klart.
+                  </BodyShort>
+                </Modal.Body>
+                <Modal.Footer>
+                  <startFetcher.Form method="post">
+                    <input type="hidden" name="_intent" value="hentGrunnlag" />
+                    <Button
+                      type="submit"
+                      loading={startFetcher.state !== 'idle'}
+                      disabled={disableStart || startFetcher.state !== 'idle'}
+                      onClick={() => setOpenHentGrunnlagDialog(false)}
+                    >
+                      Ja, hent nytt grunnlag
+                    </Button>
+                  </startFetcher.Form>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={startFetcher.state !== 'idle'}
+                    onClick={() => setOpenHentGrunnlagDialog(false)}
+                  >
+                    Avbryt
+                  </Button>
+                </Modal.Footer>
+              </Modal>
 
               <HStack align="center" gap="space-2">
                 <Button
@@ -883,13 +917,17 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                   value={sokPaaLand.length > 0 ? 'valgt' : 'tom'}
                   onChange={(e) => {
                     const v = e.target.value
-                    if (v === 'eu')
-                      setSokPaaLand(['DEU', 'FRA', 'ESP', 'PRT', 'ITA', 'NLD', 'BEL', 'AUT', 'CHE', 'IRL'])
-                    else if (v === 'na') setSokPaaLand(['USA', 'CAN'])
-                    else if (v === 'asia') setSokPaaLand(['THA', 'IND', 'KOR'])
-                    else if (v === 'sorostasia')
-                      setSokPaaLand(['THA', 'PHL', 'VNM', 'SGP', 'IDN', 'MYS', 'KHM', 'LAO', 'MMR'])
-                    else if (v === 'reset') setSokPaaLand([])
+                    if (v === 'sorostasia') {
+                      setSokPaaLand(['IDN', 'KHM', 'LAO', 'MMR', 'MYS', 'PHL', 'SGP', 'THA', 'VNM'])
+                    } else if (v === 'utenfor-sorostasia') {
+                      setSokPaaLand(['MAR', 'PAK'])
+                    } else if (v === 'usa') {
+                      setSokPaaLand(['USA'])
+                    } else if (v === 'utenfor-usa') {
+                      setSokPaaLand(['CAN', 'TUR', 'AUS', 'CHL', 'BIH'])
+                    } else if (v === 'reset') {
+                      setSokPaaLand([])
+                    }
                   }}
                   disabled={disableSok}
                 >
@@ -897,10 +935,10 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     Velg…
                   </option>
                   <option value="valgt">Egendefinert</option>
-                  <option value="eu">Typisk Europa</option>
-                  <option value="na">Nord-Amerika</option>
-                  <option value="asia">Asia (utvalg)</option>
-                  <option value="sorostasia">Sørøst-Asia</option>
+                  <option value="sorostasia">Sør-øst Asia</option>
+                  <option value="utenfor-sorostasia">Utenfor sør-øst Asia</option>
+                  <option value="usa">USA</option>
+                  <option value="utenfor-usa">Utenfor USA</option>
                   <option value="reset">Nullstill land</option>
                 </Select>
 
@@ -962,14 +1000,16 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                           onClick={() => setSokPaaLand((prev) => prev.filter((code) => code !== o.value))}
                           disabled={disableSok}
                           style={{
-                            border: '1px solid var(--ax-border-neutral-subtleA)',
+                            border: '1px solid var(--ax-border-focus)',
                             borderRadius: '999px',
                             padding: '0.35rem 0.7rem',
-                            background: 'var(--ax-bg-subtle)',
+                            background: 'var(--ax-border-focus)',
+                            color: 'white',
+                            fontWeight: 600,
                             cursor: disableSok ? 'default' : 'pointer',
                           }}
                         >
-                          {o.label} ×
+                          {o.label} ({o.value}) ×
                         </button>
                       ))}
                     </div>
@@ -989,7 +1029,9 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     <div style={{ columnCount: 3, columnGap: '1rem' }}>
                       {visibleLandOptions.map((o) => (
                         <div key={o.value} style={{ breakInside: 'avoid', padding: '2px 0' }}>
-                          <Checkbox value={o.value}>{o.label}</Checkbox>
+                          <Checkbox value={o.value}>
+                            {o.label} ({o.value})
+                          </Checkbox>
                         </div>
                       ))}
                     </div>

@@ -7,17 +7,19 @@ import {
 import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
 import { Await } from 'react-router'
-import { asLocalDateString } from '~/common/date'
+import type { BrevTidsserieResponse, TidsserieResponse } from '~/analyse/types'
 import { formatNumber } from '~/common/number'
+import { AktivitetChartCard } from '~/components/aktivitet-chart/AktivitetChartCard'
 import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
-import { BehandlingerPerDagLineChartCard } from '~/components/behandlinger-per-dag-linechart/BehandlingerPerDagLineChartCard'
+import { BrevChartCard } from '~/components/brev-chart/BrevChartCard'
+import { formatLocalIso } from '~/components/chart-utils/formatLocalIso'
+import { velgAggregering } from '~/components/chart-utils/velgAggregering'
 import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import { apiGet } from '~/services/api.server'
 import type {
   AntallUferdigeBehandlingerResponse,
   BehandlingAntallResponse,
   FeilendeBehandlingerResponse,
-  OpprettetPerDagResponse,
   TotaltAntallBehandlingerResponse,
   UkjenteBehandlingstyperResponse,
 } from '~/types'
@@ -28,10 +30,15 @@ export function meta(): Route.MetaDescriptors {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const defaultDager = 30
+  const defaultTimer = 24
   const fom = new Date()
-  fom.setDate(fom.getDate() - defaultDager)
-  const fomStr = asLocalDateString(fom)
+  fom.setTime(fom.getTime() - defaultTimer * 60 * 60 * 1000)
+
+  const tidsserieParams = new URLSearchParams({
+    fom: formatLocalIso(fom),
+    tom: formatLocalIso(new Date()),
+    aggregering: velgAggregering(defaultTimer),
+  })
 
   const dashboardResponse = Promise.all([
     apiGet<TotaltAntallBehandlingerResponse>('/api/behandling/oppsummering-totalt-antall-behandlinger', request).then(
@@ -50,8 +57,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     apiGet<BehandlingAntallResponse>('/api/behandling/oppsummering-behandling-antall', request).then(
       (it) => it.behandlingAntall,
     ),
-    apiGet<OpprettetPerDagResponse>(`/api/behandling/oppsummering-opprettet-per-dag?fom=${fomStr}`, request).then(
-      (it) => it.opprettetPerDag,
+    apiGet<TidsserieResponse>(`/api/behandling/analyse/tidsserie?${tidsserieParams}`, request).then(
+      (it) => it.datapunkter,
+    ),
+    apiGet<BrevTidsserieResponse>(`/api/behandling/analyse/brev-tidsserie?${tidsserieParams}`, request).then(
+      (it) => it.datapunkter,
     ),
   ]).then((it) => ({
     totaltAntallBehandlinger: it[0],
@@ -59,7 +69,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     ukjenteBehandlingstyper: it[2],
     antallUferdigeBehandlinger: it[3],
     behandlingAntall: it[4],
-    opprettetPerDag: it[5],
+    aktivitetDatapunkter: it[5],
+    brevDatapunkter: it[6],
   }))
 
   return {
@@ -119,9 +130,10 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   />
                 </HGrid>
                 <HGrid gap="space-24" columns={2}>
-                  <BehandlingerPerDagLineChartCard opprettetPerDag={dashboardResponse.opprettetPerDag} />
-                  <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
+                  <AktivitetChartCard datapunkter={dashboardResponse.aktivitetDatapunkter} />
+                  <BrevChartCard datapunkter={dashboardResponse.brevDatapunkter} />
                 </HGrid>
+                <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
               </VStack>
             )
           )
