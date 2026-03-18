@@ -1,5 +1,7 @@
 import {
   Button,
+  Checkbox,
+  CheckboxGroup,
   DatePicker,
   Heading,
   HStack,
@@ -37,7 +39,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const tomDato = formData.get('tomDato') as string
   const antallPerEnhet = Number(formData.get('antallPerEnhet'))
   const vedtakType = formData.get('vedtakType') as string
-  const response = await opprettKontrollKvalitetssjekk({ fomDato, tomDato, antallPerEnhet, vedtakType }, request)
+  const kravGjelder = formData.getAll('kravGjelder') as string[]
+  const response = await opprettKontrollKvalitetssjekk(
+    { fomDato, tomDato, antallPerEnhet, vedtakType, kravGjelder },
+    request,
+  )
   return redirect(`/behandling/${response?.behandlingId}`)
 }
 
@@ -64,6 +70,7 @@ export default function OpprettKontrollKvalitetssjekkRoute({ loaderData }: Route
   const { fra: defaultFra, til: defaultTil } = defaultDatoer()
   const [fraDate, setFraDate] = useState<Date>(defaultFra)
   const [tilDate, setTilDate] = useState<Date>(defaultTil)
+  const [kravGjelder, setKravGjelder] = useState(['FORSTEG_BH', 'F_BH_BO_UTL', 'F_BH_MED_UTL'])
 
   const { datepickerProps, fromInputProps, toInputProps } = useRangeDatepicker({
     defaultSelected: { from: defaultFra, to: defaultTil },
@@ -102,6 +109,14 @@ export default function OpprettKontrollKvalitetssjekkRoute({ loaderData }: Route
               <option value="MAN">Manuell</option>
             </Select>
           </HStack>
+          <CheckboxGroup legend="Krav gjelder" value={kravGjelder} onChange={setKravGjelder}>
+            <Checkbox value="FORSTEG_BH">Førstegangsbehandling</Checkbox>
+            <Checkbox value="F_BH_BO_UTL">Førstegangsbehandling bosatt utland</Checkbox>
+            <Checkbox value="F_BH_MED_UTL">Førstegangsbehandling kun utland</Checkbox>
+          </CheckboxGroup>
+          {kravGjelder.map((v) => (
+            <input key={v} type="hidden" name="kravGjelder" value={v} />
+          ))}
           <HStack gap="space-16">
             <Button type="button" onClick={() => modalRef.current?.showModal()}>
               Opprett kontroll
