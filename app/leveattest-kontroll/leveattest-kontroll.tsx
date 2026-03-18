@@ -224,7 +224,7 @@ const BOSTEDLAND_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'AUT', label: 'Østerrike (AT)' },
 ]
 
-function labelForLand(code: string) {
+function validerLandkode(code: string) {
   return BOSTEDLAND_OPTIONS.find((o) => o.value === code)?.value ?? `${code} (ukjent)`
 }
 
@@ -734,11 +734,11 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
         const ymd = toYmd(s.behandlingSistKjort) ?? todayYmd()
         const time = formatIsoTimeNo(s.behandlingSistKjort) ?? undefined
 
-        const landLabel = s.sokPaaLand.map(labelForLand).join(', ')
+        const landCodes = s.sokPaaLand.map(validerLandkode).join(', ')
 
         const sendt = sendtTilKontrollSet.has(s.sokBehandlingId)
 
-        const baseTag = `SøkId: ${s.sokBehandlingId} · ${landLabel} · ${s.alder}+${s.filtrerPaSakstypeUfore ? ' · Kun uføre' : ''}`
+        const baseTag = `SøkId: ${s.sokBehandlingId} · ${landCodes} · ${s.alder}+${s.filtrerPaSakstypeUfore ? ' · Kun uføre' : ''}`
         const tagText = sendt ? `${baseTag} · SENDT` : baseTag
 
         const selectable = isFerdig(s.status) && !sendt
