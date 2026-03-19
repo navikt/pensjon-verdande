@@ -1,7 +1,7 @@
 import { BodyShort, Link, Table } from '@navikt/ds-react'
 import { NavLink } from 'react-router'
 import invariant from 'tiny-invariant'
-import { HentRelaterteFamiliebehandlinger } from '~/services/behandling.server'
+import { hentRelaterteFamiliebehandlinger } from '~/services/behandling.server'
 import type { RelatertFamilieBehandling } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId.relaterteFamiliebehandlinger'
 
@@ -10,7 +10,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   invariant(behandlingId, 'Missing behandlingId param')
 
-  return HentRelaterteFamiliebehandlinger(request, +behandlingId)
+  return hentRelaterteFamiliebehandlinger(request, +behandlingId)
 }
 
 export default function RelaterteFamiliebehandlinger({ loaderData }: Route.ComponentProps) {
