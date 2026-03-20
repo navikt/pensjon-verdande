@@ -924,7 +924,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     } else if (v === 'usa') {
                       setSokPaaLand(['USA'])
                     } else if (v === 'utenfor-usa') {
-                      setSokPaaLand(['CAN', 'TUR', 'AUS', 'CHL', 'BIH', 'ESP'])
+                      setSokPaaLand(['CAN', 'TUR', 'AUS', 'CHL', 'BIH'])
                     } else if (v === 'reset') {
                       setSokPaaLand([])
                     }
