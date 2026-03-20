@@ -33,7 +33,7 @@ type AutoBrevOppsummeringDto = {
   brevnavn: string | null
   sprakKode: string | null
   antall: number
-  brevType: 'BREVBAKER' | 'LEGACY' | null
+  brevType: 'BREVBAKER' | 'LEGACY'
 }
 
 /** Visningsmodell brukt i UI — brevkode er normalisert og original bevart */
@@ -44,7 +44,7 @@ export type AutoBrevOppsummering = {
   brevnavn: string | null
   sprakKode: string | null
   antall: number
-  brevType: string | null
+  brevType: 'BREVBAKER' | 'LEGACY'
 }
 
 const FACETS = ['behandlingstype', 'brevkode', 'brevType'] as const
@@ -170,7 +170,7 @@ type GroupRow = {
   labels: Partial<Record<FacetKey, string>>
   values: Partial<Record<FacetKey, string | null>>
   brevnavn: string | null
-  brevType: string | null
+  brevType: 'BREVBAKER' | 'LEGACY'
   brevkode: string | null
   antall: number
 }
@@ -469,19 +469,21 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                         </Table.DataCell>
                         <Table.DataCell>
                           <VStack gap="space-0">
-                            {r.brevnavn ? (
-                              r.brevType === 'BREVBAKER' ? (
-                                <Link href={`${BREVOPPSKRIFT_BASE_URL}/${r.brevkode}`} target="_blank">
-                                  <BodyShort weight="semibold">{r.brevnavn}</BodyShort>
-                                </Link>
-                              ) : (
-                                <BodyShort weight="semibold">{r.brevnavn}</BodyShort>
-                              )
-                            ) : null}
-                            {r.brevType !== 'BREVBAKER' && (
-                              <BodyShort size="small" textColor="subtle">
-                                {r.brevkode}
-                              </BodyShort>
+                            {r.brevType === 'BREVBAKER' ? (
+                              <Link
+                                href={`${BREVOPPSKRIFT_BASE_URL}/${r.brevkode}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <BodyShort weight="semibold">{r.brevnavn ?? r.brevkode}</BodyShort>
+                              </Link>
+                            ) : (
+                              <>
+                                {r.brevnavn ? <BodyShort weight="semibold">{r.brevnavn}</BodyShort> : null}
+                                <BodyShort size="small" textColor="subtle">
+                                  {r.brevkode}
+                                </BodyShort>
+                              </>
                             )}
                           </VStack>
                         </Table.DataCell>
@@ -516,19 +518,21 @@ export default function BrevBestillingOppsummeringRoute({ loaderData }: Route.Co
                         g === 'brevkode' ? (
                           <Table.DataCell key={`c-${gr.groupKey}-${g}`}>
                             <VStack gap="space-0">
-                              {gr.brevnavn ? (
-                                gr.brevType === 'BREVBAKER' && gr.brevkode ? (
-                                  <Link href={`${BREVOPPSKRIFT_BASE_URL}/${gr.brevkode}`} target="_blank">
-                                    <BodyShort weight="semibold">{gr.brevnavn}</BodyShort>
-                                  </Link>
-                                ) : (
-                                  <BodyShort weight="semibold">{gr.brevnavn}</BodyShort>
-                                )
-                              ) : null}
-                              {gr.brevType !== 'BREVBAKER' && (
-                                <BodyShort size="small" textColor="subtle">
-                                  {gr.labels[g] ?? manglendeVerdi}
-                                </BodyShort>
+                              {gr.brevType === 'BREVBAKER' && gr.brevkode ? (
+                                <Link
+                                  href={`${BREVOPPSKRIFT_BASE_URL}/${gr.brevkode}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <BodyShort weight="semibold">{gr.brevnavn ?? gr.brevkode}</BodyShort>
+                                </Link>
+                              ) : (
+                                <>
+                                  {gr.brevnavn ? <BodyShort weight="semibold">{gr.brevnavn}</BodyShort> : null}
+                                  <BodyShort size="small" textColor="subtle">
+                                    {gr.labels[g] ?? manglendeVerdi}
+                                  </BodyShort>
+                                </>
                               )}
                             </VStack>
                           </Table.DataCell>
