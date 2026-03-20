@@ -920,7 +920,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
                     if (v === 'sorostasia') {
                       setSokPaaLand(['IDN', 'KHM', 'LAO', 'MMR', 'MYS', 'PHL', 'SGP', 'THA', 'VNM'])
                     } else if (v === 'utenfor-sorostasia') {
-                      setSokPaaLand(['MAR', 'PAK'])
+                      setSokPaaLand(['MAR', 'PAK', 'IND'])
                     } else if (v === 'usa') {
                       setSokPaaLand(['USA'])
                     } else if (v === 'utenfor-usa') {
