@@ -549,6 +549,7 @@ export const BrevBestillingFullpage: Story = {
           brevnavn: 'Vedtak - innvilgelse av alderspensjon',
           sprakKode: 'NB',
           antall: 123,
+          brevType: 'BREVBAKER',
         },
         {
           behandlingstype: 'FleksibelApSakBehandling',
@@ -557,6 +558,7 @@ export const BrevBestillingFullpage: Story = {
           brevnavn: 'Vedtak - endring av alderspensjon',
           sprakKode: 'NN',
           antall: 45,
+          brevType: 'BREVBAKER',
         },
         {
           behandlingstype: 'DodsmeldingBehandling',
@@ -565,6 +567,7 @@ export const BrevBestillingFullpage: Story = {
           brevnavn: 'Informasjon om rettigheter ved dødsfall',
           sprakKode: null,
           antall: 8,
+          brevType: 'LEGACY',
         },
         {
           behandlingstype: 'ReguleringFamilieBehandling',
@@ -573,6 +576,7 @@ export const BrevBestillingFullpage: Story = {
           brevnavn: 'Vedtak - regulering av uføretrygd',
           sprakKode: 'NB',
           antall: 310,
+          brevType: 'BREVBAKER',
         },
         {
           behandlingstype: 'FleksibelApSakBehandling',
@@ -581,6 +585,7 @@ export const BrevBestillingFullpage: Story = {
           brevnavn: null,
           sprakKode: 'NB',
           antall: 3,
+          brevType: 'LEGACY',
         },
       ],
       nowIso: new Date().toISOString(),
