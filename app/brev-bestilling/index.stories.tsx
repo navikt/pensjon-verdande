@@ -2,53 +2,59 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { renderWithLoader } from '../../.storybook/mocks/router'
 import BrevBestillingOppsummeringRoute from './index'
 
+const brevbakerRow = (
+  behandlingstype: string,
+  brevkode: string,
+  originalBrevkode: string,
+  brevnavn: string,
+  sprakKode: string | null,
+  antall: number,
+) => ({ behandlingstype, brevkode, originalBrevkode, brevnavn, sprakKode, antall, brevType: 'BREVBAKER' as const })
+
+const legacyRow = (
+  behandlingstype: string,
+  brevkode: string,
+  brevnavn: string | null,
+  sprakKode: string | null,
+  antall: number,
+) => ({
+  behandlingstype,
+  brevkode,
+  originalBrevkode: brevkode,
+  brevnavn,
+  sprakKode,
+  antall,
+  brevType: 'LEGACY' as const,
+})
+
 const mockData = {
   rows: [
-    {
-      behandlingstype: 'FleksibelApSakBehandling',
-      brevkode: 'AP_INNVILGELSE_AUTO',
-      originalBrevkode: 'PE_AP_04_001',
-      brevnavn: 'Vedtak - innvilgelse av alderspensjon',
-      sprakKode: 'NB',
-      antall: 123,
-      brevType: 'BREVBAKER',
-    },
-    {
-      behandlingstype: 'FleksibelApSakBehandling',
-      brevkode: 'AP_ENDRING_AUTO',
-      originalBrevkode: 'PE_AP_04_002',
-      brevnavn: 'Vedtak - endring av alderspensjon',
-      sprakKode: 'NN',
-      antall: 45,
-      brevType: 'BREVBAKER',
-    },
-    {
-      behandlingstype: 'DodsmeldingBehandling',
-      brevkode: 'PE_AP_07_001',
-      originalBrevkode: 'PE_AP_07_001',
-      brevnavn: 'Informasjon om rettigheter ved dødsfall',
-      sprakKode: null,
-      antall: 8,
-      brevType: 'LEGACY',
-    },
-    {
-      behandlingstype: 'ReguleringFamilieBehandling',
-      brevkode: 'UT_REG_AUTO',
-      originalBrevkode: 'PE_UT_04_100',
-      brevnavn: 'Vedtak - regulering av uføretrygd',
-      sprakKode: 'NB',
-      antall: 310,
-      brevType: 'BREVBAKER',
-    },
-    {
-      behandlingstype: 'FleksibelApSakBehandling',
-      brevkode: 'PE_GP_04_010',
-      originalBrevkode: 'PE_GP_04_010',
-      brevnavn: null,
-      sprakKode: 'NB',
-      antall: 3,
-      brevType: 'LEGACY',
-    },
+    brevbakerRow(
+      'FleksibelApSakBehandling',
+      'AP_INNVILGELSE_AUTO',
+      'PE_AP_04_001',
+      'Vedtak - innvilgelse av alderspensjon',
+      'NB',
+      123,
+    ),
+    brevbakerRow(
+      'FleksibelApSakBehandling',
+      'AP_ENDRING_AUTO',
+      'PE_AP_04_002',
+      'Vedtak - endring av alderspensjon',
+      'NN',
+      45,
+    ),
+    legacyRow('DodsmeldingBehandling', 'PE_AP_07_001', 'Informasjon om rettigheter ved dødsfall', null, 8),
+    brevbakerRow(
+      'ReguleringFamilieBehandling',
+      'UT_REG_AUTO',
+      'PE_UT_04_100',
+      'Vedtak - regulering av uføretrygd',
+      'NB',
+      310,
+    ),
+    legacyRow('FleksibelApSakBehandling', 'PE_GP_04_010', null, 'NB', 3),
   ],
   nowIso: new Date().toISOString(),
   fomDato: '2024-05-01',
@@ -72,5 +78,38 @@ export const Empty: Story = {
     renderWithLoader(BrevBestillingOppsummeringRoute, {
       ...mockData,
       rows: [],
+    }),
+}
+
+export const KunBrevbakerMedLenker: Story = {
+  render: () =>
+    renderWithLoader(BrevBestillingOppsummeringRoute, {
+      ...mockData,
+      rows: [
+        brevbakerRow(
+          'FleksibelApSakBehandling',
+          'AP_INNVILGELSE_AUTO',
+          'PE_AP_04_001',
+          'Vedtak - innvilgelse av alderspensjon',
+          'NB',
+          200,
+        ),
+        brevbakerRow(
+          'ReguleringFamilieBehandling',
+          'UT_REG_AUTO',
+          'PE_UT_04_100',
+          'Vedtak - regulering av uføretrygd',
+          'NN',
+          150,
+        ),
+        brevbakerRow(
+          'DodsmeldingBehandling',
+          'AP_DODSMELDING_AUTO',
+          'PE_AP_07_001',
+          'Informasjon om dødsfall',
+          null,
+          42,
+        ),
+      ],
     }),
 }
