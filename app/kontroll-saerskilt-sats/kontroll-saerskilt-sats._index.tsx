@@ -28,7 +28,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     request,
   )
 
-  return redirect(`/behandling/${response?.behandlingId}`)
+  if (!response) {
+    throw new Error('Opprettelse av kontroll særskilt sats returnerte ingen respons')
+  }
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

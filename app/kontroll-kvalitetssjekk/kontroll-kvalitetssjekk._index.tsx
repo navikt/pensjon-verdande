@@ -44,7 +44,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     { fomDato, tomDato, antallPerEnhet, vedtakType, kravGjelder },
     request,
   )
-  return redirect(`/behandling/${response?.behandlingId}`)
+  if (!response) {
+    throw new Error('Opprettelse av kontroll kvalitetssjekk returnerte ingen respons')
+  }
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -68,17 +71,21 @@ export default function OpprettKontrollKvalitetssjekkRoute({ loaderData }: Route
   const isSubmitting = navigation.state === 'submitting'
 
   const { fra: defaultFra, til: defaultTil } = defaultDatoer()
-  const [fraDate, setFraDate] = useState<Date>(defaultFra)
-  const [tilDate, setTilDate] = useState<Date>(defaultTil)
+  const [fraDate, setFraDate] = useState<Date | undefined>(defaultFra)
+  const [tilDate, setTilDate] = useState<Date | undefined>(defaultTil)
+  const [antallPerEnhet, setAntallPerEnhet] = useState(10)
   const [kravGjelder, setKravGjelder] = useState(['FORSTEG_BH', 'F_BH_BO_UTL', 'F_BH_MED_UTL'])
 
   const { datepickerProps, fromInputProps, toInputProps } = useRangeDatepicker({
     defaultSelected: { from: defaultFra, to: defaultTil },
     onRangeChange: (range) => {
-      if (range?.from) setFraDate(range.from)
-      if (range?.to) setTilDate(range.to)
+      setFraDate(range?.from)
+      setTilDate(range?.to)
     },
   })
+
+  const kanOpprette =
+    fraDate !== undefined && tilDate !== undefined && antallPerEnhet >= 1 && kravGjelder.length > 0 && !isSubmitting
 
   return (
     <div>
@@ -87,8 +94,8 @@ export default function OpprettKontrollKvalitetssjekkRoute({ loaderData }: Route
       </Heading>
       <Form id="skjema" method="post">
         <VStack gap="space-16">
-          <input type="hidden" name="fomDato" value={toIsoDate(fraDate)} />
-          <input type="hidden" name="tomDato" value={toIsoDate(tilDate)} />
+          <input type="hidden" name="fomDato" value={fraDate ? toIsoDate(fraDate) : ''} />
+          <input type="hidden" name="tomDato" value={tilDate ? toIsoDate(tilDate) : ''} />
           <DatePicker {...datepickerProps}>
             <HStack gap="space-16">
               <DatePicker.Input {...fromInputProps} label="Fra" />
@@ -100,7 +107,9 @@ export default function OpprettKontrollKvalitetssjekkRoute({ loaderData }: Route
               label="Antall per enhet"
               name="antallPerEnhet"
               type="number"
-              defaultValue={10}
+              min={1}
+              value={antallPerEnhet}
+              onChange={(e) => setAntallPerEnhet(Number(e.target.value))}
               style={{ width: '10rem' }}
             />
             <Select label="Vedtak type" name="vedtakType" defaultValue="MAN">
@@ -118,7 +127,7 @@ export default function OpprettKontrollKvalitetssjekkRoute({ loaderData }: Route
             <input key={v} type="hidden" name="kravGjelder" value={v} />
           ))}
           <HStack gap="space-16">
-            <Button type="button" onClick={() => modalRef.current?.showModal()}>
+            <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
               Opprett kontroll
             </Button>
           </HStack>
@@ -142,7 +151,7 @@ export default function OpprettKontrollKvalitetssjekkRoute({ loaderData }: Route
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <Button form="skjema" type="submit" disabled={isSubmitting} loading={isSubmitting}>
+          <Button form="skjema" type="submit" disabled={!kanOpprette} loading={isSubmitting}>
             Start behandling
           </Button>
           <Button type="button" variant="secondary" onClick={() => modalRef.current?.close()}>
