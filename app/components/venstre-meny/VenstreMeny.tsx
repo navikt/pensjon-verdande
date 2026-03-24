@@ -69,6 +69,7 @@ const batcherMeny = [
 const kontrollMeny = [
   ['INNTEKTSKONTROLL', '/batch/inntektskontroll', 'Inntektskontroll'],
   ['KONTROLLERE_SAERSKILT_SATS', '/kontroll-saerskilt-sats', 'Kontroll særskilt sats'],
+  ['KONTROLL_KVALITETSSJEKK', '/kontroll-kvalitetssjekk', 'Kontroll kvalitet'],
 ]
 
 const omregningMeny = [
