@@ -28,9 +28,9 @@ const isValidYyyyMM = (n: number) => {
   return n >= 190001 && mm >= 1 && mm <= 12
 }
 
-const isBetweenAprilAndOctober = (n: number) => {
+const isBetweenAprilAndNovember = (n: number) => {
   const mm = n % 100
-  return mm >= 4 && mm <= 10
+  return mm >= 4 && mm <= 11
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -49,8 +49,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const errors: ActionErrors = {}
   if (!isValidYyyyMM(kjoremaaned)) {
     errors.kjoremaaned = 'Ugyldig format. Bruk yyyyMM (f.eks. 202510).'
-  } else if (!isBetweenAprilAndOctober(kjoremaaned)) {
-    errors.kjoremaaned = 'Kjøremåned må være mellom april og oktober.'
+  } else if (!isBetweenAprilAndNovember(kjoremaaned)) {
+    errors.kjoremaaned = 'Kjøremåned må være mellom april og november.'
   }
   if (!Number.isInteger(prioritet) || (prioritet !== 1 && prioritet !== 2)) {
     errors.prioritet = 'Velg Online eller Batch.'
