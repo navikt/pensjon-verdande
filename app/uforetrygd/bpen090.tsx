@@ -50,7 +50,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   if (!isValidYyyyMM(kjoremaaned)) {
     errors.kjoremaaned = 'Ugyldig format. Bruk yyyyMM (f.eks. 202510).'
   } else if (!isBetweenAprilAndNovember(kjoremaaned)) {
-    errors.kjoremaaned = 'Kjøremåned må være mellom april og oktober.'
+    errors.kjoremaaned = 'Kjøremåned må være mellom april og november.'
   }
   if (!Number.isInteger(prioritet) || (prioritet !== 1 && prioritet !== 2)) {
     errors.prioritet = 'Velg Online eller Batch.'
