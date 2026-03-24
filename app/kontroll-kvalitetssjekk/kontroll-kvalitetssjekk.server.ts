@@ -13,5 +13,5 @@ type OpprettKontrollKvalitetssjekkBody = {
 }
 
 export async function opprettKontrollKvalitetssjekk(body: OpprettKontrollKvalitetssjekkBody, request: Request) {
-  return await apiPost<StartBatchResponse>('/api/behandling/kontroll-kvalitetssjekk', body, request)
+  return await apiPost<StartBatchResponse>('/api/behandling/kontroll-kvalitetssjekk/opprett', body, request)
 }
