@@ -55,7 +55,8 @@ describe('konsistensavstemming action', () => {
     formData.set('PENGY', 'false')
     formData.set('PENKP', 'true')
     formData.set('UFOREUT', 'false')
-    formData.set('avstemmingsdato', '2025-06')
+    formData.set('avstemmingsdato', '2026-03')
+    formData.set('kjoeretidspunkt', '2026-03-25T10:00:00')
 
     const request = new Request('http://localhost/konsistensavstemming', { method: 'POST', body: formData })
     await action(actionArgs(request))
@@ -69,14 +70,15 @@ describe('konsistensavstemming action', () => {
     expect(sentBody).toEqual({
       penAfp: true,
       penAfpp: true,
-      penPenap: false,
-      penPenbp: true,
-      penPenfp: false,
-      penPengj: true,
-      penPengy: false,
-      penPenkp: true,
-      penUforeut: false,
-      avstemmingsdato: '2025-06',
+      penAp: false,
+      penBp: true,
+      penFp: false,
+      penGj: true,
+      penGy: false,
+      penKp: true,
+      uforeut: false,
+      avstemmingsdato: '2026-03',
+      planlagtStartet: '2026-03-25T10:00:00',
     })
   })
 })
