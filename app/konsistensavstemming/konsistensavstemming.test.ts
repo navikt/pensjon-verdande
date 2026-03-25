@@ -55,7 +55,8 @@ describe('konsistensavstemming action', () => {
     formData.set('PENGY', 'false')
     formData.set('PENKP', 'true')
     formData.set('UFOREUT', 'false')
-    formData.set('avstemmingsdato', '2025-06')
+    formData.set('avstemmingsdato', '2026-03')
+    formData.set('kjoeretidspunkt', '2026-03-25T10:00')
 
     const request = new Request('http://localhost/konsistensavstemming', { method: 'POST', body: formData })
     await action(actionArgs(request))
@@ -76,8 +77,8 @@ describe('konsistensavstemming action', () => {
       penGy: false,
       penKp: true,
       uforeut: false,
-      avstemmingsdato: '2025-06',
-      planlagtStartet: null,
+      avstemmingsdato: '2026-03',
+      planlagtStartet: '2026-03-25T10:00',
     })
   })
 })

@@ -54,7 +54,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const PENKP = (formData.get('PENKP') as string) === 'true'
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
-  const planlagtStartet = formData.get('kjoeretidspunkt') as string
+  const planlagtStartet = formData.get('kjoeretidspunkt')
 
   await apiPost(
     '/api/vedtak/avstemming/konsistens/start',
@@ -87,12 +87,20 @@ function areDatesValid(dateFom: string) {
 
   const today = new Date()
   const minimumDate = new Date(new Date().setFullYear(today.getFullYear() - 1))
+  const maximumDate = new Date(new Date().setMonth(today.getMonth() + 1))
   const inputFom = new Date(dateFom)
 
   // Sjekk at input er gyldig dato
   if (!Number.isNaN(inputFom.getTime())) {
     // Sjekk at dato ikke er for langt tilbake i tid
-    return inputFom >= minimumDate
+    if (inputFom < minimumDate) {
+      return false
+    } else if (inputFom > maximumDate) {
+      // Sjekk at ikke i framtiden
+      return false
+    } else {
+      return true
+    }
   } else {
     return false
   }
@@ -170,7 +178,7 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
           <input
             type="hidden"
             name="kjoeretidspunkt"
-            value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
+            value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : undefined}
           />
           <Button
             type="submit"
