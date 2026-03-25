@@ -79,7 +79,7 @@ const omregningMeny = [
 ]
 
 const behandlingerMeny = [
-  ['SE_BEHANDLINGER', '/behandlinger/antall', 'Antall behandlinger'],
+  ['SE_BEHANDLINGER', '/behandlinger/antall', 'Antall etter type'],
   ['SE_BEHANDLINGER', '/behandlinger', 'Alle behandlinger'],
   ['SE_BEHANDLINGER', '/alderspensjon/forstegangsbehandling/soknader', 'Alderspensjonssøknader'],
 
