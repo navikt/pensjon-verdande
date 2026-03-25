@@ -17,7 +17,6 @@ import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import { apiGet } from '~/services/api.server'
 import type {
   AntallUferdigeBehandlingerResponse,
-  BehandlingAntallResponse,
   FeilendeBehandlingerResponse,
   TotaltAntallBehandlingerResponse,
   UkjenteBehandlingstyperResponse,
@@ -53,9 +52,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       '/api/behandling/oppsummering-antall-uferdige-behandlinger',
       request,
     ).then((it) => it.antallUferdigeBehandlinger),
-    apiGet<BehandlingAntallResponse>('/api/behandling/oppsummering-behandling-antall', request).then(
-      (it) => it.behandlingAntall,
-    ),
     apiGet<TidsserieResponse>(`/api/behandling/analyse/tidsserie?${tidsserieParams}`, request).then(
       (it) => it.datapunkter,
     ),
@@ -67,9 +63,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     feilendeBehandlinger: it[1],
     ukjenteBehandlingstyper: it[2],
     antallUferdigeBehandlinger: it[3],
-    behandlingAntall: it[4],
-    aktivitetDatapunkter: it[5],
-    brevDatapunkter: it[6],
+    aktivitetDatapunkter: it[4],
+    brevDatapunkter: it[5],
   }))
 
   return {
