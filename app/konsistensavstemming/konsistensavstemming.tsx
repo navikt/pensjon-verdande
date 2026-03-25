@@ -10,9 +10,11 @@ import {
   TextField,
   VStack,
 } from '@navikt/ds-react'
+import { format } from 'date-fns'
 import { Suspense, useState } from 'react'
 import { Await, Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { apiPost } from '~/services/api.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/konsistensavstemming'
@@ -52,20 +54,22 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const PENKP = (formData.get('PENKP') as string) === 'true'
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
+  const planlagtStartet = formData.get('kjoeretidspunkt') as string
 
   await apiPost(
     '/api/vedtak/avstemming/konsistens/start',
     {
       penAfp: PENAFP,
       penAfpp: PENAFPP,
-      penPenap: PENAP,
-      penPenbp: PENBP,
-      penPenfp: PENFP,
-      penPengj: PENGJ,
-      penPengy: PENGY,
-      penPenkp: PENKP,
-      penUforeut: UFOREUT,
-      avstemmingsdato,
+      penAp: PENAP,
+      penBp: PENBP,
+      penFp: PENFP,
+      penGj: PENGJ,
+      penGy: PENGY,
+      penKp: PENKP,
+      uforeut: UFOREUT,
+      avstemmingsdato: avstemmingsdato,
+      planlagtStartet: planlagtStartet,
     },
     request,
   )
@@ -88,14 +92,7 @@ function areDatesValid(dateFom: string) {
   // Sjekk at input er gyldig dato
   if (!Number.isNaN(inputFom.getTime())) {
     // Sjekk at dato ikke er for langt tilbake i tid
-    if (inputFom < minimumDate) {
-      return false
-    } else if (inputFom > today) {
-      // Sjekk at ikke i framtiden
-      return false
-    } else {
-      return true
-    }
+    return inputFom >= minimumDate
   } else {
     return false
   }
@@ -108,6 +105,8 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
   const isSubmitting = navigation.state === 'submitting'
 
   const [avstemmingsdato, setAvstemmingsdato] = useState<string | ''>('')
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const minDate = new Date()
 
   return (
     <VStack gap={'space-16'}>
@@ -117,7 +116,7 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
         </Heading>
         <VStack gap="space-8">
           <BodyLong>Oppretter behandlinger for konsistensavstemming mot Oppdrag</BodyLong>
-          <Detail>Avstemmingsperiode fom settes til starten av angitt måned.</Detail>
+          <Detail>Avstemmingsdato settes til den 1. i angitt måned.</Detail>
         </VStack>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
@@ -152,7 +151,7 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
             </Checkbox>
           </CheckboxGroup>
           <TextField
-            label="Avstemmingsdato:"
+            label="Avstemmingsmåned:"
             name="avstemmingsdato"
             type="text"
             description={'(ÅÅÅÅ-MM)'}
@@ -161,6 +160,17 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
               setAvstemmingsdato(v === '' ? '' : v)
             }}
             value={avstemmingsdato}
+          />
+          <DateTimePicker
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            minDate={minDate}
+            label="Kjøretidspunkt (valgfritt)"
+          />
+          <input
+            type="hidden"
+            name="kjoeretidspunkt"
+            value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
           />
           <Button
             type="submit"

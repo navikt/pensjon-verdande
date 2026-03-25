@@ -69,14 +69,15 @@ describe('konsistensavstemming action', () => {
     expect(sentBody).toEqual({
       penAfp: true,
       penAfpp: true,
-      penPenap: false,
-      penPenbp: true,
-      penPenfp: false,
-      penPengj: true,
-      penPengy: false,
-      penPenkp: true,
-      penUforeut: false,
+      penAp: false,
+      penBp: true,
+      penFp: false,
+      penGj: true,
+      penGy: false,
+      penKp: true,
+      uforeut: false,
       avstemmingsdato: '2025-06',
+      planlagtStartet: null,
     })
   })
 })
