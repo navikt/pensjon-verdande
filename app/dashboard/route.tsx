@@ -10,7 +10,6 @@ import { Await } from 'react-router'
 import type { BrevTidsserieResponse, TidsserieResponse } from '~/analyse/types'
 import { formatNumber } from '~/common/number'
 import { AktivitetChartCard } from '~/components/aktivitet-chart/AktivitetChartCard'
-import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BrevChartCard } from '~/components/brev-chart/BrevChartCard'
 import { formatLocalIso } from '~/components/chart-utils/formatLocalIso'
 import { velgAggregering } from '~/components/chart-utils/velgAggregering'
@@ -133,7 +132,6 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   <AktivitetChartCard datapunkter={dashboardResponse.aktivitetDatapunkter} />
                   <BrevChartCard datapunkter={dashboardResponse.brevDatapunkter} />
                 </HGrid>
-                <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
               </VStack>
             )
           )
