@@ -3,7 +3,6 @@ import { BodyShort, Button, CopyButton, Heading, HStack, Label, Link, Tag, Toolt
 import { useState } from 'react'
 import { Link as ReactRouterLink } from 'react-router'
 import invariant from 'tiny-invariant'
-import { finnAktivitet } from '~/behandling/behandling.$behandlingId.aktivitet.$aktivitetId'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import { tidsbruk } from '~/components/kjoringer-table/BehandlingKjoringerTable'
@@ -12,6 +11,7 @@ import { LokiLogsTableLoader } from '~/loki/LokiLogsTableLoader'
 import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
 import { tempoUrl } from '~/loki/utils'
 import { apiGet } from '~/services/api.server'
+import { getAktivitet } from '~/services/behandling.server'
 import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
 import type { BehandlingDto, BehandlingKjoringDTO } from '~/types'
 import type { Route } from './+types/kjoring-logs'
@@ -27,6 +27,10 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
     apiGet<BehandlingKjoringDTO>(`/api/behandling/${behandlingId}/kjoringer/${kjoringId}`, request),
   ])
 
+  const aktivitet = kjoring.aktivitetId
+    ? await getAktivitet(request, behandlingId, kjoring.aktivitetId.toString())
+    : undefined
+
   const response = fetchPenLogs(kjoring.startet, kjoring.avsluttet, {
     transaction: kjoring.correlationId,
     ...(kjoring.traceId ? { traceId: kjoring.traceId } : {}),
@@ -35,7 +39,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   return {
     response,
     behandling,
-    aktivitet: kjoring.aktivitetId && finnAktivitet(behandling, kjoring.aktivitetId),
+    aktivitet,
     kibanaUrl: kibanaLinkForCorrelationIdAndTraceId(
       kjoring.startet,
       kjoring.avsluttet,

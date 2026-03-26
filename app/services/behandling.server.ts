@@ -186,6 +186,25 @@ export async function getBehandlingAktiviteter(
   )
 }
 
+export async function getAktivitet(
+  request: Request,
+  behandlingId: string,
+  aktivitetId: string,
+): Promise<AktivitetDTO | undefined> {
+  return await apiGetOrUndefined<AktivitetDTO>(`/api/behandling/${behandlingId}/aktiviteter/${aktivitetId}`, request)
+}
+
+export async function getBehandlingKjoring(
+  request: Request,
+  behandlingId: string,
+  kjoringId: string,
+): Promise<BehandlingKjoringDTO | undefined> {
+  return await apiGetOrUndefined<BehandlingKjoringDTO>(
+    `/api/behandling/${behandlingId}/kjoringer/${kjoringId}`,
+    request,
+  )
+}
+
 export async function getDetaljertFremdrift(
   request: Request,
   forrigeBehandlingId: number,

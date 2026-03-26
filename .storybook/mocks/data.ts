@@ -53,7 +53,6 @@ export function mockBehandlingDto(overrides?: Partial<BehandlingDto>): Behandlin
     status: 'UNDER_BEHANDLING',
     prioritet: 5,
     erStartet: true,
-    aktiviteter: [],
     muligeKontrollpunkt: [],
     fnr: '12345678901',
     sakId: 50001,

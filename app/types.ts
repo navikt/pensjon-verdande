@@ -46,7 +46,6 @@ export type BehandlingDto = {
   status: string
   prioritet: number
   erStartet: boolean
-  aktiviteter: AktivitetDTO[]
   muligeKontrollpunkt: KontrollpunktDecode[]
 
   fnr: string | null
@@ -185,6 +184,7 @@ export type PageSort = {
 export type BehandlingManuellDto = {
   id: string // UUID
   aktivitetId: number
+  aktivitetType?: string | null
   opprettet: string
 
   sakId: number
