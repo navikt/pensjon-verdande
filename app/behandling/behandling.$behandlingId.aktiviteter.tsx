@@ -1,23 +1,28 @@
 import invariant from 'tiny-invariant'
 import BehandlingAktivitetTable from '~/components/aktiviteter-table/BehandlingAktivitetTable'
-import { getBehandling } from '~/services/behandling.server'
+import { getBehandlingAktiviteter } from '~/services/behandling.server'
 import type { Route } from './+types/behandling.$behandlingId.aktiviteter'
+
+const DEFAULT_PAGE_SIZE = 100
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
-  const behandling = await getBehandling(request, params.behandlingId)
-  if (!behandling) {
-    throw new Response('Not Found', { status: 404 })
-  }
+  const url = new URL(request.url)
+  const page = Number(url.searchParams.get('page') ?? '0')
+  const size = Number(url.searchParams.get('size') ?? String(DEFAULT_PAGE_SIZE))
+  const sort = url.searchParams.get('sort')
+
+  const aktiviteterPage = await getBehandlingAktiviteter(request, params.behandlingId, page, size, sort)
 
   return {
-    behandling,
+    behandlingId: params.behandlingId,
+    aktiviteterPage,
   }
 }
 
 export default function BehandlingAktiviteter({ loaderData }: Route.ComponentProps) {
-  const { behandling } = loaderData
+  const { behandlingId, aktiviteterPage } = loaderData
 
-  return <BehandlingAktivitetTable behandling={behandling} />
+  return <BehandlingAktivitetTable behandlingId={behandlingId} aktiviteterPage={aktiviteterPage} />
 }

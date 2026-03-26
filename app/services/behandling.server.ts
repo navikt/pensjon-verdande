@@ -11,12 +11,15 @@ import {
 } from '~/services/api.server'
 import { kibanaLink } from '~/services/kibana.server'
 import type {
+  AktivitetDTO,
   BehandlingDto,
   BehandlingerPage,
+  BehandlingKjoringDTO,
   BehandlingManuellOpptellingResponse,
   BehandlingManuellPage,
   DetaljertFremdriftDTO,
   IkkeFullforteAktiviteterDTO,
+  PageResponse,
   PatchBehandlingDto,
   RelatertFamilieBehandling,
   SchedulerStatusResponse,
@@ -147,6 +150,40 @@ export async function getBehandling(request: Request, behandlingId: string): Pro
   const behandling = await apiGet<BehandlingDto>(`/api/behandling/${behandlingId}`, request)
   behandling.kibanaUrl = kibanaLink(behandling)
   return behandling
+}
+
+export async function getBehandlingKjoringer(
+  request: Request,
+  behandlingId: string,
+  page: number,
+  size: number,
+  sort?: string | null,
+): Promise<PageResponse<BehandlingKjoringDTO>> {
+  let query = ''
+  if (sort) {
+    query += `&sort=${sort}`
+  }
+  return await apiGet<PageResponse<BehandlingKjoringDTO>>(
+    `/api/behandling/${behandlingId}/kjoringer?page=${page}&size=${size}${query}`,
+    request,
+  )
+}
+
+export async function getBehandlingAktiviteter(
+  request: Request,
+  behandlingId: string,
+  page: number,
+  size: number,
+  sort?: string | null,
+): Promise<PageResponse<AktivitetDTO>> {
+  let query = ''
+  if (sort) {
+    query += `&sort=${sort}`
+  }
+  return await apiGet<PageResponse<AktivitetDTO>>(
+    `/api/behandling/${behandlingId}/aktiviteter?page=${page}&size=${size}${query}`,
+    request,
+  )
 }
 
 export async function getDetaljertFremdrift(
