@@ -9,10 +9,9 @@ import { decodeAktivitet } from '~/common/decodeBehandling'
 import { formatNumber } from '~/common/number'
 import { useSort } from '~/hooks/useSort'
 import { behandlingKjoringLogs } from '~/routes-utils'
-import type { BehandlingDto, BehandlingKjoringDTO, HalLink, PageResponse } from '~/types'
+import type { BehandlingKjoringDTO, HalLink, PageResponse } from '~/types'
 
 type Props = {
-  behandling: BehandlingDto
   kjoringerPage: PageResponse<BehandlingKjoringDTO>
   erAldeKjoring: boolean
 }
@@ -30,14 +29,6 @@ export function BehandlingKjoringerTable(props: Props) {
   const sortedKjoringer: BehandlingKjoringDTO[] = React.useMemo(() => {
     return [...props.kjoringerPage.content].sort(sortFunc)
   }, [props.kjoringerPage.content, sortFunc])
-
-  function finnAktivitet(aktivitetId: number | null) {
-    if (aktivitetId) {
-      return props.behandling.aktiviteter.find((it) => it.aktivitetId === aktivitetId)
-    } else {
-      return undefined
-    }
-  }
 
   const onPageChange = (page: number) => {
     searchParams.set('page', (page - 1).toString())
@@ -76,13 +67,12 @@ export function BehandlingKjoringerTable(props: Props) {
         </Table.Header>
         <Table.Body>
           {sortedKjoringer?.map((it: BehandlingKjoringDTO) => {
-            const aktivitet = finnAktivitet(it.aktivitetId)
             const stackTrace = it.stackTrace
             return (
               <Table.ExpandableRow key={it.behandlingKjoringId} content={<pre>{stackTrace}</pre>}>
                 <Table.DataCell>{formatIsoTimestamp(it.startet)}</Table.DataCell>
                 <Table.DataCell align={'right'}>{tidsbruk(it)}</Table.DataCell>
-                <Table.DataCell>{aktivitet && decodeAktivitet(aktivitet.type)}</Table.DataCell>
+                <Table.DataCell>{it.aktivitetType && decodeAktivitet(it.aktivitetType)}</Table.DataCell>
                 {props.erAldeKjoring && (
                   <Table.DataCell>
                     {it.aldeStartState && it.aldeEndState && (

@@ -52,7 +52,7 @@ export function mockBehandlingDto(overrides?: Partial<BehandlingDto>): Behandlin
     ansvarligTeam: 'Team Pensjon',
     status: 'UNDER_BEHANDLING',
     prioritet: 5,
-    behandlingKjoringer: [],
+    erStartet: true,
     aktiviteter: [],
     muligeKontrollpunkt: [],
     fnr: '12345678901',

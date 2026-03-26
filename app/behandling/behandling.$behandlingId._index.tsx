@@ -23,19 +23,13 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 
   return {
-    behandling,
     kjoringerPage,
+    erAldeKjoring: !!behandling.erAldeBehandling,
   }
 }
 
 export default function BehandlingKjoringer({ loaderData }: Route.ComponentProps) {
-  const { behandling, kjoringerPage } = loaderData
+  const { kjoringerPage, erAldeKjoring } = loaderData
 
-  return (
-    <BehandlingKjoringerTable
-      behandling={behandling}
-      kjoringerPage={kjoringerPage}
-      erAldeKjoring={!!behandling.erAldeBehandling}
-    />
-  )
+  return <BehandlingKjoringerTable kjoringerPage={kjoringerPage} erAldeKjoring={erAldeKjoring} />
 }

@@ -45,7 +45,7 @@ export type BehandlingDto = {
   ansvarligTeam: string | null
   status: string
   prioritet: number
-  behandlingKjoringer: BehandlingKjoringDTO[]
+  erStartet: boolean
   aktiviteter: AktivitetDTO[]
   muligeKontrollpunkt: KontrollpunktDecode[]
 

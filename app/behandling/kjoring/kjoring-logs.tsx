@@ -13,7 +13,7 @@ import { fetchPenLogs, tempoConfiguration } from '~/loki/loki.server'
 import { tempoUrl } from '~/loki/utils'
 import { apiGet } from '~/services/api.server'
 import { kibanaLinkForCorrelationIdAndTraceId } from '~/services/kibana.server'
-import type { BehandlingDto } from '~/types'
+import type { BehandlingDto, BehandlingKjoringDTO } from '~/types'
 import type { Route } from './+types/kjoring-logs'
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
@@ -22,12 +22,10 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(behandlingId, 'Missing behandlingId param')
   invariant(kjoringId, 'Missing kjoringId param')
 
-  const behandling = await apiGet<BehandlingDto>(`/api/behandling/${behandlingId}`, request)
-
-  const kjoring = behandling.behandlingKjoringer.find((it) => it.behandlingKjoringId.toString() === params.kjoringId)
-  if (!kjoring) {
-    throw new Response('Not Found', { status: 404 })
-  }
+  const [behandling, kjoring] = await Promise.all([
+    apiGet<BehandlingDto>(`/api/behandling/${behandlingId}`, request),
+    apiGet<BehandlingKjoringDTO>(`/api/behandling/${behandlingId}/kjoringer/${kjoringId}`, request),
+  ])
 
   const response = fetchPenLogs(kjoring.startet, kjoring.avsluttet, {
     transaction: kjoring.correlationId,
