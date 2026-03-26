@@ -190,6 +190,7 @@ export default [
 
     route('behandlingserie', 'behandlingserie/behandlingserie.tsx'),
     route('behandlinger', 'behandlinger/behandlinger._index.tsx'),
+    route('behandlinger/antall', 'behandlinger/behandlinger.antall.tsx'),
     route('behandlinger/:status', 'behandlinger/behandlinger.$status.tsx', [
       route('fortsett', 'behandlinger/behandlinger.$status.fortsett.tsx'),
     ]),

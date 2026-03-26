@@ -10,7 +10,6 @@ import { Await } from 'react-router'
 import type { BrevTidsserieResponse, TidsserieResponse } from '~/analyse/types'
 import { formatNumber } from '~/common/number'
 import { AktivitetChartCard } from '~/components/aktivitet-chart/AktivitetChartCard'
-import { BehandlingAntallTableCard } from '~/components/behandling-antall-table/BehandlingAntallTableCard'
 import { BrevChartCard } from '~/components/brev-chart/BrevChartCard'
 import { formatLocalIso } from '~/components/chart-utils/formatLocalIso'
 import { velgAggregering } from '~/components/chart-utils/velgAggregering'
@@ -18,7 +17,6 @@ import { DashboardCard } from '~/components/dashboard-card/DashboardCard'
 import { apiGet } from '~/services/api.server'
 import type {
   AntallUferdigeBehandlingerResponse,
-  BehandlingAntallResponse,
   FeilendeBehandlingerResponse,
   TotaltAntallBehandlingerResponse,
   UkjenteBehandlingstyperResponse,
@@ -54,9 +52,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       '/api/behandling/oppsummering-antall-uferdige-behandlinger',
       request,
     ).then((it) => it.antallUferdigeBehandlinger),
-    apiGet<BehandlingAntallResponse>('/api/behandling/oppsummering-behandling-antall', request).then(
-      (it) => it.behandlingAntall,
-    ),
     apiGet<TidsserieResponse>(`/api/behandling/analyse/tidsserie?${tidsserieParams}`, request).then(
       (it) => it.datapunkter,
     ),
@@ -68,9 +63,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     feilendeBehandlinger: it[1],
     ukjenteBehandlingstyper: it[2],
     antallUferdigeBehandlinger: it[3],
-    behandlingAntall: it[4],
-    aktivitetDatapunkter: it[5],
-    brevDatapunkter: it[6],
+    aktivitetDatapunkter: it[4],
+    brevDatapunkter: it[5],
   }))
 
   return {
@@ -133,7 +127,6 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   <AktivitetChartCard datapunkter={dashboardResponse.aktivitetDatapunkter} />
                   <BrevChartCard datapunkter={dashboardResponse.brevDatapunkter} />
                 </HGrid>
-                <BehandlingAntallTableCard behandlingAntall={dashboardResponse.behandlingAntall} />
               </VStack>
             )
           )
