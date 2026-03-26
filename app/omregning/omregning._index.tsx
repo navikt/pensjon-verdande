@@ -276,7 +276,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
         <ul>
           <li>
             <Link
-              href="https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlinger/Felles/Omregning.html"
+              href="https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Felles/behandlinger/Omregning.html"
               target="_blank"
             >
               Dokumentasjon
