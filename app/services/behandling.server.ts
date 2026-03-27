@@ -161,7 +161,7 @@ export async function getBehandlingKjoringer(
 ): Promise<PageResponse<BehandlingKjoringDTO>> {
   let query = ''
   if (sort) {
-    query += `&sort=${sort}`
+    query += `&sort=${encodeURIComponent(sort)}`
   }
   return await apiGet<PageResponse<BehandlingKjoringDTO>>(
     `/api/behandling/${behandlingId}/kjoringer?page=${page}&size=${size}${query}`,
@@ -178,7 +178,7 @@ export async function getBehandlingAktiviteter(
 ): Promise<PageResponse<AktivitetDTO>> {
   let query = ''
   if (sort) {
-    query += `&sort=${sort}`
+    query += `&sort=${encodeURIComponent(sort)}`
   }
   return await apiGet<PageResponse<AktivitetDTO>>(
     `/api/behandling/${behandlingId}/aktiviteter?page=${page}&size=${size}${query}`,

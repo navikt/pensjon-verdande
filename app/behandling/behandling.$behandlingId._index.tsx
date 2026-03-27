@@ -9,11 +9,14 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
   const url = new URL(request.url)
-  const page = Number(url.searchParams.get('page') ?? '0')
-  const size = Number(url.searchParams.get('size') ?? String(DEFAULT_PAGE_SIZE))
-  const sortKey = url.searchParams.get('sortKey')
+  const page = Math.max(0, parseInt(url.searchParams.get('page') ?? '0', 10) || 0)
+  const size = Math.max(
+    1,
+    Math.min(parseInt(url.searchParams.get('size') ?? String(DEFAULT_PAGE_SIZE), 10) || DEFAULT_PAGE_SIZE, 1000),
+  )
+  const sortKey = url.searchParams.get('sortKey') ?? 'startet'
   const sortDir = url.searchParams.get('sortDir')
-  const sort = sortKey ? `${sortKey},${sortDir === 'ascending' ? 'asc' : 'desc'}` : null
+  const sort = `${sortKey},${sortDir === 'ascending' ? 'asc' : 'desc'}`
 
   const [behandling, kjoringerPage] = await Promise.all([
     getBehandling(request, params.behandlingId),

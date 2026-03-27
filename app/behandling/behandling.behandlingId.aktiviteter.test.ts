@@ -32,7 +32,7 @@ describe('behandling aktiviteter loader', () => {
 
     await loader(loaderArgs('http://localhost/behandling/456/aktiviteter'))
 
-    expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 0, 100, null)
+    expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 0, 100, 'aktivitetId,desc')
   })
 
   it('videresender page og size fra URL', async () => {
@@ -40,7 +40,7 @@ describe('behandling aktiviteter loader', () => {
 
     await loader(loaderArgs('http://localhost/behandling/456/aktiviteter?page=3&size=25'))
 
-    expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 3, 25, null)
+    expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 3, 25, 'aktivitetId,desc')
   })
 
   it('videresender sort fra URL', async () => {
