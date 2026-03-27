@@ -30,7 +30,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     tom: tomStr ? new Date(tomStr) : null,
     page: page ? +page : 0,
     size: size ? +size : 100,
-    sort: searchParams.get('sort'),
+    sort: searchParams.get('sort') ?? 'opprettet,desc',
   })
   if (!behandlinger) {
     throw new Response('Not Found', { status: 404 })
