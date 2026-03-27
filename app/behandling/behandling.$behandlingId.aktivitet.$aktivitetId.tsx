@@ -14,9 +14,6 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
     getAktivitet(request, params.behandlingId, aktivitetId),
   ])
 
-  if (!behandling) {
-    throw new Response('Not Found', { status: 404 })
-  }
   if (!aktivitet) {
     throw new Response('Not Found', { status: 404 })
   }

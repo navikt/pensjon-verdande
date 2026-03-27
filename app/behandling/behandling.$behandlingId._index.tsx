@@ -23,10 +23,6 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
     getBehandlingKjoringer(request, params.behandlingId, page, size, sort),
   ])
 
-  if (!behandling) {
-    throw new Response('Not Found', { status: 404 })
-  }
-
   return {
     kjoringerPage,
     erAldeKjoring: !!behandling.erAldeBehandling,
