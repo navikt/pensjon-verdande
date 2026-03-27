@@ -41,6 +41,19 @@
   display: block;
 }
 
+.menyIkon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: var(--venstre-meny-icon-gap);
+}
+
+.chevron {
+  margin-left: auto;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
 #venstreMeny.kunIkoner {
   width: var(--venstre-meny-collapsed-width);
   min-width: var(--venstre-meny-collapsed-width);
@@ -134,19 +147,6 @@
   max-height: 0;
   visibility: hidden;
   transition: all 0.5s ease-out;
-}
-
-.menyIkon {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  margin-right: var(--venstre-meny-icon-gap);
-}
-
-.chevron {
-  margin-left: auto;
-  transition: transform 0.2s;
-  flex-shrink: 0;
 }
 
 .chevronOpen {

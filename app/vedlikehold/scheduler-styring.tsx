@@ -535,6 +535,7 @@ function AuditSection({ audit }: { audit: BehandlingSchedulerStyringAuditDto[] }
       </Table.Header>
       <Table.Body>
         {audit.map((entry, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: audit entries lack unique identifiers
           <Table.Row key={`${entry.utfortDato}-${entry.behandlingCode}-${i}`}>
             <Table.DataCell>
               <BodyShort size="small">{new Date(entry.utfortDato).toLocaleString('nb-NO')}</BodyShort>

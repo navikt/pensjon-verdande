@@ -74,6 +74,7 @@ export default function FordelingStatusMedAktivitet({ data }: Props) {
               <React.Fragment key={status}>
                 {items.map((item, idx) => (
                   <Table.Row
+                    // biome-ignore lint/suspicious/noArrayIndexKey: items lack unique identifiers
                     key={`${status}-${item.aktivitet || 'ingen'}-${idx}`}
                     aria-label={
                       idx === 0
