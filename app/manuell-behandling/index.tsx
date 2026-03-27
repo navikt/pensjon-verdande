@@ -573,7 +573,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
 
         <Modal ref={sokeModalRef} header={{ heading: 'Søkefilter' }} width={1440}>
           <Modal.Body>
-            <div ref={columnsWrapperRef} style={{ overflow: 'auto', paddingRight: 8 }}>
+            <Box ref={columnsWrapperRef} paddingInline="space-0 space-8" style={{ overflow: 'auto' }}>
               <div
                 style={{
                   columnCount: columnCount,
@@ -593,7 +593,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                   </div>
                 ))}
               </div>
-            </div>
+            </Box>
           </Modal.Body>
           <Modal.Footer>
             <HStack gap="space-12">
@@ -627,15 +627,15 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                     Ingen dimensjoner valgt ennå.
                   </BodyShort>
                 ) : (
-                  <ol style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
+                  <Box as="ol" marginBlock="space-8 space-0" style={{ listStyle: 'none', padding: 0 }}>
                     {groupBy.map((g, idx) => (
-                      <li
+                      <HStack
+                        as="li"
                         key={`order-${g}`}
+                        gap="space-8"
+                        align="center"
+                        justify="space-between"
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: 8,
                           padding: '6px 10px',
                           marginBottom: 6,
                           border: '1px solid var(--ax-border-neutral-subtle)',
@@ -672,9 +672,9 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                             disabled={idx === groupBy.length - 1}
                           />
                         </HStack>
-                      </li>
+                      </HStack>
                     ))}
-                  </ol>
+                  </Box>
                 )}
               </Box>
             </VStack>
