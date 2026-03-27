@@ -136,7 +136,7 @@ export type BehandlingKjoringDTO = {
   correlationId: string
   feilmelding: string | null
   stackTrace: string | null
-  aktivitetType: string
+  aktivitetType: string | null
   aldeStartState: AldeBehandlingState | null
   aldeEndState: AldeBehandlingState | null
 
