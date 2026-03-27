@@ -1,6 +1,8 @@
 import invariant from 'tiny-invariant'
 import { BehandlingKjoringerTable } from '~/components/kjoringer-table/BehandlingKjoringerTable'
-import { getBehandling, getBehandlingKjoringer } from '~/services/behandling.server'
+import { apiGet } from '~/services/api.server'
+import { getBehandling } from '~/services/behandling.server'
+import type { BehandlingKjoringDTO, PageResponse } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId._index'
 
 const DEFAULT_PAGE_SIZE = 100
@@ -20,7 +22,10 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const [behandling, kjoringerPage] = await Promise.all([
     getBehandling(request, params.behandlingId),
-    getBehandlingKjoringer(request, params.behandlingId, page, size, sort),
+    apiGet<PageResponse<BehandlingKjoringDTO>>(
+      `/api/behandling/${params.behandlingId}/kjoringer?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`,
+      request,
+    ),
   ])
 
   return {

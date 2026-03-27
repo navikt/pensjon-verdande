@@ -10,10 +10,10 @@ vi.mock('~/services/env.server', () => ({
   isDevelopment: false,
 }))
 
-const mockGetBehandlingAktiviteter = vi.fn()
+const mockApiGet = vi.fn()
 
-vi.mock('~/services/behandling.server', () => ({
-  getBehandlingAktiviteter: mockGetBehandlingAktiviteter,
+vi.mock('~/services/api.server', () => ({
+  apiGet: mockApiGet,
 }))
 
 const { loader } = await import('./behandling.$behandlingId.aktiviteter')
@@ -28,26 +28,35 @@ const loaderArgs = (url: string) =>
 
 describe('behandling aktiviteter loader', () => {
   it('laster aktiviteter med default paginering', async () => {
-    mockGetBehandlingAktiviteter.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
+    mockApiGet.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
 
     await loader(loaderArgs('http://localhost/behandling/456/aktiviteter'))
 
-    expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 0, 100, 'aktivitetId,desc')
+    expect(mockApiGet).toHaveBeenCalledWith(
+      '/api/behandling/456/aktiviteter?page=0&size=100&sort=aktivitetId%2Cdesc',
+      expect.any(Request),
+    )
   })
 
   it('videresender page og size fra URL', async () => {
-    mockGetBehandlingAktiviteter.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
+    mockApiGet.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
 
     await loader(loaderArgs('http://localhost/behandling/456/aktiviteter?page=3&size=25'))
 
-    expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 3, 25, 'aktivitetId,desc')
+    expect(mockApiGet).toHaveBeenCalledWith(
+      '/api/behandling/456/aktiviteter?page=3&size=25&sort=aktivitetId%2Cdesc',
+      expect.any(Request),
+    )
   })
 
   it('videresender sort fra URL', async () => {
-    mockGetBehandlingAktiviteter.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
+    mockApiGet.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
 
     await loader(loaderArgs('http://localhost/behandling/456/aktiviteter?sortKey=aktivitetId&sortDir=ascending'))
 
-    expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 0, 100, 'aktivitetId,asc')
+    expect(mockApiGet).toHaveBeenCalledWith(
+      '/api/behandling/456/aktiviteter?page=0&size=100&sort=aktivitetId%2Casc',
+      expect.any(Request),
+    )
   })
 })

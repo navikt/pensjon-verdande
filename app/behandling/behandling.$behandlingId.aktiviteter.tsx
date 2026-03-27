@@ -1,6 +1,7 @@
 import invariant from 'tiny-invariant'
 import BehandlingAktivitetTable from '~/components/aktiviteter-table/BehandlingAktivitetTable'
-import { getBehandlingAktiviteter } from '~/services/behandling.server'
+import { apiGet } from '~/services/api.server'
+import type { AktivitetDTO, PageResponse } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId.aktiviteter'
 
 const DEFAULT_PAGE_SIZE = 100
@@ -18,7 +19,10 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const sortDir = url.searchParams.get('sortDir')
   const sort = `${sortKey},${sortDir === 'ascending' ? 'asc' : 'desc'}`
 
-  const aktiviteterPage = await getBehandlingAktiviteter(request, params.behandlingId, page, size, sort)
+  const aktiviteterPage = await apiGet<PageResponse<AktivitetDTO>>(
+    `/api/behandling/${params.behandlingId}/aktiviteter?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`,
+    request,
+  )
 
   return {
     behandlingId: params.behandlingId,
