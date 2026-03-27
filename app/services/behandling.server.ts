@@ -11,6 +11,7 @@ import {
 } from '~/services/api.server'
 import { kibanaLink } from '~/services/kibana.server'
 import type {
+  AktivitetDTO,
   BehandlingDto,
   BehandlingerPage,
   BehandlingManuellOpptellingResponse,
@@ -147,6 +148,14 @@ export async function getBehandling(request: Request, behandlingId: string): Pro
   const behandling = await apiGet<BehandlingDto>(`/api/behandling/${behandlingId}`, request)
   behandling.kibanaUrl = kibanaLink(behandling)
   return behandling
+}
+
+export async function getAktivitet(
+  request: Request,
+  behandlingId: string,
+  aktivitetId: string,
+): Promise<AktivitetDTO | undefined> {
+  return await apiGetOrUndefined<AktivitetDTO>(`/api/behandling/${behandlingId}/aktiviteter/${aktivitetId}`, request)
 }
 
 export async function getDetaljertFremdrift(

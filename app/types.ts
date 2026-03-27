@@ -45,8 +45,7 @@ export type BehandlingDto = {
   ansvarligTeam: string | null
   status: string
   prioritet: number
-  behandlingKjoringer: BehandlingKjoringDTO[]
-  aktiviteter: AktivitetDTO[]
+  erStartet: boolean
   muligeKontrollpunkt: KontrollpunktDecode[]
 
   fnr: string | null
@@ -137,7 +136,7 @@ export type BehandlingKjoringDTO = {
   correlationId: string
   feilmelding: string | null
   stackTrace: string | null
-  aktivitetType: string
+  aktivitetType: string | null
   aldeStartState: AldeBehandlingState | null
   aldeEndState: AldeBehandlingState | null
 
@@ -185,6 +184,7 @@ export type PageSort = {
 export type BehandlingManuellDto = {
   id: string // UUID
   aktivitetId: number
+  aktivitetType?: string | null
   opprettet: string
 
   sakId: number

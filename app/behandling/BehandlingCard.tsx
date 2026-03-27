@@ -667,7 +667,7 @@ export default function BehandlingCard(props: Props) {
 
           {fortsettAvhengigeBehandlinger()}
 
-          {props.behandling.behandlingKjoringer.length === 0 && (
+          {!props.behandling.erStartet && (
             <EndrePlanlagtStartetButton planlagtStartet={props.behandling.planlagtStartet} />
           )}
 

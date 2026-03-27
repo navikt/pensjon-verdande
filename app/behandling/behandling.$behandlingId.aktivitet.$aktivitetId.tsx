@@ -1,29 +1,19 @@
 import { useLocation } from 'react-router'
 import invariant from 'tiny-invariant'
 import AktivitetCard from '~/behandling/AktivitetCard'
-import { getBehandling } from '~/services/behandling.server'
-import type { BehandlingDto } from '~/types'
+import { getAktivitet, getBehandling } from '~/services/behandling.server'
 import type { Route } from './+types/behandling.$behandlingId.aktivitet.$aktivitetId'
-
-export function finnAktivitet(behandling: BehandlingDto, aktivitetId: number | string) {
-  if (typeof aktivitetId === 'string') {
-    return behandling.aktiviteter.find((it) => it.aktivitetId.toString() === aktivitetId)
-  } else {
-    return behandling.aktiviteter.find((it) => it.aktivitetId.toString() === aktivitetId.toString())
-  }
-}
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
   const aktivitetId = params.aktivitetId
   invariant(aktivitetId, 'Missing aktivitetId param')
 
-  const behandling = await getBehandling(request, params.behandlingId)
-  if (!behandling) {
-    throw new Response('Not Found', { status: 404 })
-  }
+  const [behandling, aktivitet] = await Promise.all([
+    getBehandling(request, params.behandlingId),
+    getAktivitet(request, params.behandlingId, aktivitetId),
+  ])
 
-  const aktivitet = finnAktivitet(behandling, aktivitetId)
   if (!aktivitet) {
     throw new Response('Not Found', { status: 404 })
   }

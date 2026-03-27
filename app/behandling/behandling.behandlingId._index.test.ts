@@ -1,0 +1,71 @@
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('~/services/auth.server', () => ({
+  requireAccessToken: vi.fn().mockResolvedValue('test-token'),
+}))
+
+vi.mock('~/services/env.server', () => ({
+  env: { penUrl: 'http://pen-test', aldeBehandlingUrlTemplate: '', psakSakUrlTemplate: '' },
+  isAldeLinkEnabled: false,
+  isDevelopment: false,
+}))
+
+const mockGetBehandling = vi.fn()
+
+vi.mock('~/services/behandling.server', () => ({
+  getBehandling: mockGetBehandling,
+}))
+
+const mockApiGet = vi.fn()
+
+vi.mock('~/services/api.server', () => ({
+  apiGet: mockApiGet,
+}))
+
+const { loader } = await import('./behandling.$behandlingId._index')
+
+const loaderArgs = (url: string) =>
+  ({
+    request: new Request(url),
+    params: { behandlingId: '123' },
+    context: {},
+    unstable_pattern: '/behandling/:behandlingId',
+  }) as Parameters<typeof loader>[0]
+
+describe('behandling kjøringer loader', () => {
+  it('laster kjøringer med default paginering', async () => {
+    mockGetBehandling.mockResolvedValueOnce({ behandlingId: 123, erAldeBehandling: false })
+    mockApiGet.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
+
+    await loader(loaderArgs('http://localhost/behandling/123'))
+
+    expect(mockApiGet).toHaveBeenCalledWith(
+      '/api/behandling/123/kjoringer?page=0&size=100&sort=startet%2Cdesc',
+      expect.any(Request),
+    )
+  })
+
+  it('videresender page og size fra URL', async () => {
+    mockGetBehandling.mockResolvedValueOnce({ behandlingId: 123, erAldeBehandling: false })
+    mockApiGet.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
+
+    await loader(loaderArgs('http://localhost/behandling/123?page=2&size=50'))
+
+    expect(mockApiGet).toHaveBeenCalledWith(
+      '/api/behandling/123/kjoringer?page=2&size=50&sort=startet%2Cdesc',
+      expect.any(Request),
+    )
+  })
+
+  it('videresender sort fra URL', async () => {
+    mockGetBehandling.mockResolvedValueOnce({ behandlingId: 123, erAldeBehandling: false })
+    mockApiGet.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
+
+    await loader(loaderArgs('http://localhost/behandling/123?sortKey=startet&sortDir=descending'))
+
+    expect(mockApiGet).toHaveBeenCalledWith(
+      '/api/behandling/123/kjoringer?page=0&size=100&sort=startet%2Cdesc',
+      expect.any(Request),
+    )
+  })
+})

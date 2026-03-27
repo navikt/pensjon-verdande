@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 
 import invariant from 'tiny-invariant'
 import { formatIsoTimestamp } from '~/common/date'
+import { decodeAktivitet } from '~/common/decodeBehandling'
 import { getBehandling, henBehandlingManuell } from '~/services/behandling.server'
 import type { BehandlingManuellDto } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId.manuelleOppgaver'
@@ -55,7 +56,7 @@ export default function ManuelleBehandlinger({ loaderData }: Route.ComponentProp
             <Table.Row key={it.id}>
               <Table.DataCell>
                 <Link to={`/behandling/${behandling.behandlingId}/aktivitet/${it.aktivitetId}`}>
-                  {behandling.aktiviteter.find((a) => a.aktivitetId === it.aktivitetId)?.type || 'Ukjent aktivitet'}
+                  {it.aktivitetType ? decodeAktivitet(it.aktivitetType) : 'Ukjent aktivitet'}
                 </Link>
               </Table.DataCell>
               <Table.DataCell>{formatIsoTimestamp(it.opprettet)}</Table.DataCell>
