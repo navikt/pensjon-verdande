@@ -9,12 +9,14 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const aktivitetId = params.aktivitetId
   invariant(aktivitetId, 'Missing aktivitetId param')
 
-  const behandling = await getBehandling(request, params.behandlingId)
+  const [behandling, aktivitet] = await Promise.all([
+    getBehandling(request, params.behandlingId),
+    getAktivitet(request, params.behandlingId, aktivitetId),
+  ])
+
   if (!behandling) {
     throw new Response('Not Found', { status: 404 })
   }
-
-  const aktivitet = await getAktivitet(request, params.behandlingId, aktivitetId)
   if (!aktivitet) {
     throw new Response('Not Found', { status: 404 })
   }

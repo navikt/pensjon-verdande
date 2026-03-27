@@ -1,9 +1,7 @@
 import { BodyShort, Pagination, Table } from '@navikt/ds-react'
-import { useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeAktivitet } from '~/common/decodeBehandling'
-import { useSort } from '~/hooks/useSort'
 import type { AktivitetDTO, PageResponse } from '~/types'
 
 interface Props {
@@ -13,11 +11,18 @@ interface Props {
 
 export default function BehandlingAktivitetTable(props: Props) {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { sortKey, onSort, sortFunc, sortDecending } = useSort<AktivitetDTO>('aktivitetId')
 
-  const sortedAktiviteter: AktivitetDTO[] = useMemo(() => {
-    return [...props.aktiviteterPage.content].sort(sortFunc)
-  }, [props.aktiviteterPage.content, sortFunc])
+  const sortKey = searchParams.get('sortKey') ?? 'aktivitetId'
+  const sortDirection = searchParams.get('sortDir') === 'ascending' ? 'ascending' : 'descending'
+
+  const onSort = (newSortKey?: string) => {
+    if (!newSortKey) return
+    const newDirection = sortKey === newSortKey && sortDirection === 'descending' ? 'ascending' : 'descending'
+    searchParams.set('sortKey', newSortKey)
+    searchParams.set('sortDir', newDirection)
+    searchParams.set('page', '0')
+    setSearchParams(searchParams, { preventScrollReset: true })
+  }
 
   const onPageChange = (page: number) => {
     searchParams.set('page', (page - 1).toString())
@@ -30,8 +35,8 @@ export default function BehandlingAktivitetTable(props: Props) {
         size={'medium'}
         onSortChange={onSort}
         sort={{
-          direction: sortDecending ? 'descending' : 'ascending',
-          orderBy: sortKey as string,
+          direction: sortDirection,
+          orderBy: sortKey,
         }}
         zebraStripes
       >
@@ -67,7 +72,7 @@ export default function BehandlingAktivitetTable(props: Props) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {sortedAktiviteter?.map((aktivitet: AktivitetDTO) => {
+          {props.aktiviteterPage.content?.map((aktivitet: AktivitetDTO) => {
             return (
               <Table.Row key={aktivitet.uuid}>
                 <Table.DataCell>

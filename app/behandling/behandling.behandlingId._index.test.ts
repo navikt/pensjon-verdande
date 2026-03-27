@@ -51,7 +51,7 @@ describe('behandling kjøringer loader', () => {
     mockGetBehandling.mockResolvedValueOnce({ behandlingId: 123, erAldeBehandling: false })
     mockGetBehandlingKjoringer.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
 
-    await loader(loaderArgs('http://localhost/behandling/123?sort=startet,desc'))
+    await loader(loaderArgs('http://localhost/behandling/123?sortKey=startet&sortDir=descending'))
 
     expect(mockGetBehandlingKjoringer).toHaveBeenCalledWith(expect.any(Request), '123', 0, 100, 'startet,desc')
   })

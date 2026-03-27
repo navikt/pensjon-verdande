@@ -11,7 +11,9 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const url = new URL(request.url)
   const page = Number(url.searchParams.get('page') ?? '0')
   const size = Number(url.searchParams.get('size') ?? String(DEFAULT_PAGE_SIZE))
-  const sort = url.searchParams.get('sort')
+  const sortKey = url.searchParams.get('sortKey')
+  const sortDir = url.searchParams.get('sortDir')
+  const sort = sortKey ? `${sortKey},${sortDir === 'ascending' ? 'asc' : 'desc'}` : null
 
   const [behandling, kjoringerPage] = await Promise.all([
     getBehandling(request, params.behandlingId),

@@ -46,7 +46,7 @@ describe('behandling aktiviteter loader', () => {
   it('videresender sort fra URL', async () => {
     mockGetBehandlingAktiviteter.mockResolvedValueOnce({ content: [], totalPages: 0, number: 0 })
 
-    await loader(loaderArgs('http://localhost/behandling/456/aktiviteter?sort=aktivitetId,asc'))
+    await loader(loaderArgs('http://localhost/behandling/456/aktiviteter?sortKey=aktivitetId&sortDir=ascending'))
 
     expect(mockGetBehandlingAktiviteter).toHaveBeenCalledWith(expect.any(Request), '456', 0, 100, 'aktivitetId,asc')
   })

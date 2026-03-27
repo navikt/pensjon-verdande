@@ -1,13 +1,11 @@
 import { ArrowRightIcon, ExternalLinkIcon, FilesIcon, MenuElipsisVerticalIcon } from '@navikt/aksel-icons'
 import { ActionMenu, BodyShort, Button, HStack, Pagination, Table, Tag } from '@navikt/ds-react'
-import React from 'react'
 import { Link as ReactRouterLink, useSearchParams } from 'react-router'
 import copy from '~/common/clipboard'
 import { formatIsoTimestamp } from '~/common/date'
 import { decodeAldeBehandlingState } from '~/common/decode'
 import { decodeAktivitet } from '~/common/decodeBehandling'
 import { formatNumber } from '~/common/number'
-import { useSort } from '~/hooks/useSort'
 import { behandlingKjoringLogs } from '~/routes-utils'
 import type { BehandlingKjoringDTO, HalLink, PageResponse } from '~/types'
 
@@ -24,11 +22,18 @@ export function tidsbruk(it: BehandlingKjoringDTO) {
 
 export function BehandlingKjoringerTable(props: Props) {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { sortKey, onSort, sortFunc, sortDecending } = useSort<BehandlingKjoringDTO>('startet')
 
-  const sortedKjoringer: BehandlingKjoringDTO[] = React.useMemo(() => {
-    return [...props.kjoringerPage.content].sort(sortFunc)
-  }, [props.kjoringerPage.content, sortFunc])
+  const sortKey = searchParams.get('sortKey') ?? 'startet'
+  const sortDirection = searchParams.get('sortDir') === 'ascending' ? 'ascending' : 'descending'
+
+  const onSort = (newSortKey?: string) => {
+    if (!newSortKey) return
+    const newDirection = sortKey === newSortKey && sortDirection === 'descending' ? 'ascending' : 'descending'
+    searchParams.set('sortKey', newSortKey)
+    searchParams.set('sortDir', newDirection)
+    searchParams.set('page', '0')
+    setSearchParams(searchParams, { preventScrollReset: true })
+  }
 
   const onPageChange = (page: number) => {
     searchParams.set('page', (page - 1).toString())
@@ -41,8 +46,8 @@ export function BehandlingKjoringerTable(props: Props) {
         size={'medium'}
         onSortChange={onSort}
         sort={{
-          direction: sortDecending ? 'descending' : 'ascending',
-          orderBy: sortKey as string,
+          direction: sortDirection,
+          orderBy: sortKey,
         }}
         zebraStripes
       >
@@ -66,7 +71,7 @@ export function BehandlingKjoringerTable(props: Props) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {sortedKjoringer?.map((it: BehandlingKjoringDTO) => {
+          {props.kjoringerPage.content?.map((it: BehandlingKjoringDTO) => {
             const stackTrace = it.stackTrace
             return (
               <Table.ExpandableRow key={it.behandlingKjoringId} content={<pre>{stackTrace}</pre>}>
