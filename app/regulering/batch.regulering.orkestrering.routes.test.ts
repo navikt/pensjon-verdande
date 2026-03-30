@@ -30,15 +30,15 @@ describe('orkestrering routes', () => {
   // Eagerly import all route modules so Vite transform cost does not count against individual test timeouts
   let orkestrerMod: typeof import('./batch.regulering.orkestrering')
   let fortsettMod: typeof import('./batch.regulering.orkestrering.fortsett.$behandlingId')
-  let pauseMod: typeof import('./batch.regulering.orkestrering.pause.$behandlingId')
+  let utsettMod: typeof import('./batch.regulering.orkestrering.utsett.$behandlingId')
   let feilmeldingerMod: typeof import('./batch.regulering.orkestrering.hentAggregerteFeilmeldinger')
   let statistikkMod: typeof import('./batch.regulering.orkestrering.hentOrkestreringStatistikk.$behandlingId')
 
   beforeAll(async () => {
-    ;[orkestrerMod, fortsettMod, pauseMod, feilmeldingerMod, statistikkMod] = await Promise.all([
+    ;[orkestrerMod, fortsettMod, utsettMod, feilmeldingerMod, statistikkMod] = await Promise.all([
       import('./batch.regulering.orkestrering'),
       import('./batch.regulering.orkestrering.fortsett.$behandlingId'),
-      import('./batch.regulering.orkestrering.pause.$behandlingId'),
+      import('./batch.regulering.orkestrering.utsett.$behandlingId'),
       import('./batch.regulering.orkestrering.hentAggregerteFeilmeldinger'),
       import('./batch.regulering.orkestrering.hentOrkestreringStatistikk.$behandlingId'),
     ])
@@ -124,9 +124,9 @@ describe('orkestrering routes', () => {
     })
   })
 
-  describe('pause.$behandlingId', () => {
-    it('POST pauser orkestrering for behandlingId', async () => {
-      const { action } = pauseMod
+  describe('utsett.$behandlingId', () => {
+    it('POST utsetter videre orkestrering for behandlingId', async () => {
+      const { action } = utsettMod
       fetchSpy.mockResolvedValueOnce(okResponse())
 
       const request = new Request('http://localhost/x', { method: 'POST' })
@@ -134,7 +134,7 @@ describe('orkestrering routes', () => {
         request,
         params: { behandlingId: '789' },
         context: {},
-        unstable_pattern: '/batch/regulering/orkestrering/pause/:behandlingId',
+        unstable_pattern: '/batch/regulering/orkestrering/utsett/:behandlingId',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -146,7 +146,7 @@ describe('orkestrering routes', () => {
     })
 
     it('backend 500 kaster feil', async () => {
-      const { action } = pauseMod
+      const { action } = utsettMod
       fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
 
       const request = new Request('http://localhost/x', { method: 'POST' })
@@ -155,7 +155,7 @@ describe('orkestrering routes', () => {
           request,
           params: { behandlingId: '789' },
           context: {},
-          unstable_pattern: '/batch/regulering/orkestrering/pause/:behandlingId',
+          unstable_pattern: '/batch/regulering/orkestrering/utsett/:behandlingId',
         } as Parameters<typeof action>[0]),
       ).rejects.toBeDefined()
     })

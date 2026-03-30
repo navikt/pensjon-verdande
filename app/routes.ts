@@ -145,7 +145,7 @@ export default [
           'regulering/batch.regulering.orkestrering.hentAggregerteFeilmeldinger.tsx',
         ),
         route('fortsett/:behandlingId', 'regulering/batch.regulering.orkestrering.fortsett.$behandlingId.tsx'),
-        route('pause/:behandlingId', 'regulering/batch.regulering.orkestrering.pause.$behandlingId.tsx'),
+        route('utsett/:behandlingId', 'regulering/batch.regulering.orkestrering.utsett.$behandlingId.tsx'),
       ]),
       route('uttrekk', 'regulering/batch.regulering.uttrekk.tsx', [
         route('startUttrekk', 'regulering/batch.regulering.uttrekk.startUttrekk.tsx'),

@@ -144,12 +144,12 @@ export function OrkestreringDetaljer({
 }) {
   const fetcher = useFetcher()
 
-  function pauseOrkestrering() {
+  function utsettOrkestrering() {
     fetcher.submit(
       { behandlingId: orkestrering.behandlingId },
       {
         method: 'post',
-        action: `pause/${orkestrering.behandlingId}`,
+        action: `utsett/${orkestrering.behandlingId}`,
       },
     )
   }
@@ -218,7 +218,7 @@ export function OrkestreringDetaljer({
               variant="secondary"
               loading={fetcher.state === 'submitting'}
               icon={<PauseIcon />}
-              onClick={() => pauseOrkestrering()}
+              onClick={() => utsettOrkestrering()}
             >
               Pause
             </Button>
