@@ -224,7 +224,7 @@ export function OrkestreringDetaljer({
             </Button>
           </div>
         )}
-        {orkestrering.utsatt && (
+        {orkestrering.utsatt && orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
           <Button size="xsmall" variant="secondary" icon={<PlayIcon />} onClick={() => fortsettOrkestrering()}>
             Fortsett
           </Button>
