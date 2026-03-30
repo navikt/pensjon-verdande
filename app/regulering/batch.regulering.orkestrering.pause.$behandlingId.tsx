@@ -5,6 +5,6 @@ import type { Route } from './+types/batch.regulering.orkestrering.pause.$behand
 export const action = async ({ params, request }: Route.ActionArgs) => {
   invariant(params.behandlingId, 'Missing behandlingId param')
 
-  await apiPost(`/api/vedtak/regulering/orkestrering/${params.behandlingId}/pause`, {}, request)
+  await apiPost(`/api/vedtak/regulering/orkestrering/${params.behandlingId}/utsett`, {}, request)
   return { success: true }
 }

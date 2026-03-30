@@ -139,7 +139,7 @@ describe('orkestrering routes', () => {
 
       expect(fetchSpy).toHaveBeenCalledOnce()
       const [url, init] = fetchSpy.mock.calls[0]
-      expect(url).toBe('http://pen-test/api/vedtak/regulering/orkestrering/789/pause')
+      expect(url).toBe('http://pen-test/api/vedtak/regulering/orkestrering/789/utsett')
       expect(init.method).toBe('POST')
       expect(init.signal).toBeInstanceOf(AbortSignal)
       expect(result).toEqual({ success: true })

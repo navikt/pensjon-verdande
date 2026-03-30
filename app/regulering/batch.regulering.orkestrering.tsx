@@ -173,11 +173,16 @@ export function OrkestreringDetaljer({
               Opprettet
             </Alert>
           )}
-          {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
+          {!orkestrering.utsatt && orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
             <Alert variant="info" size="small" inline>
               <HStack gap="space-8">
                 Under behandling <Loader size="small" title="Under behandling…" />
               </HStack>
+            </Alert>
+          )}
+          {orkestrering.utsatt && orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
+            <Alert variant="warning" size="small" inline>
+              Utsatt
             </Alert>
           )}
           {orkestrering.status === Behandlingstatus.FULLFORT && (
@@ -205,7 +210,7 @@ export function OrkestreringDetaljer({
             Gå til behandling
           </Link>
         </Entry>
-        {orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
+        {!orkestrering.utsatt && orkestrering.status === Behandlingstatus.UNDER_BEHANDLING && (
           <div>
             <Button
               data-color="neutral"
@@ -219,7 +224,7 @@ export function OrkestreringDetaljer({
             </Button>
           </div>
         )}
-        {orkestrering.status === Behandlingstatus.DEBUG && (
+        {orkestrering.utsatt && (
           <Button size="xsmall" variant="secondary" icon={<PlayIcon />} onClick={() => fortsettOrkestrering()}>
             Fortsett
           </Button>
