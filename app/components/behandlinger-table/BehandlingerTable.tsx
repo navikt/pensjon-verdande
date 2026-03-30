@@ -42,7 +42,7 @@ export default function BehandlingerTable({
   const [searchParams, setSearchParams] = useSearchParams()
 
   const sortParam = searchParams.get('sort')?.split(',')
-  const sortKey = sortParam?.[0] || 'behandlingId'
+  const sortKey = sortParam?.[0] || 'opprettet'
   const sortDecending = sortParam?.[1] || 'desc'
 
   const [valgteBehandlingIder, setValgteBehandlingIder] = useState<number[]>([])
@@ -223,11 +223,7 @@ export default function BehandlingerTable({
                 Velg
               </Table.ColumnHeader>
             )}
-            <Table.ColumnHeader
-              sortable
-              sortKey="behandlingId"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '7rem' }}
-            >
+            <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '7rem' }}>
               Id
             </Table.ColumnHeader>
             <Table.ColumnHeader
