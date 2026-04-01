@@ -25,6 +25,7 @@ export type ReguleringUttrekk = {
 export type ReguleringOrkestrering = {
   behandlingId: string
   status: Behandlingstatus
+  utsatt: boolean
   kjoringsdato: string
   opprettAntallFamilier: number | null
 }
