@@ -29,6 +29,7 @@ import {
   Page,
   ProgressBar,
   Select,
+  Skeleton,
   Tabs,
   Tag,
   Textarea,
@@ -491,6 +492,14 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
+  const filtrerteParametere = useMemo(
+    () =>
+      Object.entries(props.behandling.parametere ?? {}).filter(
+        ([, value]) => value != null && String(value).trim().length > 0,
+      ),
+    [props.behandling.parametere],
+  )
+
   return (
     <Page>
       <Heading size={'large'} spacing>
@@ -499,8 +508,8 @@ export default function BehandlingCard(props: Props) {
       </Heading>
       <VStack gap={'space-16'}>
         <HGrid
-          gap={props.detaljertFremdrift !== null ? 'space-24' : undefined}
-          columns={{ xl: 1, '2xl': props.detaljertFremdrift !== null ? 2 : 1 }}
+          gap={props.detaljertFremdrift != null ? 'space-24' : undefined}
+          columns={{ xl: 1, '2xl': props.detaljertFremdrift != null ? 2 : 1 }}
         >
           <VStack gap="space-16">
             <Box
@@ -510,89 +519,129 @@ export default function BehandlingCard(props: Props) {
               borderColor={'neutral-subtleA'}
               padding={'space-16'}
             >
-              <VStack gap={'space-32'}>
-                <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
+              <VStack gap={'space-24'}>
+                <HGrid columns={{ md: 2, lg: 3 }} gap="space-24">
                   {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
-                  {props.behandling.forrigeBehandlingId && (
-                    <Entry labelText={'Opprettet av behandling'}>
-                      <Link as={NavLink} to={`/behandling/${props.behandling.forrigeBehandlingId}`}>
-                        {props.behandling.forrigeBehandlingId}
-                      </Link>
-                    </Entry>
-                  )}
                   <Entry labelText={'Status'}>
                     <Tag variant={decodeBehandlingStatusToVariant(props.behandling.status)}>
                       {decodeBehandlingStatus(props.behandling.status)}
                     </Tag>
                   </Entry>
-                  <Await resolve={props.detaljertFremdrift}>
-                    {(detaljertFremdrift) =>
-                      detaljertFremdrift && (
-                        <Entry labelText={'Fremdrift'}>
-                          <Tooltip
-                            content={`${beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)} % ferdig`}
-                          >
-                            <ProgressBar
-                              value={+beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}
-                              valueMax={100}
-                              size={'large'}
-                              aria-labelledby="progress-bar-fremdrift"
-                            ></ProgressBar>
-                          </Tooltip>
-                        </Entry>
-                      )
+                  <Suspense
+                    fallback={
+                      <Entry labelText={'Fremdrift'}>
+                        <Skeleton variant="rounded" width="100%" height={32} aria-hidden />
+                      </Entry>
                     }
-                  </Await>
-
-                  <Entry labelText={'Ansvarlig team'}>
-                    <AnsvarligTeamSelector
-                      ansvarligTeam={props.behandling.ansvarligTeam}
-                      onAnsvarligTeamChange={oppdaterAnsvarligTeam}
-                    />
-                  </Entry>
-                  <Entry labelText={'Funksjonell identifikator'}>{props.behandling.funksjonellIdentifikator}</Entry>
-
-                  <Entry labelText={'Prioritet'}>{props.behandling.prioritet}</Entry>
-
-                  <Entry labelText={'Opprettet'}>{formatIsoTimestamp(props.behandling.opprettet)}</Entry>
-                  {props.behandling.stoppet && (
-                    <Entry labelText={'Stoppet'}>{formatIsoTimestamp(props.behandling.stoppet)}</Entry>
-                  )}
-                  {props.behandling.opprettetAv && (
-                    <Entry labelText={'Opprettet av'}>{props.behandling.opprettetAv}</Entry>
-                  )}
-                  {props.behandling.stoppetAv && <Entry labelText={'Stoppet av'}>{props.behandling.stoppetAv}</Entry>}
-                  <Entry labelText={'Siste kjøring'}>{formatIsoTimestamp(props.behandling.sisteKjoring)}</Entry>
-                  {props.behandling.ferdig ? (
-                    <Entry labelText={'Ferdig'}>{formatIsoTimestamp(props.behandling.ferdig)}</Entry>
-                  ) : (
-                    <Entry labelText={'Utsatt til'}>{formatIsoTimestamp(props.behandling.utsattTil)}</Entry>
-                  )}
-                  {props.behandling.slettes && (
-                    <Entry labelText={'Slettes'}>{formatIsoTimestamp(props.behandling.slettes)}</Entry>
-                  )}
-                  {props.behandling.planlagtStartet && (
-                    <Entry labelText={'Planlagt kjøring frem i tid'}>
-                      {formatIsoTimestamp(props.behandling.planlagtStartet)}
-                    </Entry>
-                  )}
-
-                  {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
-                  {copyPasteEntry('SakId', props.behandling.sakId)}
-                  {copyPasteEntry('KravId', props.behandling.kravId)}
-                  {copyPasteEntry('VedtakId', props.behandling.vedtakId)}
-                  {copyPasteEntry('JournalpostId', props.behandling.journalpostId)}
+                  >
+                    <Await resolve={props.detaljertFremdrift}>
+                      {(detaljertFremdrift) =>
+                        detaljertFremdrift && (
+                          <Entry labelText={'Fremdrift'}>
+                            <Tooltip
+                              content={`${beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)} % ferdig`}
+                            >
+                              <ProgressBar
+                                value={+beregnFremdriftProsent(detaljertFremdrift.ferdig, detaljertFremdrift.totalt)}
+                                valueMax={100}
+                                size={'large'}
+                                aria-label="Fremdrift"
+                              ></ProgressBar>
+                            </Tooltip>
+                          </Entry>
+                        )
+                      }
+                    </Await>
+                  </Suspense>
                 </HGrid>
-                <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift ? 3 : 4 }} gap="space-24">
-                  {props.behandling.parametere &&
-                    Object.entries(props.behandling.parametere).map(([key, value]) => {
-                      return (
-                        <Entry key={key} labelText={`${key}`}>
-                          {value as string}
+
+                <HGrid columns={{ md: 1, lg: 2, xl: props.detaljertFremdrift != null ? 2 : 3 }} gap="space-16">
+                  <Box background={'neutral-softA'} borderRadius={'8'} padding={'space-16'}>
+                    <VStack gap={'space-12'}>
+                      <Heading size="xsmall" as="h3">
+                        Tidspunkter
+                      </Heading>
+                      <Entry labelText={'Opprettet'}>{formatIsoTimestamp(props.behandling.opprettet)}</Entry>
+                      <Entry labelText={'Siste kjøring'}>{formatIsoTimestamp(props.behandling.sisteKjoring)}</Entry>
+                      {props.behandling.ferdig ? (
+                        <Entry labelText={'Ferdig'}>{formatIsoTimestamp(props.behandling.ferdig)}</Entry>
+                      ) : (
+                        <Entry labelText={'Utsatt til'}>{formatIsoTimestamp(props.behandling.utsattTil)}</Entry>
+                      )}
+                      {props.behandling.stoppet && (
+                        <Entry labelText={'Stoppet'}>{formatIsoTimestamp(props.behandling.stoppet)}</Entry>
+                      )}
+                      {props.behandling.slettes && (
+                        <Entry labelText={'Slettes'}>{formatIsoTimestamp(props.behandling.slettes)}</Entry>
+                      )}
+                      {props.behandling.planlagtStartet && (
+                        <Entry labelText={'Planlagt kjøring frem i tid'}>
+                          {formatIsoTimestamp(props.behandling.planlagtStartet)}
                         </Entry>
-                      )
-                    })}
+                      )}
+                    </VStack>
+                  </Box>
+
+                  <Box background={'neutral-softA'} borderRadius={'8'} padding={'space-16'}>
+                    <VStack gap={'space-12'}>
+                      <Heading size="xsmall" as="h3">
+                        Identifikatorer
+                      </Heading>
+                      {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
+                      {copyPasteEntry('SakId', props.behandling.sakId)}
+                      {copyPasteEntry('KravId', props.behandling.kravId)}
+                      {copyPasteEntry('VedtakId', props.behandling.vedtakId)}
+                      {copyPasteEntry('JournalpostId', props.behandling.journalpostId)}
+                      {props.behandling.forrigeBehandlingId && (
+                        <Entry labelText={'Opprettet av behandling'}>
+                          <Link as={NavLink} to={`/behandling/${props.behandling.forrigeBehandlingId}`}>
+                            {props.behandling.forrigeBehandlingId}
+                          </Link>
+                        </Entry>
+                      )}
+                    </VStack>
+                  </Box>
+
+                  <Box background={'neutral-softA'} borderRadius={'8'} padding={'space-16'}>
+                    <VStack gap={'space-12'}>
+                      <Heading size="xsmall" as="h3">
+                        Konfigurasjon
+                      </Heading>
+                      <Entry labelText={'Ansvarlig team'}>
+                        <AnsvarligTeamSelector
+                          ansvarligTeam={props.behandling.ansvarligTeam}
+                          onAnsvarligTeamChange={oppdaterAnsvarligTeam}
+                        />
+                      </Entry>
+                      <Entry labelText={'Prioritet'}>{props.behandling.prioritet}</Entry>
+                      <Entry labelText={'Funksjonell identifikator'}>{props.behandling.funksjonellIdentifikator}</Entry>
+                      {props.behandling.opprettetAv && (
+                        <Entry labelText={'Opprettet av'}>{props.behandling.opprettetAv}</Entry>
+                      )}
+                      {props.behandling.stoppetAv && (
+                        <Entry labelText={'Stoppet av'}>{props.behandling.stoppetAv}</Entry>
+                      )}
+                    </VStack>
+                  </Box>
                 </HGrid>
+
+                {filtrerteParametere.length > 0 && (
+                  <Box background={'neutral-softA'} borderRadius={'8'} padding={'space-16'}>
+                    <VStack gap={'space-12'}>
+                      <Heading size="xsmall" as="h3">
+                        Parametere
+                      </Heading>
+                      <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift != null ? 3 : 4 }} gap="space-24">
+                        {filtrerteParametere.map(([key, value]) => (
+                          <Entry key={key} labelText={key}>
+                            {value as string}
+                          </Entry>
+                        ))}
+                      </HGrid>
+                    </VStack>
+                  </Box>
+                )}
+
                 {props.behandling.stoppBegrunnelse && (
                   <Entry labelText={'Stopp begrunnelse'}>{linkifyText(props.behandling.stoppBegrunnelse)}</Entry>
                 )}
@@ -600,7 +649,7 @@ export default function BehandlingCard(props: Props) {
             </Box>
           </VStack>
           <HStack gap="space-16">
-            {props.detaljertFremdrift && (
+            {props.detaljertFremdrift != null && (
               <Page.Block>
                 <Box
                   background={'raised'}
@@ -745,7 +794,7 @@ export default function BehandlingCard(props: Props) {
             )}
             <Tabs.Tab value="manuelleOppgaver" label="Manuelle oppgaver" icon={<PersonIcon />} />
             <Tabs.Tab value="behandlingManuellOpptelling" label="Oppgaveoppsummering" icon={<TasklistIcon />} />
-            {props.detaljertFremdrift && (
+            {props.detaljertFremdrift != null && (
               <Tabs.Tab value="detaljertFremdrift" label="Detaljert fremdrift" icon={<TasklistIcon />} />
             )}
             <Tabs.Tab value="logs" label="Applikasjonslogg" icon={<ReceiptIcon />} />
