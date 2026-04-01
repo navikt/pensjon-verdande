@@ -60,7 +60,8 @@ export function makeDecoder<M extends Record<string, string>>(map: M) {
 export const decodeBehandlingStatus = makeDecoder(BEHANDLING_STATUS_MAP)
 export const decodeAktivitetStatus = makeDecoder(AKTIVITET_STATUS_MAP)
 
-export const decodeBehandlingStatusToVariant = makeDecoder(BEHANDLING_STATUS_VARIANT_MAP)
+export const decodeBehandlingStatusToVariant = (key: string) =>
+  BEHANDLING_STATUS_VARIANT_MAP[key as keyof typeof BEHANDLING_STATUS_VARIANT_MAP] ?? 'neutral'
 
 export const decodeBehandlingstype = makeDecoder(BEHANDLING_TYPES_MAP)
 export const decodeFagomrade = makeDecoder(FAGOMRADE_MAP)

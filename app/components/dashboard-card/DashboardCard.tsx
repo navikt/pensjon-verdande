@@ -1,4 +1,4 @@
-import { Box, HStack, VStack } from '@navikt/ds-react'
+import { BodyShort, Box, Heading, HStack, VStack } from '@navikt/ds-react'
 import type { Property } from 'csstype'
 import type React from 'react'
 
@@ -16,18 +16,19 @@ type Props = {
 
 export function DashboardCard(props: Props) {
   return (
-    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
-      <HStack>
+    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '12px 16px' }}>
+      <HStack gap="space-16" align="center">
         <Box
           style={{
-            height: '70px',
-            width: '70px',
+            height: '56px',
+            width: '56px',
             backgroundColor: props.iconBackgroundColor,
-            marginRight: '12px',
+            flexShrink: 0,
           }}
           borderRadius="4"
         >
           <props.icon
+            aria-hidden
             fontSize="1.5rem"
             style={{
               width: '100%',
@@ -37,9 +38,13 @@ export function DashboardCard(props: Props) {
             }}
           />
         </Box>
-        <VStack gap="space-16">
-          <Box>{props.title}</Box>
-          <Box>{props.value}</Box>
+        <VStack gap="space-4">
+          <BodyShort size="small" textColor="subtle">
+            {props.title}
+          </BodyShort>
+          <Heading as="p" size="large">
+            {props.value}
+          </Heading>
         </VStack>
       </HStack>
     </Box>
