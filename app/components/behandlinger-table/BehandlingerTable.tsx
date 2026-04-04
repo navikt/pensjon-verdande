@@ -9,12 +9,14 @@ import {
   Select,
   Spacer,
   Table,
+  Tag,
   useRangeDatepicker,
 } from '@navikt/ds-react'
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { Link, useFetcher, useSearchParams } from 'react-router'
 import { formatIsoTimestamp, toIsoDate } from '~/common/date'
+import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import type { BehandlingDto, BehandlingerPage } from '~/types'
@@ -339,7 +341,13 @@ export default function BehandlingerTable({
                 <Table.DataCell>{formatIsoTimestamp(it.sisteKjoring)}</Table.DataCell>
                 <Table.DataCell>{formatIsoTimestamp(it.utsattTil)}</Table.DataCell>
                 <Table.DataCell>{formatIsoTimestamp(it.planlagtStartet)}</Table.DataCell>
-                {visStatusSoek && <Table.DataCell>{it.status}</Table.DataCell>}
+                {visStatusSoek && (
+                  <Table.DataCell>
+                    <Tag size="small" variant={decodeBehandlingStatusToVariant(it.status)}>
+                      {decodeBehandlingStatus(it.status)}
+                    </Tag>
+                  </Table.DataCell>
+                )}
                 <Table.DataCell title={it.feilmelding ? `${it.behandlingId}\n${it.feilmelding}` : undefined}>
                   <div className={styles.feilmeldingKolonne}>{it.feilmelding}</div>
                 </Table.DataCell>
