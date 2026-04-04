@@ -12,6 +12,7 @@ import {
 import { useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
 import type { TidsserieDatapunkt } from '~/analyse/types'
+import { decodeBehandlingStatus } from '~/common/decode'
 import { formatLabel } from '~/components/chart-utils/formatLabel'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
@@ -38,9 +39,14 @@ const statusConfig: Record<string, { label: string; borderColor: string; backgro
     borderColor: 'rgba(195, 0, 0, 1)',
     backgroundColor: 'rgba(195, 0, 0, 0.15)',
   },
+  FEILENDE: {
+    label: 'Feilende',
+    borderColor: 'rgba(199, 115, 0, 1)',
+    backgroundColor: 'rgba(255, 193, 102, 0.15)',
+  },
 }
 
-const statusOrder = ['FULLFORT', 'UNDER_BEHANDLING', 'STOPPET']
+const statusOrder = ['FULLFORT', 'UNDER_BEHANDLING', 'STOPPET', 'FEILENDE']
 
 export function AktivitetChart({ datapunkter, antallTimer, maintainAspectRatio }: Props) {
   const chartData = useMemo(() => {
@@ -63,7 +69,7 @@ export function AktivitetChart({ datapunkter, antallTimer, maintainAspectRatio }
       labels: perioder.map((p) => formatLabel(p, antallTimer)),
       datasets: statuser.map((status) => {
         const config = statusConfig[status] ?? {
-          label: status,
+          label: decodeBehandlingStatus(status),
           borderColor: 'rgba(0,0,0,0.5)',
           backgroundColor: 'rgba(0,0,0,0.1)',
         }

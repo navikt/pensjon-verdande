@@ -45,3 +45,19 @@ export const TomtDatasett: Story = {
     antallTimer: 24,
   },
 }
+
+const feilendeDatapunkter: TidsserieDatapunkt[] = [
+  { periodeFra: '2024-06-15T00:00:00', status: 'FEILENDE', antall: 2 },
+  { periodeFra: '2024-06-15T02:00:00', status: 'FEILENDE', antall: 4 },
+  { periodeFra: '2024-06-15T04:00:00', status: 'FEILENDE', antall: 1 },
+  { periodeFra: '2024-06-15T06:00:00', status: 'FEILENDE', antall: 3 },
+]
+
+const mockDatapunkterMedFeilende: TidsserieDatapunkt[] = [...mockDatapunkter, ...feilendeDatapunkter]
+
+export const MedFeilendeStatus: Story = {
+  args: {
+    datapunkter: mockDatapunkterMedFeilende,
+    antallTimer: 24,
+  },
+}
