@@ -427,6 +427,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                   </Table.Header>
                   <Table.Body>
                     {avbrutteBehandlinger.map((avbruttBehandling, idx) => (
+                      // biome-ignore lint/suspicious/noArrayIndexKey: entries lack unique identifiers
                       <Table.Row key={`${avbruttBehandling.opprettet}-${idx}`}>
                         <Table.DataCell>{avbruttBehandling.opprettet}</Table.DataCell>
                         <Table.DataCell>{avbruttBehandling.begrunnelse}</Table.DataCell>
