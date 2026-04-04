@@ -1,6 +1,6 @@
 import { MoonIcon, PersonIcon, SunIcon } from '@navikt/aksel-icons'
 import { ActionMenu, BodyShort, Detail, InternalHeader, Link } from '@navikt/ds-react'
-import { Link as ReactRouterLink } from 'react-router'
+import { Link as ReactRouterLink, useFetcher } from 'react-router'
 import type { MeResponse } from '~/brukere/brukere'
 
 export default function MeMenu({
@@ -12,10 +12,11 @@ export default function MeMenu({
   isDarkmode: boolean
   setIsDarkmode: React.Dispatch<React.SetStateAction<boolean>>
 }) {
+  const cookieFetcher = useFetcher()
+
   function setDarkmode(darkmode: boolean) {
     setIsDarkmode(darkmode)
-    // biome-ignore lint/suspicious/noDocumentCookie: Ønsker å sette en cookie, har foreløpig valgt å ikke bruke et tredjepartsbibliotek
-    document.cookie = `darkmode=${encodeURIComponent(btoa(darkmode.toString()))}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
+    cookieFetcher.submit({ value: darkmode.toString() }, { method: 'POST', action: '/api/set-darkmode' })
   }
 
   return (

@@ -10,7 +10,7 @@ export type Props = {
   darkmode: boolean
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>
   showIconMenu: boolean
-  setShowIconMenu: React.Dispatch<React.SetStateAction<boolean>>
+  setShowIconMenu: (collapsed: boolean) => void
   isMac: boolean
 }
 

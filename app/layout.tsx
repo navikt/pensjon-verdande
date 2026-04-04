@@ -1,6 +1,6 @@
 import { Box, CopyButton, GlobalAlert, HStack, Page, Theme, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { createCookie, isRouteErrorResponse, Outlet, useNavigation } from 'react-router'
+import { createCookie, isRouteErrorResponse, Outlet, useFetcher, useNavigation } from 'react-router'
 import { hentMe } from '~/brukere/brukere.server'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import NavHeader from '~/components/nav-header/NavHeader'
@@ -13,6 +13,8 @@ import IkkeTilgang from './components/feilmelding/IkkeTilgang'
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const darkmodeCookie = await createCookie('darkmode').parse(request.headers.get('cookie'))
   const darkmode = darkmodeCookie === 'true' || darkmodeCookie === true
+  const sidebarCollapsedCookie = await createCookie('sidebar-collapsed').parse(request.headers.get('cookie'))
+  const sidebarCollapsed = sidebarCollapsedCookie === 'true' || sidebarCollapsedCookie === true
   const ua = request.headers.get('User-Agent') ?? ''
   const isMac = /Mac|iPhone|iPad/.test(ua)
 
@@ -23,16 +25,24 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     me: me,
     schedulerStatus: schedulerStatus,
     darkmode: darkmode,
+    sidebarCollapsed: sidebarCollapsed,
     isMac: isMac,
   }
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { env, me, schedulerStatus, darkmode, isMac } = loaderData
+  const { env, me, schedulerStatus, darkmode, sidebarCollapsed, isMac } = loaderData
   const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
-  const [showIconMenu, setShowIconMenu] = useState<boolean>(false)
+  const [showIconMenu, setShowIconMenu] = useState<boolean>(sidebarCollapsed)
   const navigation = useNavigation()
   const isNavigating = navigation.state !== 'idle'
+
+  const cookieFetcher = useFetcher()
+
+  function toggleShowIconMenu(collapsed: boolean) {
+    setShowIconMenu(collapsed)
+    cookieFetcher.submit({ value: collapsed.toString() }, { method: 'POST', action: '/api/set-sidebar-collapsed' })
+  }
 
   const schedulerAlert = schedulerStatus && (
     <>
@@ -90,7 +100,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
             darkmode={isDarkmode}
             setDarkmode={setIsDarkmode}
             showIconMenu={showIconMenu}
-            setShowIconMenu={setShowIconMenu}
+            setShowIconMenu={toggleShowIconMenu}
             isMac={isMac}
           />
 
