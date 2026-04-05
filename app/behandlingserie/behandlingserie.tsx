@@ -504,7 +504,7 @@ function EndreDialog({
               toDate={horisontSlutt}
               disableWeekends={ekskluderHelg}
               disabled={deaktiverteDatoer}
-              onSelect={(d) => setDato(d ?? undefined)}
+              onSelect={(d) => setDato(d)}
             >
               <DatePicker.Input
                 label="Ny dato"
