@@ -48,7 +48,7 @@ export const options: ChartOptions<'bar'> = {
 }
 
 function safeGetItems(entry: AldeFordelingSamboerKontrollpunktBehandlingDto): KontrollpunktElement[] {
-  return (entry.data || entry.data || []) as KontrollpunktElement[]
+  return (entry.data || []) as KontrollpunktElement[]
 }
 
 function parseKontrollpunktToChartData(data: AldeFordelingSamboerKontrollpunktBehandlingDto[]) {

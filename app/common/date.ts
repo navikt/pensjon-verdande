@@ -109,7 +109,7 @@ export function fmtDateTime(iso?: string | null) {
   try {
     return dtf.format(new Date(iso))
   } catch {
-    return iso ?? '–'
+    return iso
   }
 }
 

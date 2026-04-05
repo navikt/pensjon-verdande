@@ -125,11 +125,7 @@ export default function HentOpplysningerFraSkatt({ actionData }: Route.Component
       <BodyShort>Angi sekvensnummer for å lagre inntektene på disse hendelsene manuelt.</BodyShort>
       <Form method="post">
         <VStack gap="space-16" width="20em">
-          <TextField
-            label="Kommaseparert liste med sekvensnr."
-            name="sekvensnr"
-            error={actionData?.error && actionData.error}
-          />
+          <TextField label="Kommaseparert liste med sekvensnr." name="sekvensnr" error={actionData?.error} />
           <Button type="submit" name="action" value={Action.HentSkattehendelserManuelt} disabled={isSubmitting}>
             Kjør
           </Button>
