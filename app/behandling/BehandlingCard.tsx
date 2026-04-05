@@ -857,7 +857,7 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
   const fetcher = useFetcher()
 
   const handleSelect = (d?: Date) => {
-    setDato(d ?? undefined)
+    setDato(d)
     setInputValue(formatDDMMYYYY(d ?? initialDate))
     setInputError(undefined)
   }

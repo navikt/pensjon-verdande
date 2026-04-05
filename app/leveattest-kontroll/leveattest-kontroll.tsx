@@ -125,10 +125,10 @@ function formatIsoDateTimeNo(value: unknown): string | null {
   }).format(dt)
 }
 
-function formatIsoTimeNo(value: unknown): string | null {
-  if (typeof value !== 'string' || value.length < 10) return null
+function formatIsoTimeNo(value: unknown): string | undefined {
+  if (typeof value !== 'string' || value.length < 10) return undefined
   const dt = new Date(value)
-  if (Number.isNaN(dt.getTime())) return null
+  if (Number.isNaN(dt.getTime())) return undefined
   return new Intl.DateTimeFormat('no-NO', { hour: '2-digit', minute: '2-digit' }).format(dt)
 }
 
@@ -732,7 +732,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       .sort((a, b) => b.sokBehandlingId - a.sokBehandlingId)
       .map((s) => {
         const ymd = toYmd(s.behandlingSistKjort) ?? todayYmd()
-        const time = formatIsoTimeNo(s.behandlingSistKjort) ?? undefined
+        const time = formatIsoTimeNo(s.behandlingSistKjort)
 
         const landCodes = s.sokPaaLand.map(validerLandkode).join(', ')
 
@@ -770,7 +770,7 @@ export default function LeveattestKontrollStartside({ loaderData }: Route.Compon
       .sort((a, b) => b.sokBehandlingId - a.sokBehandlingId)
       .map((k) => {
         const ymd = toYmd(k.behandlingSistKjort) ?? todayYmd()
-        const time = formatIsoTimeNo(k.behandlingSistKjort) ?? undefined
+        const time = formatIsoTimeNo(k.behandlingSistKjort)
 
         return {
           id: String(k.sokBehandlingId),

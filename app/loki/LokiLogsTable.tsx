@@ -495,7 +495,7 @@ export default function LokiLogsTable({
         </Button>
       </HStack>
       <HStack as="div" className={styles.tableScroller} wrap={false} align="stretch">
-        <Table className={styles.table} size="small" sort={sort ?? undefined} onSortChange={onSortChange}>
+        <Table className={styles.table} size="small" sort={sort} onSortChange={onSortChange}>
           <BodyShort as="caption" visuallyHidden>
             Loggoppføringer
           </BodyShort>

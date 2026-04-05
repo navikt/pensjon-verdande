@@ -47,10 +47,10 @@ export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
 
   const [beskrivelse, setBeskrivelse] = useState<string>(infobanner.description ?? '')
   const [valgtVariant, setValgtVariant] = useState<InfobannerVariant>(infobanner.variant ?? 'INFO')
-  const [url, setUrl] = useState<string | undefined>(infobanner.url ?? undefined)
-  const [urlText, setUrlText] = useState<string | undefined>(infobanner.urlText ?? undefined)
+  const [url, setUrl] = useState(infobanner.url)
+  const [urlText, setUrlText] = useState(infobanner.urlText)
 
-  const brukUrl = url !== undefined && urlText !== undefined
+  const brukUrl = url !== null && urlText !== null
 
   const enabled = validToDate !== undefined && (isFuture(validToDate) || isToday(validToDate))
 
@@ -82,8 +82,12 @@ export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
           </Switch>
           {brukUrl && (
             <>
-              <TextField label="URL" value={url} onChange={(event) => setUrl(event.target.value)} />
-              <TextField label="Lenketekst" value={urlText} onChange={(event) => setUrlText(event.target.value)} />
+              <TextField label="URL" value={url ?? ''} onChange={(event) => setUrl(event.target.value)} />
+              <TextField
+                label="Lenketekst"
+                value={urlText ?? ''}
+                onChange={(event) => setUrlText(event.target.value)}
+              />
             </>
           )}
 
@@ -139,8 +143,8 @@ export default function InfoBannerPage({ loaderData }: Route.ComponentProps) {
       setUrl(infobanner.url ?? '')
       setUrlText(infobanner.urlText ?? '')
     } else {
-      setUrl(undefined)
-      setUrlText(undefined)
+      setUrl(null)
+      setUrlText(null)
     }
   }
 
