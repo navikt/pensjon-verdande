@@ -1,6 +1,5 @@
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { playwright } from '@vitest/browser-playwright'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
@@ -8,7 +7,9 @@ export default defineConfig({
     projects: [
       // Eksisterende enhetstester (Node)
       {
-        plugins: [tsconfigPaths()],
+        resolve: {
+          tsconfigPaths: true,
+        },
         test: {
           name: 'unit',
           include: ['app/**/*.test.{ts,tsx}'],
@@ -16,7 +17,10 @@ export default defineConfig({
       },
       // Storybook smoke-tester (browser via Playwright)
       {
-        plugins: [tsconfigPaths(), storybookTest({ configDir: '.storybook' })],
+        resolve: {
+          tsconfigPaths: true,
+        },
+        plugins: [storybookTest({ configDir: '.storybook' })],
         test: {
           name: 'storybook',
           browser: {
