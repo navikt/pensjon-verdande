@@ -17,7 +17,7 @@ export function AktivitetChartCard(props: Props) {
   >(props.datapunkter, '/api/aktivitet-per-dag', DEFAULT_ANTALL_TIMER)
 
   return (
-    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
+    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px', minWidth: 0 }}>
       <HStack>
         <BarChartFillIcon title="Aktivitet" fontSize="1.5rem" style={{ verticalAlign: 'middle', marginRight: '6px' }} />
         <BodyShort weight="semibold">Aktivitet</BodyShort>
@@ -33,21 +33,16 @@ export function AktivitetChartCard(props: Props) {
           </Button>
         ))}
       </HStack>
-      {props.chartHeight !== undefined ? (
-        <div
-          style={{
-            position: 'relative',
-            height: `${props.chartHeight}px`,
-            opacity: isLoading ? 0.5 : 1,
-          }}
-        >
-          <AktivitetChart datapunkter={datapunkter} antallTimer={antallTimer} maintainAspectRatio={false} />
-        </div>
-      ) : (
-        <div style={{ opacity: isLoading ? 0.5 : 1 }}>
-          <AktivitetChart datapunkter={datapunkter} antallTimer={antallTimer} />
-        </div>
-      )}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          ...(props.chartHeight !== undefined ? { height: `${props.chartHeight}px` } : { aspectRatio: '2 / 1' }),
+          opacity: isLoading ? 0.5 : 1,
+        }}
+      >
+        <AktivitetChart datapunkter={datapunkter} antallTimer={antallTimer} maintainAspectRatio={false} />
+      </div>
     </Box>
   )
 }
