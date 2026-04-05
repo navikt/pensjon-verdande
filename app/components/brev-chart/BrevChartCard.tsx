@@ -17,7 +17,7 @@ export function BrevChartCard(props: Props) {
   >(props.datapunkter, '/api/brev-per-periode', DEFAULT_ANTALL_TIMER)
 
   return (
-    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px' }}>
+    <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '6px', minWidth: 0 }}>
       <HStack>
         <EnvelopeClosedFillIcon
           title="Brev opprettet"
@@ -37,21 +37,16 @@ export function BrevChartCard(props: Props) {
           </Button>
         ))}
       </HStack>
-      {props.chartHeight !== undefined ? (
-        <div
-          style={{
-            position: 'relative',
-            height: `${props.chartHeight}px`,
-            opacity: isLoading ? 0.5 : 1,
-          }}
-        >
-          <BrevChart datapunkter={datapunkter} antallTimer={antallTimer} maintainAspectRatio={false} />
-        </div>
-      ) : (
-        <div style={{ opacity: isLoading ? 0.5 : 1 }}>
-          <BrevChart datapunkter={datapunkter} antallTimer={antallTimer} />
-        </div>
-      )}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          ...(props.chartHeight !== undefined ? { height: `${props.chartHeight}px` } : { aspectRatio: '2 / 1' }),
+          opacity: isLoading ? 0.5 : 1,
+        }}
+      >
+        <BrevChart datapunkter={datapunkter} antallTimer={antallTimer} maintainAspectRatio={false} />
+      </div>
     </Box>
   )
 }
