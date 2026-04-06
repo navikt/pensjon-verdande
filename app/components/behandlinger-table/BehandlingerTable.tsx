@@ -195,7 +195,12 @@ export default function BehandlingerTable({
   }
 
   return (
-    <Box background={'default'} style={{ padding: '6px' }} borderRadius="4" shadow="dialog">
+    <Box
+      background={'default'}
+      style={{ padding: '6px', minWidth: 0, maxWidth: '100%' }}
+      borderRadius="4"
+      shadow="dialog"
+    >
       {visTidsperiodeSoek && (
         <HStack gap="space-16" align="end" style={{ padding: '8px 6px' }}>
           <DatePicker {...datepickerProps}>
@@ -206,156 +211,161 @@ export default function BehandlingerTable({
           </DatePicker>
         </HStack>
       )}
-      <Table
-        size={'medium'}
-        onSortChange={onSortChange}
-        sort={{
-          direction: sortDecending === 'desc' ? 'descending' : 'ascending',
-          orderBy: sortKey as string,
-        }}
-        zebraStripes
-      >
-        <BodyShort as="caption" visuallyHidden>
-          Behandlinger
-        </BodyShort>
-        <Table.Header>
-          <Table.Row>
-            {inkluderFortsett && (
-              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '4rem' }}>
-                Velg
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG scrollable-region-focusable requires tabindex on scrollable regions */}
+      <section style={{ overflowX: 'auto', minWidth: 0 }} tabIndex={0} aria-label="Behandlinger">
+        <Table
+          size={'medium'}
+          onSortChange={onSortChange}
+          sort={{
+            direction: sortDecending === 'desc' ? 'descending' : 'ascending',
+            orderBy: sortKey as string,
+          }}
+          zebraStripes
+        >
+          <BodyShort as="caption" visuallyHidden>
+            Behandlinger
+          </BodyShort>
+          <Table.Header>
+            <Table.Row>
+              {inkluderFortsett && (
+                <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '4rem' }}>
+                  Velg
+                </Table.ColumnHeader>
+              )}
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '7rem' }}>
+                Id
               </Table.ColumnHeader>
-            )}
-            <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '7rem' }}>
-              Id
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="class"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '30rem' }}
-            >
-              Type
-            </Table.ColumnHeader>
-            <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '8rem' }}>
-              Ansvarlig team
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="opprettet"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Opprettet
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="sisteKjoring"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Siste kjøring
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="utsattTil"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Utsatt til
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="planlagtStartet"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Planlagt startet
-            </Table.ColumnHeader>
-            {visStatusSoek && (
               <Table.ColumnHeader
                 sortable
-                sortKey="status"
-                style={{ borderBottomWidth: 0, paddingBottom: 0, width: '14rem' }}
+                sortKey="class"
+                style={{ borderBottomWidth: 0, paddingBottom: 0, width: '30rem' }}
               >
-                Status
+                Type
               </Table.ColumnHeader>
-            )}
-            <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>Feilmelding</Table.ColumnHeader>
-          </Table.Row>
-          <Table.Row>
-            {inkluderFortsett && (
-              <Table.DataCell style={{ paddingTop: 0 }}>
-                <Checkbox
-                  checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
-                  disabled={behandlingerResponse.content.filter((it) => it.utsattTil != null).length === 0}
-                  indeterminate={
-                    valgteBehandlingIder.length > 0 &&
-                    valgteBehandlingIder.length !== behandlingerResponse.content.length
-                  }
-                  onChange={() => {
-                    valgteBehandlingIder.length
-                      ? setValgteBehandlingIder([])
-                      : setValgteBehandlingIder(
-                          behandlingerResponse.content
-                            .filter((it) => it.utsattTil != null)
-                            .map(({ behandlingId }) => behandlingId),
-                        )
-                  }}
-                  hideLabel
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '8rem' }}>
+                Ansvarlig team
+              </Table.ColumnHeader>
+              <Table.ColumnHeader
+                sortable
+                sortKey="opprettet"
+                style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
+              >
+                Opprettet
+              </Table.ColumnHeader>
+              <Table.ColumnHeader
+                sortable
+                sortKey="sisteKjoring"
+                style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
+              >
+                Siste kjøring
+              </Table.ColumnHeader>
+              <Table.ColumnHeader
+                sortable
+                sortKey="utsattTil"
+                style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
+              >
+                Utsatt til
+              </Table.ColumnHeader>
+              <Table.ColumnHeader
+                sortable
+                sortKey="planlagtStartet"
+                style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
+              >
+                Planlagt startet
+              </Table.ColumnHeader>
+              {visStatusSoek && (
+                <Table.ColumnHeader
+                  sortable
+                  sortKey="status"
+                  style={{ borderBottomWidth: 0, paddingBottom: 0, width: '14rem' }}
                 >
-                  Velg alle rader
-                </Checkbox>
+                  Status
+                </Table.ColumnHeader>
+              )}
+              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>Feilmelding</Table.ColumnHeader>
+            </Table.Row>
+            <Table.Row>
+              {inkluderFortsett && (
+                <Table.DataCell style={{ paddingTop: 0 }}>
+                  <Checkbox
+                    checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
+                    disabled={behandlingerResponse.content.filter((it) => it.utsattTil != null).length === 0}
+                    indeterminate={
+                      valgteBehandlingIder.length > 0 &&
+                      valgteBehandlingIder.length !== behandlingerResponse.content.length
+                    }
+                    onChange={() => {
+                      valgteBehandlingIder.length
+                        ? setValgteBehandlingIder([])
+                        : setValgteBehandlingIder(
+                            behandlingerResponse.content
+                              .filter((it) => it.utsattTil != null)
+                              .map(({ behandlingId }) => behandlingId),
+                          )
+                    }}
+                    hideLabel
+                  >
+                    Velg alle rader
+                  </Checkbox>
+                </Table.DataCell>
+              )}
+              <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}>
+                {visBehandlingTypeSoek && behandlingtypeOptions()}
               </Table.DataCell>
-            )}
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}>
-              {visBehandlingTypeSoek && behandlingtypeOptions()}
-            </Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}>{visAnsvarligTeamSoek && ansvarligTeamOptions()}</Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            {visStatusSoek && <Table.DataCell style={{ paddingTop: 0 }}>{statusOptions()}</Table.DataCell>}
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {behandlingerResponse.content?.map((it: BehandlingDto) => {
-            return (
-              <Table.Row key={it.behandlingId} selected={valgteBehandlingIder.includes(it.behandlingId)}>
-                {inkluderFortsett && (
-                  <Table.DataCell align="center">
-                    <Checkbox
-                      hideLabel
-                      disabled={it.status === 'FULLFORT' || it.status === 'STOPPET'}
-                      checked={valgteBehandlingIder.includes(it.behandlingId)}
-                      onChange={() => toggleSelectedRow(it.behandlingId)}
-                      aria-labelledby={`id-${it.behandlingId}`}
-                    >
-                      Velg behandling
-                    </Checkbox>
-                  </Table.DataCell>
-                )}
-                <Table.DataCell>
-                  <Link to={`/behandling/${it.behandlingId}`}>{it.behandlingId}</Link>
-                </Table.DataCell>
-                <Table.DataCell>{decodeBehandling(it.type)}</Table.DataCell>
-                <Table.DataCell>{decodeTeam(it.ansvarligTeam)}</Table.DataCell>
-                <Table.DataCell>{formatIsoTimestamp(it.opprettet)}</Table.DataCell>
-                <Table.DataCell>{formatIsoTimestamp(it.sisteKjoring)}</Table.DataCell>
-                <Table.DataCell>{formatIsoTimestamp(it.utsattTil)}</Table.DataCell>
-                <Table.DataCell>{formatIsoTimestamp(it.planlagtStartet)}</Table.DataCell>
-                {visStatusSoek && (
+              <Table.DataCell style={{ paddingTop: 0 }}>
+                {visAnsvarligTeamSoek && ansvarligTeamOptions()}
+              </Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
+              <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
+              {visStatusSoek && <Table.DataCell style={{ paddingTop: 0 }}>{statusOptions()}</Table.DataCell>}
+              <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {behandlingerResponse.content?.map((it: BehandlingDto) => {
+              return (
+                <Table.Row key={it.behandlingId} selected={valgteBehandlingIder.includes(it.behandlingId)}>
+                  {inkluderFortsett && (
+                    <Table.DataCell align="center">
+                      <Checkbox
+                        hideLabel
+                        disabled={it.status === 'FULLFORT' || it.status === 'STOPPET'}
+                        checked={valgteBehandlingIder.includes(it.behandlingId)}
+                        onChange={() => toggleSelectedRow(it.behandlingId)}
+                        aria-labelledby={`id-${it.behandlingId}`}
+                      >
+                        Velg behandling
+                      </Checkbox>
+                    </Table.DataCell>
+                  )}
                   <Table.DataCell>
-                    <Tag size="small" variant={decodeBehandlingStatusToVariant(it.status)}>
-                      {decodeBehandlingStatus(it.status)}
-                    </Tag>
+                    <Link to={`/behandling/${it.behandlingId}`}>{it.behandlingId}</Link>
                   </Table.DataCell>
-                )}
-                <Table.DataCell title={it.feilmelding ? `${it.behandlingId}\n${it.feilmelding}` : undefined}>
-                  <div className={styles.feilmeldingKolonne}>{it.feilmelding}</div>
-                </Table.DataCell>
-              </Table.Row>
-            )
-          })}
-        </Table.Body>
-      </Table>
+                  <Table.DataCell>{decodeBehandling(it.type)}</Table.DataCell>
+                  <Table.DataCell>{decodeTeam(it.ansvarligTeam)}</Table.DataCell>
+                  <Table.DataCell>{formatIsoTimestamp(it.opprettet)}</Table.DataCell>
+                  <Table.DataCell>{formatIsoTimestamp(it.sisteKjoring)}</Table.DataCell>
+                  <Table.DataCell>{formatIsoTimestamp(it.utsattTil)}</Table.DataCell>
+                  <Table.DataCell>{formatIsoTimestamp(it.planlagtStartet)}</Table.DataCell>
+                  {visStatusSoek && (
+                    <Table.DataCell>
+                      <Tag size="small" variant={decodeBehandlingStatusToVariant(it.status)}>
+                        {decodeBehandlingStatus(it.status)}
+                      </Tag>
+                    </Table.DataCell>
+                  )}
+                  <Table.DataCell title={it.feilmelding ? `${it.behandlingId}\n${it.feilmelding}` : undefined}>
+                    <div className={styles.feilmeldingKolonne}>{it.feilmelding}</div>
+                  </Table.DataCell>
+                </Table.Row>
+              )
+            })}
+          </Table.Body>
+        </Table>
+      </section>
       <HStack align="center" marginBlock="space-16">
         {inkluderFortsett && (
           <Button

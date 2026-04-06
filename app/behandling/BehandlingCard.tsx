@@ -520,7 +520,7 @@ export default function BehandlingCard(props: Props) {
               padding={'space-16'}
             >
               <VStack gap={'space-24'}>
-                <HGrid columns={{ md: 2, lg: 3 }} gap="space-24">
+                <HGrid columns={{ xs: 1, md: 2, lg: 3 }} gap="space-24">
                   <Entry labelText={'Status'}>
                     <Tag variant={decodeBehandlingStatusToVariant(props.behandling.status)}>
                       {decodeBehandlingStatus(props.behandling.status)}
@@ -566,7 +566,7 @@ export default function BehandlingCard(props: Props) {
                   </Suspense>
                 </HGrid>
 
-                <HGrid columns={{ md: 1, lg: 2, xl: props.detaljertFremdrift != null ? 2 : 3 }} gap="space-16">
+                <HGrid columns={{ xs: 1, md: 1, lg: 2, xl: props.detaljertFremdrift != null ? 2 : 3 }} gap="space-16">
                   <Box background={'neutral-softA'} borderRadius={'8'} padding={'space-16'}>
                     <VStack gap={'space-12'}>
                       <Heading size="xsmall" as="h3">
@@ -643,7 +643,10 @@ export default function BehandlingCard(props: Props) {
                       <Heading size="xsmall" as="h3">
                         Parametere
                       </Heading>
-                      <HGrid columns={{ md: 2, lg: 3, xl: props.detaljertFremdrift != null ? 3 : 4 }} gap="space-24">
+                      <HGrid
+                        columns={{ xs: 1, md: 2, lg: 3, xl: props.detaljertFremdrift != null ? 3 : 4 }}
+                        gap="space-24"
+                      >
                         {filtrerteParametere.map(([key, value]) => (
                           <Entry key={key} labelText={key}>
                             {value as string}

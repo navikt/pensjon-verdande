@@ -59,6 +59,7 @@ export const BehandlingslosningenAvslaatt: Story = {
           me: mockMeResponse(),
           schedulerStatus: { schedulerEnabled: false, schedulerLocal: false },
           darkmode: false,
+          sidebarCollapsed: true,
         }),
       },
     ])

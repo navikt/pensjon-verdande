@@ -119,24 +119,27 @@ export default function Kalender(props: Props) {
           </HStack>
         </HStack>
       </Heading>
-      <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed' }}>
-        <thead>
-          <tr>
-            {weekdays.map((day) => (
-              <th key={day} style={{ textAlign: 'right', width: 'calc(100% / 7)', maxWidth: 'calc(100% / 7)' }}>
-                {day}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {[0, 1, 2, 3, 4, 5, 6].map((row) => (
-            <tr key={`rad:${row}`} style={{ height: '8em', verticalAlign: 'top' }}>
-              {[...Array(7)].map((_, colIdx) => dag(colIdx, row))}
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG scrollable-region-focusable requires tabindex on scrollable regions */}
+      <section style={{ overflowX: 'auto' }} tabIndex={0} aria-label="Kalendervisning">
+        <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed', minWidth: 600 }}>
+          <thead>
+            <tr>
+              {weekdays.map((day) => (
+                <th key={day} style={{ textAlign: 'right', width: 'calc(100% / 7)', maxWidth: 'calc(100% / 7)' }}>
+                  {day}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {[0, 1, 2, 3, 4, 5, 6].map((row) => (
+              <tr key={`rad:${row}`} style={{ height: '8em', verticalAlign: 'top' }}>
+                {[...Array(7)].map((_, colIdx) => dag(colIdx, row))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </Box>
   )
 }

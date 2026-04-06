@@ -11,4 +11,6 @@ node_modules
 .zed/
 storybook-static/
 screenshots/
+.vitest-attachments/
 *.swp
+app/__screenshots__

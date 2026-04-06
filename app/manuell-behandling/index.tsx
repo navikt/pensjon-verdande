@@ -398,7 +398,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
         <BodyShort>Tabellen viser opptelling av antall oppgaver som er opprettet av behandlingene</BodyShort>
 
         <HStack gap="space-24" align="start" wrap>
-          <VStack gap="space-16" style={{ flex: 1, minWidth: 420 }}>
+          <VStack gap="space-16" style={{ flex: 1, minWidth: 0 }}>
             <Box padding="space-12" borderRadius="8" borderWidth="1" borderColor="neutral-subtleA">
               <HStack gap="space-12" align="end" wrap>
                 <DatePicker {...datepickerProps}>
@@ -461,99 +461,107 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
             </HStack>
 
             {groupBy.length === 0 ? (
-              <Table size="small" zebraStripes>
-                <BodyShort as="caption" visuallyHidden>
-                  Manuelle oppgaver
-                </BodyShort>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
-                    <Table.HeaderCell>Kategori</Table.HeaderCell>
-                    <Table.HeaderCell>Fagområde</Table.HeaderCell>
-                    <Table.HeaderCell>Oppgavekode</Table.HeaderCell>
-                    <Table.HeaderCell>Underkategori</Table.HeaderCell>
-                    <Table.HeaderCell>Prioritet</Table.HeaderCell>
-                    <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
-                    <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
-                    <Table.ColumnHeader />
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {filtered
-                    .slice()
-                    .sort((a, b) => b.antall - a.antall)
-                    .map((r) => (
-                      <Table.Row key={rowKey(r)}>
-                        <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
-                        <Table.DataCell>
-                          <VStack gap="space-4">
-                            <span>{r.kategoriDecode}</span>
-                            <BodyShort size="small" as="span" textColor="subtle">
-                              {r.kategori}
-                            </BodyShort>
-                          </VStack>
-                        </Table.DataCell>
-                        <Table.DataCell>{r.fagomrade}</Table.DataCell>
-                        <Table.DataCell>{decodeOppgaveKode(r.oppgaveKode)}</Table.DataCell>
-                        <Table.DataCell>
-                          {r.underkategoriKode ? decodeUnderkategoriKode(r.underkategoriKode) : manglendeVerdi}
-                        </Table.DataCell>
-                        <Table.DataCell>
-                          {r.prioritetKode ? (
-                            <Tag size="small" variant={priorityVariant(r.prioritetKode)}>
-                              {decodeOppgavePrioritet(r.prioritetKode)}
-                            </Tag>
-                          ) : (
-                            <span>{manglendeVerdi}</span>
-                          )}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG scrollable-region-focusable requires tabindex on scrollable regions
+              <section style={{ overflowX: 'auto' }} tabIndex={0} aria-label="Manuelle oppgaver">
+                <Table size="small" zebraStripes>
+                  <BodyShort as="caption" visuallyHidden>
+                    Manuelle oppgaver
+                  </BodyShort>
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.HeaderCell>Behandlingstype</Table.HeaderCell>
+                      <Table.HeaderCell>Kategori</Table.HeaderCell>
+                      <Table.HeaderCell>Fagområde</Table.HeaderCell>
+                      <Table.HeaderCell>Oppgavekode</Table.HeaderCell>
+                      <Table.HeaderCell>Underkategori</Table.HeaderCell>
+                      <Table.HeaderCell>Prioritet</Table.HeaderCell>
+                      <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
+                      <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
+                      <Table.ColumnHeader />
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {filtered
+                      .slice()
+                      .sort((a, b) => b.antall - a.antall)
+                      .map((r) => (
+                        <Table.Row key={rowKey(r)}>
+                          <Table.DataCell>{decodeBehandling(r.behandlingType)}</Table.DataCell>
+                          <Table.DataCell>
+                            <VStack gap="space-4">
+                              <span>{r.kategoriDecode}</span>
+                              <BodyShort size="small" as="span" textColor="subtle">
+                                {r.kategori}
+                              </BodyShort>
+                            </VStack>
+                          </Table.DataCell>
+                          <Table.DataCell>{r.fagomrade}</Table.DataCell>
+                          <Table.DataCell>{decodeOppgaveKode(r.oppgaveKode)}</Table.DataCell>
+                          <Table.DataCell>
+                            {r.underkategoriKode ? decodeUnderkategoriKode(r.underkategoriKode) : manglendeVerdi}
+                          </Table.DataCell>
+                          <Table.DataCell>
+                            {r.prioritetKode ? (
+                              <Tag size="small" variant={priorityVariant(r.prioritetKode)}>
+                                {decodeOppgavePrioritet(r.prioritetKode)}
+                              </Tag>
+                            ) : (
+                              <span>{manglendeVerdi}</span>
+                            )}
+                          </Table.DataCell>
+                          <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                            {r.antall.toLocaleString('nb-NO')}
+                          </Table.DataCell>
+                          <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                            {((r.antall * 100) / total).toFixed(1)} %
+                          </Table.DataCell>
+                          <Table.DataCell>
+                            <ManuellBehandlingActionMenu />
+                          </Table.DataCell>
+                        </Table.Row>
+                      ))}
+                  </Table.Body>
+                </Table>
+              </section>
+            ) : (
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG scrollable-region-focusable requires tabindex on scrollable regions
+              <section style={{ overflowX: 'auto' }} tabIndex={0} aria-label="Grupperte manuelle oppgaver">
+                <Table size="small" zebraStripes>
+                  <BodyShort as="caption" visuallyHidden>
+                    Grupperte manuelle oppgaver
+                  </BodyShort>
+                  <Table.Header>
+                    <Table.Row>
+                      {groupBy.map((g) => (
+                        <Table.HeaderCell key={`h-${g}`}>{facetLabel(g)}</Table.HeaderCell>
+                      ))}
+                      <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
+                      <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
+                      <Table.ColumnHeader />
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {grouped.map((gr) => (
+                      <Table.Row key={`gr-${gr.groupKey}`}>
+                        {groupBy.map((g) => (
+                          <Table.DataCell key={`c-${gr.groupKey}-${g}`}>
+                            {gr.labels[g] ?? manglendeVerdi}
+                          </Table.DataCell>
+                        ))}
+                        <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
+                          {gr.antall.toLocaleString('nb-NO')}
                         </Table.DataCell>
                         <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
-                          {r.antall.toLocaleString('nb-NO')}
-                        </Table.DataCell>
-                        <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
-                          {((r.antall * 100) / total).toFixed(1)} %
+                          {((gr.antall * 100) / total).toFixed(1)} %
                         </Table.DataCell>
                         <Table.DataCell>
                           <ManuellBehandlingActionMenu />
                         </Table.DataCell>
                       </Table.Row>
                     ))}
-                </Table.Body>
-              </Table>
-            ) : (
-              <Table size="small" zebraStripes>
-                <BodyShort as="caption" visuallyHidden>
-                  Grupperte manuelle oppgaver
-                </BodyShort>
-                <Table.Header>
-                  <Table.Row>
-                    {groupBy.map((g) => (
-                      <Table.HeaderCell key={`h-${g}`}>{facetLabel(g)}</Table.HeaderCell>
-                    ))}
-                    <Table.HeaderCell style={{ textAlign: 'right' }}>Antall</Table.HeaderCell>
-                    <Table.HeaderCell style={{ textAlign: 'right' }}>Andel</Table.HeaderCell>
-                    <Table.ColumnHeader />
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {grouped.map((gr) => (
-                    <Table.Row key={`gr-${gr.groupKey}`}>
-                      {groupBy.map((g) => (
-                        <Table.DataCell key={`c-${gr.groupKey}-${g}`}>{gr.labels[g] ?? manglendeVerdi}</Table.DataCell>
-                      ))}
-                      <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
-                        {gr.antall.toLocaleString('nb-NO')}
-                      </Table.DataCell>
-                      <Table.DataCell style={{ textAlign: 'right', fontFamily: 'monospace' }}>
-                        {((gr.antall * 100) / total).toFixed(1)} %
-                      </Table.DataCell>
-                      <Table.DataCell>
-                        <ManuellBehandlingActionMenu />
-                      </Table.DataCell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
+                  </Table.Body>
+                </Table>
+              </section>
             )}
           </VStack>
         </HStack>
@@ -561,7 +569,7 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
         <HStack justify="end">
           <Button
             size="small"
-            icon={<DownloadIcon />}
+            icon={<DownloadIcon aria-hidden />}
             as="a"
             href={`/manuell-behandling-uttrekk?${searchParams.toString()}`}
             target="_blank"

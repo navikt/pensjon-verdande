@@ -10,7 +10,7 @@ export default function IkkeTilgang(props: Props) {
     <div
       style={{
         paddingBlock: '5rem',
-        paddingInline: '0.25rem',
+        paddingInline: '1rem',
         display: 'grid',
         placeContent: 'center',
         textAlign: 'center',
@@ -19,9 +19,7 @@ export default function IkkeTilgang(props: Props) {
       <img
         src="/heimdal-403.png"
         alt="403 ikke tilgang til operasjon"
-        width={420}
-        height={510}
-        style={{ marginLeft: '87' }}
+        style={{ maxWidth: '100%', height: 'auto', marginLeft: 'auto', marginRight: 'auto' }}
       />
       <Heading level="1" size="large">
         403
