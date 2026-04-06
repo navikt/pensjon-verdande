@@ -41,8 +41,8 @@ import { Await, NavLink, Outlet, useFetcher, useLocation, useNavigate } from 're
 import { OPERATION } from '~/behandling/behandling.$behandlingId'
 import type { MeResponse } from '~/brukere/brukere'
 import { formatIsoTimestamp } from '~/common/date'
-import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
-import { decodeBehandling } from '~/common/decodeBehandling'
+import { decodeAldeBehandlingState, decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
+import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import type { Team } from '~/common/decodeTeam'
 import { linkifyText } from '~/common/linkifyText'
 import { replaceTemplates } from '~/common/replace-templates'
@@ -527,6 +527,18 @@ export default function BehandlingCard(props: Props) {
                       {decodeBehandlingStatus(props.behandling.status)}
                     </Tag>
                   </Entry>
+                  {props.behandling.nesteAktivitetType && (
+                    <Entry labelText={'Neste aktivitet'}>
+                      <HStack gap="space-8" align="center" wrap={false}>
+                        <span>{decodeAktivitet(props.behandling.nesteAktivitetType)}</span>
+                        {props.behandling.nesteAktivitetAldeState && (
+                          <Tag size="small" data-color="meta-purple" variant="outline" style={{ whiteSpace: 'nowrap' }}>
+                            {decodeAldeBehandlingState(props.behandling.nesteAktivitetAldeState)}
+                          </Tag>
+                        )}
+                      </HStack>
+                    </Entry>
+                  )}
                   <Suspense
                     fallback={
                       <Entry labelText={'Fremdrift'}>
