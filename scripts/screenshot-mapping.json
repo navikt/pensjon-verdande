@@ -97,6 +97,11 @@
       "storyId": "fullpage--dashboard-deaktiverte-behandlinger-fullpage",
       "filename": "verdande-dashboard-deaktiverte-behandlinger.png",
       "description": "Dashboard med GlobalAlert for deaktiverte behandlingstyper"
+    },
+    {
+      "storyId": "fullpage--sokedialog-fullpage",
+      "filename": "verdande-sokedialog.png",
+      "description": "Søkedialog med resultater"
     }
   ]
 }
