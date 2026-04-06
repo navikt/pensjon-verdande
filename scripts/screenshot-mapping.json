@@ -14,11 +14,6 @@
       "description": "Kalender med kjørte og planlagte batch-behandlinger"
     },
     {
-      "storyId": "fullpage--sok-fullpage",
-      "filename": "verdande-sok.png",
-      "description": "Søkeresultater for behandlinger"
-    },
-    {
       "storyId": "fullpage--behandling-fullpage",
       "filename": "verdande-behandling.png",
       "description": "Behandlingsdetaljer med aktiviteter og historikk"
