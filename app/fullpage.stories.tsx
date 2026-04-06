@@ -217,8 +217,9 @@ export const BehandlingUnderBehandlingFullpage: Story = {
           parametere: {
             behandlingType: 'DEL_AUTO',
             onsketVirkningsdato: '2026-07-01',
-            nesteAktivitet: 'FleksibelApSakA412VentPaaKompletteringAvGrunnlagAktivitet',
           },
+          nesteAktivitetType: 'FleksibelApSakA412VentPaaKompletteringAvGrunnlagAktivitet',
+          nesteAktivitetAldeState: 'MANUELL_BEHANDLING',
           erAldeBehandling: true,
           _links: {
             fortsett: { href: '#', type: 'POST' },
@@ -257,8 +258,9 @@ export const BehandlingMedAlleKnapperFullpage: Story = {
           parametere: {
             behandlingType: 'AUTO',
             onsketVirkningsdato: '2026-03-01',
-            nesteAktivitet: 'FleksibelApSakA406VurderSamboerAktivitet',
           },
+          nesteAktivitetType: 'FleksibelApSakA406VurderSamboerAktivitet',
+          nesteAktivitetAldeState: 'PROSESSER_VURDERING',
           erAldeBehandling: true,
           muligeKontrollpunkt: [
             { kontrollpunkt: 'SAMBOER', decode: 'Samboerskap' },
