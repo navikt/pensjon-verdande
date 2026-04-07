@@ -521,7 +521,6 @@ export default function BehandlingCard(props: Props) {
             >
               <VStack gap={'space-24'}>
                 <HGrid columns={{ md: 2, lg: 3 }} gap="space-24">
-                  {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
                   <Entry labelText={'Status'}>
                     <Tag variant={decodeBehandlingStatusToVariant(props.behandling.status)}>
                       {decodeBehandlingStatus(props.behandling.status)}
@@ -599,6 +598,7 @@ export default function BehandlingCard(props: Props) {
                       <Heading size="xsmall" as="h3">
                         Identifikatorer
                       </Heading>
+                      {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
                       {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
                       {copyPasteEntry('SakId', props.behandling.sakId)}
                       {copyPasteEntry('KravId', props.behandling.kravId)}
