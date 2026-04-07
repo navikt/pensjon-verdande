@@ -78,7 +78,6 @@ for (const [moduleName, importFn] of Object.entries(storyModules)) {
           }
 
           await page.viewport(1280, 720)
-          cleanup()
         })
       }
     }
