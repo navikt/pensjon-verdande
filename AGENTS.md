@@ -245,7 +245,7 @@ npm run test:responsive  # Viewport-testing i 3 størrelser (desktop/tablet/mobi
 ```
 
 - `test:stories` kjører axe-core mot alle Storybook-stories automatisk
-- `test:responsive` rendrer fase 1-sider i tre viewports og sjekker for overflow og WCAG-brudd
+- `test:responsive` rendrer fase 1-sider i tre viewports og sjekker for horisontal overflow
 - Stories kan tagges med `a11y-skip` for å hoppe over axe-sjekk (midlertidig, for kjente mangler)
 
 ## Decode av verdier (status, type, m.m.)
