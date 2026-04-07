@@ -63,18 +63,50 @@ for (const [moduleName, importFn] of Object.entries(storyModules)) {
           const clientWidth = document.documentElement.clientWidth
 
           if (scrollWidth > clientWidth + 1) {
-            // Page overflows — check if all overflow is inside intentional scroll
-            // containers (section with aria-label and overflowX: auto). In production,
-            // these are constrained by the Layout flex container. In test context
-            // (without Layout), they still correctly scroll their content.
-            const scrollContainers = container.querySelectorAll<HTMLElement>('section[aria-label]')
-            const hasScrollContainer = Array.from(scrollContainers).some((el) => el.scrollWidth > el.clientWidth)
+            // Find the nearest horizontal scroll container for an element
+            const getHorizontalScrollContainer = (el: HTMLElement) => {
+              let current = el.parentElement
+
+              while (current && container.contains(current)) {
+                const { overflowX } = window.getComputedStyle(current)
+                const isScrollable = overflowX === 'auto' || overflowX === 'scroll'
+
+                if (isScrollable && current.scrollWidth > current.clientWidth + 1) {
+                  return current
+                }
+
+                current = current.parentElement
+              }
+
+              return null
+            }
+
+            const overflowingElements = Array.from(container.querySelectorAll<HTMLElement>('*')).filter((el) => {
+              const rect = el.getBoundingClientRect()
+              return rect.width > 0 && rect.right > clientWidth + 1
+            })
+
+            const uncontainedOverflowingElements = overflowingElements.filter(
+              (el) => getHorizontalScrollContainer(el) === null,
+            )
 
             expect(
-              hasScrollContainer,
+              uncontainedOverflowingElements,
               `Uncontained horizontal overflow at ${vp.width}px: scrollWidth=${scrollWidth} > clientWidth=${clientWidth}. ` +
-                'Content overflows without a scroll container.',
-            ).toBe(true)
+                `Overflowing elements without a horizontal scroll container: ${
+                  uncontainedOverflowingElements
+                    .map((el) => {
+                      const label = el.getAttribute('aria-label')
+                      const testId = el.getAttribute('data-testid')
+                      return [
+                        el.tagName.toLowerCase(),
+                        label ? `[aria-label="${label}"]` : '',
+                        testId ? `[data-testid="${testId}"]` : '',
+                      ].join('')
+                    })
+                    .join(', ') || 'unknown'
+                }`,
+            ).toHaveLength(0)
           }
 
           await page.viewport(1280, 720)
