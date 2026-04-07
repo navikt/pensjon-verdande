@@ -80,6 +80,8 @@ export function renderWithLayout<T>(
     me?: Partial<MeResponse>
     env?: string
     schedulerStatus?: { schedulerEnabled: boolean; schedulerLocal: boolean; deaktiverteBehandlingstyper?: string[] }
+    // biome-ignore lint/suspicious/noExplicitAny: Extra routes have varying shapes
+    extraRoutes?: Array<{ path: string; action?: () => any; loader?: () => any }>
   },
 ) {
   const path = options?.path ?? '/'
@@ -125,6 +127,7 @@ export function renderWithLayout<T>(
         },
       ],
     },
+    ...(options?.extraRoutes ?? []),
   ])
   return <Stub initialEntries={[options?.initialEntry ?? path]} />
 }

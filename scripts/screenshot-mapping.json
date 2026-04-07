@@ -14,11 +14,6 @@
       "description": "Kalender med kjørte og planlagte batch-behandlinger"
     },
     {
-      "storyId": "fullpage--sok-fullpage",
-      "filename": "verdande-sok.png",
-      "description": "Søkeresultater for behandlinger"
-    },
-    {
       "storyId": "fullpage--behandling-fullpage",
       "filename": "verdande-behandling.png",
       "description": "Behandlingsdetaljer med aktiviteter og historikk"
@@ -102,6 +97,11 @@
       "storyId": "fullpage--dashboard-deaktiverte-behandlinger-fullpage",
       "filename": "verdande-dashboard-deaktiverte-behandlinger.png",
       "description": "Dashboard med GlobalAlert for deaktiverte behandlingstyper"
+    },
+    {
+      "storyId": "fullpage--sokedialog-fullpage",
+      "filename": "verdande-sokedialog.png",
+      "description": "Søkedialog med resultater"
     }
   ]
 }

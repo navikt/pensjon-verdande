@@ -66,6 +66,9 @@ export type BehandlingDto = {
 
   erAldeBehandling?: boolean
 
+  nesteAktivitetType?: string | null
+  nesteAktivitetAldeState?: AldeBehandlingState | null
+
   _links?: HalLinks
 }
 

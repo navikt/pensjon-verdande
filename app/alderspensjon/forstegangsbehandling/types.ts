@@ -6,7 +6,7 @@ export type AldeBehandlingStatus = 'VENTER_SAKSBEHANDLER' | 'VENTER_MASKINELL' |
 
 export type AldeBehandlingState =
   | 'HENT_GRUNNLAG'
-  | 'PROSSESER_GRUNNLAG'
+  | 'PROSESSER_GRUNNLAG'
   | 'MANUELL_BEHANDLING'
   | 'PROSESSER_VURDERING'
   | 'SKIPPED'

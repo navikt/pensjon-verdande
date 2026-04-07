@@ -6,6 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import type React from 'react'
 import { createRoutesStub } from 'react-router'
 import type { KalenderHendelser } from '~/components/kalender/types'
+import SearchDialog from '~/components/nav-header/SearchDialog'
 import Layout from '~/layout'
 import {
   mockBehandlingDto,
@@ -217,8 +218,9 @@ export const BehandlingUnderBehandlingFullpage: Story = {
           parametere: {
             behandlingType: 'DEL_AUTO',
             onsketVirkningsdato: '2026-07-01',
-            nesteAktivitet: 'FleksibelApSakA412VentPaaKompletteringAvGrunnlagAktivitet',
           },
+          nesteAktivitetType: 'FleksibelApSakA412VentPaaKompletteringAvGrunnlagAktivitet',
+          nesteAktivitetAldeState: 'MANUELL_BEHANDLING',
           erAldeBehandling: true,
           _links: {
             fortsett: { href: '#', type: 'POST' },
@@ -257,8 +259,9 @@ export const BehandlingMedAlleKnapperFullpage: Story = {
           parametere: {
             behandlingType: 'AUTO',
             onsketVirkningsdato: '2026-03-01',
-            nesteAktivitet: 'FleksibelApSakA406VurderSamboerAktivitet',
           },
+          nesteAktivitetType: 'FleksibelApSakA406VurderSamboerAktivitet',
+          nesteAktivitetAldeState: 'PROSESSER_VURDERING',
           erAldeBehandling: true,
           muligeKontrollpunkt: [
             { kontrollpunkt: 'SAMBOER', decode: 'Samboerskap' },
@@ -928,4 +931,49 @@ export const DashboardDeaktiverteBehandlingerFullpage: Story = {
         },
       },
     ),
+}
+
+export const SokedialogFullpage: Story = {
+  name: 'Søkedialog',
+  render: () => {
+    const searchResults = {
+      behandlinger: mockBehandlingerPage([
+        mockBehandlingDto({
+          behandlingId: 5591497,
+          type: 'BrevkvitteringBehandling',
+          status: 'FULLFORT',
+          ansvarligTeam: 'PESYS_FELLES',
+          matchedVerdiTypeDecodes: ['JournalpostId'],
+        }),
+        mockBehandlingDto({
+          behandlingId: 5591498,
+          type: 'ForstegangsbehandlingAlder',
+          status: 'UNDER_BEHANDLING',
+          ansvarligTeam: 'PESYS_ALDER',
+          matchedVerdiTypeDecodes: ['Fødselsnummer', 'Saksnummer'],
+        }),
+        mockBehandlingDto({
+          behandlingId: 5591499,
+          type: 'Omregning',
+          status: 'FEILENDE',
+          ansvarligTeam: 'PESYS_UFORE',
+          matchedVerdiTypeDecodes: ['Saksnummer'],
+        }),
+      ]),
+      error: null,
+    }
+
+    const Component = () => <SearchDialog defaultOpen initialQuery="454008672" />
+    const Stub = createRoutesStub([
+      {
+        path: '/',
+        Component,
+      },
+      {
+        path: '/api/sok',
+        action: () => searchResults,
+      },
+    ])
+    return <Stub initialEntries={['/']} />
+  },
 }
