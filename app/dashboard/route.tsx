@@ -79,13 +79,13 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
     <React.Suspense
       fallback={
         <VStack gap="space-24">
-          <HGrid gap="space-24" columns={4}>
+          <HGrid gap="space-24" columns={{ xs: 1, sm: 2, lg: 4 }}>
             <Skeleton variant="rounded" width="100%" height={70} />
             <Skeleton variant="rounded" width="100%" height={70} />
             <Skeleton variant="rounded" width="100%" height={70} />
             <Skeleton variant="rounded" width="100%" height={70} />
           </HGrid>
-          <HGrid gap="space-24" style={{ paddingTop: '12px' }} columns={2}>
+          <HGrid gap="space-24" style={{ paddingTop: '12px' }} columns={{ xs: 1, md: 2 }}>
             <Skeleton variant="rounded" width="100%" height={550} />
             <Skeleton variant="rounded" width="100%" height={550} />
           </HGrid>
@@ -97,7 +97,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
           return (
             dashboardResponse && (
               <VStack gap="space-24">
-                <HGrid gap="space-24" columns={4}>
+                <HGrid gap="space-24" columns={{ xs: 1, sm: 2, lg: 4 }}>
                   <DashboardCard
                     iconBackgroundColor={'var(--ax-bg-success-strong)'}
                     title="Totalt"
@@ -123,7 +123,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     icon={QuestionmarkDiamondFillIcon}
                   />
                 </HGrid>
-                <HGrid gap="space-24" columns={2}>
+                <HGrid gap="space-24" columns={{ xs: 1, md: 2 }}>
                   <AktivitetChartCard datapunkter={dashboardResponse.aktivitetDatapunkter} />
                   <BrevChartCard datapunkter={dashboardResponse.brevDatapunkter} />
                 </HGrid>

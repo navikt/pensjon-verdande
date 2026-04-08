@@ -54,6 +54,7 @@ export function BrevChart({ datapunkter, antallTimer, maintainAspectRatio }: Pro
 
   return (
     <Line
+      aria-label="Brev opprettet linjediagram"
       data={chartData}
       options={{
         responsive: true,

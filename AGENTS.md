@@ -214,6 +214,40 @@ export async function hentData(request: Request) {
 - Bruk Darkside versjonen
 - Legg til rette for at utseende fungerer både med darkmode og lightmode
 
+## Responsivitet og universell utforming (UU)
+
+Alle sider i Verdande **skal** være responsive og oppfylle **WCAG 2.1 AA**.
+
+### Krav for nye sider
+
+- **Responsive layout**: Sider skal fungere på Desktop (≥1280px), Tablet (768px) og Mobil (375px)
+- **WCAG 2.1 AA**: Alle sider skal bestå automatisert axe-core WCAG 2.1 AA-sjekk
+- **Ingen horisontal overflow**: Innhold skal tilpasse seg viewport uten horisontal scrollbar
+- **Storybook-stories**: Alle nye sider **må** ha Storybook-stories — disse testes automatisk for a11y og responsivitet
+
+### Hvordan oppnå dette
+
+- Bruk `HGrid` med responsive `columns`-props (f.eks. `columns={{ xs: 1, md: 2, lg: 3 }}`)
+- Bruk `Hide`/`Show` for å vise/skjule innhold basert på viewport
+- Unngå faste bredder (`width: 800px`); bruk relative enheter og Aksel tokens
+- Bruk `overflow-x: auto` på tabeller som ikke kan brytes ned
+- Sørg for at alle interaktive elementer har synlig fokus-indikator
+- Bruk semantisk HTML via Aksel-komponenter (`Button`, `Table`, `Heading`, etc.)
+- Legg til `aria-label` på interaktive elementer uten synlig tekst
+
+### Testing
+
+Responsivitet og WCAG testes automatisk:
+
+```zsh
+npm run test:stories     # axe-core WCAG 2.1 AA sjekk på alle stories
+npm run test:responsive  # Viewport-testing i 3 størrelser (desktop/tablet/mobil)
+```
+
+- `test:stories` kjører axe-core mot alle Storybook-stories automatisk
+- `test:responsive` rendrer fase 1-sider i tre viewports og sjekker for horisontal overflow
+- Stories kan tagges med `a11y-skip` for å hoppe over axe-sjekk (midlertidig, for kjente mangler)
+
 ## Decode av verdier (status, type, m.m.)
 All decode/visning av enumer og koder skal bruke fellesfunksjonene i `app/common/decode.ts` eller andre eksisterende felles decode-moduler (f.eks. `app/common/decodeTeam.ts`, `app/common/decodeBehandling.ts`).
 
@@ -249,8 +283,10 @@ npm run test:stories
 - `npm run check` (Biome) er grønn
 - `npm run typecheck` er grønn
 - `npm run test` er grønn
-- `npm run test:stories` er grønn
+- `npm run test:stories` er grønn (inkl. WCAG 2.1 AA axe-core sjekk)
+- `npm run test:responsive` er grønn (viewport-testing for berørte sider)
 - `npm run build` er grønn
+- Nye sider har Storybook-stories med komplett mock-data
 - Endringen er dokumentert kort i PR-beskrivelse (hva/hvorfor) og evt. i README/kommentar ved behov
 
 ## Skjermbilder for dokumentasjon

@@ -22,6 +22,7 @@
     "capture-docs-screenshots": "npx tsx scripts/capture-screenshots.ts --docs",
     "test": "vitest --project unit",
     "test:stories": "vitest --project storybook",
+    "test:responsive": "vitest --project responsive",
     "typecheck": "node scripts/copy-server-dts.ts && react-router typegen && tsc"
   },
   "prettier": {
@@ -72,6 +73,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitest/browser": "^4.1.0",
     "@vitest/browser-playwright": "^4.0.18",
+    "axe-core": "^4.11.2",
     "jsdom": "^29.0.1",
     "lefthook": "^2.1.4",
     "playwright": "^1.58.2",

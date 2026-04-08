@@ -11,5 +11,5 @@
   position: absolute;
   top: 6px;
   font-size: 16px;
-  color: var(--ax-bg-success-strong);
+  color: var(--ax-text-on-action);
 }

@@ -50,7 +50,7 @@ export default function Dag(props: Props) {
   ) {
     textColor = 'var(--ax-text-neutral)'
   } else {
-    textColor = 'var(--ax-neutral-600)'
+    textColor = 'var(--ax-text-subtle)'
   }
 
   const offentligFridag = props.kalenderHendelser.offentligeFridager.find((it) => isSameDay(it.dato, props.dato))?.navn
@@ -64,7 +64,7 @@ export default function Dag(props: Props) {
           <span
             style={{
               textAlign: 'left',
-              color: 'var(--ax-neutral-600)',
+              color: 'var(--ax-text-subtle)',
               fontSize: '0.9em',
             }}
           >
@@ -131,7 +131,7 @@ export default function Dag(props: Props) {
     const offentligFridagElement = offentligFridag
       ? [
           <HStack key="kalenderHendelse" style={{ fontSize: '0.8em' }}>
-            <span style={{ color: 'red' }}>{offentligFridag}</span>
+            <span style={{ color: 'var(--ax-text-danger)' }}>{offentligFridag}</span>
           </HStack>,
         ]
       : []
@@ -189,7 +189,7 @@ export default function Dag(props: Props) {
             <VStack gap="space-4">
               {offentligFridag && (
                 <HStack key="modal-kalenderHendelse" style={{ fontSize: '0.9em' }}>
-                  <span style={{ color: 'red' }}>{offentligFridag}</span>
+                  <span style={{ color: 'var(--ax-text-danger)' }}>{offentligFridag}</span>
                 </HStack>
               )}
 

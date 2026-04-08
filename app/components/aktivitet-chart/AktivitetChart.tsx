@@ -91,6 +91,7 @@ export function AktivitetChart({ datapunkter, antallTimer, maintainAspectRatio }
 
   return (
     <Line
+      aria-label="Aktivitetsoversikt linjediagram"
       data={chartData}
       options={{
         responsive: true,
