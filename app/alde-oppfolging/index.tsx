@@ -236,14 +236,16 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     <Page.Block>
       <Bleed marginInline={'space-48 space-48'} marginBlock={'space-16'} asChild>
         <Box>
-          <Heading className={css.topBanner} level={'1'} size={'large'} style={{ marginTop: 0 }}>
-            <div className={css.topBannerContent}>
-              <div className={css.topBannerText}>Alde oppfølging</div>
-              <div className={css.topBannerImgContainer}>
-                <img src="/alderspensjon.svg" className={css.illustration} alt="" />
+          <Box marginBlock="space-0" asChild>
+            <Heading className={css.topBanner} level={'1'} size={'large'}>
+              <div className={css.topBannerContent}>
+                <div className={css.topBannerText}>Alde oppfølging</div>
+                <div className={css.topBannerImgContainer}>
+                  <img src="/alderspensjon.svg" className={css.illustration} alt="" />
+                </div>
               </div>
-            </div>
-          </Heading>
+            </Heading>
+          </Box>
         </Box>
       </Bleed>
       <VStack gap="space-24" paddingBlock={'space-32'}>
