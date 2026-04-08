@@ -24,6 +24,7 @@ import { toIsoDate } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { apiGet } from '~/services/api.server'
 import type { Route } from './+types/index'
+import { brevRowKey, mergeRows } from './mergeRows'
 
 /** DTO som speiler API-responsen fra /api/behandling/brev/oppsummering */
 type AutoBrevOppsummeringDto = {
@@ -94,7 +95,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   qs.set('tomDato', tomDato)
 
   const dtoRows = await apiGet<AutoBrevOppsummeringDto[]>(`/api/behandling/brev/oppsummering?${qs.toString()}`, request)
-  const rows: AutoBrevOppsummering[] = dtoRows.map((r) => ({
+  const mapped: AutoBrevOppsummering[] = dtoRows.map((r) => ({
     behandlingstype: r.behandlingstype,
     brevkode: r.brevbakerBrevkode ?? r.brevkode,
     originalBrevkode: r.brevkode,
@@ -104,6 +105,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     brevType: r.brevType,
   }))
 
+  // Slå sammen rader som er visuelt like (f.eks. ulike språkkoder for samme brev)
+  const rows = mergeRows(mapped)
+
   return {
     rows,
     nowIso: now.toISOString(),
@@ -112,8 +116,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
-/** Sentinel-verdi for null i URL-parametere */
+/** Sentinel-verdi for null i URL-parametere og sammensatte nøkler */
 const NULL_TOKEN = '__NULL__'
+const KEY_SEP = '\u001F'
 
 function encodeValue(v: string | null): string {
   return v ?? NULL_TOKEN
@@ -177,7 +182,6 @@ type GroupRow = {
 
 function groupRows(rows: AutoBrevOppsummering[], keys: FacetKey[]): GroupRow[] {
   if (!keys.length) return []
-  const sep = '\u001F'
   const m = new Map<string, GroupRow>()
   for (const r of rows) {
     const rawValues: Partial<Record<FacetKey, string | null>> = {}
@@ -186,7 +190,7 @@ function groupRows(rows: AutoBrevOppsummering[], keys: FacetKey[]): GroupRow[] {
       rawValues[k] = r[k] ?? null
       labels[k] = labelForFacet(k, r)
     }
-    const key = keys.map((k) => encodeValue(rawValues[k] ?? null)).join(sep)
+    const key = keys.map((k) => encodeValue(rawValues[k] ?? null)).join(KEY_SEP)
     const prev = m.get(key)
     if (prev) {
       prev.antall += r.antall
@@ -216,7 +220,7 @@ function toggleParam(current: string[] | null, value: string): string[] | null {
   return arr.length ? arr : null
 }
 
-const rowKey = (r: AutoBrevOppsummering) => [r.behandlingstype, r.originalBrevkode, r.brevnavn, r.sprakKode].join('|')
+const rowKey = brevRowKey
 
 function countActiveFilters(filters: Partial<Record<FacetKey, string[]>>): number {
   return Object.values(filters).reduce((acc, v) => acc + ((v?.length ?? 0) > 0 ? 1 : 0), 0)
