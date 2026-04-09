@@ -715,6 +715,9 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       ``,
       `skalBestilleBrevForSøker: ${skalBestilleBrev}`,
       `skalSendeBrevBerørteSaker: ${skalSendeBrevBerorteSaker}`,
+      ``,
+      `regelendringUt2026: ${regelendringUt2026}`,
+      `skalBrukeKjøreplan: ${skalBrukeKjoreplan}`,
     ].join('\n')
   }
 }
