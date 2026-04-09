@@ -117,6 +117,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
   const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
   const [regelendringUt2026, setRegelendringUt2026] = useState(false)
+  const [skalBrukeKjoreplan, setSkalBrukeKjoreplan] = useState(false)
 
   const [hasError, setHasError] = useState(false)
   const fetcher = useFetcher()
@@ -435,6 +436,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Skal distribuere uførevedtak
                       </OmregningCheckbox>
                       <OmregningCheckbox
+                        defaultChecked={skalBrukeKjoreplan}
+                        name={'skalBrukeKjoreplan'}
+                        value={skalBrukeKjoreplan}
+                        onChange={setSkalBrukeKjoreplan}
+                      >
+                        Skal bruke kjøreplan
+                      </OmregningCheckbox>
+                      <OmregningCheckbox
                         defaultChecked={regelendringUt2026}
                         name={'regelendringUt2026'}
                         value={regelendringUt2026}
@@ -636,6 +645,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   skalSletteIverksettingsoppgaver={skalSletteIverksettingsoppgaver}
                   skalDistribuereUforevedtak={skalDistribuereUforevedtak}
                   regelendringUt2026={regelendringUt2026}
+                  skalBrukeKjoreplan={skalBrukeKjoreplan}
                   behandleApneKrav={behandleApneKrav}
                   brukFaktoromregning={brukFaktoromregning}
                   opprettAlleOppgaver={opprettAlleOppgaver}
