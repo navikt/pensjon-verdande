@@ -329,6 +329,7 @@ export type OmregningRequest = {
   sendBrevBerorteSaker: boolean
   prioritet: string
   regelendringUt2026: boolean
+  skalBrukeKjoreplan: boolean
 
   brevkoderSoker: { [key: string]: string }
   brevkoderBerorteSaker: { [key: string]: string }

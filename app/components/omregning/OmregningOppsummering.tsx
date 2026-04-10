@@ -21,6 +21,7 @@ interface OmregningOppsummeringProps {
   skalSletteIverksettingsoppgaver: boolean
   skalDistribuereUforevedtak: boolean
   regelendringUt2026: boolean
+  skalBrukeKjoreplan: boolean
   skalBestilleBrev: string
 
   selectedBrevkodeSokerAlderGammeltRegelverk: ComboboxOption | undefined
@@ -128,6 +129,10 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
                   <FormSummary.Answer>
                     <FormSummary.Label>Skal distribuere uførevedtak</FormSummary.Label>
                     <FormSummary.Value>{props.skalDistribuereUforevedtak ? 'Ja' : 'Nei'}</FormSummary.Value>
+                  </FormSummary.Answer>
+                  <FormSummary.Answer>
+                    <FormSummary.Label>Skal bruke kjøreplan</FormSummary.Label>
+                    <FormSummary.Value>{props.skalBrukeKjoreplan ? 'Ja' : 'Nei'}</FormSummary.Value>
                   </FormSummary.Answer>
                   <FormSummary.Answer>
                     <FormSummary.Label>Regelendringer UT 2026</FormSummary.Label>
