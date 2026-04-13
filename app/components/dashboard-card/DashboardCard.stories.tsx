@@ -1,5 +1,6 @@
 import { BriefcaseIcon, BugIcon, ClockDashedIcon } from '@navikt/aksel-icons'
 import type { Meta, StoryObj } from '@storybook/react'
+import { withRouter } from '../../../.storybook/mocks/router'
 import { DashboardCard } from './DashboardCard'
 
 const meta = {
@@ -20,11 +21,13 @@ export const Default: Story = {
 }
 
 export const Feilende: Story = {
+  decorators: [withRouter],
   args: {
     title: 'Feilende behandlinger',
     value: '3',
     iconBackgroundColor: 'var(--ax-bg-danger-moderate)',
     icon: BugIcon,
+    href: '/behandlinger/FEILENDE',
   },
 }
 
