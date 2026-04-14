@@ -1,7 +1,9 @@
+import { ChevronRightIcon } from '@navikt/aksel-icons'
 import { BodyShort, Box, Heading, HStack, VStack } from '@navikt/ds-react'
 import type { Property } from 'csstype'
 import type React from 'react'
 import { Link } from 'react-router'
+import styles from './DashboardCard.module.css'
 
 interface SVGRProps {
   title?: string
@@ -48,13 +50,20 @@ export function DashboardCard(props: Props) {
             {props.value}
           </Heading>
         </VStack>
+        {props.href && (
+          <ChevronRightIcon
+            aria-hidden
+            fontSize="1.5rem"
+            style={{ marginLeft: 'auto', color: 'var(--ax-text-subtle)' }}
+          />
+        )}
       </HStack>
     </Box>
   )
 
   if (props.href) {
     return (
-      <Link to={props.href} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to={props.href} className={styles.clickable}>
         {card}
       </Link>
     )
