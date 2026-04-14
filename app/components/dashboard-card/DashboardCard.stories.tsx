@@ -20,6 +20,17 @@ export const Default: Story = {
   },
 }
 
+export const Klikkbar: Story = {
+  decorators: [withRouter],
+  args: {
+    title: 'Totalt antall behandlinger',
+    value: '185',
+    iconBackgroundColor: 'var(--ax-bg-brand-blue-moderate)',
+    icon: BriefcaseIcon,
+    href: '/behandlinger/antall',
+  },
+}
+
 export const Feilende: Story = {
   decorators: [withRouter],
   args: {

@@ -1,0 +1,16 @@
+.clickable {
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--ax-border-radius-4);
+  transition:
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.clickable:hover,
+.clickable:focus-visible {
+  box-shadow: var(--ax-shadow-large);
+  transform: translateY(-2px);
+}
