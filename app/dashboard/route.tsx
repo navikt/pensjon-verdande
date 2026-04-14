@@ -103,6 +103,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     title="Totalt"
                     value={formatNumber(dashboardResponse.totaltAntallBehandlinger)}
                     icon={ClipboardFillIcon}
+                    href="/behandlinger/antall"
                   />
                   <DashboardCard
                     iconBackgroundColor={'var(--ax-bg-accent-strong)'}
@@ -122,6 +123,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     title="Ukjente typer"
                     value={formatNumber(dashboardResponse.ukjenteBehandlingstyper.length)}
                     icon={QuestionmarkDiamondFillIcon}
+                    href="/behandlinger/antall?kunUkjente=true"
                   />
                 </HGrid>
                 <HGrid gap="space-24" columns={2}>
