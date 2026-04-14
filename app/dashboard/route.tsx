@@ -115,6 +115,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     title="Feilende"
                     value={formatNumber(dashboardResponse.feilendeBehandlinger)}
                     icon={ExclamationmarkTriangleFillIcon}
+                    href="/behandlinger/FEILENDE"
                   />
                   <DashboardCard
                     iconBackgroundColor={'var(--ax-bg-warning-strong)'}

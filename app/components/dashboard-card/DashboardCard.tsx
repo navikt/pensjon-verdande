@@ -1,6 +1,7 @@
 import { BodyShort, Box, Heading, HStack, VStack } from '@navikt/ds-react'
 import type { Property } from 'csstype'
 import type React from 'react'
+import { Link } from 'react-router'
 
 interface SVGRProps {
   title?: string
@@ -12,10 +13,11 @@ type Props = {
   value: string
   iconBackgroundColor: Property.BackgroundColor
   icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & SVGRProps & React.RefAttributes<SVGSVGElement>>
+  href?: string
 }
 
 export function DashboardCard(props: Props) {
-  return (
+  const card = (
     <Box background={'raised'} borderRadius="4" shadow="dialog" style={{ padding: '12px 16px' }}>
       <HStack gap="space-16" align="center">
         <Box
@@ -49,4 +51,14 @@ export function DashboardCard(props: Props) {
       </HStack>
     </Box>
   )
+
+  if (props.href) {
+    return (
+      <Link to={props.href} style={{ textDecoration: 'none', color: 'inherit' }}>
+        {card}
+      </Link>
+    )
+  }
+
+  return card
 }
