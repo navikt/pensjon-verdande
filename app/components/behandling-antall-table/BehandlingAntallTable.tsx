@@ -10,15 +10,20 @@ const DEFAULT_VISIBLE_ROWS = 10
 
 type Props = {
   oppsummering: BehandlingAntall[]
+  defaultVisAlle?: boolean
+  kunUkjente?: boolean
 }
 
 export default function BehandlingAntallTable(props: Props) {
   const { sortFunc } = useSort<BehandlingAntall>('antall')
-  const [visAlle, setVisAlle] = useState(false)
+  const [visAlle, setVisAlle] = useState(props.defaultVisAlle ?? false)
 
   const sortedOppsummering: BehandlingAntall[] = React.useMemo(() => {
-    return props.oppsummering.slice().sort(sortFunc)
-  }, [props.oppsummering, sortFunc])
+    const filtered = props.kunUkjente
+      ? props.oppsummering.filter((it) => it.behandlingType === null)
+      : props.oppsummering
+    return filtered.slice().sort(sortFunc)
+  }, [props.oppsummering, props.kunUkjente, sortFunc])
 
   const harFlereEnnDefault = sortedOppsummering.length > DEFAULT_VISIBLE_ROWS
   const synligeRader = visAlle ? sortedOppsummering : sortedOppsummering.slice(0, DEFAULT_VISIBLE_ROWS)

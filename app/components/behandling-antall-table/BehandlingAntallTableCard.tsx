@@ -5,6 +5,8 @@ import type { BehandlingAntall } from '~/types'
 
 type Props = {
   behandlingAntall: BehandlingAntall[]
+  defaultVisAlle?: boolean
+  kunUkjente?: boolean
 }
 
 export function BehandlingAntallTableCard(props: Props) {
@@ -17,10 +19,14 @@ export function BehandlingAntallTableCard(props: Props) {
             fontSize="1.5rem"
             style={{ verticalAlign: 'middle', marginRight: '6px' }}
           />
-          Antall etter type
+          {props.kunUkjente ? 'Ukjente behandlingstyper' : 'Antall etter type'}
         </div>
       </Box>
-      <BehandlingAntallTable oppsummering={props.behandlingAntall} />
+      <BehandlingAntallTable
+        oppsummering={props.behandlingAntall}
+        defaultVisAlle={props.defaultVisAlle}
+        kunUkjente={props.kunUkjente}
+      />
     </Box>
   )
 }
