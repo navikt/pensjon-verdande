@@ -22,6 +22,16 @@ export type ReguleringUttrekk = {
   kjoretidAktiviteter: KjoretidForAktivitet[]
 }
 
+export type ReguleringAktiveReferansebelop = {
+  referansebelop: ReguleringReferansebelop[]
+}
+
+export type ReguleringReferansebelop = {
+  arskull: string
+  referansebelop: string
+  fomDato: string
+}
+
 export type ReguleringOrkestrering = {
   behandlingId: string
   status: Behandlingstatus
