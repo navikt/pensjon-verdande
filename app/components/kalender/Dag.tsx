@@ -6,9 +6,11 @@ import { isSameDay } from '~/common/date'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { getWeek } from '~/common/weeknumber'
 import type { KalenderBehandling, KalenderHendelser } from '~/components/kalender/types'
+import styles from './Dag.module.css'
 
 export type Props = {
   dato: Date
+  iDag: Date
   highlightMaaned: Date
   maksAntallPerDag?: number
   kalenderHendelser: KalenderHendelser
@@ -28,15 +30,16 @@ export default function Dag(props: Props) {
     dagStreng = `${props.dato.getDate().toString()}.`
   }
 
+  const erIDag = isSameDay(props.dato, props.iDag)
+
   let dagLabel: JSX.Element
-  if (isSameDay(props.dato, new Date())) {
+  if (erIDag) {
+    const maanedSuffix =
+      props.dato.getDate() === 1 ? ` ${props.dato.toLocaleDateString('no-NO', { month: 'short' })}` : ''
     dagLabel = (
-      <span
-        style={{
-          fontWeight: 'bold',
-        }}
-      >
-        {dagStreng}
+      <span className={styles.todayWrapper}>
+        <span className={styles.todayCircle}>{props.dato.getDate()}</span>
+        <span>.{maanedSuffix}</span>
       </span>
     )
   } else {
