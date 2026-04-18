@@ -1,3 +1,4 @@
+import { asLocalDateString } from '~/common/date'
 import Kalender, { forsteOgSisteDatoForKalender } from '~/components/kalender/Kalender'
 import { hentKalenderHendelser } from '~/services/behandling.server'
 import type { Route } from './+types/route'
@@ -21,11 +22,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       tom: sisteDato,
     }),
     startDato: startDato,
+    serverIDag: asLocalDateString(new Date()),
   }
 }
 
 export default function KalenderVisning({ loaderData }: Route.ComponentProps) {
-  const { kalenderHendelser, startDato } = loaderData
+  const { kalenderHendelser, startDato, serverIDag } = loaderData
 
   return (
     <Kalender
@@ -33,6 +35,7 @@ export default function KalenderVisning({ loaderData }: Route.ComponentProps) {
       maksAntallPerDag={6}
       startDato={startDato}
       visKlokkeSlett={true}
+      serverIDag={serverIDag}
     ></Kalender>
   )
 }

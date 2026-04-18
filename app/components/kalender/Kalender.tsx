@@ -1,5 +1,6 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
 import { Box, Button, Heading, HStack, Spacer } from '@navikt/ds-react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { erHelgedag, getDato, isSameDay } from '~/common/date'
 import { getWeek, getWeekYear } from '~/common/weeknumber'
@@ -26,6 +27,7 @@ export type Props = {
   maksAntallPerDag: number
   startDato: Date
   visKlokkeSlett: boolean
+  serverIDag?: string
 }
 
 function backgroundColorForDato(kalenderHendelser: KalenderHendelser, dato: Date): string {
@@ -41,6 +43,37 @@ export default function Kalender(props: Props) {
   const [, setSearchParams] = useSearchParams()
   const firstInThisMonth = new Date(valgtDato.getFullYear(), valgtDato.getMonth(), 1)
   const forsteUkeNr = getWeek(firstInThisMonth)
+
+  // Parse YYYY-MM-DD som lokal midnatt (ikke UTC) for konsistent datosammenligning
+  function parseLokalDato(isoStr: string): Date {
+    const [y, m, d] = isoStr.split('-').map(Number)
+    return new Date(y, m - 1, d)
+  }
+
+  // Bruk server-datoen som initial verdi for å unngå hydreringsfeil,
+  // og oppdater ved midnatt slik at sirkelen flyttes til riktig dag.
+  const [iDagDato, setIDagDato] = useState(() => (props.serverIDag ? parseLokalDato(props.serverIDag) : new Date()))
+
+  useEffect(() => {
+    let timerRef: ReturnType<typeof setTimeout>
+
+    function planleggMidnattOppdatering() {
+      const naa = new Date()
+      const nesteMidnatt = new Date(naa.getFullYear(), naa.getMonth(), naa.getDate() + 1)
+      const msTilMidnatt = nesteMidnatt.getTime() - naa.getTime() + 100 // +100ms margin
+
+      timerRef = setTimeout(() => {
+        setIDagDato(new Date())
+        planleggMidnattOppdatering()
+      }, msTilMidnatt)
+    }
+
+    // Synk med klient-tid etter hydring
+    setIDagDato(new Date())
+    planleggMidnattOppdatering()
+
+    return () => clearTimeout(timerRef)
+  }, [])
 
   function day(ukenr: number, colIdx: number) {
     return getDato(getWeekYear(valgtDato), ukenr, colIdx + 1)
@@ -81,6 +114,7 @@ export default function Kalender(props: Props) {
       >
         <Dag
           dato={dato}
+          iDag={iDagDato}
           highlightMaaned={valgtDato}
           kalenderHendelser={props.kalenderHendelser}
           maksAntallPerDag={props.maksAntallPerDag}

@@ -1,0 +1,20 @@
+.todayWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.todayCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ax-bg-danger-strong);
+  color: var(--ax-text-danger-contrast);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+  flex-shrink: 0;
+}
