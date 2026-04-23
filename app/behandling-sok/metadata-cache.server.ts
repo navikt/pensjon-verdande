@@ -57,7 +57,7 @@ export async function hentBehandlingMetadata(behandlingType: string, request: Re
   return promise
 }
 
-export type BehandlingstyperResponse = { typer: string[] }
+export type BehandlingstyperResponse = { typer: string[] } | string[]
 
 const TYPER_TTL_MS = 60_000
 let typerCache: { data: string[]; fetchedAt: number } | null = null
@@ -72,7 +72,8 @@ export async function hentBehandlingstyper(request: Request): Promise<string[]> 
 
   typerInFlight = apiGet<BehandlingstyperResponse>('/api/behandling/sok/metadata/typer', request)
     .then((res) => {
-      const data = res.typer ?? []
+      // Backend kan returnere enten { typer: [...] } eller string[] direkte — vær tolerant.
+      const data = Array.isArray(res) ? res : (res?.typer ?? [])
       typerCache = { data, fetchedAt: Date.now() }
       return data
     })
