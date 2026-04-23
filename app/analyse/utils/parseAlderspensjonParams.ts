@@ -27,7 +27,10 @@ export function parseAlderspensjonParams(request: Request): AlderspensjonParams 
 
   let fom = url.searchParams.get('fom') || toIsoDate(sub(now, { months: 24 }))
   let tom = url.searchParams.get('tom') || toIsoDate(now)
-  if (fom > tom) {
+  // Sammenlign på dato-prefiks (YYYY-MM-DD) for å unngå feil swap når formatene er blandet
+  // (f.eks. fom='2024-01-10T12:00:00' og tom='2024-01-10'). Innen samme dag gir swap
+  // uansett ikke meningsfull endring, så det er trygt å ikke bytte da.
+  if (fom.slice(0, 10) > tom.slice(0, 10)) {
     ;[fom, tom] = [tom, fom]
   }
 
