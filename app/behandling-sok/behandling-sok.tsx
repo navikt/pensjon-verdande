@@ -417,7 +417,7 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
           {harUkjørteEndringer && <EndringerIkkeKjortBanner />}
 
           <HStack gap="space-12" align="center" wrap>
-            <KjorSokKnapp invalid={!kanKjore} onClick={kjørSøk} />
+            <KjorSokKnapp invalid={!kanKjore} harFeil={validering.feil.length > 0} onClick={kjørSøk} />
             <KopierJsonKnapp
               snapshot={{
                 schemaVersion: '1',
