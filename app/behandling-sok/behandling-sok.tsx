@@ -205,7 +205,11 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
     venterPaInitialSensitiveLoad.current = committed.visning === 'treff'
     if (committed.visning === 'treff') {
       const body = buildTreffRequest(committed.behandlingType, committedKriterier, null)
-      fetcher.submit(body, { method: 'post', action: '/behandling-sok/api/treff', encType: 'application/json' })
+      fetcher.submit(body as never, {
+        method: 'post',
+        action: '/behandling-sok/api/treff',
+        encType: 'application/json',
+      })
     } else {
       const body = buildAntallOverTidRequest(
         committed.behandlingType,
@@ -213,7 +217,7 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
         committed.aggregering,
         committed.tidsdimensjon,
       )
-      antallFetcher.submit(body, {
+      antallFetcher.submit(body as never, {
         method: 'post',
         action: '/behandling-sok/api/antall',
         encType: 'application/json',
@@ -308,7 +312,7 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
     if (!nesteCursor || !committed.behandlingType) return
     if (harUkjørteEndringer) return
     const body = buildTreffRequest(committed.behandlingType, committedKriterier, nesteCursor)
-    fetcher.submit(body, {
+    fetcher.submit(body as never, {
       method: 'post',
       action: '/behandling-sok/api/treff',
       encType: 'application/json',

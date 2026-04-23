@@ -67,3 +67,33 @@ describe('buildAntallOverTidRequest', () => {
     expect(r.tidsdimensjon).toBe('OPPRETTET')
   })
 })
+
+describe('rensKriterier mapper interne feltnavn til backend-DTO', () => {
+  it('OPPRETTET_AV: identer → brukere', () => {
+    const r = rensKriterier([{ type: 'OPPRETTET_AV', identer: ['Z123', 'Z456'] }])
+    expect(r).toEqual([{ type: 'OPPRETTET_AV', brukere: ['Z123', 'Z456'] }])
+  })
+  it('TILHORER_BEHANDLINGSSERIE: uuid → behandlingSerieId', () => {
+    const r = rensKriterier([{ type: 'TILHORER_BEHANDLINGSSERIE', uuid: 'abc' }])
+    expect(r).toEqual([{ type: 'TILHORER_BEHANDLINGSSERIE', behandlingSerieId: 'abc' }])
+  })
+  it('ER_BATCH: verdi → erBatch', () => {
+    const r = rensKriterier([{ type: 'ER_BATCH', verdi: true }])
+    expect(r).toEqual([{ type: 'ER_BATCH', erBatch: true }])
+  })
+  it('KRAV_HAR_EIERENHET: eierenheter → enhetsnr', () => {
+    const r = rensKriterier([{ type: 'KRAV_HAR_EIERENHET', eierenheter: ['4849'] }])
+    expect(r).toEqual([{ type: 'KRAV_HAR_EIERENHET', enhetsnr: ['4849'] }])
+  })
+  it('HAR_FEILET_KJORING: siden → sidenDato (utelater når null)', () => {
+    expect(rensKriterier([{ type: 'HAR_FEILET_KJORING', siden: '2025-01-01' }])).toEqual([
+      { type: 'HAR_FEILET_KJORING', sidenDato: '2025-01-01' },
+    ])
+    expect(rensKriterier([{ type: 'HAR_FEILET_KJORING', siden: null }])).toEqual([{ type: 'HAR_FEILET_KJORING' }])
+  })
+  it('andre kriterier passerer uendret', () => {
+    expect(rensKriterier([{ type: 'HAR_STATUS', statuser: ['MAN'] }])).toEqual([
+      { type: 'HAR_STATUS', statuser: ['MAN'] },
+    ])
+  })
+})

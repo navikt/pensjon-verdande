@@ -21,19 +21,18 @@ describe('hentBehandlingstyper', () => {
     mockApiGet.mockReset()
   })
 
-  test('aksepterer { typer: string[] }-shape', async () => {
-    mockApiGet.mockResolvedValue({ typer: ['A', 'B', 'C'] })
+  test('mapper { behandlingTyper }-shape fra backend', async () => {
+    mockApiGet.mockResolvedValue({
+      schemaVersion: '1',
+      metadataVersion: 'm',
+      generatedAt: '2026-01-01T00:00:00',
+      behandlingTyper: ['A', 'B', 'C'],
+    })
     const res = await hentBehandlingstyper(new Request('http://x'))
     expect(res).toEqual(['A', 'B', 'C'])
   })
 
-  test('aksepterer string[]-shape direkte', async () => {
-    mockApiGet.mockResolvedValue(['A', 'B'])
-    const res = await hentBehandlingstyper(new Request('http://x'))
-    expect(res).toEqual(['A', 'B'])
-  })
-
-  test('returnerer tom liste hvis verken array eller { typer }', async () => {
+  test('returnerer tom liste når behandlingTyper mangler', async () => {
     mockApiGet.mockResolvedValue({})
     const res = await hentBehandlingstyper(new Request('http://x'))
     expect(res).toEqual([])

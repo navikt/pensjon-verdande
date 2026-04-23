@@ -41,14 +41,36 @@ function harInnhold(k: Kriterium): boolean {
   }
 }
 
-export function rensKriterier(kriterier: Kriterium[]): Kriterium[] {
-  return kriterier.filter(harInnhold)
+/** Et kriterium slik backend forventer å motta det (etter feltnavn-mapping). */
+export type BackendKriterium = { type: string; [key: string]: unknown }
+
+export function rensKriterier(kriterier: Kriterium[]): BackendKriterium[] {
+  // Filtrerer bort tomme kriterier OG mapper interne feltnavn til backend-DTO-felt.
+  // Backend-DTO-er ligger i `BehandlingSokKriterium.kt`; denne mappingen må holdes synkron.
+  return kriterier.filter(harInnhold).map((k) => mapTilBackend(k))
+}
+
+function mapTilBackend(k: Kriterium): BackendKriterium {
+  switch (k.type) {
+    case 'OPPRETTET_AV':
+      return { type: k.type, brukere: k.identer }
+    case 'TILHORER_BEHANDLINGSSERIE':
+      return { type: k.type, behandlingSerieId: k.uuid }
+    case 'ER_BATCH':
+      return { type: k.type, erBatch: k.verdi }
+    case 'KRAV_HAR_EIERENHET':
+      return { type: k.type, enhetsnr: k.eierenheter }
+    case 'HAR_FEILET_KJORING':
+      return k.siden ? { type: k.type, sidenDato: k.siden } : { type: k.type }
+    default:
+      return k
+  }
 }
 
 export type TreffRequest = {
   schemaVersion: string
   behandlingType: string
-  kriterier: Kriterium[]
+  kriterier: BackendKriterium[]
   limit: number
   cursor: { opprettet: string; behandlingId: number } | null
 }
@@ -71,7 +93,7 @@ export function buildTreffRequest(
 export type AntallOverTidRequest = {
   schemaVersion: string
   behandlingType: string
-  kriterier: Kriterium[]
+  kriterier: BackendKriterium[]
   aggregering: Aggregering
   tidsdimensjon: Tidsdimensjon
 }

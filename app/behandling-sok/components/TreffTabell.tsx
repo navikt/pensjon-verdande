@@ -11,6 +11,7 @@ export type Treff = {
   sisteKjoring?: string | null
   utsattTil?: string | null
   prioritet?: number | null
+  kravId?: number | null
   opprettetAv?: string | null
 }
 
