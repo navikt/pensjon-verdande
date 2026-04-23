@@ -10,6 +10,7 @@ import { parseAlderspensjonParams } from './utils/parseAlderspensjonParams'
 import { useSortableTable } from './utils/useSortableTable'
 
 const MottakereAlderChart = React.lazy(() => import('./components/MottakereAlderChart'))
+const NettoEndringChart = React.lazy(() => import('./components/NettoEndringChart'))
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Alderspensjon — mottakere | Verdande' }]
@@ -135,6 +136,19 @@ export default function MottakereAlderTab({ loaderData }: Route.ComponentProps) 
         </BodyShort>
         <React.Suspense fallback={<Skeleton variant="rounded" width="100%" height={320} />}>
           <MottakereAlderChart data={datapunkter} />
+        </React.Suspense>
+      </VStack>
+
+      <VStack gap="space-8">
+        <Heading level="3" size="small">
+          Bestandsutvikling — netto endring
+        </Heading>
+        <BodyShort size="small" textColor="subtle">
+          Søyler viser netto endring per periode (grønn = vekst, rød = nedgang). Linjen viser akkumulert netto over
+          valgt tidsrom og indikerer om bestanden samlet sett øker eller går ned.
+        </BodyShort>
+        <React.Suspense fallback={<Skeleton variant="rounded" width="100%" height={300} />}>
+          <NettoEndringChart data={datapunkter} />
         </React.Suspense>
       </VStack>
 
