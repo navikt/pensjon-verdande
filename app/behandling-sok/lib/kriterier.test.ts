@@ -42,7 +42,7 @@ describe('maanederMellom', () => {
 
 describe('KRITERIE_DEFINISJONER', () => {
   it('har en entry per KriterieType', () => {
-    expect(ALLE_KRITERIE_TYPER.length).toBe(21)
+    expect(ALLE_KRITERIE_TYPER.length).toBe(22)
     for (const type of ALLE_KRITERIE_TYPER) {
       expect(KRITERIE_DEFINISJONER[type]).toBeDefined()
       expect(KRITERIE_DEFINISJONER[type].type).toBe(type)

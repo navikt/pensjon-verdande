@@ -157,6 +157,17 @@ function renderEditor(
       )
     }
 
+    case 'KRAVHODE_HAR_BEHANDLINGTYPE':
+      return (
+        <MultiSelectEditor
+          label="Kravhodets behandlingstype"
+          alternativer={metadata?.kravhodeBehandlingTyper ?? []}
+          valgte={kriterium.behandlingTyper}
+          onChange={(nye) => onChange({ ...kriterium, behandlingTyper: nye })}
+          feil={feil}
+        />
+      )
+
     case 'OPPRETTET_AV':
       return (
         <TagInputEditor

@@ -25,6 +25,7 @@ export type BehandlingMetadata = {
   kravGjelderKoder: string[]
   sakstyper: string[]
   eierenheter: string[]
+  kravhodeBehandlingTyper: string[]
 }
 
 const TTL_MS = 60_000

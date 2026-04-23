@@ -17,6 +17,7 @@ const metadata: BehandlingMetadata = {
   kravGjelderKoder: ['AP', 'UT'],
   sakstyper: ['ALDER', 'UFORE'],
   eierenheter: ['4849', '4862'],
+  kravhodeBehandlingTyper: ['FORSTEG_BH', 'REVURD'],
 }
 
 const meta: Meta<typeof BehandlingSokPage> = {

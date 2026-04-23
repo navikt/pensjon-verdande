@@ -23,6 +23,8 @@ function harInnhold(k: Kriterium): boolean {
       return k.aktivitetTyper.length > 0
     case 'KRAVHODE_HAR_KONTROLLPUNKT':
       return k.kontrollpunktTyper.length > 0
+    case 'KRAVHODE_HAR_BEHANDLINGTYPE':
+      return k.behandlingTyper.length > 0
     case 'KRAV_GJELDER':
       return k.koder.length > 0
     case 'SAK_HAR_TYPE':

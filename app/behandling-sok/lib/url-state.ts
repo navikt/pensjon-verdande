@@ -123,6 +123,10 @@ function validateKriteriumShape(raw: any): Kriterium | null {
       return isStrArr(raw.kontrollpunktTyper) && isOp(raw.operator)
         ? { type: 'KRAVHODE_HAR_KONTROLLPUNKT', kontrollpunktTyper: raw.kontrollpunktTyper, operator: raw.operator }
         : null
+    case 'KRAVHODE_HAR_BEHANDLINGTYPE':
+      return isStrArr(raw.behandlingTyper)
+        ? { type: 'KRAVHODE_HAR_BEHANDLINGTYPE', behandlingTyper: raw.behandlingTyper }
+        : null
     case 'KONTROLLPUNKT_ER_KRITISK':
       return { type: 'KONTROLLPUNKT_ER_KRITISK' }
     case 'KRAV_GJELDER':

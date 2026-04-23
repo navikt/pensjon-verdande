@@ -26,6 +26,7 @@ export type Kriterium =
   | { type: 'HAR_FEILET_KJORING'; siden?: string | null }
   | { type: 'KRAVHODE_HAR_STATUS'; statuser: string[] }
   | { type: 'KRAVHODE_HAR_KONTROLLPUNKT'; kontrollpunktTyper: string[]; operator: Operator }
+  | { type: 'KRAVHODE_HAR_BEHANDLINGTYPE'; behandlingTyper: string[] }
   | { type: 'KONTROLLPUNKT_ER_KRITISK' }
   | { type: 'KRAV_GJELDER'; koder: string[] }
   | { type: 'SAK_HAR_TYPE'; sakstyper: string[] }
@@ -61,6 +62,7 @@ export type MetadataNokkel =
   | 'ansvarligeTeam'
   | 'aktivitetTyper'
   | 'kontrollpunktTyper'
+  | 'kravhodeBehandlingTyper'
   | 'none'
 
 export type KriterieDefinisjon = {
@@ -260,6 +262,17 @@ export const KRITERIE_DEFINISJONER: Record<KriterieType, KriterieDefinisjon> = {
     sensitiv: false,
     tidsfilter: false,
     defaultVerdi: () => ({ type: 'KRAVHODE_HAR_KONTROLLPUNKT', kontrollpunktTyper: [], operator: 'OR' }),
+  },
+  KRAVHODE_HAR_BEHANDLINGTYPE: {
+    type: 'KRAVHODE_HAR_BEHANDLINGTYPE',
+    visningsnavn: 'Kravhode har behandlingstype',
+    gruppe: 'Krav & sak',
+    editor: 'MultiSelectEditor',
+    metadataNokkel: 'kravhodeBehandlingTyper',
+    verdiNokkel: 'behandlingTyper' as keyof Kriterium,
+    sensitiv: false,
+    tidsfilter: false,
+    defaultVerdi: () => ({ type: 'KRAVHODE_HAR_BEHANDLINGTYPE', behandlingTyper: [] }),
   },
   KONTROLLPUNKT_ER_KRITISK: {
     type: 'KONTROLLPUNKT_ER_KRITISK',
