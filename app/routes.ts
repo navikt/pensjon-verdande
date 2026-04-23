@@ -260,6 +260,10 @@ export default [
     route('manuell-behandling', 'manuell-behandling/index.tsx'),
     route('manuell-behandling-uttrekk', 'manuell-behandling/uttrekk.tsx'),
 
+    route('behandling-sok', 'behandling-sok/behandling-sok.tsx'),
+    route('behandling-sok/api/treff', 'behandling-sok/api.treff.ts'),
+    route('behandling-sok/api/antall', 'behandling-sok/api.antall.ts'),
+
     route('omregning', 'omregning/omregning._index.tsx'),
     route('omregning/behandlinger', 'omregning/omregning.behandlinger.tsx'),
     route('omregning/omregning', 'omregning/omregning.omregning.tsx'),
