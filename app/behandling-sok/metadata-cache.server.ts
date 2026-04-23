@@ -7,6 +7,7 @@
  */
 
 import { apiGet } from '~/services/api.server'
+import { logger } from '~/services/logger.server'
 
 export type Kontrollpunkt = { kode: string; dekodeTekst: string }
 
@@ -74,6 +75,11 @@ export async function hentBehandlingstyper(request: Request): Promise<string[]> 
     .then((res) => {
       // Backend kan returnere enten { typer: [...] } eller string[] direkte — vær tolerant.
       const data = Array.isArray(res) ? res : (res?.typer ?? [])
+      logger.info(
+        `behandling-sok: hentet ${data.length} behandlingstyper (raw shape: ${
+          Array.isArray(res) ? 'array' : typeof res
+        }${!Array.isArray(res) && res ? `, keys=[${Object.keys(res).join(',')}]` : ''})`,
+      )
       typerCache = { data, fetchedAt: Date.now() }
       return data
     })
