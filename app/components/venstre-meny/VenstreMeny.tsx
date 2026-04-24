@@ -9,6 +9,7 @@ import {
   GavelIcon,
   HandShakeHeartIcon,
   HouseIcon,
+  MagnifyingGlassIcon,
   NumberListIcon,
   PersonGroupIcon,
   PersonRectangleIcon,
@@ -255,6 +256,17 @@ export default function VenstreMeny(props: Props) {
                   <HandShakeHeartIcon title="Alde oppfølging" fontSize="1.5rem" />
                 </span>
                 <span className={styles.menyTekst}>Alde oppfølging</span>
+              </NavLink>
+            </li>
+          )}
+
+          {harTilgang(me, 'SE_BEHANDLINGER') && (
+            <li>
+              <NavLink to="/behandling-sok" className={({ isActive }) => (isActive ? styles.active : '')}>
+                <span className={styles.menyIkon}>
+                  <MagnifyingGlassIcon title="Behandlingssøk" fontSize="1.5rem" />
+                </span>
+                <span className={styles.menyTekst}>Behandlingssøk</span>
               </NavLink>
             </li>
           )}
