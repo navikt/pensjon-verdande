@@ -754,6 +754,7 @@ export default function BehandlingCard(props: Props) {
             <SendTilManuellMedKontrollpunktModal
               sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
               behandling={props.behandling}
+              isSubmitting={fetcher.state !== 'idle'}
             />
           )}
 
