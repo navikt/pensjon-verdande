@@ -139,6 +139,7 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
   const navigate = useNavigate()
   const fetcher = useFetcher<TreffResponse | { error: string }>()
   const antallFetcher = useFetcher<{ totalAntall: number; buckets: Bucket[] } | { error: string }>()
+  const metadataFetcher = useFetcher<BehandlingMetadata | { error: string }>()
   const [klientFeilmelding, setKlientFeilmelding] = useState<string | null>(null)
 
   const committedHash = useMemo(() => hashCommittedState(committed), [committed])
@@ -167,6 +168,27 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
   const [draftVisning, setDraftVisning] = useState<Visning>(committed.visning)
   const [draftAggregering, setDraftAggregering] = useState<Aggregering>(committed.aggregering)
   const [draftTidsdimensjon, setDraftTidsdimensjon] = useState<Tidsdimensjon>(committed.tidsdimensjon)
+
+  // Hent metadata for valgt draft-behandlingstype slik at editorene viser riktige dropdowns
+  // (loaderens metadata speiler kun committed.behandlingType, så uten dette står editorene tomme
+  // til brukeren har kjørt søket).
+  const sisteFetchetType = useRef<string | null>(null)
+  useEffect(() => {
+    if (!draftBehandlingType) return
+    if (draftBehandlingType === committed.behandlingType) return
+    if (sisteFetchetType.current === draftBehandlingType) return
+    sisteFetchetType.current = draftBehandlingType
+    metadataFetcher.load(`/behandling-sok/api/metadata?type=${encodeURIComponent(draftBehandlingType)}`)
+  }, [draftBehandlingType, committed.behandlingType, metadataFetcher.load])
+
+  const draftMetadata = useMemo<BehandlingMetadata | null>(() => {
+    if (!draftBehandlingType) return null
+    if (draftBehandlingType === committed.behandlingType) return metadata
+    const data = metadataFetcher.data
+    if (data && !('error' in data) && data.behandlingType === draftBehandlingType) return data
+    return null
+  }, [draftBehandlingType, committed.behandlingType, metadata, metadataFetcher.data])
+  const draftMetadataFeil = metadataFetcher.data && 'error' in metadataFetcher.data ? metadataFetcher.data.error : null
 
   // Når committedSensitive lastes etter mount, oppdater draft hvis brukeren ikke har redigert noe ennå.
   const initialKriterierHashRef = useRef<string>(JSON.stringify(committed.ikkeSensitiveKriterier))
@@ -420,9 +442,15 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
             )}
           </HStack>
 
+          {draftMetadataFeil && (
+            <Alert variant="error" size="small">
+              Kunne ikke hente metadata for {draftBehandlingType}: {draftMetadataFeil}
+            </Alert>
+          )}
+
           <KriteriumListe
             kriterier={draftKriterier}
-            metadata={metadata}
+            metadata={draftMetadata}
             feil={validering.feil}
             onChange={setDraftKriterier}
           />
