@@ -25,8 +25,7 @@ export const Default: Story = {
 
 export const Submitting: Story = {
   args: {
-    ...Default.args!,
+    ...Default.args,
     isSubmitting: true,
   },
 }
-
