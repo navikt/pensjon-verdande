@@ -1,5 +1,15 @@
-import { BodyShort, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
-import { useState } from 'react'
+import {
+  BodyLong,
+  BodyShort,
+  Box,
+  Button,
+  Heading,
+  InlineMessage,
+  List,
+  Select,
+  TextField,
+  VStack,
+} from '@navikt/ds-react'
 import { Form, Link, redirect, useNavigation } from 'react-router'
 import { apiGet, apiPost } from '~/services/api.server'
 import type { Route } from './+types/bpen096'
@@ -7,11 +17,19 @@ import type { Route } from './+types/bpen096'
 enum Action {
   HentSkattehendelser = 'HENT_SKATTEHENDELSER',
   HentSkattehendelserManuelt = 'HENT_SKATTEHENDELSER_MANUELT',
-  HentAntallSkattehendelser = 'HENT_ANTALL_SKATTEHENDELSER',
 }
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'BPEN096 | Verdande' }]
+}
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  try {
+    const { antall } = await apiGet<{ antall: number }>('/api/uforetrygd/etteroppgjor/skattehendelser/antall', request)
+    return { antallHendelserAaHente: antall }
+  } catch {
+    return { antallHendelserAaHente: null }
+  }
 }
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -22,7 +40,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
       '/api/uforetrygd/etteroppgjor/skattehendelser',
       {
         maksAntallSekvensnummer: +formData.maksAntallSekvensnummer,
-        sekvensnummerPerBehandling: +formData.sekvensnummerPerBehandling,
         debug: formData.debug === 'true',
       },
       request,
@@ -59,100 +76,90 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
     }
     return { behandlingIder: response.behandlingIder }
-  } else if (formData.action === Action.HentAntallSkattehendelser) {
-    const response = await apiGet<{ antall: number }>('/api/uforetrygd/etteroppgjor/skattehendelser/antall', request)
-    return { antall: response.antall }
   }
 }
 
-export default function HentOpplysningerFraSkatt({ actionData }: Route.ComponentProps) {
+export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Route.ComponentProps) {
   const navigation = useNavigation()
 
   const isSubmitting = navigation.state === 'submitting'
-  const [debug, setDebug] = useState<string>('')
 
   return (
-    <VStack gap={'space-16'}>
-      <Box className={'aksel-pageblock--lg'}>
-        <Heading size={'medium'} level={'1'}>
+    <VStack gap="space-24" maxWidth="48rem" paddingInline="space-16">
+      <VStack gap="space-4">
+        <Heading size="medium" level="1">
           Hent opplysninger fra Skatt (tidligere BPEN096)
         </Heading>
-        <BodyShort>Batchkjøring for henting av opplysninger fra Skatteetaten for Uføretrygd Etteroppgjør</BodyShort>
-      </Box>
-      <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'space-16'}>
-          <TextField
-            label={'Max antall sekvensnummer'}
-            defaultValue="10000"
-            aria-label="maxSekvensnummer"
-            name="maksAntallSekvensnummer"
-            type="number"
-          />
+        <BodyLong>Batchkjøring for henting av opplysninger fra Skatteetaten for Uføretrygd Etteroppgjør</BodyLong>
+      </VStack>
 
-          <TextField
-            label={'Antall sekvensnummer per behandling'}
-            defaultValue="100"
-            aria-label="sekvensnummerPerBehandling"
-            name="sekvensnummerPerBehandling"
-            type="number"
-          />
+      <Box as="section" padding="space-24" borderRadius="8" borderColor="neutral-subtleA" borderWidth="1">
+        <VStack gap="space-16">
+          <VStack gap="space-4">
+            <Heading size="small" level="2">
+              Behandle nyeste hendelser
+            </Heading>
+            <BodyShort>
+              Antall nye hendelser: <strong>{loaderData.antallHendelserAaHente ?? 'Ikke tilgjengelig'}</strong>
+            </BodyShort>
+          </VStack>
+          <Form method="post">
+            <VStack gap="space-16" maxWidth="20em">
+              <Select label="Debug" size="medium" name="debug" defaultValue="" required>
+                <option value="">Velg</option>
+                <option value="true">Ja</option>
+                <option value="false">Nei</option>
+              </Select>
 
-          <Select
-            label="Debug"
-            size={'medium'}
-            name={'debug'}
-            onChange={(e) => setDebug(e.target.value)}
-            value={debug ?? ''}
-          >
-            <option value="" disabled>
-              Velg
-            </option>
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
+              <TextField
+                label="Maks antall hendelser"
+                defaultValue="10000"
+                aria-label="maxSekvensnummer"
+                name="maksAntallSekvensnummer"
+                type="number"
+              />
 
-          <Button
-            type="submit"
-            name="action"
-            value={Action.HentSkattehendelser}
-            disabled={isSubmitting || debug === ''}
-          >
-            {isSubmitting ? 'Oppretter…' : 'Opprett'}
-          </Button>
+              <Button type="submit" name="action" value={Action.HentSkattehendelser} loading={isSubmitting}>
+                Kjør
+              </Button>
+            </VStack>
+          </Form>
         </VStack>
-      </Form>
-      <Heading size="medium">Kjør hendelser manuelt</Heading>
-      <BodyShort>Angi sekvensnummer for å lagre inntektene på disse hendelsene manuelt.</BodyShort>
-      <Form method="post">
-        <VStack gap="space-16" width="20em">
-          <TextField label="Kommaseparert liste med sekvensnr." name="sekvensnr" error={actionData?.error} />
-          <Button type="submit" name="action" value={Action.HentSkattehendelserManuelt} disabled={isSubmitting}>
-            Kjør
-          </Button>
+      </Box>
+
+      <Box as="section" padding="space-24" borderRadius="8" borderColor="neutral-subtleA" borderWidth="1">
+        <VStack gap="space-16">
+          <VStack gap="space-4">
+            <Heading size="small" level="2">
+              Behandle utvalgte hendelser
+            </Heading>
+            <BodyShort>Behandle utvalgte hendelser ved å angi tilhørende sekvensnummer</BodyShort>
+          </VStack>
+          <Form method="post">
+            <VStack gap="space-16" maxWidth="20em">
+              <TextField label="Kommaseparert liste med sekvensnr." name="sekvensnr" error={actionData?.error} />
+              <Button type="submit" name="action" value={Action.HentSkattehendelserManuelt} loading={isSubmitting}>
+                Kjør
+              </Button>
+            </VStack>
+          </Form>
 
           {actionData?.behandlingIder && (
-            <>
-              Oppretta behandlinger
-              {actionData?.behandlingIder.map((behandlingId: number) => (
-                <Link key={`behandling-link:${behandlingId}`} to={`/behandling/${behandlingId}`}>
-                  {behandlingId}
-                </Link>
-              ))}
-            </>
+            <InlineMessage status="success">
+              <VStack gap="space-8">
+                <BodyShort weight="semibold">Opprettet behandlinger:</BodyShort>
+                <List size="small">
+                  {actionData.behandlingIder.map((behandlingId: number) => (
+                    <List.Item key={`behandling-link:${behandlingId}`}>
+                      <Link to={`/behandling/${behandlingId}`}>{behandlingId}</Link>
+                    </List.Item>
+                  ))}
+                </List>
+              </VStack>
+            </InlineMessage>
           )}
         </VStack>
-      </Form>
-      <Heading size="medium">Antall hendelser å hente</Heading>
-      <BodyShort>Gjør et kall mot Sigrun for å se hvor mange hendelser en faktisk kjøring vil hente.</BodyShort>
-      <Form method="post">
-        <VStack gap="space-16" width="20em">
-          <Button type="submit" name="action" value={Action.HentAntallSkattehendelser} disabled={isSubmitting}>
-            Hent
-          </Button>
-
-          {actionData?.antall !== undefined && <>Antall å hente: {actionData?.antall}</>}
-        </VStack>
-      </Form>
+      </Box>
     </VStack>
   )
 }
