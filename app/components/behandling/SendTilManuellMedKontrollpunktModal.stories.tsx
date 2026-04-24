@@ -19,5 +19,14 @@ export const Default: Story = {
       ],
     }),
     sendTilManuellMedKontrollpunkt: () => {},
+    isSubmitting: false,
   },
 }
+
+export const Submitting: Story = {
+  args: {
+    ...Default.args!,
+    isSubmitting: true,
+  },
+}
+
