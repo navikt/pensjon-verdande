@@ -62,6 +62,8 @@ function mapTilBackend(k: Kriterium): BackendKriterium {
       return { type: k.type, erBatch: k.verdi }
     case 'KRAV_HAR_EIERENHET':
       return { type: k.type, enhetsnr: k.eierenheter }
+    case 'HAR_ANSVARLIG_TEAM':
+      return { type: k.type, teams: k.team }
     case 'HAR_FEILET_KJORING':
       return k.siden ? { type: k.type, sidenDato: k.siden } : { type: k.type }
     default:

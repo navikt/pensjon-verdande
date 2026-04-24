@@ -139,15 +139,21 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
   const navigate = useNavigate()
   const fetcher = useFetcher<TreffResponse | { error: string }>()
   const antallFetcher = useFetcher<{ totalAntall: number; buckets: Bucket[] } | { error: string }>()
+  const [klientFeilmelding, setKlientFeilmelding] = useState<string | null>(null)
 
   const committedHash = useMemo(() => hashCommittedState(committed), [committed])
 
   // ─── Committed sensitive kriterier (lest fra sessionStorage etter mount) ───
   const [committedSensitive, setCommittedSensitive] = useState<Kriterium[]>([])
+  const [sensitiveLastet, setSensitiveLastet] = useState(false)
   useEffect(() => {
     if (typeof window === 'undefined') return
     setCommittedSensitive(harSensitiveISok ? hentSensitive(committedHash) : [])
+    setSensitiveLastet(true)
   }, [committedHash, harSensitiveISok])
+
+  // Sensitive del av URL, men ingen treff i sessionStorage (ny fane / refresh / delt lenke).
+  const sensitiveMangler = harSensitiveISok && sensitiveLastet && committedSensitive.length === 0
 
   // Fullstendig committed-kriterieliste (ikke-sensitive fra URL + sensitive fra sessionStorage)
   const committedKriterier = useMemo<Kriterium[]>(
@@ -200,7 +206,7 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
   const venterPaInitialSensitiveLoad = useRef(false)
   useEffect(() => {
     if (!harSensitiveISok) return
-    if (committedSensitive.length === 0) return // venter på lasting fra sessionStorage
+    if (committedSensitive.length === 0) return // venter på lasting fra sessionStorage, eller mangler helt
     if (!committed.behandlingType) return
     venterPaInitialSensitiveLoad.current = committed.visning === 'treff'
     if (committed.visning === 'treff') {
@@ -238,7 +244,13 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
   // Akkumuler treff fra fetcher
   useEffect(() => {
     if (!fetcher.data) return
+    if ('error' in fetcher.data) {
+      setKlientFeilmelding(fetcher.data.error)
+      venterPaInitialSensitiveLoad.current = false
+      return
+    }
     if ('treff' in fetcher.data) {
+      setKlientFeilmelding(null)
       const data = fetcher.data
       const erstatt = venterPaInitialSensitiveLoad.current
       venterPaInitialSensitiveLoad.current = false
@@ -249,7 +261,12 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
 
   useEffect(() => {
     if (!antallFetcher.data) return
+    if ('error' in antallFetcher.data) {
+      setKlientFeilmelding(antallFetcher.data.error)
+      return
+    }
     if ('buckets' in antallFetcher.data) {
+      setKlientFeilmelding(null)
       setKlientAntall(antallFetcher.data)
     }
   }, [antallFetcher.data])
@@ -322,8 +339,11 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
   const [limInnOpen, setLimInnOpen] = useState(false)
 
   // Vise-data: foretrekk klient-resultat når det finnes (sensitive-søk), ellers initial.
-  const visTreff = initialResultat?.kind === 'treff' || (harSensitiveISok && committed.visning === 'treff')
-  const visAntall = initialResultat?.kind === 'antall' || (harSensitiveISok && committed.visning === 'antall-over-tid')
+  const visTreff =
+    !sensitiveMangler && (initialResultat?.kind === 'treff' || (harSensitiveISok && committed.visning === 'treff'))
+  const visAntall =
+    !sensitiveMangler &&
+    (initialResultat?.kind === 'antall' || (harSensitiveISok && committed.visning === 'antall-over-tid'))
   const antallData = initialResultat?.kind === 'antall' ? initialResultat.data : klientAntall
 
   return (
@@ -347,6 +367,15 @@ export default function BehandlingSokPage({ loaderData }: Route.ComponentProps) 
           )}
 
           {feilmelding && <Alert variant="error">{feilmelding}</Alert>}
+
+          {klientFeilmelding && <Alert variant="error">{klientFeilmelding}</Alert>}
+
+          {sensitiveMangler && (
+            <Alert variant="warning">
+              Søket inneholder sensitive kriterier (NAV-identer eller behandlingsserie-UUID) som ble lagret lokalt og
+              ikke ligger i URL-en. De er ikke tilgjengelige i denne fanen — kjør søket på nytt med kriteriene fylt inn.
+            </Alert>
+          )}
 
           {harSensitive && <SensitiveVerdierBanner />}
 

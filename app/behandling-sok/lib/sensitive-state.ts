@@ -14,7 +14,18 @@ const MAX_ENTRIES = 20
 
 type Lagring = Record<string, { kriterier: Kriterium[]; seq: number }>
 
-let nesteSeq = 1
+let nesteSeq = 0
+let nesteSeqInitialized = false
+
+function initNesteSeqFraStorage(data: Lagring): void {
+  if (nesteSeqInitialized) return
+  let max = 0
+  for (const entry of Object.values(data)) {
+    if (typeof entry?.seq === 'number' && entry.seq > max) max = entry.seq
+  }
+  nesteSeq = max + 1
+  nesteSeqInitialized = true
+}
 function getStorage(): Storage | null {
   if (typeof window === 'undefined') return null
   try {
@@ -57,6 +68,7 @@ export function lagreSensitive(queryHash: string, kriterier: Kriterium[]): void 
     return
   }
   const data = lesAlle()
+  initNesteSeqFraStorage(data)
   const seq = nesteSeq++
   data[queryHash] = { kriterier, seq }
   skrivAlle(data)
@@ -76,4 +88,6 @@ export function fjernSensitive(queryHash: string): void {
 export function tomAlleSensitive(): void {
   const s = getStorage()
   if (s) s.removeItem(STORAGE_KEY)
+  nesteSeq = 0
+  nesteSeqInitialized = false
 }

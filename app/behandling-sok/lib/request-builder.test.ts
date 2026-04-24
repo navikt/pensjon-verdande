@@ -85,6 +85,10 @@ describe('rensKriterier mapper interne feltnavn til backend-DTO', () => {
     const r = rensKriterier([{ type: 'KRAV_HAR_EIERENHET', eierenheter: ['4849'] }])
     expect(r).toEqual([{ type: 'KRAV_HAR_EIERENHET', enhetsnr: ['4849'] }])
   })
+  it('HAR_ANSVARLIG_TEAM: team → teams', () => {
+    const r = rensKriterier([{ type: 'HAR_ANSVARLIG_TEAM', team: ['TEAM_ALDER'] }])
+    expect(r).toEqual([{ type: 'HAR_ANSVARLIG_TEAM', teams: ['TEAM_ALDER'] }])
+  })
   it('HAR_FEILET_KJORING: siden → sidenDato (utelater når null)', () => {
     expect(rensKriterier([{ type: 'HAR_FEILET_KJORING', siden: '2025-01-01' }])).toEqual([
       { type: 'HAR_FEILET_KJORING', sidenDato: '2025-01-01' },
