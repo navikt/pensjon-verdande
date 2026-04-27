@@ -82,7 +82,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Route.ComponentProps) {
   const navigation = useNavigation()
 
-  const isSubmitting = navigation.state === 'submitting'
+  const isSubmittingHent =
+    navigation.state !== 'idle' && navigation.formData?.get('action') === Action.HentSkattehendelser
+  const isSubmittingManuelt =
+    navigation.state !== 'idle' && navigation.formData?.get('action') === Action.HentSkattehendelserManuelt
 
   return (
     <VStack gap="space-24" maxWidth="48rem" paddingInline="space-16">
@@ -90,7 +93,7 @@ export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Rou
         <Heading size="medium" level="1">
           Hent opplysninger fra Skatt (tidligere BPEN096)
         </Heading>
-        <BodyLong>Batchkjøring for henting av opplysninger fra Skatteetaten for Uføretrygd Etteroppgjør</BodyLong>
+        <BodyLong>Batchkjøring for henting av inntekter fra Skatteetaten for bruk i Uføretrygd Etteroppgjør</BodyLong>
       </VStack>
 
       <Box as="section" padding="space-24" borderRadius="8" borderColor="neutral-subtleA" borderWidth="1">
@@ -99,9 +102,13 @@ export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Rou
             <Heading size="small" level="2">
               Behandle nyeste hendelser
             </Heading>
-            <BodyShort>
-              Antall nye hendelser: <strong>{loaderData.antallHendelserAaHente ?? 'Ikke tilgjengelig'}</strong>
-            </BodyShort>
+            {loaderData.antallHendelserAaHente !== null ? (
+              <BodyShort>
+                Antall nye hendelser: <strong>{loaderData.antallHendelserAaHente}</strong>
+              </BodyShort>
+            ) : (
+              <InlineMessage status="error">Henting av antall nye hendelser feilet</InlineMessage>
+            )}
           </VStack>
           <Form method="post">
             <VStack gap="space-16" maxWidth="20em">
@@ -119,7 +126,7 @@ export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Rou
                 type="number"
               />
 
-              <Button type="submit" name="action" value={Action.HentSkattehendelser} loading={isSubmitting}>
+              <Button type="submit" name="action" value={Action.HentSkattehendelser} loading={isSubmittingHent}>
                 Kjør
               </Button>
             </VStack>
@@ -138,7 +145,12 @@ export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Rou
           <Form method="post">
             <VStack gap="space-16" maxWidth="20em">
               <TextField label="Kommaseparert liste med sekvensnr." name="sekvensnr" error={actionData?.error} />
-              <Button type="submit" name="action" value={Action.HentSkattehendelserManuelt} loading={isSubmitting}>
+              <Button
+                type="submit"
+                name="action"
+                value={Action.HentSkattehendelserManuelt}
+                loading={isSubmittingManuelt}
+              >
                 Kjør
               </Button>
             </VStack>
