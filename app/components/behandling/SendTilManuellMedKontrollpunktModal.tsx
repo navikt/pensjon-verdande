@@ -6,6 +6,7 @@ import type { BehandlingDto, KontrollpunktDecode } from '~/types'
 export interface Props {
   behandling: BehandlingDto
   sendTilManuellMedKontrollpunkt: (kontrollpunkt: string) => void
+  isSubmitting: boolean
 }
 
 export default function SendTilManuellMedKontrollpunktModal(props: Props) {
@@ -60,7 +61,8 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
             data-color="danger"
             type="button"
             variant="primary"
-            disabled={valgtKontrollpunkt == null}
+            disabled={valgtKontrollpunkt == null || props.isSubmitting}
+            loading={props.isSubmitting}
             onClick={() => {
               if (valgtKontrollpunkt) {
                 props.sendTilManuellMedKontrollpunkt(valgtKontrollpunkt.kontrollpunkt)
