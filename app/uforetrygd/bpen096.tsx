@@ -27,7 +27,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   try {
     const { antall } = await apiGet<{ antall: number }>('/api/uforetrygd/etteroppgjor/skattehendelser/antall', request)
     return { antallHendelserAaHente: antall }
-  } catch {
+  } catch (e) {
+    console.warn('Kunne ikke hente antall skattehendelser', e)
     return { antallHendelserAaHente: null }
   }
 }
@@ -112,8 +113,7 @@ export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Rou
           </VStack>
           <Form method="post">
             <VStack gap="space-16" maxWidth="20em">
-              <Select label="Debug" size="medium" name="debug" defaultValue="" required>
-                <option value="">Velg</option>
+              <Select label="Debug" size="medium" name="debug" defaultValue="false">
                 <option value="true">Ja</option>
                 <option value="false">Nei</option>
               </Select>
@@ -121,7 +121,6 @@ export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Rou
               <TextField
                 label="Maks antall hendelser"
                 defaultValue="10000"
-                aria-label="maxSekvensnummer"
                 name="maksAntallSekvensnummer"
                 type="number"
               />

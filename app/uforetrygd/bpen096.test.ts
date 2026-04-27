@@ -9,7 +9,7 @@ vi.mock('~/services/env.server', () => ({
   isDevelopment: false,
 }))
 
-const { action } = await import('./bpen096')
+const { action, loader } = await import('./bpen096')
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -20,6 +20,9 @@ function jsonResponse(body: unknown, status = 200) {
 
 const actionArgs = (request: Request) =>
   ({ request, params: {}, context: {}, unstable_pattern: '/bpen096' }) as Parameters<typeof action>[0]
+
+const loaderArgs = (request: Request) =>
+  ({ request, params: {}, context: {}, unstable_pattern: '/bpen096' }) as Parameters<typeof loader>[0]
 
 describe('bpen096 action', () => {
   let fetchSpy: ReturnType<typeof vi.fn>
@@ -40,7 +43,6 @@ describe('bpen096 action', () => {
     const formData = new FormData()
     formData.set('action', 'HENT_SKATTEHENDELSER')
     formData.set('maksAntallSekvensnummer', '10000')
-    formData.set('sekvensnummerPerBehandling', '100')
     formData.set('debug', 'false')
 
     const request = new Request('http://localhost/bpen096', { method: 'POST', body: formData })
@@ -56,7 +58,6 @@ describe('bpen096 action', () => {
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({
       maksAntallSekvensnummer: 10000,
-      sekvensnummerPerBehandling: 100,
       debug: false,
     })
 
@@ -98,31 +99,12 @@ describe('bpen096 action', () => {
     expect(result).toMatchObject({ action: 'HENT_SKATTEHENDELSER_MANUELT', error: 'Ugyldig sekvensnr' })
   })
 
-  it('HentAntallSkattehendelser returnerer antall', async () => {
-    fetchSpy.mockResolvedValueOnce(jsonResponse({ antall: 42 }))
-
-    const formData = new FormData()
-    formData.set('action', 'HENT_ANTALL_SKATTEHENDELSER')
-
-    const request = new Request('http://localhost/bpen096', { method: 'POST', body: formData })
-    const result = await action(actionArgs(request))
-
-    expect(fetchSpy).toHaveBeenCalledOnce()
-    const [url, init] = fetchSpy.mock.calls[0]
-    expect(url).toBe('http://pen-test/api/uforetrygd/etteroppgjor/skattehendelser/antall')
-    expect(init.method).toBe('GET')
-    expect(init.signal).toBeInstanceOf(AbortSignal)
-
-    expect(result).toEqual({ antall: 42 })
-  })
-
   it('HentSkattehendelser kaster feil ved tomt svar (manglende behandlingId)', async () => {
     fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }))
 
     const formData = new FormData()
     formData.set('action', 'HENT_SKATTEHENDELSER')
     formData.set('maksAntallSekvensnummer', '10000')
-    formData.set('sekvensnummerPerBehandling', '100')
     formData.set('debug', 'false')
 
     const request = new Request('http://localhost/bpen096', { method: 'POST', body: formData })
@@ -144,5 +126,37 @@ describe('bpen096 action', () => {
       action: 'HENT_SKATTEHENDELSER_MANUELT',
       error: 'Mangler behandlingIder fra tjenesten',
     })
+  })
+})
+
+describe('bpen096 loader', () => {
+  let fetchSpy: ReturnType<typeof vi.fn>
+
+  beforeEach(() => {
+    fetchSpy = vi.fn()
+    vi.stubGlobal('fetch', fetchSpy)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+  })
+
+  it('returnerer antall hendelser ved vellykket kall', async () => {
+    fetchSpy.mockResolvedValueOnce(jsonResponse({ antall: 42 }))
+
+    const request = new Request('http://localhost/bpen096')
+    const result = await loader(loaderArgs(request))
+
+    expect(result).toEqual({ antallHendelserAaHente: 42 })
+  })
+
+  it('returnerer null ved feil', async () => {
+    fetchSpy.mockRejectedValueOnce(new Error('Network error'))
+
+    const request = new Request('http://localhost/bpen096')
+    const result = await loader(loaderArgs(request))
+
+    expect(result).toEqual({ antallHendelserAaHente: null })
   })
 })
