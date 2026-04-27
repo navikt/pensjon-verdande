@@ -7,6 +7,7 @@ import { createRoutesStub } from 'react-router'
 import AktiviteterTab from './aktiviteter'
 import AktiviteterLayout from './aktiviteter-layout'
 import AktivitetsvarighetTab from './aktivitetsvarighet'
+import AlderspensjonLayout from './alderspensjon-layout'
 import AutomatiseringTab from './automatisering'
 import AutomatiseringLayout from './automatisering-layout'
 import DimensjonerLayout from './dimensjoner-layout'
@@ -22,6 +23,7 @@ import ManuelleTab from './manuelle'
 import {
   mockAktivitetData,
   mockAktivitetsvarighetData,
+  mockAlderspensjonMottakereData,
   mockAutomatiseringData,
   mockBehandlingKravAlderData,
   mockBehandlingstidPerTypeData,
@@ -49,6 +51,7 @@ import {
   mockVarighetData,
   mockVedtakstypeData,
 } from './mocks'
+import MottakereAlderTab from './mottakere-alder'
 import Nokkeltall from './nokkeltall'
 import PlanlagtTab from './planlagt'
 import PrioritetTab from './prioritet'
@@ -307,4 +310,31 @@ export const SakBehandlingstidStory: Story = {
 export const BehandlingKravAlderStory: Story = {
   name: 'Behandling per alder',
   render: () => renderAnalyseTab(SakBehandlingKravAlderTab, mockBehandlingKravAlderData(), 'sak-behandling-krav-alder'),
+}
+
+// --- Alderspensjon ---
+
+function renderAlderspensjonTab() {
+  const Stub = createRoutesStub([
+    {
+      path: '/analyse/alderspensjon',
+      // biome-ignore lint/suspicious/noExplicitAny: createRoutesStub type mismatch with react-router typed routes
+      Component: AlderspensjonLayout as any,
+      loader: () => ({ fom: '2024-01-01', tom: '2026-01-01', aggregering: 'MAANED' }),
+      children: [
+        {
+          path: 'mottakere',
+          // biome-ignore lint/suspicious/noExplicitAny: createRoutesStub type mismatch with react-router typed routes
+          Component: MottakereAlderTab as any,
+          loader: () => mockAlderspensjonMottakereData(),
+        },
+      ],
+    },
+  ])
+  return <Stub initialEntries={['/analyse/alderspensjon/mottakere?fom=2024-01-01&tom=2026-01-01&aggregering=MAANED']} />
+}
+
+export const AlderspensjonMottakereStory: Story = {
+  name: 'Alderspensjon — mottakere',
+  render: renderAlderspensjonTab,
 }
