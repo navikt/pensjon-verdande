@@ -158,7 +158,7 @@ export default function HentOpplysningerFraSkatt({ loaderData, actionData }: Rou
           {actionData?.behandlingIder && (
             <InlineMessage status="success">
               <VStack gap="space-8">
-                <BodyShort weight="semibold">Opprettet behandlinger:</BodyShort>
+                <BodyShort weight="semibold">Opprettede behandlinger:</BodyShort>
                 <List size="small">
                   {actionData.behandlingIder.map((behandlingId: number) => (
                     <List.Item key={`behandling-link:${behandlingId}`}>
