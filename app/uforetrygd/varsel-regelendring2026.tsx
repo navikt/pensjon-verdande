@@ -1,4 +1,4 @@
-import { BodyLong, Box, Button, Heading, Select, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, Heading, HStack, Select, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/varsel-regelendring2026'
@@ -13,16 +13,25 @@ export const loader = () => {
   }
 }
 
+const ENDEPUNKTER = {
+  varsel: '/api/uforetrygd/regelendring2026/varsel',
+  populer: '/api/uforetrygd/regelendring2026/populer',
+} as const
+
+type Intent = keyof typeof ENDEPUNKTER
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const dryRunStr = String(formData.get('dryRun') ?? 'true')
   const dryRun = dryRunStr === 'true'
+  const intent = String(formData.get('intent') ?? '') as Intent
 
-  const response = await apiPost<{ behandlingId: number }>(
-    '/api/uforetrygd/regelendring2026/varsel',
-    { dryRun },
-    request,
-  )
+  const endepunkt = ENDEPUNKTER[intent]
+  if (!endepunkt) {
+    throw new Error(`Ukjent intent: ${intent}`)
+  }
+
+  const response = await apiPost<{ behandlingId: number }>(endepunkt, { dryRun }, request)
 
   if (!response?.behandlingId) {
     throw new Error('Missing behandlingId')
@@ -33,7 +42,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function VarselRegelendring2026() {
   const navigation = useNavigation()
 
-  const isSubmitting = navigation.state === 'submitting'
+  const submittingIntent =
+    navigation.state === 'submitting' ? (navigation.formData?.get('intent') as Intent | null) : null
 
   return (
     <VStack gap={'space-16'}>
@@ -41,7 +51,9 @@ export default function VarselRegelendring2026() {
         <Heading size={'medium'} level={'1'}>
           Varsel regelendring 2026
         </Heading>
-        <BodyLong>Regelendring Uføretrygd 2026</BodyLong>
+        <BodyLong>
+          Regelendring Uføretrygd 2026 — send ut varselbrev og populér <code>T_OMREGNING_INPUT</code> for omregning.
+        </BodyLong>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'space-16'}>
@@ -49,9 +61,20 @@ export default function VarselRegelendring2026() {
             <option value="true">Ja</option>
             <option value="false">Nei</option>
           </Select>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Oppretter…' : 'Opprett'}
-          </Button>
+          <HStack gap={'space-8'}>
+            <Button type="submit" name="intent" value="varsel" disabled={navigation.state === 'submitting'}>
+              {submittingIntent === 'varsel' ? 'Oppretter…' : 'Send varselbrev'}
+            </Button>
+            <Button
+              type="submit"
+              name="intent"
+              value="populer"
+              variant="secondary"
+              disabled={navigation.state === 'submitting'}
+            >
+              {submittingIntent === 'populer' ? 'Populerer…' : 'Populér T_OMREGNING_INPUT'}
+            </Button>
+          </HStack>
         </VStack>
       </Form>
     </VStack>
