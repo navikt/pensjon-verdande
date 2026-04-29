@@ -114,6 +114,30 @@ function sumAntall(rows: ManuellBehandlingOppsummering[]): number {
   return rows.reduce((acc, r) => acc + (r.antall ?? 0), 0)
 }
 
+function buildUttrekkHref(
+  fomDato: string,
+  tomDato: string,
+  rowFacets: Partial<Record<FacetKey, string | null>>,
+  activeFilters: Partial<Record<FacetKey, string[]>>,
+): string {
+  const params = new URLSearchParams()
+  params.set('fomDato', fomDato)
+  params.set('tomDato', tomDato)
+
+  for (const facet of FACETS) {
+    if (facet in rowFacets) {
+      params.set(facet, encodeValue(rowFacets[facet] ?? null))
+    } else {
+      const values = activeFilters[facet]
+      if (values?.length) {
+        for (const v of values) params.append(facet, v)
+      }
+    }
+  }
+
+  return `/manuell-behandling-uttrekk?${params.toString()}`
+}
+
 function applyFilters(
   rows: ManuellBehandlingOppsummering[],
   filters: Partial<Record<FacetKey, string[]>>,
@@ -514,7 +538,21 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                           {((r.antall * 100) / total).toFixed(1)} %
                         </Table.DataCell>
                         <Table.DataCell>
-                          <ManuellBehandlingActionMenu />
+                          <ManuellBehandlingActionMenu
+                            uttrekkHref={buildUttrekkHref(
+                              fomDato,
+                              tomDato,
+                              {
+                                behandlingType: r.behandlingType,
+                                kategori: r.kategori,
+                                fagomrade: r.fagomrade,
+                                oppgaveKode: r.oppgaveKode,
+                                underkategoriKode: r.underkategoriKode,
+                                prioritetKode: r.prioritetKode,
+                              },
+                              filters,
+                            )}
+                          />
                         </Table.DataCell>
                       </Table.Row>
                     ))}
@@ -548,7 +586,9 @@ export default function ManuellBehandlingOppsummeringRoute({ loaderData }: Route
                         {((gr.antall * 100) / total).toFixed(1)} %
                       </Table.DataCell>
                       <Table.DataCell>
-                        <ManuellBehandlingActionMenu />
+                        <ManuellBehandlingActionMenu
+                          uttrekkHref={buildUttrekkHref(fomDato, tomDato, gr.values, filters)}
+                        />
                       </Table.DataCell>
                     </Table.Row>
                   ))}
