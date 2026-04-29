@@ -4,7 +4,7 @@ import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/regelendring2026'
 
 export function meta(): Route.MetaDescriptors {
-  return [{ title: 'Regelendring 2026 Uføre | Verdande' }]
+  return [{ title: 'Regelendring 2026 uføre | Verdande' }]
 }
 
 export const loader = () => {
@@ -52,8 +52,8 @@ export default function Regelendring2026() {
           Regelendring uføretrygd 2026
         </Heading>
         <BodyLong>
-          Et samlested for en midlertidig behandling for regelendringer 2026. Slettes når alle regelendringer er
-          gjennomført. Her kan det bestilles varselbrev eller populering av tabell T_OMREGNING_INPUT som brukes av{' '}
+          En midlertidig behandling for regelendringer 2026. Slettes når alle regelendringer er gjennomført. Her kan det
+          bestilles varselbrev eller populering av tabell T_OMREGNING_INPUT som brukes av{' '}
           <Link to="/omregning">omregningsbehandlingen</Link>.
         </BodyLong>
       </Box>
