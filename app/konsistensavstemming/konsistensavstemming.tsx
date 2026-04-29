@@ -19,7 +19,7 @@ import { apiPost } from '~/services/api.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/konsistensavstemming'
 
-const behandlingType = 'KonsistensavstemmingBehandling'
+const behandlingType = 'ManedligAvstemmingBehandling'
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Konsistensavstemming | Verdande' }]
@@ -33,7 +33,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const behandlinger = getBehandlinger(request, {
     behandlingType: behandlingType,
     page: page ? +page : 0,
-    size: size ? +size : 9,
+    size: size ? +size : 3,
     sort: searchParams.get('sort'),
   })
 
@@ -112,7 +112,7 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
     <VStack gap={'space-16'}>
       <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
-          Opprett avstemming
+          Opprett konsistensavstemming
         </Heading>
         <VStack gap="space-8">
           <BodyLong>Oppretter behandlinger for konsistensavstemming mot Oppdrag</BodyLong>
@@ -165,7 +165,7 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
             minDate={minDate}
-            label="Kjøretidspunkt (valgfritt)"
+            label="Kjøretidspunkt"
           />
           <input
             type="hidden"
@@ -174,10 +174,10 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
           />
           <Button
             type="submit"
-            disabled={avstemmingsdato === '' || !areDatesValid(avstemmingsdato)}
+            disabled={avstemmingsdato === '' || !areDatesValid(avstemmingsdato) || selectedDate === null}
             loading={isSubmitting}
           >
-            Opprett avstemming-behandlinger
+            Opprett konsistensavstemming
           </Button>
         </VStack>
       </Form>
