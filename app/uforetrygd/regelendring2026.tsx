@@ -1,10 +1,10 @@
 import { BodyLong, Box, Button, Heading, HStack, Select, VStack } from '@navikt/ds-react'
-import { Form, redirect, useNavigation } from 'react-router'
+import { Form, Link, redirect, useNavigation } from 'react-router'
 import { apiPost } from '~/services/api.server'
-import type { Route } from './+types/varsel-regelendring2026'
+import type { Route } from './+types/regelendring2026'
 
 export function meta(): Route.MetaDescriptors {
-  return [{ title: 'Varsel regelendring 2026 Uføre | Verdande' }]
+  return [{ title: 'Regelendring 2026 Uføre | Verdande' }]
 }
 
 export const loader = () => {
@@ -39,7 +39,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return redirect(`/behandling/${response.behandlingId}`)
 }
 
-export default function VarselRegelendring2026() {
+export default function Regelendring2026() {
   const navigation = useNavigation()
 
   const submittingIntent =
@@ -49,10 +49,12 @@ export default function VarselRegelendring2026() {
     <VStack gap={'space-16'}>
       <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
-          Varsel regelendring 2026
+          Regelendring uføretrygd 2026
         </Heading>
         <BodyLong>
-          Regelendring Uføretrygd 2026 — send ut varselbrev og populér <code>T_OMREGNING_INPUT</code> for omregning.
+          Et samlested for en midlertidig behandling for regelendringer 2026. Slettes når alle regelendringer er
+          gjennomført. Her kan det bestilles varselbrev eller populering av tabell T_OMREGNING_INPUT som brukes av{' '}
+          <Link to="/omregning">omregningsbehandlingen</Link>.
         </BodyLong>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
@@ -65,13 +67,7 @@ export default function VarselRegelendring2026() {
             <Button type="submit" name="intent" value="varsel" disabled={navigation.state === 'submitting'}>
               {submittingIntent === 'varsel' ? 'Oppretter…' : 'Send varselbrev'}
             </Button>
-            <Button
-              type="submit"
-              name="intent"
-              value="populer"
-              variant="secondary"
-              disabled={navigation.state === 'submitting'}
-            >
+            <Button type="submit" name="intent" value="populer" disabled={navigation.state === 'submitting'}>
               {submittingIntent === 'populer' ? 'Populerer…' : 'Populér T_OMREGNING_INPUT'}
             </Button>
           </HStack>
