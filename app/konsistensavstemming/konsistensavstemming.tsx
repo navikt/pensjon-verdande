@@ -33,7 +33,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const behandlinger = getBehandlinger(request, {
     behandlingType: behandlingType,
     page: page ? +page : 0,
-    size: size ? +size : 3,
+    size: size ? +size : 12,
     sort: searchParams.get('sort'),
   })
 
