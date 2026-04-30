@@ -249,7 +249,7 @@ export default [
 
     route('linke-dnr-fnr', 'vedlikehold/linke-dnr-fnr.tsx'),
 
-    route('feil-registrer-krav', 'vedlikehold/feil-registrer-krav.tsx'),
+    route('feil-registrer-krav', 'vedlikehold/feil-registrer-krav-og-oppgave.tsx'),
 
     route('manglende-foreign-key-indexer', 'vedlikehold/manglende-foreign-key-indexer.tsx'),
 
