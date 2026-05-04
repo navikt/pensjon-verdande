@@ -18,7 +18,7 @@ import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/feil-registrer-krav-og-oppgave'
 
 export function meta(): Route.MetaDescriptors {
-  return [{ title: 'Feil registrer krav og oppgave | Verdande' }]
+  return [{ title: 'Feilregistrer krav og oppgave | Verdande' }]
 }
 
 export const BEHANDLING_TYPE = {
@@ -66,10 +66,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const oppgavetekst = typeof oppgavetekstRaw === 'string' ? oppgavetekstRaw : ''
   const kommentar = typeof kommentarRaw === 'string' ? kommentarRaw : ''
 
-  const kreverDato = feilregistrerType !== FEILREGISTRER_TYPE.KRAV
   const datoOpprettet = typeof datoOpprettetRaw === 'string' && datoOpprettetRaw !== '' ? datoOpprettetRaw : null
 
-  if (kreverDato && datoOpprettet === null) {
+  if (datoOpprettet === null) {
     return { error: 'Dato når oppgave ble opprettet er påkrevd' }
   }
 
@@ -99,7 +98,7 @@ function konverterTilListe(sakIderText: string): string[] {
     .filter((id) => id !== '')
 }
 
-export default function FeilRegistrerKravPage() {
+export default function FeilRegistrerKravOgOppgavePage() {
   const fetcher = useFetcher<typeof action>()
   const [sakIderText, setSakIderText] = useState<string>('')
   const [oppgavetekst, setOppgavetekst] = useState<string>('')
@@ -108,7 +107,7 @@ export default function FeilRegistrerKravPage() {
 
   return (
     <VStack gap="space-16">
-      <Heading size="large">Feilregistrer krav</Heading>
+      <Heading size="large">Feilregistrer krav og oppgave</Heading>
       <fetcher.Form
         method="post"
         onSubmit={(e) => {
@@ -122,11 +121,11 @@ export default function FeilRegistrerKravPage() {
       >
         <VStack gap="space-12">
           <HStack gap="space-8" align="end">
-            <Select label="Velg krav eller oppgave som skal feilregistreres" name="feilregistrerType" defaultValue="">
-              <option value="" disabled>
-                Velg feilregistrertype
-              </option>
-
+            <Select
+              label="Velg krav eller oppgave som skal feilregistreres"
+              name="feilregistrerType"
+              defaultValue={FEILREGISTRER_TYPE.KRAV_OG_OPPGAVE}
+            >
               <option value={FEILREGISTRER_TYPE.KRAV_OG_OPPGAVE}>Krav og oppgave</option>
 
               <option value={FEILREGISTRER_TYPE.KRAV}>Krav</option>
@@ -166,7 +165,7 @@ export default function FeilRegistrerKravPage() {
                 minRows={3}
               />
               <Textarea
-                label={'Kommentar(valgfritt)'}
+                label={'Kommentar (valgfritt)'}
                 onChange={(e) => setKommentarText(e.target.value)}
                 value={kommentar}
                 name="kommentar"
@@ -175,14 +174,19 @@ export default function FeilRegistrerKravPage() {
             </VStack>
 
             <VStack gap="space-2" style={{ minWidth: 240, marginLeft: '0.5rem' }}>
-              <Label>Dato når oppgave ble opprettet *</Label>
+              <Label>Dato når oppgave ble opprettet</Label>
               <Box
                 padding="space-8"
                 borderRadius="8"
                 borderWidth="1"
                 borderColor={fetcher.data?.error ? 'danger' : 'neutral'}
               >
-                <div style={{ transform: 'scale(0.9)', transformOrigin: 'top left' }}>
+                <div
+                  style={{
+                    transform: 'scale(0.9)',
+                    transformOrigin: 'top left',
+                  }}
+                >
                   <DatePicker.Standalone
                     toDate={new Date()}
                     selected={datoOpprettet}
@@ -194,7 +198,12 @@ export default function FeilRegistrerKravPage() {
             </VStack>
           </HStack>
           <HStack>
-            <Button type="submit" name="action">
+            <Button
+              type="submit"
+              name="action"
+              loading={fetcher.state === 'submitting'}
+              disabled={fetcher.state === 'submitting'}
+            >
               Feilregistrer
             </Button>
           </HStack>
