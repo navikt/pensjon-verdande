@@ -24,11 +24,6 @@
     "test:stories": "vitest --project storybook",
     "typecheck": "node scripts/copy-server-dts.ts && react-router typegen && tsc"
   },
-  "prettier": {
-    "trailingComma": "all",
-    "semi": false,
-    "singleQuote": true
-  },
   "dependencies": {
     "@mjackson/form-data-parser": "^0.9.1",
     "@navikt/aksel-icons": "^8.10.3",
