@@ -17,6 +17,10 @@ updates:
         patterns:
           - "@react-router*"
           - "react-router"
+      storybook:
+        patterns:
+          - 'storybook'
+          - '@storybook/*'
 
   - package-ecosystem: "docker"
     directory: "/"
