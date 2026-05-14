@@ -1,4 +1,4 @@
-import { BodyShort, Box, Heading, Table, VStack } from '@navikt/ds-react'
+import { BodyShort, Box, Button, Heading, Table, VStack } from '@navikt/ds-react'
 import { useCallback } from 'react'
 import { decodeAktivitet } from '~/common/decodeBehandling'
 import type { ManuellOppgaveStatistikk } from '../types'
@@ -7,9 +7,11 @@ import { useSortableTable } from '../utils/useSortableTable'
 
 interface Props {
   data: ManuellOppgaveStatistikk[]
+  onSelectOppgaveKategori?: (kategori: string) => void
+  valgtOppgaveKategori?: string | null
 }
 
-export default function ManuelleOppgaverTabell({ data }: Props) {
+export default function ManuelleOppgaverTabell({ data, onSelectOppgaveKategori, valgtOppgaveKategori }: Props) {
   const getValue = useCallback((item: ManuellOppgaveStatistikk, key: string) => {
     switch (key) {
       case 'aktivitet':
@@ -79,7 +81,22 @@ export default function ManuelleOppgaverTabell({ data }: Props) {
               }
             >
               <Table.DataCell>{decodeAktivitet(oppgave.aktivitetType)}</Table.DataCell>
-              <Table.DataCell>{oppgave.oppgaveKategori}</Table.DataCell>
+              <Table.DataCell>
+                {onSelectOppgaveKategori ? (
+                  <Button
+                    size="xsmall"
+                    variant={valgtOppgaveKategori === oppgave.oppgaveKategori ? 'primary' : 'tertiary'}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onSelectOppgaveKategori(oppgave.oppgaveKategori)
+                    }}
+                  >
+                    {oppgave.oppgaveKategori}
+                  </Button>
+                ) : (
+                  oppgave.oppgaveKategori
+                )}
+              </Table.DataCell>
               <Table.DataCell align="right">{formaterTall(oppgave.antall)}</Table.DataCell>
             </Table.ExpandableRow>
           ))}

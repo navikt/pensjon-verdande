@@ -88,6 +88,22 @@ export type KontrollpunktTelling = {
   antallKritiske: number
 }
 
+// --- Manuelle oppgaver tidsserie ---
+
+export type ManuellOppgaveTidsserieResponse = {
+  behandlingType: string
+  fom: string
+  tom: string
+  aggregering: Aggregeringsniva
+  datapunkter: ManuellOppgaveTidsserieDatapunkt[]
+}
+
+export type ManuellOppgaveTidsserieDatapunkt = {
+  periodeFra: string
+  oppgaveKategori: string
+  antall: number
+}
+
 // --- Kontrollpunkter ---
 
 export type KontrollpunktAnalyseResponse = {
