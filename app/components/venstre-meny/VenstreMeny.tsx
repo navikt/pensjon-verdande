@@ -100,6 +100,8 @@ const sakKravAnalyseMeny = [
   ['SE_BEHANDLINGER', '/analyse/sak-krav/behandlingstid', 'Behandlingstid'],
 ]
 
+const alderspensjonAnalyseMeny = [['SE_BEHANDLINGER', '/analyse/alderspensjon/mottakere', 'Mottakere']]
+
 export function harTilgang(me: MeResponse | undefined, operasjon: string) {
   if (!me) {
     return false
@@ -118,10 +120,13 @@ export default function VenstreMeny(props: Props) {
   const me = props.me
   const location = useLocation()
   const analyseSearch =
-    location.pathname.startsWith('/analyse') && !location.pathname.startsWith('/analyse/sak-krav')
+    location.pathname.startsWith('/analyse') &&
+    !location.pathname.startsWith('/analyse/sak-krav') &&
+    !location.pathname.startsWith('/analyse/alderspensjon')
       ? location.search
       : ''
   const sakKravSearch = location.pathname.startsWith('/analyse/sak-krav') ? location.search : ''
+  const alderspensjonSearch = location.pathname.startsWith('/analyse/alderspensjon') ? location.search : ''
   let currentIndex = 0
 
   function nextIndex() {
@@ -287,6 +292,15 @@ export default function VenstreMeny(props: Props) {
             <FileSearchIcon title="Sak- og kravanalyse" fontSize="1.5rem" />,
             false,
             sakKravSearch,
+          )}
+
+          {byggMeny(
+            'Alderspensjon-analyse',
+            alderspensjonAnalyseMeny,
+            nextIndex,
+            <SackPensionIcon title="Alderspensjon-analyse" fontSize="1.5rem" />,
+            false,
+            alderspensjonSearch,
           )}
 
           {byggMeny(
