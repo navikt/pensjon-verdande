@@ -40,7 +40,7 @@ const administrasjonMeny = [
   ['LINKE_DNR_TIL_FNR', `/linke-dnr-fnr`, 'Linke Dnr Fnr'],
   ['VERIFISER_ANTALL_FRA_MOT', `/leveattester-sokos-spkmottak`, 'Verifiser antall fra MOT'],
   ['OPPDATER_BARN_BRUK', '/vedlikehold-barn', 'Vedlikehold barn'],
-  ['FEIL_REGISTRER_KRAV', '/feil-registrer-krav', 'Feilregistrer krav'],
+  ['FEIL_REGISTRER_KRAV_OG_OPPGAVE', '/feil-registrer-krav', 'Feilregistrer krav og oppgave'],
 ]
 
 const batcherMeny = [
