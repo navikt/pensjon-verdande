@@ -111,7 +111,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       const sakIdNumbers = sakIdNumre.filter((id) => Number.isInteger(id))
 
       const response = await apiPost<unknown>(
-        '/api/feilregistrerkrav/hentoppgaver',
+        '/api/feilregistrerkravogoppgave/hentoppgaver',
         {
           sakIder: sakIdNumbers,
           datoOpprettet: datoOpprettetRaw,
@@ -212,7 +212,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   try {
     const response = await apiPost<{ behandlingId: number }>(
-      '/api/feilregistrerkrav/feilregistrer',
+      '/api/feilregistrerkravogoppgave/feilregistrer',
       {
         sakIder: sakIdTall,
         behandlingstype,
