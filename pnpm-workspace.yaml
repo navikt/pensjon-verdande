@@ -4,4 +4,4 @@ minimumReleaseAgeExclude:
   - "@navikt/*"
 allowBuilds:
   esbuild: false
-  lefthook: false
+  lefthook: true
