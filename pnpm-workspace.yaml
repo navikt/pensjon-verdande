@@ -1,0 +1,7 @@
+# Pakker må være minst 7 dager gamle før de lastes ned
+minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - "@navikt/*"
+allowBuilds:
+  esbuild: false
+  lefthook: false
