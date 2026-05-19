@@ -225,7 +225,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     )
 
     if (!response) {
-      throw new Error('Opprettelse av feilregistrer krav returnerte ingen respons')
+      throw new Error('Opprettelse av feilregistrering av krav eller oppgave returnerte ingen respons')
     }
 
     return redirect(`/behandling/${response.behandlingId}`)
@@ -378,7 +378,7 @@ export default function FeilRegistrerKravOgOppgavePage() {
                   padding="space-8"
                   borderRadius="8"
                   borderWidth="1"
-                  borderColor={fetcher.data?.error ? 'danger' : 'neutral'}
+                  borderColor={fetcher.data?.error ? 'danger-subtle' : 'neutral-subtleA'}
                 >
                   <DatePicker.Standalone
                     toDate={new Date()}
