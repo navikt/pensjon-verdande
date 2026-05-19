@@ -20,8 +20,8 @@ Denne filen beskriver hvordan en automatisert kodeagent (og mennesker) bør jobb
 Fra repo-roten:
 
 ```zsh
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ### Node-versjon
@@ -32,11 +32,11 @@ Hvis du får rare build/typecheck-feil, sjekk at du kjører riktig Node.
 Kjør alltid disse før du leverer større endringer:
 
 ```zsh
-npm run typecheck
-npm run check
-npm run test
-npm run test:stories
-npm run build
+pnpm run typecheck
+pnpm run check
+pnpm run test
+pnpm run test:stories
+pnpm run build
 ```
 
 ### Typegen / `+types`
@@ -48,17 +48,17 @@ Prosjektet bruker **Biome** for både linting og formattering (se `biome.json`).
 Vanlige kommandoer:
 
 ```zsh
-npm run check
-npm run lint
-npm run format
+pnpm run check
+pnpm run lint
+pnpm run format
 ```
 
 Auto-fix:
 
 ```zsh
-npm run check:fix
-npm run lint:fix
-npm run format:fix
+pnpm run check:fix
+pnpm run lint:fix
+pnpm run format:fix
 ```
 
 ### Tips ved feilsøking
@@ -67,7 +67,7 @@ npm run format:fix
   - Merk: status kan ligge i både `e.data.status` og/eller `e.init.status` (avhengig av hvor feilen kommer fra).
 
 ### Pre-commit hooks (Lefthook)
-Repoet bruker Lefthook (`lefthook.yml`). Hvis hooks feiler: kjør samme kommando lokalt (typisk `npm run check` og/eller `npm run typecheck`).
+Repoet bruker Lefthook (`lefthook.yml`). Hvis hooks feiler: kjør samme kommando lokalt (typisk `pnpm run check` og/eller `pnpm run typecheck`).
 
 ## Kodekonvensjoner
 - Foretrekk små, isolerte endringer i eksisterende filer. Unngå store refactors uten behov.
@@ -238,7 +238,7 @@ All decode/visning av enumer og koder skal bruke fellesfunksjonene i `app/common
 Alle Storybook-historier kjøres automatisk som smoke-tester via `@storybook/addon-vitest` i headless Chromium (Playwright).
 
 ```zsh
-npm run test:stories
+pnpm run test:stories
 ```
 
 - Historier som krasjer med "Unexpected Application Error" feiler testen automatisk
@@ -246,11 +246,11 @@ npm run test:stories
 - Nye historier bør alltid ha komplett loader-data for å unngå rendering-feil
 
 ## Definition of Done (DoD)
-- `npm run check` (Biome) er grønn
-- `npm run typecheck` er grønn
-- `npm run test` er grønn
-- `npm run test:stories` er grønn
-- `npm run build` er grønn
+- `pnpm run check` (Biome) er grønn
+- `pnpm run typecheck` er grønn
+- `pnpm run test` er grønn
+- `pnpm run test:stories` er grønn
+- `pnpm run build` er grønn
 - Endringen er dokumentert kort i PR-beskrivelse (hva/hvorfor) og evt. i README/kommentar ved behov
 
 ## Skjermbilder for dokumentasjon
@@ -261,10 +261,10 @@ Verdande har et script for å ta skjermbilder av Storybook-stories, som brukes t
 
 ```zsh
 # Ta skjermbilder av alle stories
-npm run capture-screenshots
+pnpm run capture-screenshots
 
 # Ta skjermbilder kun for dokumentasjon og kopier til pensjon-dokumentasjon
-npm run capture-docs-screenshots
+pnpm run capture-docs-screenshots
 ```
 
 ### Mapping
@@ -275,8 +275,8 @@ Filen `scripts/screenshot-mapping.json` definerer hvilke stories som brukes i do
 
 Etter visuelle endringer i Verdande:
 
-1. Start Storybook: `npm run storybook`
-2. Generer docs-screenshots: `npm run capture-docs-screenshots`
+1. Start Storybook: `pnpm run storybook`
+2. Generer docs-screenshots: `pnpm run capture-docs-screenshots`
 3. Verifiser bildene i `pensjon-dokumentasjon/pen/docs/modules/Behandlingsloesningen/images/`
 4. Commit endrede bilder i `pensjon-dokumentasjon`
 

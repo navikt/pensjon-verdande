@@ -1,0 +1,22 @@
+name: "Sett opp og installer frontend avhengigheter"
+description: "Sett opp node, pnpm, og installer avhengigheter."
+
+runs:
+  using: composite
+  steps:
+    - name: Sett opp pnpm
+      uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
+      with:
+        run_install: false
+        package_json_file: 'package.json'
+
+    - name: Sett opp node
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      with:
+        node-version-file: 'package.json'
+        cache: 'pnpm'
+        cache-dependency-path: 'pnpm-lock.yaml'
+
+    - name: Installer avhengigheter
+      shell: bash
+      run: pnpm install --frozen-lockfile
