@@ -1,5 +1,5 @@
 name: "Sett opp og installer frontend avhengigheter"
-description: "Sett opp node, pnpm, og installer avhengigheter for frontend-mappen."
+description: "Sett opp node, pnpm, og installer avhengigheter."
 
 runs:
   using: composite

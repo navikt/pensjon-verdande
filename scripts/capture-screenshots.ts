@@ -1,7 +1,7 @@
 /**
  * Tar screenshots av Storybook-stories for dokumentasjon.
  *
- * Forutsetter at Storybook kjører (enten `npm run storybook` eller bygg + serve).
+ * Forutsetter at Storybook kjører (enten `pnpm run storybook` eller bygg + serve).
  *
  * Bruk:
  *   npx tsx scripts/capture-screenshots.ts                  # Alle stories

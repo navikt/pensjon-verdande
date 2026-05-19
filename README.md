@@ -1,6 +1,6 @@
 # Verdande
 
-Verdande er et grafisk brukergrensesnitt for å kunne overvåke, feilsøke og utvikle behandlinger i [behandlingsløsningen](https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html) for PO Pensjon. Verdande er tilgjengelig i alle miljøene som Navs fagsystem for administrering av pensjon og uføretrygd, pensjon-pen, kjører i.  
+Verdande er et grafisk brukergrensesnitt for å kunne overvåke, feilsøke og utvikle behandlinger i [behandlingsløsningen](https://pensjon-dokumentasjon.intern.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html) for PO Pensjon. Verdande er tilgjengelig i alle miljøene som Navs fagsystem for administrering av pensjon og uføretrygd, pensjon-pen, kjører i.
 
 Mer informasjon om Verdande i [systemdokumentasjonen](https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Verdande.html) (intern).
 
@@ -10,33 +10,33 @@ Verdande henter sitt navn fra norrøn mytologi og betyr "[det som er i ferd med 
 
 ## Komme i gang
 
-Krever Node.js ≥ 24.11.0.
+Krever Node.js ^24.11.0.
 
 ```sh
-npm install
+pnpm install
 ./fetch-secrets.sh   # Henter secrets fra Kubernetes (krever naisdevice)
 ```
 
 Start `PenApplication`. Deretter:
 
 ```sh
-npm run dev
+pnpm run dev
 ```
 
 ## Kvalitetssjekker
 
 ```sh
-npm run check        # Biome lint + formattering
-npm run typecheck    # TypeScript-sjekk
-npm run test         # Enhetstester (Vitest)
-npm run test:stories # Storybook smoke-tester (Playwright)
-npm run build        # Produksjonsbygg
+pnpm run check        # Biome lint + formattering
+pnpm run typecheck    # TypeScript-sjekk
+pnpm run test         # Enhetstester (Vitest)
+pnpm run test:stories # Storybook smoke-tester (Playwright)
+pnpm run build        # Produksjonsbygg
 ```
 
 ## Storybook
 
 ```sh
-npm run storybook    # Start Storybook på http://localhost:6006
+pnpm run storybook    # Start Storybook på http://localhost:6006
 ```
 
 ---
