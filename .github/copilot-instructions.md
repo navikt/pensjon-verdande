@@ -24,9 +24,9 @@ Verdande is a web application for monitoring, debugging, and developing treatmen
 ### Environment Setup
 Local development requires secrets from Kubernetes:
 ```bash
-npm install
+pnpm install
 ./fetch-secrets.sh  # Creates .env file with Azure AD & backend URLs
-npm run dev
+pnpm run dev
 ```
 The `fetch-secrets.sh` script requires `kubectl`, `gcloud`, `base64`, and NAIS device connection.
 
@@ -34,18 +34,18 @@ The `fetch-secrets.sh` script requires `kubectl`, `gcloud`, `base64`, and NAIS d
 
 ### Installation
 ```bash
-npm ci  # Use in CI or for clean install
-npm install  # For local development
+pnpm install --frozen-lockfile  # Use in CI or for clean install
+pnpm install  # For local development
 ```
 
 ### Development
 ```bash
-npm run dev  # Start dev server on http://localhost:3000
+pnpm run dev  # Start dev server on http://localhost:3000
 ```
 
 ### Type Checking
 ```bash
-npm run typecheck  # MUST run before builds
+pnpm run typecheck  # MUST run before builds
 ```
 This command:
 1. Runs `node scripts/copy-server-dts.ts` (copies `types/build-server.d.ts` to `build/server/index.d.ts`)
@@ -56,7 +56,7 @@ This command:
 
 ### Building
 ```bash
-npm run build  # Builds client and server bundles to build/
+pnpm run build  # Builds client and server bundles to build/
 ```
 Production build creates:
 - `build/client/` - Client-side assets
@@ -64,8 +64,8 @@ Production build creates:
 
 ### Testing
 ```bash
-npm test          # Run Vitest unit tests
-npm run test:stories  # Run Storybook smoke tests in headless Chromium
+pnpm test          # Run Vitest unit tests
+pnpm run test:stories  # Run Storybook smoke tests in headless Chromium
 ```
 
 Unit tests are located throughout `app/**/*.test.{ts,tsx}`. Storybook story tests are auto-discovered from `app/**/*.stories.tsx` and run via `@storybook/addon-vitest` with Playwright. Stories that crash with an error boundary are automatically detected and fail the test. Stories that intentionally test error states should use `tags: ['error-expected']`.
@@ -73,12 +73,12 @@ Unit tests are located throughout `app/**/*.test.{ts,tsx}`. Storybook story test
 ### Linting and Formatting (Biome)
 Biome is configured in `biome.json` and handles both linting and formatting:
 ```bash
-npm run check      # Check linting + formatting
-npm run check:fix  # Auto-fix issues
-npm run lint       # Lint only
-npm run lint:fix   # Auto-fix lint issues
-npm run format     # Check formatting
-npm run format:fix # Auto-fix formatting
+pnpm run check      # Check linting + formatting
+pnpm run check:fix  # Auto-fix issues
+pnpm run lint       # Lint only
+pnpm run lint:fix   # Auto-fix lint issues
+pnpm run format     # Check formatting
+pnpm run format:fix # Auto-fix formatting
 ```
 
 **Biome Config Highlights:**
@@ -91,29 +91,29 @@ npm run format:fix # Auto-fix formatting
 ### Pre-commit Hooks (Lefthook)
 Lefthook (`lefthook.yml`) runs on pre-commit:
 1. `biome check --write` on staged files
-2. `npm run typecheck`
+2. `pnpm run typecheck`
 
 If hooks fail locally, run the same commands manually.
 
 ### CI/CD Pipeline
 GitHub Actions workflows:
 - **CI** (`.github/workflows/ci.yml`): Runs on PRs and pushes to main
-  - `unit` job: `npm ci && npm test`
-  - `storybook` job: `npm ci && npx playwright install --with-deps chromium && npm run test:stories`
+  - `unit` job: `pnpm install --frozen-lockfile && pnpm test`
+  - `storybook` job: `pnpm install --frozen-lockfile && pnpm exec playwright install --with-deps chromium && pnpm run test:stories`
   - `biome` job: Lint/format check
 - **Deploy** (`.github/workflows/deploy.yml`): Build, Docker, deploy to NAIS
-  1. **Build job**: `npm ci && npm run typecheck && npm run build && npm prune --omit=dev`
+  1. **Build job**: `pnpm install --frozen-lockfile && pnpm run typecheck && pnpm run build && pnpm prune --prod`
   2. Docker build and push to NAIS registry
   3. Deploy to dev (q0, q1, q2, q5) and prod environments
 
 **To replicate CI locally**:
 ```bash
-npm ci
-npm run check
-npm run typecheck
-npm run test
-npm run test:stories
-npm run build
+pnpm install --frozen-lockfile
+pnpm run check
+pnpm run typecheck
+pnpm run test
+pnpm run test:stories
+pnpm run build
 ```
 
 ## Project Structure
@@ -299,13 +299,13 @@ Dynamic imports can trigger Vite warnings about modules being both dynamically a
 ## Common Issues and Workarounds
 
 ### Build/Typecheck Failures
-1. **Always run `npm run typecheck` before `npm run build`**
+1. **Always run `pnpm run typecheck` before `pnpm run build`**
 2. If typecheck fails with missing types, ensure `.react-router/types/` is generated
 3. Node version mismatch: Verify `node --version` >= 24.11.0
 
 ### Test Failures
 - Unit tests: `app/**/*.test.{ts,tsx}`
-- Story tests: `app/**/*.stories.tsx` (smoke-tested via `npm run test:stories`)
+- Story tests: `app/**/*.stories.tsx` (smoke-tested via `pnpm run test:stories`)
 - If adding features, tests are not strictly required but recommended
 
 ### Environment Issues
@@ -314,11 +314,11 @@ Dynamic imports can trigger Vite warnings about modules being both dynamically a
 
 ## Definition of Done
 Before submitting changes:
-1. `npm run check` (Biome) passes
-2. `npm run typecheck` passes
-3. `npm run test` passes
-4. `npm run test:stories` passes
-5. `npm run build` succeeds
+1. `pnpm run check` (Biome) passes
+2. `pnpm run typecheck` passes
+3. `pnpm run test` passes
+4. `pnpm run test:stories` passes
+5. `pnpm run build` succeeds
 6. Changes documented in PR description
 
 ## Additional Notes

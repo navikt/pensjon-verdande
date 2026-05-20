@@ -21,18 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Setup node
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-        with:
-          node-version-file: 'package.json'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Sett opp og installer frontend avhengigheter
+        uses: ./.github/actions/setup-frontend
 
       - name: Test
-        run: npm run test
+        run: pnpm run test
 
   storybook:
     runs-on: ubuntu-latest
@@ -40,21 +33,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Setup node
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-        with:
-          node-version-file: 'package.json'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Sett opp og installer frontend avhengigheter
+        uses: ./.github/actions/setup-frontend
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Test stories
-        run: npm run test:stories
+        run: pnpm run test:stories
 
   biome:
     runs-on: ubuntu-latest
