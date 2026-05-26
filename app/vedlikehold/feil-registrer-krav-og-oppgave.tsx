@@ -312,16 +312,21 @@ export default function FeilRegistrerKravOgOppgavePage() {
           payload.set('feilregistrerType', feilregistrerType)
 
           payload.set('sakIder', (htmlFormData.get('sakIder') ?? '').toString())
-          payload.set('behandlingstype', (htmlFormData.get('behandlingstype') ?? '').toString())
-          payload.set('kommentar', (htmlFormData.get('kommentar') ?? '').toString())
-
-          if (datoOpprettet) {
-            payload.set('datoOpprettet', toIsoDate(datoOpprettet))
+          if (visBehandlingstypeFelter) {
+            payload.set('behandlingstype', (htmlFormData.get('behandlingstype') ?? '').toString())
           }
 
-          payload.set('oppgaveteksterMap', JSON.stringify(oppgaveteksterMap))
-          for (const tekst of valgteOppgaver) {
-            payload.append('valgteOppgaver', tekst)
+          if (visOppgaveFelter) {
+            payload.set('kommentar', (htmlFormData.get('kommentar') ?? '').toString())
+
+            if (datoOpprettet) {
+              payload.set('datoOpprettet', toIsoDate(datoOpprettet))
+            }
+
+            payload.set('oppgaveteksterMap', JSON.stringify(oppgaveteksterMap))
+            for (const tekst of valgteOppgaver) {
+              payload.append('valgteOppgaver', tekst)
+            }
           }
 
           fetcher.submit(payload, { method: 'post' })
