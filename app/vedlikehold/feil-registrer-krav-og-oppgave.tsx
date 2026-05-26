@@ -262,6 +262,13 @@ export default function FeilRegistrerKravOgOppgavePage() {
   const visBehandlingstypeFelter = feilregistrerType !== FEILREGISTRER_TYPE.OPPGAVE
   const kanHenteOppgaver = visOppgaveFelter && sakIderText.trim().length > 0 && datoOpprettet !== undefined
 
+  const valideringsFeil: string | undefined = (() => {
+    if (konverterTilListe(sakIderText).length === 0) return 'Fyll inn minst én sakId'
+    if (visOppgaveFelter && datoOpprettet === undefined) return 'Velg dato når oppgave ble opprettet'
+    if (visOppgaveFelter && valgteOppgaver.length === 0) return 'Velg minst én oppgavetekst'
+    return undefined
+  })()
+
   useEffect(() => {
     if (oppgaveFetcher.data !== undefined) {
       setValgteOppgaver([])
@@ -451,13 +458,18 @@ export default function FeilRegistrerKravOgOppgavePage() {
               type="button"
               onClick={() => modalRef.current?.showModal()}
               loading={fetcher.state === 'submitting'}
-              disabled={fetcher.state === 'submitting' || (visOppgaveFelter && oppgaveFetcher.state !== 'idle')}
+              disabled={
+                fetcher.state === 'submitting' ||
+                (visOppgaveFelter && oppgaveFetcher.state !== 'idle') ||
+                Boolean(valideringsFeil)
+              }
             >
               Feilregistrer
             </Button>
           </HStack>
 
-          {!visOppgaveFelter && fetcher.data?.error && <ErrorMessage>{fetcher.data.error}</ErrorMessage>}
+          {valideringsFeil && <ErrorMessage>{valideringsFeil}</ErrorMessage>}
+          {fetcher.data?.error && <ErrorMessage>{fetcher.data.error}</ErrorMessage>}
         </VStack>
       </fetcher.Form>
 
@@ -469,7 +481,7 @@ export default function FeilRegistrerKravOgOppgavePage() {
           <Button
             type="button"
             loading={fetcher.state === 'submitting'}
-            disabled={fetcher.state === 'submitting'}
+            disabled={fetcher.state === 'submitting' || Boolean(valideringsFeil)}
             onClick={() => {
               modalRef.current?.close()
               formRef.current?.requestSubmit()
