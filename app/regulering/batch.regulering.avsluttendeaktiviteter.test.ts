@@ -36,6 +36,25 @@ describe('batch.regulering.avsluttendeaktiviteter action', () => {
     vi.unstubAllGlobals()
   })
 
+  it('POST avbryter behandlinger feilet i Beregn Ytelser', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response('', { status: 200 }))
+
+    const request = new Request('http://localhost/batch/regulering/avsluttendeaktiviteter', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'avbrytBehandlingerFeiletIBeregnYtelse' }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const result = await action(actionArgs(request))
+
+    expect(fetchSpy).toHaveBeenCalledOnce()
+    const [url, init] = fetchSpy.mock.calls[0]
+    expect(url).toBe('http://pen-test/api/vedtak/regulering/avbryt/beregnytelser')
+    expect(init.method).toBe('POST')
+    expect(init.headers.Authorization).toBe('Bearer test-token')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
+    expect(result).toEqual({ success: true, action: 'avbrytBehandlingerFeiletIBeregnYtelse' })
+  })
+
   it('POST avbryter behandlinger feilet mot POPP', async () => {
     fetchSpy.mockResolvedValueOnce(new Response('', { status: 200 }))
 
@@ -53,6 +72,25 @@ describe('batch.regulering.avsluttendeaktiviteter action', () => {
     expect(init.headers.Authorization).toBe('Bearer test-token')
     expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result).toEqual({ success: true, action: 'avbrytBehandlingerFeiletMotPOPP' })
+  })
+
+  it('POST avbryter behandlinger feilet i Oppdater Vedtakstatus', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response('', { status: 200 }))
+
+    const request = new Request('http://localhost/batch/regulering/avsluttendeaktiviteter', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'avbrytBehandlingerFeiletIOppdaterVedtakstatus' }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const result = await action(actionArgs(request))
+
+    expect(fetchSpy).toHaveBeenCalledOnce()
+    const [url, init] = fetchSpy.mock.calls[0]
+    expect(url).toBe('http://pen-test/api/vedtak/regulering/avbryt/oppdatervedtakstatus')
+    expect(init.method).toBe('POST')
+    expect(init.headers.Authorization).toBe('Bearer test-token')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
+    expect(result).toEqual({ success: true, action: 'avbrytBehandlingerFeiletIOppdaterVedtakstatus' })
   })
 
   it('backend 500 kaster feil', async () => {
