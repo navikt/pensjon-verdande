@@ -40,7 +40,7 @@ import type {
   KontrollpunktGranulering,
   KontrollpunktTypeValg,
 } from './types'
-import { kontrollpunktTypeLabels } from './types'
+import { kontrollpunktTypeConfig } from './types'
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'ALDE oppfølging | Verdande' }]
@@ -94,8 +94,13 @@ export async function loader({ request }: { request: Request }) {
   )
 
   const kontrollpunktParams = new URLSearchParams(dateRangeSearchParams)
-  kontrollpunktParams.set('kontrollpunktType', kontrollpunktType)
   kontrollpunktParams.set('aggregeringsniva', aggregeringsniva)
+  const config = kontrollpunktTypeConfig[kontrollpunktType]
+  if (config.aktivitetType) {
+    kontrollpunktParams.set('aktivitetType', config.aktivitetType)
+  } else {
+    kontrollpunktParams.set('kontrollpunktType', kontrollpunktType)
+  }
 
   const kontrollpunktFordeling = await apiGet<AldeFordelingKontrollpunktOverTidDto>(
     `/api/behandling/alde/oppfolging/behandling-kontrollpunkt-fordeling?${kontrollpunktParams.toString()}`,
@@ -150,7 +155,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
 
   // Oversett type-verdier (Alde/IkkeAlde) til lesbare navn basert på valgt kontrollpunkttype
   const mergedKontrollpunktFordeling = useMemo<AldeFordelingKontrollpunktOverTidDto>(() => {
-    const labels = kontrollpunktTypeLabels[kontrollpunktType]
+    const labels = kontrollpunktTypeConfig[kontrollpunktType]
     const typeMap: Record<string, string> = {
       Alde: labels.alde,
       IkkeAlde: labels.ikkeAlde,

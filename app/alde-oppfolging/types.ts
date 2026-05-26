@@ -61,7 +61,14 @@ export interface AldeKontrollpunktFordelingResponse {
 
 export type KontrollpunktTypeValg = 'SAMBOER' | 'INNTOPP_EKTEF'
 
-export const kontrollpunktTypeLabels: Record<KontrollpunktTypeValg, { alde: string; ikkeAlde: string }> = {
+export const kontrollpunktTypeConfig: Record<
+  KontrollpunktTypeValg,
+  { alde: string; ikkeAlde: string; aktivitetType?: string }
+> = {
   SAMBOER: { alde: 'AldeSamboer', ikkeAlde: 'Samboer' },
-  INNTOPP_EKTEF: { alde: 'AldeEps2G', ikkeAlde: 'Eps2G' },
+  INNTOPP_EKTEF: {
+    alde: 'AldeEps2G',
+    ikkeAlde: 'Eps2G',
+    aktivitetType: 'FleksibelApSak_KontrollerInntektsopplysningerForEps',
+  },
 }
