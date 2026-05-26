@@ -41,7 +41,7 @@ describe('batch.regulering.avsluttendeaktiviteter action', () => {
 
     const request = new Request('http://localhost/batch/regulering/avsluttendeaktiviteter', {
       method: 'POST',
-      body: JSON.stringify({ action: 'avbrytBehandlingerFeiletIBeregnYtelse' }),
+      body: JSON.stringify({ action: 'avbrytBehandlingerFeiletIBeregnYtelser' }),
       headers: { 'Content-Type': 'application/json' },
     })
     const result = await action(actionArgs(request))
@@ -52,7 +52,7 @@ describe('batch.regulering.avsluttendeaktiviteter action', () => {
     expect(init.method).toBe('POST')
     expect(init.headers.Authorization).toBe('Bearer test-token')
     expect(init.signal).toBeInstanceOf(AbortSignal)
-    expect(result).toEqual({ success: true, action: 'avbrytBehandlingerFeiletIBeregnYtelse' })
+    expect(result).toEqual({ success: true, action: 'avbrytBehandlingerFeiletIBeregnYtelser' })
   })
 
   it('POST avbryter behandlinger feilet mot POPP', async () => {

@@ -15,7 +15,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   let urlPostfix: string
 
   switch (data.action) {
-    case 'avbrytBehandlingerFeiletIBeregnYtelse':
+    case 'avbrytBehandlingerFeiletIBeregnYtelser':
       urlPostfix = '/avbryt/beregnytelser'
       break
     case 'avbrytBehandlingerFeiletMotPOPP':
@@ -38,8 +38,8 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
   const [openConfirmationModal, setOpenConfirmationModal] = useState<ActionType | null>(null)
   const submit = useSubmit()
 
-  function avbrytBehandlerFeiletIBeregnYtelse() {
-    submit({ action: 'avbrytBehandlingerFeiletIBeregnYtelse' }, { method: 'post', encType: 'application/json' })
+  function avbrytBehandlingerFeiletIBeregnYtelser() {
+    submit({ action: 'avbrytBehandlingerFeiletIBeregnYtelser' }, { method: 'post', encType: 'application/json' })
     setOpenConfirmationModal(null)
   }
 
@@ -55,17 +55,17 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
 
   return (
     <VStack gap="space-20">
-      {actionData?.success && actionData.action === 'avbrytBehandlingerFeiletIBeregnYtelse' && (
+      {actionData?.success && actionData.action === 'avbrytBehandlingerFeiletIBeregnYtelser' && (
         <InlineMessage status="success">Behandlinger avbrutt i Beregn Ytelser</InlineMessage>
       )}
       {actionData?.success && actionData.action === 'avbrytBehandlingerFeiletMotPOPP' && (
-        <InlineMessage status="success">Behandlinger avbrutt i Oppdater Popp</InlineMessage>
+        <InlineMessage status="success">Behandlinger avbrutt i Oppdater POPP</InlineMessage>
       )}
       {actionData?.success && actionData.action === 'avbrytBehandlingerFeiletIOppdaterVedtakstatus' && (
         <InlineMessage status="success">Behandlinger avbrutt i Oppdater Vedtakstatus</InlineMessage>
       )}
       <HStack gap="space-20">
-        <Button onClick={() => setOpenConfirmationModal('avbrytBehandlingerFeiletIBeregnYtelse')}>
+        <Button onClick={() => setOpenConfirmationModal('avbrytBehandlingerFeiletIBeregnYtelser')}>
           Avbryt behandlinger feilet i Beregn Ytelser
         </Button>
         <Button onClick={() => setOpenConfirmationModal('avbrytBehandlingerFeiletMotPOPP')}>
@@ -76,9 +76,9 @@ export default function Avsluttendeaktiviteter({ actionData }: Route.ComponentPr
         </Button>
         <ConfirmationModal
           text="Er du sikker på at du vil avbryte behandlinger som har feilet i Beregn Ytelser? Dette vil sette det nye vedtaket til avbrutt og opprette oppgave til saksbehandler om at saken må reguleres manuelt."
-          open={openConfirmationModal === 'avbrytBehandlingerFeiletIBeregnYtelse'}
+          open={openConfirmationModal === 'avbrytBehandlingerFeiletIBeregnYtelser'}
           onOk={() => {
-            avbrytBehandlerFeiletIBeregnYtelse()
+            avbrytBehandlingerFeiletIBeregnYtelser()
           }}
           onCancel={() => setOpenConfirmationModal(null)}
         />
@@ -108,7 +108,7 @@ type FormType = {
 }
 
 type ActionType =
-  | 'avbrytBehandlingerFeiletIBeregnYtelse'
+  | 'avbrytBehandlingerFeiletIBeregnYtelser'
   | 'avbrytBehandlingerFeiletMotPOPP'
   | 'avbrytBehandlingerFeiletIOppdaterVedtakstatus'
   | null
