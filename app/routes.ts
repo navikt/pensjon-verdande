@@ -212,6 +212,8 @@ export default [
 
     route('regelendring2026', 'uforetrygd/regelendring2026.tsx'),
 
+    route('unge-med-uforetrygd-varsler', 'uforetrygd/varsler/unge-med-uforetrygd-varsel.tsx'),
+
     route('brukere', 'brukere/index.tsx'),
     route('brukere/:brukernavn', 'brukere/$brukernavn.tsx'),
 
