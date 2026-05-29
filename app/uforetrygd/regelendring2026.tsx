@@ -1,4 +1,4 @@
-import { BodyLong, Box, Button, Heading, HStack, Select, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, Heading, Select, VStack } from '@navikt/ds-react'
 import { Form, Link, redirect, useNavigation } from 'react-router'
 import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/regelendring2026'
@@ -20,6 +20,29 @@ const ENDEPUNKTER = {
 
 type Intent = keyof typeof ENDEPUNKTER
 
+const POPULER_KATEGORIER = [
+  'LAVERE_KOMPENSASJONSGRAD',
+  'LAVERE_KOMPENSASJONSGRAD_OPPHØR',
+  'ØKT_IFU',
+  'ØKT_IFU_OPPHØR',
+  'LAVERE_KOMPGRAD_ØKT_IFU',
+  'LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR',
+] as const
+
+type PopulerKategori = (typeof POPULER_KATEGORIER)[number]
+
+const POPULER_KATEGORI_VISNINGSNAVN: Record<PopulerKategori, string> = {
+  LAVERE_KOMPENSASJONSGRAD: 'LAVERE_KOMPENSASJONSGRAD',
+  LAVERE_KOMPENSASJONSGRAD_OPPHØR: 'LAVERE_KOMPENSASJONSGRAD_OPPHØR',
+  ØKT_IFU: 'ØKT_IFU',
+  ØKT_IFU_OPPHØR: 'ØKT_IFU_OPPHØR',
+  LAVERE_KOMPGRAD_ØKT_IFU: 'LAVERE_KOMPGRAD_ØKT_IFU',
+  LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR: 'LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR',
+}
+
+const isPopulerKategori = (verdi: string): verdi is PopulerKategori =>
+  (POPULER_KATEGORIER as readonly string[]).includes(verdi)
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const dryRunStr = String(formData.get('dryRun') ?? 'true')
@@ -31,7 +54,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
     throw new Error(`Ukjent intent: ${intent}`)
   }
 
-  const response = await apiPost<{ behandlingId: number }>(endepunkt, { dryRun }, request)
+  let body: { dryRun: boolean; kategori?: PopulerKategori } = { dryRun }
+  if (intent === 'populer') {
+    const kategori = String(formData.get('kategori') ?? '')
+    if (!isPopulerKategori(kategori)) {
+      throw new Error(`Ugyldig kategori: ${kategori}`)
+    }
+    body = { dryRun, kategori }
+  }
+
+  const response = await apiPost<{ behandlingId: number }>(endepunkt, body, request)
 
   if (!response?.behandlingId) {
     throw new Error('Missing behandlingId')
@@ -58,19 +90,37 @@ export default function Regelendring2026() {
         </BodyLong>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'space-16'}>
-          <Select label="Prøvekjøring (dry run)" size="small" name="dryRun" defaultValue="true">
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
-          <HStack gap={'space-8'}>
+        <VStack gap={'space-32'}>
+          <Box padding="space-16" borderRadius="8" borderWidth="1" borderColor="neutral">
+            <Select label="Prøvekjøring (dry run)" size="small" name="dryRun" defaultValue="true">
+              <option value="true">Ja</option>
+              <option value="false">Nei</option>
+            </Select>
+          </Box>
+          <Box padding="space-16" borderRadius="8" borderWidth="1" borderColor="neutral">
             <Button type="submit" name="intent" value="varsel" disabled={navigation.state === 'submitting'}>
               {submittingIntent === 'varsel' ? 'Oppretter…' : 'Send varselbrev'}
             </Button>
-            <Button type="submit" name="intent" value="populer" disabled={navigation.state === 'submitting'}>
-              {submittingIntent === 'populer' ? 'Populerer…' : 'Populér T_OMREGNING_INPUT'}
-            </Button>
-          </HStack>
+          </Box>
+          <Box padding="space-16" borderRadius="8" borderWidth="1" borderColor="neutral">
+            <VStack gap={'space-8'}>
+              <Select
+                label="Kategori (for populering)"
+                size="small"
+                name="kategori"
+                defaultValue={POPULER_KATEGORIER[0]}
+              >
+                {POPULER_KATEGORIER.map((k) => (
+                  <option key={k} value={k}>
+                    {POPULER_KATEGORI_VISNINGSNAVN[k]}
+                  </option>
+                ))}
+              </Select>
+              <Button type="submit" name="intent" value="populer" disabled={navigation.state === 'submitting'}>
+                {submittingIntent === 'populer' ? 'Populerer…' : 'Populér T_OMREGNING_INPUT'}
+              </Button>
+            </VStack>
+          </Box>
         </VStack>
       </Form>
     </VStack>
