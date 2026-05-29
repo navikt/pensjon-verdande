@@ -12,7 +12,7 @@ export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData()
   const kriterieDato = formData.get('kriterieDato') as string
 
-  await apiPost('/api/uforetrygd/varsler/unge-med-ufore/start', kriterieDato, request)
+  await apiPost('/api/uforetrygd/varsler/unge-med-ufore/start', { kriterieDato: kriterieDato }, request)
 }
 
 export default function UngeMedUforetrygdVarselPage() {
