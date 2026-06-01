@@ -21,6 +21,7 @@ interface OmregningOppsummeringProps {
   skalSletteIverksettingsoppgaver: boolean
   skalDistribuereUforevedtak: boolean
   regelendringUt2026: boolean
+  regelendringBerortSakAuto: boolean
   skalBrukeKjoreplan: boolean
   skalBestilleBrev: string
 
@@ -137,6 +138,10 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
                   <FormSummary.Answer>
                     <FormSummary.Label>Regelendringer UT 2026</FormSummary.Label>
                     <FormSummary.Value>{props.regelendringUt2026 ? 'Ja' : 'Nei'}</FormSummary.Value>
+                  </FormSummary.Answer>
+                  <FormSummary.Answer>
+                    <FormSummary.Label>Regelendringer UT 2026 : Behandle berørt sak automatisk</FormSummary.Label>
+                    <FormSummary.Value>{props.regelendringBerortSakAuto ? 'Ja' : 'Nei'}</FormSummary.Value>
                   </FormSummary.Answer>
                 </FormSummary.Answers>
               </FormSummary.Value>
