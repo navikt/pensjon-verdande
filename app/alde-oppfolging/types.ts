@@ -51,3 +51,24 @@ export interface AldeFordelingSamboerKontrollpunktBehandlingDto {
 export interface AldeFordelingKontrollpunktOverTidDto {
   fordeling: AldeFordelingSamboerKontrollpunktBehandlingDto[]
 }
+
+export type KontrollpunktGranulering = 'DAG' | 'UKE' | 'MAANED'
+
+export interface AldeKontrollpunktFordelingResponse {
+  aldeFordeling: AldeFordelingSamboerKontrollpunktBehandlingDto[]
+  ikkeAldeFordeling: AldeFordelingSamboerKontrollpunktBehandlingDto[]
+}
+
+export type KontrollpunktTypeValg = 'SAMBOER' | 'INNTOPP_EKTEF'
+
+export const kontrollpunktTypeConfig: Record<
+  KontrollpunktTypeValg,
+  { alde: string; ikkeAlde: string; aktivitetType?: string }
+> = {
+  SAMBOER: { alde: 'AldeSamboer', ikkeAlde: 'Samboer' },
+  INNTOPP_EKTEF: {
+    alde: 'AldeEps2G',
+    ikkeAlde: 'Eps2G',
+    aktivitetType: 'FleksibelApSak_KontrollerInntektsopplysningerForEps',
+  },
+}
