@@ -10,14 +10,16 @@ import {
   TextField,
   VStack,
 } from '@navikt/ds-react'
+import { format } from 'date-fns'
 import { Suspense, useState } from 'react'
 import { Await, Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
+import DateTimePicker from '~/components/datetimepicker/DateTimePicker'
 import { apiPost } from '~/services/api.server'
 import { getBehandlinger } from '~/services/behandling.server'
 import type { Route } from './+types/avstemming'
 
-const behandlingType = 'AvstemmingGrensesnittBehandling'
+const behandlingType = 'DagligAvstemmingBehandling'
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Avstemming | Verdande' }]
@@ -53,6 +55,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsperiodeStart = formData.get('fom') as string
   const avstemmingsperiodeEnd = formData.get('tom') as string
+  const planlagtStartet = formData.get('kjoeretidspunkt') as string
 
   await apiPost(
     '/api/vedtak/avstemming/grensesnitt/start',
@@ -68,6 +71,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       uforeut: UFOREUT,
       avstemmingsperiodeStart,
       avstemmingsperiodeEnd,
+      planlagtStartet: planlagtStartet,
     },
     request,
   )
@@ -111,12 +115,14 @@ export default function Avstemming({ loaderData }: Route.ComponentProps) {
 
   const [avstemmingsperiodeStart, setAvstemmingsperiodeStart] = useState<string | ''>('')
   const [avstemmingsperiodeEnd, setAvstemmingsperiodeEnd] = useState<string | ''>('')
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const minDate = new Date()
 
   return (
     <VStack gap={'space-16'}>
       <Box className={'aksel-pageblock--lg'}>
         <Heading size={'medium'} level={'1'}>
-          Opprett avstemming
+          Opprett daglig avstemming
         </Heading>
         <VStack gap="space-8">
           <BodyLong>Oppretter behandlinger for grensesnittavstemming mot Oppdrag</BodyLong>
@@ -179,16 +185,28 @@ export default function Avstemming({ loaderData }: Route.ComponentProps) {
             }}
             value={avstemmingsperiodeEnd}
           />
+          <DateTimePicker
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            minDate={minDate}
+            label="Kjøretidspunkt"
+          />
+          <input
+            type="hidden"
+            name="kjoeretidspunkt"
+            value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
+          />
           <Button
             type="submit"
             disabled={
               avstemmingsperiodeStart === '' ||
               avstemmingsperiodeEnd === '' ||
-              !areDatesValid(avstemmingsperiodeStart, avstemmingsperiodeEnd)
+              !areDatesValid(avstemmingsperiodeStart, avstemmingsperiodeEnd) ||
+              selectedDate === null
             }
             loading={isSubmitting}
           >
-            Opprett avstemming-behandlinger
+            Opprett daglig avstemming
           </Button>
         </VStack>
       </Form>
