@@ -57,6 +57,7 @@ describe('avstemming action', () => {
     formData.set('UFOREUT', 'true')
     formData.set('fom', '2025-01-01')
     formData.set('tom', '2025-06-30')
+    formData.set('kjoeretidspunkt', '2025-07-01T10:00:00')
 
     const request = new Request('http://localhost/avstemming', { method: 'POST', body: formData })
     await action(actionArgs(request))
@@ -79,6 +80,7 @@ describe('avstemming action', () => {
       uforeut: true,
       avstemmingsperiodeStart: '2025-01-01',
       avstemmingsperiodeEnd: '2025-06-30',
+      planlagtStartet: '2025-07-01T10:00:00',
     })
   })
 })
