@@ -132,4 +132,3 @@ jobs:
         uses: nais/attest-sign@2548fccb3e472f3f65d1cf0fe6e339c7675d3c55 # v2.0.9
         with:
           image_ref: "${{ needs.build.outputs.image-digest }}"
-          sbom: "auto-generate-for-me-please.json"
