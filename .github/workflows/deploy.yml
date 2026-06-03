@@ -137,7 +137,7 @@ jobs:
 
       - name: Attest and sign image
         id: attest-sign
-        uses: nais/attest-sign@4026aea21c05a2c711a00bced0d9bb5fc944fcf6 # v1
+        uses: nais/attest-sign@2548fccb3e472f3f65d1cf0fe6e339c7675d3c55 # v2.0.9
         with:
           image_ref: "${{ needs.build.outputs.image-digest }}"
           sbom: "trivy-results.cyclonedx"
