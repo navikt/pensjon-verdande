@@ -35,7 +35,7 @@ jobs:
 
       - name: NAIS login
         if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: nais/login@d0fcfa8591d10b57312f58e7f6269de58bdab1df # v0
+        uses: nais/login@5b34cb6e280f8eda678746fcbe14cba7636e6129 # v0
         id: login
         with:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
@@ -120,7 +120,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: NAIS login
-        uses: nais/login@d0fcfa8591d10b57312f58e7f6269de58bdab1df # v0
+        uses: nais/login@5b34cb6e280f8eda678746fcbe14cba7636e6129 # v0
         id: login
         with:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
