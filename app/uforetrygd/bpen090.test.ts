@@ -19,7 +19,7 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 const actionArgs = (request: Request) =>
-  ({ request, params: {}, context: {}, unstable_pattern: '/bpen090' }) as Parameters<typeof action>[0]
+  ({ request, params: {}, context: {}, pattern: '/bpen090' }) as Parameters<typeof action>[0]
 
 describe('bpen090 action', () => {
   let fetchSpy: ReturnType<typeof vi.fn>

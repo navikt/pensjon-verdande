@@ -44,7 +44,7 @@ describe('ekskludertesaker routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/ekskludertesaker/hent',
+        pattern: '/batch/regulering/ekskludertesaker/hent',
       } as Parameters<typeof loader>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -68,7 +68,7 @@ describe('ekskludertesaker routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/ekskludertesaker/leggTil',
+        pattern: '/batch/regulering/ekskludertesaker/leggTil',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -96,7 +96,7 @@ describe('ekskludertesaker routes', () => {
           request,
           params: {},
           context: {},
-          unstable_pattern: '/batch/regulering/ekskludertesaker/leggTil',
+          pattern: '/batch/regulering/ekskludertesaker/leggTil',
         } as Parameters<typeof action>[0]),
       ).rejects.toBeDefined()
     })
@@ -116,7 +116,7 @@ describe('ekskludertesaker routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/ekskludertesaker/fjern',
+        pattern: '/batch/regulering/ekskludertesaker/fjern',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -143,7 +143,7 @@ describe('ekskludertesaker routes', () => {
           request,
           params: {},
           context: {},
-          unstable_pattern: '/batch/regulering/ekskludertesaker/fjern',
+          pattern: '/batch/regulering/ekskludertesaker/fjern',
         } as Parameters<typeof action>[0]),
       ).rejects.toBeDefined()
     })

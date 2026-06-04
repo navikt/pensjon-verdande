@@ -44,7 +44,7 @@ describe('uttrekk routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/uttrekk/startUttrekk',
+        pattern: '/batch/regulering/uttrekk/startUttrekk',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -72,7 +72,7 @@ describe('uttrekk routes', () => {
           request,
           params: {},
           context: {},
-          unstable_pattern: '/batch/regulering/uttrekk/startUttrekk',
+          pattern: '/batch/regulering/uttrekk/startUttrekk',
         } as Parameters<typeof action>[0]),
       ).rejects.toBeDefined()
     })
@@ -88,7 +88,7 @@ describe('uttrekk routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/uttrekk/oppdaterUttrekk',
+        pattern: '/batch/regulering/uttrekk/oppdaterUttrekk',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -109,7 +109,7 @@ describe('uttrekk routes', () => {
           request,
           params: {},
           context: {},
-          unstable_pattern: '/batch/regulering/uttrekk/oppdaterUttrekk',
+          pattern: '/batch/regulering/uttrekk/oppdaterUttrekk',
         } as Parameters<typeof action>[0]),
       ).rejects.toBeDefined()
     })

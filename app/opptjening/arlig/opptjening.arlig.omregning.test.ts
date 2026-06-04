@@ -23,7 +23,7 @@ const loaderArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/opptjening/arlig/omregning',
+    pattern: '/opptjening/arlig/omregning',
   }) as Parameters<typeof loader>[0]
 
 const actionArgs = (request: Request) =>
@@ -31,7 +31,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/opptjening/arlig/omregning',
+    pattern: '/opptjening/arlig/omregning',
   }) as Parameters<typeof action>[0]
 
 describe('opptjening.arlig.omregning loader', () => {

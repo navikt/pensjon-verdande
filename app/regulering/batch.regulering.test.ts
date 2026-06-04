@@ -27,7 +27,7 @@ const loaderArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/batch/regulering',
+    pattern: '/batch/regulering',
   }) as Parameters<typeof loader>[0]
 
 describe('batch.regulering loader', () => {

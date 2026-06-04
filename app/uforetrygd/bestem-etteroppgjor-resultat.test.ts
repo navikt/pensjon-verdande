@@ -23,7 +23,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/bestem-etteroppgjor-resultat',
+    pattern: '/bestem-etteroppgjor-resultat',
   }) as Parameters<typeof action>[0]
 
 describe('bestem-etteroppgjor-resultat action', () => {

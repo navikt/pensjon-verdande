@@ -23,7 +23,7 @@ const loaderArgs = (url: string) =>
     request: new Request(url),
     params: { behandlingId: '456' },
     context: {},
-    unstable_pattern: '/behandling/:behandlingId/aktiviteter',
+    pattern: '/behandling/:behandlingId/aktiviteter',
   }) as Parameters<typeof loader>[0]
 
 describe('behandling aktiviteter loader', () => {

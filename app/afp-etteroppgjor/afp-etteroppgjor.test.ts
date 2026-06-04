@@ -23,7 +23,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/afp-etteroppgjor',
+    pattern: '/afp-etteroppgjor',
   }) as Parameters<typeof action>[0]
 
 describe('afp-etteroppgjor action', () => {

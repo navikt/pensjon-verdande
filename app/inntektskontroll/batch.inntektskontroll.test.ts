@@ -23,7 +23,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/batch/inntektskontroll',
+    pattern: '/batch/inntektskontroll',
   }) as Parameters<typeof action>[0]
 
 describe('batch.inntektskontroll action', () => {

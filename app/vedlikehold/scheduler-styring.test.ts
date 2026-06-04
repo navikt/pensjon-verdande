@@ -16,7 +16,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/scheduler-styring',
+    pattern: '/scheduler-styring',
   }) as Parameters<typeof action>[0]
 
 function jsonRequest(body: Record<string, unknown>) {

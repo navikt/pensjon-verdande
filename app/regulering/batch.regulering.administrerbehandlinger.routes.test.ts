@@ -47,7 +47,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/endrePrioritetBatch',
+        pattern: '/batch/regulering/administrerbehandlinger/endrePrioritetBatch',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -69,7 +69,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/endrePrioritetOnline',
+        pattern: '/batch/regulering/administrerbehandlinger/endrePrioritetOnline',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -91,7 +91,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/fortsettFaktoromregningsmodus',
+        pattern: '/batch/regulering/administrerbehandlinger/fortsettFaktoromregningsmodus',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -115,7 +115,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/fortsettFamilieReguleringerTilBehandling',
+        pattern: '/batch/regulering/administrerbehandlinger/fortsettFamilieReguleringerTilBehandling',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -137,7 +137,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/fortsettFeilendeFamilieReguleringer',
+        pattern: '/batch/regulering/administrerbehandlinger/fortsettFeilendeFamilieReguleringer',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -159,7 +159,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/fortsettFeilendeIverksettVedtak',
+        pattern: '/batch/regulering/administrerbehandlinger/fortsettFeilendeIverksettVedtak',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -181,7 +181,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/fortsettFeilhandteringmodus',
+        pattern: '/batch/regulering/administrerbehandlinger/fortsettFeilhandteringmodus',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -203,7 +203,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/fortsettNyAvviksgrenser',
+        pattern: '/batch/regulering/administrerbehandlinger/fortsettNyAvviksgrenser',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -226,7 +226,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/hentStatistikk',
+        pattern: '/batch/regulering/administrerbehandlinger/hentStatistikk',
       } as Parameters<typeof loader>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -249,7 +249,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: { behandlingId: '123' },
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/hentTotaloversiktBehandlinger/:behandlingId',
+        pattern: '/batch/regulering/administrerbehandlinger/hentTotaloversiktBehandlinger/:behandlingId',
       } as Parameters<typeof loader>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -274,7 +274,7 @@ describe('administrerbehandlinger action-routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/administrerbehandlinger/oppdaterAvviksgrenser',
+        pattern: '/batch/regulering/administrerbehandlinger/oppdaterAvviksgrenser',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()

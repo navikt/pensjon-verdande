@@ -23,7 +23,7 @@ const loaderArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/omregning',
+    pattern: '/omregning',
   }) as Parameters<typeof loader>[0]
 
 describe('omregning._index loader', () => {

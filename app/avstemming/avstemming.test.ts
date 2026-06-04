@@ -27,7 +27,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/avstemming',
+    pattern: '/avstemming',
   }) as Parameters<typeof action>[0]
 
 describe('avstemming action', () => {

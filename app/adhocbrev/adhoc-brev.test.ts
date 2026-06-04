@@ -27,7 +27,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/adhoc-brev',
+    pattern: '/adhoc-brev',
   }) as Parameters<typeof action>[0]
 
 describe('adhoc-brev action', () => {

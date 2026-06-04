@@ -20,7 +20,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/batch/regulering/avsluttendeaktiviteter',
+    pattern: '/batch/regulering/avsluttendeaktiviteter',
   }) as Parameters<typeof action>[0]
 
 describe('batch.regulering.avsluttendeaktiviteter action', () => {
