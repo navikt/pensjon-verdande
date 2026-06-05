@@ -70,7 +70,7 @@ describe('orkestrering routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/orkestrering',
+        pattern: '/batch/regulering/orkestrering',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -97,7 +97,7 @@ describe('orkestrering routes', () => {
         request,
         params: { behandlingId: '456' },
         context: {},
-        unstable_pattern: '/batch/regulering/orkestrering/fortsett/:behandlingId',
+        pattern: '/batch/regulering/orkestrering/fortsett/:behandlingId',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -118,7 +118,7 @@ describe('orkestrering routes', () => {
           request,
           params: { behandlingId: '456' },
           context: {},
-          unstable_pattern: '/batch/regulering/orkestrering/fortsett/:behandlingId',
+          pattern: '/batch/regulering/orkestrering/fortsett/:behandlingId',
         } as Parameters<typeof action>[0]),
       ).rejects.toBeDefined()
     })
@@ -134,7 +134,7 @@ describe('orkestrering routes', () => {
         request,
         params: { behandlingId: '789' },
         context: {},
-        unstable_pattern: '/batch/regulering/orkestrering/utsett/:behandlingId',
+        pattern: '/batch/regulering/orkestrering/utsett/:behandlingId',
       } as Parameters<typeof action>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -155,7 +155,7 @@ describe('orkestrering routes', () => {
           request,
           params: { behandlingId: '789' },
           context: {},
-          unstable_pattern: '/batch/regulering/orkestrering/utsett/:behandlingId',
+          pattern: '/batch/regulering/orkestrering/utsett/:behandlingId',
         } as Parameters<typeof action>[0]),
       ).rejects.toBeDefined()
     })
@@ -172,7 +172,7 @@ describe('orkestrering routes', () => {
         request,
         params: {},
         context: {},
-        unstable_pattern: '/batch/regulering/orkestrering/hentAggregerteFeilmeldinger',
+        pattern: '/batch/regulering/orkestrering/hentAggregerteFeilmeldinger',
       } as Parameters<typeof loader>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()
@@ -193,7 +193,7 @@ describe('orkestrering routes', () => {
         request,
         params: { behandlingId: '111' },
         context: {},
-        unstable_pattern: '/batch/regulering/orkestrering/hentOrkestreringStatistikk/:behandlingId',
+        pattern: '/batch/regulering/orkestrering/hentOrkestreringStatistikk/:behandlingId',
       } as Parameters<typeof loader>[0])
 
       expect(fetchSpy).toHaveBeenCalledOnce()

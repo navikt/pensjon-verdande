@@ -27,7 +27,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/konsistensavstemming',
+    pattern: '/konsistensavstemming',
   }) as Parameters<typeof action>[0]
 
 describe('konsistensavstemming action', () => {

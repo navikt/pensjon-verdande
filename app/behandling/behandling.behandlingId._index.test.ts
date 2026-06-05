@@ -29,7 +29,7 @@ const loaderArgs = (url: string) =>
     request: new Request(url),
     params: { behandlingId: '123' },
     context: {},
-    unstable_pattern: '/behandling/:behandlingId',
+    pattern: '/behandling/:behandlingId',
   }) as Parameters<typeof loader>[0]
 
 describe('behandling kjøringer loader', () => {

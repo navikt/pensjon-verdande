@@ -33,7 +33,7 @@ const actionArgs = (request: Request) =>
     request,
     params: { behandlingId: '123' },
     context: {},
-    unstable_pattern: '/behandling/:behandlingId',
+    pattern: '/behandling/:behandlingId',
   }) as Parameters<typeof action>[0]
 
 describe('behandling.$behandlingId action', () => {

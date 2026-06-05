@@ -20,7 +20,7 @@ const loaderArgs = (request: Request, behandlingsnoekkel: string) =>
     request,
     params: { behandlingsnoekkel },
     context: {},
-    unstable_pattern: '/omregningStatistikk/:behandlingsnoekkel.csv',
+    pattern: '/omregningStatistikk/:behandlingsnoekkel.csv',
   }) as Parameters<typeof loader>[0]
 
 describe('omregningStatistikk.csv', () => {

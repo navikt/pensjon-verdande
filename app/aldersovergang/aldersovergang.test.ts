@@ -48,7 +48,7 @@ describe('aldersovergang._index loader', () => {
       request,
       params: {},
       context: {},
-      unstable_pattern: '/aldersovergang',
+      pattern: '/aldersovergang',
     } as Parameters<typeof loader>[0]
 
     const result = await loader(loaderArgs)
@@ -90,7 +90,7 @@ describe('aldersovergang.opprett action', () => {
       request,
       params: {},
       context: {},
-      unstable_pattern: '/aldersovergang/opprett',
+      pattern: '/aldersovergang/opprett',
     } as Parameters<typeof action>[0]
 
     const result = (await action(actionArgs)) as Response

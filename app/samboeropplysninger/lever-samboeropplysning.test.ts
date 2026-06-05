@@ -27,7 +27,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/lever-samboeropplysning',
+    pattern: '/lever-samboeropplysning',
   }) as Parameters<typeof action>[0]
 
 describe('lever-samboeropplysning action', () => {

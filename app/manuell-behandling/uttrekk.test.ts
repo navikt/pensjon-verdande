@@ -23,7 +23,7 @@ const loaderArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/manuell-behandling/uttrekk',
+    pattern: '/manuell-behandling/uttrekk',
   }) as Parameters<typeof loader>[0]
 
 describe('uttrekk loader', () => {

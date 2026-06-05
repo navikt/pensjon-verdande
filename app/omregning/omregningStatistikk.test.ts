@@ -23,7 +23,7 @@ const loaderArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/omregningStatistikk',
+    pattern: '/omregningStatistikk',
   }) as Parameters<typeof loader>[0]
 
 describe('omregningStatistikk._index', () => {

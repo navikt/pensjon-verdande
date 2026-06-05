@@ -23,7 +23,7 @@ const actionArgs = (request: Request) =>
     request,
     params: {},
     context: {},
-    unstable_pattern: '/omregning/omregning',
+    pattern: '/omregning/omregning',
   }) as Parameters<typeof action>[0]
 
 describe('omregning.omregning action', () => {
