@@ -131,4 +131,4 @@ jobs:
         id: attest-sign
         uses: nais/attest-sign@2548fccb3e472f3f65d1cf0fe6e339c7675d3c55 # v2.0.9
         with:
-          image_ref: "${{ steps.login.outputs.registry }}/${{ github.repository }}@${{ needs.build.outputs.image-digest }}"
+          image_ref: "${{ steps.login.outputs.registry }}/${{ github.repository }}/${{ github.repository_owner}}@${{ needs.build.outputs.image-digest }}"
