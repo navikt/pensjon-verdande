@@ -1,12 +1,15 @@
+import type { ComboboxProps } from '@navikt/ds-react'
 import { Box, UNSAFE_Combobox } from '@navikt/ds-react'
-import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
+import type { Dispatch, SetStateAction } from 'react'
+
+type ComboboxOption = Exclude<ComboboxProps['options'][number], string>
 
 interface OmregningBrevCheckboxProps {
   navn: string
   skalVises: boolean
   tekst: string
   selectedBrevKode: ComboboxOption | undefined
-  setselectedBrevKode: React.Dispatch<React.SetStateAction<ComboboxOption | undefined>>
+  setselectedBrevKode: Dispatch<SetStateAction<ComboboxOption | undefined>>
   optionBatchbrevtyper: ComboboxOption[]
 }
 

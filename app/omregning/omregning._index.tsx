@@ -1,4 +1,5 @@
 import { PlayIcon } from '@navikt/aksel-icons'
+import type { ComboboxProps } from '@navikt/ds-react'
 import {
   BodyShort,
   Box,
@@ -18,7 +19,6 @@ import {
   useMonthpicker,
   VStack,
 } from '@navikt/ds-react'
-import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
 import type React from 'react'
 import { useRef, useState } from 'react'
 import type { HTMLFormMethod } from 'react-router'
@@ -30,6 +30,8 @@ import OmregningSelector from '~/components/omregning/OmregningSelector'
 import { apiGet } from '~/services/api.server'
 import type { OmregningInit, OmregningSakerPage } from '~/types'
 import type { Route } from './+types/omregning._index'
+
+type ComboboxOption = Exclude<ComboboxProps['options'][number], string>
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'Omregning | Verdande' }]
