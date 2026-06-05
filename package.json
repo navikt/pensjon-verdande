@@ -34,7 +34,7 @@
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",
     "compression": "^1.8.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.3.0",
     "date-fns-tz": "^3.2.0",
     "express": "^5.2.1",
     "isbot": "^5.1.39",
