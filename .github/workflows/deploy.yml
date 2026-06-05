@@ -29,9 +29,7 @@ jobs:
         shell: bash
         run: |
           TIME=$(TZ="Europe/Oslo" date +%Y.%m.%d-%H.%M)
-          COMMIT=$(git rev-parse --short=12 HEAD)
           echo "TIME=$TIME" >> $GITHUB_OUTPUT
-          echo "VERSION=$TIME-$COMMIT" >> $GITHUB_OUTPUT
 
       - name: NAIS login
         if: ${{ github.actor != 'dependabot[bot]' }}
@@ -104,7 +102,7 @@ jobs:
       - uses: nais/deploy/actions/deploy@fa754451577294aae42872a69b888b3470478ec1 # v2
         name: 'Deploy to NAIS'
         env:
-          IMAGE: "${{ needs.build.outputs.image }}"
+          IMAGE: "${{ needs.build.outputs.image-digest }}"
           RESOURCE: .nais/nais.yaml
           CLUSTER: '${{ matrix.cluster }}'
           VARS: ${{matrix.vars}}
