@@ -1,5 +1,7 @@
+import type { ComboboxProps } from '@navikt/ds-react'
 import { Box, UNSAFE_Combobox } from '@navikt/ds-react'
-import type { ComboboxOption } from 'node_modules/@navikt/ds-react/esm/form/combobox/types'
+
+type ComboboxOption = Exclude<ComboboxProps['options'][number], string>
 
 interface OmregningBrevCheckboxProps {
   navn: string
