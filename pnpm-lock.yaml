@@ -36,11 +36,11 @@ importers:
         specifier: ^1.8.1
         version: 1.8.1
       date-fns:
-        specifier: ^4.3.0
-        version: 4.3.0
+        specifier: ^4.4.0
+        version: 4.4.0
       date-fns-tz:
         specifier: ^3.2.0
-        version: 3.2.0(date-fns@4.3.0)
+        version: 3.2.0(date-fns@4.4.0)
       express:
         specifier: ^5.2.1
         version: 5.2.1
@@ -61,7 +61,7 @@ importers:
         version: 5.3.1(chart.js@4.5.1)(react@19.2.6)
       react-datepicker:
         specifier: ^9.1.0
-        version: 9.1.0(date-fns-tz@3.2.0(date-fns@4.3.0))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        version: 9.1.0(date-fns-tz@3.2.0(date-fns@4.4.0))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       react-day-picker:
         specifier: ^10.0.0
         version: 10.0.0(react@19.2.6)
@@ -2115,8 +2115,8 @@ packages:
     peerDependencies:
       date-fns: ^3.0.0 || ^4.0.0
 
-  date-fns@4.3.0:
-    resolution: {integrity: sha512-OYcL+3N/jyWbYdFGqoMAhytDgxP9pbYPUUiRCOgn4Fewaadk9l/Wam4Avciiyp2BgkpfQyBV9B+ehnVJych+eQ==}
+  date-fns@4.4.0:
+    resolution: {integrity: sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==}
 
   dayjs@1.11.20:
     resolution: {integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==}
@@ -4052,7 +4052,7 @@ snapshots:
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@navikt/aksel-icons': 8.11.1
       '@navikt/ds-tokens': 8.11.1
-      date-fns: 4.3.0
+      date-fns: 4.4.0
       react: 19.2.6
       react-day-picker: 9.14.0(react@19.2.6)
       react-dom: 19.2.6(react@19.2.6)
@@ -5259,11 +5259,11 @@ snapshots:
 
   date-fns-jalali@4.1.0-0: {}
 
-  date-fns-tz@3.2.0(date-fns@4.3.0):
+  date-fns-tz@3.2.0(date-fns@4.4.0):
     dependencies:
-      date-fns: 4.3.0
+      date-fns: 4.4.0
 
-  date-fns@4.3.0: {}
+  date-fns@4.4.0: {}
 
   dayjs@1.11.20: {}
 
@@ -5938,27 +5938,27 @@ snapshots:
       react-dom: 19.2.6(react@19.2.6)
       uuid: 8.3.2
 
-  react-datepicker@9.1.0(date-fns-tz@3.2.0(date-fns@4.3.0))(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  react-datepicker@9.1.0(date-fns-tz@3.2.0(date-fns@4.4.0))(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       '@floating-ui/react': 0.27.19(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       clsx: 2.1.1
-      date-fns: 4.3.0
+      date-fns: 4.4.0
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
     optionalDependencies:
-      date-fns-tz: 3.2.0(date-fns@4.3.0)
+      date-fns-tz: 3.2.0(date-fns@4.4.0)
 
   react-day-picker@10.0.0(react@19.2.6):
     dependencies:
       '@date-fns/tz': 1.4.1
-      date-fns: 4.3.0
+      date-fns: 4.4.0
       react: 19.2.6
 
   react-day-picker@9.14.0(react@19.2.6):
     dependencies:
       '@date-fns/tz': 1.5.0
       '@tabby_ai/hijri-converter': 1.0.5
-      date-fns: 4.3.0
+      date-fns: 4.4.0
       date-fns-jalali: 4.1.0-0
       react: 19.2.6
 
