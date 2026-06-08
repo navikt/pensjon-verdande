@@ -67,7 +67,7 @@
     "@types/node": "^25.9.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
-    "@vitest/browser": "^4.1.7",
+    "@vitest/browser": "^4.1.8",
     "@vitest/browser-playwright": "^4.1.5",
     "csstype": "^3.2.3",
     "jsdom": "^29.1.0",
