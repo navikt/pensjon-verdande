@@ -127,6 +127,6 @@ jobs:
 
       - name: Attest and sign image
         id: attest-sign
-        uses: nais/attest-sign@2548fccb3e472f3f65d1cf0fe6e339c7675d3c55 # v2.0.9
+        uses: nais/attest-sign@c839bd87ba71207e36341b6e9b6d8aabdcbc86c2 # v2.0.12
         with:
           image_ref: "${{ needs.build.outputs.image-digest }}"
