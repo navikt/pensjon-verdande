@@ -217,6 +217,7 @@ Available functions:
 - `apiGet<T>(path, requestCtx)` — GET with JSON response
 - `apiGetOrUndefined<T>(path, requestCtx)` — GET where 404 returns `undefined`
 - `apiGetRawStringOrUndefined(path, requestCtx)` — GET with text response
+- `apiGetStream(path, requestCtx)` — GET returning raw `Response` for streaming (e.g., CSV, binary data)
 - `apiPost<T>(path, body, requestCtx)` — POST with JSON body
 - `apiPut<T>(path, body, requestCtx)` — PUT with JSON body
 - `apiPatch<T>(path, body, requestCtx)` — PATCH with JSON body
