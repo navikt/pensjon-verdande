@@ -1,17 +1,21 @@
 name: Build and deploy
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
   build:
     permissions:
-      packages: write
       contents: read
       id-token: write
     runs-on: ubuntu-latest
     outputs:
-      image: "${{ steps.set-outputs.outputs.IMAGE }}"
-      image-digest: "${{ steps.login.outputs.registry }}/${{ github.repository }}/${{ github.repository_owner}}@${{ steps.build_push.outputs.digest }}"
+      image: "${{ steps.docker-push.outputs.image }}"
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
@@ -24,55 +28,25 @@ jobs:
       - name: Fjern dev dependencies
         run: pnpm prune --prod
 
-      - name: Set version
-        id: version
-        shell: bash
-        run: |
-          TIME=$(TZ="Europe/Oslo" date +%Y.%m.%d-%H.%M)
-          echo "TIME=$TIME" >> $GITHUB_OUTPUT
-
-      - name: NAIS login
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: nais/login@5b34cb6e280f8eda678746fcbe14cba7636e6129 # v0
-        id: login
+      - uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
+        if: github.ref == 'refs/heads/main'
+        id: docker-push
         with:
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           team: teampensjon
-
-      - name: Docker meta
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
-        with:
-          images: |
-            ${{ steps.login.outputs.registry }}/${{ github.repository }}/${{ github.repository_owner}}
-          tags: |
-            type=sha,prefix=${{ steps.version.outputs.time }}-,priority=9002
-
-      - name: Build and push
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        id: build_push
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-
-      - name: Set outputs
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        shell: bash
-        id: set-outputs
-        run: |
-          echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          build_args: GITHUB_SHA=${{ github.sha }}
 
   deploy:
+    if: github.ref == 'refs/heads/main'
+
+    needs: [ci, build]
+
+    runs-on: 'ubuntu-latest'
+
     permissions:
       contents: "read"
       id-token: "write"
-    if: github.ref == 'refs/heads/main'
-    needs: [build, attest-sign]
-    runs-on: 'ubuntu-latest'
 
     strategy:
       matrix:
@@ -107,26 +81,41 @@ jobs:
           CLUSTER: '${{ matrix.cluster }}'
           VARS: ${{matrix.vars}}
 
-  attest-sign:
+  deployPages:
+    if: github.ref == 'refs/heads/main'
+
+    needs: [ci]
+
+    runs-on: ubuntu-latest
+
     permissions:
       contents: read
+      pages: write
       id-token: write
-    if: github.ref == 'refs/heads/main'
-    needs: [build]
-    runs-on: 'ubuntu-latest'
+    concurrency:
+      group: 'pages'
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - name: NAIS login
-        uses: nais/login@5b34cb6e280f8eda678746fcbe14cba7636e6129 # v0
-        id: login
-        with:
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          team: teampensjon
+      - name: Sett opp og installer frontend avhengigheter
+        uses: ./.github/actions/setup-frontend
 
-      - name: Attest and sign image
-        id: attest-sign
-        uses: nais/attest-sign@c839bd87ba71207e36341b6e9b6d8aabdcbc86c2 # v2.0.12
+      - name: Build Storybook
+        run: pnpm run build-storybook
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          image_ref: "${{ needs.build.outputs.image-digest }}"
+          path: 'storybook-static'
+          overwrite: true
+
+      - id: deploy
+        name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        with:
+          token: ${{ github.token }}
