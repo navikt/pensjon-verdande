@@ -90,8 +90,8 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
       zod-form-data:
-        specifier: ^3.0.1
-        version: 3.0.1(zod@4.4.3)
+        specifier: ^3.0.2
+        version: 3.0.2(zod@4.4.3)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.15
@@ -3336,8 +3336,8 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
-  zod-form-data@3.0.1:
-    resolution: {integrity: sha512-uwSrDzpLDoXeAxePjPHrjjMelE5pk5zL5JcwLFISvqidGjtPl7hcheH584xGcS76c9IRHq6tqdGkf+A4eKO6Cw==}
+  zod-form-data@3.0.2:
+    resolution: {integrity: sha512-iN8oSINKqNHJ90T+SHUvHg2gfvF+gyVvg4nK1RYYhMUDUpUWaqwqawLbJNDxxrM59pgE0kdcMfqKVwK55Bm5cw==}
     peerDependencies:
       zod: '>= 3.25.0'
 
@@ -6295,7 +6295,7 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  zod-form-data@3.0.1(zod@4.4.3):
+  zod-form-data@3.0.2(zod@4.4.3):
     dependencies:
       '@rvf/set-get': 7.0.2
       zod: 4.4.3
