@@ -1,6 +1,6 @@
 import { BodyShort, Button, DatePicker, Heading, HStack, useDatepicker, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import { useFetcher } from 'react-router'
+import { redirect, useFetcher } from 'react-router'
 import { apiPost } from '~/services/api.server'
 import type { Route } from './+types/unge-med-uforetrygd-varsel'
 
@@ -12,7 +12,16 @@ export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData()
   const kriterieDato = formData.get('kriterieDato') as string
 
-  await apiPost('/api/uforetrygd/varsler/unge-med-ufore/start', { kriterieDato: kriterieDato }, request)
+  const response = await apiPost<{ behandlingId: number }>(
+    '/api/uforetrygd/varsler/unge-med-ufore/start',
+    { kriterieDato: kriterieDato },
+    request,
+  )
+
+  if (!response?.behandlingId) {
+    throw new Error('Missing behandlingId')
+  }
+  return redirect(`/behandling/${response.behandlingId}`)
 }
 
 export default function UngeMedUforetrygdVarselPage() {
