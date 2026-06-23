@@ -4,7 +4,7 @@ import {
   ExclamationmarkTriangleFillIcon,
   QuestionmarkDiamondFillIcon,
 } from '@navikt/aksel-icons'
-import { BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
+import { Alert, BodyShort, Box, Heading, HGrid, Skeleton, VStack } from '@navikt/ds-react'
 import React from 'react'
 import { Await } from 'react-router'
 import type { BrevTidsserieResponse, TidsserieResponse } from '~/analyse/types'
@@ -92,7 +92,14 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         </VStack>
       }
     >
-      <Await resolve={loadingDashboardResponse}>
+      <Await
+        resolve={loadingDashboardResponse}
+        errorElement={
+          <Alert variant="warning">
+            Dashboard-data kunne ikke lastes. Dette kan skyldes tregt svar fra tjenesten. Forsøk å laste siden på nytt.
+          </Alert>
+        }
+      >
         {(dashboardResponse) => {
           return (
             dashboardResponse && (

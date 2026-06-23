@@ -48,3 +48,11 @@ export const MedVisAlleKnapp: Story = {
       }),
     }),
 }
+
+export const FeilendeData: Story = {
+  tags: ['error-expected'],
+  render: () =>
+    renderWithLoader(Dashboard, {
+      loadingDashboardResponse: Promise.reject(new Error('Tidsavbrudd')),
+    }),
+}

@@ -1,4 +1,5 @@
 import {
+  Alert,
   BodyLong,
   Box,
   Button,
@@ -214,7 +215,14 @@ export default function Avstemming({ loaderData }: Route.ComponentProps) {
         Eksisterende avstemminger
       </Heading>
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
-        <Await resolve={behandlinger}>
+        <Await
+          resolve={behandlinger}
+          errorElement={
+            <Alert variant="warning">
+              Avstemminger kunne ikke lastes. Dette kan skyldes tregt svar fra tjenesten. Forsøk å laste siden på nytt.
+            </Alert>
+          }
+        >
           {(it) => (
             <BehandlingerTable
               inkluderFortsett={false}
