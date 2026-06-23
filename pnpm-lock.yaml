@@ -12,14 +12,14 @@ importers:
         specifier: ^0.9.1
         version: 0.9.1
       '@navikt/aksel-icons':
-        specifier: ^8.12.1
-        version: 8.12.1
+        specifier: ^8.13.0
+        version: 8.13.0
       '@navikt/ds-css':
-        specifier: ^8.12.1
-        version: 8.12.1
+        specifier: ^8.13.0
+        version: 8.13.0
       '@navikt/ds-react':
-        specifier: ^8.12.1
-        version: 8.12.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^8.13.0
+        version: 8.13.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@react-router/express':
         specifier: 7.17.0
         version: 7.17.0(express@5.2.1)(react-router@7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@6.0.3)
@@ -710,14 +710,14 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@navikt/aksel-icons@8.12.1':
-    resolution: {integrity: sha512-v05kWk0eJFOg1gKF9LJDS+n/W1S2aVDTNbhRdiuKi01ec5B9jiN8grOzylGtungvabLhiakGmROT3XmkXDgn9w==}
+  '@navikt/aksel-icons@8.13.0':
+    resolution: {integrity: sha512-z2r80EAuKX6W1XUSaBjAvQCAyyjir41XCmXPlmnvvNqOINfV8RFf2LYUx2+FwCqVfuPOdh7sdPLUtzwMl7QNmQ==}
 
-  '@navikt/ds-css@8.12.1':
-    resolution: {integrity: sha512-4PgSwo/HKPifRgSkfPupR/VJTi3LrATzKk2g3/c/Pe3OUOpI5ldgR199r4r5WBBM+5Z2rosRwm9eC7jCWlQ9nQ==}
+  '@navikt/ds-css@8.13.0':
+    resolution: {integrity: sha512-EAUiycmU4tCWYJ8eSO6G9m3slAYOXANX/dYluDlHxsBptEGUTyj8RRvrWhUVxqbrZJaZWCzLy05bpDIQlv425g==}
 
-  '@navikt/ds-react@8.12.1':
-    resolution: {integrity: sha512-7WJWiuVLsTfEI0/AV/XWVKduX+JG2f90aJMT6hDxQ1odwMsRdRuT/P8p+W65Ql+Sz82kbgV9megIsmzFRSbSuw==}
+  '@navikt/ds-react@8.13.0':
+    resolution: {integrity: sha512-U0ooqlmgjHTJNdOKFwGzO20VfxpNfLLwRwniyFFYV2IUeiUG1KvI92g0K3qdwrIkh3b89Epir75fT+s5rhhgNA==}
     peerDependencies:
       '@types/react': ^17.0.30 || ^18 || ^19
       react: ^17 || ^18 || ^19
@@ -726,8 +726,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@navikt/ds-tokens@8.13.0':
-    resolution: {integrity: sha512-rtdyubAcoP4f8onbtghjjCyL5UlOLvz9eK53bR7CJbUUTEGovebgoUwB6S10LFGj3BktFe7m91Vu6vtsCpmEZw==}
+  '@navikt/ds-tokens@8.13.1':
+    resolution: {integrity: sha512-wi8sBX6UPDZ3tVI2Nx2KJkiGutx6U5fixeVHRo/oX36RvkYVW9zjYO8/I51BLGdiJW0qOufqFOEs+AEVupuRZA==}
 
   '@oslojs/asn1@1.0.0':
     resolution: {integrity: sha512-zw/wn0sj0j0QKbIXfIlnEcTviaCzYOY3V5rAyjR6YtOByFtJiT574+8p9Wlach0lZH9fddD4yb9laEAIl4vXQA==}
@@ -3859,16 +3859,16 @@ snapshots:
       '@tybys/wasm-util': 0.10.2
     optional: true
 
-  '@navikt/aksel-icons@8.12.1': {}
+  '@navikt/aksel-icons@8.13.0': {}
 
-  '@navikt/ds-css@8.12.1': {}
+  '@navikt/ds-css@8.13.0': {}
 
-  '@navikt/ds-react@8.12.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@navikt/ds-react@8.13.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@floating-ui/react': 0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@navikt/aksel-icons': 8.12.1
-      '@navikt/ds-tokens': 8.13.0
+      '@navikt/aksel-icons': 8.13.0
+      '@navikt/ds-tokens': 8.13.1
       date-fns: 4.4.0
       react: 19.2.7
       react-day-picker: 9.14.0(react@19.2.7)
@@ -3876,7 +3876,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.17
 
-  '@navikt/ds-tokens@8.13.0': {}
+  '@navikt/ds-tokens@8.13.1': {}
 
   '@oslojs/asn1@1.0.0':
     dependencies:
