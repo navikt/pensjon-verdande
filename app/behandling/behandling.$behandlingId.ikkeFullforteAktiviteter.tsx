@@ -16,7 +16,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 }
 
-export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentProps) {
+export default function IkkeFullforteAktiviteterRoute({ loaderData }: Route.ComponentProps) {
   const { ikkeFullforteAktiviteter } = loaderData
 
   return (
