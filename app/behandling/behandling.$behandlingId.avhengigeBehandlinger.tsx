@@ -1,4 +1,4 @@
-import { Skeleton } from '@navikt/ds-react'
+import { Alert, Skeleton } from '@navikt/ds-react'
 import { Suspense } from 'react'
 import { Await } from 'react-router'
 import invariant from 'tiny-invariant'
@@ -34,7 +34,15 @@ export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentPro
 
   return (
     <Suspense fallback={<Skeleton variant="text" width="100%" />}>
-      <Await resolve={avhengigeBehandlinger}>
+      <Await
+        resolve={avhengigeBehandlinger}
+        errorElement={
+          <Alert variant="warning">
+            Avhengige behandlinger kunne ikke lastes. Dette kan skyldes tregt svar fra tjenesten. Forsøk å laste siden
+            på nytt.
+          </Alert>
+        }
+      >
         {(it) => <AvhengigeBehandlingerElement avhengigeBehandlinger={it} />}
       </Await>
     </Suspense>

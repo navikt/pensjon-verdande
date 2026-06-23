@@ -24,3 +24,11 @@ export const Empty: Story = {
       behandlinger: mockBehandlingerPage([], { empty: true }),
     }),
 }
+
+export const FeilendeData: Story = {
+  tags: ['error-expected'],
+  render: () =>
+    renderWithLoader(Konsistensavstemming, {
+      behandlinger: Promise.reject(new Error('Tidsavbrudd')),
+    }),
+}
