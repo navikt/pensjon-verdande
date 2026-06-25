@@ -5,6 +5,7 @@ node_modules
 /build
 /public/build
 .env
+.env*.local
 .idea/
 .react-router/
 .DS_Store
