@@ -83,6 +83,11 @@ export default [
     ]),
     route('analyse/eksport', 'analyse/eksport.tsx'),
 
+    route('analyse/alderspensjon', 'analyse/alderspensjon-layout.tsx', [
+      index('analyse/alderspensjon-index.tsx'),
+      route('mottakere', 'analyse/mottakere-alder.tsx'),
+    ]),
+
     route('aldersovergang', 'aldersovergang/aldersovergang._index.tsx'),
 
     route('aldersovergang/opprett', 'aldersovergang/aldersovergang.opprett.tsx'),

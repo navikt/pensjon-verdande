@@ -1072,3 +1072,44 @@ export function mockBehandlingKravAlderData(): import('./types').BehandlingKravA
     ],
   }
 }
+
+export function mockAlderspensjonMottakereData(): import('./types').AlderspensjonMottakereResponse {
+  const months = [
+    '2024-01-01T00:00:00',
+    '2024-02-01T00:00:00',
+    '2024-03-01T00:00:00',
+    '2024-04-01T00:00:00',
+    '2024-05-01T00:00:00',
+    '2024-06-01T00:00:00',
+    '2024-07-01T00:00:00',
+    '2024-08-01T00:00:00',
+    '2024-09-01T00:00:00',
+    '2024-10-01T00:00:00',
+    '2024-11-01T00:00:00',
+    '2024-12-01T00:00:00',
+  ]
+  const nye = [5234, 4987, 5410, 5123, 4890, 4720, 4250, 4180, 5320, 5510, 5180, 4960]
+  const opphor = [3812, 3654, 3970, 3810, 3720, 3680, 3550, 3490, 3820, 3910, 3870, 3760]
+  const brutto = [
+    287654.12,
+    null,
+    291230.55,
+    289450.0,
+    293120.4,
+    295800.1,
+    298400.0,
+    297500.0,
+    301250.5,
+    303400.0,
+    305120.0,
+    307800.0,
+  ]
+  return {
+    datapunkter: months.map((periodeFra, i) => ({
+      periodeFra,
+      antallNye: nye[i],
+      antallOpphor: opphor[i],
+      gjennomsnittBruttoPerAarNyeMottakere: brutto[i],
+    })),
+  }
+}

@@ -554,3 +554,17 @@ export type BrevTidsserieDatapunkt = {
   periodeFra: string
   antall: number
 }
+
+// --- Alderspensjon mottakere (tilvekst og avgang) ---
+
+export type AlderspensjonMottakereResponse = {
+  datapunkter: AlderspensjonMottakereDatapunkt[]
+}
+
+export type AlderspensjonMottakereDatapunkt = {
+  periodeFra: string
+  antallNye: number
+  antallOpphor: number
+  /** Årlig brutto, snitt over nye mottakere i perioden. Null hvis ingen vinnende beregning. */
+  gjennomsnittBruttoPerAarNyeMottakere: number | null
+}
