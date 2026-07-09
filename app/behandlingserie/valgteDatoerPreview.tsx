@@ -1,4 +1,4 @@
-import { Heading, HStack, VStack } from '@navikt/ds-react'
+import { Box, Heading, HStack, VStack } from '@navikt/ds-react'
 
 export default function ValgteDatoerPreview({
   yearMonthDayDates,
@@ -11,9 +11,9 @@ export default function ValgteDatoerPreview({
     return (
       <VStack
         gap="space-4"
+        padding="space-16"
         style={{
           background: 'var(--ax-bg-neutral-soft, #f3f3f3)',
-          padding: '1rem',
           borderRadius: '0.5rem',
         }}
       >
@@ -67,9 +67,9 @@ export default function ValgteDatoerPreview({
   return (
     <VStack
       gap="space-8"
+      padding="space-16"
       style={{
         background: 'var(--ax-bg-neutral-soft, #f3f3f3)',
-        padding: '1rem',
         borderRadius: '0.5rem',
       }}
     >
@@ -89,15 +89,13 @@ export default function ValgteDatoerPreview({
                 const weekday = date.getDay()
 
                 return (
-                  <div
+                  <VStack
                     key={yearMonthDay}
+                    align="center"
+                    padding="space-8"
                     style={{
                       background: dayColors[weekday],
-                      padding: '0.4rem 0.6rem',
                       borderRadius: '0.5rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
                       minWidth: '5rem',
                       border: '1px solid transparent',
                     }}
@@ -120,17 +118,18 @@ export default function ValgteDatoerPreview({
                       {fmtNO(date)}
                     </span>
                     {time && (
-                      <span
-                        style={{
-                          fontSize: '0.75rem',
-                          opacity: 0.9,
-                          marginTop: '0.2rem',
-                        }}
-                      >
-                        {time}
-                      </span>
+                      <Box marginBlock="space-4 space-0">
+                        <span
+                          style={{
+                            fontSize: '0.75rem',
+                            opacity: 0.9,
+                          }}
+                        >
+                          {time}
+                        </span>
+                      </Box>
                     )}
-                  </div>
+                  </VStack>
                 )
               })}
             </HStack>
