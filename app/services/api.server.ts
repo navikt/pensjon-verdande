@@ -35,11 +35,11 @@ async function apiFetch<T>(
   path: string,
   requestCtx: RequestCtx | Request,
   parse: (res: Response) => Promise<T>,
-  opts?: { allow404AsUndefined?: boolean; body?: unknown },
+  opts?: { allow404AsUndefined?: boolean; body?: unknown; timeoutMs?: number },
 ): Promise<T | undefined> {
   const ctx = await resolveCtx(requestCtx)
   const url = `${env.penUrl}${path}`
-  const { signal, cancel } = withTimeout(15_000)
+  const { signal, cancel } = withTimeout(opts?.timeoutMs ?? 15_000)
   const start = performance.now()
   try {
     const headers: HeadersInit = { ...buildHeaders(ctx) }
@@ -81,8 +81,12 @@ async function apiFetch<T>(
   }
 }
 
-export async function apiGet<T>(path: string, requestCtx: RequestCtx | Request): Promise<T> {
-  const result = await apiFetch<T>('GET', path, requestCtx, async (res) => (await res.json()) as T)
+export async function apiGet<T>(
+  path: string,
+  requestCtx: RequestCtx | Request,
+  opts?: { timeoutMs?: number },
+): Promise<T> {
+  const result = await apiFetch<T>('GET', path, requestCtx, async (res) => (await res.json()) as T, opts)
   // apiFetch never returns undefined here since allow404AsUndefined is not used
   return result as T
 }
@@ -92,8 +96,15 @@ export async function apiGetRawResponse(path: string, requestCtx: RequestCtx | R
   return result as Response
 }
 
-export async function apiGetOrUndefined<T>(path: string, requestCtx: RequestCtx | Request): Promise<T | undefined> {
-  return apiFetch<T>('GET', path, requestCtx, async (res) => (await res.json()) as T, { allow404AsUndefined: true })
+export async function apiGetOrUndefined<T>(
+  path: string,
+  requestCtx: RequestCtx | Request,
+  opts?: { timeoutMs?: number },
+): Promise<T | undefined> {
+  return apiFetch<T>('GET', path, requestCtx, async (res) => (await res.json()) as T, {
+    ...opts,
+    allow404AsUndefined: true,
+  })
 }
 
 export async function apiGetRawStringOrUndefined(
