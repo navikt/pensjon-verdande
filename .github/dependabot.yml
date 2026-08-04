@@ -23,6 +23,11 @@ updates:
         patterns:
           - "@react-router*"
           - "react-router"
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "@storybook/addon-vitest"
       storybook:
         patterns:
           - 'storybook'
