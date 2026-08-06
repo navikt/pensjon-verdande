@@ -13,28 +13,13 @@ export const loader = () => {
   }
 }
 
-const POPULER_KATEGORIER = [
-  'BEHANDLE_ÅPNE_KRAV',
-  'IKKE_BEHANDLE_ÅPNE_KRAV',
-  'LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR',
-  'LAVERE_KOMPGRAD_ØKT_IFU',
-  'ØKT_IFU_OPPHØR',
-  'ØKT_IFU',
-  'LAVERE_KOMPENSASJONSGRAD_OPPHØR',
-  'LAVERE_KOMPENSASJONSGRAD',
-] as const
+const POPULER_KATEGORIER = ['BEHANDLE_ÅPNE_KRAV', 'IKKE_BEHANDLE_ÅPNE_KRAV'] as const
 
 type PopulerKategori = (typeof POPULER_KATEGORIER)[number]
 
 const POPULER_KATEGORI_VISNINGSNAVN: Record<PopulerKategori, string> = {
   BEHANDLE_ÅPNE_KRAV: 'Reduksjonsprosent - Behandle åpne krav',
   IKKE_BEHANDLE_ÅPNE_KRAV: 'Vilkårsprøving - Ikke behandle åpne krav',
-  LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR: 'LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR (ikke i bruk)',
-  LAVERE_KOMPGRAD_ØKT_IFU: 'LAVERE_KOMPGRAD_ØKT_IFU (ikke i bruk)',
-  ØKT_IFU_OPPHØR: 'ØKT_IFU_OPPHØR (ikke i bruk)',
-  ØKT_IFU: 'ØKT_IFU (ikke i bruk)',
-  LAVERE_KOMPENSASJONSGRAD_OPPHØR: 'LAVERE_KOMPENSASJONSGRAD_OPPHØR (ikke i bruk)',
-  LAVERE_KOMPENSASJONSGRAD: 'LAVERE_KOMPENSASJONSGRAD (ikke i bruk)',
 }
 
 const isPopulerKategori = (verdi: string): verdi is PopulerKategori =>
