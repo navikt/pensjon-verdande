@@ -26,7 +26,7 @@ const isPopulerKategori = (verdi: string): verdi is PopulerKategori =>
   (POPULER_KATEGORIER as readonly string[]).includes(verdi)
 
 const ENDEPUNKTER = {
-  varsel: '/api/uforetrygd/regelendring2026/varsel',
+  kategoriser: '/api/uforetrygd/regelendring2026/kategoriser',
   populer: '/api/uforetrygd/regelendring2026/populer',
 } as const
 
@@ -38,13 +38,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const dryRun = dryRunStr === 'true'
   const intent = String(formData.get('intent') ?? '') as Intent
 
-  if (intent !== 'varsel' && intent !== 'populer') {
+  if (intent !== 'kategoriser' && intent !== 'populer') {
     throw new Error(`Ukjent intent: ${intent}`)
   }
 
   let response: { behandlingId: number } | undefined
-  if (intent === 'varsel') {
-    response = await apiPost<{ behandlingId: number }>(ENDEPUNKTER.varsel, { dryRun }, request)
+  if (intent === 'kategoriser') {
+    response = await apiPost<{ behandlingId: number }>(ENDEPUNKTER.kategoriser, { dryRun }, request)
   } else {
     const kategori = String(formData.get('kategori') ?? '')
     if (!isPopulerKategori(kategori)) {
@@ -79,8 +79,8 @@ export default function Regelendring2026() {
       </Box>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'space-64'}>
-          <Button type="submit" name="intent" value="varsel" disabled={navigation.state === 'submitting'}>
-            {submittingIntent === 'varsel' ? 'Oppretter…' : 'Kategoriser'}
+          <Button type="submit" name="intent" value="kategoriser" disabled={navigation.state === 'submitting'}>
+            {submittingIntent === 'kategoriser' ? 'Oppretter…' : 'Kategoriser'}
           </Button>
           <VStack gap={'space-8'}>
             <Select label="Prøvekjøring (dry run)" size="small" name="dryRun" defaultValue="true">
