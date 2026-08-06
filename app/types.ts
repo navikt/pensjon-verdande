@@ -310,6 +310,7 @@ export interface HalLinks {
 }
 
 export type OmregningRequest = {
+  ansvarligTeam: string
   behandlingsnokkel: string
   omregningstidspunkt: string
   omregneAFP: boolean
