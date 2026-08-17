@@ -119,8 +119,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
   const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
-  const [regelendringUt2026, setRegelendringUt2026] = useState(false)
-  const [regelendringBerortSakAuto, setRegelendringBerortSakAuto] = useState(false)
   const [skalBrukeKjoreplan, setSkalBrukeKjoreplan] = useState(false)
 
   const [hasError, setHasError] = useState(false)
@@ -460,22 +458,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                       >
                         Skal bruke kjøreplan
                       </OmregningCheckbox>
-                      <OmregningCheckbox
-                        defaultChecked={regelendringUt2026}
-                        name={'regelendringUt2026'}
-                        value={regelendringUt2026}
-                        onChange={setRegelendringUt2026}
-                      >
-                        Regelendringer UT 2026
-                      </OmregningCheckbox>
-                      <OmregningCheckbox
-                        defaultChecked={regelendringBerortSakAuto}
-                        name={'regelendringBerortSakAuto'}
-                        value={regelendringBerortSakAuto}
-                        onChange={setRegelendringBerortSakAuto}
-                      >
-                        Regelendringer UT 2026 : Behandle berørt sak automatisk
-                      </OmregningCheckbox>
                     </CheckboxGroup>
                   </VStack>
                 </Box>
@@ -670,8 +652,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   skalSamordne={skalSamordne}
                   skalSletteIverksettingsoppgaver={skalSletteIverksettingsoppgaver}
                   skalDistribuereUforevedtak={skalDistribuereUforevedtak}
-                  regelendringUt2026={regelendringUt2026}
-                  regelendringBerortSakAuto={regelendringBerortSakAuto}
                   skalBrukeKjoreplan={skalBrukeKjoreplan}
                   behandleApneKrav={behandleApneKrav}
                   brukFaktoromregning={brukFaktoromregning}
@@ -744,8 +724,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       `skalBestilleBrevForSøker: ${skalBestilleBrev}`,
       `skalSendeBrevBerørteSaker: ${skalSendeBrevBerorteSaker}`,
       ``,
-      `regelendringUt2026: ${regelendringUt2026}`,
-      `regelendringBerortSakAuto: ${regelendringBerortSakAuto}`,
       `skalBrukeKjøreplan: ${skalBrukeKjoreplan}`,
     ].join('\n')
   }
