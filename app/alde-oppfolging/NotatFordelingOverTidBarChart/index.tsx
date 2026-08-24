@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { Bar } from 'react-chartjs-2'
 import { statusColors, statusLabels } from '../StatusfordelingOverTidBarChart/utils'
 import type { AktivitetStatusFordelingDto } from '../types'
+import { byggNotatSerie } from './utils'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -50,23 +51,20 @@ export const options: ChartOptions<'bar'> = {
  */
 const NotatFordelingOverTidBarChart: React.FC<NotatFordelingOverTidBarChartProps> = ({ data }) => {
   const chartData = useMemo(() => {
-    const fullforte = data.filter((d) => d.status === 'FULLFORT' && d.dato)
+    const serie = byggNotatSerie(data)
 
-    if (fullforte.length === 0) {
+    if (!serie) {
       return null
     }
-
-    const dates = [...fullforte.map((d) => d.dato as string)].sort()
-    const antallPerDato = new Map(fullforte.map((d) => [d.dato, d.antall]))
 
     const colors = statusColors.FULLFORT
 
     const result: ChartData<'bar'> = {
-      labels: dates,
+      labels: serie.datoer,
       datasets: [
         {
           label: statusLabels.FULLFORT || 'Fullført',
-          data: dates.map((dato) => antallPerDato.get(dato) || 0),
+          data: serie.antall,
           backgroundColor: colors?.backgroundColor || 'var(--ax-bg-neutral-soft)',
           borderColor: colors?.borderColor || 'var(--ax-border-neutral)',
           borderWidth: 1,
