@@ -28,16 +28,26 @@ import FordelingAldeStatus from './FordelingAldeStatus'
 import FordelingBehandlingStatus from './FordelingBehandling'
 import FordelingStatusMedAktivitet from './FordelingStatusMedAktivitet'
 import css from './index.module.css'
+import NotatFordelingOverTidBarChart from './NotatFordelingOverTidBarChart'
 import StatusfordelingOverTidBarChart from './StatusfordelingOverTidBarChart'
 import { statusColors, statusLabels } from './StatusfordelingOverTidBarChart/utils'
 import type {
+  AktivitetStatusFordelingDto,
   AldeAvbrutteBehandlingerDto,
   AldeBehandlingNavn,
   AldeFordelingKontrollpunktOverTidDto,
-  AldeFordelingStatusDto,
   AldeFordelingStatusMedAktivitet,
   AldeFordelingStatusOverTidDto,
+  BehandlingStatusFordelingDto,
 } from './types'
+
+// Aktivitetskoden som markerer at en Alde-behandling er avbrutt. I dag kun relevant for
+// FleksibelApSak; sendes eksplisitt inn siden backend har genericert bort den tidligere
+// hardkodingen (se AldeOppfolgingController i pensjon-pen).
+const AVBRUDD_AKTIVITET_CODE = 'FleksibelApSak_AvbrytAldeBehandling'
+
+// Aktivitetskoden for notat-aktiviteten hvis fullførte instanser regnes som «opprettede notater».
+const NOTAT_AKTIVITET_CODE = 'FleksibelApSak_AldeNotat'
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'ALDE oppfølging | Verdande' }]
@@ -56,18 +66,24 @@ export async function loader({ request }: { request: Request }) {
   dateRangeSearchParams.set('tomDato', tomDato)
   dateRangeSearchParams.set('behandlingType', behandlingstype)
 
-  const aldeStatusFordeling = await apiGet<AldeFordelingStatusDto>(
-    `/api/behandling/alde/oppfolging/status-fordeling?${dateRangeSearchParams.toString()}`,
+  const behandlingStatusFordelingParams = new URLSearchParams(dateRangeSearchParams)
+  behandlingStatusFordelingParams.set('avbruddAktivitetCode', AVBRUDD_AKTIVITET_CODE)
+
+  const aldeStatusFordeling = await apiGet<BehandlingStatusFordelingDto[]>(
+    `/api/behandling/alde/oppfolging/behandling-status-fordeling?${behandlingStatusFordelingParams.toString()}`,
     request,
-  ).then((it) => it.statusFordeling)
+  ).then((rows) => rows.map((row) => ({ status: row.status, antall: row.antall })))
 
   const behandlingFordeling = await apiGet<{ fordeling: { behandlingType: string; antall: number }[] }>(
     `/api/behandling/alde/oppfolging/behandling-fordeling?${dateRangeSearchParams.toString()}`,
     request,
   ).then((it) => it.fordeling)
 
+  const avbrutteBehandlingerParams = new URLSearchParams(dateRangeSearchParams)
+  avbrutteBehandlingerParams.set('avbruddAktivitetCode', AVBRUDD_AKTIVITET_CODE)
+
   const avbrutteBehandlinger = await apiGet<AldeAvbrutteBehandlingerDto>(
-    `/api/behandling/alde/oppfolging/avbrutte-behandlinger?${dateRangeSearchParams.toString()}`,
+    `/api/behandling/alde/oppfolging/avbrutte-behandlinger?${avbrutteBehandlingerParams.toString()}`,
     request,
   ).then((response) =>
     response.avbrutteBehandlinger
@@ -83,20 +99,37 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
-  const statusfordelingOverTid = await apiGet<AldeFordelingStatusOverTidDto[]>(
-    `/api/behandling/alde/oppfolging/behandling-status?${dateRangeSearchParams.toString()}`,
+  const statusfordelingOverTidParams = new URLSearchParams(behandlingStatusFordelingParams)
+  statusfordelingOverTidParams.set('perDag', 'true')
+
+  const statusfordelingOverTid = await apiGet<BehandlingStatusFordelingDto[]>(
+    `/api/behandling/alde/oppfolging/behandling-status-fordeling?${statusfordelingOverTidParams.toString()}`,
     request,
-  )
+  ).then((rows) => grupperPerDato(rows))
 
   const kontrollpunktFordelingOverTid = await apiGet<AldeFordelingKontrollpunktOverTidDto>(
     `/api/behandling/alde/oppfolging/behandling-samboer-kontrollpunkt-fordeling?kontrollpunktType=SAMBOER&${dateRangeSearchParams.toString()}`,
     request,
   )
 
-  const statusfordelingAldeAktiviteter = await apiGet<{ statusFordeling: AldeFordelingStatusMedAktivitet[] }>(
-    `/api/behandling/alde/oppfolging/status-fordeling-med-aktivitet?${dateRangeSearchParams.toString()}`,
+  const statusfordelingMedAktivitetParams = new URLSearchParams(behandlingStatusFordelingParams)
+  statusfordelingMedAktivitetParams.set('grupperPerAktivitet', 'true')
+
+  const statusfordelingAldeAktiviteter = await apiGet<BehandlingStatusFordelingDto[]>(
+    `/api/behandling/alde/oppfolging/behandling-status-fordeling?${statusfordelingMedAktivitetParams.toString()}`,
     request,
-  ).then((it) => it.statusFordeling)
+  ).then((rows): AldeFordelingStatusMedAktivitet[] =>
+    rows.map((row) => ({ status: row.status, aktivitet: row.aktivitetCode || '', antall: row.antall })),
+  )
+
+  const notatFordelingParams = new URLSearchParams(dateRangeSearchParams)
+  notatFordelingParams.set('aktivitetCode', NOTAT_AKTIVITET_CODE)
+  notatFordelingParams.set('perDag', 'true')
+
+  const notatFordelingOverTid = await apiGet<AktivitetStatusFordelingDto[]>(
+    `/api/behandling/alde/oppfolging/aktivitet-status-fordeling?${notatFordelingParams.toString()}`,
+    request,
+  )
 
   return {
     avbrutteBehandlinger,
@@ -109,8 +142,22 @@ export async function loader({ request }: { request: Request }) {
     behandlingstype,
     kontrollpunktFordelingOverTid,
     statusfordelingAldeAktiviteter,
+    notatFordelingOverTid,
     nowIso: now.toISOString(),
   }
+}
+
+/** Grupperer den flate `dato`-per-`status`-listen fra /behandling-status-fordeling (perDag=true)
+ * til den nøstede formen StatusfordelingOverTidBarChart forventer. */
+function grupperPerDato(rows: BehandlingStatusFordelingDto[]): AldeFordelingStatusOverTidDto[] {
+  const perDato = new Map<string, { status: string; antall: number }[]>()
+  for (const row of rows) {
+    if (!row.dato) continue
+    const eksisterende = perDato.get(row.dato) || []
+    eksisterende.push({ status: row.status, antall: row.antall })
+    perDato.set(row.dato, eksisterende)
+  }
+  return Array.from(perDato.entries()).map(([dato, fordeling]) => ({ dato, fordeling }))
 }
 
 export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
@@ -125,6 +172,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     aldeBehandlinger,
     kontrollpunktFordelingOverTid,
     statusfordelingAldeAktiviteter,
+    notatFordelingOverTid,
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
   const navigation = useNavigation()
@@ -373,6 +421,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
               <Tabs.Tab value="status-over-tid" label="Statusfordeling over tid" />
               <Tabs.Tab value="kontrollpunkt" label="Kontrollpunkt" />
               <Tabs.Tab value="status-aktivitet" label="Status med aktivitet" />
+              <Tabs.Tab value="notat" label="Notat" />
               <Tabs.Tab value="avbrutte-behandlinger" label="Avbrutte behandlinger" />
             </Tabs.List>
 
@@ -407,6 +456,12 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
             <Tabs.Panel value="status-aktivitet">
               <Box padding="space-24">
                 <FordelingStatusMedAktivitet data={statusfordelingAldeAktiviteter} />
+              </Box>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="notat">
+              <Box padding="space-24">
+                <NotatFordelingOverTidBarChart data={notatFordelingOverTid} />
               </Box>
             </Tabs.Panel>
 
