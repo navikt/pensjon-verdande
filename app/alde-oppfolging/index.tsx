@@ -487,8 +487,6 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
               <VStack gap="space-24" padding="space-24">
                 <StatusfordelingOverTidBarChart
                   data={statusfordelingOverTid}
-                  fomDate={fomDato}
-                  tomDate={tomDato}
                   hiddenStatuses={hiddenStatuses}
                   behandlingstype={behandlingstype}
                   avbruddAktivitetCode={avbruddAktivitetCode}

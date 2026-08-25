@@ -12,8 +12,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 interface StatusfordelingOverTidBarChartProps {
   data: AldeFordelingStatusOverTidDto[]
-  fomDate: string
-  tomDate: string
   hiddenStatuses?: string[]
   /** Drilldown aktiveres kun når disse er satt. */
   behandlingstype?: string
@@ -71,6 +69,12 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
     const [labels, parsed] = parseToChartData(data)
     return { labels, statusNokler: parsed?.[0] ? Object.keys(parsed[0]) : [] }
   }, [data])
+
+  // Chart.js beholder skjulte datasett, så `statusNokler` må stå urørt for `datasetIndex` i onClick.
+  const synligeStatusNokler = useMemo(
+    () => statusNokler.filter((status) => !hiddenStatuses.includes(status)),
+    [statusNokler, hiddenStatuses],
+  )
 
   const chartData = useMemo(() => {
     const [labels, parsedData] = parseToChartData(data)
@@ -140,9 +144,8 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
         />
       </div>
 
-      {/* Chart.js-søyler kan ikke tastaturnavigeres. Denne lista gir samme drilldown for
-          tastatur- og skjermleserbrukere. */}
-      {drilldownAktiv && datoer.length > 0 && (
+      {/* Chart.js-søyler kan ikke tastaturnavigeres. */}
+      {drilldownAktiv && datoer.length > 0 && synligeStatusNokler.length > 0 && (
         <ReadMore header="Vis behandlinger per dag og status">
           <Table size="small">
             <BodyShort as="caption" visuallyHidden>
@@ -151,7 +154,7 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
             <Table.Header>
               <Table.Row>
                 <Table.ColumnHeader>Dato</Table.ColumnHeader>
-                {statusNokler.map((status) => (
+                {synligeStatusNokler.map((status) => (
                   <Table.ColumnHeader key={status}>{statusLabels[status] || status}</Table.ColumnHeader>
                 ))}
               </Table.Row>
@@ -160,7 +163,7 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
               {datoer.map((dato) => (
                 <Table.Row key={dato}>
                   <Table.DataCell>{formaterDato(dato)}</Table.DataCell>
-                  {statusNokler.map((status) => (
+                  {synligeStatusNokler.map((status) => (
                     <Table.DataCell key={status}>
                       <Link
                         as={RouterLink}
