@@ -107,13 +107,20 @@ const mockStatusfordelingAldeAktiviteter: AldeFordelingStatusMedAktivitet[] = [
   { status: 'FEILENDE', aktivitet: 'IverksettVedtak', antall: 3 },
 ]
 
-const mockNotatFordelingOverTid: AktivitetStatusFordelingDto[] = [
+const mockAktivitetFordelingOverTid: AktivitetStatusFordelingDto[] = [
   { dato: '2024-06-10', status: 'FULLFORT', antall: 12 },
+  { dato: '2024-06-10', status: 'FEILET', antall: 2 },
   { dato: '2024-06-11', status: 'FULLFORT', antall: 15 },
+  { dato: '2024-06-11', status: 'UNDER_BEHANDLING', antall: 4 },
   { dato: '2024-06-12', status: 'FULLFORT', antall: 9 },
   { dato: '2024-06-13', status: 'FULLFORT', antall: 18 },
-  { dato: '2024-06-14', status: 'FULLFORT', antall: 14 },
+  { dato: '2024-06-14', status: 'OPPRETTET', antall: 3 },
   { dato: '2024-06-15', status: 'FULLFORT', antall: 11 },
+]
+
+const mockAktivitetTyper = [
+  { kode: 'FleksibelApSak_AldeAttester', friendlyName: 'Attestere' },
+  { kode: 'FleksibelApSak_AldeNotat', friendlyName: 'Generer notat' },
 ]
 
 const meta: Meta = {
@@ -137,7 +144,11 @@ export const Default: Story = {
       behandlingstype: 'FleksibelApSak',
       kontrollpunktFordelingOverTid: mockKontrollpunktFordelingOverTid,
       statusfordelingAldeAktiviteter: mockStatusfordelingAldeAktiviteter,
-      notatFordelingOverTid: mockNotatFordelingOverTid,
+      aktivitetFordelingOverTid: mockAktivitetFordelingOverTid,
+      aktivitetCode: 'FleksibelApSak_AldeNotat',
+      aktivitetNavn: 'Generer notat',
+      tilgjengeligeAktivitetTyper: mockAktivitetTyper,
+      avbruddAktivitetCode: 'FleksibelApSak_AvbrytAldeBehandling',
       nowIso: '2024-06-15T12:00:00.000Z',
     }),
 }
@@ -155,7 +166,11 @@ export const Empty: Story = {
       behandlingstype: 'FleksibelApSak',
       kontrollpunktFordelingOverTid: { fordeling: [] },
       statusfordelingAldeAktiviteter: [],
-      notatFordelingOverTid: [],
+      aktivitetFordelingOverTid: [],
+      aktivitetCode: 'FleksibelApSak_AldeNotat',
+      aktivitetNavn: 'Generer notat',
+      tilgjengeligeAktivitetTyper: mockAktivitetTyper,
+      avbruddAktivitetCode: 'FleksibelApSak_AvbrytAldeBehandling',
       nowIso: '2024-06-15T12:00:00.000Z',
     }),
 }

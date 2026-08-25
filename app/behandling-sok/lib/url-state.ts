@@ -109,6 +109,25 @@ function validateKriteriumShape(raw: any): Kriterium | null {
       return isStrArr(raw.aktivitetTyper) && isOp(raw.operator)
         ? { type: 'HAR_AKTIVITET_AV_TYPE', aktivitetTyper: raw.aktivitetTyper, operator: raw.operator }
         : null
+    case 'IKKE_HAR_AKTIVITET_AV_TYPE':
+      return isStrArr(raw.aktivitetTyper)
+        ? { type: 'IKKE_HAR_AKTIVITET_AV_TYPE', aktivitetTyper: raw.aktivitetTyper }
+        : null
+    case 'HAR_AKTIVITET_I_STATUS': {
+      if (!isStrArr(raw.aktivitetTyper) || !isStrArr(raw.statuser)) return null
+      const fomOk = raw.fom === null || raw.fom === undefined || isStr(raw.fom)
+      const tomOk = raw.tom === null || raw.tom === undefined || isStr(raw.tom)
+      if (!fomOk || !tomOk) return null
+      return {
+        type: 'HAR_AKTIVITET_I_STATUS',
+        aktivitetTyper: raw.aktivitetTyper,
+        statuser: raw.statuser,
+        fom: raw.fom ?? null,
+        tom: raw.tom ?? null,
+      }
+    }
+    case 'HAR_ALDE_AKTIVITET':
+      return { type: 'HAR_ALDE_AKTIVITET' }
     case 'AKTIVITET_KJORT_FLERE_GANGER_ENN':
       return isNum(raw.terskel) ? { type: 'AKTIVITET_KJORT_FLERE_GANGER_ENN', terskel: raw.terskel } : null
     case 'HAR_AAPEN_MANUELL_BEHANDLING':
