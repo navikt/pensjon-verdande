@@ -6,6 +6,7 @@ import { Bar, getElementAtEvent } from 'react-chartjs-2'
 import { Link as RouterLink, useNavigate } from 'react-router'
 import { byggBehandlingStatusSokUrl } from '../lib/drilldown'
 import type { AldeFordelingStatusOverTidDto } from '../types'
+import type { ChartOutput } from './utils'
 import { parseToChartData, statusColors, statusLabels } from './utils'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
@@ -65,9 +66,14 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
 
   // Datasettenes rekkefølge må matche `parseToChartData`-nøklene for at klikk skal treffe
   // riktig status. Utledes fra samme kilde i stedet for å gjentas som konstant.
-  const { labels: datoer, statusNokler } = useMemo(() => {
+  const {
+    labels: datoer,
+    statusNokler,
+    antallPerStatus,
+  } = useMemo(() => {
     const [labels, parsed] = parseToChartData(data)
-    return { labels, statusNokler: parsed?.[0] ? Object.keys(parsed[0]) : [] }
+    const fordeling = parsed?.[0]
+    return { labels, statusNokler: fordeling ? Object.keys(fordeling) : [], antallPerStatus: fordeling }
   }, [data])
 
   // Chart.js beholder skjulte datasett, så `statusNokler` må stå urørt for `datasetIndex` i onClick.
@@ -146,10 +152,10 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
 
       {/* Chart.js-søyler kan ikke tastaturnavigeres. */}
       {drilldownAktiv && datoer.length > 0 && synligeStatusNokler.length > 0 && (
-        <ReadMore header="Vis behandlinger per dag og status">
+        <ReadMore header="Vis statusfordeling som tabell">
           <Table size="small">
             <BodyShort as="caption" visuallyHidden>
-              Behandlingsstatus per dag med lenke til behandlingssøk
+              Antall behandlinger per dag og status, med lenke til behandlingssøk
             </BodyShort>
             <Table.Header>
               <Table.Row>
@@ -160,22 +166,29 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {datoer.map((dato) => (
+              {datoer.map((dato, datoIndex) => (
                 <Table.Row key={dato}>
                   <Table.DataCell>{formaterDato(dato)}</Table.DataCell>
-                  {synligeStatusNokler.map((status) => (
-                    <Table.DataCell key={status}>
-                      <Link
-                        as={RouterLink}
-                        to={drilldownUrl(status, dato)}
-                        aria-label={`Vis behandlinger med behandlingsstatus ${
-                          statusLabels[status] || status
-                        } opprettet ${formaterDato(dato)}`}
-                      >
-                        Vis
-                      </Link>
-                    </Table.DataCell>
-                  ))}
+                  {synligeStatusNokler.map((status) => {
+                    const antall = antallPerStatus?.[status as keyof ChartOutput]?.[datoIndex] ?? 0
+                    return (
+                      <Table.DataCell key={status}>
+                        {antall > 0 ? (
+                          <Link
+                            as={RouterLink}
+                            to={drilldownUrl(status, dato)}
+                            aria-label={`Vis ${antall} behandlinger med behandlingsstatus ${
+                              statusLabels[status] || status
+                            } opprettet ${formaterDato(dato)}`}
+                          >
+                            {antall}
+                          </Link>
+                        ) : (
+                          0
+                        )}
+                      </Table.DataCell>
+                    )
+                  })}
                 </Table.Row>
               ))}
             </Table.Body>
