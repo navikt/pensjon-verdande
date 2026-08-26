@@ -14,6 +14,7 @@ import {
   XMarkOctagonIcon,
 } from '@navikt/aksel-icons'
 import {
+  Alert,
   BodyLong,
   Box,
   Button,
@@ -545,7 +546,16 @@ export default function BehandlingCard(props: Props) {
                       </Entry>
                     }
                   >
-                    <Await resolve={props.detaljertFremdrift}>
+                    <Await
+                      resolve={props.detaljertFremdrift}
+                      errorElement={
+                        <Entry labelText={'Fremdrift'}>
+                          <Alert variant="warning" size="small" inline>
+                            Kunne ikke laste fremdriftsdata
+                          </Alert>
+                        </Entry>
+                      }
+                    >
                       {(detaljertFremdrift) =>
                         detaljertFremdrift && (
                           <Entry labelText={'Fremdrift'}>
@@ -671,7 +681,15 @@ export default function BehandlingCard(props: Props) {
                   padding={'space-16'}
                 >
                   <Suspense fallback={<Loader size="3xlarge" title="Venter..." />}>
-                    <Await resolve={props.detaljertFremdrift}>
+                    <Await
+                      resolve={props.detaljertFremdrift}
+                      errorElement={
+                        <Alert variant="warning">
+                          Fremdriftsdata kunne ikke lastes. Dette kan skyldes tregt svar fra tjenesten. Forsøk å laste
+                          siden på nytt.
+                        </Alert>
+                      }
+                    >
                       {(detaljertFremdrift) =>
                         detaljertFremdrift && (
                           <BehandlingBatchDetaljertFremdriftBarChart detaljertFremdrift={detaljertFremdrift} />

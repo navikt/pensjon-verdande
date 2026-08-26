@@ -61,6 +61,7 @@ describe('omregning.omregning action', () => {
     formData.set('skalDistribuereUforevedtak', 'false')
     formData.set('sendBrevBerorteSaker', 'false')
     formData.set('prioritet', 'NORMAL')
+    formData.set('ansvarligTeam', 'PESYS_UFORE')
 
     const request = new Request('http://localhost/omregning/omregning', { method: 'POST', body: formData })
     const result = (await action(actionArgs(request))) as Response
@@ -74,6 +75,7 @@ describe('omregning.omregning action', () => {
     expect(sentBody.omregneAFP).toBe(true)
     expect(sentBody.skalSamordne).toBe(true)
     expect(sentBody.brukFaktoromregning).toBe(false)
+    expect(sentBody.ansvarligTeam).toBe('PESYS_UFORE')
     expect(init.signal).toBeInstanceOf(AbortSignal)
     expect(result.status).toBe(302)
     expect(result.headers.get('Location')).toBe('/behandling/42')

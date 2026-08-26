@@ -12,11 +12,21 @@ updates:
         patterns:
           - "@navikt/aksel*"
           - "@navikt/ds*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
       react-router:
         applies-to: version-updates
         patterns:
           - "@react-router*"
           - "react-router"
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
       storybook:
         patterns:
           - 'storybook'

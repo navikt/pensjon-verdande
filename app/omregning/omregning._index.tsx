@@ -23,6 +23,7 @@ import type React from 'react'
 import { useRef, useState } from 'react'
 import type { HTMLFormMethod } from 'react-router'
 import { Form, useFetcher, useNavigation, useSearchParams, useSubmit } from 'react-router'
+import { decodeTeam, Team } from '~/common/decodeTeam'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
 import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
 import { OmregningOppsummering } from '~/components/omregning/OmregningOppsummering'
@@ -185,6 +186,11 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     { value: 'BATCH', label: 'BATCH - egen batch-kø med HPEN' },
   ]
 
+  const optionAnsvarligTeam = (Object.entries(Team) as [keyof typeof Team, string][]).map(([value, label]) => ({
+    value,
+    label,
+  }))
+
   function setMonthSelected(date: Date | undefined): Date | undefined {
     if (!date) {
       return undefined
@@ -214,6 +220,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [oppgaveSett, setOppgaveSett] = useState(optionOppgaveSett[0].value)
   const [oppgavePrefiks, setOppgavePrefiks] = useState(optionOppgavePrefiks[0].value)
   const [prioritet, setPrioritet] = useState(optionPrioritet[1].value)
+  const [ansvarligTeam, setAnsvarligTeam] = useState<string>('PESYS_ALDER')
 
   const [searchParams, setSearchParams] = useSearchParams()
   const omregningsaker = omregningSakerPage as OmregningSakerPage
@@ -322,6 +329,13 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   <br />
                   <br />
 
+                  <OmregningSelector
+                    label={'Ansvarlig team'}
+                    navn={'ansvarligTeam'}
+                    value={ansvarligTeam}
+                    setSelectedValue={setAnsvarligTeam}
+                    optionsmap={optionAnsvarligTeam}
+                  />
                   <OmregningSelector
                     label={'Krav gjelder'}
                     navn={'kravGjelder'}
@@ -650,6 +664,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   toleransegrenseSett={toleransegrenseSett}
                   oppgaveSett={oppgaveSett}
                   oppgavePrefiks={oppgavePrefiks}
+                  ansvarligTeam={ansvarligTeam}
                   omregneAFP={omregneAFP}
                   prioritet={prioritet}
                   skalSamordne={skalSamordne}
@@ -708,6 +723,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       `behandlingsnøkkel: ${behandlingsnokkel}`,
       `omregningstidspunkt: ${omregningstidspunkt}`,
       ``,
+      `ansvarligTeam: ${decodeTeam(ansvarligTeam)}`,
       `kravGjelder: ${kravGjelder}`,
       `kravÅrsak: ${kravArsak}`,
       `toleransegrenseSett: ${toleransegrenseSett}`,

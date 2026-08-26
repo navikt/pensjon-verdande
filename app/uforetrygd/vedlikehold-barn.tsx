@@ -22,6 +22,7 @@ export type PersonDetaljForVedlikehold = {
   annenForelder: string
   rolleFom: string
   rolleTom?: string
+  grunnlagsrolle: string
   vurdertTilBarnetillegg: boolean
   kilde: string
   bruk: boolean
@@ -91,6 +92,7 @@ export default function VedlikeholdBarnPage() {
               <Table.Row>
                 <Table.HeaderCell>Persondetalj ID</Table.HeaderCell>
                 <Table.HeaderCell>Persongrunnlag ID</Table.HeaderCell>
+                <Table.HeaderCell>Grunnlagsrolle</Table.HeaderCell>
                 <Table.HeaderCell>Barn FNR</Table.HeaderCell>
                 <Table.HeaderCell>Rolle FOM</Table.HeaderCell>
                 <Table.HeaderCell>Rolle TOM</Table.HeaderCell>
@@ -105,6 +107,7 @@ export default function VedlikeholdBarnPage() {
                 <Table.Row key={person.personDetaljId}>
                   <Table.DataCell>{person.personDetaljId}</Table.DataCell>
                   <Table.DataCell>{person.persongrunnlagId}</Table.DataCell>
+                  <Table.DataCell>{person.grunnlagsrolle}</Table.DataCell>
                   <Table.DataCell>{person.fnr}</Table.DataCell>
                   <Table.DataCell>{person.rolleFom}</Table.DataCell>
                   <Table.DataCell>{person.rolleTom}</Table.DataCell>

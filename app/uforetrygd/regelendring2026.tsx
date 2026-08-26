@@ -13,43 +13,45 @@ export const loader = () => {
   }
 }
 
-const POPULER_KATEGORIER = [
-  'LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR',
-  'LAVERE_KOMPGRAD_ØKT_IFU',
-  'ØKT_IFU_OPPHØR',
-  'ØKT_IFU',
-  'LAVERE_KOMPENSASJONSGRAD_OPPHØR',
-  'LAVERE_KOMPENSASJONSGRAD',
-] as const
+const POPULER_KATEGORIER = ['BEHANDLE_ÅPNE_KRAV', 'IKKE_BEHANDLE_ÅPNE_KRAV'] as const
 
 type PopulerKategori = (typeof POPULER_KATEGORIER)[number]
 
 const POPULER_KATEGORI_VISNINGSNAVN: Record<PopulerKategori, string> = {
-  LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR: 'LAVERE_KOMPGRAD_ØKT_IFU_OPPHØR',
-  LAVERE_KOMPGRAD_ØKT_IFU: 'LAVERE_KOMPGRAD_ØKT_IFU',
-  ØKT_IFU_OPPHØR: 'ØKT_IFU_OPPHØR',
-  ØKT_IFU: 'ØKT_IFU',
-  LAVERE_KOMPENSASJONSGRAD_OPPHØR: 'LAVERE_KOMPENSASJONSGRAD_OPPHØR',
-  LAVERE_KOMPENSASJONSGRAD: 'LAVERE_KOMPENSASJONSGRAD',
+  BEHANDLE_ÅPNE_KRAV: 'Reduksjonsprosent - Behandle åpne krav',
+  IKKE_BEHANDLE_ÅPNE_KRAV: 'Vilkårsprøving - Ikke behandle åpne krav',
 }
 
 const isPopulerKategori = (verdi: string): verdi is PopulerKategori =>
   (POPULER_KATEGORIER as readonly string[]).includes(verdi)
 
+const ENDEPUNKTER = {
+  kategoriser: '/api/uforetrygd/regelendring2026/kategoriser',
+  populer: '/api/uforetrygd/regelendring2026/populer',
+} as const
+
+type Intent = keyof typeof ENDEPUNKTER
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const dryRunStr = String(formData.get('dryRun') ?? 'true')
   const dryRun = dryRunStr === 'true'
-  const kategori = String(formData.get('kategori') ?? '')
-  if (!isPopulerKategori(kategori)) {
-    throw new Error(`Ugyldig kategori: ${kategori}`)
+  const intent = String(formData.get('intent') ?? '') as Intent
+
+  if (intent !== 'kategoriser' && intent !== 'populer') {
+    throw new Error(`Ukjent intent: ${intent}`)
   }
 
-  const response = await apiPost<{ behandlingId: number }>(
-    '/api/uforetrygd/regelendring2026/populer',
-    { dryRun, kategori },
-    request,
-  )
+  let response: { behandlingId: number } | undefined
+  if (intent === 'kategoriser') {
+    response = await apiPost<{ behandlingId: number }>(ENDEPUNKTER.kategoriser, { dryRun }, request)
+  } else {
+    const kategori = String(formData.get('kategori') ?? '')
+    if (!isPopulerKategori(kategori)) {
+      throw new Error(`Ugyldig kategori: ${kategori}`)
+    }
+    response = await apiPost<{ behandlingId: number }>(ENDEPUNKTER.populer, { dryRun, kategori }, request)
+  }
 
   if (!response?.behandlingId) {
     throw new Error('Missing behandlingId')
@@ -60,6 +62,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function Regelendring2026() {
   const navigation = useNavigation()
 
+  const submittingIntent =
+    navigation.state === 'submitting' ? (navigation.formData?.get('intent') as Intent | null) : null
+
   return (
     <VStack gap={'space-16'}>
       <Box className={'aksel-pageblock--lg'}>
@@ -68,17 +73,20 @@ export default function Regelendring2026() {
         </Heading>
         <BodyLong>
           En midlertidig behandling for regelendringer 2026. Slettes når alle regelendringer er gjennomført. Her kan det
-          bestilles populering av tabell T_OMREGNING_INPUT som brukes av{' '}
+          kategoriseres eller populering av tabell T_OMREGNING_INPUT som brukes av{' '}
           <Link to="/omregning">omregningsbehandlingen</Link>.
         </BodyLong>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
-        <VStack gap={'space-16'}>
-          <Select label="Prøvekjøring (dry run)" size="small" name="dryRun" defaultValue="true">
-            <option value="true">Ja</option>
-            <option value="false">Nei</option>
-          </Select>
+        <VStack gap={'space-64'}>
+          <Button type="submit" name="intent" value="kategoriser" disabled={navigation.state === 'submitting'}>
+            {submittingIntent === 'kategoriser' ? 'Oppretter…' : 'Kategoriser'}
+          </Button>
           <VStack gap={'space-8'}>
+            <Select label="Prøvekjøring (dry run)" size="small" name="dryRun" defaultValue="true">
+              <option value="true">Ja</option>
+              <option value="false">Nei</option>
+            </Select>
             <Select
               label="Kategori som skal populeres"
               size="small"
@@ -91,8 +99,8 @@ export default function Regelendring2026() {
                 </option>
               ))}
             </Select>
-            <Button type="submit" disabled={navigation.state === 'submitting'}>
-              {navigation.state === 'submitting' ? 'Populerer…' : 'Populér T_OMREGNING_INPUT'}
+            <Button type="submit" name="intent" value="populer" disabled={navigation.state === 'submitting'}>
+              {submittingIntent === 'populer' ? 'Populerer…' : 'Populér T_OMREGNING_INPUT'}
             </Button>
           </VStack>
         </VStack>

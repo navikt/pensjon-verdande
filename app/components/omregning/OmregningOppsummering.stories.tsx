@@ -18,6 +18,7 @@ export const Default: Story = {
     toleransegrenseSett: 'Standard',
     oppgaveSett: 'Regulering 2024',
     oppgavePrefiks: 'REG',
+    ansvarligTeam: 'PESYS_ALDER',
     behandleApneKrav: false,
     brukFaktoromregning: true,
     opprettAlleOppgaver: false,

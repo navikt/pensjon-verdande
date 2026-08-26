@@ -1,4 +1,4 @@
-import { BodyLong, Box, Button, Heading, Select, Skeleton, TextField, VStack } from '@navikt/ds-react'
+import { Alert, BodyLong, Box, Button, Heading, Select, Skeleton, TextField, VStack } from '@navikt/ds-react'
 import { Suspense, useState } from 'react'
 import { Await, Form, redirect, useNavigation } from 'react-router'
 import { decodeBehandling } from '~/common/decodeBehandling'
@@ -107,7 +107,15 @@ export default function AdhocBrev({ loaderData }: Route.ComponentProps) {
         Eksisterende ad-hoc brevbestillinger
       </Heading>
       <Suspense fallback={<Skeleton variant="rectangle" width="100%" height={407} />}>
-        <Await resolve={behandlinger}>
+        <Await
+          resolve={behandlinger}
+          errorElement={
+            <Alert variant="warning">
+              Brevbestillinger kunne ikke lastes. Dette kan skyldes tregt svar fra tjenesten. Forsøk å laste siden på
+              nytt.
+            </Alert>
+          }
+        >
           {(it) => (
             <BehandlingerTable
               inkluderFortsett={false}
