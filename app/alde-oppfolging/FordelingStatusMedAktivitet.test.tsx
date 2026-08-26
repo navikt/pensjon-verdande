@@ -1,10 +1,27 @@
 import { renderToStaticMarkup } from 'react-dom/server'
+import { createMemoryRouter, RouterProvider } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import FordelingStatusMedAktivitet from './FordelingStatusMedAktivitet'
 import type { AldeFordelingStatusMedAktivitet } from './types'
 
-const render = (data: AldeFordelingStatusMedAktivitet[]) =>
-  renderToStaticMarkup(<FordelingStatusMedAktivitet data={data} />)
+// Komponenten bruker <Link as={RouterLink}> for drilldown, og trenger derfor router-kontekst.
+const render = (data: AldeFordelingStatusMedAktivitet[]) => {
+  const router = createMemoryRouter([
+    {
+      path: '/',
+      element: (
+        <FordelingStatusMedAktivitet
+          data={data}
+          behandlingstype="FleksibelApSak"
+          fomDato="2026-08-18"
+          tomDato="2026-08-25"
+          avbruddAktivitetCode="FleksibelApSak_AvbrytAldeBehandling"
+        />
+      ),
+    },
+  ])
+  return renderToStaticMarkup(<RouterProvider router={router} />)
+}
 
 describe('FordelingStatusMedAktivitet', () => {
   it('viser empty state når data er tom', () => {
