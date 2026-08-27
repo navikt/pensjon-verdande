@@ -186,6 +186,12 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     { value: 'BATCH', label: 'BATCH - egen batch-kø med HPEN' },
   ]
 
+  const optionBrevstrategi = [
+    { value: 'DEFAULT', label: 'Brevparametere' },
+    { value: 'BUNNFRADRAG_1G', label: 'Bunnfradrag 1G' },
+    { value: 'REVERSERING_HARMONISERING_AV_IFU', label: 'Reversering harmonisering av IFU' },
+  ]
+
   const optionAnsvarligTeam = (Object.entries(Team) as [keyof typeof Team, string][]).map(([value, label]) => ({
     value,
     label,
@@ -220,6 +226,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [oppgaveSett, setOppgaveSett] = useState(optionOppgaveSett[0].value)
   const [oppgavePrefiks, setOppgavePrefiks] = useState(optionOppgavePrefiks[0].value)
   const [prioritet, setPrioritet] = useState(optionPrioritet[1].value)
+  const [brevstrategi, setBrevstrategi] = useState(optionBrevstrategi[0].value)
   const [ansvarligTeam, setAnsvarligTeam] = useState<string>('PESYS_ALDER')
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -480,7 +487,15 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   </VStack>
                 </Box>
                 <Box>
-                  <CheckboxGroup legend={'Brevparametere'}>
+                  <OmregningSelector
+                    label={'Brevstrategi'}
+                    navn={'brevstrategi'}
+                    value={brevstrategi}
+                    setSelectedValue={setBrevstrategi}
+                    optionsmap={optionBrevstrategi}
+                    size={'small'}
+                  />
+                  <CheckboxGroup legend={'Brevparametere'} hidden={brevstrategi !== 'DEFAULT'}>
                     Ved å <b>ikke</b> angi brev for berørte saker vil default brevkode bli brukt.
                     <HGrid columns={2} gap="space-48">
                       <Box padding="space-16" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
@@ -640,6 +655,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
               <Modal.Body>
                 <OmregningOppsummering
                   skalBestilleBrev={skalBestilleBrev}
+                  brevstrategi={brevstrategi}
                   skalSendeBrevBerorteSaker={skalSendeBrevBerorteSaker}
                   selectedBrevkodeSokerAlderGammeltRegelverk={selectedBrevkodeSokerAlderGammeltRegelverk}
                   selectedBrevkodeSokerAlderNyttRegelverk={selectedBrevkodeSokerAlderNyttRegelverk}
