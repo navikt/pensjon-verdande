@@ -1,0 +1,67 @@
+name: Build and deploy sandbox
+
+permissions:
+  contents: read
+
+# sandbox deployer til q1 og q2. Disse miljøene følger sandbox, ikke main,
+# slik at de holder seg i takt med pensjon-pen sin sandbox-syklus.
+#
+# workflow_call brukes av merge-main-to-sandbox.yml og delete-and-create-sandbox.yml,
+# fordi push utført med GITHUB_TOKEN ikke trigger nye workflows.
+on:
+  push:
+    branches:
+      - sandbox
+  workflow_call:
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: sandbox
+
+  build:
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    uses: ./.github/workflows/build.yml
+    with:
+      # Må settes eksplisitt: ved workflow_call er github.sha commit-en på main,
+      # ikke den sammenslåtte commit-en på sandbox.
+      ref: sandbox
+
+  deploy:
+    needs: [ci, build]
+
+    runs-on: 'ubuntu-latest'
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    concurrency: deploy-${{ matrix.name }}
+
+    strategy:
+      matrix:
+        include:
+          - name: pensjon-verdande-q1
+            cluster: dev-gcp
+            vars: .nais/vars-dev-q1.yaml
+
+          - name: pensjon-verdande-q2
+            cluster: dev-gcp
+            vars: .nais/vars-dev-q2.yaml
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: sandbox
+
+      - uses: nais/deploy/actions/deploy@fc3eae3edebabdf67f7592102ae16176d5ba3b5f # v2
+        name: 'Deploy to NAIS'
+        env:
+          IMAGE: "${{ needs.build.outputs.image }}"
+          RESOURCE: .nais/nais.yaml
+          CLUSTER: '${{ matrix.cluster }}'
+          VARS: ${{ matrix.vars }}

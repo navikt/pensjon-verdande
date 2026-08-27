@@ -1,0 +1,47 @@
+name: Build
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Git ref som skal bygges. Standard er ref-en som trigget kjøringen.'
+        type: string
+        required: false
+        default: ''
+    outputs:
+      image:
+        description: 'Image-referansen som ble pushet til Nais-registeret.'
+        value: ${{ jobs.build.outputs.image }}
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    outputs:
+      image: "${{ steps.docker-push.outputs.image }}"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Sett opp og installer frontend avhengigheter
+        uses: ./.github/actions/setup-frontend
+
+      - run: |
+          pnpm run typecheck && pnpm run build
+
+      - name: Fjern dev dependencies
+        run: pnpm prune --prod
+
+      - uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
+        id: docker-push
+        with:
+          team: teampensjon
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          build_args: GITHUB_SHA=${{ github.sha }}

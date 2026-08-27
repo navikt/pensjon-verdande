@@ -1,0 +1,31 @@
+name: Prevent sandbox commits
+
+permissions:
+  contents: read
+
+# .github/SANDBOX.md finnes kun på sandbox-branchen. Dukker den opp i en annen branch,
+# betyr det at sandbox-commits har blitt merget dit — det er ikke tillatt.
+on:
+  push:
+    branches-ignore:
+      - 'sandbox'
+
+jobs:
+  detectSandboxCommits:
+    name: 'Prevent sandbox commits'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Sjekk om branchen inneholder commits fra sandbox
+        shell: bash
+        run: |
+          FILE=.github/SANDBOX.md
+          if test -f "$FILE"; then
+            echo "::error::$FILE finnes i denne branchen. Det betyr at kode fra sandbox-branchen har blitt merget inn, noe som ikke er tillatt."
+            exit 1
+          else
+            echo "Ingen sandbox-commits oppdaget i denne branchen."
+          fi

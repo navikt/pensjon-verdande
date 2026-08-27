@@ -1,0 +1,74 @@
+name: Delete and create new sandbox branch
+
+permissions:
+  contents: read
+
+# Nullstiller sandbox fra main hver mandag, slik at branchen ikke drifter fra main.
+# ADVARSEL: alt ureviewet arbeid i sandbox slettes. Behold alltid arbeidet i en feature-branch.
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  createNewSandbox:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    concurrency: merge-main-to-sandbox
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Slett sandbox-branchen
+        uses: dawidd6/action-delete-branch@d1efac9a6f7a9b408d4e8ff663a99c1fbac17b3f # v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branches: sandbox
+          soft_fail: true
+
+      - name: Opprett sandbox-branchen på nytt
+        uses: peterjgrainger/action-create-branch@4b81ce657e255acd677cc6c55c9c763654be3aef # v4.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: 'sandbox'
+
+      - name: Legg til SANDBOX.md
+        shell: bash
+        run: |
+          cat > .github/SANDBOX.md <<'MARKDOWN'
+          # SANDBOX
+
+          Denne filen tilhører `sandbox`-branchen.
+
+          Ikke flytt eller slett den. Den brukes til å oppdage om endringer fra
+          `sandbox`-branchen har blitt merget inn i en annen branch, slik at
+          sandbox-commits ikke havner på `main`.
+
+          Se `.github/workflows/prevent-sandbox-commits.yml`.
+          MARKDOWN
+
+      - name: Commit SANDBOX.md
+        uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9
+        with:
+          new_branch: sandbox
+          message: 'Opprettet SANDBOX.md'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push til sandbox
+        run: git push origin HEAD:sandbox
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Push utført med GITHUB_TOKEN trigger ikke nye workflows,
+  # så sandbox-deployen må kalles eksplisitt her.
+  deploySandbox:
+    needs: createNewSandbox
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    uses: ./.github/workflows/sandbox.yml
