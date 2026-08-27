@@ -17,7 +17,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Sjekk om branchen inneholder commits fra sandbox
+      - name: Sjekk at .github/SANDBOX.md ikke finnes
         shell: bash
         run: |
           FILE=.github/SANDBOX.md

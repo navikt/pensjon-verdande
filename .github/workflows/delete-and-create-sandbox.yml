@@ -26,13 +26,6 @@ jobs:
           branches: sandbox
           soft_fail: true
 
-      - name: Opprett sandbox-branchen på nytt
-        uses: peterjgrainger/action-create-branch@4b81ce657e255acd677cc6c55c9c763654be3aef # v4.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          branch: 'sandbox'
-
       - name: Legg til SANDBOX.md
         shell: bash
         run: |
@@ -48,7 +41,7 @@ jobs:
           Se `.github/workflows/prevent-sandbox-commits.yml`.
           MARKDOWN
 
-      - name: Commit SANDBOX.md
+      - name: Opprett sandbox-branchen på nytt med SANDBOX.md
         uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9
         with:
           new_branch: sandbox
