@@ -39,6 +39,34 @@ pnpm run build        # Produksjonsbygg
 pnpm run storybook    # Start Storybook på http://localhost:6006
 ```
 
+## Deploy
+
+Verdande følger samme sandbox-mønster som pensjon-pen, slik at q1 og q2 holder seg i takt med
+pen sin sandbox-syklus.
+
+| Branch    | Miljøer          | Workflow                                     |
+| --------- | ---------------- | -------------------------------------------- |
+| `main`    | prod, q0, q5     | `.github/workflows/deploy.yml`                |
+| `sandbox` | q1, q2           | `.github/workflows/sandbox.yml`               |
+
+- Push til `main` deployer prod/q0/q5, og merger deretter automatisk `main` inn i `sandbox`,
+  som igjen deployer q1 og q2.
+- Push direkte til `sandbox` deployer kun q1 og q2. Slik tester du en branch i q1/q2 før merge:
+
+  ```sh
+  git checkout sandbox && git pull
+  git merge din-feature-branch
+  git push
+  ```
+
+- **`sandbox` nullstilles fra `main` hver mandag 04:00.** Alt som kun finnes i sandbox går tapt.
+  Behold alltid arbeidet i en egen feature-branch. Nullstillingen kan også kjøres manuelt via
+  `Delete and create new sandbox branch` i Actions.
+- `.github/SANDBOX.md` finnes kun på `sandbox` og brukes til å oppdage om sandbox-commits
+  ved et uhell blir merget inn i en annen branch. Merger du sandbox inn i en feature-branch,
+  feiler byggene til filen er fjernet.
+- Storybook publiseres til GitHub Pages kun fra `main`.
+
 ---
 
 ## Henvendelser

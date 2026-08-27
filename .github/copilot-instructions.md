@@ -101,10 +101,54 @@ GitHub Actions workflows:
   - `unit` job: `pnpm install --frozen-lockfile && pnpm test`
   - `storybook` job: `pnpm install --frozen-lockfile && pnpm exec playwright install --with-deps chromium && pnpm run test:stories`
   - `biome` job: Lint/format check
-- **Deploy** (`.github/workflows/deploy.yml`): Build, Docker, deploy to NAIS
-  1. **Build job**: `pnpm install --frozen-lockfile && pnpm run typecheck && pnpm run build && pnpm prune --prod`
-  2. Docker build and push to NAIS registry
-  3. Deploy to dev (q0, q1, q2, q5) and prod environments
+- **Deploy** (`.github/workflows/deploy.yml`): Runs on push to `main`. Deploys to prod, q0 and q5.
+- **Build** (`.github/workflows/build.yml`): Reusable `workflow_call` used by both deploy workflows.
+  `pnpm run typecheck && pnpm run build && pnpm prune --prod`, then Docker build/push to the NAIS registry.
+  Accepts an optional boolean `sandbox` input. Outputs `image`.
+- **Sandbox** (`.github/workflows/sandbox.yml`): Runs on push to `sandbox`, and via `workflow_call`.
+  Deploys to q1 and q2.
+- **Merge main to sandbox** (`.github/workflows/merge-main-to-sandbox.yml`): On push to `main`,
+  auto-merges `main` into `sandbox` and then explicitly calls `sandbox.yml`.
+- **Delete and create sandbox** (`.github/workflows/delete-and-create-sandbox.yml`): Weekly cron
+  (Monday 04:00) plus `workflow_dispatch`. Resets `sandbox` from `main`, writes `.github/SANDBOX.md`,
+  and redeploys q1/q2.
+- **Prevent sandbox commits** (`.github/workflows/prevent-sandbox-commits.yml`): Fails the build if
+  `.github/SANDBOX.md` is present on a non-sandbox branch.
+
+**Branch → environment mapping:**
+
+| Branch | Environments |
+| ------ | ------------ |
+| `main` | prod-gcp, dev-gcp q0, dev-gcp q5 |
+| `sandbox` | dev-gcp q1, dev-gcp q2 |
+
+This mirrors pensjon-pen, so q1/q2 stay in sync with pen's sandbox cycle.
+
+**Important CI/CD constraints:**
+- A push made with `GITHUB_TOKEN` does NOT trigger new workflows. Any workflow that pushes to
+  `sandbox` must call `sandbox.yml` explicitly via `workflow_call`.
+- Workflows that call `sandbox.yml` must pass `sandbox: true`, which is forwarded to `ci.yml`
+  and `build.yml` so they check out the `sandbox` branch — when invoked via `workflow_call`,
+  `github.sha` points at the `main` commit. On a direct push to `sandbox` the input defaults to
+  `false`, and every checkout uses `github.sha` so build, test and deploy all use the exact
+  triggering commit rather than a branch head that may move mid-run.
+- `build.yml` passes the actually checked-out commit (`git rev-parse HEAD`) as the `GITHUB_SHA`
+  build arg, not `github.sha`, so image metadata matches the code that was built.
+- The checkout ref is derived from a boolean input, never from a free-form string input.
+  A string ref input trips CodeQL's `actions/cache-poisoning/poisonable-step` rule, because the
+  workflow is reachable from `schedule`/`workflow_dispatch` and would check out an
+  attacker-influenced ref before restoring the default-branch pnpm cache.
+- `deploy.yml` guards main-only deploys in two layers, both intentional and both required:
+  the `push: branches: [main]` trigger, and `if: github.ref == 'refs/heads/main'` on the `build`,
+  `deploy` and `deployPages` jobs. The job-level `if` looks redundant today, but it keeps the
+  invariant if someone later adds another trigger such as `workflow_dispatch`. On top of that,
+  the deploy job has a step that fails prod deploys from any other ref. Do not remove any of them.
+- All third-party actions must be SHA-pinned.
+- `merge-main-to-sandbox.yml` and `delete-and-create-sandbox.yml` share the workflow-level
+  concurrency group `sandbox-branch`. This keeps mutation *and* the following deploy serialized as
+  one operation, so a reset cannot move the branch while a merge-triggered deploy is checking it out.
+  Never add that group to `sandbox.yml` — the callers already hold it, and a called workflow waiting
+  on its caller's group would deadlock.
 
 **To replicate CI locally**:
 ```bash
@@ -324,6 +368,6 @@ Before submitting changes:
 
 ## Additional Notes
 - **AGENTS.md** contains team-specific Norwegian instructions (complementary to this file)
-- Deployment targets: dev-gcp (q0, q1, q2, q5) and prod-gcp
+- Deployment targets: dev-gcp (q0, q5 fra `main`; q1, q2 fra `sandbox`) and prod-gcp
 - Server runs on port 8080 in production, 3000 in development
 - Uses SSR by default (`ssr: true` in `react-router.config.ts`)

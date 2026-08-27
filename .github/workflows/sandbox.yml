@@ -1,0 +1,66 @@
+name: Build and deploy sandbox
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - sandbox
+  workflow_call:
+    inputs:
+      sandbox:
+        description: 'Sjekk ut sandbox-branchen i stedet for den triggende commit-en. Settes av workflows som kaller denne, der github.sha peker på main.'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    with:
+      sandbox: ${{ inputs.sandbox || false }}
+
+  build:
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    uses: ./.github/workflows/build.yml
+    with:
+      sandbox: ${{ inputs.sandbox || false }}
+
+  deploy:
+    needs: [ci, build]
+
+    runs-on: 'ubuntu-latest'
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    concurrency: deploy-${{ matrix.name }}
+
+    strategy:
+      matrix:
+        include:
+          - name: pensjon-verdande-q1
+            cluster: dev-gcp
+            vars: .nais/vars-dev-q1.yaml
+
+          - name: pensjon-verdande-q2
+            cluster: dev-gcp
+            vars: .nais/vars-dev-q2.yaml
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.sandbox && 'sandbox' || github.sha }}
+
+      - uses: nais/deploy/actions/deploy@fc3eae3edebabdf67f7592102ae16176d5ba3b5f # v2
+        name: 'Deploy to NAIS'
+        env:
+          IMAGE: "${{ needs.build.outputs.image }}"
+          RESOURCE: .nais/nais.yaml
+          CLUSTER: '${{ matrix.cluster }}'
+          VARS: ${{ matrix.vars }}

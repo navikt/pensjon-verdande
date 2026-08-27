@@ -1,0 +1,47 @@
+name: Merge main to sandbox
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+
+concurrency:
+  group: sandbox-branch
+  cancel-in-progress: false
+
+jobs:
+  mergeMainToSandbox:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 20
+
+      - name: Merge main til sandbox
+        uses: robotology/gh-action-nightly-merge@81570ba03dd370f582bd3f52d47672d29191829f # v1.5.2
+        with:
+          stable_branch: 'main'
+          development_branch: 'sandbox'
+          allow_ff: true
+          allow_forks: true
+          user_name: GitHub Merge Actions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploySandbox:
+    needs: mergeMainToSandbox
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    uses: ./.github/workflows/sandbox.yml
+    with:
+      sandbox: true

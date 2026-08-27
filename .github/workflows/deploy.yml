@@ -3,39 +3,23 @@ name: Build and deploy
 permissions:
   contents: read
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
 
   build:
+    if: github.ref == 'refs/heads/main'
+
     permissions:
       contents: read
       id-token: write
-    runs-on: ubuntu-latest
-    outputs:
-      image: "${{ steps.docker-push.outputs.image }}"
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Sett opp og installer frontend avhengigheter
-        uses: ./.github/actions/setup-frontend
-
-      - run: |
-          pnpm run typecheck && pnpm run build
-
-      - name: Fjern dev dependencies
-        run: pnpm prune --prod
-
-      - uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
-        if: github.ref == 'refs/heads/main'
-        id: docker-push
-        with:
-          team: teampensjon
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          build_args: GITHUB_SHA=${{ github.sha }}
+    secrets: inherit
+    uses: ./.github/workflows/build.yml
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -48,6 +32,8 @@ jobs:
       contents: "read"
       id-token: "write"
 
+    concurrency: deploy-${{ matrix.name }}
+
     strategy:
       matrix:
         include:
@@ -59,19 +45,19 @@ jobs:
             cluster: dev-gcp
             vars: .nais/vars-dev-q0.yaml
 
-          - name: pensjon-verdande-q1
-            cluster: dev-gcp
-            vars: .nais/vars-dev-q1.yaml
-
-          - name: pensjon-verdande-q2
-            cluster: dev-gcp
-            vars: .nais/vars-dev-q2.yaml
-
           - name: pensjon-verdande-q5
             cluster: dev-gcp
             vars: .nais/vars-dev-q5.yaml
 
     steps:
+      - name: 'Verifiser at prod kun deployes fra main'
+        if: matrix.cluster == 'prod-gcp' && github.ref != 'refs/heads/main'
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          echo "::error::Deploy til prod-gcp er kun tillatt fra main, men ref er $REF"
+          exit 1
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: nais/deploy/actions/deploy@fc3eae3edebabdf67f7592102ae16176d5ba3b5f # v2
         name: 'Deploy to NAIS'
