@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
-      ref:
-        description: 'Git ref som skal testes. Standard er ref-en som trigget kjøringen.'
-        type: string
+      sandbox:
+        description: 'Bygg sandbox-branchen i stedet for ref-en som trigget kjøringen.'
+        type: boolean
         required: false
-        default: ''
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.sandbox && 'sandbox' || '' }}
 
       - name: Sett opp og installer frontend avhengigheter
         uses: ./.github/actions/setup-frontend
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.sandbox && 'sandbox' || '' }}
 
       - name: Sett opp og installer frontend avhengigheter
         uses: ./.github/actions/setup-frontend
@@ -56,7 +56,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.sandbox && 'sandbox' || '' }}
           persist-credentials: false
 
       - name: Setup Biome

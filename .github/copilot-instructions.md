@@ -104,7 +104,7 @@ GitHub Actions workflows:
 - **Deploy** (`.github/workflows/deploy.yml`): Runs on push to `main`. Deploys to prod, q0 and q5.
 - **Build** (`.github/workflows/build.yml`): Reusable `workflow_call` used by both deploy workflows.
   `pnpm run typecheck && pnpm run build && pnpm prune --prod`, then Docker build/push to the NAIS registry.
-  Accepts an optional `ref` input. Outputs `image`.
+  Accepts an optional boolean `sandbox` input. Outputs `image`.
 - **Sandbox** (`.github/workflows/sandbox.yml`): Runs on push to `sandbox`, and via `workflow_call`.
   Deploys to q1 and q2.
 - **Merge main to sandbox** (`.github/workflows/merge-main-to-sandbox.yml`): On push to `main`,
@@ -127,8 +127,12 @@ This mirrors pensjon-pen, so q1/q2 stay in sync with pen's sandbox cycle.
 **Important CI/CD constraints:**
 - A push made with `GITHUB_TOKEN` does NOT trigger new workflows. Any workflow that pushes to
   `sandbox` must call `sandbox.yml` explicitly via `workflow_call`.
-- `sandbox.yml` must check out `ref: sandbox` explicitly — when invoked via `workflow_call`,
-  `github.sha` points at the `main` commit.
+- `sandbox.yml` must pass `sandbox: true` to `ci.yml` and `build.yml` so they check out the
+  `sandbox` branch — when invoked via `workflow_call`, `github.sha` points at the `main` commit.
+- The checkout ref is derived from a boolean input, never from a free-form string input.
+  A string ref input trips CodeQL's `actions/cache-poisoning/poisonable-step` rule, because the
+  workflow is reachable from `schedule`/`workflow_dispatch` and would check out an
+  attacker-influenced ref before restoring the default-branch pnpm cache.
 - `deploy.yml` contains a guard that fails prod deploys from any ref other than `refs/heads/main`.
   Do not remove it.
 - All third-party actions must be SHA-pinned.
