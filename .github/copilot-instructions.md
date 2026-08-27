@@ -144,6 +144,11 @@ This mirrors pensjon-pen, so q1/q2 stay in sync with pen's sandbox cycle.
   invariant if someone later adds another trigger such as `workflow_dispatch`. On top of that,
   the deploy job has a step that fails prod deploys from any other ref. Do not remove any of them.
 - All third-party actions must be SHA-pinned.
+- `merge-main-to-sandbox.yml` and `delete-and-create-sandbox.yml` share the workflow-level
+  concurrency group `sandbox-branch`. This keeps mutation *and* the following deploy serialized as
+  one operation, so a reset cannot move the branch while a merge-triggered deploy is checking it out.
+  Never add that group to `sandbox.yml` — the callers already hold it, and a called workflow waiting
+  on its caller's group would deadlock.
 
 **To replicate CI locally**:
 ```bash

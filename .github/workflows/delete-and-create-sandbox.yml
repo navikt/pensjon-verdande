@@ -8,12 +8,15 @@ on:
     - cron: '0 4 * * 1'
   workflow_dispatch:
 
+concurrency:
+  group: sandbox-branch
+  cancel-in-progress: false
+
 jobs:
   createNewSandbox:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    concurrency: merge-main-to-sandbox
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
