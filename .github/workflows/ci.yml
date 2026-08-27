@@ -15,7 +15,7 @@ on:
         default: false
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.sandbox && 'sandbox' || 'head' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.sandbox && 'sandbox' || '' }}
+          ref: ${{ inputs.sandbox && 'sandbox' || github.sha }}
 
       - name: Sett opp og installer frontend avhengigheter
         uses: ./.github/actions/setup-frontend
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.sandbox && 'sandbox' || '' }}
+          ref: ${{ inputs.sandbox && 'sandbox' || github.sha }}
 
       - name: Sett opp og installer frontend avhengigheter
         uses: ./.github/actions/setup-frontend
@@ -56,7 +56,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.sandbox && 'sandbox' || '' }}
+          ref: ${{ inputs.sandbox && 'sandbox' || github.sha }}
           persist-credentials: false
 
       - name: Setup Biome

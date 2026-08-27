@@ -27,7 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.sandbox && 'sandbox' || '' }}
+          ref: ${{ inputs.sandbox && 'sandbox' || github.sha }}
+
+      - name: Finn commit som faktisk bygges
+        id: rev
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Sett opp og installer frontend avhengigheter
         uses: ./.github/actions/setup-frontend
@@ -44,4 +48,4 @@ jobs:
           team: teampensjon
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          build_args: GITHUB_SHA=${{ github.sha }}
+          build_args: GITHUB_SHA=${{ steps.rev.outputs.sha }}

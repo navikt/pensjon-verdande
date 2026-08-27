@@ -33,8 +33,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Push utført med GITHUB_TOKEN trigger ikke nye workflows,
-  # så sandbox-deployen må kalles eksplisitt her.
   deploySandbox:
     needs: mergeMainToSandbox
     permissions:
@@ -42,3 +40,5 @@ jobs:
       id-token: write
     secrets: inherit
     uses: ./.github/workflows/sandbox.yml
+    with:
+      sandbox: true

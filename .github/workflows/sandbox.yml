@@ -3,22 +3,23 @@ name: Build and deploy sandbox
 permissions:
   contents: read
 
-# sandbox deployer til q1 og q2. Disse miljøene følger sandbox, ikke main,
-# slik at de holder seg i takt med pensjon-pen sin sandbox-syklus.
-#
-# workflow_call brukes av merge-main-to-sandbox.yml og delete-and-create-sandbox.yml,
-# fordi push utført med GITHUB_TOKEN ikke trigger nye workflows.
 on:
   push:
     branches:
       - sandbox
   workflow_call:
+    inputs:
+      sandbox:
+        description: 'Sjekk ut sandbox-branchen i stedet for den triggende commit-en. Settes av workflows som kaller denne, der github.sha peker på main.'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
     with:
-      sandbox: true
+      sandbox: ${{ inputs.sandbox || false }}
 
   build:
     permissions:
@@ -27,9 +28,7 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build.yml
     with:
-      # Må settes eksplisitt: ved workflow_call er github.sha commit-en på main,
-      # ikke den sammenslåtte commit-en på sandbox.
-      sandbox: true
+      sandbox: ${{ inputs.sandbox || false }}
 
   deploy:
     needs: [ci, build]
@@ -56,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: sandbox
+          ref: ${{ inputs.sandbox && 'sandbox' || github.sha }}
 
       - uses: nais/deploy/actions/deploy@fc3eae3edebabdf67f7592102ae16176d5ba3b5f # v2
         name: 'Deploy to NAIS'

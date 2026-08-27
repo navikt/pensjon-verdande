@@ -3,8 +3,6 @@ name: Delete and create new sandbox branch
 permissions:
   contents: read
 
-# Nullstiller sandbox fra main hver mandag, slik at branchen ikke drifter fra main.
-# ADVARSEL: alt ureviewet arbeid i sandbox slettes. Behold alltid arbeidet i en feature-branch.
 on:
   schedule:
     - cron: '0 4 * * 1'
@@ -63,8 +61,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Push utført med GITHUB_TOKEN trigger ikke nye workflows,
-  # så sandbox-deployen må kalles eksplisitt her.
   deploySandbox:
     needs: createNewSandbox
     permissions:
@@ -72,3 +68,5 @@ jobs:
       id-token: write
     secrets: inherit
     uses: ./.github/workflows/sandbox.yml
+    with:
+      sandbox: true

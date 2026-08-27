@@ -3,8 +3,6 @@ name: Prevent sandbox commits
 permissions:
   contents: read
 
-# .github/SANDBOX.md finnes kun på sandbox-branchen. Dukker den opp i en annen branch,
-# betyr det at sandbox-commits har blitt merget dit — det er ikke tillatt.
 on:
   push:
     branches-ignore:

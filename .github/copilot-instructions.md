@@ -127,8 +127,13 @@ This mirrors pensjon-pen, so q1/q2 stay in sync with pen's sandbox cycle.
 **Important CI/CD constraints:**
 - A push made with `GITHUB_TOKEN` does NOT trigger new workflows. Any workflow that pushes to
   `sandbox` must call `sandbox.yml` explicitly via `workflow_call`.
-- `sandbox.yml` must pass `sandbox: true` to `ci.yml` and `build.yml` so they check out the
-  `sandbox` branch — when invoked via `workflow_call`, `github.sha` points at the `main` commit.
+- Workflows that call `sandbox.yml` must pass `sandbox: true`, which is forwarded to `ci.yml`
+  and `build.yml` so they check out the `sandbox` branch — when invoked via `workflow_call`,
+  `github.sha` points at the `main` commit. On a direct push to `sandbox` the input defaults to
+  `false`, and every checkout uses `github.sha` so build, test and deploy all use the exact
+  triggering commit rather than a branch head that may move mid-run.
+- `build.yml` passes the actually checked-out commit (`git rev-parse HEAD`) as the `GITHUB_SHA`
+  build arg, not `github.sha`, so image metadata matches the code that was built.
 - The checkout ref is derived from a boolean input, never from a free-form string input.
   A string ref input trips CodeQL's `actions/cache-poisoning/poisonable-step` rule, because the
   workflow is reachable from `schedule`/`workflow_dispatch` and would check out an
