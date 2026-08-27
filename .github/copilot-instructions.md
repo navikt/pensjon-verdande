@@ -138,8 +138,11 @@ This mirrors pensjon-pen, so q1/q2 stay in sync with pen's sandbox cycle.
   A string ref input trips CodeQL's `actions/cache-poisoning/poisonable-step` rule, because the
   workflow is reachable from `schedule`/`workflow_dispatch` and would check out an
   attacker-influenced ref before restoring the default-branch pnpm cache.
-- `deploy.yml` contains a guard that fails prod deploys from any ref other than `refs/heads/main`.
-  Do not remove it.
+- `deploy.yml` guards main-only deploys in two layers, both intentional and both required:
+  the `push: branches: [main]` trigger, and `if: github.ref == 'refs/heads/main'` on the `build`,
+  `deploy` and `deployPages` jobs. The job-level `if` looks redundant today, but it keeps the
+  invariant if someone later adds another trigger such as `workflow_dispatch`. On top of that,
+  the deploy job has a step that fails prod deploys from any other ref. Do not remove any of them.
 - All third-party actions must be SHA-pinned.
 
 **To replicate CI locally**:
