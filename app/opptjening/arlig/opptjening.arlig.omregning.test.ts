@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { stripDataSuffix } from '~/common/utils'
 
 vi.mock('~/services/auth.server', () => ({
   requireAccessToken: vi.fn().mockResolvedValue('test-token'),
@@ -18,12 +19,22 @@ function jsonResponse(body: unknown, status = 200) {
   })
 }
 
+// I React Router 8 er `request.url` den rå, inngående URL-en (kan ha et internt `.data`-suffiks for
+// client-side data-requests), mens loader-/action-argumentenes `url` alltid er normalisert av rammeverket.
+// Vi simulerer den normaliseringen her med samme helper som brukes i runtime (auth.server.ts).
+function normalizedUrl(request: Request) {
+  const url = new URL(request.url)
+  url.pathname = stripDataSuffix(url.pathname)
+  return url
+}
+
 const loaderArgs = (request: Request) =>
   ({
     request,
     params: {},
     context: {},
     pattern: '/opptjening/arlig/omregning',
+    url: normalizedUrl(request),
   }) as Parameters<typeof loader>[0]
 
 const actionArgs = (request: Request) =>
@@ -32,6 +43,7 @@ const actionArgs = (request: Request) =>
     params: {},
     context: {},
     pattern: '/opptjening/arlig/omregning',
+    url: normalizedUrl(request),
   }) as Parameters<typeof action>[0]
 
 describe('opptjening.arlig.omregning loader', () => {
@@ -130,6 +142,21 @@ describe('opptjening.arlig.omregning action', () => {
     const sentBody = JSON.parse(init.body)
     expect(sentBody).toEqual({ sakIder: ['100', '200', '300'], kommentar: 'Testkommentar' })
     expect(result.status).toBe(302)
+  })
+
+  it('ekskluderSaker redirecter til normalisert url selv om request.url har .data-suffiks', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 200 }))
+
+    const formData = new FormData()
+    formData.set('action', 'EKSKLUDER_SAKER')
+    formData.set('ekskluderteSakIderText', '100')
+
+    // Simulerer en client-side data-request, der React Router legger til .data på request.url.
+    const request = new Request('http://localhost/opptjening/arlig/omregning.data', { method: 'POST', body: formData })
+    const result = (await action(actionArgs(request))) as Response
+
+    expect(result.status).toBe(302)
+    expect(result.headers.get('Location')).toBe('/opptjening/arlig/omregning')
   })
 
   it('oppdaterSisteGyldigeOpptjeningsaar returnerer melding', async () => {
