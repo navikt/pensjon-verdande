@@ -4,7 +4,6 @@ import { byggAktivitetStatusSokUrl, byggBehandlingStatusSokUrl } from './drilldo
 
 const AVBRUDD = 'FleksibelApSak_AvbrytAldeBehandling'
 
-/** Deep-linken er verdiløs hvis søkeflaten ikke kan lese den tilbake — derfor round-trip. */
 function kriterierFra(url: string) {
   const sp = new URLSearchParams(url.split('?')[1])
   const resultat = deserializeStateFromSearchParams(sp)

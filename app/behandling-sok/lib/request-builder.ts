@@ -71,7 +71,6 @@ function mapTilBackend(k: Kriterium): BackendKriterium {
     case 'HAR_FEILET_KJORING':
       return k.siden ? { type: k.type, sidenDato: k.siden } : { type: k.type }
     case 'HAR_AKTIVITET_I_STATUS':
-      // Tom periode må utelates helt — backend avviser halvåpen periode med 400.
       return k.fom && k.tom
         ? { type: k.type, aktivitetTyper: k.aktivitetTyper, statuser: k.statuser, fom: k.fom, tom: k.tom }
         : { type: k.type, aktivitetTyper: k.aktivitetTyper, statuser: k.statuser }

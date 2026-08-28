@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 import FordelingStatusMedAktivitet from './FordelingStatusMedAktivitet'
 import type { AldeFordelingStatusMedAktivitet } from './types'
 
-// Komponenten bruker <Link as={RouterLink}> for drilldown, og trenger derfor router-kontekst.
 const render = (data: AldeFordelingStatusMedAktivitet[]) => {
   const router = createMemoryRouter([
     {

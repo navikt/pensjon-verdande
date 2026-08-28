@@ -45,13 +45,8 @@ import type {
   BehandlingStatusFordelingDto,
 } from './types'
 
-// Aktivitetskoden som markerer at en Alde-behandling er avbrutt. I dag kun relevant for
-// FleksibelApSak; sendes eksplisitt inn siden backend har genericert bort den tidligere
-// hardkodingen (se AldeOppfolgingController i pensjon-pen).
 const AVBRUDD_AKTIVITET_CODE = 'FleksibelApSak_AvbrytAldeBehandling'
 
-// Aktivitetskoden for notat-aktiviteten — beholdes som default for Aktivitet-taben slik at
-// visningen er uendret rett etter deploy.
 const NOTAT_AKTIVITET_CODE = 'FleksibelApSak_AldeNotat'
 
 export function meta(): Route.MetaDescriptors {
@@ -127,15 +122,11 @@ export async function loader({ request }: { request: Request }) {
     rows.map((row) => ({ status: row.status, aktivitet: row.aktivitetCode || '', antall: row.antall })),
   )
 
-  // Felles kilde til aktivitetskodene for Alde-siden og /behandling-sok.
   const metadata = await hentBehandlingMetadata(behandlingstype, request).catch((e) => {
-    // Metadata er kun til dropdown-en; en feil her skal ikke ta ned hele oppfølgingssiden.
     logger.warn(`Kunne ikke hente søke-metadata for ${behandlingstype}: ${e}`)
     return null
   })
 
-  // Kun Alde-stegene er relevante her; resten av dashbordet teller også bare Alde-behandlinger.
-  // Fallback til alle typer hvis pen ennå ikke leverer feltet (deploy-rekkefølge pen → verdande).
   const aldeAktivitetTyper = metadata?.aldeAktivitetTyper ?? []
   const tilgjengeligeAktivitetTyper: { kode: string; friendlyName: string }[] =
     aldeAktivitetTyper.length > 0
@@ -144,7 +135,6 @@ export async function loader({ request }: { request: Request }) {
           .sort()
           .map((kode) => ({ kode, friendlyName: kode }))
 
-  // En aktivitetCode fra URL som ikke finnes for behandlingstypen ville gitt tomt diagram.
   const koder = tilgjengeligeAktivitetTyper.map((a) => a.kode)
   const onsketAktivitetCode = url.searchParams.get('aktivitetCode')
   const aktivitetCode =
@@ -184,8 +174,6 @@ export async function loader({ request }: { request: Request }) {
   }
 }
 
-/** Grupperer den flate `dato`-per-`status`-listen fra /behandling-status-fordeling (perDag=true)
- * til den nøstede formen StatusfordelingOverTidBarChart forventer. */
 function grupperPerDato(rows: BehandlingStatusFordelingDto[]): AldeFordelingStatusOverTidDto[] {
   const perDato = new Map<string, { status: string; antall: number }[]>()
   for (const row of rows) {
@@ -451,7 +439,6 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                         {antall}
                       </Heading>
                       {antall > 0 && (
-                        // Egen lenke — kortets onClick er allerede opptatt med skjul/vis-filteret.
                         <Link
                           as={RouterLink}
                           to={byggBehandlingStatusSokUrl({

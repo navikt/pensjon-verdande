@@ -14,7 +14,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 interface StatusfordelingOverTidBarChartProps {
   data: AldeFordelingStatusOverTidDto[]
   hiddenStatuses?: string[]
-  /** Drilldown aktiveres kun når disse er satt. */
   behandlingstype?: string
   avbruddAktivitetCode?: string
 }
@@ -64,8 +63,6 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
   const chartRef = useRef<any>(null)
   const drilldownAktiv = Boolean(behandlingstype && avbruddAktivitetCode)
 
-  // Datasettenes rekkefølge må matche `parseToChartData`-nøklene for at klikk skal treffe
-  // riktig status. Utledes fra samme kilde i stedet for å gjentas som konstant.
   const {
     labels: datoer,
     statusNokler,
@@ -76,7 +73,6 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
     return { labels, statusNokler: fordeling ? Object.keys(fordeling) : [], antallPerStatus: fordeling }
   }, [data])
 
-  // Chart.js beholder skjulte datasett, så `statusNokler` må stå urørt for `datasetIndex` i onClick.
   const synligeStatusNokler = useMemo(
     () => statusNokler.filter((status) => !hiddenStatuses.includes(status)),
     [statusNokler, hiddenStatuses],
@@ -124,7 +120,6 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
     byggBehandlingStatusSokUrl({
       behandlingType: behandlingstype as string,
       behandlingStatus: status,
-      // Én dags søyle: perioden er nøyaktig den dagen.
       fomDato: dato,
       tomDato: dato,
       avbruddAktivitetCode: avbruddAktivitetCode as string,
@@ -150,7 +145,6 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
         />
       </div>
 
-      {/* Chart.js-søyler kan ikke tastaturnavigeres. */}
       {drilldownAktiv && datoer.length > 0 && synligeStatusNokler.length > 0 && (
         <ReadMore header="Vis statusfordeling som tabell">
           <Table size="small">

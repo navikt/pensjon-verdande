@@ -14,7 +14,6 @@ interface Props {
   data: AktivitetStatusFordelingDto[]
   behandlingstype: string
   aktivitetCode: string
-  /** Visningsnavn på aktiviteten, brukes i tittel og lenketekster. */
   aktivitetNavn: string
   fomDato: string
   tomDato: string
@@ -25,12 +24,6 @@ function formaterDato(iso: string): string {
   return `${dag}.${maaned}.${aar}`
 }
 
-/**
- * Aktivitetens egen statusfordeling per dag, med drilldown til `/behandling-sok`.
- *
- * Statusene er Aktivitetstatus, ikke behandlingens status. Tallene teller *aktiviteter* mens
- * drilldown-en viser *behandlinger*, så lenketeksten sier «Vis behandlinger», ikke antallet.
- */
 export default function AktivitetStatusFordelingOverTidBarChart({
   data,
   behandlingstype,
@@ -110,8 +103,6 @@ export default function AktivitetStatusFordelingOverTidBarChart({
         />
       </div>
 
-      {/* Chart.js-søyler kan ikke tastaturnavigeres. Denne tabellen gir samme drilldown for
-          tastatur- og skjermleserbrukere, og er derfor ikke valgfri pynt. */}
       <VStack gap="space-8">
         <Heading level="3" size="xsmall">
           Vis behandlinger per aktivitetstatus

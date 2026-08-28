@@ -1,9 +1,5 @@
 import type { AktivitetStatusFordelingDto } from '../types'
 
-/**
- * Aktivitetens EGEN status (`T_AKTIVITET.STATUS`) — annet verdisett enn behandlingens status.
- * Bevisst adskilt fra `statusLabels` så de to begrepene ikke blandes i UI-et.
- */
 export const aktivitetStatusLabels: Record<string, string> = {
   OPPRETTET: 'Opprettet',
   UNDER_BEHANDLING: 'Under behandling',
@@ -11,7 +7,6 @@ export const aktivitetStatusLabels: Record<string, string> = {
   FEILET: 'Feilet',
 }
 
-/** Visningsrekkefølge som følger aktivitetens livsløp, ikke alfabetisk. */
 export const AKTIVITET_STATUS_REKKEFOLGE = ['OPPRETTET', 'UNDER_BEHANDLING', 'FULLFORT', 'FEILET']
 
 export const aktivitetStatusColors: Record<string, { backgroundColor: string; borderColor: string }> = {
@@ -35,20 +30,9 @@ export const aktivitetStatusColors: Record<string, { backgroundColor: string; bo
 
 export type AktivitetSerie = {
   datoer: string[]
-  /** Status → antall per dato, i samme rekkefølge som `datoer`. */
   perStatus: { status: string; antall: number[] }[]
 }
 
-/**
- * Bygger dag-for-dag-serien per aktivitetstatus.
- *
- * I motsetning til den tidligere notat-serien filtreres det ikke på FULLFORT — hele poenget med
- * den generiske aktivitet-taben er å se hvordan et steg fordeler seg på sine egne statuser.
- * Alle dager mellom første og siste dato fylles ut med 0, ellers ville dager uten aktivitet falt
- * bort og fjerntliggende datoer framstått som nabodager.
- *
- * Returnerer `null` når perioden er tom, slik at komponenten kan vise tom-tilstand.
- */
 export const byggAktivitetSerie = (data: AktivitetStatusFordelingDto[]): AktivitetSerie | null => {
   const antallPerDatoOgStatus = new Map<string, Map<string, number>>()
   const observerteStatuser = new Set<string>()
@@ -57,7 +41,6 @@ export const byggAktivitetSerie = (data: AktivitetStatusFordelingDto[]): Aktivit
     if (!rad.dato) continue
     observerteStatuser.add(rad.status)
     const perStatus = antallPerDatoOgStatus.get(rad.dato) ?? new Map<string, number>()
-    // Summer heller enn å overskrive: backend kan returnere flere rader per (dato, status).
     perStatus.set(rad.status, (perStatus.get(rad.status) ?? 0) + rad.antall)
     antallPerDatoOgStatus.set(rad.dato, perStatus)
   }
@@ -73,8 +56,6 @@ export const byggAktivitetSerie = (data: AktivitetStatusFordelingDto[]): Aktivit
     currentDate.setDate(currentDate.getDate() + 1)
   }
 
-  // Kjente statuser først i livsløpsrekkefølge, deretter ukjente alfabetisk, slik at en ny
-  // Aktivitetstatus i backend ikke forsvinner stille fra diagrammet.
   const kjente = AKTIVITET_STATUS_REKKEFOLGE.filter((s) => observerteStatuser.has(s))
   const ukjente = [...observerteStatuser].filter((s) => !AKTIVITET_STATUS_REKKEFOLGE.includes(s)).sort()
 
@@ -87,7 +68,6 @@ export const byggAktivitetSerie = (data: AktivitetStatusFordelingDto[]): Aktivit
   }
 }
 
-/** Totalt antall per status over hele perioden — brukes i den tilgjengelige lenketabellen. */
 export const summerPerStatus = (serie: AktivitetSerie): { status: string; antall: number }[] =>
   serie.perStatus.map(({ status, antall }) => ({
     status,

@@ -24,9 +24,7 @@ export type Kriterium =
   | {
       type: 'HAR_AKTIVITET_I_STATUS'
       aktivitetTyper: string[]
-      /** Aktivitetstatus (OPPRETTET/UNDER_BEHANDLING/FULLFORT/FEILET) — ikke behandlingsstatus. */
       statuser: string[]
-      /** Perioden gjelder aktivitetens egen OPPRETTET, og må derfor ligge inne i kriteriet. */
       fom?: string | null
       tom?: string | null
     }
@@ -233,8 +231,6 @@ export const KRITERIE_DEFINISJONER: Record<KriterieType, KriterieDefinisjon> = {
     metadataNokkel: 'aktivitetTyper',
     verdiNokkel: 'aktivitetTyper' as keyof Kriterium,
     sensitiv: false,
-    // Perioden i kriteriet gjelder aktivitetens egen OPPRETTET og teller derfor som tidsfilter
-    // — men bare når både fom og tom er satt (se validerKriterier).
     tidsfilter: true,
     defaultVerdi: () => ({
       type: 'HAR_AKTIVITET_I_STATUS',
@@ -385,8 +381,6 @@ export function isSensitiv(k: Kriterium): boolean {
 export function harTidsfilter(kriterier: Kriterium[]): boolean {
   return kriterier.some((k) => {
     if (!KRITERIE_DEFINISJONER[k.type].tidsfilter) return false
-    // HAR_AKTIVITET_I_STATUS teller kun som tidsfilter når perioden faktisk er utfylt —
-    // uten periode er kriteriet ubegrenset i tid og speiler backend-regelen i BehandlingSokValidator.
     if (k.type === 'HAR_AKTIVITET_I_STATUS') return Boolean(k.fom) && Boolean(k.tom)
     return true
   })
@@ -484,7 +478,6 @@ export function validerKriterier(kriterier: Kriterium[]): ValideringsResultat {
       if (k.statuser.length === 0) {
         feil.push({ kriterieIndeks: idx, felt: 'statuser', melding: 'Velg minst én aktivitetstatus' })
       }
-      // Halvåpen periode avvises av backend. Fanger den her for å gi feilmelding på riktig felt.
       const harFom = Boolean(k.fom)
       const harTom = Boolean(k.tom)
       if (harFom !== harTom) {

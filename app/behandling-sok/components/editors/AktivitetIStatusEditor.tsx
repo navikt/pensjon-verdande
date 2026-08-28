@@ -12,13 +12,6 @@ type Props = {
   feil?: string
 }
 
-/**
- * Sammensatt editor: aktivitetstype + aktivitetstatus + valgfri periode.
- *
- * De tre delene hører sammen i ett kriterium fordi backend krever at de gjelder SAMME
- * aktivitetsrad. Splittes de i separate kriterier, kan status matche én aktivitet og
- * perioden en annen på samme behandling — stille gale treff.
- */
 export function AktivitetIStatusEditor({
   kriterium,
   aktivitetTyper,

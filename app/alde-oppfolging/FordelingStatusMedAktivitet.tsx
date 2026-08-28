@@ -134,7 +134,6 @@ export default function FordelingStatusMedAktivitet({
                   <Table.DataCell align="right">
                     {total > 0 ? `${((statusTotal / total) * 100).toFixed(1)}%` : '0%'}
                   </Table.DataCell>
-                  {/* Sum-rader lenkes ikke: kan ikke uttrykkes som ett søk uten dobbelttelling. */}
                   <Table.DataCell />
                 </Table.Row>
               </React.Fragment>

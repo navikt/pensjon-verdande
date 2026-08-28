@@ -18,10 +18,8 @@ export type BehandlingMetadata = {
   behandlingType: string
   supportedAktivitetTyper: string[]
   observedAktivitetTyper: string[]
-  /** Alde-stegene med visningsnavn. Kan mangle mot eldre pen-versjoner. */
   aldeAktivitetTyper?: { kode: string; friendlyName: string }[]
   behandlingStatuser: string[]
-  /** Aktivitetens egen status (OPPRETTET/UNDER_BEHANDLING/FULLFORT/FEILET) — ikke behandlingsstatus. */
   aktivitetStatuser: string[]
   ansvarligeTeam: string[]
   kravStatuser: string[]

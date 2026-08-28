@@ -187,7 +187,6 @@ describe('HAR_AKTIVITET_I_STATUS', () => {
       { type: 'HAR_AKTIVITET_I_STATUS', aktivitetTyper: ['A'], statuser: ['FULLFORT'], fom: '', tom: '' },
     ])
     expect(r.manglerTidsfilter).toBe(true)
-    // ...men er i seg selv gyldig, så lenge et annet tidsfilter finnes.
     expect(r.feil).toEqual([])
   })
 
