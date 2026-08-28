@@ -51,8 +51,8 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
       isbot:
-        specifier: ^5.1.43
-        version: 5.1.43
+        specifier: ^5.2.1
+        version: 5.2.1
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
@@ -2338,8 +2338,8 @@ packages:
     resolution: {integrity: sha512-e6rvdUCiQCAuumZslxRJWR/Doq4VpPR82kqclvcS0efgt430SlGIk05vdCN58+VrzgtIcfNODjozVielycD4Sw==}
     engines: {node: '>=16'}
 
-  isbot@5.1.43:
-    resolution: {integrity: sha512-drJhFmibra4LO6Wd7D3Oi6UICRK9244vSZkmxzhlZP0TTdwCA2ueK4PEkUkzPYeuqug9+cqqdWPgihjk5+83Cg==}
+  isbot@5.2.1:
+    resolution: {integrity: sha512-dJ+LpKyClQZ7NG+j3OensC/mAZkGpukE9YUrgPYvAZj2doVL0edfDgywTUh5CXa0o+nW9a1V9e5+CJTX8+SxRw==}
     engines: {node: '>=18'}
 
   js-tokens@4.0.0:
@@ -4173,7 +4173,7 @@ snapshots:
       dedent: 1.7.2
       es-module-lexer: 2.3.2
       exit-hook: 5.1.0
-      isbot: 5.1.43
+      isbot: 5.2.1
       jsesc: 3.1.0
       lodash: 4.18.1
       p-map: 7.0.6
@@ -5282,7 +5282,7 @@ snapshots:
     dependencies:
       is-inside-container: 1.0.0
 
-  isbot@5.1.43: {}
+  isbot@5.2.1: {}
 
   js-tokens@4.0.0: {}
 
