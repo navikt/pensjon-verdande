@@ -63,9 +63,7 @@ export function meta(): Route.MetaDescriptors {
   return [{ title: 'Brevbestilling | Verdande' }]
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const url = new URL(request.url)
-
+export async function loader({ request, url }: Route.LoaderArgs) {
   const now = new Date()
 
   const iso = /^\d{4}-\d{2}-\d{2}$/
