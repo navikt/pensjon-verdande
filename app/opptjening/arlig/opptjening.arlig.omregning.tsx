@@ -36,21 +36,21 @@ enum Action {
   oppdaterSisteOmsorgGodskrivingsaar = 'OPPDATER_GODSKRIVINGSAAR',
 }
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, url }: Route.ActionArgs) => {
   const formData = await request.formData()
   const fromEntries = Object.fromEntries(formData)
 
   if (fromEntries.action === Action.ekskluderSaker) {
     const sakIder = konverterTilListe(fromEntries.ekskluderteSakIderText as string)
     await apiPost('/api/opptjening/eksludertesaker/leggTil', { sakIder, kommentar: fromEntries.kommentar }, request)
-    return redirect(request.url)
+    return redirect(url.pathname + url.search)
   } else if (fromEntries.action === Action.fjernEkskluderSaker) {
     const sakIder = konverterTilListe(fromEntries.ekskluderteSakIderText as string)
     await apiPost('/api/opptjening/eksludertesaker/fjern', { sakIder }, request)
-    return redirect(request.url)
+    return redirect(url.pathname + url.search)
   } else if (fromEntries.action === Action.fjernAlleEkskluderSaker) {
     await apiPost('/api/opptjening/eksludertesaker/fjernAlle', {}, request)
-    return redirect(request.url)
+    return redirect(url.pathname + url.search)
   } else if (fromEntries.action === Action.kjoerUttrekk) {
     const response = await apiPost<StartBatchResponse>('/api/opptjening/arliguttrekk/opprett', {}, request)
     if (!response) {
