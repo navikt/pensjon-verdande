@@ -65,9 +65,7 @@ export function meta(): Route.MetaDescriptors {
   return [{ title: 'Manuell behandling | Verdande' }]
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const url = new URL(request.url)
-
+export async function loader({ request, url }: Route.LoaderArgs) {
   const now = new Date()
 
   const fomDato = url.searchParams.get('fomDato') as string

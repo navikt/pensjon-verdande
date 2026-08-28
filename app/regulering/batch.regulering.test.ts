@@ -22,13 +22,21 @@ function jsonResponse(body: unknown, status = 200) {
   })
 }
 
-const loaderArgs = (request: Request) =>
-  ({
+// I React Router 8 er `request.url` den rå, inngående URL-en (kan ha et internt `.data`-suffiks for
+// client-side data-requests), mens loader-argumentenes `url` alltid er normalisert av rammeverket.
+// Vi simulerer den normaliseringen her slik at testene faktisk reflekterer runtime-oppførselen.
+const loaderArgs = (request: Request) => {
+  const url = new URL(request.url)
+  url.pathname = url.pathname.replace(/\.data$/, '')
+
+  return {
     request,
     params: {},
     context: {},
     pattern: '/batch/regulering',
-  }) as Parameters<typeof loader>[0]
+    url,
+  } as Parameters<typeof loader>[0]
+}
 
 describe('batch.regulering loader', () => {
   let fetchSpy: ReturnType<typeof vi.fn>
@@ -63,5 +71,18 @@ describe('batch.regulering loader', () => {
 
     const request = new Request('http://localhost/batch/regulering/uttrekk')
     await expect(loader(loaderArgs(request))).rejects.toBeDefined()
+  })
+
+  it('redirecter til riktig steg når normalisert url peker til rot-ruten, selv om request.url har .data-suffiks', async () => {
+    const mockDetaljer = { steg: 3, orkestreringsStatistikk: [] }
+    fetchSpy.mockResolvedValueOnce(jsonResponse(mockDetaljer))
+
+    // Simulerer en client-side data-request, der React Router legger til .data på request.url.
+    const request = new Request('http://localhost/batch/regulering.data')
+    const result = await loader(loaderArgs(request))
+
+    expect(result).toBeInstanceOf(Response)
+    expect((result as Response).status).toBe(302)
+    expect((result as Response).headers.get('Location')).toBe('/batch/regulering/orkestrering')
   })
 })

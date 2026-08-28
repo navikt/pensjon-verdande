@@ -10,12 +10,10 @@ export function meta(): Route.MetaDescriptors {
   return [{ title: 'Regulering | Verdande' }]
 }
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = async ({ request, url }: Route.LoaderArgs) => {
   const regulering = await apiGet<ReguleringDetaljer>('/api/vedtak/regulering/detaljer', request)
 
-  const url = new URL(request.url)
-  const pathname = url.pathname
-  if (pathname.endsWith('regulering')) {
+  if (url.pathname.endsWith('regulering')) {
     return redirect(stepToPath(regulering.steg))
   }
 
