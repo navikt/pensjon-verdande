@@ -76,7 +76,7 @@
     "react-router-devtools": "^6.2.3",
     "storybook": "^10.5.10",
     "typescript": "^7.0.2",
-    "vite": "^8.0.16",
+    "vite": "^8.2.2",
     "vitest": "^4.1.10"
   },
   "engines": {
