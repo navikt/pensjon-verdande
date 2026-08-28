@@ -5,3 +5,7 @@ minimumReleaseAgeExclude:
 allowBuilds:
   esbuild: false
   lefthook: true
+
+overrides:
+  qs: 6.15.2
+  body-parser: 2.3.0
