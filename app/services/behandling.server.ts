@@ -185,7 +185,7 @@ export async function stopp(request: Request, behandlingId: string, begrunnelse:
 export async function endrePlanlagtStartet(
   request: Request,
   behandlingId: string,
-  nyPlanlagtStartet: string,
+  nyPlanlagtStartet: string | null,
 ): Promise<void> {
   await apiPut(`/api/behandling/${behandlingId}/endrePlanlagtStartet`, { planlagtStartet: nyPlanlagtStartet }, request)
 }

@@ -36,6 +36,7 @@ export const OPERATION = {
   sendTilOppdragPaNytt: 'sendTilOppdragPaNytt',
   stopp: 'stopp',
   endrePlanlagtStartet: 'endrePlanlagtStartet',
+  startBehandlingNa: 'startBehandlingNa',
   taTilDebug: 'taTilDebug',
 } as const
 
@@ -124,6 +125,9 @@ function operationHandlers(
         break
       case OPERATION.endrePlanlagtStartet:
         handler = () => endrePlanlagtStartet(request, behandlingId, String(form.get('nyPlanlagtStartet')))
+        break
+      case OPERATION.startBehandlingNa:
+        handler = () => endrePlanlagtStartet(request, behandlingId, null)
         break
       case OPERATION.taTilDebug:
         handler = () => taTilDebug(request, behandlingId)
