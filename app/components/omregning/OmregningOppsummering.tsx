@@ -28,6 +28,7 @@ interface OmregningOppsummeringProps {
   regelendringBerortSakAuto: boolean
   skalBrukeKjoreplan: boolean
   skalBestilleBrev: string
+  brevstrategi: string
 
   selectedBrevkodeSokerAlderGammeltRegelverk: ComboboxOption | undefined
   selectedBrevkodeSokerAlderNyttRegelverk: ComboboxOption | undefined
@@ -158,142 +159,156 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
 
           <FormSummary.Answer>
             <FormSummary.Label>Omregning brev</FormSummary.Label>
-            <HGrid columns={2} gap="space-40">
+            {props.brevstrategi !== 'DEFAULT' && (
               <FormSummary.Value>
                 <FormSummary.Answers>
                   <FormSummary.Answer>
-                    <FormSummary.Label>Skal bestille brev for søker</FormSummary.Label>
-                    <FormSummary.Value>{props.skalBestilleBrev}</FormSummary.Value>
+                    <FormSummary.Label>Brevstrategi</FormSummary.Label>
+                    <FormSummary.Value>{props.brevstrategi}</FormSummary.Value>
                   </FormSummary.Answer>
-                  {props.skalBestilleBrev !== 'INGEN' &&
-                    props.selectedBrevkodeSokerAlderGammeltRegelverk &&
-                    props.selectedBrevkodeSokerAlderGammeltRegelverk.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Alder gammelt regelverk</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeSokerAlderGammeltRegelverk.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalBestilleBrev !== 'INGEN' &&
-                    props.selectedBrevkodeSokerAlderNyttRegelverk &&
-                    props.selectedBrevkodeSokerAlderNyttRegelverk.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Alder nytt regelverk</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeSokerAlderNyttRegelverk.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalBestilleBrev !== 'INGEN' &&
-                    props.selectedBrevkodeSokerUforetrygd &&
-                    props.selectedBrevkodeSokerUforetrygd.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Uføretrygd</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeSokerUforetrygd.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalBestilleBrev !== 'INGEN' &&
-                    props.selectedBrevkodeSokerBarnepensjon &&
-                    props.selectedBrevkodeSokerBarnepensjon.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Barnepensjon</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeSokerBarnepensjon.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalBestilleBrev !== 'INGEN' &&
-                    props.selectedBrevkodeSokerAFP &&
-                    props.selectedBrevkodeSokerAFP.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for AFP</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeSokerAFP.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalBestilleBrev !== 'INGEN' &&
-                    props.selectedBrevkodeSokerGjenlevendepensjon &&
-                    props.selectedBrevkodeSokerGjenlevendepensjon.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Gjenlevendepensjon</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeSokerGjenlevendepensjon.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalBestilleBrev !== 'INGEN' &&
-                    props.selectedBrevkodeSokerAFPPrivat &&
-                    props.selectedBrevkodeSokerAFPPrivat.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for AFP Privat</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeSokerAFPPrivat.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
                 </FormSummary.Answers>
               </FormSummary.Value>
-              <FormSummary.Value>
-                <FormSummary.Answers>
-                  <FormSummary.Answer>
-                    <FormSummary.Label>Skal sende brev for berørte saker</FormSummary.Label>
-                    <FormSummary.Value>{props.skalSendeBrevBerorteSaker ? 'Ja' : 'Nei'}</FormSummary.Value>
-                  </FormSummary.Answer>
-                  {props.skalSendeBrevBerorteSaker &&
-                    props.selectedBrevkoderBerorteSakerAlderGammeltRegelverk &&
-                    props.selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Alder gammelt regelverk</FormSummary.Label>
-                        <FormSummary.Value>
-                          {props.selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value}
-                        </FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalSendeBrevBerorteSaker &&
-                    props.selectedBrevkoderBerorteSakerAlderNyttRegelverk &&
-                    props.selectedBrevkoderBerorteSakerAlderNyttRegelverk.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Alder nytt regelverk</FormSummary.Label>
-                        <FormSummary.Value>
-                          {props.selectedBrevkoderBerorteSakerAlderNyttRegelverk.value}
-                        </FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalSendeBrevBerorteSaker &&
-                    props.selectedBrevkoderBerorteSakerUforetrygd &&
-                    props.selectedBrevkoderBerorteSakerUforetrygd.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Uføretrygd</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkoderBerorteSakerUforetrygd.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalSendeBrevBerorteSaker &&
-                    props.selectedBrevkoderBerorteSakerBarnepensjon &&
-                    props.selectedBrevkoderBerorteSakerBarnepensjon.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Barnepensjon</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkoderBerorteSakerBarnepensjon.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalSendeBrevBerorteSaker &&
-                    props.selectedBrevkoderBerorteSakerAFP &&
-                    props.selectedBrevkoderBerorteSakerAFP.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for AFP</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkoderBerorteSakerAFP.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalSendeBrevBerorteSaker &&
-                    props.selectedBrevkoderBerorteSakerGjenlevendepensjon &&
-                    props.selectedBrevkoderBerorteSakerGjenlevendepensjon.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for Gjenlevendepensjon</FormSummary.Label>
-                        <FormSummary.Value>
-                          {props.selectedBrevkoderBerorteSakerGjenlevendepensjon.value}
-                        </FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                  {props.skalSendeBrevBerorteSaker &&
-                    props.selectedBrevkodeBerorteSakerAFPPrivat &&
-                    props.selectedBrevkodeBerorteSakerAFPPrivat.value !== 'not set' && (
-                      <FormSummary.Answer>
-                        <FormSummary.Label>Batchbrev for AFP Privat</FormSummary.Label>
-                        <FormSummary.Value>{props.selectedBrevkodeBerorteSakerAFPPrivat.value}</FormSummary.Value>
-                      </FormSummary.Answer>
-                    )}
-                </FormSummary.Answers>
-              </FormSummary.Value>
-            </HGrid>
+            )}
+            {props.brevstrategi === 'DEFAULT' && (
+              <HGrid columns={2} gap="space-40">
+                <FormSummary.Value>
+                  <FormSummary.Answers>
+                    <FormSummary.Answer>
+                      <FormSummary.Label>Skal bestille brev for søker</FormSummary.Label>
+                      <FormSummary.Value>{props.skalBestilleBrev}</FormSummary.Value>
+                    </FormSummary.Answer>
+                    {props.skalBestilleBrev !== 'INGEN' &&
+                      props.selectedBrevkodeSokerAlderGammeltRegelverk &&
+                      props.selectedBrevkodeSokerAlderGammeltRegelverk.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Alder gammelt regelverk</FormSummary.Label>
+                          <FormSummary.Value>
+                            {props.selectedBrevkodeSokerAlderGammeltRegelverk.value}
+                          </FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalBestilleBrev !== 'INGEN' &&
+                      props.selectedBrevkodeSokerAlderNyttRegelverk &&
+                      props.selectedBrevkodeSokerAlderNyttRegelverk.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Alder nytt regelverk</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkodeSokerAlderNyttRegelverk.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalBestilleBrev !== 'INGEN' &&
+                      props.selectedBrevkodeSokerUforetrygd &&
+                      props.selectedBrevkodeSokerUforetrygd.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Uføretrygd</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkodeSokerUforetrygd.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalBestilleBrev !== 'INGEN' &&
+                      props.selectedBrevkodeSokerBarnepensjon &&
+                      props.selectedBrevkodeSokerBarnepensjon.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Barnepensjon</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkodeSokerBarnepensjon.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalBestilleBrev !== 'INGEN' &&
+                      props.selectedBrevkodeSokerAFP &&
+                      props.selectedBrevkodeSokerAFP.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for AFP</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkodeSokerAFP.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalBestilleBrev !== 'INGEN' &&
+                      props.selectedBrevkodeSokerGjenlevendepensjon &&
+                      props.selectedBrevkodeSokerGjenlevendepensjon.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Gjenlevendepensjon</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkodeSokerGjenlevendepensjon.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalBestilleBrev !== 'INGEN' &&
+                      props.selectedBrevkodeSokerAFPPrivat &&
+                      props.selectedBrevkodeSokerAFPPrivat.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for AFP Privat</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkodeSokerAFPPrivat.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                  </FormSummary.Answers>
+                </FormSummary.Value>
+                <FormSummary.Value>
+                  <FormSummary.Answers>
+                    <FormSummary.Answer>
+                      <FormSummary.Label>Skal sende brev for berørte saker</FormSummary.Label>
+                      <FormSummary.Value>{props.skalSendeBrevBerorteSaker ? 'Ja' : 'Nei'}</FormSummary.Value>
+                    </FormSummary.Answer>
+                    {props.skalSendeBrevBerorteSaker &&
+                      props.selectedBrevkoderBerorteSakerAlderGammeltRegelverk &&
+                      props.selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Alder gammelt regelverk</FormSummary.Label>
+                          <FormSummary.Value>
+                            {props.selectedBrevkoderBerorteSakerAlderGammeltRegelverk.value}
+                          </FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalSendeBrevBerorteSaker &&
+                      props.selectedBrevkoderBerorteSakerAlderNyttRegelverk &&
+                      props.selectedBrevkoderBerorteSakerAlderNyttRegelverk.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Alder nytt regelverk</FormSummary.Label>
+                          <FormSummary.Value>
+                            {props.selectedBrevkoderBerorteSakerAlderNyttRegelverk.value}
+                          </FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalSendeBrevBerorteSaker &&
+                      props.selectedBrevkoderBerorteSakerUforetrygd &&
+                      props.selectedBrevkoderBerorteSakerUforetrygd.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Uføretrygd</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkoderBerorteSakerUforetrygd.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalSendeBrevBerorteSaker &&
+                      props.selectedBrevkoderBerorteSakerBarnepensjon &&
+                      props.selectedBrevkoderBerorteSakerBarnepensjon.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Barnepensjon</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkoderBerorteSakerBarnepensjon.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalSendeBrevBerorteSaker &&
+                      props.selectedBrevkoderBerorteSakerAFP &&
+                      props.selectedBrevkoderBerorteSakerAFP.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for AFP</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkoderBerorteSakerAFP.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalSendeBrevBerorteSaker &&
+                      props.selectedBrevkoderBerorteSakerGjenlevendepensjon &&
+                      props.selectedBrevkoderBerorteSakerGjenlevendepensjon.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for Gjenlevendepensjon</FormSummary.Label>
+                          <FormSummary.Value>
+                            {props.selectedBrevkoderBerorteSakerGjenlevendepensjon.value}
+                          </FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                    {props.skalSendeBrevBerorteSaker &&
+                      props.selectedBrevkodeBerorteSakerAFPPrivat &&
+                      props.selectedBrevkodeBerorteSakerAFPPrivat.value !== 'not set' && (
+                        <FormSummary.Answer>
+                          <FormSummary.Label>Batchbrev for AFP Privat</FormSummary.Label>
+                          <FormSummary.Value>{props.selectedBrevkodeBerorteSakerAFPPrivat.value}</FormSummary.Value>
+                        </FormSummary.Answer>
+                      )}
+                  </FormSummary.Answers>
+                </FormSummary.Value>
+              </HGrid>
+            )}
           </FormSummary.Answer>
         </FormSummary.Answers>
       </FormSummary>

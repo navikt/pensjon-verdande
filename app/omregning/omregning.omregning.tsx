@@ -52,6 +52,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     regelendringUt2026: updates.regelendringUt2026 === 'true',
     regelendringBerortSakAuto: updates.regelendringBerortSakAuto === 'true',
     skalBrukeKjoreplan: updates.skalBrukeKjoreplan === 'true',
+    brevstrategi: updates.brevstrategi,
   } as OmregningRequest
 
   const response = (await apiPost<{ behandlingId: number }>(
