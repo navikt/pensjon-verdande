@@ -16,7 +16,7 @@ import {
   VStack,
 } from '@navikt/ds-react'
 import { format, sub } from 'date-fns'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useNavigation, useRevalidator, useSearchParams } from 'react-router'
 import KontrollpunktfordelingOverTidBarChart from '~/alde-oppfolging/KontrollpunktfordelingOverTidBarChart'
 import KontrollpunktfordelingPieChart from '~/alde-oppfolging/KontrollpunktfordelingPieChart'
@@ -37,7 +37,10 @@ import type {
   AldeFordelingStatusDto,
   AldeFordelingStatusMedAktivitet,
   AldeFordelingStatusOverTidDto,
+  KontrollpunktGranulering,
+  KontrollpunktTypeValg,
 } from './types'
+import { kontrollpunktTypeConfig } from './types'
 
 export function meta(): Route.MetaDescriptors {
   return [{ title: 'ALDE oppfølging | Verdande' }]
@@ -50,6 +53,8 @@ export async function loader({ request }: { request: Request }) {
   const fomDato = url.searchParams.get('fomDato') || toIsoDate(sub(now, { days: 7 }))
   const tomDato = url.searchParams.get('tomDato') || toIsoDate(now)
   const behandlingstype = url.searchParams.get('behandlingstype') || 'FleksibelApSak'
+  const kontrollpunktType = (url.searchParams.get('kontrollpunktType') || 'SAMBOER') as KontrollpunktTypeValg
+  const aggregeringsniva = (url.searchParams.get('aggregeringsniva') || 'DAG') as KontrollpunktGranulering
 
   const dateRangeSearchParams = new URLSearchParams()
   dateRangeSearchParams.set('fomDato', fomDato)
@@ -88,8 +93,17 @@ export async function loader({ request }: { request: Request }) {
     request,
   )
 
-  const kontrollpunktFordelingOverTid = await apiGet<AldeFordelingKontrollpunktOverTidDto>(
-    `/api/behandling/alde/oppfolging/behandling-samboer-kontrollpunkt-fordeling?kontrollpunktType=SAMBOER&${dateRangeSearchParams.toString()}`,
+  const kontrollpunktParams = new URLSearchParams(dateRangeSearchParams)
+  kontrollpunktParams.set('aggregeringsniva', aggregeringsniva)
+  const config = kontrollpunktTypeConfig[kontrollpunktType]
+  if (config.aktivitetType) {
+    kontrollpunktParams.set('aktivitetType', config.aktivitetType)
+  } else {
+    kontrollpunktParams.set('kontrollpunktType', kontrollpunktType)
+  }
+
+  const kontrollpunktFordeling = await apiGet<AldeFordelingKontrollpunktOverTidDto>(
+    `/api/behandling/alde/oppfolging/behandling-kontrollpunkt-fordeling?${kontrollpunktParams.toString()}`,
     request,
   )
 
@@ -107,7 +121,9 @@ export async function loader({ request }: { request: Request }) {
     fomDato,
     tomDato,
     behandlingstype,
-    kontrollpunktFordelingOverTid,
+    kontrollpunktType,
+    aggregeringsniva,
+    kontrollpunktFordeling,
     statusfordelingAldeAktiviteter,
     nowIso: now.toISOString(),
   }
@@ -123,7 +139,9 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
     statusfordelingOverTid,
     behandlingFordeling,
     aldeBehandlinger,
-    kontrollpunktFordelingOverTid,
+    kontrollpunktType,
+    aggregeringsniva,
+    kontrollpunktFordeling,
     statusfordelingAldeAktiviteter,
   } = loaderData
   const [searchParams, setSearchParams] = useSearchParams()
@@ -134,6 +152,25 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
   const [autoReloadInterval, setAutoReloadInterval] = React.useState<number | null>(null)
   const [isAutoReloading, setIsAutoReloading] = React.useState(false)
   const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET']
+
+  // Oversett type-verdier (Alde/IkkeAlde) til lesbare navn basert på valgt kontrollpunkttype
+  const mergedKontrollpunktFordeling = useMemo<AldeFordelingKontrollpunktOverTidDto>(() => {
+    const labels = kontrollpunktTypeConfig[kontrollpunktType]
+    const typeMap: Record<string, string> = {
+      Alde: labels.alde,
+      IkkeAlde: labels.ikkeAlde,
+    }
+
+    return {
+      fordeling: kontrollpunktFordeling.fordeling.map((entry) => ({
+        dato: entry.dato,
+        data: (entry.data || []).map((item) => ({
+          ...item,
+          type: typeMap[item.type] ?? item.type,
+        })),
+      })),
+    }
+  }, [kontrollpunktFordeling, kontrollpunktType])
 
   const isLoading = navigation.state === 'loading'
 
@@ -308,6 +345,31 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
                   <option value="1800000">30 minutter</option>
                 </Select>
               </Box>
+
+              <Box style={{ minWidth: '150px' }}>
+                <Select
+                  label="Kontrollpunkttype"
+                  size="small"
+                  value={kontrollpunktType}
+                  onChange={(e) => updateSearchParams({ kontrollpunktType: e.target.value })}
+                >
+                  <option value="SAMBOER">Samboer</option>
+                  <option value="INNTOPP_EKTEF">Eps2G</option>
+                </Select>
+              </Box>
+
+              <Box style={{ minWidth: '130px' }}>
+                <Select
+                  label="Aggregeringsnivå"
+                  size="small"
+                  value={aggregeringsniva}
+                  onChange={(e) => updateSearchParams({ aggregeringsniva: e.target.value })}
+                >
+                  <option value="DAG">Dag</option>
+                  <option value="UKE">Uke</option>
+                  <option value="MAANED">Måned</option>
+                </Select>
+              </Box>
             </HStack>
           </VStack>
         </Box>
@@ -395,12 +457,12 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
             <Tabs.Panel value="kontrollpunkt">
               <VStack gap="space-56" padding="space-24">
                 <KontrollpunktfordelingOverTidBarChart
-                  data={kontrollpunktFordelingOverTid}
+                  data={mergedKontrollpunktFordeling}
                   fomDate={fomDato}
                   tomDate={tomDato}
                 />
 
-                <KontrollpunktfordelingPieChart data={kontrollpunktFordelingOverTid} />
+                <KontrollpunktfordelingPieChart data={mergedKontrollpunktFordeling} />
               </VStack>
             </Tabs.Panel>
 
