@@ -5,7 +5,7 @@ export async function action({ request }: Route.ActionArgs) {
   const body = await request.formData()
   const behandlingIder = body.get('behandlingIder') as string
 
-  await Promise.all(behandlingIder.split(',').map((behandlingId) => fortsettBehandling(request, behandlingId, false)))
+  await Promise.all(behandlingIder.split(',').map((behandlingId) => fortsettBehandling(request, behandlingId)))
 
   return null
 }

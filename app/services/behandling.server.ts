@@ -138,12 +138,8 @@ export async function getIkkeFullforteAktiviteter(request: Request, behandlingId
   return await apiGet<IkkeFullforteAktiviteterDTO>(`/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`, request)
 }
 
-export async function fortsettBehandling(
-  request: Request,
-  behandlingId: string,
-  nullstillPlanlagtStartet: boolean,
-): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/fortsett`, { nullstillPlanlagtStartet }, request)
+export async function fortsettBehandling(request: Request, behandlingId: string): Promise<void> {
+  await apiPut(`/api/behandling/${behandlingId}/fortsett`, {}, request)
 }
 
 export async function fortsettAvhengigeBehandlinger(request: Request, behandlingId: string): Promise<void> {
