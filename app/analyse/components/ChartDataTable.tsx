@@ -38,7 +38,6 @@ export function ChartDataTable<T extends Record<string, unknown>>({
             </Table.Header>
             <Table.Body>
               {rows.map((row, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: tabellrader har ikke unik nøkkel
                 <Table.Row key={i}>
                   {columns.map((col) => (
                     <Table.DataCell key={col.key}>
