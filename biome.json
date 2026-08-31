@@ -17,7 +17,16 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended",
+      "correctness": {
+        "useHookAtTopLevel": "off"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off"
+      },
+      "style": {
+        "noDescendingSpecificity": "off"
+      }
     }
   },
   "javascript": {
