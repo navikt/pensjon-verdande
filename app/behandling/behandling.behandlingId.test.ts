@@ -64,6 +64,31 @@ describe('behandling.$behandlingId action', () => {
     expect(init.signal).toBeInstanceOf(AbortSignal)
   })
 
+  it('endrePlanlagtStartet kaller endrePlanlagtStartet med ny dato', async () => {
+    const { endrePlanlagtStartet } = await import('~/services/behandling.server')
+
+    const formData = new FormData()
+    formData.set('operation', 'endrePlanlagtStartet')
+    formData.set('nyPlanlagtStartet', '2026-09-15T10:00:00')
+
+    const request = new Request('http://localhost/behandling/123', { method: 'POST', body: formData })
+    await action(actionArgs(request))
+
+    expect(endrePlanlagtStartet).toHaveBeenCalledWith(request, '123', '2026-09-15T10:00:00')
+  })
+
+  it('startBehandlingNa kaller endrePlanlagtStartet med null', async () => {
+    const { endrePlanlagtStartet } = await import('~/services/behandling.server')
+
+    const formData = new FormData()
+    formData.set('operation', 'startBehandlingNa')
+
+    const request = new Request('http://localhost/behandling/123', { method: 'POST', body: formData })
+    await action(actionArgs(request))
+
+    expect(endrePlanlagtStartet).toHaveBeenCalledWith(request, '123', null)
+  })
+
   it('ukjent operasjon returnerer feil', async () => {
     const formData = new FormData()
     formData.set('operation', 'ugyldig')
