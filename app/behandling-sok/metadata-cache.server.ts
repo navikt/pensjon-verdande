@@ -18,7 +18,9 @@ export type BehandlingMetadata = {
   behandlingType: string
   supportedAktivitetTyper: string[]
   observedAktivitetTyper: string[]
+  aldeAktivitetTyper?: { kode: string; friendlyName: string }[]
   behandlingStatuser: string[]
+  aktivitetStatuser: string[]
   ansvarligeTeam: string[]
   kravStatuser: string[]
   kontrollpunktTyper: Kontrollpunkt[]

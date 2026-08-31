@@ -2,6 +2,7 @@ import { BodyShort, Box, Button, Heading, HStack, VStack } from '@navikt/ds-reac
 import type { Kriterium } from '../lib/kriterier'
 import { KRITERIE_DEFINISJONER, type Valideringsfeil } from '../lib/kriterier'
 import type { BehandlingMetadata } from '../metadata-cache.server'
+import { AktivitetIStatusEditor } from './editors/AktivitetIStatusEditor'
 import { CheckboxEditor } from './editors/CheckboxEditor'
 import { MultiSelectEditor } from './editors/MultiSelectEditor'
 import { MultiSelectMedOperatorEditor } from './editors/MultiSelectMedOperatorEditor'
@@ -143,6 +144,36 @@ function renderEditor(
       )
     }
 
+    case 'IKKE_HAR_AKTIVITET_AV_TYPE': {
+      const supported = metadata?.supportedAktivitetTyper ?? []
+      const observed = metadata?.observedAktivitetTyper ?? []
+      return (
+        <MultiSelectEditor
+          label="Aktivitetstype som ikke skal finnes"
+          alternativer={supported}
+          historiske={observed.filter((o) => !supported.includes(o))}
+          valgte={kriterium.aktivitetTyper}
+          onChange={(nye) => onChange({ ...kriterium, aktivitetTyper: nye })}
+          feil={feil}
+        />
+      )
+    }
+
+    case 'HAR_AKTIVITET_I_STATUS': {
+      const supported = metadata?.supportedAktivitetTyper ?? []
+      const observed = metadata?.observedAktivitetTyper ?? []
+      return (
+        <AktivitetIStatusEditor
+          kriterium={kriterium}
+          aktivitetTyper={supported}
+          historiskeAktivitetTyper={observed.filter((o) => !supported.includes(o))}
+          aktivitetStatuser={metadata?.aktivitetStatuser ?? []}
+          onChange={onChange}
+          feil={feil}
+        />
+      )
+    }
+
     case 'KRAVHODE_HAR_KONTROLLPUNKT': {
       const koder = (metadata?.kontrollpunktTyper ?? []).map((k) => k.kode)
       return (
@@ -233,6 +264,10 @@ function renderEditor(
       return <CheckboxEditor beskrivelse="Filtrerer på behandlinger som har en åpen brevbestilling-aktivitet." />
     case 'KONTROLLPUNKT_ER_KRITISK':
       return <CheckboxEditor beskrivelse="Filtrerer på krav med minst ett kritisk kontrollpunkt." />
+    case 'HAR_ALDE_AKTIVITET':
+      return (
+        <CheckboxEditor beskrivelse="Filtrerer på behandlinger som har minst én aktivitet registrert som Alde-aktivitet. Speiler avgrensningen i Alde-statistikken." />
+      )
 
     default: {
       // exhaustive check

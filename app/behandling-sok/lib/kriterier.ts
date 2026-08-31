@@ -20,6 +20,15 @@ export type Kriterium =
   | { type: 'ER_BATCH'; verdi: boolean }
   | { type: 'TILHORER_BEHANDLINGSSERIE'; uuid: string }
   | { type: 'HAR_AKTIVITET_AV_TYPE'; aktivitetTyper: string[]; operator: Operator }
+  | { type: 'IKKE_HAR_AKTIVITET_AV_TYPE'; aktivitetTyper: string[] }
+  | {
+      type: 'HAR_AKTIVITET_I_STATUS'
+      aktivitetTyper: string[]
+      statuser: string[]
+      fom?: string | null
+      tom?: string | null
+    }
+  | { type: 'HAR_ALDE_AKTIVITET' }
   | { type: 'AKTIVITET_KJORT_FLERE_GANGER_ENN'; terskel: number }
   | { type: 'HAR_AAPEN_MANUELL_BEHANDLING' }
   | { type: 'HAR_AAPEN_BREVBESTILLING' }
@@ -48,6 +57,7 @@ export type EditorKomponent =
   | 'UuidEditor'
   | 'ValgfriDatoEditor'
   | 'MultiTallEditor'
+  | 'AktivitetIStatusEditor'
 
 /**
  * Hvilken metadata-nøkkel skal MultiSelectEditor lese fra for å fylle dropdown.
@@ -61,6 +71,7 @@ export type MetadataNokkel =
   | 'eierenheter'
   | 'ansvarligeTeam'
   | 'aktivitetTyper'
+  | 'aktivitetStatuser'
   | 'kontrollpunktTyper'
   | 'kravhodeBehandlingTyper'
   | 'none'
@@ -201,6 +212,44 @@ export const KRITERIE_DEFINISJONER: Record<KriterieType, KriterieDefinisjon> = {
     tidsfilter: false,
     defaultVerdi: () => ({ type: 'HAR_AKTIVITET_AV_TYPE', aktivitetTyper: [], operator: 'OR' }),
   },
+  IKKE_HAR_AKTIVITET_AV_TYPE: {
+    type: 'IKKE_HAR_AKTIVITET_AV_TYPE',
+    visningsnavn: 'Har ikke aktivitet av type',
+    gruppe: 'Aktiviteter',
+    editor: 'MultiSelectEditor',
+    metadataNokkel: 'aktivitetTyper',
+    verdiNokkel: 'aktivitetTyper' as keyof Kriterium,
+    sensitiv: false,
+    tidsfilter: false,
+    defaultVerdi: () => ({ type: 'IKKE_HAR_AKTIVITET_AV_TYPE', aktivitetTyper: [] }),
+  },
+  HAR_AKTIVITET_I_STATUS: {
+    type: 'HAR_AKTIVITET_I_STATUS',
+    visningsnavn: 'Har aktivitet i aktivitetstatus',
+    gruppe: 'Aktiviteter',
+    editor: 'AktivitetIStatusEditor',
+    metadataNokkel: 'aktivitetTyper',
+    verdiNokkel: 'aktivitetTyper' as keyof Kriterium,
+    sensitiv: false,
+    tidsfilter: true,
+    defaultVerdi: () => ({
+      type: 'HAR_AKTIVITET_I_STATUS',
+      aktivitetTyper: [],
+      statuser: [],
+      fom: '',
+      tom: '',
+    }),
+  },
+  HAR_ALDE_AKTIVITET: {
+    type: 'HAR_ALDE_AKTIVITET',
+    visningsnavn: 'Har Alde-aktivitet',
+    gruppe: 'Aktiviteter',
+    editor: 'CheckboxEditor',
+    metadataNokkel: 'none',
+    sensitiv: false,
+    tidsfilter: false,
+    defaultVerdi: () => ({ type: 'HAR_ALDE_AKTIVITET' }),
+  },
   AKTIVITET_KJORT_FLERE_GANGER_ENN: {
     type: 'AKTIVITET_KJORT_FLERE_GANGER_ENN',
     visningsnavn: 'Aktivitet kjørt flere ganger enn',
@@ -330,7 +379,11 @@ export function isSensitiv(k: Kriterium): boolean {
 }
 
 export function harTidsfilter(kriterier: Kriterium[]): boolean {
-  return kriterier.some((k) => KRITERIE_DEFINISJONER[k.type].tidsfilter)
+  return kriterier.some((k) => {
+    if (!KRITERIE_DEFINISJONER[k.type].tidsfilter) return false
+    if (k.type === 'HAR_AKTIVITET_I_STATUS') return Boolean(k.fom) && Boolean(k.tom)
+    return true
+  })
 }
 
 /* ──────────────────── Validering ──────────────────── */
@@ -374,7 +427,7 @@ export function validerKriterier(kriterier: Kriterium[]): ValideringsResultat {
 
   kriterier.forEach((k, idx) => {
     const definisjon = KRITERIE_DEFINISJONER[k.type]
-    if (definisjon.tidsfilter && 'fom' in k && 'tom' in k) {
+    if (definisjon.tidsfilter && k.type !== 'HAR_AKTIVITET_I_STATUS' && 'fom' in k && 'tom' in k) {
       const fomD = parseStrictIsoDate(k.fom)
       const tomD = parseStrictIsoDate(k.tom)
       if (!fomD) feil.push({ kriterieIndeks: idx, felt: 'fom', melding: 'Fra-dato mangler eller er ugyldig' })
@@ -412,6 +465,39 @@ export function validerKriterier(kriterier: Kriterium[]): ValideringsResultat {
 
     if (k.type === 'HAR_AKTIVITET_AV_TYPE' && k.aktivitetTyper.length === 0) {
       feil.push({ kriterieIndeks: idx, felt: 'aktivitetTyper', melding: 'Velg minst én aktivitetstype' })
+    }
+
+    if (k.type === 'IKKE_HAR_AKTIVITET_AV_TYPE' && k.aktivitetTyper.length === 0) {
+      feil.push({ kriterieIndeks: idx, felt: 'aktivitetTyper', melding: 'Velg minst én aktivitetstype' })
+    }
+
+    if (k.type === 'HAR_AKTIVITET_I_STATUS') {
+      if (k.aktivitetTyper.length === 0) {
+        feil.push({ kriterieIndeks: idx, felt: 'aktivitetTyper', melding: 'Velg minst én aktivitetstype' })
+      }
+      if (k.statuser.length === 0) {
+        feil.push({ kriterieIndeks: idx, felt: 'statuser', melding: 'Velg minst én aktivitetstatus' })
+      }
+      const harFom = Boolean(k.fom)
+      const harTom = Boolean(k.tom)
+      if (harFom !== harTom) {
+        feil.push({
+          kriterieIndeks: idx,
+          felt: harFom ? 'tom' : 'fom',
+          melding: 'Oppgi både fra- og til-dato, eller ingen av dem',
+        })
+      } else if (k.fom && k.tom) {
+        const fomD = parseStrictIsoDate(k.fom)
+        const tomD = parseStrictIsoDate(k.tom)
+        if (!fomD) feil.push({ kriterieIndeks: idx, felt: 'fom', melding: 'Fra-dato er ugyldig' })
+        if (!tomD) feil.push({ kriterieIndeks: idx, felt: 'tom', melding: 'Til-dato er ugyldig' })
+        if (fomD && tomD) {
+          if (fomD > tomD)
+            feil.push({ kriterieIndeks: idx, felt: 'tom', melding: 'Til-dato må være på eller etter fra-dato' })
+          else if (maanederMellom(fomD, tomD) > 24)
+            feil.push({ kriterieIndeks: idx, felt: 'tom', melding: 'Periode kan ikke være lengre enn 24 måneder' })
+        }
+      }
     }
 
     if (k.type === 'KRAVHODE_HAR_KONTROLLPUNKT' && k.kontrollpunktTyper.length === 0) {

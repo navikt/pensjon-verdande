@@ -31,6 +31,19 @@ export interface AldeFordelingStatusMedAktivitet {
   antall: number
 }
 
+export interface BehandlingStatusFordelingDto {
+  dato: string | null
+  aktivitetCode: string | null
+  status: string
+  antall: number
+}
+
+export interface AktivitetStatusFordelingDto {
+  dato: string | null
+  status: string
+  antall: number
+}
+
 export interface AldeBehandlingNavn {
   friendlyName: string
   handlerName: string

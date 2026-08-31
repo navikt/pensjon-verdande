@@ -21,6 +21,10 @@ function harInnhold(k: Kriterium): boolean {
       return k.identer.length > 0
     case 'HAR_AKTIVITET_AV_TYPE':
       return k.aktivitetTyper.length > 0
+    case 'IKKE_HAR_AKTIVITET_AV_TYPE':
+      return k.aktivitetTyper.length > 0
+    case 'HAR_AKTIVITET_I_STATUS':
+      return k.aktivitetTyper.length > 0 && k.statuser.length > 0
     case 'KRAVHODE_HAR_KONTROLLPUNKT':
       return k.kontrollpunktTyper.length > 0
     case 'KRAVHODE_HAR_BEHANDLINGTYPE':
@@ -66,6 +70,10 @@ function mapTilBackend(k: Kriterium): BackendKriterium {
       return { type: k.type, teams: k.team }
     case 'HAR_FEILET_KJORING':
       return k.siden ? { type: k.type, sidenDato: k.siden } : { type: k.type }
+    case 'HAR_AKTIVITET_I_STATUS':
+      return k.fom && k.tom
+        ? { type: k.type, aktivitetTyper: k.aktivitetTyper, statuser: k.statuser, fom: k.fom, tom: k.tom }
+        : { type: k.type, aktivitetTyper: k.aktivitetTyper, statuser: k.statuser }
     default:
       return k
   }

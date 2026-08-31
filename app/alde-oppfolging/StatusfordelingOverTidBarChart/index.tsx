@@ -1,18 +1,21 @@
-import { BodyShort } from '@navikt/ds-react'
+import { BodyShort, Link, ReadMore, Table, VStack } from '@navikt/ds-react'
 import type { ChartData, ChartOptions } from 'chart.js'
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js'
-import { useMemo } from 'react'
-import { Bar } from 'react-chartjs-2'
+import { useMemo, useRef } from 'react'
+import { Bar, getElementAtEvent } from 'react-chartjs-2'
+import { Link as RouterLink, useNavigate } from 'react-router'
+import { byggBehandlingStatusSokUrl } from '../lib/drilldown'
 import type { AldeFordelingStatusOverTidDto } from '../types'
+import type { ChartOutput } from './utils'
 import { parseToChartData, statusColors, statusLabels } from './utils'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 interface StatusfordelingOverTidBarChartProps {
   data: AldeFordelingStatusOverTidDto[]
-  fomDate: string
-  tomDate: string
   hiddenStatuses?: string[]
+  behandlingstype?: string
+  avbruddAktivitetCode?: string
 }
 
 export const options: ChartOptions<'bar'> = {
@@ -44,10 +47,37 @@ export const options: ChartOptions<'bar'> = {
   },
 }
 
+function formaterDato(iso: string): string {
+  const [aar, maaned, dag] = iso.split('-')
+  return `${dag}.${maaned}.${aar}`
+}
+
 const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartProps> = ({
   data,
   hiddenStatuses = [],
+  behandlingstype,
+  avbruddAktivitetCode,
 }) => {
+  const navigate = useNavigate()
+  // biome-ignore lint/suspicious/noExplicitAny: Chart-ref-typen fra react-chartjs-2 er generisk
+  const chartRef = useRef<any>(null)
+  const drilldownAktiv = Boolean(behandlingstype && avbruddAktivitetCode)
+
+  const {
+    labels: datoer,
+    statusNokler,
+    antallPerStatus,
+  } = useMemo(() => {
+    const [labels, parsed] = parseToChartData(data)
+    const fordeling = parsed?.[0]
+    return { labels, statusNokler: fordeling ? Object.keys(fordeling) : [], antallPerStatus: fordeling }
+  }, [data])
+
+  const synligeStatusNokler = useMemo(
+    () => statusNokler.filter((status) => !hiddenStatuses.includes(status)),
+    [statusNokler, hiddenStatuses],
+  )
+
   const chartData = useMemo(() => {
     const [labels, parsedData] = parseToChartData(data)
 
@@ -86,10 +116,80 @@ const StatusfordelingOverTidBarChart: React.FC<StatusfordelingOverTidBarChartPro
     )
   }
 
+  const drilldownUrl = (status: string, dato: string) =>
+    byggBehandlingStatusSokUrl({
+      behandlingType: behandlingstype as string,
+      behandlingStatus: status,
+      fomDato: dato,
+      tomDato: dato,
+      avbruddAktivitetCode: avbruddAktivitetCode as string,
+    })
+
   return (
-    <div style={{ maxHeight: '500px' }}>
-      <Bar options={options} data={chartData} />
-    </div>
+    <VStack gap="space-16">
+      <div style={{ maxHeight: '500px' }}>
+        <Bar
+          ref={chartRef}
+          options={options}
+          data={chartData}
+          onClick={(event) => {
+            if (!drilldownAktiv) return
+            const elementer = getElementAtEvent(chartRef.current, event)
+            if (elementer.length === 0) return
+            const { datasetIndex, index } = elementer[0]
+            const status = statusNokler[datasetIndex]
+            const dato = datoer[index]
+            if (!status || !dato) return
+            navigate(drilldownUrl(status, dato))
+          }}
+        />
+      </div>
+
+      {drilldownAktiv && datoer.length > 0 && synligeStatusNokler.length > 0 && (
+        <ReadMore header="Vis statusfordeling som tabell">
+          <Table size="small">
+            <BodyShort as="caption" visuallyHidden>
+              Antall behandlinger per dag og status, med lenke til behandlingssøk
+            </BodyShort>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader>Dato</Table.ColumnHeader>
+                {synligeStatusNokler.map((status) => (
+                  <Table.ColumnHeader key={status}>{statusLabels[status] || status}</Table.ColumnHeader>
+                ))}
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {datoer.map((dato, datoIndex) => (
+                <Table.Row key={dato}>
+                  <Table.DataCell>{formaterDato(dato)}</Table.DataCell>
+                  {synligeStatusNokler.map((status) => {
+                    const antall = antallPerStatus?.[status as keyof ChartOutput]?.[datoIndex] ?? 0
+                    return (
+                      <Table.DataCell key={status}>
+                        {antall > 0 ? (
+                          <Link
+                            as={RouterLink}
+                            to={drilldownUrl(status, dato)}
+                            aria-label={`Vis ${antall} behandlinger med behandlingsstatus ${
+                              statusLabels[status] || status
+                            } opprettet ${formaterDato(dato)}`}
+                          >
+                            {antall}
+                          </Link>
+                        ) : (
+                          0
+                        )}
+                      </Table.DataCell>
+                    )
+                  })}
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        </ReadMore>
+      )}
+    </VStack>
   )
 }
 

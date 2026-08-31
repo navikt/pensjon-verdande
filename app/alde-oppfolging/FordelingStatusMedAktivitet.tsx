@@ -1,16 +1,28 @@
-import { BodyShort, Heading, Table } from '@navikt/ds-react'
+import { BodyShort, Heading, Link, Table } from '@navikt/ds-react'
 import React from 'react'
+import { Link as RouterLink } from 'react-router'
+import { byggBehandlingStatusSokUrl } from './lib/drilldown'
 import { statusLabels } from './StatusfordelingOverTidBarChart/utils'
 import type { AldeFordelingStatusMedAktivitet } from './types'
 
 interface Props {
   data: AldeFordelingStatusMedAktivitet[]
+  behandlingstype: string
+  fomDato: string
+  tomDato: string
+  avbruddAktivitetCode: string
 }
 
 // Predefined order for consistent display - must match statusLabels mapping
 const statusOrder = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'FEILENDE', 'DEBUG', 'STOPPET']
 
-export default function FordelingStatusMedAktivitet({ data }: Props) {
+export default function FordelingStatusMedAktivitet({
+  data,
+  behandlingstype,
+  fomDato,
+  tomDato,
+  avbruddAktivitetCode,
+}: Props) {
   // Group data by status
   const groupedByStatus = data.reduce(
     (acc, item) => {
@@ -65,6 +77,7 @@ export default function FordelingStatusMedAktivitet({ data }: Props) {
             <Table.ColumnHeader>Aktivitet</Table.ColumnHeader>
             <Table.ColumnHeader align="right">Antall</Table.ColumnHeader>
             <Table.ColumnHeader align="right">Andel</Table.ColumnHeader>
+            <Table.ColumnHeader>Drilldown</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -91,6 +104,24 @@ export default function FordelingStatusMedAktivitet({ data }: Props) {
                     <Table.DataCell align="right">
                       {total > 0 ? `${((item.antall / total) * 100).toFixed(1)}%` : '0%'}
                     </Table.DataCell>
+                    <Table.DataCell>
+                      <Link
+                        as={RouterLink}
+                        to={byggBehandlingStatusSokUrl({
+                          behandlingType: behandlingstype,
+                          behandlingStatus: status,
+                          aktivitetCode: item.aktivitet || null,
+                          fomDato,
+                          tomDato,
+                          avbruddAktivitetCode,
+                        })}
+                        aria-label={`Vis behandlinger med behandlingsstatus ${statusLabels[status] || status} og aktiviteten ${
+                          item.aktivitet || 'ingen aktivitet'
+                        }`}
+                      >
+                        Vis behandlinger
+                      </Link>
+                    </Table.DataCell>
                   </Table.Row>
                 ))}
                 <Table.Row
@@ -103,6 +134,7 @@ export default function FordelingStatusMedAktivitet({ data }: Props) {
                   <Table.DataCell align="right">
                     {total > 0 ? `${((statusTotal / total) * 100).toFixed(1)}%` : '0%'}
                   </Table.DataCell>
+                  <Table.DataCell />
                 </Table.Row>
               </React.Fragment>
             )

@@ -42,7 +42,7 @@ describe('maanederMellom', () => {
 
 describe('KRITERIE_DEFINISJONER', () => {
   it('har en entry per KriterieType', () => {
-    expect(ALLE_KRITERIE_TYPER.length).toBe(22)
+    expect(ALLE_KRITERIE_TYPER.length).toBe(25)
     for (const type of ALLE_KRITERIE_TYPER) {
       expect(KRITERIE_DEFINISJONER[type]).toBeDefined()
       expect(KRITERIE_DEFINISJONER[type].type).toBe(type)
@@ -56,7 +56,7 @@ describe('KRITERIE_DEFINISJONER', () => {
   })
   it('har minst ett tidsfilter', () => {
     const tidsfiltre = ALLE_KRITERIE_TYPER.filter((t) => KRITERIE_DEFINISJONER[t].tidsfilter)
-    expect(tidsfiltre.length).toBe(4)
+    expect(tidsfiltre.length).toBe(5)
   })
   it('OPPRETTET_AV og TILHORER_BEHANDLINGSSERIE er sensitive', () => {
     expect(isSensitiv({ type: 'OPPRETTET_AV', identer: ['Z990123'] })).toBe(true)
@@ -164,5 +164,56 @@ describe('validerKriterier', () => {
     // Bare den ene perioden er for lang
     expect(r.feil.filter((f) => f.melding.includes('24 måneder')).length).toBe(1)
     expect(r.feil[0].kriterieIndeks).toBe(1)
+  })
+})
+
+describe('HAR_AKTIVITET_I_STATUS', () => {
+  it('teller som tidsfilter når perioden er utfylt', () => {
+    const r = validerKriterier([
+      {
+        type: 'HAR_AKTIVITET_I_STATUS',
+        aktivitetTyper: ['A'],
+        statuser: ['FULLFORT'],
+        fom: '2025-01-01',
+        tom: '2025-01-31',
+      },
+    ])
+    expect(r.manglerTidsfilter).toBe(false)
+    expect(r.feil).toEqual([])
+  })
+
+  it('teller ikke som tidsfilter uten periode', () => {
+    const r = validerKriterier([
+      { type: 'HAR_AKTIVITET_I_STATUS', aktivitetTyper: ['A'], statuser: ['FULLFORT'], fom: '', tom: '' },
+    ])
+    expect(r.manglerTidsfilter).toBe(true)
+    expect(r.feil).toEqual([])
+  })
+
+  it('avviser halvåpen periode', () => {
+    const r = validerKriterier([
+      { type: 'OPPRETTET_I_PERIODE', fom: '2025-01-01', tom: '2025-01-31' },
+      { type: 'HAR_AKTIVITET_I_STATUS', aktivitetTyper: ['A'], statuser: ['FULLFORT'], fom: '2025-01-01', tom: '' },
+    ])
+    expect(r.feil.some((f) => f.melding.includes('både fra- og til-dato'))).toBe(true)
+  })
+
+  it('krever både aktivitetstype og aktivitetstatus', () => {
+    const r = validerKriterier([
+      { type: 'OPPRETTET_I_PERIODE', fom: '2025-01-01', tom: '2025-01-31' },
+      { type: 'HAR_AKTIVITET_I_STATUS', aktivitetTyper: [], statuser: [], fom: '', tom: '' },
+    ])
+    expect(r.feil.some((f) => f.felt === 'aktivitetTyper')).toBe(true)
+    expect(r.feil.some((f) => f.felt === 'statuser')).toBe(true)
+  })
+})
+
+describe('IKKE_HAR_AKTIVITET_AV_TYPE', () => {
+  it('krever minst én aktivitetstype', () => {
+    const r = validerKriterier([
+      { type: 'OPPRETTET_I_PERIODE', fom: '2025-01-01', tom: '2025-01-31' },
+      { type: 'IKKE_HAR_AKTIVITET_AV_TYPE', aktivitetTyper: [] },
+    ])
+    expect(r.feil.some((f) => f.felt === 'aktivitetTyper')).toBe(true)
   })
 })
