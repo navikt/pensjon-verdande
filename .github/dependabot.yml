@@ -42,6 +42,10 @@ updates:
       interval: "daily"
     cooldown:
       default-days: 7
+    ignore:
+      # Node er låst til v24 i Dockerfile.
+      - dependency-name: "cgr-nav/pull-through/nav.no/node"
+        versions: ['>= 25']
 
   - package-ecosystem: github-actions
     directory: "/"
