@@ -8,6 +8,7 @@ import {
 } from 'react-router'
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
+import { stripDataSuffix } from '~/common/utils'
 import { env, isDevelopment } from '~/services/env.server'
 import { logger } from '~/services/logger.server'
 import { exchange } from '~/services/obo.server'
@@ -83,7 +84,7 @@ if (isDevelopment) {
  */
 export async function requireAccessToken(request: Request) {
   function redirectUrl(request: Request) {
-    const searchParams = new URLSearchParams([['returnTo', new URL(request.url).pathname]])
+    const searchParams = new URLSearchParams([['returnTo', stripDataSuffix(new URL(request.url).pathname)]])
     return `/auth/microsoft?${searchParams}`
   }
 

@@ -32,6 +32,7 @@ export const Default: Story = {
     regelendringBerortSakAuto: false,
     skalBrukeKjoreplan: false,
     skalBestilleBrev: 'ALLE',
+    brevstrategi: 'DEFAULT',
     selectedBrevkodeSokerAlderGammeltRegelverk: { value: 'PE_BA_01_001', label: 'Vedtak alderspensjon' },
     selectedBrevkodeSokerAlderNyttRegelverk: undefined,
     selectedBrevkodeSokerUforetrygd: undefined,

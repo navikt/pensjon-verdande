@@ -2,11 +2,10 @@
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - "@navikt/*"
-  - "react-router@7.16.0"
-  - "@react-router/node@7.16.0"
-  - "@react-router/serve@7.16.0"
-  - "@react-router/dev@7.16.0"
-  - "@react-router/express@7.16.0"
 allowBuilds:
   esbuild: false
   lefthook: true
+
+overrides:
+  qs: 6.15.2
+  body-parser: 2.3.0
