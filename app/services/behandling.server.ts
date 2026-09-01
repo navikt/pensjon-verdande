@@ -88,7 +88,9 @@ export async function getAvhengigeBehandlinger(
   if (sort) params.set('sort', sort)
   if (ansvarligTeam) params.set('ansvarligTeam', ansvarligTeam)
 
-  return await apiGet<BehandlingerPage>(`/api/behandling/${behandlingId}/avhengigeBehandlinger?${params}`, request)
+  return await apiGet<BehandlingerPage>(`/api/behandling/${behandlingId}/avhengigeBehandlinger?${params}`, request, {
+    timeoutMs: 60_000,
+  })
 }
 
 export async function search(
@@ -131,11 +133,18 @@ export async function getDetaljertFremdrift(
   return await apiGetOrUndefined<DetaljertFremdriftDTO>(
     `/api/behandling/${forrigeBehandlingId}/detaljertfremdrift`,
     request,
+    { timeoutMs: 60_000 },
   )
 }
 
 export async function getIkkeFullforteAktiviteter(request: Request, behandlingId: number) {
-  return await apiGet<IkkeFullforteAktiviteterDTO>(`/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`, request)
+  return await apiGet<IkkeFullforteAktiviteterDTO>(
+    `/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`,
+    request,
+    {
+      timeoutMs: 60_000,
+    },
+  )
 }
 
 export async function fortsettBehandling(
