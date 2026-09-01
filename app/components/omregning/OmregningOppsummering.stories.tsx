@@ -28,8 +28,6 @@ export const Default: Story = {
     skalSamordne: true,
     skalSletteIverksettingsoppgaver: false,
     skalDistribuereUforevedtak: false,
-    regelendringUt2026: false,
-    regelendringBerortSakAuto: false,
     skalBrukeKjoreplan: false,
     skalBestilleBrev: 'ALLE',
     brevstrategi: 'DEFAULT',
