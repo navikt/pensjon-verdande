@@ -966,6 +966,10 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
               fd.set('operation', OPERATION.startBehandlingNa)
               fetcher.submit(fd, { method: 'post' })
               setOpen(false)
+              setDato(initialDate)
+              setTid(initialTime)
+              setInputValue(formatDDMMYYYY(initialDate))
+              setInputError(undefined)
             }}
             disabled={fetcher.state !== 'idle'}
           >
