@@ -7,9 +7,9 @@ env="q2"
 
 bold=$(tput bold)
 normal=$(tput sgr0)
-white=""
-red=""
-endcolor=""
+white="[97;1m"
+red="[31;1m"
+endcolor="[0m"
 
 envfile=".env"
 
@@ -44,9 +44,6 @@ gcloud auth print-access-token >& /dev/null || (
   fi
 ) || exit 1
 
-# NB: Vanlige teammedlemmer har (via RBAC-rollen "nais:developer") kun create/update/patch/delete på
-# Kubernetes-secrets, ikke get/list. Vi henter derfor secrets via "nais secret get" (Nais API) i stedet
-# for "kubectl get secrets".
 function fetch_nais_secret_env {
     local type=$1
     local team=$2
