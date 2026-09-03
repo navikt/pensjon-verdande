@@ -54,9 +54,20 @@ function fetch_nais_secret_env {
 
     echo -n -e "\t- $type "
 
+    local app_env_output
+    local app_env_status
+    app_env_output=$(nais app env "$app" -t "$team" -e "$environment" -o json 2>&1)
+    app_env_status=$?
+
+    if [[ $app_env_status -ne 0 ]]; then
+        echo
+        echo -e "${red}Klarte ikke å kjøre 'nais app env' for app \"$app\" i \"$environment\":${endcolor}"
+        echo "$app_env_output"
+        exit 1
+    fi
+
     local secret_name
-    secret_name=$(nais app env "$app" -t "$team" -e "$environment" -o json 2>/dev/null \
-      | jq -r --arg v "$var_for_secret_lookup" '[.[] | select(.name == $v and .source.kind == "SECRET")][0].source.name // empty')
+    secret_name=$(echo "$app_env_output" | jq -r --arg v "$var_for_secret_lookup" '[.[] | select(.name == $v and .source.kind == "SECRET")][0].source.name // empty')
 
     if [[ -z "$secret_name" ]]; then
         echo
