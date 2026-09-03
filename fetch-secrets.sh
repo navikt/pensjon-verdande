@@ -54,16 +54,19 @@ function fetch_nais_secret_env {
     echo -n -e "\t- $type "
 
     local app_env_output
-    local app_env_status
-    app_env_output=$(nais app env "$app" -t "$team" -e "$environment" -o json 2>&1)
-    app_env_status=$?
+    local app_env_stderr_file
+    app_env_stderr_file=$(mktemp)
+    app_env_output=$(nais app env "$app" -t "$team" -e "$environment" -o json 2>"$app_env_stderr_file")
+    local app_env_status=$?
 
     if [[ $app_env_status -ne 0 ]]; then
         echo
         echo -e "${red}Klarte ikke å kjøre 'nais app env' for app \"$app\" i \"$environment\":${endcolor}"
-        echo "$app_env_output"
+        cat "$app_env_stderr_file"
+        rm -f "$app_env_stderr_file"
         exit 1
     fi
+    rm -f "$app_env_stderr_file"
 
     local secret_name
     secret_name=$(echo "$app_env_output" | jq -r --arg v "$var_for_secret_lookup" '[.[] | select(.name == $v and .source.kind == "SECRET")][0].source.name // empty')
@@ -75,15 +78,20 @@ function fetch_nais_secret_env {
     fi
 
     local secret_response
+    local secret_stderr_file
+    secret_stderr_file=$(mktemp)
     secret_response=$(nais secret get "$secret_name" -t "$team" --environment "$environment" --with-values \
-      --reason "Henter secrets for lokal utvikling (fetch-secrets.sh)" --output json 2>&1)
+      --reason "Henter secrets for lokal utvikling (fetch-secrets.sh)" --output json 2>"$secret_stderr_file")
+    local secret_status=$?
 
-    if [[ $? -ne 0 ]]; then
+    if [[ $secret_status -ne 0 ]]; then
         echo
         echo -e "${red}Klarte ikke å hente secret \"$secret_name\":${endcolor}"
-        echo "$secret_response"
+        cat "$secret_stderr_file"
+        rm -f "$secret_stderr_file"
         exit 1
     fi
+    rm -f "$secret_stderr_file"
 
     for name in "${A[@]:5}"
     do
