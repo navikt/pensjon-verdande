@@ -13,7 +13,6 @@ endcolor="[0m"
 
 envfile=".env"
 
-command -v base64 >/dev/null 2>&1 || { echo -e >&2 "${red}Du må installere installere base64 (brew install base64 on macOS)${endcolor}"; exit 1; }
 command -v jq >/dev/null 2>&1 || { echo -e >&2 "${red}Du må installere jq (brew install jq on macOS)${endcolor}"; exit 1; }
 command -v nais >/dev/null 2>&1 || { echo -e >&2 "${red}Du må installere nais CLI (https://docs.nais.io/operate/how-to/command-line-access/)${endcolor}"; exit 1; }
 command -v gcloud >/dev/null 2>&1 || { echo -e >&2 "${red}Du må installere gcloud (https://docs.nais.io/operate/how-to/command-line-access/)${endcolor}"; exit 1; }
