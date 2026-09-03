@@ -36,6 +36,7 @@ export const OPERATION = {
   sendTilOppdragPaNytt: 'sendTilOppdragPaNytt',
   stopp: 'stopp',
   endrePlanlagtStartet: 'endrePlanlagtStartet',
+  startBehandlingNa: 'startBehandlingNa',
   taTilDebug: 'taTilDebug',
 } as const
 
@@ -46,8 +47,6 @@ export const OperationSet = new Set<string>(OPERATIONS)
 function isOperation(x: unknown): x is Operation {
   return typeof x === 'string' && OperationSet.has(x)
 }
-
-const getBool = (v: FormDataEntryValue | null) => v === 'true' || v === 'on' || v === '1'
 
 function getField(form: FormData, name: string): { value: string; error?: never } | { value?: never; error: string } {
   const v = form.get(name)
@@ -92,7 +91,7 @@ function operationHandlers(
         handler = () => fjernFraDebug(request, behandlingId)
         break
       case OPERATION.fortsett:
-        handler = () => fortsettBehandling(request, behandlingId, getBool(form.get('nullstillPlanlagtStartet')))
+        handler = () => fortsettBehandling(request, behandlingId)
         break
       case OPERATION.fortsettAvhengigeBehandlinger:
         handler = () => fortsettAvhengigeBehandlinger(request, behandlingId)
@@ -124,6 +123,9 @@ function operationHandlers(
         break
       case OPERATION.endrePlanlagtStartet:
         handler = () => endrePlanlagtStartet(request, behandlingId, String(form.get('nyPlanlagtStartet')))
+        break
+      case OPERATION.startBehandlingNa:
+        handler = () => endrePlanlagtStartet(request, behandlingId, null)
         break
       case OPERATION.taTilDebug:
         handler = () => taTilDebug(request, behandlingId)

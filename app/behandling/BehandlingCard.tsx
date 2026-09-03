@@ -198,7 +198,6 @@ export default function BehandlingCard(props: Props) {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const fortsettModal = useRef<HTMLDialogElement>(null)
   const sendTilOppdragPaNyttModal = useRef<HTMLDialogElement>(null)
 
   function beregnFremdriftProsent(ferdig: number, totalt: number): string {
@@ -325,58 +324,16 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
-  function fortsettBehandling(planlagtStartet: string | null) {
+  function fortsettBehandling() {
     if (hasLink('fortsett')) {
       return (
-        <>
-          {planlagtStartet ? (
-            <>
-              <Tooltip content="Fjerner utsatt tidspunkt og planlagt startet tidspunkt slik at behandling kan kjøres umiddelbart">
-                <Button
-                  variant={'secondary'}
-                  icon={<PlayIcon aria-hidden />}
-                  onClick={() => fortsettModal.current?.showModal()}
-                >
-                  Fortsett
-                </Button>
-              </Tooltip>
-              <Modal ref={fortsettModal} header={{ heading: 'Fortsett behandling' }}>
-                <Modal.Body>
-                  <BodyLong>
-                    Dette er en behandling planlagt kjørt <strong>{formatIsoTimestamp(planlagtStartet)}</strong>. Vil du
-                    kjøre den nå med en gang? Denne handlingen kan ikke angres.
-                  </BodyLong>
-                </Modal.Body>
-                <Modal.Footer>
-                  <fetcher.Form method="post">
-                    <input hidden readOnly name="operation" value={OPERATION.fortsett} />
-
-                    <input type="hidden" name="nullstillPlanlagtStartet" value="true" />
-                    <Button variant={'primary'} icon={<PlayIcon aria-hidden />} name={'fortsett'}>
-                      Kjør planlagt startet behandling nå
-                    </Button>
-                  </fetcher.Form>
-                  <Button type="button" variant="secondary" onClick={() => fortsettModal.current?.close()}>
-                    Avbryt
-                  </Button>
-                </Modal.Footer>
-              </Modal>
-            </>
-          ) : (
-            <Tooltip content="Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart">
-              <fetcher.Form method="post">
-                <Button
-                  variant={'secondary'}
-                  icon={<PlayIcon aria-hidden />}
-                  name="operation"
-                  value={OPERATION.fortsett}
-                >
-                  Fortsett
-                </Button>
-              </fetcher.Form>
-            </Tooltip>
-          )}
-        </>
+        <Tooltip content="Fjerner utsatt tidspunkt slik at behandling kan kjøres umiddelbart">
+          <fetcher.Form method="post">
+            <Button variant={'secondary'} icon={<PlayIcon aria-hidden />} name="operation" value={OPERATION.fortsett}>
+              Fortsett
+            </Button>
+          </fetcher.Form>
+        </Tooltip>
       )
     }
   }
@@ -738,7 +695,7 @@ export default function BehandlingCard(props: Props) {
         </HStack>
 
         <HStack gap="space-16">
-          {fortsettBehandling(props.behandling.planlagtStartet)}
+          {fortsettBehandling()}
 
           {godkjennOpprettelse()}
 
@@ -1000,6 +957,23 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
             disabled={!dato || !!inputError || fetcher.state !== 'idle'}
           >
             {fetcher.state === 'idle' ? 'Lagre' : 'Lagrer...'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              const fd = new FormData()
+              fd.set('operation', OPERATION.startBehandlingNa)
+              fetcher.submit(fd, { method: 'post' })
+              setOpen(false)
+              setDato(initialDate)
+              setTid(initialTime)
+              setInputValue(formatDDMMYYYY(initialDate))
+              setInputError(undefined)
+            }}
+            disabled={fetcher.state !== 'idle'}
+          >
+            Start behandling nå
           </Button>
           <Button
             type="button"
