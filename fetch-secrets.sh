@@ -20,7 +20,7 @@ command -v gcloud >/dev/null 2>&1 || { echo -e >&2 "${red}Du må installere gclo
 if command -v nais >& /dev/null; then
   DISCONNECT_STATUS=$(nais device status | grep -c Disconnected)
 
-  if [ $DISCONNECT_STATUS -eq 1 ]; then
+  if [ "$DISCONNECT_STATUS" -eq 1 ]; then
     read -p "Du er ikke koblet til med naisdevice. Vil du koble til? (J/n) " -n 1 -r -s
     echo
     if [[ $REPLY = "" || $REPLY =~ ^[YyjJ]$ ]]; then
@@ -95,8 +95,17 @@ function fetch_nais_secret_env {
 
     for name in "${A[@]:5}"
     do
+        local key_found
+        key_found=$(echo "$secret_response" | jq -r --arg k "$name" '[.data[] | select(.key == $k)] | length')
+
+        if [[ "$key_found" -eq 0 ]]; then
+            echo
+            echo -e "${red}Advarsel: fant ikke nøkkelen \"$name\" i secret \"$secret_name\". Hopper over.${endcolor}"
+            continue
+        fi
+
         local value
-        value=$(echo "$secret_response" | jq -r --arg k "$name" '.data[] | select(.key == $k) | .value')
+        value=$(echo "$secret_response" | jq -r --arg k "$name" '.data[] | select(.key == $k) | .value' | tr -d '\n')
 
         if [[ "$value" == "******" ]]; then
             echo
