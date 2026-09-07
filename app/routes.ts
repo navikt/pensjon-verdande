@@ -271,8 +271,6 @@ export default [
     route('omregning/behandlinger', 'omregning/omregning.behandlinger.tsx'),
     route('omregning/omregning', 'omregning/omregning.omregning.tsx'),
     route('omregning/omregningsaker', 'omregning/omregning.omregningsaker.tsx'),
-    route('omregningStatistikk', 'omregning/omregningStatistikk._index.tsx'),
-    route('omregningStatistikk/:behandlingsnoekkel.csv', 'omregning/omregningStatistikk.$behandlingsnoekkel.csv.tsx'),
 
     route('opptjening/arlig/omregning', 'opptjening/arlig/opptjening.arlig.omregning.tsx'),
     route('opptjening/manedlig/omregning', 'opptjening/manedlig/opptjening.manedlig.omregning.tsx'),
