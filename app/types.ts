@@ -323,7 +323,6 @@ export type OmregningRequest = {
   toleransegrenseSett: string
   oppgaveSett: string
   oppgavePrefiks: string
-  skalBestilleBrev: string
   skalSletteIverksettingsoppgaver: boolean
   skalSamordne: boolean
   skalDistribuereUforevedtak: boolean
@@ -332,7 +331,7 @@ export type OmregningRequest = {
   regelendringUt2026: boolean
   regelendringBerortSakAuto: boolean
   skalBrukeKjoreplan: boolean
-
+  brevstrategi: string
   brevkoderSoker: { [key: string]: string }
   brevkoderBerorteSaker: { [key: string]: string }
 }
