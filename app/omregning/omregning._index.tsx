@@ -70,7 +70,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
-  const [skalBestilleBrev, setSkalBestilleBrev] = useState('INGEN')
 
   const [selectedBrevkodeSokerAlderGammeltRegelverk, setselectedBrevkodeSokerAlderGammeltRegelverk] = useState<
     ComboboxOption | undefined
@@ -175,11 +174,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     { value: 'FEILRETTING_PREFIKS', label: 'Feilretting prefiks' },
   ]
 
-  const optionBestilleBrev = [
-    { value: 'INGEN', label: 'Ingen' },
-    { value: 'ALLE', label: 'Alle' },
-    { value: 'ALLE_MED_ENDRING_I_BELOP', label: 'Alle med endring i beløp' },
-  ]
   const optionPrioritet = [
     { value: 'ONLINE', label: 'ONLINE - online-kø med høy prioritet' },
     { value: 'ONLINE_BATCH', label: 'ONLINE_BATCH - online-kø med lav prioritet' },
@@ -187,7 +181,9 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   ]
 
   const optionBrevstrategi = [
-    { value: 'DEFAULT', label: 'Brevparametere' },
+    { value: 'INGEN', label: 'Ingen' },
+    { value: 'ALLE', label: 'Alle' },
+    { value: 'KUN_ENDRET', label: 'Alle med endring i beløp' },
     { value: 'BUNNFRADRAG_1G', label: 'Bunnfradrag 1G' },
     { value: 'REVERSERING_HARMONISERING_AV_IFU', label: 'Reversering harmonisering av IFU' },
   ]
@@ -495,21 +491,16 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     optionsmap={optionBrevstrategi}
                     size={'small'}
                   />
-                  <CheckboxGroup legend={'Brevparametere'} hidden={brevstrategi !== 'DEFAULT'}>
+                  <CheckboxGroup
+                    legend={'Brevparametere'}
+                    hidden={brevstrategi !== 'ALLE' && brevstrategi !== 'KUN_ENDRET'}
+                  >
                     Ved å <b>ikke</b> angi brev for berørte saker vil default brevkode bli brukt.
                     <HGrid columns={2} gap="space-48">
                       <Box padding="space-16" background={'raised'} borderColor={'neutral-subtle'} borderWidth="4">
-                        <OmregningSelector
-                          label={'Bestill brev for'}
-                          navn={'skalBestilleBrev'}
-                          value={skalBestilleBrev}
-                          setSelectedValue={setSkalBestilleBrev}
-                          optionsmap={optionBestilleBrev}
-                        />
-
                         <OmregningBrevCheckbox
                           navn={'brevkodeSokerAlderGammeltRegelverk'}
-                          skalVises={skalBestilleBrev !== 'INGEN'}
+                          skalVises={true}
                           tekst={'Velg brevkode for Alder, gammelt regelverk'}
                           selectedBrevKode={selectedBrevkodeSokerAlderGammeltRegelverk}
                           setselectedBrevKode={setselectedBrevkodeSokerAlderGammeltRegelverk}
@@ -517,7 +508,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         />
                         <OmregningBrevCheckbox
                           navn={'brevkodeSokerAlderNyttRegelverk'}
-                          skalVises={skalBestilleBrev !== 'INGEN'}
+                          skalVises={true}
                           tekst={'Velg brevkode for Alder, nytt regelverk'}
                           selectedBrevKode={selectedBrevkodeSokerAlderNyttRegelverk}
                           setselectedBrevKode={setselectedBrevkodeSokerAlderNyttRegelverk}
@@ -525,7 +516,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         />
                         <OmregningBrevCheckbox
                           navn={'brevkodeSokerUforetrygd'}
-                          skalVises={skalBestilleBrev !== 'INGEN'}
+                          skalVises={true}
                           tekst={'Velg brevkode for Uføretrygd'}
                           selectedBrevKode={selectedBrevkodeSokerUforetrygd}
                           setselectedBrevKode={setselectedBrevkodeSokerUforetrygd}
@@ -533,7 +524,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         />
                         <OmregningBrevCheckbox
                           navn={'brevkodeSokerBarnepensjon'}
-                          skalVises={skalBestilleBrev !== 'INGEN'}
+                          skalVises={true}
                           tekst={'Velg brevkode for Barnepensjon'}
                           selectedBrevKode={selectedBrevkodeSokerBarnepensjon}
                           setselectedBrevKode={setselectedBrevkodeSokerBarnepensjon}
@@ -541,7 +532,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         />
                         <OmregningBrevCheckbox
                           navn={'brevkodeSokerAFP'}
-                          skalVises={skalBestilleBrev !== 'INGEN'}
+                          skalVises={true}
                           tekst={'Velg brevkode for AFP'}
                           selectedBrevKode={selectedBrevkodeSokerAFP}
                           setselectedBrevKode={setselectedBrevkodeSokerAFP}
@@ -549,7 +540,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         />
                         <OmregningBrevCheckbox
                           navn={'brevkodeSokerGjenlevendepensjon'}
-                          skalVises={skalBestilleBrev !== 'INGEN'}
+                          skalVises={true}
                           tekst={'Velg brevkode for Gjenlevendepensjon'}
                           selectedBrevKode={selectedBrevkodeSokerGjenlevendepensjon}
                           setselectedBrevKode={setselectedBrevkodeSokerGjenlevendepensjon}
@@ -557,7 +548,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         />
                         <OmregningBrevCheckbox
                           navn={'brevkodeSokerAFPPrivat'}
-                          skalVises={skalBestilleBrev !== 'INGEN'}
+                          skalVises={true}
                           tekst={'Velg brevkode for AFP Privat'}
                           selectedBrevKode={selectedBrevkodeSokerAFPPrivat}
                           setselectedBrevKode={setselectedBrevkodeSokerAFPPrivat}
@@ -654,7 +645,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
             >
               <Modal.Body>
                 <OmregningOppsummering
-                  skalBestilleBrev={skalBestilleBrev}
                   brevstrategi={brevstrategi}
                   skalSendeBrevBerorteSaker={skalSendeBrevBerorteSaker}
                   selectedBrevkodeSokerAlderGammeltRegelverk={selectedBrevkodeSokerAlderGammeltRegelverk}
@@ -757,7 +747,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       `skalSletteIverksettingsoppgaver: ${skalSletteIverksettingsoppgaver}`,
       `skalDistribuereUførevedtak: ${skalDistribuereUforevedtak}`,
       ``,
-      `skalBestilleBrevForSøker: ${skalBestilleBrev}`,
       `skalSendeBrevBerørteSaker: ${skalSendeBrevBerorteSaker}`,
       ``,
       `regelendringUt2026: ${regelendringUt2026}`,
