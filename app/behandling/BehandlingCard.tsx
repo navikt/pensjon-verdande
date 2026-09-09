@@ -51,7 +51,7 @@ import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector
 import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTilManuellMedKontrollpunktModal'
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { Entry } from '~/components/entry/Entry'
-import { harRolle } from '~/components/venstre-meny/VenstreMeny'
+import { harRolle, harTilgang, TILGANG_BEHANDLINGSERIE } from '~/components/venstre-meny/VenstreMeny'
 import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
 
 export interface Props {
@@ -704,7 +704,7 @@ export default function BehandlingCard(props: Props) {
           {fortsettAvhengigeBehandlinger()}
 
           {!props.behandling.erStartet && (
-            <EndrePlanlagtStartetButton planlagtStartet={props.behandling.planlagtStartet} />
+            <EndrePlanlagtStartetButton planlagtStartet={props.behandling.planlagtStartet} me={props.me} />
           )}
 
           {debugButton()}
@@ -800,7 +800,15 @@ export default function BehandlingCard(props: Props) {
   )
 }
 
-export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStartet?: string | null }) {
+export function EndrePlanlagtStartetButton({
+  planlagtStartet,
+  me,
+}: {
+  planlagtStartet?: string | null
+  me: MeResponse
+}) {
+  const harTilgangTilAEndre = !!harTilgang(me, TILGANG_BEHANDLINGSERIE)
+
   const pad = (n: number) => String(n).padStart(2, '0')
   const formatDDMMYYYY = (d?: Date) => (d ? `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}` : '')
 
@@ -884,6 +892,7 @@ export function EndrePlanlagtStartetButton({ planlagtStartet }: { planlagtStarte
           type="button"
           variant="secondary"
           icon={<PlayIcon aria-hidden />}
+          disabled={!harTilgangTilAEndre}
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
