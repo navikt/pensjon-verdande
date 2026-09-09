@@ -180,13 +180,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     { value: 'BATCH', label: 'BATCH - egen batch-kø med HPEN' },
   ]
 
-  const optionBrevstrategi = [
-    { value: 'INGEN', label: 'Ingen' },
-    { value: 'ALLE', label: 'Alle' },
-    { value: 'KUN_ENDRET', label: 'Alle med endring i beløp' },
-    { value: 'BUNNFRADRAG_1G', label: 'Bunnfradrag 1G' },
-    { value: 'REVERSERING_HARMONISERING_AV_IFU', label: 'Reversering harmonisering av IFU' },
-  ]
+  const optionBrevstrategi = omregningInit.brevstrategier
 
   const optionAnsvarligTeam = (Object.entries(Team) as [keyof typeof Team, string][]).map(([value, label]) => ({
     value,
@@ -222,7 +216,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [oppgaveSett, setOppgaveSett] = useState(optionOppgaveSett[0].value)
   const [oppgavePrefiks, setOppgavePrefiks] = useState(optionOppgavePrefiks[0].value)
   const [prioritet, setPrioritet] = useState(optionPrioritet[1].value)
-  const [brevstrategi, setBrevstrategi] = useState(optionBrevstrategi[0].value)
+  const [brevstrategi, setBrevstrategi] = useState(Object.values(optionBrevstrategi)[0])
   const [ansvarligTeam, setAnsvarligTeam] = useState<string>('PESYS_ALDER')
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -488,7 +482,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     navn={'brevstrategi'}
                     value={brevstrategi}
                     setSelectedValue={setBrevstrategi}
-                    optionsmap={optionBrevstrategi}
+                    optionsmap={Object.entries(optionBrevstrategi).map(([key, value]) => ({
+                      value: key,
+                      label: value,
+                    }))}
                     size={'small'}
                   />
                   <CheckboxGroup
