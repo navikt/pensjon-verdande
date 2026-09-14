@@ -29,9 +29,11 @@ export type Props = {
   showIconMenu: boolean
 }
 
+export const TILGANG_BEHANDLINGSERIE = 'BEHANDLINGSERIE'
+
 const administrasjonMeny = [
   ['SCHEDULER_STYRING', `/scheduler-styring`, 'Scheduler-styring'],
-  ['BEHANDLINGSERIE', `/behandlingserie`, 'Behandlingserie'],
+  [TILGANG_BEHANDLINGSERIE, `/behandlingserie`, 'Behandlingserie'],
   ['UGYLDIGGJOR_ETTEROPPGJOR_HISTORIKK_UFORE', `/etteroppgjor-historikk-ufore`, 'Etteroppgjørhistorikk Uføre'],
   ['INFOBANNER_PSAK', `/infobanner`, 'Infobanner i PSAK'],
   ['MANGLENDE_FOREIGN_KEY_INDEXER', `/manglende-foreign-key-indexer`, 'Manglende indekser for fjernnøkler'],
