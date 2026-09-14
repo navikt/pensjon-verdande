@@ -261,6 +261,7 @@ export default function FeilRegistrerKravOgOppgavePage() {
                   value={oppgavetekst}
                   name="oppgavetekst"
                   minRows={4}
+                  required
                 />
                 <Textarea
                   label="Kommentar (valgfritt)"
