@@ -34,7 +34,7 @@ app.use(compression())
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
 
-app.set("trust proxy", 1);
+app.set('trust proxy', 1);
 
 // Vite fingerprints its assets so we can cache forever.
 app.use('/assets', express.static('build/client/assets', { immutable: true, maxAge: '1y' }))
