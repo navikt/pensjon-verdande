@@ -339,6 +339,7 @@ export type OmregningInit = {
   toleransegrenser: string[]
   oppgaveSett: string[]
   batchbrevtyper: string[]
+  brevstrategier: Record<string, string>
 }
 export type OmregningInput = {
   saker: string[]
