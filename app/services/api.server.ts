@@ -39,7 +39,7 @@ async function apiFetch<T>(
 ): Promise<T | undefined> {
   const ctx = await resolveCtx(requestCtx)
   const url = `${env.penUrl}${path}`
-  const { signal, cancel } = withTimeout(45_000)
+  const { signal, cancel } = withTimeout(60_000)
   const start = performance.now()
   try {
     const headers: HeadersInit = { ...buildHeaders(ctx) }
@@ -106,7 +106,7 @@ export async function apiGetRawStringOrUndefined(
 export async function apiGetStream(path: string, requestCtx: RequestCtx | Request): Promise<Response> {
   const ctx = await resolveCtx(requestCtx)
   const url = `${env.penUrl}${path}`
-  const { signal, cancel } = withTimeout(45_000)
+  const { signal, cancel } = withTimeout(60_000)
   const start = performance.now()
   try {
     const headers = { ...buildHeaders(ctx), Accept: '*/*' }
