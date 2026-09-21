@@ -1,4 +1,4 @@
-import { BodyLong, Box, Button, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, Checkbox, Heading, Select, TextField, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { Team } from '~/common/decodeTeam'
 import { apiPost } from '~/services/api.server'
@@ -47,9 +47,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
     throw new Error(`Ugyldig uttrekkstrategi: ${uttrekkStrategi}`)
   }
 
+  const dryRun = String(formData.get('dryRun') ?? true)
+
   const response = await apiPost<{ behandlingId: number }>(
     '/api/behandling/samordning/opprett',
-    { funksjonellIdentifikator, behandlingsnøkkel, ansvarligTeam, uttrekkStrategi },
+    { funksjonellIdentifikator, behandlingsnøkkel, ansvarligTeam, uttrekkStrategi, dryRun },
     request,
   )
 
@@ -104,6 +106,9 @@ export default function SendTilSamordning() {
               </option>
             ))}
           </Select>
+          <Checkbox name={'dryRun'} defaultChecked={true}>
+            "Dry run"
+          </Checkbox>
           <Button type="submit" disabled={submitting}>
             {submitting ? 'Oppretter…' : 'Opprett behandling'}
           </Button>
