@@ -32,6 +32,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
     throw new Error('Funksjonell identifikator må fylles ut')
   }
 
+  const behandlingsnøkkel = String(formData.get('behandlingsnøkkel') ?? '').trim()
+  if (!behandlingsnøkkel) {
+    throw new Error('Behandlingsnøkkel må fylles ut')
+  }
+
   const ansvarligTeam = String(formData.get('ansvarligTeam') ?? '')
   if (!isTeam(ansvarligTeam)) {
     throw new Error(`Ugyldig ansvarlig team: ${ansvarligTeam}`)
@@ -44,7 +49,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   const response = await apiPost<{ behandlingId: number }>(
     '/api/behandling/samordning/opprett',
-    { funksjonellIdentifikator, ansvarligTeam, uttrekkStrategi },
+    { funksjonellIdentifikator, behandlingsnøkkel, ansvarligTeam, uttrekkStrategi },
     request,
   )
 
@@ -76,6 +81,12 @@ export default function SendTilSamordning() {
             description="Unik identifikator for kjøringen"
             size="small"
             name="funksjonellIdentifikator"
+          />
+          <TextField
+            label="Behandlingsnøkkel"
+            description="Nøkkel som brukes til å finne saker for uttrekket"
+            size="small"
+            name="behandlingsnøkkel"
           />
           <Select label="Ansvarlig team" size="small" name="ansvarligTeam" defaultValue="PESYS_UFORE">
             {TEAM_KODER.map((kode) => (
