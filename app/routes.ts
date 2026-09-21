@@ -259,6 +259,8 @@ export default [
 
     route('scheduler-styring', 'vedlikehold/scheduler-styring.tsx'),
 
+    route('send-til-samordning', 'vedlikehold/send-til-samordning.tsx'),
+
     route('manuell-behandling', 'manuell-behandling/index.tsx'),
     route('manuell-behandling-uttrekk', 'manuell-behandling/uttrekk.tsx'),
 
