@@ -81,12 +81,14 @@ export default function SendTilSamordning() {
             description="Unik identifikator for kjøringen"
             size="small"
             name="funksjonellIdentifikator"
+            required
           />
           <TextField
             label="Behandlingsnøkkel"
             description="Nøkkel som brukes til å finne saker for uttrekket"
             size="small"
             name="behandlingsnøkkel"
+            required
           />
           <Select label="Ansvarlig team" size="small" name="ansvarligTeam" defaultValue="PESYS_UFORE">
             {TEAM_KODER.map((kode) => (
