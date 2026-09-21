@@ -28,7 +28,7 @@ jobs:
       - name: Fjern dev dependencies
         run: pnpm prune --prod
 
-      - uses: nais/docker-build-push@8e41f1f58749b9248e376c25d33bfbdd2b1163c0
+      - uses: nais/docker-build-push@0e73849f69ff260ee27597553c0a7848ca4e9795
         if: github.ref == 'refs/heads/main'
         id: docker-push
         with:
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: nais/deploy/actions/deploy@849e900e3cfa7faf7ad1532bb3a3e6499c932199 # v2
+      - uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
         name: 'Deploy to NAIS'
         env:
           IMAGE: "${{ needs.build.outputs.image }}"
@@ -116,6 +116,6 @@ jobs:
 
       - id: deploy
         name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
         with:
           token: ${{ github.token }}

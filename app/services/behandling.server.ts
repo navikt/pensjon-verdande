@@ -23,6 +23,9 @@ import type {
   SchedulerStatusResponse,
 } from '~/types'
 
+// Enkelte tunge aggregeringsendepunkter kan bruke lengre tid enn standard timeout på 15s
+const HEAVY_AGGREGATION_TIMEOUT_MS = 60_000
+
 export async function getSchedulerStatus(request: Request): Promise<SchedulerStatusResponse> {
   return await apiGet<SchedulerStatusResponse>('/api/behandling/scheduler-status', request)
 }
@@ -88,7 +91,9 @@ export async function getAvhengigeBehandlinger(
   if (sort) params.set('sort', sort)
   if (ansvarligTeam) params.set('ansvarligTeam', ansvarligTeam)
 
-  return await apiGet<BehandlingerPage>(`/api/behandling/${behandlingId}/avhengigeBehandlinger?${params}`, request)
+  return await apiGet<BehandlingerPage>(`/api/behandling/${behandlingId}/avhengigeBehandlinger?${params}`, request, {
+    timeoutMs: HEAVY_AGGREGATION_TIMEOUT_MS,
+  })
 }
 
 export async function search(
@@ -131,11 +136,18 @@ export async function getDetaljertFremdrift(
   return await apiGetOrUndefined<DetaljertFremdriftDTO>(
     `/api/behandling/${forrigeBehandlingId}/detaljertfremdrift`,
     request,
+    { timeoutMs: HEAVY_AGGREGATION_TIMEOUT_MS },
   )
 }
 
 export async function getIkkeFullforteAktiviteter(request: Request, behandlingId: number) {
-  return await apiGet<IkkeFullforteAktiviteterDTO>(`/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`, request)
+  return await apiGet<IkkeFullforteAktiviteterDTO>(
+    `/api/behandling/${behandlingId}/ikkeFullforteAktiviteter`,
+    request,
+    {
+      timeoutMs: HEAVY_AGGREGATION_TIMEOUT_MS,
+    },
+  )
 }
 
 export async function fortsettBehandling(request: Request, behandlingId: string): Promise<void> {
