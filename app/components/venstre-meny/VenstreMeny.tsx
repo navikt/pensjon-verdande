@@ -67,6 +67,7 @@ const batcherMeny = [
   ],
   ['REGULERING_LES', `/batch/regulering`, 'Regulering'],
   ['REGELENDRING2026_VARSEL', `/regelendring2026`, 'Regelendring uføretrygd 2026'],
+  ['SAMORDNING_SKRIV', '/send-til-samordning', 'Send til samordning'],
   ['UFORE_VARSLER', `/unge-med-uforetrygd-varsler`, 'Unge med uføretrygd varsel'],
 ]
 
