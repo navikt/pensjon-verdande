@@ -93,11 +93,11 @@ importers:
         specifier: ^3.7.0
         version: 3.7.0
       zod:
-        specifier: ^4.5.4
-        version: 4.5.4
+        specifier: ^4.6.5
+        version: 4.6.5
       zod-form-data:
         specifier: ^3.0.3
-        version: 3.0.3(zod@4.5.4)
+        version: 3.0.3(zod@4.6.5)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.12
@@ -3241,8 +3241,8 @@ packages:
     peerDependencies:
       zod: '>= 3.25.0'
 
-  zod@4.5.4:
-    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
 snapshots:
 
@@ -6114,9 +6114,9 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  zod-form-data@3.0.3(zod@4.5.4):
+  zod-form-data@3.0.3(zod@4.6.5):
     dependencies:
       '@rvf/set-get': 7.0.3
-      zod: 4.5.4
+      zod: 4.6.5
 
-  zod@4.5.4: {}
+  zod@4.6.5: {}
