@@ -33,7 +33,7 @@
     "@react-router/node": "8.3.1",
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",
-    "compression": "^1.8.1",
+    "compression": "^1.8.2",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "express": "^5.2.1",
