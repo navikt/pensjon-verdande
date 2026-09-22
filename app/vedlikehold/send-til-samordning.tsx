@@ -47,7 +47,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     throw new Error(`Ugyldig uttrekkstrategi: ${uttrekkStrategi}`)
   }
 
-  const dryRun = String(formData.get('dryRun') ?? 'false') === 'true'
+  const dryRun = formData.get('dryRun')
 
   const response = await apiPost<{ behandlingId: number }>(
     '/api/behandling/samordning/opprett',
