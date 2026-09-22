@@ -47,7 +47,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     throw new Error(`Ugyldig uttrekkstrategi: ${uttrekkStrategi}`)
   }
 
-  const dryRun = String(formData.get('dryRun') ?? true)
+  const dryRun = String(formData.get('dryRun')) === 'on'
 
   const response = await apiPost<{ behandlingId: number }>(
     '/api/behandling/samordning/opprett',
@@ -106,7 +106,7 @@ export default function SendTilSamordning() {
               </option>
             ))}
           </Select>
-          <Checkbox name={'dryRun'} defaultChecked={true}>
+          <Checkbox name="dryRun" defaultChecked={true}>
             "Dry run"
           </Checkbox>
           <Button type="submit" disabled={submitting}>
