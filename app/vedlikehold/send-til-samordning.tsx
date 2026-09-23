@@ -72,8 +72,8 @@ export default function SendTilSamordning() {
           Send til samordning
         </Heading>
         <BodyLong>
-          Starter en samordningsuttrekksbehandling som plukker ut vedtak som skal sendes til samordning, basert på valgt
-          uttrekkstrategi.
+          Starter en samordningsbehandling som plukker ut vedtak som skal sendes til samordning, basert på valgt
+          uttrekksstrategi. Vedtak hentes fra en tidligere behandling basert på behandlingsId.
         </BodyLong>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
@@ -87,8 +87,10 @@ export default function SendTilSamordning() {
           />
           <TextField
             label="Behandlingsnøkkel"
-            description="Nøkkel som brukes til å finne saker for uttrekket"
+            description="Nøkkel (behandlingsId) som brukes til å finne saker for uttrekket"
             size="small"
+            pattern="\d+"
+            inputMode="numeric"
             name="behandlingsnøkkel"
             required
           />
