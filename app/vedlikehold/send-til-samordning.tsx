@@ -72,8 +72,9 @@ export default function SendTilSamordning() {
           Send til samordning
         </Heading>
         <BodyLong>
-          Starter en samordningsbehandling som plukker ut vedtak som i <b>ettertid</b> skal sendes til samordning,
-          basert på valgt uttrekksstrategi. Vedtak hentes fra en tidligere behandling basert på behandlingId.
+          Starter en samordningsbehandling som plukker ut vedtak som i <strong>ettertid</strong> skal sendes til
+          samordning, basert på valgt uttrekksstrategi. Vedtak hentes fra en tidligere behandling basert på
+          behandlingId.
         </BodyLong>
         <BodyShort weight={'semibold'}>
           NB! Det gjøres ingen oppdatering av vedtakstatus, og det ventes heller ikke på svar fra SAM.
