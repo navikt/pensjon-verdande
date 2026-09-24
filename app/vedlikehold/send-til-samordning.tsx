@@ -1,4 +1,4 @@
-import { BodyLong, BodyShort, Box, Button, Checkbox, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, Checkbox, Heading, LocalAlert, Select, TextField, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { Team } from '~/common/decodeTeam'
 import { apiPost } from '~/services/api.server'
@@ -76,9 +76,14 @@ export default function SendTilSamordning() {
           samordning, basert på valgt uttrekksstrategi. Vedtak hentes fra en tidligere behandling basert på
           behandlingId.
         </BodyLong>
-        <BodyShort weight={'semibold'}>
-          NB! Det gjøres ingen oppdatering av vedtakstatus, og det ventes heller ikke på svar fra SAM.
-        </BodyShort>
+        <LocalAlert status="warning">
+          <LocalAlert.Header>
+            <LocalAlert.Title>NB!</LocalAlert.Title>
+          </LocalAlert.Header>
+          <LocalAlert.Content>
+            Det gjøres ingen oppdatering av vedtakstatus, og det ventes heller ikke på svar fra SAM.
+          </LocalAlert.Content>
+        </LocalAlert>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'space-16'}>
