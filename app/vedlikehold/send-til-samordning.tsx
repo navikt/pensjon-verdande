@@ -1,4 +1,4 @@
-import { BodyLong, Box, Button, Checkbox, Heading, Select, TextField, VStack } from '@navikt/ds-react'
+import { BodyLong, Box, Button, Checkbox, Heading, LocalAlert, Select, TextField, VStack } from '@navikt/ds-react'
 import { Form, redirect, useNavigation } from 'react-router'
 import { Team } from '~/common/decodeTeam'
 import { apiPost } from '~/services/api.server'
@@ -72,9 +72,18 @@ export default function SendTilSamordning() {
           Send til samordning
         </Heading>
         <BodyLong>
-          Starter en samordningsbehandling som plukker ut vedtak som skal sendes til samordning, basert på valgt
-          uttrekksstrategi. Vedtak hentes fra en tidligere behandling basert på behandlingsId.
+          Starter en samordningsbehandling som plukker ut vedtak som i <strong>ettertid</strong> skal sendes til
+          samordning, basert på valgt uttrekksstrategi. Vedtak hentes fra en tidligere behandling basert på
+          behandlingId.
         </BodyLong>
+        <LocalAlert status="warning">
+          <LocalAlert.Header>
+            <LocalAlert.Title>NB!</LocalAlert.Title>
+          </LocalAlert.Header>
+          <LocalAlert.Content>
+            Det gjøres ingen oppdatering av vedtakstatus, og det ventes heller ikke på svar fra SAM.
+          </LocalAlert.Content>
+        </LocalAlert>
       </Box>
       <Form method="post" style={{ width: '20em' }}>
         <VStack gap={'space-16'}>
@@ -87,7 +96,7 @@ export default function SendTilSamordning() {
           />
           <TextField
             label="Behandlingsnøkkel"
-            description="Nøkkel (behandlingsId) som brukes til å finne saker for uttrekket"
+            description="Nøkkel (behandlingId) som brukes til å finne saker for uttrekket"
             size="small"
             pattern="\d+"
             inputMode="numeric"
