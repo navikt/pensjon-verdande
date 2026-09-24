@@ -55,7 +55,7 @@
     "zod-form-data": "^3.0.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.13",
+    "@biomejs/biome": "2.5.14",
     "@react-router/dev": "8.3.1",
     "@react-router/serve": "8.3.1",
     "@storybook/addon-vitest": "^10.6.0",
