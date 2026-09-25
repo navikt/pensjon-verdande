@@ -112,7 +112,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     ComboboxOption | undefined
   >(defaultbatchbrevtypeOption)
 
-  const [skalSamordne, setSkalSamordne] = useState(false)
+  const [skalSamordne, setSkalSamordne] = useState(true)
   const [skalSendeBrevBerorteSaker, setSkalSendeBrevBerorteSaker] = useState(true)
   const [behandleApneKrav, setBehandleApneKrav] = useState(false)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
