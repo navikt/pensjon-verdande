@@ -56,6 +56,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const UFOREUT = (formData.get('UFOREUT') as string) === 'true'
   const avstemmingsdato = formData.get('avstemmingsdato') as string
   const planlagtStartet = formData.get('kjoeretidspunkt') as string
+  const dryRun = (formData.get('dryRun') as string) === 'true'
 
   await apiPost(
     '/api/vedtak/avstemming/konsistens/start',
@@ -71,6 +72,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       uforeut: UFOREUT,
       avstemmingsdato: avstemmingsdato,
       planlagtStartet: planlagtStartet,
+      dryRun: dryRun,
     },
     request,
   )
@@ -173,6 +175,16 @@ export default function Konsistensavstemming({ loaderData }: Route.ComponentProp
             name="kjoeretidspunkt"
             value={selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss") : ''}
           />
+          <CheckboxGroup legend="Modus">
+            <Checkbox
+              name={'dryRun'}
+              value={'true'}
+              description={'Kjør uten å faktisk sende meldinger til OS'}
+              defaultChecked={false}
+            >
+              Dry run
+            </Checkbox>
+          </CheckboxGroup>
           <Button
             type="submit"
             disabled={avstemmingsdato === '' || !areDatesValid(avstemmingsdato) || selectedDate === null}
