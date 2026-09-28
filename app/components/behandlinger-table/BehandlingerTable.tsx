@@ -12,7 +12,6 @@ import {
   Tag,
   useRangeDatepicker,
 } from '@navikt/ds-react'
-import type { JSX } from 'react'
 import { useState } from 'react'
 import { Link, useFetcher, useSearchParams } from 'react-router'
 import { formatIsoTimestamp, toIsoDate } from '~/common/date'
