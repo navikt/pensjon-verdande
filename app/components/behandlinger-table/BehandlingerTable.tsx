@@ -93,89 +93,18 @@ export default function BehandlingerTable({
     setSearchParams(searchParams)
   }
 
-  function StatusOptions() {
-    return (
-      <Select
-        label="Status"
-        defaultValue={searchParams.get('status') || undefined}
-        onChange={(value) => {
-          searchParams.set('status', value.target.value)
-          setSearchParams(searchParams, {
-            preventScrollReset: true,
-          })
-        }}
-        size="small"
-      >
-        <option value="">Alle statuser</option>
-        <option value="DEBUG">Debug</option>
-        <option value="FEILENDE">Feilende</option>
-        <option value="FULLFORT">Fullført</option>
-        <option value="OPPRETTET">Opprettet</option>
-        <option value="STOPPET">Stoppet</option>
-        <option value="UNDER_BEHANDLING">Under behandling</option>
-      </Select>
-    )
-  }
-
-  function AnsvarligTeamOptions() {
-    return (
-      <Select
-        label="Ansvarlig team"
-        defaultValue={searchParams.get('ansvarligTeam') || undefined}
-        onChange={(value) => {
-          searchParams.set('ansvarligTeam', value.target.value)
-          setSearchParams(searchParams, {
-            preventScrollReset: true,
-          })
-        }}
-        size="small"
-      >
-        <option value="">Alle team</option>
-
-        {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
-          <option key={key} value={key}>
-            {label}
-          </option>
-        ))}
-      </Select>
-    )
-  }
-
-  function BehandlingtypeOptions() {
-    let ekstraBehandlingType: JSX.Element | undefined
+  const getBehandlingTypeOptions = () => {
+    const ekstraBehandlingType = []
     const currentBehandlingType = searchParams.get('behandlingType')
     if (currentBehandlingType && !behandlingerResponse.behandlingTyper.includes(currentBehandlingType)) {
-      ekstraBehandlingType = <option value={currentBehandlingType}>{decodeBehandling(currentBehandlingType)}</option>
-    } else {
-      ekstraBehandlingType = undefined
+      ekstraBehandlingType.push({ value: currentBehandlingType, label: decodeBehandling(currentBehandlingType) })
     }
 
-    return (
-      <Select
-        label="Type"
-        defaultValue={searchParams.get('behandlingType') || undefined}
-        onChange={(value) => {
-          searchParams.set('behandlingType', value.target.value)
-          setSearchParams(searchParams, {
-            preventScrollReset: true,
-          })
-        }}
-        size="small"
-      >
-        <option value="">Alle typer</option>
-        {ekstraBehandlingType}
+    const behandlingstyper = behandlingerResponse.behandlingTyper
+      ?.sort((a, b) => decodeBehandling(a).localeCompare(decodeBehandling(b), 'nb', { sensitivity: 'base' }))
+      .map((type) => ({ value: type, label: decodeBehandling(type) }))
 
-        {behandlingerResponse.behandlingTyper
-          ?.sort((a, b) => decodeBehandling(a).localeCompare(decodeBehandling(b), 'nb', { sensitivity: 'base' }))
-          .map((type) => {
-            return (
-              <option key={type} value={type}>
-                {decodeBehandling(type)}
-              </option>
-            )
-          })}
-      </Select>
-    )
+    return [{ value: '', label: 'Alle typer' }, ...ekstraBehandlingType, ...behandlingstyper]
   }
 
   const toggleSelectedRow = (behandlingId: number) =>
@@ -206,9 +135,77 @@ export default function BehandlingerTable({
               </HStack>
             </DatePicker>
           )}
-          {visBehandlingTypeSoek && <BehandlingtypeOptions />}
-          {visAnsvarligTeamSoek && <AnsvarligTeamOptions />}
-          {visStatusSoek && <StatusOptions />}
+          {visBehandlingTypeSoek && (
+            <Select
+              label="Type"
+              defaultValue={searchParams.get('behandlingType') || undefined}
+              onChange={(value) => {
+                searchParams.set('behandlingType', value.target.value)
+                setSearchParams(searchParams, {
+                  preventScrollReset: true,
+                })
+              }}
+              size="small"
+            >
+              {getBehandlingTypeOptions().map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+
+              {/* {behandlingerResponse.behandlingTyper
+                ?.sort((a, b) => decodeBehandling(a).localeCompare(decodeBehandling(b), 'nb', { sensitivity: 'base' }))
+                .map((type) => {
+                  return (
+                    <option key={type} value={type}>
+                      {decodeBehandling(type)}
+                    </option>
+                  )
+                })} */}
+            </Select>
+          )}
+          {visAnsvarligTeamSoek && (
+            <Select
+              label="Ansvarlig team"
+              defaultValue={searchParams.get('ansvarligTeam') || undefined}
+              onChange={(value) => {
+                searchParams.set('ansvarligTeam', value.target.value)
+                setSearchParams(searchParams, {
+                  preventScrollReset: true,
+                })
+              }}
+              size="small"
+            >
+              <option value="">Alle team</option>
+
+              {(Object.entries(Team) as [keyof typeof Team, string][]).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          )}
+          {visStatusSoek && (
+            <Select
+              label="Status"
+              defaultValue={searchParams.get('status') || undefined}
+              onChange={(value) => {
+                searchParams.set('status', value.target.value)
+                setSearchParams(searchParams, {
+                  preventScrollReset: true,
+                })
+              }}
+              size="small"
+            >
+              <option value="">Alle statuser</option>
+              <option value="DEBUG">Debug</option>
+              <option value="FEILENDE">Feilende</option>
+              <option value="FULLFORT">Fullført</option>
+              <option value="OPPRETTET">Opprettet</option>
+              <option value="STOPPET">Stoppet</option>
+              <option value="UNDER_BEHANDLING">Under behandling</option>
+            </Select>
+          )}
         </HStack>
       )}
       <Table
