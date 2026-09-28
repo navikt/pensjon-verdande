@@ -152,16 +152,6 @@ export default function BehandlingerTable({
                   {label}
                 </option>
               ))}
-
-              {/* {behandlingerResponse.behandlingTyper
-                ?.sort((a, b) => decodeBehandling(a).localeCompare(decodeBehandling(b), 'nb', { sensitivity: 'base' }))
-                .map((type) => {
-                  return (
-                    <option key={type} value={type}>
-                      {decodeBehandling(type)}
-                    </option>
-                  )
-                })} */}
             </Select>
           )}
           {visAnsvarligTeamSoek && (
