@@ -196,19 +196,19 @@ export default function BehandlingerTable({
 
   return (
     <Box background={'default'} style={{ padding: '6px' }} borderRadius="4" shadow="dialog">
-      {visTidsperiodeSoek && (
-        <HStack gap="space-16" align="end" paddingBlock="space-8 space-32" paddingInline="space-6">
+      <HStack gap="space-16" align="end" paddingBlock="space-8 space-32" paddingInline="space-6">
+        {visTidsperiodeSoek && (
           <DatePicker {...datepickerProps}>
             <HStack wrap gap="space-16" align="end">
               <DatePicker.Input size="small" {...fromInputProps} label="Fra dato" />
               <DatePicker.Input size="small" {...toInputProps} label="Til dato" />
             </HStack>
           </DatePicker>
-          {visBehandlingTypeSoek && <BehandlingtypeOptions />}
-          {visAnsvarligTeamSoek && <AnsvarligTeamOptions />}
-          {visStatusSoek && <StatusOptions />}
-        </HStack>
-      )}
+        )}
+        {visBehandlingTypeSoek && <BehandlingtypeOptions />}
+        {visAnsvarligTeamSoek && <AnsvarligTeamOptions />}
+        {visStatusSoek && <StatusOptions />}
+      </HStack>
       <Table
         size={'medium'}
         onSortChange={onSortChange}
@@ -224,7 +224,7 @@ export default function BehandlingerTable({
         <Table.Header>
           <Table.Row style={{ whiteSpace: 'nowrap' }}>
             {inkluderFortsett && (
-              <Table.DataCell>
+              <Table.ColumnHeader>
                 <Checkbox
                   checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
                   disabled={behandlingerResponse.content.filter((it) => it.utsattTil != null).length === 0}
@@ -245,7 +245,7 @@ export default function BehandlingerTable({
                 >
                   Velg alle rader
                 </Checkbox>
-              </Table.DataCell>
+              </Table.ColumnHeader>
             )}
             <Table.ColumnHeader>Id</Table.ColumnHeader>
             <Table.ColumnHeader sortable sortKey="class">
