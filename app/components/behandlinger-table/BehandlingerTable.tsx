@@ -196,19 +196,21 @@ export default function BehandlingerTable({
 
   return (
     <Box background={'default'} style={{ padding: '6px' }} borderRadius="4" shadow="dialog">
-      <HStack gap="space-16" align="end" paddingBlock="space-8 space-32" paddingInline="space-6">
-        {visTidsperiodeSoek && (
-          <DatePicker {...datepickerProps}>
-            <HStack wrap gap="space-16" align="end">
-              <DatePicker.Input size="small" {...fromInputProps} label="Fra dato" />
-              <DatePicker.Input size="small" {...toInputProps} label="Til dato" />
-            </HStack>
-          </DatePicker>
-        )}
-        {visBehandlingTypeSoek && <BehandlingtypeOptions />}
-        {visAnsvarligTeamSoek && <AnsvarligTeamOptions />}
-        {visStatusSoek && <StatusOptions />}
-      </HStack>
+      {(visTidsperiodeSoek || visBehandlingTypeSoek || visAnsvarligTeamSoek || visStatusSoek) && (
+        <HStack gap="space-16" align="end" wrap paddingBlock="space-8 space-32" paddingInline="space-6">
+          {visTidsperiodeSoek && (
+            <DatePicker {...datepickerProps}>
+              <HStack wrap gap="space-16" align="end">
+                <DatePicker.Input size="small" {...fromInputProps} label="Fra dato" />
+                <DatePicker.Input size="small" {...toInputProps} label="Til dato" />
+              </HStack>
+            </DatePicker>
+          )}
+          {visBehandlingTypeSoek && <BehandlingtypeOptions />}
+          {visAnsvarligTeamSoek && <AnsvarligTeamOptions />}
+          {visStatusSoek && <StatusOptions />}
+        </HStack>
+      )}
       <Table
         size={'medium'}
         onSortChange={onSortChange}
