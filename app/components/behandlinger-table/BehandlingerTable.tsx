@@ -93,10 +93,10 @@ export default function BehandlingerTable({
     setSearchParams(searchParams)
   }
 
-  function statusOptions() {
+  function StatusOptions() {
     return (
       <Select
-        label="Behandlingsstatus"
+        label="Status"
         defaultValue={searchParams.get('status') || undefined}
         onChange={(value) => {
           searchParams.set('status', value.target.value)
@@ -104,7 +104,7 @@ export default function BehandlingerTable({
             preventScrollReset: true,
           })
         }}
-        hideLabel
+        size="small"
       >
         <option value="">Alle statuser</option>
         <option value="DEBUG">Debug</option>
@@ -117,7 +117,7 @@ export default function BehandlingerTable({
     )
   }
 
-  function ansvarligTeamOptions() {
+  function AnsvarligTeamOptions() {
     return (
       <Select
         label="Ansvarlig team"
@@ -128,7 +128,7 @@ export default function BehandlingerTable({
             preventScrollReset: true,
           })
         }}
-        hideLabel
+        size="small"
       >
         <option value="">Alle team</option>
 
@@ -141,7 +141,7 @@ export default function BehandlingerTable({
     )
   }
 
-  function behandlingtypeOptions() {
+  function BehandlingtypeOptions() {
     let ekstraBehandlingType: JSX.Element | undefined
     const currentBehandlingType = searchParams.get('behandlingType')
     if (currentBehandlingType && !behandlingerResponse.behandlingTyper.includes(currentBehandlingType)) {
@@ -152,7 +152,7 @@ export default function BehandlingerTable({
 
     return (
       <Select
-        label="Behandlingstype"
+        label="Type"
         defaultValue={searchParams.get('behandlingType') || undefined}
         onChange={(value) => {
           searchParams.set('behandlingType', value.target.value)
@@ -160,7 +160,7 @@ export default function BehandlingerTable({
             preventScrollReset: true,
           })
         }}
-        hideLabel
+        size="small"
       >
         <option value="">Alle typer</option>
         {ekstraBehandlingType}
@@ -197,13 +197,16 @@ export default function BehandlingerTable({
   return (
     <Box background={'default'} style={{ padding: '6px' }} borderRadius="4" shadow="dialog">
       {visTidsperiodeSoek && (
-        <HStack gap="space-16" align="end" style={{ padding: '8px 6px' }}>
+        <HStack gap="space-16" align="end" paddingBlock="space-8 space-32" paddingInline="space-6">
           <DatePicker {...datepickerProps}>
             <HStack wrap gap="space-16" align="end">
               <DatePicker.Input size="small" {...fromInputProps} label="Fra dato" />
               <DatePicker.Input size="small" {...toInputProps} label="Til dato" />
             </HStack>
           </DatePicker>
+          {visBehandlingTypeSoek && <BehandlingtypeOptions />}
+          {visAnsvarligTeamSoek && <AnsvarligTeamOptions />}
+          {visStatusSoek && <StatusOptions />}
         </HStack>
       )}
       <Table
@@ -219,67 +222,9 @@ export default function BehandlingerTable({
           Behandlinger
         </BodyShort>
         <Table.Header>
-          <Table.Row>
+          <Table.Row style={{ whiteSpace: 'nowrap' }}>
             {inkluderFortsett && (
-              <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '4rem' }}>
-                Velg
-              </Table.ColumnHeader>
-            )}
-            <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '7rem' }}>
-              Id
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="class"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '30rem' }}
-            >
-              Type
-            </Table.ColumnHeader>
-            <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0, width: '8rem' }}>
-              Ansvarlig team
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="opprettet"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Opprettet
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="sisteKjoring"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Siste kjøring
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="utsattTil"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Utsatt til
-            </Table.ColumnHeader>
-            <Table.ColumnHeader
-              sortable
-              sortKey="planlagtStartet"
-              style={{ borderBottomWidth: 0, paddingBottom: 0, width: '12rem' }}
-            >
-              Planlagt startet
-            </Table.ColumnHeader>
-            {visStatusSoek && (
-              <Table.ColumnHeader
-                sortable
-                sortKey="status"
-                style={{ borderBottomWidth: 0, paddingBottom: 0, width: '14rem' }}
-              >
-                Status
-              </Table.ColumnHeader>
-            )}
-            <Table.ColumnHeader style={{ borderBottomWidth: 0, paddingBottom: 0 }}>Feilmelding</Table.ColumnHeader>
-          </Table.Row>
-          <Table.Row>
-            {inkluderFortsett && (
-              <Table.DataCell style={{ paddingTop: 0 }}>
+              <Table.DataCell>
                 <Checkbox
                   checked={valgteBehandlingIder.length === behandlingerResponse.content.length}
                   disabled={behandlingerResponse.content.filter((it) => it.utsattTil != null).length === 0}
@@ -302,17 +247,29 @@ export default function BehandlingerTable({
                 </Checkbox>
               </Table.DataCell>
             )}
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}>
-              {visBehandlingTypeSoek && behandlingtypeOptions()}
-            </Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}>{visAnsvarligTeamSoek && ansvarligTeamOptions()}</Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
-            {visStatusSoek && <Table.DataCell style={{ paddingTop: 0 }}>{statusOptions()}</Table.DataCell>}
-            <Table.DataCell style={{ paddingTop: 0 }}></Table.DataCell>
+            <Table.ColumnHeader>Id</Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="class">
+              Type
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>Ansvarlig team</Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="opprettet">
+              Opprettet
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="sisteKjoring">
+              Siste kjøring
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="utsattTil">
+              Utsatt til
+            </Table.ColumnHeader>
+            <Table.ColumnHeader sortable sortKey="planlagtStartet">
+              Planlagt startet
+            </Table.ColumnHeader>
+            {visStatusSoek && (
+              <Table.ColumnHeader sortable sortKey="status">
+                Status
+              </Table.ColumnHeader>
+            )}
+            <Table.ColumnHeader>Feilmelding</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
