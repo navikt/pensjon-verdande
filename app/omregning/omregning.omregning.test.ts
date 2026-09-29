@@ -44,6 +44,7 @@ describe('omregning.omregning action', () => {
 
     const formData = new FormData()
     formData.set('behandlingsnokkel', 'TEST-2025')
+    formData.set('beskrivelse', 'Omregning av alderspensjon')
     formData.set('omregningstidspunkt', '2025-07-01')
     formData.set('omregneAFP', 'true')
     formData.set('behandleApneKrav', 'false')
@@ -72,6 +73,7 @@ describe('omregning.omregning action', () => {
     expect(init.method).toBe('POST')
     const sentBody = JSON.parse(init.body)
     expect(sentBody.behandlingsnokkel).toBe('TEST-2025')
+    expect(sentBody.beskrivelse).toBe('Omregning av alderspensjon')
     expect(sentBody.omregneAFP).toBe(true)
     expect(sentBody.skalSamordne).toBe(true)
     expect(sentBody.brukFaktoromregning).toBe(false)

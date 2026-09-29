@@ -12,6 +12,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     behandlingsnokkel: 'REG-2024-001',
+    beskrivelse: 'Regulering av alderspensjon 2024',
     omregningstidspunkt: '2024-06-15T09:00:00',
     kravGjelder: 'Alderspensjon',
     kravArsak: 'Regulering',
