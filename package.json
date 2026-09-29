@@ -71,7 +71,7 @@
     "@vitest/browser": "^5.0.1",
     "@vitest/browser-playwright": "^5.0.1",
     "csstype": "^3.2.3",
-    "jsdom": "^30.1.0",
+    "jsdom": "^30.1.1",
     "lefthook": "^2.1.14",
     "playwright": "^1.63.0",
     "react-router-devtools": "^6.2.3",
