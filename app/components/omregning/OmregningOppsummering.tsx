@@ -6,6 +6,7 @@ type ComboboxOption = Exclude<ComboboxProps['options'][number], string>
 
 interface OmregningOppsummeringProps {
   behandlingsnokkel: string
+  beskrivelse: string
   omregningstidspunkt: string
 
   kravGjelder: string
@@ -57,6 +58,11 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
           <FormSummary.Answer>
             <FormSummary.Label>Behandlingsnøkkel</FormSummary.Label>
             <FormSummary.Value>{props.behandlingsnokkel && <>{props.behandlingsnokkel}</>}</FormSummary.Value>
+          </FormSummary.Answer>
+
+          <FormSummary.Answer>
+            <FormSummary.Label>Beskrivelse</FormSummary.Label>
+            <FormSummary.Value>{props.beskrivelse && <>{props.beskrivelse}</>}</FormSummary.Value>
           </FormSummary.Answer>
 
           <FormSummary.Answer>

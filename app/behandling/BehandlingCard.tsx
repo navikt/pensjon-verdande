@@ -401,7 +401,7 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
-  function copyPasteEntry(name: string, value: string | number | null) {
+  function copyPasteEntry(name: string, value: string | number | null | undefined) {
     if (value) {
       return (
         <Entry labelText={`${name}`}>
@@ -571,6 +571,8 @@ export default function BehandlingCard(props: Props) {
                       {copyPasteEntry('KravId', props.behandling.kravId)}
                       {copyPasteEntry('VedtakId', props.behandling.vedtakId)}
                       {copyPasteEntry('JournalpostId', props.behandling.journalpostId)}
+                      {copyPasteEntry('Krav behandlende enhetId', props.behandling.kravBehandlendeEnhetId)}
+                      {copyPasteEntry('Sak enhetId', props.behandling.sakEnhetId)}
                       {props.behandling.forrigeBehandlingId && (
                         <Entry labelText={'Opprettet av behandling'}>
                           <Link as={NavLink} to={`/behandling/${props.behandling.forrigeBehandlingId}`}>

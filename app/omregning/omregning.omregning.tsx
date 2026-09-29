@@ -30,6 +30,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const omregningRequest = {
     ansvarligTeam: updates.ansvarligTeam,
     behandlingsnokkel: updates.behandlingsnokkel,
+    beskrivelse: updates.beskrivelse,
     omregningstidspunkt: updates.omregningstidspunkt,
     omregneAFP: updates.omregneAFP === 'true',
     behandleApneKrav: updates.behandleApneKrav === 'true',

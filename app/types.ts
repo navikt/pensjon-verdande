@@ -48,14 +48,16 @@ export type BehandlingDto = {
   erStartet: boolean
   muligeKontrollpunkt: KontrollpunktDecode[]
 
-  fnr: string | null
-  sakId: number | null
-  kravId: number | null
-  vedtakId: number | null
-  journalpostId: string | null
+  fnr?: string | null
+  sakId?: number | null
+  kravId?: number | null
+  vedtakId?: number | null
+  journalpostId?: string | null
   kibanaUrl?: string
-  feilmelding: string | null
-  gruppeId: string | null
+  feilmelding?: string | null
+  kravBehandlendeEnhetId?: string | null
+  sakEnhetId?: string | null
+  gruppeId?: string | null
 
   matchedVerdiTypes?: string[]
   matchedVerdiTypeDecodes?: string[]
@@ -312,6 +314,7 @@ export interface HalLinks {
 export type OmregningRequest = {
   ansvarligTeam: string
   behandlingsnokkel: string
+  beskrivelse: string
   omregningstidspunkt: string
   omregneAFP: boolean
   behandleApneKrav: boolean

@@ -67,6 +67,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
 
   const [omregningstidspunkt, setOmregningstidspunkt] = useState('')
   const [behandlingsnokkel, setBehandlingsnokkel] = useState('')
+  const [beskrivelse, setBeskrivelse] = useState('')
   const [omregneAFP, setOmregneAFP] = useState(true)
   const [skalSletteIverksettingsoppgaver, setSkalSletteIverksettingsoppgaver] = useState(true)
   const [skalDistribuereUforevedtak, setSkalDistribuereUforevedtak] = useState(true)
@@ -311,6 +312,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={behandlingsnokkel}
                     onChange={(event) => setBehandlingsnokkel(event.target.value)}
                     error={hasError}
+                  />
+
+                  <TextField
+                    label={'Beskrivelse'}
+                    name={'beskrivelse'}
+                    size="small"
+                    value={beskrivelse}
+                    onChange={(event) => setBeskrivelse(event.target.value)}
                   />
 
                   <MonthPicker {...monthpickerProps}>
@@ -662,6 +671,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   selectedBrevkodeBerorteSakerAFPPrivat={selectedBrevkodeBerorteSakerAFPPrivat}
                   omregningstidspunkt={omregningstidspunkt}
                   behandlingsnokkel={behandlingsnokkel}
+                  beskrivelse={beskrivelse}
                   kravGjelder={kravGjelder}
                   kravArsak={kravArsak}
                   toleransegrenseSett={toleransegrenseSett}
@@ -724,6 +734,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   function getHumanReadableParameterText() {
     return [
       `behandlingsnøkkel: ${behandlingsnokkel}`,
+      `beskrivelse: ${beskrivelse}`,
       `omregningstidspunkt: ${omregningstidspunkt}`,
       ``,
       `ansvarligTeam: ${decodeTeam(ansvarligTeam)}`,
