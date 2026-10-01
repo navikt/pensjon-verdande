@@ -42,6 +42,7 @@ export type ChartOutput = {
   FEILENDE: number[]
   FULLFORT: number[]
   STOPPET: number[]
+  STOPPET_I_ALDE: number[]
   UNDER_BEHANDLING: number[]
 }
 
@@ -77,6 +78,7 @@ export const parseToChartData = (data: AldeFordelingStatusOverTidDto[]): [string
         acc.FEILENDE.push(dayMap.get('FEILENDE') || 0)
         acc.FULLFORT.push(dayMap.get('FULLFORT') || 0)
         acc.STOPPET.push(dayMap.get('STOPPET') || 0)
+        acc.STOPPET_I_ALDE.push(dayMap.get('STOPPET_I_ALDE') || 0)
         acc.UNDER_BEHANDLING.push(dayMap.get('UNDER_BEHANDLING') || 0)
       } else {
         acc.AVBRUTT.push(0)
@@ -95,6 +97,7 @@ export const parseToChartData = (data: AldeFordelingStatusOverTidDto[]): [string
       FEILENDE: [],
       FULLFORT: [],
       STOPPET: [],
+      STOPPET_I_ALDE: [],
       UNDER_BEHANDLING: [],
     },
   )

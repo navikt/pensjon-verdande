@@ -132,6 +132,7 @@ const statusConfig: Record<
   UNDER_BEHANDLING: { label: 'Under behandling', variant: 'alt1' },
   FULLFORT: { label: 'Fullført', variant: 'success' },
   STOPPET: { label: 'Stoppet', variant: 'warning' },
+  STOPPET_I_ALDE: { label: 'Stoppet i ALDE', variant: 'warning' },
   DEBUG: { label: 'Debug', variant: 'neutral' },
   FEILENDE: { label: 'Feilende', variant: 'error' },
 }
