@@ -354,7 +354,15 @@ function FilterBar({
   onChangeSortField: (field: SortField) => void
   onChangeSortDir: (dir: SortDir) => void
 }) {
-  const allStatuses: BehandlingStatus[] = ['OPPRETTET', 'UNDER_BEHANDLING', 'FULLFORT', 'STOPPET', 'DEBUG', 'FEILENDE']
+  const allStatuses: BehandlingStatus[] = [
+    'OPPRETTET',
+    'UNDER_BEHANDLING',
+    'FULLFORT',
+    'STOPPET',
+    'STOPPET_I_ALDE',
+    'DEBUG',
+    'FEILENDE',
+  ]
 
   return (
     <VStack gap="space-12">

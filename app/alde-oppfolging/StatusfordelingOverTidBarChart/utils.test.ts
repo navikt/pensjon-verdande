@@ -92,6 +92,10 @@ describe('utils', () => {
           antall: 1,
         },
         {
+          status: 'STOPPET_I_ALDE',
+          antall: 2,
+        },
+        {
           status: 'UNDER_BEHANDLING',
           antall: 1,
         },
@@ -109,7 +113,7 @@ describe('utils', () => {
           FEILENDE: [0, 0, 0, 0, 0, 0, 0, 0],
           FULLFORT: [2, 4, 2, 0, 4, 0, 0, 1],
           STOPPET: [0, 0, 0, 0, 0, 0, 0, 0],
-          STOPPET_I_ALDE: [0, 0, 0, 0, 0, 0, 0, 0],
+          STOPPET_I_ALDE: [0, 0, 0, 0, 0, 0, 0, 2],
           UNDER_BEHANDLING: [0, 1, 3, 0, 1, 0, 0, 1],
         },
       ],

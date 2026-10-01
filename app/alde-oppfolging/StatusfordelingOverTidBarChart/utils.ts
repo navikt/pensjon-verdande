@@ -7,6 +7,7 @@ export const statusLabels: Record<string, string> = {
   DEBUG: 'Debug',
   FEILENDE: 'Feilende',
   STOPPET: 'Stoppet',
+  STOPPET_I_ALDE: 'Stoppet i ALDE',
 }
 
 export const statusColors: Record<string, { backgroundColor: string; borderColor: string }> = {
@@ -33,6 +34,10 @@ export const statusColors: Record<string, { backgroundColor: string; borderColor
   STOPPET: {
     backgroundColor: 'rgba(236, 243, 153, 0.5)', // limegreen-200 with opacity
     borderColor: 'rgba(127, 137, 0, 1)', // limegreen-700
+  },
+  STOPPET_I_ALDE: {
+    backgroundColor: 'rgba(214, 198, 177, 0.5)', // beige-300 with opacity
+    borderColor: 'rgba(149, 110, 69, 1)', // beige-700
   },
 }
 
