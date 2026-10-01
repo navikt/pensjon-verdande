@@ -210,7 +210,7 @@ export default function AldeOppfolging({ loaderData }: Route.ComponentProps) {
   const [debouncedLoading, setDebouncedLoading] = React.useState(false)
   const [autoReloadInterval, setAutoReloadInterval] = React.useState<number | null>(null)
   const [isAutoReloading, setIsAutoReloading] = React.useState(false)
-  const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET']
+  const allStatuses = ['FULLFORT', 'UNDER_BEHANDLING', 'AVBRUTT', 'DEBUG', 'FEILENDE', 'STOPPET', 'STOPPET_I_ALDE']
 
   const isLoading = navigation.state === 'loading'
 

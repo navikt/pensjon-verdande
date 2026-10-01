@@ -1,4 +1,11 @@
-export type BehandlingStatus = 'OPPRETTET' | 'UNDER_BEHANDLING' | 'FULLFORT' | 'STOPPET' | 'FEILENDE' | 'DEBUG'
+export type BehandlingStatus =
+  | 'OPPRETTET'
+  | 'UNDER_BEHANDLING'
+  | 'FULLFORT'
+  | 'STOPPET'
+  | 'STOPPET_I_ALDE'
+  | 'FEILENDE'
+  | 'DEBUG'
 
 export type BehandlingTypeCode = 'AUTO' | 'DEL_AUTO' | 'MAN'
 

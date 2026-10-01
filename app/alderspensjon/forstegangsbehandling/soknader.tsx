@@ -132,6 +132,7 @@ const statusConfig: Record<
   UNDER_BEHANDLING: { label: 'Under behandling', variant: 'alt1' },
   FULLFORT: { label: 'Fullført', variant: 'success' },
   STOPPET: { label: 'Stoppet', variant: 'warning' },
+  STOPPET_I_ALDE: { label: 'Stoppet i ALDE', variant: 'warning' },
   DEBUG: { label: 'Debug', variant: 'neutral' },
   FEILENDE: { label: 'Feilende', variant: 'error' },
 }
@@ -353,7 +354,15 @@ function FilterBar({
   onChangeSortField: (field: SortField) => void
   onChangeSortDir: (dir: SortDir) => void
 }) {
-  const allStatuses: BehandlingStatus[] = ['OPPRETTET', 'UNDER_BEHANDLING', 'FULLFORT', 'STOPPET', 'DEBUG', 'FEILENDE']
+  const allStatuses: BehandlingStatus[] = [
+    'OPPRETTET',
+    'UNDER_BEHANDLING',
+    'FULLFORT',
+    'STOPPET',
+    'STOPPET_I_ALDE',
+    'DEBUG',
+    'FEILENDE',
+  ]
 
   return (
     <VStack gap="space-12">

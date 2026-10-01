@@ -7,6 +7,7 @@ export const statusLabels: Record<string, string> = {
   DEBUG: 'Debug',
   FEILENDE: 'Feilende',
   STOPPET: 'Stoppet',
+  STOPPET_I_ALDE: 'Stoppet i ALDE',
 }
 
 export const statusColors: Record<string, { backgroundColor: string; borderColor: string }> = {
@@ -34,6 +35,10 @@ export const statusColors: Record<string, { backgroundColor: string; borderColor
     backgroundColor: 'rgba(236, 243, 153, 0.5)', // limegreen-200 with opacity
     borderColor: 'rgba(127, 137, 0, 1)', // limegreen-700
   },
+  STOPPET_I_ALDE: {
+    backgroundColor: 'rgba(214, 198, 177, 0.5)', // beige-300 with opacity
+    borderColor: 'rgba(149, 110, 69, 1)', // beige-700
+  },
 }
 
 export type ChartOutput = {
@@ -42,6 +47,7 @@ export type ChartOutput = {
   FEILENDE: number[]
   FULLFORT: number[]
   STOPPET: number[]
+  STOPPET_I_ALDE: number[]
   UNDER_BEHANDLING: number[]
 }
 
@@ -77,6 +83,7 @@ export const parseToChartData = (data: AldeFordelingStatusOverTidDto[]): [string
         acc.FEILENDE.push(dayMap.get('FEILENDE') || 0)
         acc.FULLFORT.push(dayMap.get('FULLFORT') || 0)
         acc.STOPPET.push(dayMap.get('STOPPET') || 0)
+        acc.STOPPET_I_ALDE.push(dayMap.get('STOPPET_I_ALDE') || 0)
         acc.UNDER_BEHANDLING.push(dayMap.get('UNDER_BEHANDLING') || 0)
       } else {
         acc.AVBRUTT.push(0)
@@ -84,6 +91,7 @@ export const parseToChartData = (data: AldeFordelingStatusOverTidDto[]): [string
         acc.FEILENDE.push(0)
         acc.FULLFORT.push(0)
         acc.STOPPET.push(0)
+        acc.STOPPET_I_ALDE.push(0)
         acc.UNDER_BEHANDLING.push(0)
       }
 
@@ -95,6 +103,7 @@ export const parseToChartData = (data: AldeFordelingStatusOverTidDto[]): [string
       FEILENDE: [],
       FULLFORT: [],
       STOPPET: [],
+      STOPPET_I_ALDE: [],
       UNDER_BEHANDLING: [],
     },
   )
