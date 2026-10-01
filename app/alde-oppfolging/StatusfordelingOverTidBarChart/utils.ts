@@ -86,6 +86,7 @@ export const parseToChartData = (data: AldeFordelingStatusOverTidDto[]): [string
         acc.FEILENDE.push(0)
         acc.FULLFORT.push(0)
         acc.STOPPET.push(0)
+        acc.STOPPET_I_ALDE.push(0)
         acc.UNDER_BEHANDLING.push(0)
       }
 

@@ -109,6 +109,7 @@ describe('utils', () => {
           FEILENDE: [0, 0, 0, 0, 0, 0, 0, 0],
           FULLFORT: [2, 4, 2, 0, 4, 0, 0, 1],
           STOPPET: [0, 0, 0, 0, 0, 0, 0, 0],
+          STOPPET_I_ALDE: [0, 0, 0, 0, 0, 0, 0, 0],
           UNDER_BEHANDLING: [0, 1, 3, 0, 1, 0, 0, 1],
         },
       ],
