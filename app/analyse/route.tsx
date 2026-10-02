@@ -31,6 +31,7 @@ import { parseAnalyseParams } from './utils/parseAnalyseParams'
 
 const behandlingstyper = [
   'FleksibelApSak',
+  'EndringAvUttaksgrad',
   'OppdaterFodselsnummer',
   'ForelderBarnMelding',
   'OppdaterFoedselsdato',
