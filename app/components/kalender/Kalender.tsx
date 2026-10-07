@@ -10,15 +10,17 @@ import type { KalenderHendelser } from '~/components/kalender/types'
 const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
 
 /**
- * Returnerer første og siste dag som vil vises i kalenderen for en gitt dato
+ * Returnerer første og siste dag som hentes for kalenderen for en gitt dato
  */
 export function forsteOgSisteDatoForKalender(dato: Date): { forsteDato: Date; sisteDato: Date } {
-  const forsteUkeNr = getWeek(new Date(dato.getFullYear(), dato.getMonth(), 1))
-  const sisteUkeNr = forsteUkeNr + 5 // kalenderen viser alltid 6 uker i kalenderen
+  const forsteDagIMaaneden = new Date(dato.getFullYear(), dato.getMonth(), 1)
+  const forsteUkeNr = getWeek(forsteDagIMaaneden)
+  const ukeAar = getWeekYear(forsteDagIMaaneden)
+  const sisteUkeNr = forsteUkeNr + 5 // henter seks uker
 
   return {
-    forsteDato: getDato(getWeekYear(dato), forsteUkeNr, 1),
-    sisteDato: getDato(getWeekYear(dato), sisteUkeNr, 7),
+    forsteDato: getDato(ukeAar, forsteUkeNr, 1),
+    sisteDato: getDato(ukeAar, sisteUkeNr, 7),
   }
 }
 
@@ -43,6 +45,7 @@ export default function Kalender(props: Props) {
   const [, setSearchParams] = useSearchParams()
   const firstInThisMonth = new Date(valgtDato.getFullYear(), valgtDato.getMonth(), 1)
   const forsteUkeNr = getWeek(firstInThisMonth)
+  const ukeAar = getWeekYear(firstInThisMonth)
 
   // Parse YYYY-MM-DD som lokal midnatt (ikke UTC) for konsistent datosammenligning
   function parseLokalDato(isoStr: string): Date {
@@ -76,7 +79,7 @@ export default function Kalender(props: Props) {
   }, [])
 
   function day(ukenr: number, colIdx: number) {
-    return getDato(getWeekYear(valgtDato), ukenr, colIdx + 1)
+    return getDato(ukeAar, ukenr, colIdx + 1)
   }
 
   function setValgtDato(dato: Date) {
