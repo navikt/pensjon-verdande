@@ -1,0 +1,68 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+vi.mock('~/services/auth.server', () => ({
+  requireAccessToken: vi.fn().mockResolvedValue('test-token'),
+}))
+
+vi.mock('~/services/env.server', () => ({
+  env: { penUrl: 'http://pen-test' },
+  isDevelopment: false,
+}))
+
+vi.mock('~/services/behandling.server', () => ({
+  getBehandlinger: vi.fn().mockResolvedValue({ content: [] }),
+}))
+
+const { action } = await import('./egenerklaeringOmsorgspoeng')
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+const actionArgs = (request: Request) =>
+  ({
+    request,
+    params: {},
+    context: {},
+    pattern: '/egenerklaeringOmsorgspoeng',
+  }) as Parameters<typeof action>[0]
+
+describe('egenerklaeringOmsorgspoeng action', () => {
+  let fetchSpy: ReturnType<typeof vi.fn>
+
+  beforeEach(() => {
+    fetchSpy = vi.fn()
+    vi.stubGlobal('fetch', fetchSpy)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('POST oppretter egenerklaering med alle felter', async () => {
+    fetchSpy.mockResolvedValueOnce(jsonResponse({ behandlingIder: [1, 2] }))
+
+    const formData = new FormData()
+    formData.set('kjorAlle', 'true')
+    formData.set('kjorKunUttakssteg', 'false')
+    formData.set('kjoreAr', '2024')
+
+    const request = new Request('http://localhost/egenerklaering', { method: 'POST', body: formData })
+    await action(actionArgs(request))
+
+    expect(fetchSpy).toHaveBeenCalledOnce()
+    const [url, init] = fetchSpy.mock.calls[0]
+    expect(url).toBe('http://pen-test/api/omsorgspoeng/egenerklaering/batch')
+    expect(init.method).toBe('POST')
+    expect(init.signal).toBeInstanceOf(AbortSignal)
+    const sentBody = JSON.parse(init.body)
+    expect(sentBody).toEqual({
+      kjorAlle: true,
+      kjorKunUttakssteg: false,
+      kjoreAr: '2024',
+    })
+  })
+})
