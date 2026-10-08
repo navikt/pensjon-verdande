@@ -23,7 +23,7 @@ import type { Route } from './+types/egenerklaeringOmsorgspoeng'
 const behandlingType = 'VedtakMedInnvilgetOmsorgspoengBatch'
 
 export function meta(): Route.MetaDescriptors {
-  return [{ title: 'VedtakMedInnvilgetOmsorgspoengBatch | Verdande' }]
+  return [{ title: 'Egenerklæring omsorgspoeng | Verdande' }]
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
