@@ -53,6 +53,7 @@ const batcherMeny = [
   ['AVSTEMMING_LES', '/avstemming', 'Avstemming'],
   ['AVSTEMMING_LES', '/konsistensavstemming', 'Konsistensavstemming'],
   ['BESTEM_ETTEROPPGJOER_RESULTAT', `/bestem-etteroppgjor-resultat`, 'Bestem etteroppgjør resultat'],
+  ['EGENERKLAERING_OMSORGSPOENG_LES', '/egenerklaeringOmsorgspoeng', 'Egenerklæring omsorgspoeng'],
   ['FASTSETTE_INNTEKT_FOR_UFOERETRYGD', `/bpen091`, 'Fastsette inntekt for uføretrygd'],
   ['HENT_OPPLYSNINGER_FRA_SKATT', `/bpen096`, 'Hent opplysninger fra Skatt'],
   ['HVILENDE_RETT_UFORETRYGD', `/hvilenderett`, 'Hvilende rett av Uføretrygd'],
