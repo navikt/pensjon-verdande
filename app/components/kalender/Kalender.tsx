@@ -1,26 +1,24 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@navikt/aksel-icons'
 import { Box, Button, Heading, HStack, Spacer } from '@navikt/ds-react'
+import { addDays, eachWeekOfInterval, startOfISOWeek, startOfMonth } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { erHelgedag, getDato, isSameDay } from '~/common/date'
-import { getWeek, getWeekYear } from '~/common/weeknumber'
+import { erHelgedag, isSameDay } from '~/common/date'
 import Dag from '~/components/kalender/Dag'
 import type { KalenderHendelser } from '~/components/kalender/types'
 
 const weekdays = ['man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.', 'søn.']
+const antallUker = 6
 
 /**
- * Returnerer første og siste dag som hentes for kalenderen for en gitt dato
+ * Returnerer første og siste dag som vises og hentes for kalenderen for en gitt dato
  */
 export function forsteOgSisteDatoForKalender(dato: Date): { forsteDato: Date; sisteDato: Date } {
-  const forsteDagIMaaneden = new Date(dato.getFullYear(), dato.getMonth(), 1)
-  const forsteUkeNr = getWeek(forsteDagIMaaneden)
-  const ukeAar = getWeekYear(forsteDagIMaaneden)
-  const sisteUkeNr = forsteUkeNr + 5 // henter seks uker
+  const forsteDato = startOfISOWeek(startOfMonth(dato))
 
   return {
-    forsteDato: getDato(ukeAar, forsteUkeNr, 1),
-    sisteDato: getDato(ukeAar, sisteUkeNr, 7),
+    forsteDato,
+    sisteDato: addDays(forsteDato, antallUker * 7 - 1),
   }
 }
 
@@ -43,9 +41,8 @@ function backgroundColorForDato(kalenderHendelser: KalenderHendelser, dato: Date
 export default function Kalender(props: Props) {
   const valgtDato = props.startDato
   const [, setSearchParams] = useSearchParams()
-  const firstInThisMonth = new Date(valgtDato.getFullYear(), valgtDato.getMonth(), 1)
-  const forsteUkeNr = getWeek(firstInThisMonth)
-  const ukeAar = getWeekYear(firstInThisMonth)
+  const { forsteDato, sisteDato } = forsteOgSisteDatoForKalender(valgtDato)
+  const uker = eachWeekOfInterval({ start: forsteDato, end: sisteDato }, { weekStartsOn: 1 })
 
   // Parse YYYY-MM-DD som lokal midnatt (ikke UTC) for konsistent datosammenligning
   function parseLokalDato(isoStr: string): Date {
@@ -78,10 +75,6 @@ export default function Kalender(props: Props) {
     return () => clearTimeout(timerRef)
   }, [])
 
-  function day(ukenr: number, colIdx: number) {
-    return getDato(ukeAar, ukenr, colIdx + 1)
-  }
-
   function setValgtDato(dato: Date) {
     setSearchParams({ dato: dato.toISOString().slice(0, 10) })
   }
@@ -102,12 +95,10 @@ export default function Kalender(props: Props) {
     setValgtDato(nextMonth)
   }
 
-  function dag(colIdx: number, rowIdx: number) {
-    const dato = day(rowIdx + forsteUkeNr, colIdx)
-
+  function dag(dato: Date) {
     return (
       <td
-        key={`col:${colIdx} row:${rowIdx}`}
+        key={dato.getTime()}
         style={{
           border: '1px solid #ddd',
           width: 'calc(100% / 7)',
@@ -167,9 +158,9 @@ export default function Kalender(props: Props) {
           </tr>
         </thead>
         <tbody>
-          {[0, 1, 2, 3, 4, 5, 6].map((row) => (
-            <tr key={`rad:${row}`} style={{ height: '8em', verticalAlign: 'top' }}>
-              {[...Array(7)].map((_, colIdx) => dag(colIdx, row))}
+          {uker.map((ukeStart) => (
+            <tr key={ukeStart.getTime()} style={{ height: '8em', verticalAlign: 'top' }}>
+              {weekdays.map((_, colIdx) => dag(addDays(ukeStart, colIdx)))}
             </tr>
           ))}
         </tbody>
