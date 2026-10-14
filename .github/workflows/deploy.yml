@@ -28,7 +28,7 @@ jobs:
       - name: Fjern dev dependencies
         run: pnpm prune --prod
 
-      - uses: nais/docker-build-push@bfe52e3ad6d0e96fd1056a03acb7b619aaffb39d
+      - uses: nais/docker-build-push@dd7421d5068057a020ca46ead966c26190c516b1
         if: github.ref == 'refs/heads/main'
         id: docker-push
         with:
