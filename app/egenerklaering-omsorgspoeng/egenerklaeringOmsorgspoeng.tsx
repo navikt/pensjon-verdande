@@ -116,7 +116,7 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
           <HStack gap="space-12" align="center">
             <Dialog>
               <Dialog.Trigger>
-                <Button disabled={!kanOpprette}>Opprett batch-behandling</Button>
+                <Button disabled={!kanOpprette}>Opprett behandling</Button>
               </Dialog.Trigger>
               <Dialog.Popup role="alertdialog" closeOnOutsideClick={false}>
                 <Dialog.Header withClosebutton={false}>
