@@ -6,6 +6,7 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
+  Dialog,
   Heading,
   HStack,
   Link,
@@ -71,6 +72,8 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
   const kjoreAr = new Date().getFullYear() - 2
   const [useDefaultParametre, setUseDefaultParametre] = useState(true)
 
+  const kanOpprette = !isSubmitting
+
   return (
     <VStack gap={'space-16'}>
       <Box className={'aksel-pageblock--lg'}>
@@ -99,7 +102,7 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
           Endre standard kjøreparametre
         </Button>
       </div>
-      <Form method="post" style={{ width: '20em' }}>
+      <Form id="skjema" method="post" style={{ width: '20em' }}>
         <VStack gap={'space-16'}>
           <CheckboxGroup legend="Modus" readOnly={useDefaultParametre}>
             <Checkbox name={'kjorAlle'} value={'true'} defaultChecked={true}>
@@ -111,11 +114,33 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
           </CheckboxGroup>
           <TextField label="Kjøreår" description={'Gjeldende år - 2'} value={kjoreAr} name="kjoreAr" readOnly />
           <HStack gap="space-12" align="center">
-            <div>
-              <Button type="submit" loading={isSubmitting}>
-                Opprett batch-behandling
-              </Button>
-            </div>
+            <Dialog>
+              <Dialog.Trigger>
+                <Button disabled={!kanOpprette}>Opprett behandling</Button>
+              </Dialog.Trigger>
+              <Dialog.Popup role="alertdialog" closeOnOutsideClick={false}>
+                <Dialog.Header withClosebutton={false}>
+                  <Dialog.Title>Start distribusjon</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <BodyLong>
+                    Er du sikker på at du vil starte en ny behandling for distribuering av egenerklæringsbrev?
+                  </BodyLong>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Dialog.CloseTrigger>
+                    <Button variant="secondary" data-color="neutral">
+                      Avbryt
+                    </Button>
+                  </Dialog.CloseTrigger>
+                  <Dialog.CloseTrigger>
+                    <Button variant="danger" form="skjema" type="submit" disabled={!kanOpprette}>
+                      Start behandling
+                    </Button>
+                  </Dialog.CloseTrigger>
+                </Dialog.Footer>
+              </Dialog.Popup>
+            </Dialog>
           </HStack>
         </VStack>
       </Form>
