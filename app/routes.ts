@@ -208,6 +208,8 @@ export default [
 
     route('bpen091', 'uforetrygd/bpen091.tsx'),
 
+    route('overfor-saker', 'uforetrygd/overfor-saker/overfor-saker.tsx'),
+
     route('bpen096', 'uforetrygd/bpen096.tsx'),
 
     route('hvilenderett', 'uforetrygd/hvilende-rett.tsx'),
