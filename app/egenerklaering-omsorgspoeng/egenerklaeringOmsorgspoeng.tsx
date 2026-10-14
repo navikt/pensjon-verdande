@@ -6,15 +6,15 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
+  Dialog,
   Heading,
   HStack,
   Link,
-  Modal,
   Skeleton,
   TextField,
   VStack,
 } from '@navikt/ds-react'
-import { Suspense, useRef, useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Await, Form, useNavigation } from 'react-router'
 import BehandlingerTable from '~/components/behandlinger-table/BehandlingerTable'
 import { apiPost } from '~/services/api.server'
@@ -66,7 +66,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.ComponentProps) {
   const { behandlinger } = loaderData
   const navigation = useNavigation()
-  const modalRef = useRef<HTMLDialogElement>(null)
 
   const isSubmitting = navigation.state === 'submitting'
 
@@ -115,35 +114,36 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
           </CheckboxGroup>
           <TextField label="Kjøreår" description={'Gjeldende år - 2'} value={kjoreAr} name="kjoreAr" readOnly />
           <HStack gap="space-12" align="center">
-            <div>
-              <Button type="button" onClick={() => modalRef.current?.showModal()} disabled={!kanOpprette}>
-                Opprett batch-behandling
-              </Button>
-            </div>
+            <Dialog>
+              <Dialog.Trigger>
+                <Button disabled={!kanOpprette}>Opprett batch-behandling</Button>
+              </Dialog.Trigger>
+              <Dialog.Popup role="alertdialog" closeOnOutsideClick={false}>
+                <Dialog.Header withClosebutton={false}>
+                  <Dialog.Title>Start distribusjon</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <BodyLong>
+                    Er du sikker på at du vil starte en ny behandling for distribuering av egenerklæringsbrev?
+                  </BodyLong>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Dialog.CloseTrigger>
+                    <Button variant="secondary" data-color="neutral">
+                      Avbryt
+                    </Button>
+                  </Dialog.CloseTrigger>
+                  <Dialog.CloseTrigger>
+                    <Button variant="danger" form="skjema" type="submit" disabled={!kanOpprette} loading={isSubmitting}>
+                      Start behandling
+                    </Button>
+                  </Dialog.CloseTrigger>
+                </Dialog.Footer>
+              </Dialog.Popup>
+            </Dialog>
           </HStack>
         </VStack>
       </Form>
-      <Modal ref={modalRef} header={{ heading: 'Start distribusjon' }} size="small">
-        <Modal.Body>
-          <VStack gap="space-16">
-            <div>Er du sikker på at du vil starte en ny behandling for distribuering av egenerklæringsbrev?</div>
-          </VStack>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            form="skjema"
-            type="submit"
-            disabled={!kanOpprette}
-            loading={isSubmitting}
-            onClick={() => modalRef.current?.close()}
-          >
-            Start behandling
-          </Button>
-          <Button type="button" variant="secondary" onClick={() => modalRef.current?.close()}>
-            Avbryt
-          </Button>
-        </Modal.Footer>
-      </Modal>
       <Heading level="2" size="medium" style={{ marginTop: '2em' }}>
         Eksisterende behandlinger
       </Heading>
