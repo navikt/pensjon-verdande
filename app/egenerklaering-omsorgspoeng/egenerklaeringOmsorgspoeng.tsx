@@ -134,7 +134,7 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
                     </Button>
                   </Dialog.CloseTrigger>
                   <Dialog.CloseTrigger>
-                    <Button variant="danger" form="skjema" type="submit" disabled={!kanOpprette} loading={isSubmitting}>
+                    <Button variant="danger" form="skjema" type="submit" disabled={!kanOpprette}>
                       Start behandling
                     </Button>
                   </Dialog.CloseTrigger>
