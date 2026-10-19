@@ -21,6 +21,7 @@ import type {
   PatchBehandlingDto,
   RelatertFamilieBehandling,
   SchedulerStatusResponse,
+  SendTilManuellRequest,
 } from '~/types'
 
 // Enkelte tunge aggregeringsendepunkter kan bruke lengre tid enn standard timeout på 15s
@@ -201,9 +202,10 @@ export async function endrePlanlagtStartet(
 export async function sendTilManuellMedKontrollpunkt(
   request: Request,
   behandlingId: string,
-  kontrollpunkt: string,
+  data: SendTilManuellRequest,
 ): Promise<void> {
-  await apiPut(`/api/behandling/${behandlingId}/sendTilManuellMedKontrollpunkt`, { kontrollpunkt }, request)
+  // Fritekstvarianten forutsetter backend-støtte for { oppgavetekst } uten kontrollpunkt.
+  await apiPut(`/api/behandling/${behandlingId}/sendTilManuellMedKontrollpunkt`, data, request)
 }
 
 export async function getOppdragsmelding(request: Request, behandlingId: string) {

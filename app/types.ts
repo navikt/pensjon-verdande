@@ -102,6 +102,10 @@ export type KontrollpunktDecode = {
   decode: string
 }
 
+export type SendTilManuellRequest =
+  | { kontrollpunkt: string; oppgavetekst?: never }
+  | { oppgavetekst: string; kontrollpunkt?: never }
+
 export type DetaljertFremdriftDTO = {
   ferdig: number
   totalt: number

@@ -1,20 +1,41 @@
 import { PersonIcon } from '@navikt/aksel-icons'
-import { Button, Dialog, Tooltip, UNSAFE_Combobox } from '@navikt/ds-react'
+import { Button, Dialog, Radio, RadioGroup, Textarea, Tooltip, UNSAFE_Combobox, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
-import type { BehandlingDto, KontrollpunktDecode } from '~/types'
+import type { BehandlingDto, SendTilManuellRequest } from '~/types'
 
 export interface Props {
   behandling: BehandlingDto
-  sendTilManuellMedKontrollpunkt: (kontrollpunkt: string) => void
+  sendTilManuellMedKontrollpunkt: (data: SendTilManuellRequest) => void
   isSubmitting: boolean
+  errors?: Record<string, string>
 }
 
 export default function SendTilManuellMedKontrollpunktModal(props: Props) {
-  const [valgtKontrollpunkt, setKontrollpunkt] = useState<KontrollpunktDecode | null>(null)
+  const [oppgavetype, setOppgavetype] = useState<'kontrollpunkt' | 'oppgavetekst'>('kontrollpunkt')
+  const [valgtKontrollpunkt, setKontrollpunkt] = useState<string | null>(null)
+  const [oppgavetekst, setOppgavetekst] = useState('')
+  const [valideringsfeil, setValideringsfeil] = useState<string>()
+
+  function sendTilManuell() {
+    if (props.isSubmitting) return
+
+    if (oppgavetype === 'oppgavetekst') {
+      const tekst = oppgavetekst.trim()
+      if (!tekst) {
+        setValideringsfeil('Skriv inn oppgavetekst.')
+        return
+      }
+      props.sendTilManuellMedKontrollpunkt({ oppgavetekst: tekst })
+    } else if (valgtKontrollpunkt) {
+      props.sendTilManuellMedKontrollpunkt({ kontrollpunkt: valgtKontrollpunkt })
+    } else {
+      setValideringsfeil('Velg et kontrollpunkt.')
+    }
+  }
 
   return (
     <Dialog>
-      <Tooltip content="Fortsett videre behandling manuelt med oppgitt kontrollpunkt">
+      <Tooltip content="Fortsett videre behandling manuelt med kontrollpunkt eller egendefinert oppgavetekst">
         <Dialog.Trigger>
           <Button data-color="danger" variant={'secondary'} icon={<PersonIcon aria-hidden />}>
             Manuell behandling
@@ -25,31 +46,52 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
         <Dialog.Header>
           <Dialog.Title>Manuell behandling</Dialog.Title>
           <Dialog.Description>
-            Dette vil avbryte automatisk behandling og sette kravet til manuelt behandling. Kontrollpunktet vil bli
-            lagret på kravet og det vil bli opprettet en oppgave med oppgitt kontrollpunkt. Det er ikke mulig å angre
-            denne handlingen.
+            Dette vil avbryte automatisk behandling og sette kravet til manuell behandling. Det vil bli opprettet en
+            oppgave med valgt kontrollpunkt eller egendefinert oppgavetekst. Velger du kontrollpunkt, blir dette også
+            lagret på kravet. Det er ikke mulig å angre denne handlingen.
           </Dialog.Description>
         </Dialog.Header>
         <Dialog.Body>
-          <UNSAFE_Combobox
-            label="Velg kontrollpunkt"
-            onToggleSelected={(option, isSelected) =>
-              isSelected
-                ? setKontrollpunkt(
-                    Object.entries(props.behandling.muligeKontrollpunkt).filter(
-                      (it) => it[1].kontrollpunkt === option,
-                    )[0][1],
-                  )
-                : setKontrollpunkt(null)
-            }
-            shouldAutocomplete
-            options={Object.entries(props.behandling.muligeKontrollpunkt || []).map(([_key, value]) => {
-              return {
-                label: `${value.decode} [${value.kontrollpunkt}]`,
-                value: value.kontrollpunkt,
-              }
-            })}
-          />
+          <VStack gap="space-24">
+            <RadioGroup
+              legend="Grunnlag for manuell behandling"
+              value={oppgavetype}
+              onChange={(value: 'kontrollpunkt' | 'oppgavetekst') => {
+                setOppgavetype(value)
+                setValideringsfeil(undefined)
+              }}
+            >
+              <Radio value="kontrollpunkt">Kontrollpunkt</Radio>
+              <Radio value="oppgavetekst">Egendefinert oppgavetekst</Radio>
+            </RadioGroup>
+            {oppgavetype === 'kontrollpunkt' ? (
+              <UNSAFE_Combobox
+                label="Velg kontrollpunkt"
+                selectedOptions={valgtKontrollpunkt ? [valgtKontrollpunkt] : []}
+                onToggleSelected={(option, isSelected) => {
+                  setKontrollpunkt(isSelected ? option : null)
+                  setValideringsfeil(undefined)
+                }}
+                shouldAutocomplete
+                options={(props.behandling.muligeKontrollpunkt ?? []).map((value) => ({
+                  label: `${value.decode} [${value.kontrollpunkt}]`,
+                  value: value.kontrollpunkt,
+                }))}
+                error={valideringsfeil ?? props.errors?.kontrollpunkt}
+              />
+            ) : (
+              <Textarea
+                label="Oppgavetekst"
+                description="Beskriv hvorfor kravet må behandles manuelt. Det blir ikke lagt til et kontrollpunkt."
+                value={oppgavetekst}
+                onChange={(event) => {
+                  setOppgavetekst(event.target.value)
+                  setValideringsfeil(undefined)
+                }}
+                error={valideringsfeil ?? props.errors?.oppgavetekst}
+              />
+            )}
+          </VStack>
         </Dialog.Body>
         <Dialog.Footer>
           <Dialog.CloseTrigger>
@@ -61,13 +103,9 @@ export default function SendTilManuellMedKontrollpunktModal(props: Props) {
             data-color="danger"
             type="button"
             variant="primary"
-            disabled={valgtKontrollpunkt == null || props.isSubmitting}
+            disabled={props.isSubmitting}
             loading={props.isSubmitting}
-            onClick={() => {
-              if (valgtKontrollpunkt) {
-                props.sendTilManuellMedKontrollpunkt(valgtKontrollpunkt.kontrollpunkt)
-              }
-            }}
+            onClick={sendTilManuell}
           >
             Manuell behandling
           </Button>

@@ -21,7 +21,7 @@ import {
   taTilDebug,
 } from '~/services/behandling.server'
 import { env, isAldeLinkEnabled } from '~/services/env.server'
-import type { DetaljertFremdriftDTO } from '~/types'
+import type { DetaljertFremdriftDTO, SendTilManuellRequest } from '~/types'
 import type { Route } from './+types/behandling.$behandlingId'
 
 export const OPERATION = {
@@ -68,9 +68,23 @@ function operationHandlers(
   if (operation === OPERATION.oppdaterAnsvarligTeam && ansvarligTeam.error) {
     errors.ansvarligTeam = ansvarligTeam.error
   }
-  const kontrollpunkt = getField(form, 'kontrollpunkt')
-  if (operation === OPERATION.sendTilManuellMedKontrollpunkt && kontrollpunkt.error) {
-    errors.kontrollpunkt = kontrollpunkt.error
+  let manuellRequest: SendTilManuellRequest | undefined
+  if (operation === OPERATION.sendTilManuellMedKontrollpunkt) {
+    const kontrollpunkt = form.get('kontrollpunkt')
+    const oppgavetekst = form.get('oppgavetekst')
+    if (form.has('kontrollpunkt') && form.has('oppgavetekst')) {
+      errors.kontrollpunkt = errors.oppgavetekst = 'Velg enten kontrollpunkt eller egendefinert oppgavetekst.'
+    } else if (form.has('oppgavetekst')) {
+      if (typeof oppgavetekst !== 'string' || !oppgavetekst.trim()) {
+        errors.oppgavetekst = 'Skriv inn oppgavetekst.'
+      } else {
+        manuellRequest = { oppgavetekst: oppgavetekst.trim() }
+      }
+    } else if (typeof kontrollpunkt !== 'string' || !kontrollpunkt.trim()) {
+      errors.kontrollpunkt = 'Velg et kontrollpunkt.'
+    } else {
+      manuellRequest = { kontrollpunkt: kontrollpunkt.trim() }
+    }
   }
   const beskrivelse = form.get('begrunnelse')
   let trimmedBegrunnelse = ''
@@ -104,8 +118,10 @@ function operationHandlers(
         handler = () => runBehandling(request, behandlingId)
         break
       case OPERATION.sendTilManuellMedKontrollpunkt:
-        if (kontrollpunkt.value)
-          handler = () => sendTilManuellMedKontrollpunkt(request, behandlingId, kontrollpunkt.value)
+        if (manuellRequest) {
+          const data = manuellRequest
+          handler = () => sendTilManuellMedKontrollpunkt(request, behandlingId, data)
+        }
         break
       case OPERATION.sendTilOppdragPaNytt:
         handler = async () => {

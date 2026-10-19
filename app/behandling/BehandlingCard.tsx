@@ -52,7 +52,7 @@ import SendTilManuellMedKontrollpunktModal from '~/components/behandling/SendTil
 import { BehandlingBatchDetaljertFremdriftBarChart } from '~/components/behandling-batch-fremdrift/BehandlingBatchDetaljertFremdriftBarChart'
 import { Entry } from '~/components/entry/Entry'
 import { harRolle, harTilgang, TILGANG_BEHANDLINGSERIE } from '~/components/venstre-meny/VenstreMeny'
-import type { BehandlingDto, DetaljertFremdriftDTO } from '~/types'
+import type { BehandlingDto, DetaljertFremdriftDTO, SendTilManuellRequest } from '~/types'
 
 export interface Props {
   aldeBehandlingUrlTemplate?: string
@@ -225,16 +225,13 @@ export default function BehandlingCard(props: Props) {
     )
   }
 
-  function sendTilManuellMedKontrollpunkt(kontrollpunkt: string) {
-    fetcher.submit(
-      {
-        kontrollpunkt: kontrollpunkt,
-        operation: OPERATION.sendTilManuellMedKontrollpunkt,
-      },
-      {
-        method: 'POST',
-      },
-    )
+  function sendTilManuellMedKontrollpunkt(data: SendTilManuellRequest) {
+    const formData = new FormData()
+    formData.set('operation', OPERATION.sendTilManuellMedKontrollpunkt)
+    for (const [key, value] of Object.entries(data)) {
+      formData.set(key, value)
+    }
+    fetcher.submit(formData, { method: 'POST' })
   }
 
   function sendTilOppdragPaNytt() {
@@ -731,6 +728,7 @@ export default function BehandlingCard(props: Props) {
             <SendTilManuellMedKontrollpunktModal
               sendTilManuellMedKontrollpunkt={sendTilManuellMedKontrollpunkt}
               behandling={props.behandling}
+              errors={fetcher.data?.errors}
               isSubmitting={
                 fetcher.state !== 'idle' &&
                 fetcher.formData?.get('operation') === OPERATION.sendTilManuellMedKontrollpunkt

@@ -40,6 +40,7 @@ describe('behandling.$behandlingId action', () => {
   let fetchSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
+    vi.clearAllMocks()
     fetchSpy = vi.fn()
     vi.stubGlobal('fetch', fetchSpy)
   })
@@ -98,4 +99,63 @@ describe('behandling.$behandlingId action', () => {
 
     expect(result).toEqual({ errors: { operation: expect.stringContaining('ugyldig') } })
   })
+
+  it.each([
+    { kontrollpunkt: ' KP001 ' },
+    { oppgavetekst: ' Manuell behandling: Overlappende trygdetidsperioder, kravet lar seg ikke behandle automatisk. ' },
+  ])('sender kun valgt grunnlag videre: %j', async (data) => {
+    const { sendTilManuellMedKontrollpunkt } = await import('~/services/behandling.server')
+    const formData = new FormData()
+    formData.set('operation', 'sendTilManuellMedKontrollpunkt')
+    const expected: Record<string, string> = {}
+    for (const [key, value] of Object.entries(data)) {
+      formData.set(key, value)
+      expected[key] = value.trim()
+    }
+
+    const request = new Request('http://localhost/behandling/123', { method: 'POST', body: formData })
+    const result = await action(actionArgs(request))
+
+    expect(result).toBeNull()
+    expect(sendTilManuellMedKontrollpunkt).toHaveBeenCalledExactlyOnceWith(request, '123', expected)
+  })
+
+  it.each([
+    { data: {}, field: 'kontrollpunkt' },
+    { data: { kontrollpunkt: '   ' }, field: 'kontrollpunkt' },
+    { data: { oppgavetekst: ' \n ' }, field: 'oppgavetekst' },
+    { data: { kontrollpunkt: 'KP001', oppgavetekst: 'Manuell vurdering' }, field: 'oppgavetekst' },
+    { data: { kontrollpunkt: '', oppgavetekst: 'Manuell vurdering' }, field: 'oppgavetekst' },
+  ])('avviser ugyldig grunnlag uten å kalle backend: $data', async ({ data, field }) => {
+    const { sendTilManuellMedKontrollpunkt } = await import('~/services/behandling.server')
+    const formData = new FormData()
+    formData.set('operation', 'sendTilManuellMedKontrollpunkt')
+    for (const [key, value] of Object.entries(data)) {
+      formData.set(key, value)
+    }
+
+    const request = new Request('http://localhost/behandling/123', { method: 'POST', body: formData })
+    const result = await action(actionArgs(request))
+
+    expect(result).toEqual({ errors: expect.objectContaining({ [field]: expect.any(String) }) })
+    expect(sendTilManuellMedKontrollpunkt).not.toHaveBeenCalled()
+  })
+
+  it.each([{ kontrollpunkt: 'KP001' }, { oppgavetekst: 'Manuell behandling: Overlappende trygdetidsperioder.' }])(
+    'sender foreslått API-body uendret med PUT: %j',
+    async (data) => {
+      const { sendTilManuellMedKontrollpunkt } =
+        await vi.importActual<typeof import('~/services/behandling.server')>('~/services/behandling.server')
+      fetchSpy.mockResolvedValueOnce(new Response(null, { status: 200 }))
+      const request = new Request('http://localhost/behandling/123')
+
+      await sendTilManuellMedKontrollpunkt(request, '123', data)
+
+      expect(fetchSpy).toHaveBeenCalledOnce()
+      const [url, init] = fetchSpy.mock.calls[0]
+      expect(url).toBe('http://pen-test/api/behandling/123/sendTilManuellMedKontrollpunkt')
+      expect(init.method).toBe('PUT')
+      expect(JSON.parse(init.body)).toEqual(data)
+    },
+  )
 })
