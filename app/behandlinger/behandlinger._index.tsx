@@ -52,7 +52,12 @@ export default function AvhengigeBehandlinger({ loaderData }: Route.ComponentPro
   return (
     <VStack gap="space-24">
       {opprettetPerDag && <BehandlingerPerDagLineChartCard opprettetPerDag={opprettetPerDag} chartHeight={180} />}
-      <BehandlingerTable visStatusSoek={true} visTidsperiodeSoek={true} behandlingerResponse={behandlinger} />
+      <BehandlingerTable
+        visStatusSoek={true}
+        visTidsperiodeSoek={true}
+        inkluderSendTilManuell
+        behandlingerResponse={behandlinger}
+      />
     </VStack>
   )
 }

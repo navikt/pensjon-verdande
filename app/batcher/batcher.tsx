@@ -32,5 +32,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export default function BehandlingerStatus({ loaderData }: Route.ComponentProps) {
   const { behandlinger } = loaderData
 
-  return <BehandlingerTable visStatusSoek={true} behandlingerResponse={behandlinger as BehandlingerPage} />
+  return (
+    <BehandlingerTable
+      visStatusSoek={true}
+      inkluderSendTilManuell
+      behandlingerResponse={behandlinger as BehandlingerPage}
+    />
+  )
 }

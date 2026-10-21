@@ -42,6 +42,7 @@ export default function BehandlingerStatus({ loaderData }: Route.ComponentProps)
     <BehandlingerTable
       visStatusSoek={false}
       visTidsperiodeSoek={true}
+      inkluderSendTilManuell
       behandlingerResponse={behandlinger as BehandlingerPage}
     />
   )

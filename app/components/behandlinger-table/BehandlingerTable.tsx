@@ -4,21 +4,27 @@ import {
   Button,
   Checkbox,
   DatePicker,
+  Dialog,
   HStack,
+  InlineMessage,
   Pagination,
+  Radio,
+  RadioGroup,
   Select,
   Spacer,
   Table,
   Tag,
+  Textarea,
+  UNSAFE_Combobox,
   useRangeDatepicker,
 } from '@navikt/ds-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useFetcher, useSearchParams } from 'react-router'
 import { formatIsoTimestamp, toIsoDate } from '~/common/date'
 import { decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
 import { decodeBehandling } from '~/common/decodeBehandling'
 import { decodeTeam, Team } from '~/common/decodeTeam'
-import type { BehandlingDto, BehandlingerPage } from '~/types'
+import type { BehandlingDto, BehandlingerPage, KontrollpunktDecode } from '~/types'
 import styles from './behandlinger-table.module.css'
 
 interface Props {
@@ -27,7 +33,15 @@ interface Props {
   visBehandlingTypeSoek?: boolean | true
   visAnsvarligTeamSoek?: boolean | true
   visTidsperiodeSoek?: boolean
+  inkluderSendTilManuell?: boolean
   behandlingerResponse: BehandlingerPage
+}
+
+type SendTilManuellResult = { success: true; antall: number } | { success: false; error: string }
+type ManuellTilgjengelighet = {
+  behandlingIder: number[]
+  kanSendesTilManuell: number[]
+  kontrollpunkter: KontrollpunktDecode[]
 }
 
 export default function BehandlingerTable({
@@ -36,9 +50,11 @@ export default function BehandlingerTable({
   visBehandlingTypeSoek = true,
   visAnsvarligTeamSoek = true,
   visTidsperiodeSoek = false,
+  inkluderSendTilManuell = false,
   behandlingerResponse,
 }: Props) {
-  const fetcher = useFetcher()
+  const fetcher = useFetcher<SendTilManuellResult>()
+  const manuellTilgjengelighetFetcher = useFetcher<ManuellTilgjengelighet>()
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -47,6 +63,33 @@ export default function BehandlingerTable({
   const sortDecending = sortParam?.[1] || 'desc'
 
   const [valgteBehandlingIder, setValgteBehandlingIder] = useState<number[]>([])
+  const [sendTilManuellDialogOpen, setSendTilManuellDialogOpen] = useState(false)
+  const [oppgavetype, setOppgavetype] = useState<'kontrollpunkt' | 'egendefinert'>('kontrollpunkt')
+  const [valgtKontrollpunkt, setValgtKontrollpunkt] = useState('')
+  const [oppgavetekst, setOppgavetekst] = useState('')
+  const previousFetcherState = useRef(fetcher.state)
+  const behandlingIderKey = [...valgteBehandlingIder].sort((a, b) => a - b).join(',')
+
+  useEffect(() => {
+    if (previousFetcherState.current !== 'idle' && fetcher.state === 'idle' && fetcher.data?.success) {
+      setValgteBehandlingIder([])
+      setOppgavetype('kontrollpunkt')
+      setValgtKontrollpunkt('')
+      setOppgavetekst('')
+      setSendTilManuellDialogOpen(false)
+    }
+    previousFetcherState.current = fetcher.state
+  }, [fetcher.state, fetcher.data])
+
+  useEffect(() => {
+    if (inkluderSendTilManuell && behandlingIderKey) {
+      const params = new URLSearchParams()
+      behandlingIderKey.split(',').forEach((behandlingId) => {
+        params.append('behandlingId', behandlingId)
+      })
+      manuellTilgjengelighetFetcher.load(`/api/send-behandlinger-til-manuell?${params.toString()}`)
+    }
+  }, [behandlingIderKey, inkluderSendTilManuell, manuellTilgjengelighetFetcher.load])
 
   const fomParam = searchParams.get('fom')
   const tomParam = searchParams.get('tom')
@@ -106,10 +149,25 @@ export default function BehandlingerTable({
     return [{ value: '', label: 'Alle typer' }, ...ekstraBehandlingType, ...behandlingstyper]
   }
 
-  const toggleSelectedRow = (behandlingId: number) =>
+  const toggleSelectedRow = (behandlingId: number) => {
     setValgteBehandlingIder((list) =>
       list.includes(behandlingId) ? list.filter((id) => id !== behandlingId) : [...list, behandlingId],
     )
+  }
+
+  const kanSendesTilManuell =
+    valgteBehandlingIder.length > 0 &&
+    manuellTilgjengelighetFetcher.state === 'idle' &&
+    manuellTilgjengelighetFetcher.data?.behandlingIder.join(',') === behandlingIderKey &&
+    valgteBehandlingIder.every((behandlingId) =>
+      manuellTilgjengelighetFetcher.data?.kanSendesTilManuell.includes(behandlingId),
+    )
+  const kontrollpunkter = manuellTilgjengelighetFetcher.data?.kontrollpunkter ?? []
+  const kanSendeTilManuellMedValgtInnhold =
+    kanSendesTilManuell &&
+    (oppgavetype === 'kontrollpunkt'
+      ? kontrollpunkter.some((it) => it.kontrollpunkt === valgtKontrollpunkt)
+      : oppgavetekst.trim().length > 0)
 
   function fortsettValgteBehandlinger() {
     fetcher.submit(
@@ -120,6 +178,23 @@ export default function BehandlingerTable({
       },
     )
     setValgteBehandlingIder([])
+  }
+
+  function sendValgteBehandlingerTilManuell() {
+    if (!kanSendeTilManuellMedValgtInnhold) return
+
+    fetcher.submit(
+      {
+        behandlingIder: JSON.stringify(valgteBehandlingIder),
+        modus: oppgavetype,
+        kontrollpunkt: valgtKontrollpunkt,
+        oppgavetekst,
+      },
+      {
+        action: '/api/send-behandlinger-til-manuell',
+        method: 'POST',
+      },
+    )
   }
 
   return (
@@ -221,13 +296,12 @@ export default function BehandlingerTable({
                     valgteBehandlingIder.length !== behandlingerResponse.content.length
                   }
                   onChange={() => {
-                    valgteBehandlingIder.length
-                      ? setValgteBehandlingIder([])
-                      : setValgteBehandlingIder(
-                          behandlingerResponse.content
-                            .filter((it) => it.utsattTil != null)
-                            .map(({ behandlingId }) => behandlingId),
-                        )
+                    if (valgteBehandlingIder.length) {
+                      setValgteBehandlingIder([])
+                    } else {
+                      const behandlinger = behandlingerResponse.content.filter((it) => it.utsattTil != null)
+                      setValgteBehandlingIder(behandlinger.map(({ behandlingId }) => behandlingId))
+                    }
                   }}
                   hideLabel
                 >
@@ -311,6 +385,93 @@ export default function BehandlingerTable({
           >
             Fortsett valgte behandlinger
           </Button>
+        )}
+        {inkluderSendTilManuell && (
+          <Dialog open={sendTilManuellDialogOpen} onOpenChange={setSendTilManuellDialogOpen}>
+            {kanSendesTilManuell && (
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => {
+                  fetcher.reset()
+                  setSendTilManuellDialogOpen(true)
+                }}
+              >
+                Send valgte behandlinger til manuell behandling
+              </Button>
+            )}
+            <Dialog.Popup>
+              <Dialog.Header>
+                <Dialog.Title>Send behandlinger til manuell behandling</Dialog.Title>
+                <Dialog.Description>
+                  De {valgteBehandlingIder.length} valgte behandlingene sendes til manuell behandling. Oppgavene
+                  opprettes asynkront av behandlingsmotoren.
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Body>
+                <RadioGroup
+                  legend="Hvordan skal oppgaven opprettes?"
+                  value={oppgavetype}
+                  onChange={(value: 'kontrollpunkt' | 'egendefinert') => {
+                    setOppgavetype(value)
+                    fetcher.reset()
+                  }}
+                >
+                  <Radio value="kontrollpunkt">Kontrollpunkt</Radio>
+                  <Radio value="egendefinert">Egendefinert oppgave</Radio>
+                </RadioGroup>
+                {oppgavetype === 'kontrollpunkt' ? (
+                  <UNSAFE_Combobox
+                    label="Velg kontrollpunkt"
+                    selectedOptions={valgtKontrollpunkt ? [valgtKontrollpunkt] : []}
+                    onToggleSelected={(option, isSelected) => setValgtKontrollpunkt(isSelected ? option : '')}
+                    shouldAutocomplete
+                    options={kontrollpunkter.map(({ kontrollpunkt, decode }) => ({
+                      label: `${decode} [${kontrollpunkt}]`,
+                      value: kontrollpunkt,
+                    }))}
+                    error={fetcher.data?.success === false ? fetcher.data.error : undefined}
+                  />
+                ) : (
+                  <Textarea
+                    label="Oppgavetekst"
+                    description="Behandlingene sendes til manuell behandling med kontrollpunkt AUTO_PROS_FEILER. Oppgavene får teksten du skriver her."
+                    value={oppgavetekst}
+                    onChange={(event) => setOppgavetekst(event.target.value)}
+                    error={fetcher.data?.success === false ? fetcher.data.error : undefined}
+                    autoComplete="off"
+                  />
+                )}
+                {oppgavetype === 'kontrollpunkt' && kontrollpunkter.length === 0 && kanSendesTilManuell && (
+                  <InlineMessage status="warning">
+                    Behandlingene har ingen felles kontrollpunkter. Velg egendefinert oppgave i stedet.
+                  </InlineMessage>
+                )}
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Dialog.CloseTrigger>
+                  <Button type="button" variant="secondary">
+                    Avbryt
+                  </Button>
+                </Dialog.CloseTrigger>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={sendValgteBehandlingerTilManuell}
+                  disabled={!kanSendeTilManuellMedValgtInnhold || fetcher.state !== 'idle'}
+                  loading={fetcher.state !== 'idle'}
+                >
+                  Send til manuell behandling
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Popup>
+          </Dialog>
+        )}
+        {fetcher.data?.success && (
+          <InlineMessage status="success" size="small">
+            Overføring til manuell behandling er bestilt for {fetcher.data.antall} behandlinger. Oppgavene opprettes
+            asynkront.
+          </InlineMessage>
         )}
         <Spacer />
         <Pagination
