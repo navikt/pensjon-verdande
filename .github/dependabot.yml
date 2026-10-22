@@ -3,7 +3,10 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: weekly
+      day: monday
+      time: '07:00'
+      timezone: 'Europe/Oslo'
     cooldown:
       default-days: 7
     groups:
@@ -39,7 +42,10 @@ updates:
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: weekly
+      day: monday
+      time: '07:00'
+      timezone: 'Europe/Oslo'
     cooldown:
       default-days: 7
     ignore:
@@ -50,7 +56,10 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
+      day: monday
+      time: '07:00'
+      timezone: 'Europe/Oslo'
     cooldown:
       default-days: 7
     open-pull-requests-limit: 10
