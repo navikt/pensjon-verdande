@@ -52,7 +52,7 @@
     "winston": "^3.19.0",
     "xml-formatter": "^3.7.0",
     "zod": "^4.6.7",
-    "zod-form-data": "^3.0.3"
+    "zod-form-data": "^3.0.4"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

@@ -92,8 +92,8 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
       zod-form-data:
-        specifier: ^3.0.3
-        version: 3.0.3(zod@4.6.7)
+        specifier: ^3.0.4
+        version: 3.0.4(zod@4.6.7)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.15
@@ -1259,8 +1259,8 @@ packages:
     os: [linux]
     libc: [glibc]
 
-  '@rvf/set-get@7.0.3':
-    resolution: {integrity: sha512-Ky2uOJ5WpgqVev4W+dNlOIJ2R9b6heHD4PHx7NGI98XanfeH8Pl/m5wE0aZU3d/nD79iOUlZHBn0uxJU/DJF7g==}
+  '@rvf/set-get@7.0.4':
+    resolution: {integrity: sha512-1QZ3hRXB0ftyaszFwTgLYzW+Ydeffz5tPPqEYeX88okTBiZXXWmavNIL/jjXX/Q/s9oj1NAJ5veqNuPYzbg4mg==}
 
   '@so-ric/colorspace@1.1.6':
     resolution: {integrity: sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw==}
@@ -3228,8 +3228,8 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
-  zod-form-data@3.0.3:
-    resolution: {integrity: sha512-1qXJ6hayyUr3TqxfXqmm5qwCa8f/mnG/o8Itcny03iFyrwX/dZkCwfCcYoJDyQP8RxEkycw0c/ldCJXBeaCstg==}
+  zod-form-data@3.0.4:
+    resolution: {integrity: sha512-3GGlbm9HdPwaUskkwu4ozubCD0sU8POnRMFuFl5BIJcSN4fm61Fn4zj7wIq6ufUFzP4hsdp4NvpeuovlXj5kkw==}
     peerDependencies:
       zod: '>= 3.25.0'
 
@@ -4113,7 +4113,7 @@ snapshots:
   '@rollup/rollup-linux-x64-gnu@4.61.1':
     optional: true
 
-  '@rvf/set-get@7.0.3': {}
+  '@rvf/set-get@7.0.4': {}
 
   '@so-ric/colorspace@1.1.6':
     dependencies:
@@ -6092,9 +6092,9 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  zod-form-data@3.0.3(zod@4.6.7):
+  zod-form-data@3.0.4(zod@4.6.7):
     dependencies:
-      '@rvf/set-get': 7.0.3
+      '@rvf/set-get': 7.0.4
       zod: 4.6.7
 
   zod@4.6.7: {}
