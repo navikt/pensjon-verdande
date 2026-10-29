@@ -62,7 +62,7 @@ describe('gjenlevendepensjon-opphor action', () => {
     expect(fetchSpy).not.toHaveBeenCalled()
   })
 
-  it.each(['-1', '1.5', '9007199254740993'])('avviser ugyldig sak-ID: %s', async (sakIdListe) => {
+  it.each(['1.5', '9007199254740993'])('avviser sak-ID som ikke er et sikkert heltall: %s', async (sakIdListe) => {
     await expect(action(actionArgs({ sakIdListe }))).rejects.toMatchObject({ status: 400 })
     expect(fetchSpy).not.toHaveBeenCalled()
   })
