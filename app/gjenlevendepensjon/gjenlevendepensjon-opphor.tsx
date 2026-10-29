@@ -53,7 +53,7 @@ export default function GjenlevendepensjonOpphorPage() {
   const [formData, setFormData] = useState<FormData | null>(null)
 
   return (
-    <VStack gap="space-20" style={{ maxWidth: '40em' }}>
+    <VStack gap="space-20" margin="space-32" style={{ maxWidth: '40em' }}>
       <Heading size="medium" level="1">
         Opprett behandlinger for opphør av gjenlevendepensjon
       </Heading>
