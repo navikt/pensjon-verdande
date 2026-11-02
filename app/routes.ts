@@ -214,6 +214,8 @@ export default [
 
     route('hvilenderett', 'uforetrygd/hvilende-rett.tsx'),
 
+    route('gjenlevendepensjon-opphor', 'gjenlevendepensjon/gjenlevendepensjon-opphor.tsx'),
+
     route('regelendring2026', 'uforetrygd/regelendring2026.tsx'),
 
     route('unge-med-uforetrygd-varsler', 'uforetrygd/varsler/unge-med-uforetrygd-varsel.tsx'),
