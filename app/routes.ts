@@ -284,5 +284,16 @@ export default [
 
     route('kontroll-saerskilt-sats', 'kontroll-saerskilt-sats/kontroll-saerskilt-sats._index.tsx'),
     route('kontroll-kvalitetssjekk', 'kontroll-kvalitetssjekk/kontroll-kvalitetssjekk._index.tsx'),
+
+    route('reguleringsomregning', 'reguleringsomregning/reguleringsomregning._index.tsx'),
+    route('reguleringsomregning/behandlinger', 'reguleringsomregning/reguleringsomregning.behandlinger.tsx'),
+    route(
+      'reguleringsomregning/reguleringsomregning',
+      'reguleringsomregning/reguleringsomregning.reguleringsomregning.tsx',
+    ),
+    route(
+      'reguleringsomregning/reguleringsomregningsaker',
+      'reguleringsomregning/reguleringsomregning.reguleringsomregningsaker.tsx',
+    ),
   ]),
 ] satisfies RouteConfig

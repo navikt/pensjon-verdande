@@ -368,6 +368,11 @@ export type OmregningInputSaker = {
 export type OmregningBehandlingsnoekler = {
   behandlingsnoekkel: string[]
 }
+export type ReguleringsomregningRequest = {
+  reguleringsdato: string
+  prioritet: string
+  fullstendigUttrekk: boolean
+}
 
 export type BehandlingManuellOpptellingDto = {
   behandlingType: string

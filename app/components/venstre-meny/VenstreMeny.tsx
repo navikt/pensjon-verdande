@@ -84,6 +84,11 @@ const omregningMeny = [
   ['OMREGN_YTELSER', '/omregning', 'Omregn ytelser'],
 ]
 
+const reguleringsomregningMeny = [
+  ['REGULERING_LES', '/reguleringsomregning/behandlinger', 'Behandlinger'],
+  ['REGULERING_LES', '/reguleringsomregning', 'Reguler ytelser'],
+]
+
 const behandlingerMeny = [
   ['SE_BEHANDLINGER', '/behandlinger/antall', 'Antall etter type'],
   ['SE_BEHANDLINGER', '/behandlinger', 'Alle behandlinger'],
@@ -312,6 +317,12 @@ export default function VenstreMeny(props: Props) {
             omregningMeny,
             nextIndex,
             <CurrencyExchangeIcon title="Omregning" fontSize="1.5rem" />,
+          )}
+          {byggMeny(
+            'Reguleringsomregning',
+            reguleringsomregningMeny,
+            nextIndex,
+            <CurrencyExchangeIcon title="Reguleringsomregning" fontSize="1.5rem" />,
           )}
           {byggMeny('Vedlikehold', administrasjonMeny, nextIndex, <WrenchIcon title="Vedlikehold" fontSize="1.5rem" />)}
         </ul>

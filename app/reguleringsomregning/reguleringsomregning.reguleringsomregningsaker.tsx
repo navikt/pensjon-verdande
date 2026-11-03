@@ -1,0 +1,17 @@
+import { apiPost } from '~/services/api.server'
+import type { Route } from './+types/reguleringsomregning.reguleringsomregningsaker'
+
+export const action = async ({ request }: Route.ActionArgs) => {
+  const formData = await request.formData()
+  const omregnedeSaker = (formData.get('saksnummerListe') as string)
+    .split('\n')
+    .map((t: string) => t.trim())
+    .filter((t: string) => t !== '')
+    .map(Number)
+
+  const requestPen: { saker: number[] } = {
+    saker: omregnedeSaker,
+  }
+
+  return await apiPost('/api/behandling/reguleringsomregning/input', requestPen, request)
+}
