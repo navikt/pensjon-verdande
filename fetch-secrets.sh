@@ -146,7 +146,7 @@ fetch_nais_secret_env "AzureAD" "pensjon-$env" "dev-gcp" "pensjon-verdande-$env"
   echo PEN_SCOPE=api://dev-fss.pensjon-q2.pensjon-pen-q2/.default
   echo PEN_SERVICE_NAME='pensjon-pen-q2'
   echo PEN_URL=http://localhost:8089
-  echo PSAK_SAK_URL_TEMPLATE='http://localhost:9080/psak/sak/sakId={sakId}'
+  echo PSAK_SAK_URL_TEMPLATE='http://localhost:9081/pensjonsoversikt?sakId={sakId}'
   echo TEMPO_DATA_SOURCE='dev-gcp-tempo'
 } >> ${envfile}
 
