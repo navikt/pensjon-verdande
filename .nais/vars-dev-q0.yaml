@@ -17,7 +17,7 @@ pen:
   url: 'https://pensjon-pen-q0.dev-fss-pub.nais.io'
 
 psak:
-  sak_url_template: 'https://pensjon-psak-q0.nais.preprod.local/psak/sak/sakId={sakId}'
+  sak_url_template: 'https://pensjon-penny-q0.intern.dev.nav.no/pensjonsoversikt?sakId={sakId}'
 
 alde:
   link_enabled: false
