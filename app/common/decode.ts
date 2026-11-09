@@ -20,6 +20,11 @@ const BEHANDLING_STATUS_VARIANT_MAP = {
   UNDER_BEHANDLING: 'info',
 } as const
 
+export const OMREGNINGSSTRATEGI_MAP = {
+  DEFAULT: 'Default',
+  FREMSKRIVE_INNTEKT_UT: 'FremskriveInntektUT',
+} as const
+
 const AKTIVITET_STATUS_MAP = {
   OPPRETTET: 'Opprettet',
   FEILET: 'Feilet',
@@ -61,6 +66,8 @@ export function makeDecoder<M extends Record<string, string>>(map: M) {
 
 export const decodeBehandlingStatus = makeDecoder(BEHANDLING_STATUS_MAP)
 export const decodeAktivitetStatus = makeDecoder(AKTIVITET_STATUS_MAP)
+
+export const decodeOmregningsstrategi = makeDecoder(OMREGNINGSSTRATEGI_MAP)
 
 export const decodeBehandlingStatusToVariant = (key: string) =>
   BEHANDLING_STATUS_VARIANT_MAP[key as keyof typeof BEHANDLING_STATUS_VARIANT_MAP] ?? 'neutral'

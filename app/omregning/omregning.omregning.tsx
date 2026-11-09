@@ -29,6 +29,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   const omregningRequest = {
     ansvarligTeam: updates.ansvarligTeam,
+    omregningsstrategi: updates.omregningsstrategi,
     behandlingsnokkel: updates.behandlingsnokkel,
     beskrivelse: updates.beskrivelse,
     omregningstidspunkt: updates.omregningstidspunkt,
@@ -49,7 +50,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
     brevkoderSoker: brevkoderSoker,
     brevkoderBerorteSaker: brevkoderBerorteSaker,
     prioritet: updates.prioritet,
-    regelendringUt2026: updates.regelendringUt2026 === 'true',
     regelendringBerortSakAuto: updates.regelendringBerortSakAuto === 'true',
     skalBrukeKjoreplan: updates.skalBrukeKjoreplan === 'true',
     brevstrategi: updates.brevstrategi,

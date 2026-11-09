@@ -1,5 +1,6 @@
 import type { ComboboxProps } from '@navikt/ds-react'
 import { FormSummary, HGrid } from '@navikt/ds-react'
+import { decodeOmregningsstrategi } from '~/common/decode'
 import { decodeTeam } from '~/common/decodeTeam'
 
 type ComboboxOption = Exclude<ComboboxProps['options'][number], string>
@@ -15,6 +16,7 @@ interface OmregningOppsummeringProps {
   oppgaveSett: string
   oppgavePrefiks: string
   ansvarligTeam: string
+  omregningsstrategi: string
 
   behandleApneKrav: boolean
   brukFaktoromregning: boolean
@@ -25,7 +27,6 @@ interface OmregningOppsummeringProps {
   skalSamordne: boolean
   skalSletteIverksettingsoppgaver: boolean
   skalDistribuereUforevedtak: boolean
-  regelendringUt2026: boolean
   regelendringBerortSakAuto: boolean
   skalBrukeKjoreplan: boolean
   brevstrategi: string
@@ -78,6 +79,10 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
                   <FormSummary.Answer>
                     <FormSummary.Label>Ansvarlig team</FormSummary.Label>
                     <FormSummary.Value>{decodeTeam(props.ansvarligTeam)}</FormSummary.Value>
+                  </FormSummary.Answer>
+                  <FormSummary.Answer>
+                    <FormSummary.Label>Omregningsstrategi</FormSummary.Label>
+                    <FormSummary.Value>{decodeOmregningsstrategi(props.omregningsstrategi)}</FormSummary.Value>
                   </FormSummary.Answer>
                   <FormSummary.Answer>
                     <FormSummary.Label>Krav gjelder</FormSummary.Label>
@@ -148,10 +153,6 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
                   <FormSummary.Answer>
                     <FormSummary.Label>Skal bruke kjøreplan</FormSummary.Label>
                     <FormSummary.Value>{props.skalBrukeKjoreplan ? 'Ja' : 'Nei'}</FormSummary.Value>
-                  </FormSummary.Answer>
-                  <FormSummary.Answer>
-                    <FormSummary.Label>Regelendringer UT 2026</FormSummary.Label>
-                    <FormSummary.Value>{props.regelendringUt2026 ? 'Ja' : 'Nei'}</FormSummary.Value>
                   </FormSummary.Answer>
                   <FormSummary.Answer>
                     <FormSummary.Label>Regelendringer UT 2026 : Behandle berørt sak automatisk</FormSummary.Label>
