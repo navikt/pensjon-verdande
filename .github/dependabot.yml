@@ -9,6 +9,8 @@ updates:
       timezone: 'Europe/Oslo'
     cooldown:
       default-days: 7
+      exclude:
+        - '@navikt/*'
     groups:
       aksel:
         applies-to: version-updates
