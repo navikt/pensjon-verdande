@@ -50,13 +50,16 @@ export type BehandlingDto = {
 
   fnr?: string | null
   sakId?: number | null
+  sakType?: string | null
   kravId?: number | null
   vedtakId?: number | null
   journalpostId?: string | null
   kibanaUrl?: string
   feilmelding?: string | null
   kravBehandlendeEnhetId?: string | null
+  kravBehandlendeEnhetNavn?: string | null
   sakEnhetId?: string | null
+  sakEnhetNavn?: string | null
   gruppeId?: string | null
 
   matchedVerdiTypes?: string[]

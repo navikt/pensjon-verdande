@@ -45,6 +45,7 @@ import { formatIsoTimestamp } from '~/common/date'
 import { decodeAldeBehandlingState, decodeBehandlingStatus, decodeBehandlingStatusToVariant } from '~/common/decode'
 import { decodeAktivitet, decodeBehandling } from '~/common/decodeBehandling'
 import type { Team } from '~/common/decodeTeam'
+import { formatEnhet } from '~/common/formatEnhet'
 import { linkifyText } from '~/common/linkifyText'
 import { replaceTemplates } from '~/common/replace-templates'
 import AnsvarligTeamSelector from '~/components/behandling/AnsvarligTeamSelector'
@@ -401,16 +402,26 @@ export default function BehandlingCard(props: Props) {
     }
   }
 
-  function copyPasteEntry(name: string, value: string | number | null | undefined) {
+  function copyPasteEntry(name: string, value: string | number | null | undefined, copyText?: string) {
     if (value) {
       return (
         <Entry labelText={`${name}`}>
           <HStack align="start">
             {value}
             <Tooltip content={`Kopier ${name}`}>
-              <CopyButton copyText={value.toString()} size={'xsmall'} />
+              <CopyButton copyText={copyText ?? value.toString()} size={'xsmall'} />
             </Tooltip>
           </HStack>
+        </Entry>
+      )
+    }
+  }
+
+  function entry(name: string, value: string | number | null | undefined) {
+    if (value) {
+      return (
+        <Entry labelText={`${name}`}>
+          <HStack align="start">{value}</HStack>
         </Entry>
       )
     }
@@ -568,11 +579,15 @@ export default function BehandlingCard(props: Props) {
                       {copyPasteEntry('BehandlingId', props.behandling.behandlingId)}
                       {copyPasteEntry('Fødselsnummer', props.behandling.fnr)}
                       {copyPasteEntry('SakId', props.behandling.sakId)}
+                      {entry('Sakstype', props.behandling.sakType)}
+                      {entry('Sak enhet', formatEnhet(props.behandling.sakEnhetId, props.behandling.sakEnhetNavn))}
                       {copyPasteEntry('KravId', props.behandling.kravId)}
+                      {entry(
+                        'Krav behandlende enhet',
+                        formatEnhet(props.behandling.kravBehandlendeEnhetId, props.behandling.kravBehandlendeEnhetNavn),
+                      )}
                       {copyPasteEntry('VedtakId', props.behandling.vedtakId)}
                       {copyPasteEntry('JournalpostId', props.behandling.journalpostId)}
-                      {copyPasteEntry('Krav behandlende enhetId', props.behandling.kravBehandlendeEnhetId)}
-                      {copyPasteEntry('Sak enhetId', props.behandling.sakEnhetId)}
                       {props.behandling.forrigeBehandlingId && (
                         <Entry labelText={'Opprettet av behandling'}>
                           <Link as={NavLink} to={`/behandling/${props.behandling.forrigeBehandlingId}`}>
