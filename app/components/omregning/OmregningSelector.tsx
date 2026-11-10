@@ -1,12 +1,12 @@
 import { Select } from '@navikt/ds-react'
-import type React from 'react'
 
 interface OmregningSelectorProps {
   label: string
   navn: string
   value: string
-  setSelectedValue: React.Dispatch<React.SetStateAction<string>>
+  setSelectedValue: (value: string) => void
   optionsmap: { value: string; label: string }[]
+  readOnly?: boolean
   size?: 'small' | 'medium'
 }
 
@@ -18,6 +18,7 @@ export default function OmregningSelector(props: OmregningSelectorProps) {
       value={props.value}
       onChange={(event) => props.setSelectedValue(event.target.value)}
       size={props.size}
+      readOnly={props.readOnly}
     >
       {props.optionsmap.map((option) => (
         <option key={option.value} value={option.value}>

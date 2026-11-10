@@ -22,7 +22,7 @@ const BEHANDLING_STATUS_VARIANT_MAP = {
 
 export const OMREGNINGSSTRATEGI_MAP = {
   DEFAULT: 'Default',
-  FREMSKRIVE_INNTEKT_UT: 'FremskriveInntektUT',
+  UT_FREMSKRIVE_INNTEKT: 'Årsomregning uføretrygd',
 } as const
 
 const AKTIVITET_STATUS_MAP = {

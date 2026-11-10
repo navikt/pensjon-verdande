@@ -128,7 +128,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const submit = useSubmit()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (hasError) {
+    if (hasError || årsomregningJanuarFeil) {
       return
     } else {
       event.preventDefault()
@@ -201,7 +201,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     return date
   }
 
-  const { monthpickerProps, inputProps } = useMonthpicker({
+  const { monthpickerProps, inputProps, selectedMonth } = useMonthpicker({
     onMonthChange: setMonthSelected,
     fromDate: new Date(`1 Oct ${now.getFullYear() - 10}`),
     toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
@@ -222,6 +222,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [brevstrategi, setBrevstrategi] = useState(Object.values(optionBrevstrategi)[0])
   const [ansvarligTeam, setAnsvarligTeam] = useState<string>('PESYS_ALDER')
   const [omregningsstrategi, setOmregningsstrategi] = useState(optionOmregningsstrategi[0].value)
+  const årsomregningJanuarFeil =
+    omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT' && selectedMonth?.getMonth() !== 0
+      ? 'Velg januar for å bruke årsomregning uføretrygd'
+      : undefined
 
   const [searchParams, setSearchParams] = useSearchParams()
   const omregningsaker = omregningSakerPage as OmregningSakerPage
@@ -330,7 +334,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                       {...inputProps}
                       value={omregningstidspunkt}
                       label="Omregningstidspunkt (virkFom)"
-                      error={hasError && 'Du må velge måned'}
+                      error={årsomregningJanuarFeil || (hasError && 'Du må velge måned')}
                     />
                   </MonthPicker>
                   <input hidden type="text" name="omregningstidspunkt" value={omregningstidspunkt} readOnly />
@@ -344,12 +348,13 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={ansvarligTeam}
                     setSelectedValue={setAnsvarligTeam}
                     optionsmap={optionAnsvarligTeam}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                   />
                   <OmregningSelector
                     label={'Omregningsstrategi'}
                     navn={'omregningsstrategi'}
                     value={omregningsstrategi}
-                    setSelectedValue={setOmregningsstrategi}
+                    setSelectedValue={handleOmregningsstrategiChange}
                     optionsmap={optionOmregningsstrategi}
                   />
                   <OmregningSelector
@@ -358,6 +363,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={kravGjelder}
                     setSelectedValue={setKravGjelder}
                     optionsmap={optionsKravGjelder}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                   />
                   <OmregningSelector
                     label={'Kravårsak'}
@@ -365,6 +371,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={kravArsak}
                     setSelectedValue={setKravArsak}
                     optionsmap={optionsKravArsak}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                   />
                   <OmregningSelector
                     label={'Toleransegrense-sett'}
@@ -763,5 +770,15 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       `regelendringBerortSakAuto: ${regelendringBerortSakAuto}`,
       `skalBrukeKjøreplan: ${skalBrukeKjoreplan}`,
     ].join('\n')
+  }
+
+  function handleOmregningsstrategiChange(strategi: string) {
+    setOmregningsstrategi(strategi)
+
+    if (strategi === 'UT_FREMSKRIVE_INNTEKT') {
+      setAnsvarligTeam('PESYS_UFORE')
+      setKravGjelder('REVURD')
+      setKravArsak('OMREGNING')
+    }
   }
 }
