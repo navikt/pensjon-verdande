@@ -401,15 +401,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   <VStack gap="space-8">
                     <CheckboxGroup size={'medium'} legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
                       <OmregningCheckbox
-                        defaultChecked={behandleApneKrav}
                         name={'behandleApneKrav'}
                         value={behandleApneKrav}
                         onChange={setBehandleApneKrav}
+                        readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                       >
                         Behandle åpne krav
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={brukFaktoromregning}
                         name={'brukFaktoromregning'}
                         value={brukFaktoromregning}
                         onChange={setBrukFaktoromregning}
@@ -417,7 +416,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Bruk faktoromregning
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={opprettAlleOppgaver}
                         name={'opprettAlleOppgaver'}
                         value={opprettAlleOppgaver}
                         onChange={setOpprettAlleOppgaver}
@@ -425,19 +423,13 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Opprett alle oppgaver
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={sjekkYtelseFraAvtaleland}
                         name={'sjekkYtelseFraAvtaleland'}
                         value={sjekkYtelseFraAvtaleland}
                         onChange={setSjekkYtelseFraAvtaleland}
                       >
                         Sjekk ytelser fra avtaleland
                       </OmregningCheckbox>
-                      <OmregningCheckbox
-                        defaultChecked={omregneAFP}
-                        name={'omregneAFP'}
-                        value={omregneAFP}
-                        onChange={setOmregneAFP}
-                      >
+                      <OmregningCheckbox name={'omregneAFP'} value={omregneAFP} onChange={setOmregneAFP}>
                         Omregne AFP
                       </OmregningCheckbox>
                     </CheckboxGroup>
@@ -451,16 +443,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         optionsmap={optionPrioritet}
                         size={'small'}
                       />
-                      <OmregningCheckbox
-                        defaultChecked={skalSamordne}
-                        name={'skalSamordne'}
-                        value={skalSamordne}
-                        onChange={setSkalSamordne}
-                      >
+                      <OmregningCheckbox name={'skalSamordne'} value={skalSamordne} onChange={setSkalSamordne}>
                         Skal samordne
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={skalSletteIverksettingsoppgaver}
                         name={'skalSletteIverksettingsoppgaver'}
                         value={skalSletteIverksettingsoppgaver}
                         onChange={setSkalSletteIverksettingsoppgaver}
@@ -468,7 +454,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Skal slette iverksettingsoppgaver
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={skalDistribuereUforevedtak}
                         name={'skalDistribuereUforevedtak'}
                         value={skalDistribuereUforevedtak}
                         onChange={setSkalDistribuereUforevedtak}
@@ -476,7 +461,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Skal distribuere uførevedtak
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={skalBrukeKjoreplan}
                         name={'skalBrukeKjoreplan'}
                         value={skalBrukeKjoreplan}
                         onChange={setSkalBrukeKjoreplan}
@@ -484,7 +468,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Skal bruke kjøreplan
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={regelendringBerortSakAuto}
                         name={'regelendringBerortSakAuto'}
                         value={regelendringBerortSakAuto}
                         onChange={setRegelendringBerortSakAuto}
@@ -572,7 +555,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                       </Box>
                       <Box padding="space-16" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
                         <OmregningCheckbox
-                          defaultChecked={skalSendeBrevBerorteSaker}
                           name={'sendBrevBerorteSaker'}
                           value={skalSendeBrevBerorteSaker}
                           onChange={setSkalSendeBrevBerorteSaker}
@@ -779,6 +761,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       setAnsvarligTeam('PESYS_UFORE')
       setKravGjelder('REVURD')
       setKravArsak('OMREGNING')
+      setBehandleApneKrav(true)
     }
   }
 }
