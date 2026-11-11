@@ -23,7 +23,6 @@ import type React from 'react'
 import { useRef, useState } from 'react'
 import type { HTMLFormMethod } from 'react-router'
 import { Form, useFetcher, useNavigation, useSearchParams, useSubmit } from 'react-router'
-import { decodeOmregningsstrategi, OMREGNINGSSTRATEGI_MAP } from '~/common/decode'
 import { decodeTeam, Team } from '~/common/decodeTeam'
 import OmregningBrevCheckbox from '~/components/omregning/OmregningBrevCheckbox'
 import OmregningCheckbox from '~/components/omregning/OmregningCheckbox'
@@ -128,10 +127,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const submit = useSubmit()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     if (hasError || årsomregningJanuarFeil) {
       return
     } else {
-      event.preventDefault()
       const $form = event.currentTarget
       const formData = new FormData($form)
       submit(formData, {
@@ -188,7 +187,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     label,
   }))
 
-  const optionOmregningsstrategi = Object.entries(OMREGNINGSSTRATEGI_MAP).map(([value, label]) => ({ value, label }))
+  const optionOmregningsstrategi = Object.entries(omregningInit.omregningsstrategier).map(([value, label]) => ({
+    value,
+    label,
+  }))
 
   function setMonthSelected(date: Date | undefined): Date | undefined {
     if (!date) {
@@ -221,7 +223,8 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [prioritet, setPrioritet] = useState(optionPrioritet[1].value)
   const [brevstrategi, setBrevstrategi] = useState(Object.values(optionBrevstrategi)[0])
   const [ansvarligTeam, setAnsvarligTeam] = useState<string>('PESYS_ALDER')
-  const [omregningsstrategi, setOmregningsstrategi] = useState(optionOmregningsstrategi[0].value)
+  const [omregningsstrategi, setOmregningsstrategi] = useState('DEFAULT')
+  const omregningsstrategiNavn = omregningInit.omregningsstrategier[omregningsstrategi] ?? omregningsstrategi
   const årsomregningJanuarFeil =
     omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT' && selectedMonth?.getMonth() !== 0
       ? 'Velg januar for å bruke årsomregning uføretrygd'
@@ -669,7 +672,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   oppgaveSett={oppgaveSett}
                   oppgavePrefiks={oppgavePrefiks}
                   ansvarligTeam={ansvarligTeam}
-                  omregningsstrategi={omregningsstrategi}
+                  omregningsstrategi={omregningsstrategiNavn}
                   omregneAFP={omregneAFP}
                   prioritet={prioritet}
                   skalSamordne={skalSamordne}
@@ -729,7 +732,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       `omregningstidspunkt: ${omregningstidspunkt}`,
       ``,
       `ansvarligTeam: ${decodeTeam(ansvarligTeam)}`,
-      `omregningsstrategi: ${decodeOmregningsstrategi(omregningsstrategi)}`,
+      `omregningsstrategi: ${omregningsstrategiNavn}`,
       `kravGjelder: ${kravGjelder}`,
       `kravÅrsak: ${kravArsak}`,
       `toleransegrenseSett: ${toleransegrenseSett}`,

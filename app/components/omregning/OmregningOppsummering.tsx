@@ -1,6 +1,5 @@
 import type { ComboboxProps } from '@navikt/ds-react'
 import { FormSummary, HGrid } from '@navikt/ds-react'
-import { decodeOmregningsstrategi } from '~/common/decode'
 import { decodeTeam } from '~/common/decodeTeam'
 
 type ComboboxOption = Exclude<ComboboxProps['options'][number], string>
@@ -82,7 +81,7 @@ export function OmregningOppsummering(props: OmregningOppsummeringProps) {
                   </FormSummary.Answer>
                   <FormSummary.Answer>
                     <FormSummary.Label>Omregningsstrategi</FormSummary.Label>
-                    <FormSummary.Value>{decodeOmregningsstrategi(props.omregningsstrategi)}</FormSummary.Value>
+                    <FormSummary.Value>{props.omregningsstrategi}</FormSummary.Value>
                   </FormSummary.Answer>
                   <FormSummary.Answer>
                     <FormSummary.Label>Krav gjelder</FormSummary.Label>

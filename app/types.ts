@@ -343,6 +343,7 @@ export type OmregningInit = {
   oppgaveSett: string[]
   batchbrevtyper: string[]
   brevstrategier: Record<string, string>
+  omregningsstrategier: Record<string, string>
 }
 export type OmregningInput = {
   saker: string[]
