@@ -208,9 +208,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     fromDate: new Date(`1 Oct ${now.getFullYear() - 10}`),
     toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
     onValidate: (val) => {
-      if (!val.isValidMonth && val.isEmpty) {
-        setHasError(true)
-      }
+      setHasError(!val.isValidMonth && val.isEmpty)
     },
     required: true,
   })
@@ -321,7 +319,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     size="small"
                     value={behandlingsnokkel}
                     onChange={(event) => setBehandlingsnokkel(event.target.value)}
-                    error={hasError}
                   />
 
                   <TextField
@@ -335,7 +332,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   <MonthPicker {...monthpickerProps}>
                     <MonthPicker.Input
                       {...inputProps}
-                      value={omregningstidspunkt}
                       label="Omregningstidspunkt (virkFom)"
                       error={årsomregningJanuarFeil || (hasError && 'Du må velge måned')}
                     />
