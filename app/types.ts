@@ -52,6 +52,7 @@ export type BehandlingDto = {
   sakId?: number | null
   sakType?: string | null
   kravId?: number | null
+  kravGjelder?: string | null
   vedtakId?: number | null
   journalpostId?: string | null
   kibanaUrl?: string

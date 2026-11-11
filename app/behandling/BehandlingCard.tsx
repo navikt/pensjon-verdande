@@ -582,6 +582,7 @@ export default function BehandlingCard(props: Props) {
                       {entry('Sakstype', props.behandling.sakType)}
                       {entry('Sak enhet', formatEnhet(props.behandling.sakEnhetId, props.behandling.sakEnhetNavn))}
                       {copyPasteEntry('KravId', props.behandling.kravId)}
+                      {entry('Krav gjelder', props.behandling.kravGjelder)}
                       {entry(
                         'Krav behandlende enhet',
                         formatEnhet(props.behandling.kravBehandlendeEnhetId, props.behandling.kravBehandlendeEnhetNavn),
