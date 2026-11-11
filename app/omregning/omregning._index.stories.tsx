@@ -8,7 +8,6 @@ const mockData = {
     oppgaveSett: ['OPPG_01', 'OPPG_02'],
     batchbrevtyper: ['PE_AP_REGULERING', 'PE_UT_REGULERING'],
     omregningsstrategier: {
-      DEFAULT: 'Default',
       UT_FREMSKRIVE_INNTEKT: 'Årsomregning uføretrygd',
     },
     brevstrategier: {

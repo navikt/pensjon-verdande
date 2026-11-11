@@ -29,7 +29,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   const omregningRequest = {
     ansvarligTeam: updates.ansvarligTeam,
-    omregningsstrategi: updates.omregningsstrategi,
     behandlingsnokkel: updates.behandlingsnokkel,
     beskrivelse: updates.beskrivelse,
     omregningstidspunkt: updates.omregningstidspunkt,
@@ -53,6 +52,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     regelendringBerortSakAuto: updates.regelendringBerortSakAuto === 'true',
     skalBrukeKjoreplan: updates.skalBrukeKjoreplan === 'true',
     brevstrategi: updates.brevstrategi,
+    ...(updates.omregningsstrategi !== '' ? { omregningsstrategi: updates.omregningsstrategi } : {}),
   } as OmregningRequest
 
   const response = (await apiPost<{ behandlingId: number }>(

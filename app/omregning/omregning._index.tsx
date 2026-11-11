@@ -128,7 +128,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (hasError || årsomregningJanuarFeil) {
+    if (!kanStarteOmregning) {
       return
     } else {
       const $form = event.currentTarget
@@ -187,10 +187,11 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     label,
   }))
 
-  const optionOmregningsstrategi = Object.entries(omregningInit.omregningsstrategier).map(([value, label]) => ({
-    value,
-    label,
-  }))
+  const omregningsstrategier = omregningInit.omregningsstrategier ?? {}
+  const optionOmregningsstrategi = [
+    { value: '', label: 'Default' },
+    ...Object.entries(omregningsstrategier).map(([value, label]) => ({ value, label })),
+  ]
 
   function setMonthSelected(date: Date | undefined): Date | undefined {
     if (!date) {
@@ -221,12 +222,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [prioritet, setPrioritet] = useState(optionPrioritet[1].value)
   const [brevstrategi, setBrevstrategi] = useState(Object.values(optionBrevstrategi)[0])
   const [ansvarligTeam, setAnsvarligTeam] = useState<string>('PESYS_ALDER')
-  const [omregningsstrategi, setOmregningsstrategi] = useState('DEFAULT')
-  const omregningsstrategiNavn = omregningInit.omregningsstrategier[omregningsstrategi] ?? omregningsstrategi
+  const [omregningsstrategi, setOmregningsstrategi] = useState('')
+  const omregningsstrategiNavn =
+    omregningsstrategi === '' ? 'Default' : (omregningsstrategier[omregningsstrategi] ?? omregningsstrategi)
   const årsomregningJanuarFeil =
     omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT' && selectedMonth?.getMonth() !== 0
       ? 'Velg januar for å bruke årsomregning uføretrygd'
       : undefined
+  const kanStarteOmregning = selectedMonth !== undefined && !hasError && !årsomregningJanuarFeil
 
   const [searchParams, setSearchParams] = useSearchParams()
   const omregningsaker = omregningSakerPage as OmregningSakerPage
@@ -355,6 +358,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={omregningsstrategi}
                     setSelectedValue={handleOmregningsstrategiChange}
                     optionsmap={optionOmregningsstrategi}
+                    readOnly={omregningInit.omregningsstrategier === undefined}
                   />
                   <OmregningSelector
                     label={'Krav gjelder'}
@@ -627,7 +631,11 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
 
           <Box>
             <br />
-            <Button icon={<PlayIcon aria-hidden />} onClick={() => ref.current?.showModal()}>
+            <Button
+              icon={<PlayIcon aria-hidden />}
+              onClick={() => ref.current?.showModal()}
+              disabled={!kanStarteOmregning}
+            >
               Start omregning
             </Button>
 

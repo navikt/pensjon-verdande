@@ -63,7 +63,7 @@ describe('omregning.omregning action', () => {
     formData.set('sendBrevBerorteSaker', 'false')
     formData.set('prioritet', 'NORMAL')
     formData.set('ansvarligTeam', 'PESYS_UFORE')
-    formData.set('omregningsstrategi', 'DEFAULT')
+    formData.set('omregningsstrategi', '')
 
     const request = new Request('http://localhost/omregning/omregning', { method: 'POST', body: formData })
     const result = (await action(actionArgs(request))) as Response
@@ -84,7 +84,7 @@ describe('omregning.omregning action', () => {
     expect(result.headers.get('Location')).toBe('/behandling/42')
   })
 
-  it.each(['DEFAULT', 'UT_FREMSKRIVE_INNTEKT'])(
+  it.each(['', 'UT_FREMSKRIVE_INNTEKT'])(
     'sender valgt omregningsstrategi %s til backend',
     async (omregningsstrategi) => {
       fetchSpy.mockResolvedValueOnce(jsonResponse({ behandlingId: 42 }))
@@ -103,7 +103,11 @@ describe('omregning.omregning action', () => {
       const [, init] = fetchSpy.mock.calls[0]
       const sentBody = JSON.parse(init.body)
 
-      expect(sentBody.omregningsstrategi).toBe(omregningsstrategi)
+      if (omregningsstrategi === '') {
+        expect(sentBody).not.toHaveProperty('omregningsstrategi')
+      } else {
+        expect(sentBody.omregningsstrategi).toBe(omregningsstrategi)
+      }
     },
   )
 
