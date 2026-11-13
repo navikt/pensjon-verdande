@@ -209,7 +209,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     fromDate: new Date(`1 Oct ${now.getFullYear() - 10}`),
     toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
     onValidate: (val) => {
-      setHasError(!val.isValidMonth && val.isEmpty)
+      setHasError(!val.isValidMonth)
     },
     required: true,
   })
