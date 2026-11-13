@@ -10,29 +10,34 @@ import {
   useRouteLoaderData,
 } from 'react-router'
 import IkkeTilgang from '~/components/feilmelding/IkkeTilgang'
-
 import { env } from '~/services/env.server'
-import type { Route } from '../.react-router/types/app/+types/root'
+import type { Route } from './+types/root'
 import appStylesHref from './app.css?url'
 import '@navikt/ds-css'
+import { useTheme } from './components/theme-switch'
+import { getTheme } from './utils/theme.server'
 
 export const links: LinksFunction = () => {
   return [...[{ rel: 'stylesheet', href: appStylesHref }]]
 }
 
-export const loader = async () => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const theme = await getTheme(request)
+
   return {
     env: env.env,
+    theme,
   }
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const theme = useTheme()
   const rootData = useRouteLoaderData<typeof loader>('root')
   const envName = rootData?.env
   const title = envName ? (envName === 'p' ? 'Verdande' : `(${envName.toUpperCase()}) Verdande`) : 'Verdande'
 
   return (
-    <html lang="nb">
+    <html lang="nb" className={theme}>
       <head>
         <title>{title}</title>
         <meta charSet="utf-8" />
@@ -41,7 +46,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <div style={{ width: '100%' }}>{children}</div>
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>
