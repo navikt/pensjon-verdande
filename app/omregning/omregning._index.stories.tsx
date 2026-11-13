@@ -7,6 +7,12 @@ const mockData = {
     toleransegrenser: ['0', '100', '500'],
     oppgaveSett: ['OPPG_01', 'OPPG_02'],
     batchbrevtyper: ['PE_AP_REGULERING', 'PE_UT_REGULERING'],
+    omregningsstrategier: {
+      UT_FREMSKRIVE_INNTEKT: 'Årsomregning uføretrygd',
+    },
+    brevstrategier: {
+      INGEN: 'Ingen brevutsending',
+    },
   },
   omregningSakerPage: {
     content: [],

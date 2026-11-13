@@ -45,7 +45,7 @@ describe('omregning.omregning action', () => {
     const formData = new FormData()
     formData.set('behandlingsnokkel', 'TEST-2025')
     formData.set('beskrivelse', 'Omregning av alderspensjon')
-    formData.set('omregningstidspunkt', '2025-07-01')
+    formData.set('omregningstidspunkt', '202507')
     formData.set('omregneAFP', 'true')
     formData.set('behandleApneKrav', 'false')
     formData.set('brukFaktoromregning', 'false')
@@ -63,6 +63,7 @@ describe('omregning.omregning action', () => {
     formData.set('sendBrevBerorteSaker', 'false')
     formData.set('prioritet', 'NORMAL')
     formData.set('ansvarligTeam', 'PESYS_UFORE')
+    formData.set('omregningsstrategi', '')
 
     const request = new Request('http://localhost/omregning/omregning', { method: 'POST', body: formData })
     const result = (await action(actionArgs(request))) as Response
@@ -83,12 +84,39 @@ describe('omregning.omregning action', () => {
     expect(result.headers.get('Location')).toBe('/behandling/42')
   })
 
+  it.each(['', 'UT_FREMSKRIVE_INNTEKT'])(
+    'sender valgt omregningsstrategi %s til backend',
+    async (omregningsstrategi) => {
+      fetchSpy.mockResolvedValueOnce(jsonResponse({ behandlingId: 42 }))
+
+      const formData = new FormData()
+      formData.set('omregningsstrategi', omregningsstrategi)
+
+      const request = new Request('http://localhost/omregning/omregning', {
+        method: 'POST',
+        body: formData,
+      })
+
+      await action(actionArgs(request))
+
+      expect(fetchSpy).toHaveBeenCalledOnce()
+      const [, init] = fetchSpy.mock.calls[0]
+      const sentBody = JSON.parse(init.body)
+
+      if (omregningsstrategi === '') {
+        expect(sentBody).not.toHaveProperty('omregningsstrategi')
+      } else {
+        expect(sentBody.omregningsstrategi).toBe(omregningsstrategi)
+      }
+    },
+  )
+
   it('backend 500 kaster feil', async () => {
     fetchSpy.mockResolvedValueOnce(new Response('Feil', { status: 500 }))
 
     const formData = new FormData()
     formData.set('behandlingsnokkel', 'TEST')
-    formData.set('omregningstidspunkt', '2025-07-01')
+    formData.set('omregningstidspunkt', '202507')
 
     const request = new Request('http://localhost/omregning/omregning', { method: 'POST', body: formData })
     await expect(action(actionArgs(request))).rejects.toBeDefined()

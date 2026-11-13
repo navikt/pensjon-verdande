@@ -119,7 +119,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [brukFaktoromregning, setBrukFaktoromregning] = useState(false)
   const [opprettAlleOppgaver, setOpprettAlleOppgaver] = useState(false)
   const [sjekkYtelseFraAvtaleland, setSjekkYtelseFraAvtaleland] = useState(false)
-  const [regelendringUt2026, setRegelendringUt2026] = useState(false)
   const [regelendringBerortSakAuto, setRegelendringBerortSakAuto] = useState(false)
   const [skalBrukeKjoreplan, setSkalBrukeKjoreplan] = useState(false)
 
@@ -128,10 +127,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const submit = useSubmit()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (hasError) {
+    event.preventDefault()
+    if (!kanStarteOmregning) {
       return
     } else {
-      event.preventDefault()
       const $form = event.currentTarget
       const formData = new FormData($form)
       submit(formData, {
@@ -188,6 +187,12 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     label,
   }))
 
+  const omregningsstrategier = omregningInit.omregningsstrategier ?? {}
+  const optionOmregningsstrategi = [
+    { value: '', label: 'Default' },
+    ...Object.entries(omregningsstrategier).map(([value, label]) => ({ value, label })),
+  ]
+
   function setMonthSelected(date: Date | undefined): Date | undefined {
     if (!date) {
       return undefined
@@ -199,14 +204,12 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
     return date
   }
 
-  const { monthpickerProps, inputProps } = useMonthpicker({
+  const { monthpickerProps, inputProps, selectedMonth } = useMonthpicker({
     onMonthChange: setMonthSelected,
     fromDate: new Date(`1 Oct ${now.getFullYear() - 10}`),
     toDate: new Date(`1 Oct ${now.getFullYear() + 1}`),
     onValidate: (val) => {
-      if (!val.isValidMonth && val.isEmpty) {
-        setHasError(true)
-      }
+      setHasError(!val.isValidMonth)
     },
     required: true,
   })
@@ -219,6 +222,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
   const [prioritet, setPrioritet] = useState(optionPrioritet[1].value)
   const [brevstrategi, setBrevstrategi] = useState(Object.values(optionBrevstrategi)[0])
   const [ansvarligTeam, setAnsvarligTeam] = useState<string>('PESYS_ALDER')
+  const [omregningsstrategi, setOmregningsstrategi] = useState('')
+  const omregningsstrategiNavn =
+    omregningsstrategi === '' ? 'Default' : (omregningsstrategier[omregningsstrategi] ?? omregningsstrategi)
+  const årsomregningJanuarFeil =
+    omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT' && selectedMonth?.getMonth() !== 0
+      ? 'Velg januar for å bruke årsomregning uføretrygd'
+      : undefined
+  const kanStarteOmregning = selectedMonth !== undefined && !hasError && !årsomregningJanuarFeil
 
   const [searchParams, setSearchParams] = useSearchParams()
   const omregningsaker = omregningSakerPage as OmregningSakerPage
@@ -311,7 +322,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     size="small"
                     value={behandlingsnokkel}
                     onChange={(event) => setBehandlingsnokkel(event.target.value)}
-                    error={hasError}
                   />
 
                   <TextField
@@ -325,9 +335,8 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   <MonthPicker {...monthpickerProps}>
                     <MonthPicker.Input
                       {...inputProps}
-                      value={omregningstidspunkt}
                       label="Omregningstidspunkt (virkFom)"
-                      error={hasError && 'Du må velge måned'}
+                      error={årsomregningJanuarFeil || (hasError && 'Du må velge måned')}
                     />
                   </MonthPicker>
                   <input hidden type="text" name="omregningstidspunkt" value={omregningstidspunkt} readOnly />
@@ -341,6 +350,15 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={ansvarligTeam}
                     setSelectedValue={setAnsvarligTeam}
                     optionsmap={optionAnsvarligTeam}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
+                  />
+                  <OmregningSelector
+                    label={'Omregningsstrategi'}
+                    navn={'omregningsstrategi'}
+                    value={omregningsstrategi}
+                    setSelectedValue={handleOmregningsstrategiChange}
+                    optionsmap={optionOmregningsstrategi}
+                    readOnly={omregningInit.omregningsstrategier === undefined}
                   />
                   <OmregningSelector
                     label={'Krav gjelder'}
@@ -348,6 +366,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={kravGjelder}
                     setSelectedValue={setKravGjelder}
                     optionsmap={optionsKravGjelder}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                   />
                   <OmregningSelector
                     label={'Kravårsak'}
@@ -355,6 +374,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={kravArsak}
                     setSelectedValue={setKravArsak}
                     optionsmap={optionsKravArsak}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                   />
                   <OmregningSelector
                     label={'Toleransegrense-sett'}
@@ -369,6 +389,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={oppgaveSett}
                     setSelectedValue={setOppgaveSett}
                     optionsmap={optionOppgaveSett}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                   />
                   <OmregningSelector
                     label={'Oppgave-prefiks'}
@@ -384,15 +405,14 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   <VStack gap="space-8">
                     <CheckboxGroup size={'medium'} legend={'Behandlingsparametere'} name={'behandlingsparametere'}>
                       <OmregningCheckbox
-                        defaultChecked={behandleApneKrav}
                         name={'behandleApneKrav'}
                         value={behandleApneKrav}
                         onChange={setBehandleApneKrav}
+                        readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                       >
                         Behandle åpne krav
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={brukFaktoromregning}
                         name={'brukFaktoromregning'}
                         value={brukFaktoromregning}
                         onChange={setBrukFaktoromregning}
@@ -400,7 +420,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Bruk faktoromregning
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={opprettAlleOppgaver}
                         name={'opprettAlleOppgaver'}
                         value={opprettAlleOppgaver}
                         onChange={setOpprettAlleOppgaver}
@@ -408,19 +427,13 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Opprett alle oppgaver
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={sjekkYtelseFraAvtaleland}
                         name={'sjekkYtelseFraAvtaleland'}
                         value={sjekkYtelseFraAvtaleland}
                         onChange={setSjekkYtelseFraAvtaleland}
                       >
                         Sjekk ytelser fra avtaleland
                       </OmregningCheckbox>
-                      <OmregningCheckbox
-                        defaultChecked={omregneAFP}
-                        name={'omregneAFP'}
-                        value={omregneAFP}
-                        onChange={setOmregneAFP}
-                      >
+                      <OmregningCheckbox name={'omregneAFP'} value={omregneAFP} onChange={setOmregneAFP}>
                         Omregne AFP
                       </OmregningCheckbox>
                     </CheckboxGroup>
@@ -434,16 +447,10 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         optionsmap={optionPrioritet}
                         size={'small'}
                       />
-                      <OmregningCheckbox
-                        defaultChecked={skalSamordne}
-                        name={'skalSamordne'}
-                        value={skalSamordne}
-                        onChange={setSkalSamordne}
-                      >
+                      <OmregningCheckbox name={'skalSamordne'} value={skalSamordne} onChange={setSkalSamordne}>
                         Skal samordne
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={skalSletteIverksettingsoppgaver}
                         name={'skalSletteIverksettingsoppgaver'}
                         value={skalSletteIverksettingsoppgaver}
                         onChange={setSkalSletteIverksettingsoppgaver}
@@ -451,7 +458,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Skal slette iverksettingsoppgaver
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={skalDistribuereUforevedtak}
                         name={'skalDistribuereUforevedtak'}
                         value={skalDistribuereUforevedtak}
                         onChange={setSkalDistribuereUforevedtak}
@@ -459,7 +465,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Skal distribuere uførevedtak
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={skalBrukeKjoreplan}
                         name={'skalBrukeKjoreplan'}
                         value={skalBrukeKjoreplan}
                         onChange={setSkalBrukeKjoreplan}
@@ -467,15 +472,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                         Skal bruke kjøreplan
                       </OmregningCheckbox>
                       <OmregningCheckbox
-                        defaultChecked={regelendringUt2026}
-                        name={'regelendringUt2026'}
-                        value={regelendringUt2026}
-                        onChange={setRegelendringUt2026}
-                      >
-                        Regelendringer UT 2026
-                      </OmregningCheckbox>
-                      <OmregningCheckbox
-                        defaultChecked={regelendringBerortSakAuto}
                         name={'regelendringBerortSakAuto'}
                         value={regelendringBerortSakAuto}
                         onChange={setRegelendringBerortSakAuto}
@@ -563,7 +559,6 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                       </Box>
                       <Box padding="space-16" background={'sunken'} borderColor={'neutral-subtleA'} borderWidth="4">
                         <OmregningCheckbox
-                          defaultChecked={skalSendeBrevBerorteSaker}
                           name={'sendBrevBerorteSaker'}
                           value={skalSendeBrevBerorteSaker}
                           onChange={setSkalSendeBrevBerorteSaker}
@@ -637,7 +632,11 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
 
           <Box>
             <br />
-            <Button icon={<PlayIcon aria-hidden />} onClick={() => ref.current?.showModal()}>
+            <Button
+              icon={<PlayIcon aria-hidden />}
+              onClick={() => ref.current?.showModal()}
+              disabled={!kanStarteOmregning}
+            >
               Start omregning
             </Button>
 
@@ -678,12 +677,12 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                   oppgaveSett={oppgaveSett}
                   oppgavePrefiks={oppgavePrefiks}
                   ansvarligTeam={ansvarligTeam}
+                  omregningsstrategi={omregningsstrategiNavn}
                   omregneAFP={omregneAFP}
                   prioritet={prioritet}
                   skalSamordne={skalSamordne}
                   skalSletteIverksettingsoppgaver={skalSletteIverksettingsoppgaver}
                   skalDistribuereUforevedtak={skalDistribuereUforevedtak}
-                  regelendringUt2026={regelendringUt2026}
                   regelendringBerortSakAuto={regelendringBerortSakAuto}
                   skalBrukeKjoreplan={skalBrukeKjoreplan}
                   behandleApneKrav={behandleApneKrav}
@@ -738,6 +737,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       `omregningstidspunkt: ${omregningstidspunkt}`,
       ``,
       `ansvarligTeam: ${decodeTeam(ansvarligTeam)}`,
+      `omregningsstrategi: ${omregningsstrategiNavn}`,
       `kravGjelder: ${kravGjelder}`,
       `kravÅrsak: ${kravArsak}`,
       `toleransegrenseSett: ${toleransegrenseSett}`,
@@ -757,9 +757,20 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       ``,
       `skalSendeBrevBerørteSaker: ${skalSendeBrevBerorteSaker}`,
       ``,
-      `regelendringUt2026: ${regelendringUt2026}`,
       `regelendringBerortSakAuto: ${regelendringBerortSakAuto}`,
       `skalBrukeKjøreplan: ${skalBrukeKjoreplan}`,
     ].join('\n')
+  }
+
+  function handleOmregningsstrategiChange(strategi: string) {
+    setOmregningsstrategi(strategi)
+
+    if (strategi === 'UT_FREMSKRIVE_INNTEKT') {
+      setAnsvarligTeam('PESYS_UFORE')
+      setKravGjelder('REVURD')
+      setKravArsak('OMREGNING')
+      setOppgaveSett('DEFAULT')
+      setBehandleApneKrav(true)
+    }
   }
 }

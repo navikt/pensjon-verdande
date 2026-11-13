@@ -49,10 +49,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     brevkoderSoker: brevkoderSoker,
     brevkoderBerorteSaker: brevkoderBerorteSaker,
     prioritet: updates.prioritet,
-    regelendringUt2026: updates.regelendringUt2026 === 'true',
     regelendringBerortSakAuto: updates.regelendringBerortSakAuto === 'true',
     skalBrukeKjoreplan: updates.skalBrukeKjoreplan === 'true',
     brevstrategi: updates.brevstrategi,
+    ...(updates.omregningsstrategi !== '' ? { omregningsstrategi: updates.omregningsstrategi } : {}),
   } as OmregningRequest
 
   const response = (await apiPost<{ behandlingId: number }>(

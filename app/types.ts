@@ -317,6 +317,7 @@ export interface HalLinks {
 
 export type OmregningRequest = {
   ansvarligTeam: string
+  omregningsstrategi?: string
   behandlingsnokkel: string
   beskrivelse: string
   omregningstidspunkt: string
@@ -335,7 +336,6 @@ export type OmregningRequest = {
   skalDistribuereUforevedtak: boolean
   sendBrevBerorteSaker: boolean
   prioritet: string
-  regelendringUt2026: boolean
   regelendringBerortSakAuto: boolean
   skalBrukeKjoreplan: boolean
   brevstrategi: string
@@ -347,6 +347,7 @@ export type OmregningInit = {
   oppgaveSett: string[]
   batchbrevtyper: string[]
   brevstrategier: Record<string, string>
+  omregningsstrategier?: Record<string, string>
 }
 export type OmregningInput = {
   saker: string[]
