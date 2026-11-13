@@ -389,6 +389,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
                     value={oppgaveSett}
                     setSelectedValue={setOppgaveSett}
                     optionsmap={optionOppgaveSett}
+                    readOnly={omregningsstrategi === 'UT_FREMSKRIVE_INNTEKT'}
                   />
                   <OmregningSelector
                     label={'Oppgave-prefiks'}
@@ -768,6 +769,7 @@ export default function BatchOpprett_index({ loaderData }: Route.ComponentProps)
       setAnsvarligTeam('PESYS_UFORE')
       setKravGjelder('REVURD')
       setKravArsak('OMREGNING')
+      setOppgaveSett('DEFAULT')
       setBehandleApneKrav(true)
     }
   }
