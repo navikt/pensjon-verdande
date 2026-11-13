@@ -1,4 +1,4 @@
-import { BodyShort, Button, Heading, HStack, Page, Select, Table, Textarea, TextField, VStack } from '@navikt/ds-react'
+import { BodyShort, Button, Heading, HStack, Page, Select, Table, Textarea, VStack } from '@navikt/ds-react'
 import { useState } from 'react'
 import { Form, redirect, useNavigation } from 'react-router'
 import type { EkskluderteSakerResponse, EkskludertSak, StartBatchResponse } from '~/opptjening/arlig/opptjening.types'
@@ -62,7 +62,6 @@ export const action = async ({ request, url }: Route.ActionArgs) => {
       '/api/opptjening/arligendring/opprett',
       {
         opptjeningsar: +fromEntries.opptjeningsar,
-        bolkstorrelse: +fromEntries.bolkstorrelse,
       },
       request,
     )
@@ -75,7 +74,6 @@ export const action = async ({ request, url }: Route.ActionArgs) => {
       '/api/opptjening/arligendring/opprettbegrensetsaker',
       {
         opptjeningsar: +fromEntries.opptjeningsar,
-        bolkstorrelse: 10000,
       },
       request,
     )
@@ -122,7 +120,6 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
 
   const isSubmitting = navigation.state === 'submitting'
 
-  const [bolkstorrelse, setBolkstorrelse] = useState<number>(10000)
   const [ekskluderteSakIderText, setEkskluderteSakIderText] = useState<string>('')
   const [kommentar, setKommentar] = useState<string>('')
 
@@ -213,13 +210,6 @@ export default function EndretOpptjeningArligUttrekk({ loaderData, actionData }:
                   </option>
                 ))}
               </Select>
-
-              <TextField
-                label="Bolkstørrelse"
-                name="bolkstorrelse"
-                value={bolkstorrelse}
-                onChange={(e) => setBolkstorrelse(+e.target.value)}
-              />
             </HStack>
             <div style={{ marginTop: '1rem' }}>
               <Button type="submit" name="action" value={Action.kjoerOmregning} disabled={isSubmitting}>

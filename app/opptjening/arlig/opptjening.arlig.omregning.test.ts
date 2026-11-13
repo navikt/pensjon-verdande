@@ -102,13 +102,12 @@ describe('opptjening.arlig.omregning action', () => {
     expect(result.status).toBe(302)
   })
 
-  it('kjoerOmregning sender opptjeningsar og bolkstorrelse', async () => {
-    fetchSpy.mockResolvedValueOnce(jsonResponse({ behandlingId: 200, bolkstorrelse: 5000 }))
+  it('kjoerOmregning sender opptjeningsar', async () => {
+    fetchSpy.mockResolvedValueOnce(jsonResponse({ behandlingId: 200 }))
 
     const formData = new FormData()
     formData.set('action', 'KJOER_OMREGNING')
     formData.set('opptjeningsar', '2025')
-    formData.set('bolkstorrelse', '5000')
 
     const request = new Request('http://localhost/opptjening/arlig/omregning', { method: 'POST', body: formData })
     const result = (await action(actionArgs(request))) as Response
@@ -119,7 +118,7 @@ describe('opptjening.arlig.omregning action', () => {
     expect(init.method).toBe('POST')
     expect(init.signal).toBeInstanceOf(AbortSignal)
     const sentBody = JSON.parse(init.body)
-    expect(sentBody).toEqual({ opptjeningsar: 2025, bolkstorrelse: 5000 })
+    expect(sentBody).toEqual({ opptjeningsar: 2025 })
     expect(result.status).toBe(302)
   })
 
