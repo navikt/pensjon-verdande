@@ -41,7 +41,8 @@ export function ThemeSwitchActionMenuItem({ variant }: { variant: 'light' | 'dar
 
   return (
     <ActionMenu.Item
-      aria-selected={theme === variant}
+      role="menuitemradio"
+      aria-checked={theme === variant}
       onSelect={() => fetcher.submit({ theme: variant }, { method: 'POST', action: '/api/theme-switch' })}
       icon={variant === 'light' ? <SunIcon /> : <MoonIcon />}
     >
