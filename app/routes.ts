@@ -6,7 +6,7 @@ export default [
   route('auth/callback', 'auth/auth.callback.tsx'),
   route('auth/microsoft', 'auth/auth.microsoft.tsx'),
 
-  route('api/set-darkmode', 'api/set-darkmode.ts'),
+  route('api/theme-switch', 'api/theme-switch.ts'),
   route('api/set-sidebar-collapsed', 'api/set-sidebar-collapsed.ts'),
   route('api/sok', 'api/sok.ts'),
   route('api/opprettet-per-dag', 'api/opprettet-per-dag.ts'),

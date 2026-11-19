@@ -1,22 +1,22 @@
 import { BarChartIcon, BookIcon, ExternalLinkIcon, MenuGridIcon, MenuHamburgerIcon } from '@navikt/aksel-icons'
-import { ActionMenu, InternalHeader, Spacer } from '@navikt/ds-react'
+import { ActionMenu, InternalHeader, Spacer, Theme } from '@navikt/ds-react'
 import type { MeResponse } from '~/brukere/brukere'
 import MeMenu from '~/components/nav-header/MeMenu'
 import SearchDialog from '~/components/nav-header/SearchDialog'
+import { useTheme } from '~/components/theme-switch'
+import styles from './navheader.module.css'
+
 export type Props = {
   erProduksjon: boolean
   env: string
   me: MeResponse
-  darkmode: boolean
-  setDarkmode: React.Dispatch<React.SetStateAction<boolean>>
   showIconMenu: boolean
   setShowIconMenu: (collapsed: boolean) => void
   isMac: boolean
 }
 
-import styles from './navheader.module.css'
-
 export default function NavHeader(props: Props) {
+  const theme = useTheme()
   function harTilgang(operasjon: string) {
     return props.me.tilganger.find((it) => it === operasjon)
   }
@@ -61,37 +61,39 @@ export default function NavHeader(props: Props) {
             <MenuGridIcon fontSize="1.5rem" title="Systemer og oppslagsverk" />
           </InternalHeader.Button>
         </ActionMenu.Trigger>
-        <ActionMenu.Content>
-          <ActionMenu.Group label="Behandlingsløsningen">
-            <ActionMenu.Item icon={<BookIcon />}>
-              <a
-                target="_blank"
-                href={
-                  'https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html'
-                }
-                style={{ textDecoration: 'none', color: 'var(--ax-text-neutral)' }}
-                rel="noopener"
-              >
-                Dokumentasjon
-              </a>
-              <ExternalLinkIcon />
-            </ActionMenu.Item>
-            <ActionMenu.Item icon={<BarChartIcon />}>
-              <a
-                target="_blank"
-                href={'https://grafana.nav.cloud.nais.io/goto/mgXUC1LHg?orgId=1'}
-                style={{ textDecoration: 'none', color: 'var(--ax-text-neutral)' }}
-                rel="noopener"
-              >
-                Grafanadashboard
-              </a>
-              <ExternalLinkIcon />
-            </ActionMenu.Item>
-          </ActionMenu.Group>
-        </ActionMenu.Content>
+        <Theme theme={theme}>
+          <ActionMenu.Content>
+            <ActionMenu.Group label="Behandlingsløsningen">
+              <ActionMenu.Item icon={<BookIcon />}>
+                <a
+                  target="_blank"
+                  href={
+                    'https://pensjon-dokumentasjon.ansatt.dev.nav.no/pen/Behandlingsloesningen/Behandlingslosningen.html'
+                  }
+                  style={{ textDecoration: 'none', color: 'var(--ax-text-neutral)' }}
+                  rel="noopener"
+                >
+                  Dokumentasjon
+                </a>
+                <ExternalLinkIcon />
+              </ActionMenu.Item>
+              <ActionMenu.Item icon={<BarChartIcon />}>
+                <a
+                  target="_blank"
+                  href={'https://grafana.nav.cloud.nais.io/goto/mgXUC1LHg?orgId=1'}
+                  style={{ textDecoration: 'none', color: 'var(--ax-text-neutral)' }}
+                  rel="noopener"
+                >
+                  Grafanadashboard
+                </a>
+                <ExternalLinkIcon />
+              </ActionMenu.Item>
+            </ActionMenu.Group>
+          </ActionMenu.Content>
+        </Theme>
       </ActionMenu>
 
-      <MeMenu meResponse={props.me} isDarkmode={props.darkmode} setIsDarkmode={props.setDarkmode} />
+      <MeMenu meResponse={props.me} />
     </InternalHeader>
   )
 }

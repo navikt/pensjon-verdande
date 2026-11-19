@@ -11,8 +11,6 @@ import type { Route } from './+types/layout'
 import IkkeTilgang from './components/feilmelding/IkkeTilgang'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const darkmodeCookie = await createCookie('darkmode').parse(request.headers.get('cookie'))
-  const darkmode = darkmodeCookie === 'true' || darkmodeCookie === true
   const sidebarCollapsedCookie = await createCookie('sidebar-collapsed').parse(request.headers.get('cookie'))
   const sidebarCollapsed = sidebarCollapsedCookie === 'true' || sidebarCollapsedCookie === true
   const ua = request.headers.get('User-Agent') ?? ''
@@ -24,15 +22,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     env: env.env,
     me: me,
     schedulerStatus: schedulerStatus,
-    darkmode: darkmode,
     sidebarCollapsed: sidebarCollapsed,
     isMac: isMac,
   }
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { env, me, schedulerStatus, darkmode, sidebarCollapsed, isMac } = loaderData
-  const [isDarkmode, setIsDarkmode] = useState<boolean>(darkmode)
+  const { env, me, schedulerStatus, sidebarCollapsed, isMac } = loaderData
   const [showIconMenu, setShowIconMenu] = useState<boolean>(sidebarCollapsed)
   const navigation = useNavigation()
   const isNavigating = navigation.state !== 'idle'
@@ -74,51 +70,45 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   )
 
   return (
-    <Theme theme={isDarkmode ? 'dark' : 'light'}>
-      <Box asChild background="default">
-        <Page contentBlockPadding="none">
-          {isNavigating && (
-            <div
-              role="progressbar"
-              aria-label="Laster side"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '3px',
-                zIndex: 9999,
-                background: 'var(--ax-bg-brand-blue-strong, var(--ax-accent-600))',
-                animation: 'loading-bar 1.5s ease-in-out infinite',
-              }}
-            />
-          )}
-          <NavHeader
-            erProduksjon={env === 'p'}
-            env={env}
-            me={me}
-            darkmode={isDarkmode}
-            setDarkmode={setIsDarkmode}
-            showIconMenu={showIconMenu}
-            setShowIconMenu={toggleShowIconMenu}
-            isMac={isMac}
-          />
+    <>
+      {isNavigating && (
+        <div
+          role="progressbar"
+          aria-label="Laster side"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '3px',
+            zIndex: 9999,
+            background: 'var(--ax-bg-brand-blue-strong, var(--ax-accent-600))',
+            animation: 'loading-bar 1.5s ease-in-out infinite',
+          }}
+        />
+      )}
+      <NavHeader
+        erProduksjon={env === 'p'}
+        env={env}
+        me={me}
+        showIconMenu={showIconMenu}
+        setShowIconMenu={toggleShowIconMenu}
+        isMac={isMac}
+      />
 
-          <HStack gap="space-0" wrap={false}>
-            <VenstreMeny me={me} showIconMenu={showIconMenu} />
+      <HStack gap="space-0" wrap={false}>
+        <VenstreMeny me={me} showIconMenu={showIconMenu} />
 
-            <Page.Block style={{ minWidth: 0 }}>
-              <Box padding={'space-16'}>
-                <VStack gap="space-16">
-                  {schedulerAlert}
-                  <Outlet context={me} />
-                </VStack>
-              </Box>
-            </Page.Block>
-          </HStack>
-        </Page>
-      </Box>
-    </Theme>
+        <Page.Block style={{ minWidth: 0 }}>
+          <Box padding={'space-16'}>
+            <VStack gap="space-16">
+              {schedulerAlert}
+              <Outlet context={me} />
+            </VStack>
+          </Box>
+        </Page.Block>
+      </HStack>
+    </>
   )
 }
 
