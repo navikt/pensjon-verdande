@@ -1,0 +1,14 @@
+{
+  "collection": "(à la carte)",
+  "version": "2026.09.17-101405-3e2b4b6",
+  "scope": "repo",
+  "source_repo": "navikt/copilot",
+  "source_sha": "e493cefdc144fb09b1824dc56fcfbc28130c2c9a",
+  "installed_at": "2026-11-12T09:46:20Z",
+  "files": [
+    {
+      "path": ".github/skills/aksel-builder/",
+      "hash": "c4c9c58ec501ca98"
+    }
+  ]
+}
