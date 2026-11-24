@@ -1,5 +1,10 @@
+:root {
+  --internal-header-height: 49px;
+}
+
 html {
   scrollbar-gutter: stable;
+  scroll-padding-block-start: var(--internal-header-height);
 }
 
 body {
