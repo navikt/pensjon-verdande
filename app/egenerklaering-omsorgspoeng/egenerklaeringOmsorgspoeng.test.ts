@@ -48,7 +48,7 @@ describe('egenerklaeringOmsorgspoeng action', () => {
     const formData = new FormData()
     formData.set('kjorAlle', 'true')
     formData.set('kjorKunUttakssteg', 'false')
-    formData.set('kjoreAr', '2024')
+    formData.set('utplukkAar', '2024')
 
     const request = new Request('http://localhost/egenerklaering', { method: 'POST', body: formData })
     await action(actionArgs(request))
@@ -62,7 +62,7 @@ describe('egenerklaeringOmsorgspoeng action', () => {
     expect(sentBody).toEqual({
       kjorAlle: true,
       kjorKunUttakssteg: false,
-      kjoreAr: '2024',
+      utplukkAar: '2024',
     })
   })
 })
