@@ -48,14 +48,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData()
   const kjorAlle = (formData.get('kjorAlle') as string) === 'true'
   const kjorKunUttakssteg = (formData.get('kjorKunUttakssteg') as string) === 'true'
-  const kjoreAr = formData.get('kjoreAr') as string
+  const utplukkAar = formData.get('utplukkAar') as string
 
   await apiPost(
     '/api/omsorgspoeng/egenerklaering/batch',
     {
       kjorAlle: kjorAlle,
       kjorKunUttakssteg: kjorKunUttakssteg,
-      kjoreAr: kjoreAr,
+      utplukkAar: utplukkAar,
     },
     request,
   )
@@ -69,7 +69,7 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
 
   const isSubmitting = navigation.state === 'submitting'
 
-  const kjoreAr = new Date().getFullYear() - 2
+  const utplukkAar = new Date().getFullYear() - 2
   const [useDefaultParametre, setUseDefaultParametre] = useState(true)
 
   const kanOpprette = !isSubmitting
@@ -112,7 +112,13 @@ export default function EgenerklaeringOmsorgspoeng({ loaderData }: Route.Compone
               Kjør kun uttakssteg
             </Checkbox>
           </CheckboxGroup>
-          <TextField label="Kjøreår" description={'Gjeldende år - 2'} value={kjoreAr} name="kjoreAr" readOnly />
+          <TextField
+            label="År for utplukk"
+            description={'Gjeldende år - 2'}
+            value={utplukkAar}
+            name="utplukkAar"
+            readOnly
+          />
           <HStack gap="space-12" align="center">
             <Dialog>
               <Dialog.Trigger>
