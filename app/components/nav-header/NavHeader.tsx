@@ -1,5 +1,6 @@
 import { BarChartIcon, BookIcon, ExternalLinkIcon, MenuGridIcon, MenuHamburgerIcon } from '@navikt/aksel-icons'
 import { ActionMenu, InternalHeader, Spacer, Theme } from '@navikt/ds-react'
+import { clsx } from 'clsx'
 import type { MeResponse } from '~/brukere/brukere'
 import MeMenu from '~/components/nav-header/MeMenu'
 import SearchDialog from '~/components/nav-header/SearchDialog'
@@ -22,7 +23,7 @@ export default function NavHeader(props: Props) {
   }
 
   return (
-    <InternalHeader className={props.erProduksjon ? styles.production : ''}>
+    <InternalHeader className={clsx(styles.header, { [styles.production]: props.erProduksjon })}>
       <InternalHeader.Button
         className={styles.hamburgerButton}
         onClick={() => props.setShowIconMenu(!props.showIconMenu)}
